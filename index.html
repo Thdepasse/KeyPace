@@ -318,7 +318,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
     <button class="modal-close" onclick="closeModal('upgrade-modal')">✕</button>
     <div class="upgrade-hero">
       <h2>Passe à Expert ✦</h2>
-      <p>Débloque les 20 leçons avancées et accède à tout le contenu KeyPace.</p>
+      <p>Débloque les 55 leçons avancées et accède à tout le contenu KeyPace.</p>
     </div>
     <div class="plan-cards">
       <div class="plan-card">
@@ -633,15 +633,100 @@ const KB=[
 ];
 const PASSAGES=["le matin, la lumière douce traverse les rideaux et réveille doucement la maison encore endormie sous un ciel calme et clair.","taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides et plus sûres.","le petit renard roux traverse le champ gelé, observe les oiseaux au loin, puis disparaît derrière la vieille grange en bois.","écrire vite, c'est surtout écrire juste : vise la précision avant la vitesse, et la cadence viendra naturellement avec le temps."];
 const CURRICULUM=[
-  {name:'Rangée de repos',lessons:[{id:'r1',title:'Position f et j',keys:'f j',neu:'fj'},{id:'r2',title:'d et k',keys:'d k',neu:'dk'},{id:'r3',title:'s et l',keys:'s l',neu:'sl'},{id:'r4',title:'q et m',keys:'q m',neu:'qm'},{id:'r5',title:'g et h',keys:'g h',neu:'gh'},{id:'r6',title:'Révision de la rangée',keys:'q s d f g h j k l m',review:'qsdfghjklm'}]},
-  {name:'Rangée du haut',lessons:[{id:'h1',title:'r et u',keys:'r u',neu:'ru'},{id:'h2',title:'e et i',keys:'e i',neu:'ei'},{id:'h3',title:'z et o',keys:'z o',neu:'zo'},{id:'h4',title:'a et p',keys:'a p',neu:'ap'},{id:'h5',title:'t et y',keys:'t y',neu:'ty'},{id:'h6',title:'Révision de la rangée',keys:'a z e r t y u i o p',review:'azertyuiop'}]},
-  {name:'Rangée du bas',lessons:[{id:'b1',title:'v et n',keys:'v n',neu:'vn'},{id:'b2',title:'c et w',keys:'c w',neu:'cw'},{id:'b3',title:'x et b',keys:'x b',neu:'xb'},{id:'b4',title:'Révision de la rangée',keys:'w x c v b n',review:'wxcvbn'}]},
-  {name:'Mots & lettres',lessons:[{id:'m1',title:'Petits mots',keys:'mots fréquents',text:"le la les un une de des et ou il elle on ne se ce ma ta sa mon ton"},{id:'m2',title:'Mots courants',keys:'mots courants',text:"avec pour dans mais sous chez bien tout sans nous vous leur quand alors aussi"},{id:'m3',title:'Révision des lettres',keys:'phrase complète',text:"le vieux chat gris dort sur le banc de bois pendant que la pluie tombe dehors"}]},
-  {name:'Majuscules & ponctuation',lessons:[{id:'p1',title:'Les majuscules',keys:'Maj',text:"Le Chat. La Seine. Un Matin. Paris. Marie. Lyon. Le Nord. Une Idée. Le Pont."},{id:'p2',title:'Point et virgule',keys:'. ,',text:"il pleut, il vente, il neige. la nuit tombe, le froid arrive, on rentre vite."},{id:'p3',title:'Deux-points et exclamation',keys:': ; ! ?',text:"écoute : respire ; avance ! pourquoi ? voici la liste : pain, lait, café."},{id:'p4',title:"Apostrophe et question",keys:"' ? -",text:"c'est l'heure qu'il aime. d'où viens-tu ? l'idée d'aujourd'hui n'est pas si mauvaise."}]},
-  {name:'Chiffres & accents',lessons:[{id:'n1',title:'Chiffres 4 5 6 7',keys:'4 5 6 7',genNum:'4567'},{id:'n2',title:'Chiffres 3 et 8',keys:'3 8',genNum:'3845867'},{id:'n3',title:'Chiffres 1 2 9 0',keys:'1 2 9 0',genNum:'1290'},{id:'a1',title:'Accents é et è',keys:'é è',text:"été élève méthode près très dès après réécrire fière période sévère élégant"},{id:'a2',title:'Accents à ç ù',keys:'à ç ù',text:"déjà à où façon leçon garçon français reçu maçon ça voilà aperçu où"}]},
-  {name:'Fluidité',lessons:[{id:'f1',title:'Phrases courtes',keys:'phrases',text:"le jour se lève. les oiseaux chantent. le café est prêt. on y va ensemble."},{id:'f2',title:'Phrases moyennes',keys:'phrases',text:"chaque matin, elle ouvre la fenêtre et respire l'air frais avant de commencer sa journée."},{id:'f3',title:'Paragraphe',keys:'paragraphe',text:"taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides et plus sûres."},{id:'f4',title:'Vitesse libre',keys:'texte long',text:"écrire vite s'apprend avec de la régularité ; entraîne-toi un peu chaque jour, garde les yeux sur l'écran, et laisse tes doigts trouver leur place tout seuls."}]}
+  {name:'1. Position de base',lessons:[
+    {id:'r1',title:'Les touches F et J',keys:'f j',neu:'ffjjfjfjjfjfjfjfjfjfjfjfjffjj'},
+    {id:'r2',title:'D et K',keys:'d k',neu:'ddkkdkdkkdkdfdkjjkdfdkkd'},
+    {id:'r3',title:'S et L',keys:'s l',neu:'sslllslslssldksldkjsldkj'},
+    {id:'r4',title:'Q et M',keys:'q m',neu:'qqmmmqmqmmqmsldmqslm'},
+    {id:'r5',title:'G et H',keys:'g h',neu:'gghhhghghhghgfhgjhfg'},
+    {id:'r6',title:'Révision rangée de repos',keys:'q s d f g h j k l m',review:'qsdfghjklm'},
+  ]},
+  {name:'2. Rangée du haut',lessons:[
+    {id:'h1',title:'R et U',keys:'r u',neu:'rruurururrurufrujujrf'},
+    {id:'h2',title:'E et I',keys:'e i',neu:'eeiieieiieiededikike'},
+    {id:'h3',title:'Z et O',keys:'z o',neu:'zzooozoozzozzsozolzos'},
+    {id:'h4',title:'A et P',keys:'a p',neu:'aappapaapapasaplpas'},
+    {id:'h5',title:'T et Y',keys:'t y',neu:'ttyytytyttytruyutr'},
+    {id:'h6',title:'Révision rangée du haut',keys:'a z e r t y u i o p',review:'azertyuiop'},
+  ]},
+  {name:'3. Rangée du bas',lessons:[
+    {id:'b1',title:'C et virgule',keys:'c ,',text:'col car cou clic clic, col, cou, car, col car clic, cela, ceci, coco, cale,'},
+    {id:'b2',title:'V et N',keys:'v n',text:'vin van venu neuf vine neve avion navire venir nager vague niveau vingt neuf'},
+    {id:'b3',title:'X et point-virgule',keys:'x ;',text:'axe fox luxe; taxi; oxe dix; mixte; expres; luxe; axel; box; flux; index;'},
+    {id:'b4',title:'W et deux-points',keys:'w :',text:'web : wifi : wok : swap : show : clown : twin : crew : bowl : www :'},
+    {id:'b5',title:'B et point d\'exclamation',keys:'b !',text:'bravo ! beau bois bol bal beurre ! brise bible bien bise ! beau bébé bleu !'},
+    {id:'b6',title:'Révision rangée du bas',keys:'w x c v b n , ; : !',text:'vive le web, xbox clown. bravo ! nuit wifi. taxi box. film. neuf, vingt !'},
+  ]},
+  {name:'4. Premiers mots',lessons:[
+    {id:'w1',title:'Syllabes simples',keys:'syllabes',text:'fa fo fi fe fu sa so si se su la lo li le lu da do di de du na no ni ne nu'},
+    {id:'w2',title:'Mots de 2 à 3 lettres',keys:'mots courts',text:'le la un du au en et ou il on ne se ce je tu me ma ta sa mon ton son nos'},
+    {id:'w3',title:'Mots fréquents',keys:'vocabulaire',text:'avec pour dans mais sous chez bien tout sans nous vous leur quand alors aussi'},
+    {id:'w4',title:'Mots de la vie courante',keys:'vocabulaire',text:'maison jardin cuisine chambre fenêtre voiture travail famille enfant quartier'},
+    {id:'w5',title:'Premières phrases complètes',keys:'phrases',text:'le chat dort sur le banc. la maison est grande. il fait beau dehors aujourd\'hui.'},
+  ]},
+  {name:'5. Majuscules',lessons:[
+    {id:'maj1',title:'Majuscules — main gauche',keys:'Maj gauche',text:'Le La Lo Li Lu Jo Ji Ku Ki Hu Hi Mu Mi Nu Ni Ou Oi Pu Pi Yu Yi Uu Oo Pp'},
+    {id:'maj2',title:'Majuscules — main droite',keys:'Maj droite',text:'Fa Fe Fi Fo Sa Se Si So Da De Di Do Ra Re Ri Ro Ta Te Ti To Za Ze Zi Zo'},
+    {id:'maj3',title:'Noms propres',keys:'noms',text:'Paris Lyon Bruxelles Liège Genève Marie Jean Sophie Pierre Luc Anna Emma Hugo'},
+    {id:'maj4',title:'Phrases avec majuscules',keys:'phrases',text:'Le soleil brille. Les enfants jouent dehors. Marie mange une pomme. Paul arrive.'},
+  ]},
+  {name:'6. Ponctuation',lessons:[
+    {id:'pon1',title:'Le point et la virgule',keys:'. ,',text:'il pleut, il vente, il neige. la nuit tombe, le froid arrive, on rentre chez soi.'},
+    {id:'pon2',title:'Question et exclamation',keys:'? !',text:'où es-tu ? que fais-tu ? viens ici ! attention ! c\'est beau ! vraiment ?'},
+    {id:'pon3',title:'Deux-points et point-virgule',keys:': ;',text:'voici la liste : pain, lait, café ; beurre, sel, sucre ; eau, jus, thé, lait.'},
+    {id:'pon4',title:"L'apostrophe",keys:"'",text:"c'est l'heure qu'il aime. d'où viens-tu ? l'idée d'aujourd'hui est vraiment bonne."},
+    {id:'pon5',title:'Les guillemets',keys:'« »',text:'il dit : « bonjour ». elle répond : « bonsoir ». il ajoute : « merci beaucoup ».'},
+    {id:'pon6',title:'Tiret et parenthèses',keys:'- ()',text:'vingt-cinq (25) élèves présents. c\'est bien — très bien même (parfait). rendez-vous.'},
+  ]},
+  {name:'7. Accents directs AZERTY',lessons:[
+    {id:'acc1',title:"L'accent aigu é",keys:'é',text:'été café écran étoile éléphant étude écrire échec éclat émoi énorme réel série'},
+    {id:'acc2',title:"L'accent grave è",keys:'è',text:'père mère frère très près après dès réécrire fière période sévère rivière lumière'},
+    {id:'acc3',title:'Le à et le où',keys:'à',text:'voilà déjà là-bas à côté où là-haut à peine à droite à gauche à présent déjà'},
+    {id:'acc4',title:'Le ù et la cédille ç',keys:'ù ç',text:'façon leçon garçon français reçu maçon ça voilà aperçu soupçon glaçon rançon'},
+    {id:'acc5',title:'Révision accents directs',keys:'é è à ù ç',text:'déjà été café façon là où très père après voilà ça leçon éclat reçu sévère'},
+  ]},
+  {name:'8. Accents circonflexes',lessons:[
+    {id:'cir1',title:'â et ê',keys:'^ a / ^ e',text:'château pâte âge bâton mât pâle pâtisserie; être fête tête bête forêt prêt arrêt'},
+    {id:'cir2',title:'î et ô',keys:'^ i / ^ o',text:'île îlot naître maître boîte traître; hôtel hôte côte rôle drôle tôt côté dôme'},
+    {id:'cir3',title:'û',keys:'^ u',text:'sûr sûrement dû crû flûte brûler goût août voûte coût fût brûlure'},
+    {id:'cir4',title:'Révision circonflexes',keys:'â ê î ô û',text:'château île hôtel sûr être tête côte forêt maître bête pâte fête voûte flûte'},
+  ]},
+  {name:'9. Tréma et ligatures',lessons:[
+    {id:'tre1',title:'Le tréma ë et ï',keys:'¨ e / ¨ i',text:'Noël naïf maïs héroïque aiguë canoë Joël Gaël coïncidence Raphaël'},
+    {id:'tre2',title:'Les ligatures œ et æ',keys:'œ æ',text:'cœur sœur œil œuvre bœuf manœuvre curriculum hors-d\'œuvre'},
+    {id:'tre3',title:'Révision tréma et ligatures',keys:'ë ï œ æ',text:'Noël cœur naïf sœur maïs aiguë Joël bœuf héroïque canoë manœuvre'},
+  ]},
+  {name:'10. Chiffres',lessons:[
+    {id:'num1',title:'4 5 6 7',keys:'4 5 6 7',genNum:'4567'},
+    {id:'num2',title:'3 et 8',keys:'3 8',genNum:'38453867'},
+    {id:'num3',title:'2 et 9',keys:'2 9',genNum:'29382979'},
+    {id:'num4',title:'1 et 0',keys:'1 0',genNum:'10291030'},
+    {id:'num5',title:'Tous les chiffres',keys:'0 à 9',genNum:'1234567890'},
+    {id:'num6',title:'Chiffres en contexte',keys:'chiffres + texte',text:'il y a 42 élèves dans 3 classes. le bus 12 part à 8h30. tél : 04 98 76 54 32.'},
+  ]},
+  {name:'11. Symboles courants',lessons:[
+    {id:'sym1',title:'Arobase et dièse',keys:'@ #',text:'contact@keypace.be #keypace #clavier @user info@site.com #top @jean #apprendre'},
+    {id:'sym2',title:'Parenthèses et crochets',keys:'() []',text:'(bonjour) [monde] (1+2) [test] (ok) [a-z] (fin) [start] (42) [rouge] (bleu)'},
+    {id:'sym3',title:'Slash et barre verticale',keys:'/ |',text:'http://site.fr chemin/vers/fichier cat file | grep mot a/b | c/d http://url.be'},
+    {id:'sym4',title:'Astérisque égal et plus',keys:'* = +',text:'2*3=6 a+b=c x*y+z=0 total=prix*quantité résultat=a+b+c valeur*2=8 somme=0'},
+    {id:'sym5',title:'Pourcentage et tiret bas',keys:'% _',text:'50% 75% ma_variable nom_fichier 100% style_css mon_pseudo classe_active_id'},
+  ]},
+  {name:'12. Symboles avancés',lessons:[
+    {id:'sym6',title:'Accolades et chevrons',keys:'{} <>',text:'{code} <html> </html> {style} <div> </div> {body} <p> </p> <span> </span>'},
+    {id:'sym7',title:'Guillemets doubles et tilde',keys:'"" ~',text:'"bonjour" "monde" ~/documents ~user "texte important" ~/bureau "valeur": true'},
+    {id:'sym8',title:'Antislash et accent grave',keys:'\\ `',text:'C:\\Users\\theo `code inline` \\n \\t `variable` C:\\Windows `npm install`'},
+    {id:'sym9',title:'Révision tous les symboles',keys:'tous symboles',text:'contact@site.fr (2024) http://url.be #tag {css} <html> 50% = ok ! a+b=c [fin]'},
+  ]},
+  {name:'13. Vitesse et fluidité',lessons:[
+    {id:'flu1',title:'Phrases courtes enchaînées',keys:'fluidité',text:'le jour se lève. les oiseaux chantent. le café est prêt. on y va ensemble. allons-y.'},
+    {id:'flu2',title:'Phrases moyennes',keys:'fluidité',text:"chaque matin, elle ouvre la fenêtre et respire l'air frais avant de commencer sa journée."},
+    {id:'flu3',title:'Paragraphe narratif',keys:'paragraphe',text:"taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides et plus sûres sur le clavier."},
+    {id:'flu4',title:'Texte professionnel',keys:'pro',text:'veuillez trouver ci-joint notre offre. n\'hésitez pas à nous contacter au 04 98 76 54 32 ou par email : contact@keypace.be'},
+    {id:'flu5',title:'Texte technique',keys:'code + texte',text:'le fichier config.json contient : {"version": "1.0", "debug": false, "port": 3000, "url": "http://localhost"}.'},
+    {id:'flu6',title:'Vitesse maximale',keys:'vitesse',text:"écrire vite s'apprend avec de la régularité ; entraîne-toi chaque jour, garde les yeux sur l'écran, et laisse tes doigts trouver leur place tout seuls sur le clavier AZERTY."},
+  ]},
 ];
-const MOD_COLORS=['#EE6B5E','#F4A04C','#D9A60C','#5BA84A','#3FA6B2','#6E8BE8','#A77BD6'];
+const MOD_COLORS=['#EE6B5E','#F4A04C','#D9A60C','#5BA84A','#3FA6B2','#6E8BE8','#A77BD6','#E8729A','#4CB8C4','#9B59B6','#E67E22','#27AE60','#2980B9'];
 const WORDS=["clé","jour","main","vite","mot","feu","ami","pain","eau","ciel","fleur","temps","doigt","clavier","rapide","facile","bravo","frappe","lettre","texte","école","vélo","chat","rêve","soleil","plume","note","page","ligne","espace","saut","tape","juste","cadence","jeu","but","top"];
 const SPRINT_WORDS=["le","la","les","un","une","de","des","et","ou","dans","sur","avec","pour","par","pas","ne","se","ce","ma","ta","sa","qui","que","quoi","où","tout","bien","très","faire","voir","aller","venir","avoir","être","dire","vouloir","pouvoir","savoir","prendre","mettre","partir","sortir","entrer","rester","trouver","donner","penser","parler","aimer","vivre","tenir","tomber","ouvrir","fermer","lire","écrire","taper","apprendre","comprendre","répondre","attendre","perdre","gagner","jouer","courir","marcher","chanter","danser","rire","pleurer","manger","boire","dormir","réveiller","travailler","voyager","revenir","passer","laisser","suivre","montrer","décider","commencer","finir","continuer","arriver","repartir","rentrer","retourner"];
 function genSprintText(){
@@ -987,7 +1072,7 @@ const app={
             <div class="pc-name" style="color:var(--accent)">Expert ✦</div>
             <div class="pc-price">4.99€<small>/mois</small></div>
             <ul>
-              <li>30 leçons complètes</li>
+              <li>65 leçons complètes</li>
               <li>Jeu Frappe-mots</li>
               <li>Test de vitesse</li>
               <li>Suivi des progrès</li>
