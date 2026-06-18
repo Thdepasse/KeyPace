@@ -278,13 +278,35 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 .gate-btn-sec{background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:14px;font-weight:600;color:var(--txt)}
 
 @media(max-width:768px){
-  .home-hero{grid-template-columns:1fr;padding:32px 16px}
+  /* nav */
+  .nav-inner{padding:10px 14px;gap:6px}
+  .nav-links{gap:0}
+  .nav-link{font-size:13px;padding:6px 8px}
+  .nav-login-btn{display:none}
+  .nav-signup-btn{font-size:12px;padding:6px 10px}
+  .nav-upgrade-btn{font-size:12px;padding:5px 8px}
+  .nav-username{display:none}
+  /* hero */
+  .home-hero{grid-template-columns:1fr;padding:28px 16px 20px}
   .hero-kb{display:none}
-  .features-grid{grid-template-columns:1fr}
+  .home-hero h1{font-size:clamp(28px,8vw,40px)}
+  /* features */
+  .features-grid{grid-template-columns:1fr;padding:0 16px 24px}
+  /* pricing */
+  .pricing-section{padding:10px 16px 40px}
   .pricing-grid{grid-template-columns:1fr}
+  /* jeux */
+  .game-selector{grid-template-columns:1fr;padding:0 16px 24px}
+  /* leçons */
+  .mod-grid{grid-template-columns:1fr !important}
+  /* stats */
   .stats-cards,.stats-grid{grid-template-columns:repeat(2,1fr)}
   .live-stats,.result-grid{grid-template-columns:repeat(2,1fr)}
   .plan-cards{grid-template-columns:1fr}
+  /* typing */
+  .sess-box{padding:20px 16px}
+  .kb-row{gap:3px}
+  .key{min-width:28px;height:36px;font-size:11px}
 }
 </style>
 </head>
@@ -335,7 +357,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
         <div class="plan-name" style="color:var(--accent)">Expert ✦</div>
         <div class="plan-price">4.99€<small>/mois</small></div>
         <ul class="plan-feat">
-          <li>30 leçons complètes</li>
+          <li>65 leçons complètes</li>
           <li>Jeu Frappe-mots</li>
           <li>Test de vitesse</li>
           <li>Suivi des progrès</li>
@@ -1158,7 +1180,7 @@ const app={
         <div class="hero-kb">${kbHtml}</div>
       </div>
       <div class="features-grid">
-        <div class="feature-card"><div class="icon">⌨️</div><h3>Cours progressifs</h3><p>30 leçons organisées par rangées de touches, du plus simple au plus complexe.</p></div>
+        <div class="feature-card"><div class="icon">⌨️</div><h3>Cours progressifs</h3><p>65 leçons progressives couvrant tout le clavier AZERTY, des bases aux accents et symboles.</p></div>
         <div class="feature-card"><div class="icon">⚡</div><h3>Test de vitesse</h3><p>Mesure tes mots par minute et ta précision sur des textes variés.</p></div>
         <div class="feature-card"><div class="icon">🎮</div><h3>Jeu de mots</h3><p>Des mots tombent du ciel — tape-les avant qu'ils touchent le sol !</p></div>
       </div>
