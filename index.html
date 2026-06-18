@@ -339,7 +339,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('upgrade-modal')">✕</button>
     <div class="upgrade-hero">
-      <h2>Passe à Expert ✦</h2>
+      <h2>Passe à Expert</h2>
       <p>Débloque les 55 leçons avancées et accède à tout le contenu KeyPace.</p>
     </div>
     <div class="plan-cards">
@@ -354,7 +354,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
         </ul>
       </div>
       <div class="plan-card pro">
-        <div class="plan-name" style="color:var(--accent)">Expert ✦</div>
+        <div class="plan-name" style="color:var(--accent)">Expert</div>
         <div class="plan-price">4.99€<small>/mois</small></div>
         <ul class="plan-feat">
           <li>65 leçons complètes</li>
@@ -414,7 +414,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <footer>
   <div class="footer-inner">
     <div class="footer-logo"><span class="flogo-icon">K</span> KeyPace</div>
-    <div>Apprends à taper, en t'amusant. · AZERTY · Fait avec ✦</div>
+    <div>Apprends à taper, en t'amusant. · AZERTY · Fait avec</div>
   </div>
 </footer>
 
@@ -550,7 +550,7 @@ function updateNavUser(){
   const plan=getUserPlan();
   const badge=document.getElementById('nav-plan-badge');
   const upgradeBtn=document.getElementById('nav-upgrade-btn');
-  badge.textContent=plan==='expert'?'EXPERT ✦':'GRATUIT';
+  badge.textContent=plan==='expert'?'EXPERT':'GRATUIT';
   badge.className='nav-plan-badge '+(plan==='expert'?'expert':'free');
   upgradeBtn.style.display=plan==='expert'?'none':'inline-block';
 }
@@ -1205,7 +1205,7 @@ const app={
             </button>
           </div>
           <div class="pricing-card featured">
-            <div class="pc-name" style="color:var(--accent)">Expert ✦</div>
+            <div class="pc-name" style="color:var(--accent)">Expert</div>
             <div class="pc-price">4.99€<small>/mois</small></div>
             <ul>
               <li>65 leçons complètes</li>
@@ -1311,7 +1311,7 @@ const app={
         const expertLocked=currentUser&&plan==='free'&&!isFree;
         const progressLocked=statusById[les.id]&&statusById[les.id].locked;
         const s=statusById[les.id]||{cleared:false,locked:false,best:0};
-        const icon=s.cleared?'✓':expertLocked?'✦':(!currentUser||progressLocked)?'🔒':'▸';
+        const icon=s.cleared?'✓':expertLocked?'':(!currentUser||progressLocked)?'🔒':'▸';
         const dotCls=s.cleared?'c':expertLocked?'ex':(!currentUser||progressLocked)?'l':'t';
         const isTodo=currentUser&&!progressLocked&&!s.cleared&&isFree;
         const cardCls=`lesson-card${isTodo?' todo-c':''}${expertLocked?' expert-locked':''}`;
@@ -1350,7 +1350,7 @@ const app={
     </div>`:'';
 
     document.getElementById('page-lessons').innerHTML=`<div class="lessons-section">
-      <div class="lessons-header"><h2>Cours de frappe</h2><p>Progresse étape par étape · <span style="color:var(--accent);font-weight:700">10 leçons gratuites</span> · 20 leçons Expert ✦</p></div>
+      <div class="lessons-header"><h2>Cours de frappe</h2><p>Progresse étape par étape · <span style="color:var(--accent);font-weight:700">10 leçons gratuites</span> · 20 leçons Expert</p></div>
       ${guestBanner}${goalsHtml}${modsHTML}
     </div>`;
   },
@@ -1373,7 +1373,7 @@ const app={
           <div class="game-sel-icon">🏁</div>
           <div class="game-sel-name">Le Sprint</div>
           <div class="game-sel-desc">30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace — chaque seconde compte.</div>
-          <span class="game-sel-tag expert">EXPERT ✦</span>
+          <span class="game-sel-tag expert">EXPERT</span>
         </div>
       </div>
     </div>`;
@@ -1449,7 +1449,7 @@ const app={
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px">
         <div class="spanel" style="margin-bottom:0"><h3>🎯 Frappe-mots — meilleur score</h3><div class="scard-val acc" style="font-size:36px;margin-top:8px">${gameBest} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div>${gameBest===0?'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le jeu pour établir un score !</p>':''}</div>
-        <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint — record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert ✦</span>. Lance un Sprint pour établir ton record !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint — record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
       </div>
       <div style="text-align:center;padding:8px 0 24px;color:var(--muted);font-size:13px">${tests.length} exercice${tests.length>1?'s':''} réalisé${tests.length>1?'s':''}</div>
     </div>`;
