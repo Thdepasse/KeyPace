@@ -23,17 +23,20 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { username, passwordHash } = req.body || {};
-  if (!username || !passwordHash) return res.status(400).json({ error: 'Champs manquants.' });
+  const { username, email, passwordHash } = req.body || {};
+  if (!username || !passwordHash || !email) return res.status(400).json({ error: 'Champs manquants.' });
 
   const check = await sb(`/users?username=eq.${encodeURIComponent(username)}&select=id`);
   if (check.data && check.data.length > 0) return res.status(409).json({ error: 'Ce nom est déjà pris.' });
+
+  const emailCheck = await sb(`/users?email=eq.${encodeURIComponent(email)}&select=id`);
+  if (emailCheck.data && emailCheck.data.length > 0) return res.status(409).json({ error: 'Cet email est déjà utilisé.' });
 
   const token = require('crypto').randomUUID();
 
   const create = await sb('/users', {
     method: 'POST',
-    body: JSON.stringify({ username, password_hash: passwordHash, plan: 'free', session_token: token }),
+    body: JSON.stringify({ username, email, password_hash: passwordHash, plan: 'free', session_token: token }),
   });
   if (!create.ok) return res.status(500).json({ error: 'Erreur création compte.' });
 
