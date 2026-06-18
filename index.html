@@ -134,7 +134,8 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .stat-unit{font-size:11px;color:var(--muted);font-weight:500}
 .prog-wrap{height:5px;background:var(--border);border-radius:3px;margin-bottom:16px}
 .prog-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .1s}
-.typing-box{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px;min-height:100px;margin-bottom:16px;line-height:1.8;font-family:'JetBrains Mono',monospace;font-size:20px;letter-spacing:.01em}
+.typing-box{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 28px;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:20px;letter-spacing:.01em;overflow:hidden;white-space:nowrap;height:72px;display:flex;align-items:center}
+.typing-box-inner{display:inline;white-space:nowrap;transition:transform .08s linear}
 .ch{border-radius:3px}.ch.ok{color:var(--txt)}.ch.wrong{color:#E5484D;background:rgba(229,72,77,0.16)}.ch.cur{color:var(--txt);background:rgba(255,77,46,0.14);box-shadow:inset 0 -3px 0 var(--accent)}.ch.todo{color:#C2BBAC}
 .kb-wrap{background:var(--light);border:1px solid var(--border);border-radius:18px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:7px}
 .kb-row-t{display:flex;gap:6px;justify-content:center}
@@ -1266,7 +1267,7 @@ const app={
         <div class="stat-box"><div class="stat-label">Progression</div><div class="stat-val">${progress}<span class="stat-unit"> %</span></div></div>
       </div>
       <div class="prog-wrap"><div class="prog-fill" style="width:${progress}%"></div></div>
-      ${!finished?`<div class="typing-box">${tbHTML}</div>`:''}
+      ${!finished?`<div class="typing-box"><div class="typing-box-inner" id="tb-scroll">${tbHTML}</div></div>`:''}
       ${finished?`<div class="result-box"><div class="result-badge">${badge}</div>
         ${isLesson?`<div class="banner ${lessonPassed?'pass':'fail'}"><div class="banner-title">${lessonPassed?'Leçon validée ✓':'Presque !'}</div><div class="banner-sub">${lessonPassed?(hasNext?'La leçon suivante est débloquée.':'Bravo, tu as terminé tout le parcours !'):'Objectif : '+goals.minWpm+' mpm · max '+goals.maxErrors+' fautes — il te manque '+missingTxt+'.'}</div></div>`:''}
         <div class="result-grid">
@@ -1283,6 +1284,21 @@ const app={
       ${!finished?`<div class="hint-txt">${s&&!s.started?'Commence à taper pour démarrer le chrono…':''}</div>`:''}
       <div class="kb-wrap">${kbHTML}<div class="kb-space${next===' '?' on':''}">espace</div></div>
     </div>`;
+    requestAnimationFrame(()=>app.scrollToCursor());
+  },
+  scrollToCursor(){
+    const box=document.querySelector('.typing-box');
+    const inner=document.getElementById('tb-scroll');
+    const cur=document.querySelector('.ch.cur');
+    if(!box||!inner||!cur)return;
+    const boxRect=box.getBoundingClientRect();
+    const curRect=cur.getBoundingClientRect();
+    const match=inner.style.transform.match(/translateX\((-?[\d.]+)px\)/);
+    const currentX=match?parseFloat(match[1]):0;
+    const curRelLeft=curRect.left-boxRect.left-currentX;
+    const target=curRelLeft-boxRect.width*0.3;
+    const newX=Math.min(0,currentX-target);
+    inner.style.transform=`translateX(${newX}px)`;
   },
 
   /* ── LESSONS ── */
