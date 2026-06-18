@@ -231,6 +231,38 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .racc{font-size:13px;font-weight:700;color:#1FA971}
 .empty-hint{text-align:center;padding:32px;color:var(--muted);font-size:15px}
 
+/* SPRINT GAME */
+.game-selector{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1120px;margin:0 auto;padding:0 24px 32px}
+.game-sel-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:28px;cursor:pointer;transition:transform .15s,box-shadow .15s;text-align:left}
+.game-sel-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,0.08)}
+.game-sel-card.expert-card{border-color:var(--accent);background:rgba(255,77,46,0.03)}
+.game-sel-icon{font-size:36px;margin-bottom:14px}
+.game-sel-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;margin-bottom:6px}
+.game-sel-desc{font-size:14px;color:#7A7365;line-height:1.5;margin-bottom:14px}
+.game-sel-tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.04em;display:inline-block}
+.game-sel-tag.free{background:rgba(31,169,113,0.12);color:#1FA971}
+.game-sel-tag.expert{background:rgba(255,77,46,0.1);color:var(--accent)}
+.sprint-arena{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:28px;max-width:1120px;margin:0 auto;padding-bottom:32px}
+.sprint-hud{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.sprint-timer{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:48px;line-height:1;color:var(--txt);transition:color .3s}
+.sprint-timer.low{color:var(--accent)}
+.sprint-score-wrap{text-align:right}
+.sprint-score-label{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px}
+.sprint-score-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:36px;color:var(--accent)}
+.sprint-text-box{background:#faf9f5;border:1.5px solid var(--border);border-radius:16px;padding:24px 28px;min-height:110px;margin-bottom:20px;font-family:'JetBrains Mono',monospace;font-size:20px;line-height:1.8;letter-spacing:.01em;overflow:hidden;position:relative}
+.sprint-wrong{color:#E5484D;background:rgba(229,72,77,0.16);border-radius:3px}
+.sprint-ok{color:var(--txt)}
+.sprint-cur{color:var(--txt);background:rgba(255,77,46,0.14);box-shadow:inset 0 -3px 0 var(--accent);border-radius:3px}
+.sprint-todo{color:#C2BBAC}
+.sprint-hint{font-size:13px;color:var(--muted);text-align:center;min-height:20px;margin-bottom:16px}
+.sprint-result{text-align:center;padding:16px 0 8px}
+.sprint-result h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;margin-bottom:20px}
+.sprint-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.sprint-record{background:rgba(31,169,113,0.1);border:1.5px solid #1FA971;border-radius:12px;padding:10px 16px;font-size:14px;font-weight:700;color:#1FA971;margin-bottom:20px;display:none}
+.sprint-record.show{display:block}
+.sprint-progress{height:6px;background:var(--border);border-radius:3px;margin-bottom:8px;overflow:hidden}
+.sprint-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),#ff8a5c);transition:width .1s}
+
 /* FOOTER */
 footer{border-top:1px solid var(--border);margin-top:10px}
 .footer-inner{max-width:1120px;margin:0 auto;padding:26px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:14px;color:#A39C8D}
@@ -554,13 +586,20 @@ const CURRICULUM=[
 ];
 const MOD_COLORS=['#EE6B5E','#F4A04C','#D9A60C','#5BA84A','#3FA6B2','#6E8BE8','#A77BD6'];
 const WORDS=["clé","jour","main","vite","mot","feu","ami","pain","eau","ciel","fleur","temps","doigt","clavier","rapide","facile","bravo","frappe","lettre","texte","école","vélo","chat","rêve","soleil","plume","note","page","ligne","espace","saut","tape","juste","cadence","jeu","but","top"];
+const SPRINT_WORDS=["le","la","les","un","une","de","des","et","ou","dans","sur","avec","pour","par","pas","ne","se","ce","ma","ta","sa","qui","que","quoi","où","tout","bien","très","faire","voir","aller","venir","avoir","être","dire","vouloir","pouvoir","savoir","prendre","mettre","partir","sortir","entrer","rester","trouver","donner","penser","parler","aimer","vivre","tenir","tomber","ouvrir","fermer","lire","écrire","taper","apprendre","comprendre","répondre","attendre","perdre","gagner","jouer","courir","marcher","chanter","danser","rire","pleurer","manger","boire","dormir","réveiller","travailler","voyager","revenir","passer","laisser","suivre","montrer","décider","commencer","finir","continuer","arriver","repartir","rentrer","retourner"];
+function genSprintText(){
+  const pool=[...SPRINT_WORDS,...WORDS];
+  const pick=()=>pool[Math.floor(Math.random()*pool.length)];
+  const words=[];for(let i=0;i<200;i++)words.push(pick());
+  return words.join(' ');
+}
 const ALL_LESSONS=[],ALL_MODULES=[];
 (function(){let pool='';CURRICULUM.forEach((mod,mi)=>{const ml=[];mod.lessons.forEach(les=>{if(les.neu)pool+=les.neu;const l=Object.assign({},les,{module:mod.name,moduleIdx:mi,pool});ALL_LESSONS.push(l);ml.push(l);});ALL_MODULES.push({name:mod.name,lessons:ml});});})();
 
 /* ── APP ── */
 const app={
-  view:'home',sess:null,stats:null,game:null,now:Date.now(),
-  _timer:null,_gameLoop:null,_onKey:null,_wid:0,_gameRec:false,
+  view:'home',sess:null,stats:null,game:null,sprint:null,activeGame:null,now:Date.now(),
+  _timer:null,_gameLoop:null,_sprintLoop:null,_onKey:null,_wid:0,_gameRec:false,
 
   init(){
     this.stats=loadStats();
@@ -569,9 +608,9 @@ const app={
     window.addEventListener('keydown',this._onKey);
   },
   stopAll(){
-    this.stopTimer();this.stopGame();
+    this.stopTimer();this.stopGame();this.stopSprint();
     if(this._onKey){window.removeEventListener('keydown',this._onKey);this._onKey=null;}
-    this.game=null;this.sess=null;
+    this.game=null;this.sess=null;this.sprint=null;this.activeGame=null;
   },
 
   lessonRec(id){const v=(this.stats&&this.stats.lessons||{})[id];if(!v)return{bestWpm:0,bestErr:null,cleared:false};if(typeof v==='number')return{bestWpm:v,bestErr:null,cleared:true};return v;},
@@ -626,7 +665,8 @@ const app={
 
   keyMatches(key,ch){if(ch==null)return false;const low=ch.toLowerCase();if(key.l.toLowerCase()===low)return true;if(key.s&&key.s===ch)return true;return false;},
   handleKey(e){
-    if(this.view==='games'&&this.game&&this.game.on){this.gameKey(e);return;}
+    if(this.view==='games'&&this.activeGame==='sprint'&&this.sprint&&this.sprint.on){this.sprintKey(e);return;}
+    if(this.view==='games'&&this.activeGame==='frappe'&&this.game&&this.game.on){this.gameKey(e);return;}
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   typeKey(e){
@@ -708,7 +748,7 @@ const app={
 
   renderView(v){
     this.view=v;
-    if(v!=='games')this.stopGame();
+    if(v!=='games'){this.stopGame();this.stopSprint();this.activeGame=null;}
     if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
     ['home','test','lessons','games','stats'].forEach(p=>{document.getElementById('page-'+p).style.display=p===v?'block':'none';});
     ['home','test','lessons','games','stats'].forEach(id=>{document.getElementById('nav-'+id).classList.toggle('active',id===v);});
@@ -723,6 +763,125 @@ const app={
       case 'games':this.renderGames();break;
       case 'stats':this.renderStats();break;
     }
+  },
+
+  /* ── SPRINT ── */
+  startSprint(){
+    if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startSprint());return;}
+    if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
+    this.stopSprint();this.stopGame();
+    this.activeGame='sprint';
+    const text=genSprintText();
+    this.sprint={on:true,over:false,text,idx:0,typed:[],correct:0,errors:0,timeLeft:30,started:false};
+    this.renderCurrent();
+    setTimeout(()=>{const b=document.querySelector('.sprint-text-box');if(b)b.focus();},50);
+  },
+  stopSprint(){if(this._sprintLoop){clearInterval(this._sprintLoop);this._sprintLoop=null;}},
+  sprintTick(){
+    const s=this.sprint;if(!s||!s.on)return;
+    s.timeLeft=Math.max(0,s.timeLeft-1);
+    if(s.timeLeft<=0){s.on=false;s.over=true;this.stopSprint();this.afterSprint();}
+    this.renderCurrent();
+  },
+  afterSprint(){
+    if(!currentUser||!this.stats)return;
+    const s=this.sprint;
+    const wpm=Math.round((s.correct/5)/0.5);
+    if(!this.stats.sprintBest||wpm>this.stats.sprintBest.wpm){
+      this.stats.sprintBest={wpm,correct:s.correct,errors:s.errors,date:Date.now()};
+      saveStats(this.stats);
+    }
+  },
+  sprintKey(e){
+    const k=e.key;
+    if(k==='Backspace'){e.preventDefault();return;}
+    if(k.length!==1)return;
+    e.preventDefault();
+    const s=this.sprint;if(!s||!s.on)return;
+    if(!s.started){
+      s.started=true;
+      this._sprintLoop=setInterval(()=>this.sprintTick(),1000);
+    }
+    if(s.idx>=s.text.length)return;
+    const expected=s.text[s.idx];
+    if(k===expected){s.typed[s.idx]='c';s.correct++;}
+    else{s.typed[s.idx]='w';s.errors++;}
+    s.idx++;
+    this.renderCurrent();
+  },
+  renderSprint(){
+    const s=this.sprint;
+    const isOver=s&&s.over;
+    const isIdle=!s;
+    const timeLeft=s?s.timeLeft:30;
+    const correct=s?s.correct:0;
+    const errors=s?s.errors:0;
+    const wpm=s&&s.started?Math.round((correct/5)/Math.max(0.05,(30-timeLeft)/60)):0;
+    const best=currentUser&&this.stats&&this.stats.sprintBest?this.stats.sprintBest.wpm:0;
+    const isRecord=isOver&&wpm>best&&best>0;
+    const isFirstRecord=isOver&&wpm>0&&best===0;
+
+    let textHTML='';
+    if(s){
+      const start=Math.max(0,s.idx-30);
+      const end=Math.min(s.text.length,s.idx+80);
+      let wbuf=[];
+      const flush=()=>{if(wbuf.length){textHTML+='<span style="white-space:nowrap">'+wbuf.join('')+'</span>';wbuf=[];}};
+      s.text.slice(start,end).split('').forEach((ch,ri)=>{
+        const i=start+ri;
+        let cls='sprint-todo';
+        if(i<s.idx)cls=s.typed[i]==='w'?'sprint-wrong':'sprint-ok';
+        else if(i===s.idx)cls='sprint-cur';
+        if(ch===' '){flush();textHTML+=`<span class="${cls}">&nbsp;</span>`;}
+        else wbuf.push(`<span class="${cls}">${ch}</span>`);
+      });flush();
+    }
+
+    const progressPct=s?Math.round(100*(30-timeLeft)/30):0;
+
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
+        <button onclick="app.activeGame=null;app.sprint=null;app.stopSprint();app.renderGames()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Le Sprint 🏁</h2>
+        <span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span>
+      </div>
+      <div class="sprint-arena">
+        ${isOver?`
+          <div class="sprint-result">
+            <h2>${wpm>=50?'Impressionnant !':wpm>=35?'Excellent !':wpm>=20?'Bien joué !':'Continue !'}</h2>
+            ${(isRecord||isFirstRecord)?'<div class="sprint-record show">🏆 Nouveau record personnel !</div>':''}
+            <div class="sprint-result-grid">
+              <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val acc" style="font-size:36px">${wpm}<span class="stat-unit"> mpm</span></div></div>
+              <div class="stat-box"><div class="stat-label">Caractères corrects</div><div class="stat-val" style="font-size:36px">${correct}</div></div>
+              <div class="stat-box"><div class="stat-label">Erreurs</div><div class="stat-val" style="font-size:36px;color:${errors>0?'#E5484D':'#1FA971'}">${errors}</div></div>
+            </div>
+            ${best>0?`<p style="font-size:14px;color:var(--muted);margin-bottom:20px">Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best} mpm</b></p>`:''}
+            <div style="display:flex;gap:12px;justify-content:center">
+              <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="app.startSprint()">Rejouer</button>
+              <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="app.activeGame=null;app.sprint=null;app.renderGames()">← Jeux</button>
+            </div>
+          </div>
+        `:`
+          <div class="sprint-hud">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">TEMPS</div>
+              <div class="sprint-timer${timeLeft<=10?' low':''}">${String(timeLeft).padStart(2,'0')}</div>
+            </div>
+            <div class="sprint-score-wrap">
+              <div class="sprint-score-label">VITESSE</div>
+              <div class="sprint-score-val">${wpm}<span style="font-size:16px;color:var(--muted);font-weight:500"> mpm</span></div>
+            </div>
+          </div>
+          <div class="sprint-progress"><div class="sprint-progress-fill" style="width:${progressPct}%"></div></div>
+          <div class="sprint-text-box" tabindex="0">${s?textHTML:'<span style="color:var(--muted)">Prêt…</span>'}</div>
+          <div class="sprint-hint">${!s||!s.started?'Commence à taper — le chrono démarre automatiquement.':errors>0?`<span style="color:#E5484D">${errors} erreur${errors>1?'s':''}</span> · ${correct} corrects`:`${correct} caractères corrects`}</div>
+          <div style="display:flex;gap:12px;justify-content:center">
+            ${!s?`<button class="btn-primary" onclick="app.startSprint()">Lancer le Sprint ▸</button>`:`<button class="btn-sm btn-dark" onclick="app.startSprint()">↻ Recommencer</button>`}
+          </div>
+          ${best>0?`<p style="text-align:center;font-size:13px;color:var(--muted);margin-top:12px">Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best} mpm</b></p>`:''}
+        `}
+      </div>
+    </div>`;
   },
 
   /* ── HOME ── */
@@ -919,16 +1078,54 @@ const app={
 
   /* ── GAMES ── */
   renderGames(){
+    if(this.activeGame==='sprint'){this.renderSprint();return;}
+    if(this.activeGame==='frappe'){this.renderFrappe();return;}
+    // selector
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;max-width:1120px;margin:0 auto;padding:0 24px 20px">Jeux de frappe</h2>
+      <div class="game-selector">
+        <div class="game-sel-card" onclick="app.selectGame('frappe')">
+          <div class="game-sel-icon">🎯</div>
+          <div class="game-sel-name">Frappe-mots</div>
+          <div class="game-sel-desc">Des mots tombent du ciel — tape-les avant qu'ils touchent le sol. Vitesse et réactivité.</div>
+          <span class="game-sel-tag free">GRATUIT</span>
+        </div>
+        <div class="game-sel-card expert-card" onclick="app.selectGame('sprint')">
+          <div class="game-sel-icon">🏁</div>
+          <div class="game-sel-name">Le Sprint</div>
+          <div class="game-sel-desc">30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace — chaque seconde compte.</div>
+          <span class="game-sel-tag expert">EXPERT ✦</span>
+        </div>
+      </div>
+    </div>`;
+  },
+  selectGame(which){
+    if(which==='sprint'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sprint'));return;}
+      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
+      this.activeGame='sprint';this.sprint=null;this.renderGames();
+    } else {
+      this.activeGame='frappe';this.game=null;this.renderGames();
+    }
+  },
+  renderFrappe(){
     const g=this.game;
     const gameOn=!!(g&&g.on);const gameOver=!!(g&&g.over);const gameIdle=!g||(!gameOn&&!gameOver);
     const score=g?g.score:0;const lives=g?g.lives:3;const best=currentUser&&this.stats?this.stats.gameBest||0:0;
     const hearts=[0,1,2].map(i=>`<span style="font-size:20px;color:${i<lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
     const wordsHTML=(g&&g.words?g.words:[]).map(w=>`<div class="gword" style="left:${w.x}%;top:${w.y}%"><span class="gtyped">${w.text.slice(0,w.typedLen)}</span><span class="grest">${w.text.slice(w.typedLen)}</span></div>`).join('');
-    const guestOverlay=!currentUser?`<div class="game-overlay"><h2>Frappe-mots</h2><p>Crée un compte gratuit pour jouer et sauvegarder ton score.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button><button style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:14px;cursor:pointer;margin-top:-8px" onclick="openAuth('login')">Déjà un compte ?</button></div>`:'';
-    const overlay=!currentUser?guestOverlay:gameIdle?`<div class="game-overlay"><h2>Frappe-mots</h2><p>Mots qui tombent, doigts qui dansent.<br>Meilleur score : <b style="color:#fff">${best} pts</b></p><button class="game-play-btn" onclick="app.startGame()">Jouer ▸</button></div>`:gameOver?`<div class="game-overlay"><h2>${score>best?'Nouveau record !':'Fin de partie'}</h2><div class="game-final">${score} pts</div><p>${score>best?'🎉 Tu bats ton record !':'Meilleur : '+best+' pts'}</p><button class="game-play-btn" onclick="app.startGame()">Rejouer ▸</button></div>`:'';
+    const guestOverlay=!currentUser?`<div class="game-overlay"><h2>Frappe-mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`:'';
+    const overlay=!currentUser?guestOverlay:gameIdle?`<div class="game-overlay"><h2>Frappe-mots</h2><p>Mots qui tombent, doigts qui dansent.<br>Meilleur : <b style="color:#fff">${best} pts</b></p><button class="game-play-btn" onclick="app.startGame()">Jouer ▸</button></div>`:gameOver?`<div class="game-overlay"><h2>${score>best?'Nouveau record !':'Fin de partie'}</h2><div class="game-final">${score} pts</div><p>${score>best?'🎉 Tu bats ton record !':'Meilleur : '+best+' pts'}</p><button class="game-play-btn" onclick="app.startGame()">Rejouer ▸</button></div>`:'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin-bottom:16px">Jeux de frappe</h2>
-      <div class="game-arena"><div class="game-hud"><div class="game-score-val">${score}<span> pts</span></div><div style="display:flex;gap:5px">${hearts}</div></div>${wordsHTML}${overlay}</div>
+      <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
+        <button onclick="app.activeGame=null;app.stopGame();app.game=null;app.renderGames()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Frappe-mots 🎯</h2>
+        <span class="game-sel-tag free">GRATUIT</span>
+      </div>
+      <div class="game-arena" style="max-width:1120px;margin:0 auto;margin-left:24px;margin-right:24px">
+        <div class="game-hud"><div class="game-score-val">${score}<span> pts</span></div><div style="display:flex;gap:5px">${hearts}</div></div>
+        ${wordsHTML}${overlay}
+      </div>
     </div>`;
   },
 
@@ -971,7 +1168,10 @@ const app={
         <div class="spanel"><h3>Vitesse récente</h3><div class="chart">${chartHTML}</div></div>
         <div class="spanel" style="margin-bottom:0"><h3>Derniers tests</h3><div class="recent-list">${recentHTML}</div></div>
       </div>
-      <div class="spanel"><h3>🎮 Jeu de mots — meilleur score</h3><div class="scard-val acc" style="font-size:36px;margin-top:8px">${gameBest} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div>${gameBest===0?'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le jeu pour établir un score !</p>':''}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px">
+        <div class="spanel" style="margin-bottom:0"><h3>🎯 Frappe-mots — meilleur score</h3><div class="scard-val acc" style="font-size:36px;margin-top:8px">${gameBest} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div>${gameBest===0?'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le jeu pour établir un score !</p>':''}</div>
+        <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint — record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert ✦</span>. Lance un Sprint pour établir ton record !</p>'}</div>
+      </div>
       <div style="text-align:center;padding:8px 0 24px;color:var(--muted);font-size:13px">${tests.length} exercice${tests.length>1?'s':''} réalisé${tests.length>1?'s':''}</div>
     </div>`;
   }
