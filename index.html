@@ -13,28 +13,51 @@
 body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--txt);min-height:100vh}
 button{font-family:inherit;cursor:pointer}
 
-/* AUTH */
-#auth-screen{display:none;position:fixed;inset:0;background:var(--bg);z-index:1000;align-items:center;justify-content:center}
-#auth-screen.visible{display:flex}
-.auth-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:40px;width:100%;max-width:400px;box-shadow:0 24px 60px rgba(0,0,0,0.08)}
-.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
-.auth-logo-icon{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#fff}
-.auth-logo-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px}
-.auth-tabs{display:flex;gap:4px;background:var(--light);border-radius:11px;padding:4px;margin-bottom:24px}
+/* ── MODAL OVERLAY ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(22,20,15,0.45);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,0.14);position:relative}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;color:var(--muted);line-height:1;padding:4px 8px;border-radius:8px}
+.modal-close:hover{background:var(--light)}
+
+/* auth modal */
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.auth-logo-icon{width:34px;height:34px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;color:#fff}
+.auth-logo-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px}
+.auth-tabs{display:flex;gap:4px;background:var(--light);border-radius:11px;padding:4px;margin-bottom:20px}
 .auth-tab{flex:1;padding:8px;border:none;background:none;border-radius:8px;font-size:14px;font-weight:600;color:var(--muted);transition:.15s}
 .auth-tab.active{background:#fff;color:var(--txt);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
-.auth-field{margin-bottom:16px}
-.auth-field label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px}
-.auth-field input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--txt);outline:none;transition:.15s}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.auth-field input{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:11px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--txt);outline:none;transition:.15s}
 .auth-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,0.12)}
-.auth-btn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-weight:700;font-size:16px;box-shadow:0 8px 20px rgba(255,77,46,0.3);transition:.15s;margin-top:4px}
+.auth-btn{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-weight:700;font-size:15px;box-shadow:0 8px 20px rgba(255,77,46,0.3);transition:.15s;margin-top:4px}
 .auth-btn:hover{box-shadow:0 12px 28px rgba(255,77,46,0.4);transform:translateY(-1px)}
-.auth-error{color:#E5484D;font-size:13px;font-weight:600;margin-bottom:12px;padding:10px 14px;background:rgba(229,72,77,0.08);border-radius:9px;display:none}
+.auth-error{color:#E5484D;font-size:13px;font-weight:600;margin-bottom:10px;padding:9px 13px;background:rgba(229,72,77,0.08);border-radius:9px;display:none}
 .auth-error.show{display:block}
+
+/* upgrade modal */
+.upgrade-hero{text-align:center;padding:8px 0 20px}
+.upgrade-hero h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;margin-bottom:8px}
+.upgrade-hero p{font-size:15px;color:#7A7365;line-height:1.55}
+.plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.plan-card{border:1.5px solid var(--border);border-radius:16px;padding:18px;text-align:center}
+.plan-card.pro{border-color:var(--accent);background:rgba(255,77,46,0.04)}
+.plan-card .plan-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;margin-bottom:6px}
+.plan-card .plan-price{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:22px;color:var(--accent);margin-bottom:10px}
+.plan-card .plan-price span{font-size:13px;color:var(--muted);font-weight:500}
+.plan-feat{font-size:13px;color:#7A7365;line-height:1.7;text-align:left}
+.plan-feat li{padding-left:4px}
+.upgrade-btn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-weight:700;font-size:16px;box-shadow:0 8px 20px rgba(255,77,46,0.3)}
+.upgrade-btn:hover{box-shadow:0 12px 28px rgba(255,77,46,0.4);transform:translateY(-1px);transition:.15s}
+.upgrade-code-wrap{margin-top:14px;display:flex;gap:8px}
+.upgrade-code-input{flex:1;padding:10px 13px;border:1.5px solid var(--border);border-radius:11px;font-size:14px;font-family:'JetBrains Mono',monospace;background:var(--bg);outline:none}
+.upgrade-code-input:focus{border-color:var(--accent)}
+.upgrade-code-btn{padding:10px 16px;background:var(--light);border:1px solid var(--border);border-radius:11px;font-size:14px;font-weight:600;color:var(--txt)}
 
 /* NAV */
 nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);backdrop-filter:blur(8px);position:sticky;top:0;z-index:100}
-.nav-inner{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:24px}
+.nav-inner{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:20px}
 .nav-logo{display:flex;align-items:center;gap:9px;cursor:pointer;background:none;border:none;padding:0}
 .nav-logo-icon{width:28px;height:28px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#fff}
 .nav-logo-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px}
@@ -44,24 +67,33 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .nav-link .underline{position:absolute;left:12px;right:12px;bottom:1px;height:2.5px;border-radius:2px;background:var(--accent);display:none}
 .nav-link.active .underline{display:block}
 .nav-spacer{flex:1}
+/* logged-out nav */
+.nav-login-btn{background:none;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;font-size:14px;font-weight:600;color:var(--txt)}
+.nav-login-btn:hover{background:var(--light)}
+.nav-signup-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 12px rgba(255,77,46,0.26)}
+/* logged-in nav */
 .nav-user{display:flex;align-items:center;gap:10px}
+.nav-plan-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.04em}
+.nav-plan-badge.free{background:var(--light);color:var(--muted)}
+.nav-plan-badge.expert{background:rgba(255,77,46,0.12);color:var(--accent)}
 .nav-username{font-size:13px;font-weight:700;color:var(--muted)}
 .nav-avatar{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700}
 .nav-logout{background:none;border:1px solid var(--border);border-radius:9px;padding:5px 10px;font-size:13px;font-weight:600;color:var(--muted)}
 .nav-logout:hover{background:var(--light)}
-.nav-start{background:var(--accent);color:#fff;border:none;border-radius:11px;padding:10px 18px;font-weight:700;font-size:15px;box-shadow:0 6px 16px rgba(255,77,46,0.26)}
+.nav-upgrade-btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:6px 12px;font-size:13px;font-weight:700;box-shadow:0 4px 10px rgba(255,77,46,0.22)}
 
-/* MAIN */
-#app{display:none}
-#app.visible{display:block}
+/* COMMON */
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:13px;padding:15px 26px;font-weight:700;font-size:17px;box-shadow:0 8px 20px rgba(255,77,46,0.3)}
+.btn-secondary{background:var(--card);color:var(--txt);border:1px solid var(--border);border-radius:13px;padding:15px 26px;font-weight:700;font-size:17px}
+.btn-sm{padding:9px 14px;border-radius:10px;font-size:14px;font-weight:600;border:none}
+.btn-outline{background:var(--card);border:1px solid var(--border);color:var(--txt)}
+.btn-dark{background:var(--txt);color:#fff}
 
 /* HOME */
 .home-hero{max-width:1120px;margin:0 auto;padding:64px 24px 36px;display:grid;grid-template-columns:1.05fr 0.95fr;gap:48px;align-items:center}
 .home-hero h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(36px,4vw,54px);letter-spacing:-0.03em;line-height:1.1;margin-bottom:18px}
 .home-hero p{font-size:17px;color:#7A7365;margin-bottom:32px;line-height:1.6}
 .hero-btns{display:flex;gap:12px;flex-wrap:wrap}
-.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:13px;padding:15px 26px;font-weight:700;font-size:17px;box-shadow:0 8px 20px rgba(255,77,46,0.3)}
-.btn-secondary{background:var(--card);color:var(--txt);border:1px solid var(--border);border-radius:13px;padding:15px 26px;font-weight:700;font-size:17px}
 .hero-kb{display:grid;gap:6px;background:var(--light);border:1px solid var(--border);border-radius:18px;padding:22px}
 .hkb-row{display:flex;gap:6px;justify-content:center}
 .hkb-key{min-width:clamp(28px,3.8vw,46px);height:clamp(34px,4vw,48px);background:#fff;border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:clamp(10px,1.1vw,13px);font-weight:600;color:var(--muted)}
@@ -71,9 +103,23 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .feature-card .icon{font-size:28px;margin-bottom:14px}
 .feature-card h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;margin-bottom:6px}
 .feature-card p{font-size:14px;color:#7A7365;line-height:1.5}
-.home-cta{max-width:1120px;margin:0 auto;padding:10px 24px 70px;text-align:center}
-.home-cta h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;margin-bottom:8px}
-.home-cta p{color:#7A7365;font-size:17px;margin-bottom:28px}
+
+/* PRICING SECTION on home */
+.pricing-section{max-width:1120px;margin:0 auto;padding:10px 24px 70px}
+.pricing-section h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;text-align:center;margin-bottom:8px}
+.pricing-section p{text-align:center;color:#7A7365;font-size:17px;margin-bottom:32px}
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:640px;margin:0 auto}
+.pricing-card{border:1.5px solid var(--border);border-radius:20px;padding:28px}
+.pricing-card.featured{border-color:var(--accent);background:rgba(255,77,46,0.03)}
+.pricing-card .pc-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;margin-bottom:4px}
+.pricing-card .pc-price{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:32px;color:var(--accent);margin-bottom:16px}
+.pricing-card .pc-price small{font-size:15px;color:var(--muted);font-weight:500}
+.pricing-card ul{font-size:14px;color:#7A7365;line-height:2;list-style:none}
+.pricing-card ul li::before{content:'✓ ';font-weight:700;color:#1FA971}
+.pricing-card ul li.locked::before{content:'🔒 ';color:var(--muted)}
+.pricing-card .pc-btn{width:100%;padding:12px;border:none;border-radius:12px;font-weight:700;font-size:15px;margin-top:20px;cursor:pointer;font-family:inherit}
+.pc-btn.pri{background:var(--accent);color:#fff;box-shadow:0 6px 16px rgba(255,77,46,0.3)}
+.pc-btn.sec{background:var(--light);color:var(--txt)}
 
 /* TYPING */
 .typing-section{max-width:1120px;margin:0 auto;padding:0 24px 40px}
@@ -81,9 +127,6 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .typing-header h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px}
 .typing-header p{font-size:14px;color:var(--muted);margin-top:4px}
 .typing-actions{display:flex;gap:10px;flex-shrink:0}
-.btn-sm{padding:9px 14px;border-radius:10px;font-size:14px;font-weight:600;border:none}
-.btn-outline{background:var(--card);border:1px solid var(--border);color:var(--txt)}
-.btn-dark{background:var(--txt);color:#fff}
 .live-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
 .stat-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
 .stat-label{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px}
@@ -95,7 +138,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .ch{border-radius:3px}.ch.ok{color:var(--txt)}.ch.wrong{color:#E5484D;background:rgba(229,72,77,0.16)}.ch.cur{color:var(--txt);background:rgba(255,77,46,0.14);box-shadow:inset 0 -3px 0 var(--accent)}.ch.todo{color:#C2BBAC}
 .kb-wrap{background:var(--light);border:1px solid var(--border);border-radius:18px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:7px}
 .kb-row-t{display:flex;gap:6px;justify-content:center}
-.kb-key-t{min-width:clamp(30px,4.2vw,50px);height:clamp(38px,4.4vw,52px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:9px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:clamp(11px,1.25vw,14px);font-weight:600;color:#3A352B;box-shadow:0 1px 0 rgba(0,0,0,0.03);transition:transform .08s,box-shadow .08s,background .08s;user-select:none;border-bottom-width:4px}
+.kb-key-t{min-width:clamp(30px,4.2vw,50px);height:clamp(38px,4.4vw,52px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:9px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:clamp(11px,1.25vw,14px);font-weight:600;color:#3A352B;box-shadow:0 1px 0 rgba(0,0,0,0.03);user-select:none;border-bottom-width:4px;transition:transform .08s,box-shadow .08s,background .08s}
 .kb-key-t.on{background:var(--accent);color:#fff;border-color:transparent;border-bottom-color:rgba(0,0,0,0.2)!important;transform:translateY(-3px);box-shadow:0 10px 22px rgba(255,77,46,0.42)}
 .kb-space{width:46%;min-width:200px;height:clamp(38px,4.4vw,52px);border-radius:9px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#9A9281;transition:transform .08s,box-shadow .08s,background .08s}
 .kb-space.on{background:var(--accent);color:#fff;border-color:transparent;transform:translateY(-3px);box-shadow:0 10px 22px rgba(255,77,46,0.42)}
@@ -133,15 +176,18 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .lessons-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
 .lesson-card{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 15px;text-align:left;font-family:inherit;width:100%;transition:transform .1s,box-shadow .1s}
 .lesson-card:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 22px -14px rgba(40,30,15,0.4)}
-.lesson-card:disabled{cursor:not-allowed;opacity:0.6}
+.lesson-card:disabled{cursor:not-allowed;opacity:0.55}
 .lesson-card.todo-c{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,0.12)}
+.lesson-card.expert-locked{border-style:dashed;opacity:0.7}
 .les-dot{flex:none;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
 .les-dot.c{background:rgba(31,169,113,0.15);color:#1FA971}
 .les-dot.l{background:var(--light);color:#B5AE9F}
 .les-dot.t{background:rgba(255,77,46,0.14);color:var(--accent)}
+.les-dot.ex{background:rgba(255,77,46,0.08);color:var(--accent)}
 .les-title{font-size:14px;font-weight:700;margin-bottom:2px}
 .les-keys{font-size:12px;color:var(--muted)}
 .les-best{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#1FA971}
+.expert-tag{font-size:10px;font-weight:700;color:var(--accent);background:rgba(255,77,46,0.1);padding:2px 6px;border-radius:5px;letter-spacing:.04em}
 
 /* GAMES */
 .games-section{max-width:1120px;margin:0 auto;padding:24px}
@@ -174,7 +220,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .spanel h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;margin-bottom:22px}
 .chart{display:flex;align-items:flex-end;gap:10px;height:180px}
 .cbar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end}
-.cbar-val{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--txt)}
+.cbar-val{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700}
 .cbar{width:100%;max-width:34px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,var(--accent),#ff8a5c)}
 .cbar-lbl{font-size:11px;color:#A39C8D;font-weight:600}
 .recent-list{display:flex;flex-direction:column;gap:10px}
@@ -191,90 +237,144 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 .footer-logo{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--txt);font-family:'Bricolage Grotesque',sans-serif}
 .flogo-icon{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:var(--accent);color:#fff;border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:13px}
 
+/* GATE BANNER (login required) */
+.gate-banner{background:rgba(255,77,46,0.07);border:1.5px solid rgba(255,77,46,0.25);border-radius:16px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.gate-banner p{font-size:15px;color:#7A7365;flex:1}
+.gate-banner strong{color:var(--txt)}
+.gate-banner-btns{display:flex;gap:10px}
+.gate-btn-pri{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:14px;font-weight:700}
+.gate-btn-sec{background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:14px;font-weight:600;color:var(--txt)}
+
 @media(max-width:768px){
   .home-hero{grid-template-columns:1fr;padding:32px 16px}
   .hero-kb{display:none}
   .features-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr}
   .stats-cards,.stats-grid{grid-template-columns:repeat(2,1fr)}
   .live-stats,.result-grid{grid-template-columns:repeat(2,1fr)}
+  .plan-cards{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
-<div id="auth-screen" class="visible">
-  <div class="auth-box">
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('auth-modal')">✕</button>
     <div class="auth-logo">
       <div class="auth-logo-icon">K</div>
       <div class="auth-logo-name">KeyPace</div>
     </div>
+    <div id="auth-context-msg" style="background:rgba(255,77,46,0.07);border-radius:10px;padding:10px 13px;font-size:13px;color:#7A7365;margin-bottom:16px;display:none"></div>
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Connexion</button>
       <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Créer un compte</button>
     </div>
     <div id="auth-error" class="auth-error"></div>
-    <div class="auth-field">
-      <label>Nom d'utilisateur</label>
-      <input type="text" id="auth-username" placeholder="ex: jean42" autocomplete="username">
-    </div>
-    <div class="auth-field">
-      <label>Mot de passe</label>
-      <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password">
-    </div>
-    <div class="auth-field" id="auth-confirm-wrap" style="display:none">
-      <label>Confirmer le mot de passe</label>
-      <input type="password" id="auth-confirm" placeholder="••••••••" autocomplete="new-password">
-    </div>
+    <div class="auth-field"><label>Nom d'utilisateur</label><input type="text" id="auth-username" placeholder="ex: jean42" autocomplete="username"></div>
+    <div class="auth-field"><label>Mot de passe</label><input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password"></div>
+    <div class="auth-field" id="auth-confirm-wrap" style="display:none"><label>Confirmer le mot de passe</label><input type="password" id="auth-confirm" placeholder="••••••••" autocomplete="new-password"></div>
     <button class="auth-btn" id="auth-submit" onclick="authSubmit()">Se connecter</button>
   </div>
 </div>
 
-<!-- MAIN APP -->
-<div id="app">
-  <nav>
-    <div class="nav-inner">
-      <button class="nav-logo" onclick="go('home')">
-        <div class="nav-logo-icon">K</div>
-        <div class="nav-logo-name">KeyPace</div>
-      </button>
-      <div class="nav-links">
-        <button class="nav-link" id="nav-home" onclick="go('home')">Accueil<span class="underline"></span></button>
-        <button class="nav-link" id="nav-test" onclick="go('test')">Test<span class="underline"></span></button>
-        <button class="nav-link" id="nav-lessons" onclick="go('lessons')">Cours<span class="underline"></span></button>
-        <button class="nav-link" id="nav-games" onclick="go('games')">Jeux<span class="underline"></span></button>
-        <button class="nav-link" id="nav-stats" onclick="go('stats')">Progrès<span class="underline"></span></button>
+<!-- UPGRADE MODAL -->
+<div class="modal-overlay" id="upgrade-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('upgrade-modal')">✕</button>
+    <div class="upgrade-hero">
+      <h2>Passe à Expert ✦</h2>
+      <p>Débloque les 20 leçons avancées et accède à tout le contenu KeyPace.</p>
+    </div>
+    <div class="plan-cards">
+      <div class="plan-card">
+        <div class="plan-name">Gratuit</div>
+        <div class="plan-price">0€</div>
+        <ul class="plan-feat">
+          <li>10 leçons de base</li>
+          <li>Jeu Frappe-mots</li>
+          <li>Test de vitesse</li>
+          <li>Suivi des progrès</li>
+        </ul>
       </div>
-      <div class="nav-spacer"></div>
+      <div class="plan-card pro">
+        <div class="plan-name" style="color:var(--accent)">Expert ✦</div>
+        <div class="plan-price">4.99€<small>/mois</small></div>
+        <ul class="plan-feat">
+          <li>30 leçons complètes</li>
+          <li>Jeu Frappe-mots</li>
+          <li>Test de vitesse</li>
+          <li>Suivi des progrès</li>
+        </ul>
+      </div>
+    </div>
+    <button class="upgrade-btn" onclick="activateExpert()">Passer à Expert →</button>
+    <div id="upgrade-msg" style="text-align:center;font-size:13px;color:var(--muted);margin-top:12px;display:none"></div>
+    <div class="upgrade-code-wrap">
+      <input type="text" class="upgrade-code-input" id="expert-code" placeholder="Code promo / licence">
+      <button class="upgrade-code-btn" onclick="redeemCode()">Activer</button>
+    </div>
+    <div id="code-msg" style="font-size:13px;margin-top:8px;font-weight:600;display:none"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<nav id="main-nav">
+  <div class="nav-inner">
+    <button class="nav-logo" onclick="go('home')">
+      <div class="nav-logo-icon">K</div>
+      <div class="nav-logo-name">KeyPace</div>
+    </button>
+    <div class="nav-links">
+      <button class="nav-link" id="nav-home" onclick="go('home')">Accueil<span class="underline"></span></button>
+      <button class="nav-link" id="nav-test" onclick="go('test')">Test<span class="underline"></span></button>
+      <button class="nav-link" id="nav-lessons" onclick="go('lessons')">Cours<span class="underline"></span></button>
+      <button class="nav-link" id="nav-games" onclick="go('games')">Jeux<span class="underline"></span></button>
+      <button class="nav-link" id="nav-stats" onclick="go('stats')">Progrès<span class="underline"></span></button>
+    </div>
+    <div class="nav-spacer"></div>
+    <div id="nav-guest" style="display:flex;gap:8px">
+      <button class="nav-login-btn" onclick="openAuth()">Se connecter</button>
+      <button class="nav-signup-btn" onclick="openAuth('register')">Créer un compte</button>
+    </div>
+    <div id="nav-logged" style="display:none">
       <div class="nav-user">
+        <span id="nav-plan-badge" class="nav-plan-badge free">GRATUIT</span>
         <span class="nav-username" id="nav-username"></span>
         <div class="nav-avatar" id="nav-avatar"></div>
+        <button id="nav-upgrade-btn" class="nav-upgrade-btn" onclick="openModal('upgrade-modal')" style="display:none">Passer Expert</button>
         <button class="nav-logout" onclick="logout()">Déconnexion</button>
       </div>
-      <button class="nav-start" onclick="go('test')">Commencer</button>
     </div>
-  </nav>
+  </div>
+</nav>
 
-  <div id="page-home"></div>
-  <div id="page-test" style="display:none"></div>
-  <div id="page-lessons" style="display:none"></div>
-  <div id="page-games" style="display:none"></div>
-  <div id="page-stats" style="display:none"></div>
+<div id="page-home"></div>
+<div id="page-test" style="display:none"></div>
+<div id="page-lessons" style="display:none"></div>
+<div id="page-games" style="display:none"></div>
+<div id="page-stats" style="display:none"></div>
 
-  <footer>
-    <div class="footer-inner">
-      <div class="footer-logo"><span class="flogo-icon">K</span> KeyPace</div>
-      <div>Apprends à taper, en t'amusant. · AZERTY · Fait avec ✦</div>
-    </div>
-  </footer>
-</div>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo"><span class="flogo-icon">K</span> KeyPace</div>
+    <div>Apprends à taper, en t'amusant. · AZERTY · Fait avec ✦</div>
+  </div>
+</footer>
 
 <script>
 'use strict';
-/* ===== AUTH ===== */
+
+/* ── PLAN CONFIG ── */
+const FREE_LESSON_IDS = ['r1','r2','r3','r4','r5','r6','h1','h2','h3','h4']; // 10 leçons gratuites
+const EXPERT_CODE = 'KEYPACE-EXPERT'; // code démo
+
+/* ── AUTH ── */
 const ACCOUNTS_KEY = 'klak_accounts';
 let currentUser = null;
 let currentTab = 'login';
+let _authCallback = null; // called after login if set
 
 function getAccounts(){try{return JSON.parse(localStorage.getItem(ACCOUNTS_KEY))||{};}catch{return {};}}
 function saveAccounts(a){localStorage.setItem(ACCOUNTS_KEY,JSON.stringify(a));}
@@ -282,6 +382,19 @@ function saveAccounts(a){localStorage.setItem(ACCOUNTS_KEY,JSON.stringify(a));}
 async function hashPw(pw){
   const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+function openAuth(tab, contextMsg, callback){
+  _authCallback = callback || null;
+  switchTab(tab || 'login');
+  const ctx = document.getElementById('auth-context-msg');
+  if(contextMsg){ctx.textContent = contextMsg; ctx.style.display = 'block';}
+  else ctx.style.display = 'none';
+  openModal('auth-modal');
+  setTimeout(()=>document.getElementById('auth-username').focus(), 100);
 }
 
 function switchTab(tab){
@@ -307,7 +420,7 @@ async function authSubmit(){
     if(password.length<6)return showAuthError('Mot de passe trop court (6 caractères min).');
     if(accounts[username])return showAuthError('Ce nom est déjà pris.');
     const hash=await hashPw(password);
-    accounts[username]={hash,created:Date.now()};
+    accounts[username]={hash,created:Date.now(),plan:'free'};
     saveAccounts(accounts);
     loginUser(username);
   } else {
@@ -319,36 +432,99 @@ async function authSubmit(){
 }
 
 document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&document.getElementById('auth-screen').classList.contains('visible'))authSubmit();
+  if(e.key==='Enter'){
+    if(document.getElementById('auth-modal').classList.contains('open'))authSubmit();
+  }
+  if(e.key==='Escape'){
+    closeModal('auth-modal');closeModal('upgrade-modal');
+  }
+});
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});
 });
 
 function loginUser(username){
   currentUser=username;
-  document.getElementById('auth-screen').classList.remove('visible');
-  document.getElementById('app').classList.add('visible');
-  document.getElementById('nav-username').textContent=username;
-  document.getElementById('nav-avatar').textContent=username[0].toUpperCase();
+  closeModal('auth-modal');
+  document.getElementById('auth-password').value='';
+  document.getElementById('auth-confirm').value='';
+  updateNavUser();
   app.init();
-  go('home');
+  app.renderCurrent();
+  if(_authCallback){const cb=_authCallback;_authCallback=null;cb();}
 }
 
 function logout(){
   currentUser=null;
   app.stopAll();
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('auth-screen').classList.add('visible');
-  document.getElementById('auth-password').value='';
-  document.getElementById('auth-confirm').value='';
+  updateNavUser();
+  app.renderCurrent();
 }
 
-/* ===== DATA ===== */
+function updateNavUser(){
+  const guest=document.getElementById('nav-guest');
+  const logged=document.getElementById('nav-logged');
+  if(!currentUser){guest.style.display='flex';logged.style.display='none';return;}
+  guest.style.display='none';logged.style.display='block';
+  document.getElementById('nav-username').textContent=currentUser;
+  document.getElementById('nav-avatar').textContent=currentUser[0].toUpperCase();
+  const plan=getUserPlan();
+  const badge=document.getElementById('nav-plan-badge');
+  const upgradeBtn=document.getElementById('nav-upgrade-btn');
+  badge.textContent=plan==='expert'?'EXPERT ✦':'GRATUIT';
+  badge.className='nav-plan-badge '+(plan==='expert'?'expert':'free');
+  upgradeBtn.style.display=plan==='expert'?'none':'inline-block';
+}
+
+function getUserPlan(){
+  if(!currentUser)return null;
+  const acc=getAccounts()[currentUser];
+  return acc?acc.plan||'free':'free';
+}
+
+function isLessonFree(lessonId){return FREE_LESSON_IDS.includes(lessonId);}
+function canAccessLesson(lessonId){
+  if(!currentUser)return false;
+  const plan=getUserPlan();
+  if(plan==='expert')return true;
+  return isLessonFree(lessonId);
+}
+function canAccessGame(){return !!currentUser;}
+
+/* ── UPGRADE ── */
+function activateExpert(){
+  if(!currentUser)return;
+  const accounts=getAccounts();
+  accounts[currentUser].plan='expert';
+  saveAccounts(accounts);
+  updateNavUser();
+  const msg=document.getElementById('upgrade-msg');
+  msg.textContent='✓ Compte Expert activé ! Toutes les leçons sont débloquées.';
+  msg.style.display='block';msg.style.color='#1FA971';
+  setTimeout(()=>{closeModal('upgrade-modal');app.renderCurrent();},1500);
+}
+
+function redeemCode(){
+  const code=document.getElementById('expert-code').value.trim().toUpperCase();
+  const msg=document.getElementById('code-msg');
+  if(code===EXPERT_CODE){
+    activateExpert();
+    msg.textContent='✓ Code valide !';msg.style.color='#1FA971';msg.style.display='block';
+  } else {
+    msg.textContent='✗ Code invalide.';msg.style.color='#E5484D';msg.style.display='block';
+  }
+}
+
+/* ── DATA ── */
 function dataKey(){return 'klak_data_'+currentUser;}
 function loadStats(){
+  if(!currentUser)return{tests:[],lessons:{},gameBest:0,goals:{minWpm:20,maxErrors:8}};
   let s=null;
   try{const r=localStorage.getItem(dataKey());if(r)s=JSON.parse(r);}catch{}
   if(!s)s={tests:[],lessons:{},gameBest:0,goals:{minWpm:20,maxErrors:8}};
-  s.tests=s.tests||[];s.lessons=s.lessons||{};
-  s.goals=s.goals||{};
+  s.tests=s.tests||[];s.lessons=s.lessons||{};s.goals=s.goals||{};
   if(typeof s.goals.minWpm!=='number')s.goals.minWpm=20;
   if(typeof s.goals.maxErrors!=='number')s.goals.maxErrors=8;
   if(typeof s.gameBest!=='number')s.gameBest=0;
@@ -356,9 +532,9 @@ function loadStats(){
   localStorage.setItem(dataKey(),JSON.stringify(s));
   return s;
 }
-function saveStats(s){try{localStorage.setItem(dataKey(),JSON.stringify(s));}catch{}}
+function saveStats(s){if(!currentUser)return;try{localStorage.setItem(dataKey(),JSON.stringify(s));}catch{}}
 
-/* ===== CURRICULUM ===== */
+/* ── CURRICULUM ── */
 const FINGERS={lp:'#B7AE9E',lr:'#79C56A',lm:'#E8C13B',li:'#EE6B5E',ri:'#A77BD6',rm:'#E8C13B',rr:'#79C56A',rp:'#B7AE9E',th:'#BCB3A2'};
 const KB=[
   [{l:'1',s:'&',f:'lp'},{l:'2',s:'é',f:'lr'},{l:'3',s:'"',f:'lm'},{l:'4',s:"'",f:'li'},{l:'5',s:'(',f:'li'},{l:'6',s:'-',f:'ri'},{l:'7',s:'è',f:'ri'},{l:'8',s:'_',f:'rm'},{l:'9',s:'ç',f:'rr'},{l:'0',s:'à',f:'rp'}],
@@ -366,12 +542,7 @@ const KB=[
   [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
   [{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'}]
 ];
-const PASSAGES=[
-  "le matin, la lumière douce traverse les rideaux et réveille doucement la maison encore endormie sous un ciel calme et clair.",
-  "taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides et plus sûres.",
-  "le petit renard roux traverse le champ gelé, observe les oiseaux au loin, puis disparaît derrière la vieille grange en bois.",
-  "écrire vite, c'est surtout écrire juste : vise la précision avant la vitesse, et la cadence viendra naturellement avec le temps."
-];
+const PASSAGES=["le matin, la lumière douce traverse les rideaux et réveille doucement la maison encore endormie sous un ciel calme et clair.","taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides et plus sûres.","le petit renard roux traverse le champ gelé, observe les oiseaux au loin, puis disparaît derrière la vieille grange en bois.","écrire vite, c'est surtout écrire juste : vise la précision avant la vitesse, et la cadence viendra naturellement avec le temps."];
 const CURRICULUM=[
   {name:'Rangée de repos',lessons:[{id:'r1',title:'Position f et j',keys:'f j',neu:'fj'},{id:'r2',title:'d et k',keys:'d k',neu:'dk'},{id:'r3',title:'s et l',keys:'s l',neu:'sl'},{id:'r4',title:'q et m',keys:'q m',neu:'qm'},{id:'r5',title:'g et h',keys:'g h',neu:'gh'},{id:'r6',title:'Révision de la rangée',keys:'q s d f g h j k l m',review:'qsdfghjklm'}]},
   {name:'Rangée du haut',lessons:[{id:'h1',title:'r et u',keys:'r u',neu:'ru'},{id:'h2',title:'e et i',keys:'e i',neu:'ei'},{id:'h3',title:'z et o',keys:'z o',neu:'zo'},{id:'h4',title:'a et p',keys:'a p',neu:'ap'},{id:'h5',title:'t et y',keys:'t y',neu:'ty'},{id:'h6',title:'Révision de la rangée',keys:'a z e r t y u i o p',review:'azertyuiop'}]},
@@ -386,7 +557,7 @@ const WORDS=["clé","jour","main","vite","mot","feu","ami","pain","eau","ciel","
 const ALL_LESSONS=[],ALL_MODULES=[];
 (function(){let pool='';CURRICULUM.forEach((mod,mi)=>{const ml=[];mod.lessons.forEach(les=>{if(les.neu)pool+=les.neu;const l=Object.assign({},les,{module:mod.name,moduleIdx:mi,pool});ALL_LESSONS.push(l);ml.push(l);});ALL_MODULES.push({name:mod.name,lessons:ml});});})();
 
-/* ===== APP ===== */
+/* ── APP ── */
 const app={
   view:'home',sess:null,stats:null,game:null,now:Date.now(),
   _timer:null,_gameLoop:null,_onKey:null,_wid:0,_gameRec:false,
@@ -403,8 +574,14 @@ const app={
     this.game=null;this.sess=null;
   },
 
-  lessonRec(id){const v=(this.stats.lessons||{})[id];if(!v)return{bestWpm:0,bestErr:null,cleared:false};if(typeof v==='number')return{bestWpm:v,bestErr:null,cleared:true};return v;},
-  setGoal(key,delta){const g=this.stats.goals;if(key==='minWpm')g.minWpm=Math.max(5,Math.min(80,g.minWpm+delta));else g.maxErrors=Math.max(0,Math.min(30,g.maxErrors+delta));saveStats(this.stats);this.renderCurrent();},
+  lessonRec(id){const v=(this.stats&&this.stats.lessons||{})[id];if(!v)return{bestWpm:0,bestErr:null,cleared:false};if(typeof v==='number')return{bestWpm:v,bestErr:null,cleared:true};return v;},
+  setGoal(key,delta){
+    if(!currentUser)return;
+    const g=this.stats.goals;
+    if(key==='minWpm')g.minWpm=Math.max(5,Math.min(80,g.minWpm+delta));
+    else g.maxErrors=Math.max(0,Math.min(30,g.maxErrors+delta));
+    saveStats(this.stats);this.renderCurrent();
+  },
 
   makeSession(mode,lessonId){
     let text=mode==='lesson'?this.genDrill(lessonId):PASSAGES[Math.floor(Math.random()*PASSAGES.length)];
@@ -424,14 +601,24 @@ const app={
     if(l.genNum)return this.genGroups(l.genNum.split(''),l.genNum.split(''),44);
     return this.genGroups((l.review||l.neu||'').split(''),(l.pool||'').split(''),58);
   },
-  startLesson(id){this.stopTimer();this.sess=this.makeSession('lesson',id);this.renderView('lessons');},
+  tryStartLesson(id){
+    if(!currentUser){
+      openAuth('register','Crée un compte gratuit pour commencer les leçons.',()=>this.tryStartLesson(id));
+      return;
+    }
+    if(!canAccessLesson(id)){
+      openModal('upgrade-modal');return;
+    }
+    this.stopTimer();this.sess=this.makeSession('lesson',id);this.renderView('lessons');
+  },
   backLessons(){this.stopTimer();this.sess=null;this.renderCurrent();},
   restart(){if(!this.sess)return;this.stopTimer();this.sess=this.makeSession(this.sess.mode,this.sess.lessonId);this.renderCurrent();},
   newPassage(){this.stopTimer();this.sess=this.makeSession('test');this.renderCurrent();},
   goNextLesson(){
     if(!this.sess||!this.sess.lessonId)return;
     const i=ALL_LESSONS.findIndex(l=>l.id===this.sess.lessonId);
-    const nx=ALL_LESSONS[i+1];if(nx)this.startLesson(nx.id);
+    const nx=ALL_LESSONS[i+1];
+    if(nx)this.tryStartLesson(nx.id);
   },
 
   startTimer(){if(this._timer)return;this._timer=setInterval(()=>{this.now=Date.now();this.renderCurrent();},150);},
@@ -462,6 +649,7 @@ const app={
     return{wpm,acc,time:Math.round((s.endTime-s.startTime)/1000),errors:s.keystrokes-s.correct};
   },
   recordResult(mode,res,lessonId){
+    if(!currentUser||!this.stats)return;
     this.stats.tests.push({t:Date.now(),wpm:res.wpm,acc:res.acc,mode});
     if(mode==='lesson'&&lessonId){
       const g=this.stats.goals;let rec=this.stats.lessons[lessonId];
@@ -475,6 +663,10 @@ const app={
   },
 
   startGame(){
+    if(!canAccessGame()){
+      openAuth('register','Crée un compte gratuit pour jouer.',()=>this.startGame());
+      return;
+    }
     this.stopGame();this._gameRec=false;
     this.game={on:true,over:false,score:0,lives:3,words:[],spawnAcc:20};
     this._gameLoop=setInterval(()=>this.gameTick(),60);
@@ -497,7 +689,7 @@ const app={
     if(g.over&&!this._gameRec){this._gameRec=true;this.stopGame();this.afterGameOver(g.score);}
   },
   afterGameOver(score){
-    if(score>(this.stats.gameBest||0)){this.stats.gameBest=score;saveStats(this.stats);}
+    if(currentUser&&this.stats&&score>(this.stats.gameBest||0)){this.stats.gameBest=score;saveStats(this.stats);}
     this.renderCurrent();
   },
   gameKey(e){
@@ -517,12 +709,13 @@ const app={
   renderView(v){
     this.view=v;
     if(v!=='games')this.stopGame();
-    if(v==='test'&&!this.sess)this.sess=this.makeSession('test');
+    if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
     ['home','test','lessons','games','stats'].forEach(p=>{document.getElementById('page-'+p).style.display=p===v?'block':'none';});
     ['home','test','lessons','games','stats'].forEach(id=>{document.getElementById('nav-'+id).classList.toggle('active',id===v);});
     this.renderCurrent();
   },
   renderCurrent(){
+    if(!this.stats)this.stats=loadStats();
     switch(this.view){
       case 'home':this.renderHome();break;
       case 'test':this.renderTyping();break;
@@ -532,16 +725,19 @@ const app={
     }
   },
 
+  /* ── HOME ── */
   renderHome(){
     const kbHtml=KB.map(row=>'<div class="hkb-row">'+row.map(k=>`<div class="hkb-key${k.home?' home':''}">${k.l.toLowerCase()}</div>`).join('')+'</div>').join('');
+    const isGuest=!currentUser;
     document.getElementById('page-home').innerHTML=`
       <div class="home-hero">
         <div>
           <h1>Tape plus vite,<br>chaque jour.</h1>
           <p>Leçons progressives, test de vitesse, jeux de mots — tout pour progresser sur clavier AZERTY.</p>
           <div class="hero-btns">
-            <button class="btn-primary" onclick="go('test')">Tester ma vitesse →</button>
-            <button class="btn-secondary" onclick="go('lessons')">Commencer les cours</button>
+            ${isGuest
+              ? `<button class="btn-primary" onclick="openAuth('register')">Créer un compte gratuit</button><button class="btn-secondary" onclick="go('lessons')">Voir les cours</button>`
+              : `<button class="btn-primary" onclick="go('test')">Tester ma vitesse →</button><button class="btn-secondary" onclick="go('lessons')">Mes cours</button>`}
           </div>
         </div>
         <div class="hero-kb">${kbHtml}</div>
@@ -551,19 +747,53 @@ const app={
         <div class="feature-card"><div class="icon">⚡</div><h3>Test de vitesse</h3><p>Mesure tes mots par minute et ta précision sur des textes variés.</p></div>
         <div class="feature-card"><div class="icon">🎮</div><h3>Jeu de mots</h3><p>Des mots tombent du ciel — tape-les avant qu'ils touchent le sol !</p></div>
       </div>
-      <div class="home-cta">
-        <h2>Prêt à progresser ?</h2>
-        <p>Lance un test de vitesse et vois où tu en es.</p>
-        <button class="btn-primary" onclick="go('test')">Lancer le test →</button>
+      <div class="pricing-section">
+        <h2>Simple et transparent</h2>
+        <p>Commence gratuitement, passe Expert quand tu veux.</p>
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <div class="pc-name">Gratuit</div>
+            <div class="pc-price">0€</div>
+            <ul>
+              <li>10 leçons de base</li>
+              <li>Jeu Frappe-mots</li>
+              <li>Test de vitesse</li>
+              <li>Suivi des progrès</li>
+              <li class="locked">Majuscules & ponctuation</li>
+              <li class="locked">Chiffres & accents</li>
+              <li class="locked">Module Fluidité</li>
+            </ul>
+            <button class="pc-btn sec" onclick="${isGuest?"openAuth('register')":'go(\'lessons\')'}">
+              ${isGuest?'Commencer gratuitement':'Mes cours'}
+            </button>
+          </div>
+          <div class="pricing-card featured">
+            <div class="pc-name" style="color:var(--accent)">Expert ✦</div>
+            <div class="pc-price">4.99€<small>/mois</small></div>
+            <ul>
+              <li>30 leçons complètes</li>
+              <li>Jeu Frappe-mots</li>
+              <li>Test de vitesse</li>
+              <li>Suivi des progrès</li>
+              <li>Majuscules & ponctuation</li>
+              <li>Chiffres & accents</li>
+              <li>Module Fluidité</li>
+            </ul>
+            <button class="pc-btn pri" onclick="${isGuest?"openAuth('register')":'openModal(\'upgrade-modal\')'}">
+              ${isGuest?'Créer un compte':'Passer Expert'}
+            </button>
+          </div>
+        </div>
       </div>`;
   },
 
+  /* ── TYPING ── */
   renderTyping(){
     if(this.sess&&this.sess.mode==='lesson'&&this.view==='lessons'){this._renderTypingInto('page-lessons');return;}
     this._renderTypingInto('page-test');
   },
   _renderTypingInto(pageId){
-    const s=this.sess;const isLesson=s&&s.mode==='lesson';const goals=this.stats.goals;
+    const s=this.sess;const isLesson=s&&s.mode==='lesson';const goals=this.stats?this.stats.goals:{minWpm:20,maxErrors:8};
     let liveWpm=0,liveAcc=100,liveTime=0,progress=0;
     if(s){
       progress=Math.round(100*s.idx/s.text.length);
@@ -583,28 +813,13 @@ const app={
     const typingTitle=les?les.title:'Test de vitesse';
     const typingSub=les?`Touches : ${les.keys||''}  ·  Objectif ${goals.minWpm} mpm, max ${goals.maxErrors} fautes`:'Tape le texte ci-dessous le plus vite et juste possible.';
     const next=s&&!s.finished?s.text[s.idx]:null;
-
     let tbHTML='';
-    if(s){
-      let wbuf=[];const flush=()=>{if(wbuf.length){tbHTML+='<span style="white-space:nowrap">'+wbuf.join('')+'</span>';wbuf=[];}};
-      s.text.split('').forEach((ch,i)=>{
-        let cls='todo';if(i<s.idx)cls=s.typed[i]==='w'?'wrong':'ok';else if(i===s.idx)cls='cur';
-        if(ch===' '){flush();tbHTML+=`<span class="ch ${cls}">&nbsp;</span>`;}else wbuf.push(`<span class="ch ${cls}">${ch}</span>`);
-      });flush();
-    }
-
+    if(s){let wbuf=[];const flush=()=>{if(wbuf.length){tbHTML+='<span style="white-space:nowrap">'+wbuf.join('')+'</span>';wbuf=[];}};s.text.split('').forEach((ch,i)=>{let cls='todo';if(i<s.idx)cls=s.typed[i]==='w'?'wrong':'ok';else if(i===s.idx)cls='cur';if(ch===' '){flush();tbHTML+=`<span class="ch ${cls}">&nbsp;</span>`;}else wbuf.push(`<span class="ch ${cls}">${ch}</span>`);});flush();}
     const kbHTML=KB.map(row=>`<div class="kb-row-t">${row.map(k=>{const on=next!=null&&this.keyMatches(k,next);return`<div class="kb-key-t${on?' on':''}" style="border-bottom-color:${on?'rgba(0,0,0,0.2)':FINGERS[k.f]}">${k.l.toLowerCase()}${k.s?'<br><span style="font-size:9px;opacity:.6">'+k.s+'</span>':''}</div>`;}).join('')}</div>`).join('');
-
-    const html=`<div class="typing-section">
+    document.getElementById(pageId).innerHTML=`<div class="typing-section">
       <div class="typing-header">
-        <div>
-          ${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br>':''}
-          <h2>${typingTitle}</h2><p>${typingSub}</p>
-        </div>
-        <div class="typing-actions">
-          ${!isLesson?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}
-          <button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button>
-        </div>
+        <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
+        <div class="typing-actions">${!isLesson?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button></div>
       </div>
       <div class="live-stats">
         <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val">${liveWpm}<span class="stat-unit"> mpm</span></div></div>
@@ -614,8 +829,7 @@ const app={
       </div>
       <div class="prog-wrap"><div class="prog-fill" style="width:${progress}%"></div></div>
       ${!finished?`<div class="typing-box">${tbHTML}</div>`:''}
-      ${finished?`<div class="result-box">
-        <div class="result-badge">${badge}</div>
+      ${finished?`<div class="result-box"><div class="result-badge">${badge}</div>
         ${isLesson?`<div class="banner ${lessonPassed?'pass':'fail'}"><div class="banner-title">${lessonPassed?'Leçon validée ✓':'Presque !'}</div><div class="banner-sub">${lessonPassed?(hasNext?'La leçon suivante est débloquée.':'Bravo, tu as terminé tout le parcours !'):'Objectif : '+goals.minWpm+' mpm · max '+goals.maxErrors+' fautes — il te manque '+missingTxt+'.'}</div></div>`:''}
         <div class="result-grid">
           <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val">${resWpm}<span class="stat-unit"> mpm</span></div></div>
@@ -625,73 +839,113 @@ const app={
         </div>
         <div class="result-actions">
           ${isLesson&&lessonPassed&&hasNext?`<button class="res-btn pri" onclick="app.goNextLesson()">Leçon suivante →</button>`:`<button class="res-btn pri" onclick="app.restart()">${isLesson?'Réessayer':'Recommencer'}</button>`}
-          <button class="res-btn sec" onclick="${isLesson?'app.backLessons()':'go(\'stats\')' }">${isLesson?'Tous les cours':'Voir mes progrès'}</button>
+          <button class="res-btn sec" onclick="${isLesson?'app.backLessons()':'go(\'stats\')'}">${isLesson?'Tous les cours':'Voir mes progrès'}</button>
         </div>
       </div>`:''}
       ${!finished?`<div class="hint-txt">${s&&!s.started?'Commence à taper pour démarrer le chrono…':''}</div>`:''}
       <div class="kb-wrap">${kbHTML}<div class="kb-space${next===' '?' on':''}">espace</div></div>
     </div>`;
-    document.getElementById(pageId).innerHTML=html;
   },
 
+  /* ── LESSONS ── */
   renderLessons(){
     if(this.sess&&this.sess.mode==='lesson'){this._renderTypingInto('page-lessons');return;}
-    const goals=this.stats.goals;
+    const goals=this.stats?this.stats.goals:{minWpm:20,maxErrors:8};
+    const plan=getUserPlan();
     const statusById={};
     ALL_LESSONS.forEach((les,i)=>{
       const prev=i===0?true:!!this.lessonRec(ALL_LESSONS[i-1].id).cleared;
       const rec=this.lessonRec(les.id);
-      statusById[les.id]={locked:!prev,cleared:!!rec.cleared,best:rec.bestWpm||0};
+      statusById[les.id]={locked:!prev&&currentUser,cleared:!!rec.cleared,best:rec.bestWpm||0};
     });
+
+    const guestBanner = !currentUser ? `<div class="gate-banner">
+      <p><strong>Crée un compte gratuit</strong> pour accéder aux 10 premières leçons et sauvegarder ta progression.</p>
+      <div class="gate-banner-btns">
+        <button class="gate-btn-pri" onclick="openAuth('register')">Créer un compte</button>
+        <button class="gate-btn-sec" onclick="openAuth('login')">Se connecter</button>
+      </div>
+    </div>` : '';
+
     const modsHTML=ALL_MODULES.map((mod,mi)=>{
       const lHTML=mod.lessons.map(les=>{
-        const s=statusById[les.id];const icon=s.cleared?'✓':s.locked?'🔒':'▸';
-        const dotCls=s.cleared?'c':s.locked?'l':'t';const isTodo=!s.locked&&!s.cleared;
-        return`<button class="lesson-card${isTodo?' todo-c':''}" ${s.locked?'disabled':`onclick="app.startLesson('${les.id}')"`}>
+        const isFree=isLessonFree(les.id);
+        const expertLocked=currentUser&&plan==='free'&&!isFree;
+        const progressLocked=statusById[les.id]&&statusById[les.id].locked;
+        const s=statusById[les.id]||{cleared:false,locked:false,best:0};
+        const icon=s.cleared?'✓':expertLocked?'✦':(!currentUser||progressLocked)?'🔒':'▸';
+        const dotCls=s.cleared?'c':expertLocked?'ex':(!currentUser||progressLocked)?'l':'t';
+        const isTodo=currentUser&&!progressLocked&&!s.cleared&&isFree;
+        const cardCls=`lesson-card${isTodo?' todo-c':''}${expertLocked?' expert-locked':''}`;
+        const clickHandler=!currentUser?`openAuth('register','Crée un compte pour commencer les leçons.')`
+          :expertLocked?`openModal('upgrade-modal')`
+          :progressLocked?''
+          :`app.tryStartLesson('${les.id}')`;
+        return`<button class="${cardCls}" ${(!currentUser||progressLocked)?'disabled':''} onclick="${clickHandler}">
           <div class="les-dot ${dotCls}">${icon}</div>
-          <div style="flex:1;min-width:0"><div class="les-title">${les.title}</div><div class="les-keys">${les.keys||''}</div></div>
+          <div style="flex:1;min-width:0">
+            <div class="les-title">${les.title}</div>
+            <div class="les-keys">${les.keys||''}</div>
+          </div>
           ${s.cleared?`<div class="les-best">${s.best} mpm</div>`:''}
+          ${expertLocked?`<div class="expert-tag">EXPERT</div>`:''}
         </button>`;
       }).join('');
-      const done=mod.lessons.filter(l=>statusById[l.id].cleared).length;
-      const pct=Math.round(100*done/mod.lessons.length);
+      const accessibleLessons=mod.lessons.filter(l=>currentUser&&(plan==='expert'||isLessonFree(l.id)));
+      const done=currentUser?mod.lessons.filter(l=>statusById[l.id]&&statusById[l.id].cleared).length:0;
+      const total=mod.lessons.length;
+      const pct=currentUser?Math.round(100*done/total):0;
       return`<div class="module">
         <div class="mod-hdr">
           <div class="mod-num" style="background:${MOD_COLORS[mi%7]}">${mi+1}</div>
           <div class="mod-name">${mod.name}</div>
           <div class="mod-bar"><div class="mod-bar-fill" style="width:${pct}%;background:${MOD_COLORS[mi%7]}"></div></div>
-          <span class="mod-prog">${done} / ${mod.lessons.length}</span>
+          <span class="mod-prog">${currentUser?done+' / '+total:'—'}</span>
         </div>
         <div class="lessons-grid">${lHTML}</div>
       </div>`;
     }).join('');
+
+    const goalsHtml=currentUser?`<div class="goals-bar">
+      <div class="goal-item"><span class="goal-label">Objectif vitesse</span><button class="goal-btn" onclick="app.setGoal('minWpm',-5)">–</button><span class="goal-val">${goals.minWpm}</span><button class="goal-btn" onclick="app.setGoal('minWpm',5)">+</button><span style="font-size:13px;color:var(--muted)">mpm</span></div>
+      <div class="goal-item"><span class="goal-label">Max erreurs</span><button class="goal-btn" onclick="app.setGoal('maxErrors',-1)">–</button><span class="goal-val">${goals.maxErrors}</span><button class="goal-btn" onclick="app.setGoal('maxErrors',1)">+</button></div>
+    </div>`:'';
+
     document.getElementById('page-lessons').innerHTML=`<div class="lessons-section">
-      <div class="lessons-header"><h2>Cours de frappe</h2><p>Progresse étape par étape, de la rangée de repos jusqu'aux accents et chiffres.</p></div>
-      <div class="goals-bar">
-        <div class="goal-item"><span class="goal-label">Objectif vitesse</span><button class="goal-btn" onclick="app.setGoal('minWpm',-5)">–</button><span class="goal-val">${goals.minWpm}</span><button class="goal-btn" onclick="app.setGoal('minWpm',5)">+</button><span style="font-size:13px;color:var(--muted)">mpm</span></div>
-        <div class="goal-item"><span class="goal-label">Max erreurs</span><button class="goal-btn" onclick="app.setGoal('maxErrors',-1)">–</button><span class="goal-val">${goals.maxErrors}</span><button class="goal-btn" onclick="app.setGoal('maxErrors',1)">+</button></div>
-      </div>
-      ${modsHTML}
+      <div class="lessons-header"><h2>Cours de frappe</h2><p>Progresse étape par étape · <span style="color:var(--accent);font-weight:700">10 leçons gratuites</span> · 20 leçons Expert ✦</p></div>
+      ${guestBanner}${goalsHtml}${modsHTML}
     </div>`;
   },
 
+  /* ── GAMES ── */
   renderGames(){
     const g=this.game;
     const gameOn=!!(g&&g.on);const gameOver=!!(g&&g.over);const gameIdle=!g||(!gameOn&&!gameOver);
-    const score=g?g.score:0;const lives=g?g.lives:3;const best=this.stats.gameBest||0;
+    const score=g?g.score:0;const lives=g?g.lives:3;const best=currentUser&&this.stats?this.stats.gameBest||0:0;
     const hearts=[0,1,2].map(i=>`<span style="font-size:20px;color:${i<lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
     const wordsHTML=(g&&g.words?g.words:[]).map(w=>`<div class="gword" style="left:${w.x}%;top:${w.y}%"><span class="gtyped">${w.text.slice(0,w.typedLen)}</span><span class="grest">${w.text.slice(w.typedLen)}</span></div>`).join('');
-    const overlay=gameIdle?`<div class="game-overlay"><h2>Frappe-mots</h2><p>Mots qui tombent, doigts qui dansent.<br>Meilleur score : <b style="color:#fff">${best} pts</b></p><button class="game-play-btn" onclick="app.startGame()">Jouer ▸</button></div>`:gameOver?`<div class="game-overlay"><h2>${score>best?'Nouveau record !':'Fin de partie'}</h2><div class="game-final">${score} pts</div><p>${score>best?'🎉 Tu bats ton record !':'Meilleur : '+best+' pts'}</p><button class="game-play-btn" onclick="app.startGame()">Rejouer ▸</button></div>`:'';
+    const guestOverlay=!currentUser?`<div class="game-overlay"><h2>Frappe-mots</h2><p>Crée un compte gratuit pour jouer et sauvegarder ton score.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button><button style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:14px;cursor:pointer;margin-top:-8px" onclick="openAuth('login')">Déjà un compte ?</button></div>`:'';
+    const overlay=!currentUser?guestOverlay:gameIdle?`<div class="game-overlay"><h2>Frappe-mots</h2><p>Mots qui tombent, doigts qui dansent.<br>Meilleur score : <b style="color:#fff">${best} pts</b></p><button class="game-play-btn" onclick="app.startGame()">Jouer ▸</button></div>`:gameOver?`<div class="game-overlay"><h2>${score>best?'Nouveau record !':'Fin de partie'}</h2><div class="game-final">${score} pts</div><p>${score>best?'🎉 Tu bats ton record !':'Meilleur : '+best+' pts'}</p><button class="game-play-btn" onclick="app.startGame()">Rejouer ▸</button></div>`:'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin-bottom:16px">Jeux de frappe</h2>
-      <div class="game-arena">
-        <div class="game-hud"><div class="game-score-val">${score}<span> pts</span></div><div style="display:flex;gap:5px">${hearts}</div></div>
-        ${wordsHTML}${overlay}
-      </div>
+      <div class="game-arena"><div class="game-hud"><div class="game-score-val">${score}<span> pts</span></div><div style="display:flex;gap:5px">${hearts}</div></div>${wordsHTML}${overlay}</div>
     </div>`;
   },
 
+  /* ── STATS ── */
   renderStats(){
+    if(!currentUser){
+      document.getElementById('page-stats').innerHTML=`<div style="max-width:640px;margin:80px auto;padding:0 24px;text-align:center">
+        <div style="font-size:48px;margin-bottom:20px">📊</div>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin-bottom:12px">Tes progrès t'attendent</h2>
+        <p style="color:#7A7365;font-size:17px;margin-bottom:28px">Crée un compte gratuit pour voir tes statistiques, suivre ta progression et enregistrer tes scores.</p>
+        <div style="display:flex;gap:12px;justify-content:center">
+          <button class="btn-primary" onclick="openAuth('register')">Créer un compte</button>
+          <button class="btn-secondary" onclick="openAuth('login')">Se connecter</button>
+        </div>
+      </div>`;
+      return;
+    }
     const tests=this.stats.tests||[];
     const bestWpm=tests.length?Math.max(...tests.map(t=>t.wpm)):0;
     const avgAcc=tests.length?Math.round(tests.reduce((a,t)=>a+t.acc,0)/tests.length):0;
@@ -704,7 +958,7 @@ const app={
     const days=['dim','lun','mar','mer','jeu','ven','sam'];
     const chartHTML=lastN.length?lastN.map(t=>`<div class="cbar-wrap"><div class="cbar-val">${t.wpm}</div><div class="cbar" style="height:${Math.max(6,Math.round(150*t.wpm/maxW))}px"></div><div class="cbar-lbl">${days[new Date(t.t).getDay()]}</div></div>`).join(''):'<div class="empty-hint">Pas encore de données.</div>';
     const rel=t=>{const d=Math.floor((Date.now()-t)/86400000);if(d<=0)return"aujourd'hui";if(d===1)return'hier';return'il y a '+d+' j';};
-    const recentHTML=tests.length===0?`<div class="empty-hint">Aucun test encore. <button class="btn-primary" style="padding:8px 16px;font-size:14px;margin-top:8px" onclick="go('test')">Commencer →</button></div>`:tests.slice(-5).reverse().map(t=>`<div class="recent-item"><div><div class="rwpm">${t.wpm} <span>mpm</span></div><div class="rwhen">${rel(t.t)}</div></div><div class="racc">${t.acc}%</div></div>`).join('');
+    const recentHTML=tests.length===0?`<div class="empty-hint">Aucun test encore.<br><button class="btn-primary" style="padding:8px 16px;font-size:14px;margin-top:12px" onclick="go('test')">Commencer →</button></div>`:tests.slice(-5).reverse().map(t=>`<div class="recent-item"><div><div class="rwpm">${t.wpm} <span>mpm</span></div><div class="rwhen">${rel(t.t)}</div></div><div class="racc">${t.acc}%</div></div>`).join('');
     document.getElementById('page-stats').innerHTML=`<div class="stats-section">
       <div class="stats-header"><h1>Tes progrès</h1><p>Chaque test et chaque leçon comptent. Continue ta série !</p></div>
       <div class="stats-cards">
@@ -723,7 +977,10 @@ const app={
   }
 };
 
-function go(view){if(!currentUser)return;app.renderView(view);}
+/* ── INIT ── */
+function go(view){app.renderView(view);}
+app.init();
+go('home');
 </script>
 </body>
 </html>
