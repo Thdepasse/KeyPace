@@ -633,97 +633,211 @@ const KB=[
 ];
 const PASSAGES=["le matin, la lumière douce traverse les rideaux et réveille doucement la maison encore endormie sous un ciel calme et clair.","taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides et plus sûres.","le petit renard roux traverse le champ gelé, observe les oiseaux au loin, puis disparaît derrière la vieille grange en bois.","écrire vite, c'est surtout écrire juste : vise la précision avant la vitesse, et la cadence viendra naturellement avec le temps."];
 const CURRICULUM=[
+  /* ── MODULE 1 : touches de repos ─────────────────────────────────────────── */
   {name:'1. Position de base',lessons:[
-    {id:'r1',title:'Les touches F et J',keys:'f j',neu:'ffjjfjfjjfjfjfjfjfjfjfjfjffjj'},
-    {id:'r2',title:'D et K',keys:'d k',neu:'ddkkdkdkkdkdfdkjjkdfdkkd'},
-    {id:'r3',title:'S et L',keys:'s l',neu:'sslllslslssldksldkjsldkj'},
-    {id:'r4',title:'Q et M',keys:'q m',neu:'qqmmmqmqmmqmsldmqslm'},
-    {id:'r5',title:'G et H',keys:'g h',neu:'gghhhghghhghgfhgjhfg'},
-    {id:'r6',title:'Révision rangée de repos',keys:'q s d f g h j k l m',review:'qsdfghjklm'},
+    // r1 : f j seulement
+    {id:'r1',title:'F et J — les index',keys:'f j',
+     text:'fj jf fj jf fjfj jfjf ffjj jjff fj jf fjfj jfjf ffj jjf fj jf ffjj'},
+    // r2 : + d k
+    {id:'r2',title:'D et K — les majeurs',keys:'d k',
+     text:'dk kd fd jk dkfj fjdk dkf jkd fdjk kjdf fdkj jkdf dk kd fd jk dkfj fjdk'},
+    // r3 : + s l
+    {id:'r3',title:'S et L — les annulaires',keys:'s l',
+     text:'sl ls sd lk fs jl sldk dksl sfld jkls sldf lsdf sdjk ljkf sl ls sdjk ljkf'},
+    // r4 : + q m
+    {id:'r4',title:'Q et M — les auriculaires',keys:'q m',
+     text:'qm mq qs ml qslm mljk qmdf jklm qmsl slqm qlsm mqdj qsdfg hjklm qmsl mqdj'},
+    // r5 : + g h  — on peut presque faire des syllabes
+    {id:'r5',title:'G et H — index intérieurs',keys:'g h',
+     text:'gh hg gfhj jhgf ghfd slgh ghsl mhgl gqhm ghfj hjkl slgh ghfd qghm hglm'},
+    // r6 : révision — toute la rangée, on commence à avoir des pseudo-mots
+    {id:'r6',title:'Révision — toute la rangée de repos',keys:'q s d f g h j k l m',
+     text:'qsd fgh jkl mqs dfg hjk lmq sdf ghj klm qsdfg hjklm qsd fghj klmq sdfgh'},
   ]},
+
+  /* ── MODULE 2 : rangée du haut ───────────────────────────────────────────── */
   {name:'2. Rangée du haut',lessons:[
-    {id:'h1',title:'R et U',keys:'r u',neu:'rruurururrurufrujujrf'},
-    {id:'h2',title:'E et I',keys:'e i',neu:'eeiieieiieiededikike'},
-    {id:'h3',title:'Z et O',keys:'z o',neu:'zzooozoozzozzsozolzos'},
-    {id:'h4',title:'A et P',keys:'a p',neu:'aappapaapapasaplpas'},
-    {id:'h5',title:'T et Y',keys:'t y',neu:'ttyytytyttytruyutr'},
-    {id:'h6',title:'Révision rangée du haut',keys:'a z e r t y u i o p',review:'azertyuiop'},
+    // h1 : + r u  → premiers vrais mots français
+    {id:'h1',title:'R et U — premiers vrais mots',keys:'r u',
+     text:'sur dur mur jus mus fur surf durs murs jus sur dur mur surf mus sur dur jus mur sur'},
+    // h2 : + e i  → explosion du vocabulaire
+    {id:'h2',title:'E et I — le français prend forme',keys:'e i',
+     text:'les mes des ris gris seul leur lire dire fier hier duel miel lieu fuir lis sur dur mur'},
+    // h3 : + z o  → premières vraies phrases (sans t, a, p encore)
+    {id:'h3',title:'Z et O — premières phrases',keys:'z o',
+     text:'le sol gris. rose dose mode. moi soi roi loi. riz ose dos. douze seize. gris sol morose. lire les mots.'},
+    // h4 : + a p  → phrases riches
+    {id:'h4',title:'A et P — phrases riches',keys:'a p',
+     text:'la soupe de moules. poire ou jupe. aide moi, ami. roue poule. prise sure. lire, apprendre, progresser.'},
+    // h5 : + t y  → phrases quasi-naturelles
+    {id:'h5',title:'T et Y — phrases naturelles',keys:'t y',
+     text:'tu tapes tous les jours. style et type. trop dur. le toit est gris. yoga et sport. progresser par la pratique.'},
+    // h6 : révision — toutes lettres hautes + repos, vraies phrases
+    {id:'h6',title:'Révision — toute la rangée du haut',keys:'a z e r t y u i o p',
+     text:'tu tapes tous les jours et tu progresses. style simple et juste. la rose pousse sur le sol dur. sport yoga type.'},
   ]},
+
+  /* ── MODULE 3 : rangée du bas ────────────────────────────────────────────── */
   {name:'3. Rangée du bas',lessons:[
-    {id:'b1',title:'C et virgule',keys:'c ,',text:'col car cou clic clic, col, cou, car, col car clic, cela, ceci, coco, cale,'},
-    {id:'b2',title:'V et N',keys:'v n',text:'vin van venu neuf vine neve avion navire venir nager vague niveau vingt neuf'},
-    {id:'b3',title:'X et point-virgule',keys:'x ;',text:'axe fox luxe; taxi; oxe dix; mixte; expres; luxe; axel; box; flux; index;'},
-    {id:'b4',title:'W et deux-points',keys:'w :',text:'web : wifi : wok : swap : show : clown : twin : crew : bowl : www :'},
-    {id:'b5',title:'B et point d\'exclamation',keys:'b !',text:'bravo ! beau bois bol bal beurre ! brise bible bien bise ! beau bébé bleu !'},
-    {id:'b6',title:'Révision rangée du bas',keys:'w x c v b n , ; : !',text:'vive le web, xbox clown. bravo ! nuit wifi. taxi box. film. neuf, vingt !'},
+    // b1 : + c ,   → phrases naturelles, on a presque tout l'alphabet
+    {id:'b1',title:'C et virgule — récit',keys:'c ,',
+     text:'ce cours est simple, car le code est clair. cour, corde, clip, coupe. la pratique, jour par jour, porte ses fruits.'},
+    // b2 : + v n   → tout le vocabulaire courant disponible
+    {id:'b2',title:'V et N — texte naturel',keys:'v n',
+     text:'un vent venu du nord. la nature est vraie. vingt navires en route. venir voir la nature, c\'est une vraie pause.'},
+    // b3 : + x ;   → chiffres oraux + ponctuation
+    {id:'b3',title:'X et point-virgule',keys:'x ;',
+     text:'six navires; dix voix. les vieux yeux voient deux axes de luxe; un taxi pour six personnes; dix voyages.'},
+    // b4 : + w :   → termes tech + prose
+    {id:'b4',title:'W et deux-points',keys:'w :',
+     text:'wifi, wok, swap : le wifi est partout. six axes : deux woks sur la table. taxi et wifi, tout est connecté, vite.'},
+    // b5 : + b !   → l'alphabet est complet, vraies phrases
+    {id:'b5',title:'B et point d\'exclamation',keys:'b !',
+     text:'beau bruit du bar ! brave et bon. boire du vin venu du nord. brun, bas, but ! la base est solide. bon voyage !'},
+    // b6 : révision totale, texte fluide, 26 lettres disponibles
+    {id:'b6',title:'Révision — les 26 lettres réunies',keys:'tout l\'alphabet',
+     text:'le vieux taxi gris part vers le nord. boire du vin au bar. brave nature. six navires. vingt voyages en bus. bonne route !'},
   ]},
-  {name:'4. Premiers mots',lessons:[
-    {id:'w1',title:'Syllabes simples',keys:'syllabes',text:'fa fo fi fe fu sa so si se su la lo li le lu da do di de du na no ni ne nu'},
-    {id:'w2',title:'Mots de 2 à 3 lettres',keys:'mots courts',text:'le la un du au en et ou il on ne se ce je tu me ma ta sa mon ton son nos'},
-    {id:'w3',title:'Mots fréquents',keys:'vocabulaire',text:'avec pour dans mais sous chez bien tout sans nous vous leur quand alors aussi'},
-    {id:'w4',title:'Mots de la vie courante',keys:'vocabulaire',text:'maison jardin cuisine chambre fenêtre voiture travail famille enfant quartier'},
-    {id:'w5',title:'Premières phrases complètes',keys:'phrases',text:'le chat dort sur le banc. la maison est grande. il fait beau dehors aujourd\'hui.'},
+
+  /* ── MODULE 4 : construire des phrases ──────────────────────────────────── */
+  {name:'4. Construire des phrases',lessons:[
+    {id:'w1',title:'Rythme et syllabes',keys:'toutes lettres',
+     text:'fa fo fi fe sa so si se la lo li le da do di de na no ni ne ba bo bi be ma mo mi me va vo vi ve'},
+    {id:'w2',title:'Mots outils essentiels',keys:'vocabulaire',
+     text:'le la les un une du des au aux et ou ni car mais donc or parce que pourtant cependant alors'},
+    {id:'w3',title:'Mots fréquents du quotidien',keys:'vocabulaire',
+     text:'avec pour dans sous chez bien tout sans nous vous leur quand alors aussi depuis souvent toujours jamais'},
+    {id:'w4',title:'Vocabulaire de la vie courante',keys:'vocabulaire',
+     text:'maison jardin cuisine voiture travail famille enfant bureau table chaise livre journal fenêtre porte mur'},
+    {id:'w5',title:'Premières phrases naturelles',keys:'fluidité',
+     text:'le chat dort sur le banc. la maison est grande et claire. il fait beau dehors. tu aimes lire et voyager loin.'},
   ]},
+
+  /* ── MODULE 5 : majuscules ───────────────────────────────────────────────── */
   {name:'5. Majuscules',lessons:[
-    {id:'maj1',title:'Majuscules — main gauche',keys:'Maj gauche',text:'Le La Lo Li Lu Jo Ji Ku Ki Hu Hi Mu Mi Nu Ni Ou Oi Pu Pi Yu Yi Uu Oo Pp'},
-    {id:'maj2',title:'Majuscules — main droite',keys:'Maj droite',text:'Fa Fe Fi Fo Sa Se Si So Da De Di Do Ra Re Ri Ro Ta Te Ti To Za Ze Zi Zo'},
-    {id:'maj3',title:'Noms propres',keys:'noms',text:'Paris Lyon Bruxelles Liège Genève Marie Jean Sophie Pierre Luc Anna Emma Hugo'},
-    {id:'maj4',title:'Phrases avec majuscules',keys:'phrases',text:'Le soleil brille. Les enfants jouent dehors. Marie mange une pomme. Paul arrive.'},
+    {id:'maj1',title:'Majuscule — main gauche (shift droit)',keys:'Maj + lettres gauches',
+     text:'La Le Lo Li Lu Na Ne Nu No Ni Ma Me Mu Mo Mi Ta Te Tu To Ti Fa Fe Fu Fo Fi Ra Re Ru'},
+    {id:'maj2',title:'Majuscule — main droite (shift gauche)',keys:'Maj + lettres droites',
+     text:'Pa Pe Pu Po Pi Sa Se Su So Si Da De Du Do Di Ya Ye Yu Zo Ze Wa We Wu Xa Xe Xi Xo'},
+    {id:'maj3',title:'Noms propres et villes',keys:'majuscules',
+     text:'Paris Lyon Bruxelles Genève Berlin Tokyo Marie Jean Sophie Pierre Hugo Luc Anna Emma Paul Clara'},
+    {id:'maj4',title:'Phrases correctement capitalisées',keys:'majuscules en contexte',
+     text:'Le soleil brille. Les enfants jouent dehors. Marie mange une pomme. Paul est arrivé en retard ce matin.'},
   ]},
-  {name:'6. Ponctuation',lessons:[
-    {id:'pon1',title:'Le point et la virgule',keys:'. ,',text:'il pleut, il vente, il neige. la nuit tombe, le froid arrive, on rentre chez soi.'},
-    {id:'pon2',title:'Question et exclamation',keys:'? !',text:'où es-tu ? que fais-tu ? viens ici ! attention ! c\'est beau ! vraiment ?'},
-    {id:'pon3',title:'Deux-points et point-virgule',keys:': ;',text:'voici la liste : pain, lait, café ; beurre, sel, sucre ; eau, jus, thé, lait.'},
-    {id:'pon4',title:"L'apostrophe",keys:"'",text:"c'est l'heure qu'il aime. d'où viens-tu ? l'idée d'aujourd'hui est vraiment bonne."},
-    {id:'pon5',title:'Les guillemets',keys:'« »',text:'il dit : « bonjour ». elle répond : « bonsoir ». il ajoute : « merci beaucoup ».'},
-    {id:'pon6',title:'Tiret et parenthèses',keys:'- ()',text:'vingt-cinq (25) élèves présents. c\'est bien — très bien même (parfait). rendez-vous.'},
+
+  /* ── MODULE 6 : ponctuation complète ────────────────────────────────────── */
+  {name:'6. Ponctuation complète',lessons:[
+    {id:'pon1',title:'Le point et la virgule',keys:'. ,',
+     text:'il pleut, il vente, il neige. la nuit tombe, le froid arrive, on rentre chez soi. vite, vite, rentrons.'},
+    {id:'pon2',title:'Question et exclamation',keys:'? !',
+     text:'où es-tu ? que fais-tu ? viens ici ! attention ! c\'est beau ! vraiment ? super ! bravo ! encore ?'},
+    {id:'pon3',title:'Deux-points et point-virgule',keys:': ;',
+     text:'voici la liste : pain, lait, café ; beurre, sel, sucre ; eau, jus, thé. trois règles : clarté, brièveté, précision.'},
+    {id:'pon4',title:"L'apostrophe et le tiret",keys:"' -",
+     text:"c'est l'heure qu'il aime. d'où viens-tu ? l'idée d'aujourd'hui est bonne. vingt-cinq élèves présents."},
+    {id:'pon5',title:'Guillemets et parenthèses',keys:'« » ()',
+     text:'il dit : « bonjour ». elle répond : « merci ». le résultat (42) est juste. bonne journée (enfin) !'},
+    {id:'pon6',title:'Ponctuation en texte réel',keys:'toute la ponctuation',
+     text:'« Viens vite ! » dit-il. Elle répondit : « J\'arrive ; attends-moi. » Vingt-cinq minutes plus tard (enfin), elle arriva.'},
   ]},
+
+  /* ── MODULE 7 : accents directs AZERTY ──────────────────────────────────── */
   {name:'7. Accents directs AZERTY',lessons:[
-    {id:'acc1',title:"L'accent aigu é",keys:'é',text:'été café écran étoile éléphant étude écrire échec éclat émoi énorme réel série'},
-    {id:'acc2',title:"L'accent grave è",keys:'è',text:'père mère frère très près après dès réécrire fière période sévère rivière lumière'},
-    {id:'acc3',title:'Le à et le où',keys:'à',text:'voilà déjà là-bas à côté où là-haut à peine à droite à gauche à présent déjà'},
-    {id:'acc4',title:'Le ù et la cédille ç',keys:'ù ç',text:'façon leçon garçon français reçu maçon ça voilà aperçu soupçon glaçon rançon'},
-    {id:'acc5',title:'Révision accents directs',keys:'é è à ù ç',text:'déjà été café façon là où très père après voilà ça leçon éclat reçu sévère'},
+    // acc1 : é seul, beaucoup de répétitions, vrais mots
+    {id:'acc1',title:"L'accent aigu — é",keys:'é',
+     text:'été café écran étoile étude écrire échec éclat réel série élève énergie épée ébène érable café été'},
+    // acc2 : è + révision é
+    {id:'acc2',title:"L'accent grave — è (+ révision é)",keys:'è',
+     text:'père mère frère très près après dès fière rivière lumière. été, très près. père préfère le café. fenêtre.'},
+    // acc3 : à où + révision é è
+    {id:'acc3',title:"À et où (+ révision é è)",keys:'à où',
+     text:'voilà déjà là-bas à côté. où es-tu ? là-haut, à gauche. père et mère sont déjà là. voilà le café.'},
+    // acc4 : ù ç + révision
+    {id:'acc4',title:"Ù et ç (+ révision tous accents)",keys:'ù ç',
+     text:'façon leçon garçon français reçu ça voilà. déjà là, façon très douce. père et mère à la leçon. café.'},
+    // acc5 : révision complète, vrais textes
+    {id:'acc5',title:'Révision — tous les accents directs',keys:'é è à ù ç',
+     text:'déjà à l\'été, le café et la façon d\'être. très près de là, père et mère écrivent la leçon de français.'},
   ]},
+
+  /* ── MODULE 8 : accents circonflexes ────────────────────────────────────── */
   {name:'8. Accents circonflexes',lessons:[
-    {id:'cir1',title:'â et ê',keys:'^ a / ^ e',text:'château pâte âge bâton mât pâle pâtisserie; être fête tête bête forêt prêt arrêt'},
-    {id:'cir2',title:'î et ô',keys:'^ i / ^ o',text:'île îlot naître maître boîte traître; hôtel hôte côte rôle drôle tôt côté dôme'},
-    {id:'cir3',title:'û',keys:'^ u',text:'sûr sûrement dû crû flûte brûler goût août voûte coût fût brûlure'},
-    {id:'cir4',title:'Révision circonflexes',keys:'â ê î ô û',text:'château île hôtel sûr être tête côte forêt maître bête pâte fête voûte flûte'},
+    // cir1 : â ê seuls, beaucoup de vrais mots
+    {id:'cir1',title:'Â et Ê — chapeau sur a et e',keys:'^ puis a ou e',
+     text:'château pâte âge bâton mât. être fête tête bête forêt prêt arrêt. le château est prêt pour la fête.'},
+    // cir2 : î ô + révision â ê
+    {id:'cir2',title:'Î et Ô — (+ révision â ê)',keys:'^ puis i ou o',
+     text:'île îlot naître maître boîte. hôtel côte rôle tôt dôme. le maître est à l\'île, près du château. hôtel.'},
+    // cir3 : û + révision complète
+    {id:'cir3',title:'Û et révision complète',keys:'^ puis u (+ tous)',
+     text:'sûr dû brûler goût août flûte voûte. le château de l\'île est sûr. fête au tôt. forêt et dôme. maître.'},
+    // cir4 : texte riche avec tous les circonflexes
+    {id:'cir4',title:'Texte avec tous les circonflexes',keys:'â ê î ô û',
+     text:'au château sur l\'île, la fête était sûre. le maître de l\'hôtel brûlait une flûte. forêt, côte, dôme, tôt.'},
   ]},
+
+  /* ── MODULE 9 : tréma et ligatures ──────────────────────────────────────── */
   {name:'9. Tréma et ligatures',lessons:[
-    {id:'tre1',title:'Le tréma ë et ï',keys:'¨ e / ¨ i',text:'Noël naïf maïs héroïque aiguë canoë Joël Gaël coïncidence Raphaël'},
-    {id:'tre2',title:'Les ligatures œ et æ',keys:'œ æ',text:'cœur sœur œil œuvre bœuf manœuvre curriculum hors-d\'œuvre'},
-    {id:'tre3',title:'Révision tréma et ligatures',keys:'ë ï œ æ',text:'Noël cœur naïf sœur maïs aiguë Joël bœuf héroïque canoë manœuvre'},
+    {id:'tre1',title:'Le tréma — ë et ï',keys:'¨ puis e ou i',
+     text:'Noël naïf maïs aiguë canoë Joël Gaël héroïque. Noël est naïf. le maïs aiguë. Joël et Gaël au canoë.'},
+    {id:'tre2',title:'Les ligatures — œ et æ',keys:'œ æ',
+     text:'cœur sœur œil œuvre bœuf manœuvre hors-d\'œuvre. ma sœur a du cœur. l\'œuvre est belle. bœuf manœuvre.'},
+    {id:'tre3',title:'Texte avec tous les signes',keys:'ë ï œ æ + tous accents',
+     text:'à Noël, ma sœur naïve au cœur héroïque fait une manœuvre. le maïs pousse où l\'île est sûre, près du château.'},
   ]},
+
+  /* ── MODULE 10 : chiffres ────────────────────────────────────────────────── */
   {name:'10. Chiffres',lessons:[
-    {id:'num1',title:'4 5 6 7',keys:'4 5 6 7',genNum:'4567'},
-    {id:'num2',title:'3 et 8',keys:'3 8',genNum:'38453867'},
-    {id:'num3',title:'2 et 9',keys:'2 9',genNum:'29382979'},
-    {id:'num4',title:'1 et 0',keys:'1 0',genNum:'10291030'},
-    {id:'num5',title:'Tous les chiffres',keys:'0 à 9',genNum:'1234567890'},
-    {id:'num6',title:'Chiffres en contexte',keys:'chiffres + texte',text:'il y a 42 élèves dans 3 classes. le bus 12 part à 8h30. tél : 04 98 76 54 32.'},
+    // progression du centre vers les bords
+    {id:'num1',title:'4 5 6 7 — proches des index',keys:'4 5 6 7',genNum:'4567'},
+    {id:'num2',title:'3 et 8 — un pas de plus',keys:'3 8',genNum:'38453867'},
+    {id:'num3',title:'2 et 9 — les annulaires',keys:'2 9',genNum:'29382979'},
+    {id:'num4',title:'1 et 0 — les auriculaires',keys:'1 0',genNum:'10291030'},
+    {id:'num5',title:'Tous les chiffres enchaînés',keys:'0 à 9',genNum:'1234567890'},
+    {id:'num6',title:'Chiffres dans un texte réel',keys:'chiffres en contexte',
+     text:'il y a 42 élèves dans 3 classes de 14. le bus 12 part à 8h30. tél : 04 98 76 54 32. code postal : 75001.'},
   ]},
+
+  /* ── MODULE 11 : symboles courants ──────────────────────────────────────── */
   {name:'11. Symboles courants',lessons:[
-    {id:'sym1',title:'Arobase et dièse',keys:'@ #',text:'contact@keypace.be #keypace #clavier @user info@site.com #top @jean #apprendre'},
-    {id:'sym2',title:'Parenthèses et crochets',keys:'() []',text:'(bonjour) [monde] (1+2) [test] (ok) [a-z] (fin) [start] (42) [rouge] (bleu)'},
-    {id:'sym3',title:'Slash et barre verticale',keys:'/ |',text:'http://site.fr chemin/vers/fichier cat file | grep mot a/b | c/d http://url.be'},
-    {id:'sym4',title:'Astérisque égal et plus',keys:'* = +',text:'2*3=6 a+b=c x*y+z=0 total=prix*quantité résultat=a+b+c valeur*2=8 somme=0'},
-    {id:'sym5',title:'Pourcentage et tiret bas',keys:'% _',text:'50% 75% ma_variable nom_fichier 100% style_css mon_pseudo classe_active_id'},
+    {id:'sym1',title:'@ et # — email et hashtag',keys:'@ #',
+     text:'contact@keypace.be #keypace @user info@site.com #top @jean #apprendre #clavier @monde contact@mail.fr'},
+    {id:'sym2',title:'Parenthèses () et crochets []',keys:'() []',
+     text:'(bonjour) [monde] fonctions(x) tableau[0] résultat(42) liste[fin] (ok) [a-z] valeur(2+3) index[i]'},
+    {id:'sym3',title:'/ et | — chemins et pipes',keys:'/ |',
+     text:'http://site.fr chemin/vers/fichier cat fichier | grep mot droite | gauche /home/user a/b | c/d /var/log'},
+    {id:'sym4',title:'* = + — calculs et code',keys:'* = +',
+     text:'2*3=6 a+b=c x*y+z=0 total=prix*quantité résultat=a+b+c valeur*2=8 score=temps*précision vitesse+1=ok'},
+    {id:'sym5',title:'% et _ — taux et variables',keys:'% _',
+     text:'50% 75% ma_variable nom_fichier 100% style_css mon_pseudo classe_active taux_erreur score_max_wpm'},
   ]},
+
+  /* ── MODULE 12 : symboles avancés ───────────────────────────────────────── */
   {name:'12. Symboles avancés',lessons:[
-    {id:'sym6',title:'Accolades et chevrons',keys:'{} <>',text:'{code} <html> </html> {style} <div> </div> {body} <p> </p> <span> </span>'},
-    {id:'sym7',title:'Guillemets doubles et tilde',keys:'"" ~',text:'"bonjour" "monde" ~/documents ~user "texte important" ~/bureau "valeur": true'},
-    {id:'sym8',title:'Antislash et accent grave',keys:'\\ `',text:'C:\\Users\\theo `code inline` \\n \\t `variable` C:\\Windows `npm install`'},
-    {id:'sym9',title:'Révision tous les symboles',keys:'tous symboles',text:'contact@site.fr (2024) http://url.be #tag {css} <html> 50% = ok ! a+b=c [fin]'},
+    {id:'sym6',title:'{} et <> — code et HTML',keys:'{} <>',
+     text:'{code: true} <html> </html> {style: "bold"} <div class="main"> </div> {return x+y} <p>texte</p>'},
+    {id:'sym7',title:'"" et ~ — chaînes et chemins',keys:'"" ~',
+     text:'"bonjour" "monde" ~/documents ~user "valeur": true ~/bureau "clé": "données" ~root "résultat": 42'},
+    {id:'sym8',title:'\\ et ` — code et terminal',keys:'\\ `',
+     text:'C:\\Users\\theo `code inline` \\n \\t `variable` C:\\Windows `npm install` \\r\\n `git commit -m "fix"`'},
+    {id:'sym9',title:'Révision — tous les symboles en texte',keys:'tous symboles',
+     text:'contact@site.fr (2024) http://url.be #tag {css: bold} <html> 50%=ok a+b=c [fin] ~/home "valeur"'},
   ]},
+
+  /* ── MODULE 13 : vitesse et fluidité ────────────────────────────────────── */
   {name:'13. Vitesse et fluidité',lessons:[
-    {id:'flu1',title:'Phrases courtes enchaînées',keys:'fluidité',text:'le jour se lève. les oiseaux chantent. le café est prêt. on y va ensemble. allons-y.'},
-    {id:'flu2',title:'Phrases moyennes',keys:'fluidité',text:"chaque matin, elle ouvre la fenêtre et respire l'air frais avant de commencer sa journée."},
-    {id:'flu3',title:'Paragraphe narratif',keys:'paragraphe',text:"taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides et plus sûres sur le clavier."},
-    {id:'flu4',title:'Texte professionnel',keys:'pro',text:'veuillez trouver ci-joint notre offre. n\'hésitez pas à nous contacter au 04 98 76 54 32 ou par email : contact@keypace.be'},
-    {id:'flu5',title:'Texte technique',keys:'code + texte',text:'le fichier config.json contient : {"version": "1.0", "debug": false, "port": 3000, "url": "http://localhost"}.'},
-    {id:'flu6',title:'Vitesse maximale',keys:'vitesse',text:"écrire vite s'apprend avec de la régularité ; entraîne-toi chaque jour, garde les yeux sur l'écran, et laisse tes doigts trouver leur place tout seuls sur le clavier AZERTY."},
+    {id:'flu1',title:'Enchaînement de phrases courtes',keys:'fluidité',
+     text:'le jour se lève. les oiseaux chantent. le café est prêt. on y va ensemble. allons-y, vite ! bonne journée.'},
+    {id:'flu2',title:'Phrases moyennes naturelles',keys:'fluidité',
+     text:"chaque matin, elle ouvre la fenêtre et respire l'air frais avant de commencer sa journée de travail chargée."},
+    {id:'flu3',title:'Paragraphe narratif complet',keys:'paragraphe',
+     text:"taper sans regarder ses doigts demande de la patience, mais chaque jour de pratique rend les mains plus rapides et plus sûres. C'est une question d'habitude."},
+    {id:'flu4',title:'Texte professionnel',keys:'style pro',
+     text:"Veuillez trouver ci-joint notre offre. N'hésitez pas à nous contacter au 04 98 76 54 32 ou par email : contact@keypace.be. Bien cordialement."},
+    {id:'flu5',title:'Texte technique avec symboles',keys:'mixte complet',
+     text:'le fichier config.json : {"version": "1.0", "debug": false, "port": 3000}. Lancer : `npm start` dans ~/projet.'},
+    {id:'flu6',title:'Sprint de vitesse — texte long',keys:'vitesse maximale',
+     text:"Écrire vite s'apprend avec de la régularité ; entraîne-toi chaque jour, garde les yeux sur l'écran, et laisse tes doigts trouver leur place tout seuls sur le clavier AZERTY. Bonne chance !"},
   ]},
 ];
 const MOD_COLORS=['#EE6B5E','#F4A04C','#D9A60C','#5BA84A','#3FA6B2','#6E8BE8','#A77BD6','#E8729A','#4CB8C4','#9B59B6','#E67E22','#27AE60','#2980B9'];
