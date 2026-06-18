@@ -963,7 +963,7 @@ const app={
         <div class="feature-card"><div class="icon">⚡</div><h3>Test de vitesse</h3><p>Mesure tes mots par minute et ta précision sur des textes variés.</p></div>
         <div class="feature-card"><div class="icon">🎮</div><h3>Jeu de mots</h3><p>Des mots tombent du ciel — tape-les avant qu'ils touchent le sol !</p></div>
       </div>
-      <div class="pricing-section">
+      ${getUserPlan()!=='expert'?`<div class="pricing-section">
         <h2>Simple et transparent</h2>
         <p>Commence gratuitement, passe Expert quand tu veux.</p>
         <div class="pricing-grid">
@@ -1000,7 +1000,8 @@ const app={
             </button>
           </div>
         </div>
-      </div>`;
+      </div>`:''}
+      `;
   },
 
   /* ── TYPING ── */
