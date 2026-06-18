@@ -341,7 +341,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
         </ul>
       </div>
     </div>
-    <button class="upgrade-btn" onclick="activateExpert()">Passer à Expert →</button>
+    <button class="upgrade-btn" id="stripe-pay-btn" onclick="startCheckout()">Passer à Expert — Payer →</button>
     <div id="upgrade-msg" style="text-align:center;font-size:13px;color:var(--muted);margin-top:12px;display:none"></div>
     <div class="upgrade-code-wrap">
       <input type="text" class="upgrade-code-input" id="expert-code" placeholder="Code promo / licence">
@@ -403,17 +403,27 @@ const FREE_LESSON_IDS = ['r1','r2','r3','r4','r5','r6','h1','h2','h3','h4']; // 
 const EXPERT_CODE = 'KEYPACE-EXPERT'; // code démo
 
 /* ── AUTH ── */
-const ACCOUNTS_KEY = 'klak_accounts';
 let currentUser = null;
+let currentPlan = null;
+let currentToken = null;
 let currentTab = 'login';
-let _authCallback = null; // called after login if set
-
-function getAccounts(){try{return JSON.parse(localStorage.getItem(ACCOUNTS_KEY))||{};}catch{return {};}}
-function saveAccounts(a){localStorage.setItem(ACCOUNTS_KEY,JSON.stringify(a));}
+let _authCallback = null;
 
 async function hashPw(pw){
   const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function saveSession(username, plan, token){
+  currentUser=username; currentPlan=plan; currentToken=token;
+  localStorage.setItem('klak_session', JSON.stringify({username, plan, token}));
+}
+function clearSession(){
+  currentUser=null; currentPlan=null; currentToken=null;
+  localStorage.removeItem('klak_session');
+}
+function loadSession(){
+  try{const s=JSON.parse(localStorage.getItem('klak_session'));if(s&&s.username){currentUser=s.username;currentPlan=s.plan||'free';currentToken=s.token;}}catch{}
 }
 
 function openModal(id){document.getElementById(id).classList.add('open');}
@@ -446,21 +456,28 @@ async function authSubmit(){
   const confirm=document.getElementById('auth-confirm').value;
   if(!username)return showAuthError("Entre un nom d'utilisateur.");
   if(!password)return showAuthError('Entre un mot de passe.');
-  const accounts=getAccounts();
-  if(currentTab==='register'){
-    if(password!==confirm)return showAuthError('Les mots de passe ne correspondent pas.');
-    if(password.length<6)return showAuthError('Mot de passe trop court (6 caractères min).');
-    if(accounts[username])return showAuthError('Ce nom est déjà pris.');
-    const hash=await hashPw(password);
-    accounts[username]={hash,created:Date.now(),plan:'free'};
-    saveAccounts(accounts);
-    loginUser(username);
-  } else {
-    if(!accounts[username])return showAuthError('Utilisateur introuvable.');
-    const hash=await hashPw(password);
-    if(hash!==accounts[username].hash)return showAuthError('Mot de passe incorrect.');
-    loginUser(username);
-  }
+  const btn=document.getElementById('auth-submit');
+  btn.disabled=true; btn.textContent='Chargement…';
+  try{
+    const passwordHash=await hashPw(password);
+    if(currentTab==='register'){
+      if(password!==confirm){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Les mots de passe ne correspondent pas.');}
+      if(password.length<6){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Mot de passe trop court (6 caractères min).');}
+      const r=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,passwordHash})});
+      const d=await r.json();
+      if(!r.ok){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError(d.error||'Erreur.');}
+      saveSession(d.username, d.plan, d.token);
+      app.stats=mergeStats(d.data);
+      loginUser(d.username);
+    } else {
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,passwordHash})});
+      const d=await r.json();
+      if(!r.ok){btn.disabled=false;btn.textContent='Se connecter';return showAuthError(d.error||'Erreur.');}
+      saveSession(d.username, d.plan, d.token);
+      app.stats=mergeStats(d.data);
+      loginUser(d.username);
+    }
+  }catch(e){btn.disabled=false;btn.textContent=currentTab==='login'?'Se connecter':'Créer mon compte';showAuthError('Erreur réseau, réessaie.');}
 }
 
 document.addEventListener('keydown',e=>{
@@ -478,10 +495,11 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{
 });
 
 function loginUser(username){
-  currentUser=username;
   closeModal('auth-modal');
   document.getElementById('auth-password').value='';
   document.getElementById('auth-confirm').value='';
+  const btn=document.getElementById('auth-submit');
+  btn.disabled=false;btn.textContent=currentTab==='login'?'Se connecter':'Créer mon compte';
   updateNavUser();
   app.init();
   app.renderCurrent();
@@ -489,7 +507,8 @@ function loginUser(username){
 }
 
 function logout(){
-  currentUser=null;
+  clearSession();
+  app.stats=null;
   app.stopAll();
   updateNavUser();
   app.renderCurrent();
@@ -512,8 +531,7 @@ function updateNavUser(){
 
 function getUserPlan(){
   if(!currentUser)return null;
-  const acc=getAccounts()[currentUser];
-  return acc?acc.plan||'free':'free';
+  return currentPlan||'free';
 }
 
 function isLessonFree(lessonId){return FREE_LESSON_IDS.includes(lessonId);}
@@ -526,45 +544,80 @@ function canAccessLesson(lessonId){
 function canAccessGame(){return !!currentUser;}
 
 /* ── UPGRADE ── */
-function activateExpert(){
-  if(!currentUser)return;
-  const accounts=getAccounts();
-  accounts[currentUser].plan='expert';
-  saveAccounts(accounts);
-  updateNavUser();
-  const msg=document.getElementById('upgrade-msg');
-  msg.textContent='✓ Compte Expert activé ! Toutes les leçons sont débloquées.';
-  msg.style.display='block';msg.style.color='#1FA971';
-  setTimeout(()=>{closeModal('upgrade-modal');app.renderCurrent();},1500);
+async function startCheckout(){
+  if(!currentUser){openAuth('register','Crée un compte pour passer à Expert.');return;}
+  const btn=document.getElementById('stripe-pay-btn');
+  btn.disabled=true;btn.textContent='Redirection…';
+  try{
+    const r=await fetch('/api/create-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+    const d=await r.json();
+    if(d.url)window.location.href=d.url;
+    else{btn.disabled=false;btn.textContent='Passer à Expert — Payer →';alert('Erreur paiement : '+( d.error||'réessaie.'));}
+  }catch{btn.disabled=false;btn.textContent='Passer à Expert — Payer →';alert('Erreur réseau.');}
 }
 
-function redeemCode(){
+async function redeemCode(){
   const code=document.getElementById('expert-code').value.trim().toUpperCase();
   const msg=document.getElementById('code-msg');
-  if(code===EXPERT_CODE){
-    activateExpert();
+  if(code==='KEYPACE-EXPERT'){
+    // demo code — activate directly via DB
+    if(!currentUser)return;
+    await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:app.stats||{}})});
+    // update plan via a small helper
+    await fetch('/api/activate-expert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+    currentPlan='expert';
+    const s=JSON.parse(localStorage.getItem('klak_session')||'{}');
+    s.plan='expert';localStorage.setItem('klak_session',JSON.stringify(s));
+    updateNavUser();
     msg.textContent='✓ Code valide !';msg.style.color='#1FA971';msg.style.display='block';
+    setTimeout(()=>{closeModal('upgrade-modal');app.renderCurrent();},1200);
   } else {
     msg.textContent='✗ Code invalide.';msg.style.color='#E5484D';msg.style.display='block';
   }
 }
 
+async function handlePaymentReturn(){
+  const params=new URLSearchParams(location.search);
+  if(params.get('payment')==='success'&&currentToken){
+    const r=await fetch('/api/refresh-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+    const d=await r.json();
+    if(d.plan){
+      currentPlan=d.plan;
+      const s=JSON.parse(localStorage.getItem('klak_session')||'{}');
+      s.plan=d.plan;localStorage.setItem('klak_session',JSON.stringify(s));
+      updateNavUser();
+      const msg=document.getElementById('upgrade-msg');
+      if(d.plan==='expert'){openModal('upgrade-modal');msg.textContent='✓ Paiement confirmé ! Compte Expert activé.';msg.style.color='#1FA971';msg.style.display='block';}
+    }
+    history.replaceState({},'',location.pathname);
+  }
+}
+
 /* ── DATA ── */
-function dataKey(){return 'klak_data_'+currentUser;}
-function loadStats(){
-  if(!currentUser)return{tests:[],lessons:{},gameBest:0,goals:{minWpm:20,maxErrors:8}};
-  let s=null;
-  try{const r=localStorage.getItem(dataKey());if(r)s=JSON.parse(r);}catch{}
-  if(!s)s={tests:[],lessons:{},gameBest:0,goals:{minWpm:20,maxErrors:8}};
+let _saveDebounce=null;
+function mergeStats(remote){
+  const def={tests:[],lessons:{},gameBest:0,goals:{minWpm:20,maxErrors:8}};
+  const s=Object.assign(def, remote||{});
   s.tests=s.tests||[];s.lessons=s.lessons||{};s.goals=s.goals||{};
   if(typeof s.goals.minWpm!=='number')s.goals.minWpm=20;
   if(typeof s.goals.maxErrors!=='number')s.goals.maxErrors=8;
   if(typeof s.gameBest!=='number')s.gameBest=0;
   Object.keys(s.lessons).forEach(k=>{const v=s.lessons[k];if(typeof v==='number')s.lessons[k]={bestWpm:v,bestErr:0,cleared:true};});
-  localStorage.setItem(dataKey(),JSON.stringify(s));
   return s;
 }
-function saveStats(s){if(!currentUser)return;try{localStorage.setItem(dataKey(),JSON.stringify(s));}catch{}}
+function loadStats(){
+  if(!currentUser)return mergeStats();
+  // stats already loaded from API on login; return from app.stats or empty
+  return app.stats||mergeStats();
+}
+function saveStats(s){
+  if(!currentUser)return;
+  app.stats=s;
+  clearTimeout(_saveDebounce);
+  _saveDebounce=setTimeout(async()=>{
+    try{await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:s})});}catch{}
+  },2000);
+}
 
 /* ── CURRICULUM ── */
 const FINGERS={lp:'#B7AE9E',lr:'#79C56A',lm:'#E8C13B',li:'#EE6B5E',ri:'#A77BD6',rm:'#E8C13B',rr:'#79C56A',rp:'#B7AE9E',th:'#BCB3A2'};
@@ -1179,8 +1232,12 @@ const app={
 
 /* ── INIT ── */
 function go(view){app.renderView(view);}
+loadSession();
+if(currentUser) app.stats = mergeStats();
 app.init();
 go('home');
+updateNavUser();
+handlePaymentReturn();
 </script>
 </body>
 </html>
