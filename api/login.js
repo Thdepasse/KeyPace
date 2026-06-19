@@ -30,6 +30,7 @@ module.exports = async function handler(req, res) {
   const user = r.data && r.data[0];
   if (!user) return res.status(401).json({ error: 'Utilisateur introuvable.' });
   if (user.password_hash !== passwordHash) return res.status(401).json({ error: 'Mot de passe incorrect.' });
+  if (user.verification_token) return res.status(403).json({ error: 'Confirme ton adresse email avant de te connecter. Vérifie ta boîte mail.', code: 'EMAIL_NOT_VERIFIED' });
 
   const token = require('crypto').randomUUID();
   await sb(`/users?id=eq.${user.id}`, {
