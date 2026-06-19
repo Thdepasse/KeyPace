@@ -141,9 +141,20 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .kb-row-t{display:flex;gap:6px;justify-content:center}
 .kb-key-t{min-width:clamp(30px,4.2vw,50px);height:clamp(38px,4.4vw,52px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:9px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:clamp(11px,1.25vw,14px);font-weight:600;color:#3A352B;box-shadow:0 1px 0 rgba(0,0,0,0.03);user-select:none;border-bottom-width:4px;transition:transform .08s,box-shadow .08s,background .08s}
 .kb-key-t.on{background:var(--accent);color:#fff;border-color:transparent;border-bottom-color:rgba(0,0,0,0.2)!important;transform:translateY(-3px);box-shadow:0 10px 22px rgba(255,77,46,0.42)}
-.kb-space{width:46%;min-width:200px;height:clamp(38px,4.4vw,52px);border-radius:9px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#9A9281;transition:transform .08s,box-shadow .08s,background .08s}
+.kb-space{width:46%;min-width:200px;height:clamp(38px,4.4vw,52px);border-radius:9px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#9A9281;transition:transform .08s,box-shadow .08s,background .08s;display:flex;align-items:center;justify-content:center}
 .kb-space.on{background:var(--accent);color:#fff;border-color:transparent;transform:translateY(-3px);box-shadow:0 10px 22px rgba(255,77,46,0.42)}
 .hint-txt{font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px;min-height:20px}
+.lesson-tip{background:#FFF8F0;border:1.5px solid #FFDCC0;border-radius:14px;padding:14px 18px;margin-bottom:16px;font-size:14px;line-height:1.6;color:#5C4A30;display:flex;gap:12px;align-items:flex-start}
+.lesson-tip-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.intro-screen{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:16px;max-width:680px;margin-left:auto;margin-right:auto}
+.intro-screen h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:18px}
+.intro-rules{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.intro-rule{display:flex;gap:14px;align-items:flex-start;background:var(--light);border-radius:12px;padding:12px 14px}
+.intro-rule-icon{font-size:22px;flex-shrink:0}
+.intro-rule-text{font-size:14px;line-height:1.6;color:var(--txt)}
+.intro-rule-text strong{display:block;font-weight:700;margin-bottom:2px;color:#2A2218}
+.intro-start-btn{width:100%;padding:14px;border-radius:12px;background:var(--accent);color:#fff;border:none;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.intro-start-btn:hover{opacity:.88}
 .result-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:16px}
 .result-badge{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin-bottom:20px}
 .result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
@@ -652,29 +663,35 @@ const KB=[
   [{l:'1',s:'&',f:'lp'},{l:'2',s:'é',f:'lr'},{l:'3',s:'"',f:'lm'},{l:'4',s:"'",f:'li'},{l:'5',s:'(',f:'li'},{l:'6',s:'-',f:'ri'},{l:'7',s:'è',f:'ri'},{l:'8',s:'_',f:'rm'},{l:'9',s:'ç',f:'rr'},{l:'0',s:'à',f:'rp'}],
   [{l:'A',f:'lp'},{l:'Z',f:'lr'},{l:'E',f:'lm'},{l:'R',f:'li'},{l:'T',f:'li'},{l:'Y',f:'ri'},{l:'U',f:'ri'},{l:'I',f:'rm'},{l:'O',f:'rr'},{l:'P',f:'rp'}],
   [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
-  [{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'}]
+  [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'!',s:'§',f:'rp'}]
 ];
 const PASSAGES=["le matin, la lumière douce traverse les rideaux et réveille doucement la maison encore endormie sous un ciel calme et clair.","taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides et plus sûres.","le petit renard roux traverse le champ gelé, observe les oiseaux au loin, puis disparaît derrière la vieille grange en bois.","écrire vite, c'est surtout écrire juste : vise la précision avant la vitesse, et la cadence viendra naturellement avec le temps."];
 const CURRICULUM=[
   /* ── MODULE 1 : touches de repos ─────────────────────────────────────────── */
   {name:'1. Position de base',lessons:[
     // r1 : f j seulement
-    {id:'r1',title:'F et J — les index',keys:'f j',
+    {id:'r1',title:'F et J — les index',keys:'f j',intro:true,
+     tip:'Bienvenue ! Pose tes index sur F (main gauche) et J (main droite) — ce sont les touches de référence, les deux petits reliefs que tu sens sous les doigts. Ne regarde pas ton clavier : fais confiance à ta mémoire musculaire.',
      text:'fj jf fj jf fjfj jfjf ffjj jjff fj jf fjfj jfjf ffj jjf fj jf ffjj'},
     // r2 : + d k
     {id:'r2',title:'D et K — les majeurs',keys:'d k',
+     tip:'Les majeurs se posent naturellement sur D et K, juste à côté des index. Garde les index sur F et J comme ancres — les autres doigts reviennent toujours à leur place de repos après chaque frappe.',
      text:'dk kd fd jk dkfj fjdk dkf jkd fdjk kjdf fdkj jkdf dk kd fd jk dkfj fjdk'},
     // r3 : + s l
     {id:'r3',title:'S et L — les annulaires',keys:'s l',
+     tip:'Les annulaires couvrent S et L. Tu as maintenant 6 doigts placés. Pense à la position en arc : les doigts reposent légèrement courbés, prêts à frapper sans lever le poignet.',
      text:'sl ls sd lk fs jl sldk dksl sfld jkls sldf lsdf sdjk ljkf sl ls sdjk ljkf'},
     // r4 : + q m
     {id:'r4',title:'Q et M — les auriculaires',keys:'q m',
+     tip:'Les auriculaires (petits doigts) sont les moins forts — c\'est normal. Q à gauche, M à droite. Évite de tourner tout le poignet : laisse juste l\'auriculaire s\'étirer légèrement.',
      text:'qm mq qs ml qslm mljk qmdf jklm qmsl slqm qlsm mqdj qsdfg hjklm qmsl mqdj'},
     // r5 : + g h  — on peut presque faire des syllabes
     {id:'r5',title:'G et H — index intérieurs',keys:'g h',
+     tip:'G et H sont tapés par les index qui s\'avancent légèrement vers le centre. Ce mouvement doit rester petit : l\'index glisse, ne saute pas. Reviens sur F ou J après chaque frappe.',
      text:'gh hg gfhj jhgf ghfd slgh ghsl mhgl gqhm ghfj hjkl slgh ghfd qghm hglm'},
     // r6 : révision — toute la rangée, on commence à avoir des pseudo-mots
     {id:'r6',title:'Révision — toute la rangée de repos',keys:'q s d f g h j k l m',
+     tip:'Révision complète de la rangée de repos. C\'est la rangée la plus importante : plus de 50 % des frappes d\'un texte français y passent. Prends ton temps, la régularité compte plus que la vitesse.',
      text:'qsd fgh jkl mqs dfg hjk lmq sdf ghj klm qsdfg hjklm qsd fghj klmq sdfgh'},
   ]},
 
@@ -682,21 +699,27 @@ const CURRICULUM=[
   {name:'2. Rangée du haut',lessons:[
     // h1 : + r u  → premiers vrais mots français
     {id:'h1',title:'R et U — premiers vrais mots',keys:'r u',
+     tip:'R est tapé par l\'index gauche (il s\'étire vers le haut), U par l\'index droit. Félicitations : avec ces deux touches tu peux déjà former de vrais mots français ! Garde les yeux sur l\'écran.',
      text:'sur dur mur jus mus fur surf durs murs jus sur dur mur surf mus sur dur jus mur sur'},
     // h2 : + e i  → explosion du vocabulaire
     {id:'h2',title:'E et I — le français prend forme',keys:'e i',
+     tip:'E est la lettre la plus fréquente du français — son majeur gauche sera très sollicité. I est au majeur droit. Dès cette leçon, tu peux écrire des centaines de mots réels : profites-en pour fluidifier le mouvement.',
      text:'les mes des ris gris seul leur lire dire fier hier duel miel lieu fuir lis sur dur mur'},
     // h3 : + z o  → premières vraies phrases (sans t, a, p encore)
     {id:'h3',title:'Z et O — premières phrases',keys:'z o',
+     tip:'Z est à l\'annulaire gauche (rangée du haut), O à l\'annulaire droit. Tu commences à former de vraies phrases. Essaie de lire le mot suivant pendant que tu tapes le mot en cours — c\'est ce qu\'on appelle l\'anticipation.',
      text:'le sol gris. rose dose mode. moi soi roi loi. riz ose dos. douze seize. gris sol morose. lire les mots.'},
     // h4 : + a p  → phrases riches
     {id:'h4',title:'A et P — phrases riches',keys:'a p',
+     tip:'A est à l\'auriculaire gauche (haut), P à l\'auriculaire droit. Les auriculaires sur la rangée du haut demandent un léger étirement — garde le poignet stable et laisse le doigt faire le travail.',
      text:'la soupe de moules. poire ou jupe. aide moi, ami. roue poule. prise sure. lire, apprendre, progresser.'},
     // h5 : + t y  → phrases quasi-naturelles
     {id:'h5',title:'T et Y — phrases naturelles',keys:'t y',
+     tip:'T et Y sont tous les deux tapés par les index (T par le gauche qui s\'étire, Y par le droit). C\'est un mouvement symétrique. À ce stade, essaie de maintenir un rythme régulier plutôt que de te précipiter.',
      text:'tu tapes tous les jours. style et type. trop dur. le toit est gris. yoga et sport. progresser par la pratique.'},
     // h6 : révision — toutes lettres hautes + repos, vraies phrases
     {id:'h6',title:'Révision — toute la rangée du haut',keys:'a z e r t y u i o p',
+     tip:'Tu maîtrises maintenant deux rangées complètes. Pendant cette révision, concentre-toi sur la fluidité entre les rangées : le passage repos → haut doit se faire sans lever les poignets du bureau.',
      text:'tu tapes tous les jours et tu progresses. style simple et juste. la rose pousse sur le sol dur. sport yoga type.'},
   ]},
 
@@ -704,21 +727,27 @@ const CURRICULUM=[
   {name:'3. Rangée du bas',lessons:[
     // b1 : + c ,   → phrases naturelles, on a presque tout l'alphabet
     {id:'b1',title:'C et virgule — récit',keys:'c ,',
+     tip:'Tu attaques la rangée du bas. C est au majeur gauche (un peu plus bas que D), la virgule au milieu droit. Pour la rangée du bas, laisse les doigts descendre naturellement — le poignet peut légèrement s\'abaisser.',
      text:'ce cours est simple, car le code est clair. cour, corde, clip, coupe. la pratique, jour par jour, porte ses fruits.'},
     // b2 : + v n   → tout le vocabulaire courant disponible
     {id:'b2',title:'V et N — texte naturel',keys:'v n',
+     tip:'V est à l\'index gauche (bas), N à l\'index droit (bas). Les index gèrent beaucoup de touches — entraîne-toi à alterner rapidement entre les rangées sans perdre la position de référence sur F et J.',
      text:'un vent venu du nord. la nature est vraie. vingt navires en route. venir voir la nature, c\'est une vraie pause.'},
     // b3 : + x ;   → chiffres oraux + ponctuation
     {id:'b3',title:'X et point-virgule',keys:'x ;',
+     tip:'X est à l\'annulaire gauche bas — c\'est un mouvement diagonal peu courant. Le point-virgule est à l\'annulaire droit, même rangée que K. Prends le temps de localiser chaque touche avant d\'accélérer.',
      text:'six navires; dix voix. les vieux yeux voient deux axes de luxe; un taxi pour six personnes; dix voyages.'},
     // b4 : + w :   → termes tech + prose
     {id:'b4',title:'W et deux-points',keys:'w :',
+     tip:'W est à l\'auriculaire gauche bas, les deux-points à l\'annulaire droit haut (Shift + ;). C\'est ta première touche combinée avec Shift. Appuie sur Shift avec l\'auriculaire opposé à la lettre tapée.',
      text:'wifi, wok, swap : le wifi est partout. six axes : deux woks sur la table. taxi et wifi, tout est connecté, vite.'},
     // b5 : + b !   → l'alphabet est complet, vraies phrases
     {id:'b5',title:'B et point d\'exclamation',keys:'b !',
+     tip:'B est à l\'index gauche bas (côté centre), le ! avec Shift. Tu couvres maintenant les 26 lettres de l\'alphabet — c\'est un cap important ! Chaque texte réel sera désormais accessible.',
      text:'beau bruit du bar ! brave et bon. boire du vin venu du nord. brun, bas, but ! la base est solide. bon voyage !'},
     // b6 : révision totale, texte fluide, 26 lettres disponibles
     {id:'b6',title:'Révision — les 26 lettres réunies',keys:'tout l\'alphabet',
+     tip:'Toutes les lettres sont là. L\'objectif de cette révision : zéro regard sur le clavier. Si tu hésites sur une touche, pause — localise-la mentalement, puis frappe. Ne regarde pas, cherche avec le doigt.',
      text:'le vieux taxi gris part vers le nord. boire du vin au bar. brave nature. six navires. vingt voyages en bus. bonne route !'},
   ]},
 
@@ -927,7 +956,20 @@ const app={
     if(!canAccessLesson(id)){
       openModal('upgrade-modal');return;
     }
-    this.stopTimer();this.sess=this.makeSession('lesson',id);this.renderView('lessons');
+    const les=this.lessonById(id);
+    if(les&&les.intro&&!localStorage.getItem('kp_intro_seen')){
+      this.stopTimer();this.sess=null;this._pendingLessonId=id;this._showIntro=true;this.renderView('lessons');
+      return;
+    }
+    this.stopTimer();this._showIntro=false;this.sess=this.makeSession('lesson',id);this.renderView('lessons');
+  },
+  confirmIntro(){
+    localStorage.setItem('kp_intro_seen','1');
+    this._showIntro=false;
+    const id=this._pendingLessonId;
+    this._pendingLessonId=null;
+    this.sess=this.makeSession('lesson',id);
+    this.renderCurrent();
   },
   backLessons(){this.stopTimer();this.sess=null;this.renderCurrent();},
   restart(){if(!this.sess)return;this.stopTimer();this.sess=this.makeSession(this.sess.mode,this.sess.lessonId);this.renderCurrent();},
@@ -1232,6 +1274,22 @@ const app={
     this._renderTypingInto('page-test');
   },
   _renderTypingInto(pageId){
+    if(this._showIntro){
+      document.getElementById(pageId).innerHTML=`<div class="typing-section">
+        <div class="typing-header"><div><button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br><h2>Avant de commencer</h2></div></div>
+        <div class="intro-screen">
+          <h3>Comment bien apprendre à taper ?</h3>
+          <div class="intro-rules">
+            <div class="intro-rule"><div class="intro-rule-icon">🤲</div><div class="intro-rule-text"><strong>La position de repos</strong>Les doigts gauches reposent sur Q·S·D·F, les droits sur J·K·L·M. Tu sentiras deux petits reliefs sous les index (F et J) — c'est ton point d'ancrage. Reviens toujours ici après chaque frappe.</div></div>
+            <div class="intro-rule"><div class="intro-rule-icon">👁️</div><div class="intro-rule-text"><strong>Regarde l'écran, pas tes doigts</strong>C'est la règle la plus importante. Regarder le clavier te force à mémoriser visuellement — regarder l'écran force ta mémoire musculaire. C'est elle qui te rendra rapide.</div></div>
+            <div class="intro-rule"><div class="intro-rule-icon">🐢</div><div class="intro-rule-text"><strong>La lenteur avant la vitesse</strong>Taper lentement et juste vaut mieux que taper vite et faux. Chaque erreur crée une mauvaise habitude. La vitesse vient naturellement une fois les gestes mémorisés.</div></div>
+            <div class="intro-rule"><div class="intro-rule-icon">📍</div><div class="intro-rule-text"><strong>Un doigt, une touche</strong>Chaque touche est assignée à un doigt précis. Respecter ces assignations, même au début quand c'est lent, est ce qui construira une technique solide sur le long terme.</div></div>
+          </div>
+          <button class="intro-start-btn" onclick="app.confirmIntro()">Je suis prêt — commencer la première leçon →</button>
+        </div>
+      </div>`;
+      return;
+    }
     const s=this.sess;const isLesson=s&&s.mode==='lesson';const goals=this.stats?this.stats.goals:{minWpm:20,maxErrors:8};
     let liveWpm=0,liveAcc=100,liveTime=0,progress=0;
     if(s){
@@ -1267,6 +1325,7 @@ const app={
         <div class="stat-box"><div class="stat-label">Progression</div><div class="stat-val">${progress}<span class="stat-unit"> %</span></div></div>
       </div>
       <div class="prog-wrap"><div class="prog-fill" style="width:${progress}%"></div></div>
+      ${!finished&&isLesson&&les&&les.tip&&s&&!s.started?`<div class="lesson-tip"><div class="lesson-tip-icon">💡</div><div>${les.tip}</div></div>`:''}
       ${!finished?`<div class="typing-box"><div class="typing-box-inner" id="tb-scroll">${tbHTML}</div></div>`:''}
       ${finished?`<div class="result-box"><div class="result-badge">${badge}</div>
         ${isLesson?`<div class="banner ${lessonPassed?'pass':'fail'}"><div class="banner-title">${lessonPassed?'Leçon validée ✓':'Presque !'}</div><div class="banner-sub">${lessonPassed?(hasNext?'La leçon suivante est débloquée.':'Bravo, tu as terminé tout le parcours !'):'Objectif : '+goals.minWpm+' mpm · max '+goals.maxErrors+' fautes — il te manque '+missingTxt+'.'}</div></div>`:''}
@@ -1303,6 +1362,7 @@ const app={
 
   /* ── LESSONS ── */
   renderLessons(){
+    if(this._showIntro){this._renderTypingInto('page-lessons');return;}
     if(this.sess&&this.sess.mode==='lesson'){this._renderTypingInto('page-lessons');return;}
     const goals=this.stats?this.stats.goals:{minWpm:20,maxErrors:8};
     const plan=getUserPlan();
