@@ -293,7 +293,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .prog-wrap{height:5px;background:var(--border);border-radius:3px;margin-bottom:16px}
 .prog-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .1s}
 .typing-box{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 28px;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:20px;letter-spacing:.01em;overflow:hidden;white-space:nowrap;height:72px;display:flex;align-items:center}
-.typing-box-inner{display:inline;white-space:nowrap}
+.typing-box-inner{display:inline;white-space:nowrap;transition:transform 0.12s ease}
 .ch{border-radius:3px}.ch.ok{color:var(--txt)}.ch.wrong{color:#E5484D;background:rgba(229,72,77,0.16)}.ch.cur{color:var(--txt);background:rgba(255,77,46,0.14);box-shadow:inset 0 -3px 0 var(--accent)}.ch.todo{color:#C2BBAC}
 .kb-wrap{background:var(--light);border:1px solid var(--border);border-radius:18px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:7px}
 .kb-row-t{display:flex;gap:6px;justify-content:center}
@@ -373,6 +373,21 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .gword{position:absolute;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;white-space:nowrap;text-shadow:0 2px 8px rgba(0,0,0,0.4)}
 .gword .gtyped{color:var(--accent)}
 .gword .grest{color:rgba(255,255,255,0.9)}
+@keyframes tierup{0%{transform:scale(1.5);color:#fff}100%{transform:scale(1);color:var(--accent)}}
+@keyframes cdPop{0%{transform:scale(1.5);opacity:0}40%{opacity:1;transform:scale(1)}85%{opacity:1}100%{opacity:.2;transform:scale(.88)}}
+#game-cd{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.88);gap:10px;pointer-events:none;border-radius:24px}
+.cd-n{font-family:'JetBrains Mono',monospace;font-size:100px;font-weight:900;color:#fff;display:block;animation:cdPop .85s ease forwards}
+.cd-go{font-family:'Bricolage Grotesque',sans-serif;font-size:64px;font-weight:900;color:var(--accent);display:block;animation:cdPop .5s ease forwards}
+#tier-banner{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;pointer-events:none;animation:tbFade 3.6s ease forwards;border-radius:24px;overflow:hidden}
+@keyframes tbFade{0%{opacity:0;background:rgba(0,0,0,0)}8%{opacity:1;background:rgba(0,0,0,.9)}72%{opacity:1;background:rgba(0,0,0,.9)}100%{opacity:0;background:rgba(0,0,0,0)}}
+.tb-card{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.tb-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.tb-name{font-family:'Bricolage Grotesque',sans-serif;font-size:58px;font-weight:900;color:#fff;animation:tbName .55s cubic-bezier(.2,1.5,.4,1) forwards}
+@keyframes tbName{from{transform:scale(.5) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.tb-desc{font-size:16px;color:rgba(255,255,255,.65);background:rgba(255,255,255,.08);padding:10px 28px;border-radius:12px}
+.tb-change{font-size:15px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.08);padding:12px 28px;border-radius:12px;line-height:1.6;text-align:center;animation:tbChange .7s .3s ease both}
+@keyframes tbChange{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.tb-speed{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.04em;animation:tbChange .7s .55s ease both}
 
 /* STATS */
 .stats-section{max-width:1120px;margin:0 auto;padding:24px}
@@ -1323,7 +1338,17 @@ const CURRICULUM=[
   ]},
 ];
 const MOD_COLORS=['#EE6B5E','#F4A04C','#D9A60C','#5BA84A','#3FA6B2','#6E8BE8','#A77BD6','#E8729A','#4CB8C4','#9B59B6','#E67E22','#27AE60','#2980B9'];
-const WORDS=["clé","jour","main","vite","mot","feu","ami","pain","eau","ciel","fleur","temps","doigt","clavier","rapide","facile","bravo","frappe","lettre","texte","école","vélo","chat","rêve","soleil","plume","note","page","ligne","espace","saut","tape","juste","cadence","jeu","but","top"];
+const GAME_TIERS=[
+  {score:0,label:'Débutant',desc:'mots courts sans accents',words:["les","des","une","pas","bon","bas","mal","mot","feu","ami","eau","chat","jeu","but","roi","nez","bras","dos","sol","air","lac","art","vol","bus","rue","mur","sac","pot","ton","son","fin","cas","mer","pic","bec","foi","bal","cap","col","bol","nid","duo","dix","rat","bar","lit","loi","car","gel","riz","vin","sel","gaz","cou","ski","ail","loup","four","pain","main","pont","fond","camp","long","sang","gris","sans","dont","cent","dent","vent","peur","noir","tout","mais","tour","coup","jour","sous","bois","mois","yeux","beau","vrai","haut","bout","lien","lieu","rang","plan","bord","port","sort","mort","fort","nord","brun","plus","char","gant","jupe","robe","arme","drap","dune","toit","voix","nuit","lune","pied","ours","veau","chien","lapin","coude","genou","pouce","nuque"]},
+  {score:50,label:'Familier',desc:'accents é, è, à, ê…',words:["fleur","temps","doigt","texte","vélo","rêve","soleil","plume","note","page","ligne","saut","lettre","veste","table","porte","plage","livre","stylo","pomme","salade","tomate","sucre","farine","glace","thème","idée","bleu","héros","forêt","clé","âge","île","fée","été","côté","frère","père","mère","flûte","boîte","pâte","côte","arête","fenêtre","lumière","rivière","manière","sorcière","siècle","fièvre","pièce","crème","même","système","style","rythme","titre","entre","libre","propre","cadre","centre","ordre","timbre","ombre","café","télé","hôtel","écho","épée","fête","prêt","décor","détail","effort","jeune","large","merci","noble","quête","riche","route","suite","utile","valeur","verbe","zeste","bière","terre","guerre","pierre","carré","arrêt","après","théâtre","école","élève","équipe","étape","célèbre","carrière","frontière","bannière","chèvre"]},
+  {score:150,label:'Confirmé',desc:'mots longs 6-8 lettres',words:["clavier","rapide","facile","frappe","présent","avancer","compter","décrire","effacer","réussir","remplir","lancer","pointer","chercher","obtenir","revenir","mériter","réaliser","étudier","décider","réviser","trouver","montrer","entrer","sortir","courir","marcher","chanter","danser","pleurer","manger","dormir","travailler","voyager","parvenir","atteindre","apporter","enseigner","partager","protéger","observer","admirer","calculer","mesurer","améliorer","construire","produire","conduire","découvrir","parcourir","déjeuner","goûter","cuisiner","mélanger","ajouter","retirer","conserver","utiliser","permettre","défendre","attendre","entendre","répondre","perdre","acheter","vendre","prendre","apprendre","comprendre","descendre","préparer","emporter","transporter","explorer","employer","nettoyer","envoyer","renvoyer","gratter","plonger","grimper","creuser","renforcer","terminer","contenir","résoudre"]},
+  {score:300,label:'Expert',desc:'mots complexes 8+ lettres',words:["apprentissage","développement","concentration","environnement","organisation","compréhension","manifestation","responsabilité","indépendance","extraordinaire","accomplissement","détermination","transformation","communication","représentation","administration","collaboration","participation","considération","explication","identification","progressivement","naturellement","directement","correctement","précisément","clairement","profondément","généralement","régulièrement","patiemment","intelligemment","difficultés","réalisations","questionnaire","bibliothèque","mathématiques","philosophique","géographique","scientifique","technologique","économique","écologique","psychologique","grammaticale","orthographique","informatique","électronique","magnétique","climatique","automatique","systématique","démocratique","caractéristique","méthodique","fantastique","domestique","acoustique","pratique","authentique","robotique","numérique","périodique","historique","logique","organisme"]},
+  {score:500,label:'Champion',desc:'mots composés avec tirets',words:["peut-être","arc-en-ciel","vis-à-vis","au-dessus","après-midi","porte-monnaie","savoir-faire","avant-garde","court-circuit","sous-sol","hors-jeu","haut-parleur","avant-hier","après-demain","porte-parole","sous-titre","entre-temps","face-à-face","tête-à-tête","va-et-vient","passe-temps","garde-manger","tire-bouchon","grille-pain","couvre-feu","cerf-volant","belle-mère","beau-père","demi-frère","demi-tour","demi-finale","mi-temps","hors-bord","sous-marin","avant-bras","arrière-plan","contre-coup","rendez-vous","bien-être","chef-lieu","porte-clés","serre-tête","libre-service","auto-école","avant-propos","c'est-à-dire","là-bas","au-delà","ci-dessus","ci-dessous","long-métrage","court-métrage","porte-fenêtre","chasse-neige","essuie-glace","passe-partout","garde-fou","cache-nez","pique-nique","casse-croûte","eau-de-vie","porte-avions","sans-abri","garde-robe"]}
+]
+function getGameTier(score){let t=GAME_TIERS[0];for(const tier of GAME_TIERS){if(score>=tier.score)t=tier;}return t;}
+const WORDS=GAME_TIERS[0].words;
+// Dead key composition for AZERTY (handles ^ as '^' not 'Dead' on some setups)
+const DEAD_COMPOSE={'^':{a:'â',e:'ê',i:'î',o:'ô',u:'û',A:'Â',E:'Ê',I:'Î',O:'Ô',U:'Û'},'¨':{a:'ä',e:'ë',i:'ï',o:'ö',u:'ü',y:'ÿ',A:'Ä',E:'Ë',I:'Ï',O:'Ö',U:'Ü'},'`':{a:'à',e:'è',i:'ì',o:'ò',u:'ù',A:'À',E:'È',I:'Ì',O:'Ò',U:'Ù'}};
 const SPRINT_WORDS=["le","la","les","un","une","de","des","et","ou","dans","sur","avec","pour","par","pas","ne","se","ce","ma","ta","sa","qui","que","quoi","où","tout","bien","très","faire","voir","aller","venir","avoir","être","dire","vouloir","pouvoir","savoir","prendre","mettre","partir","sortir","entrer","rester","trouver","donner","penser","parler","aimer","vivre","tenir","tomber","ouvrir","fermer","lire","écrire","taper","apprendre","comprendre","répondre","attendre","perdre","gagner","jouer","courir","marcher","chanter","danser","rire","pleurer","manger","boire","dormir","réveiller","travailler","voyager","revenir","passer","laisser","suivre","montrer","décider","commencer","finir","continuer","arriver","repartir","rentrer","retourner"];
 /* Banque de mots accentués + tiers de difficulté pour les jeux (réutilise WORDS/SPRINT_WORDS) */
 const TIREUR_ACCENTS=["école","élève","fenêtre","château","préféré","règle","forêt","crème","théâtre","numéro","côté","cœur","français","intérêt","élément","problème","éléphant","lumière","révéler","différent"];
@@ -1487,24 +1512,100 @@ const app={
   },
 
   startGame(){
-    if(!canAccessGame()){
-      openAuth('register','Crée un compte gratuit pour jouer.',()=>this.startGame());
-      return;
-    }
-    this.stopGame();this._gameRec=false;
-    this.game={on:true,over:false,score:0,lives:3,words:[],spawnAcc:20};
-    this._gameLoop=setInterval(()=>this.gameTick(),60);
+    if(!canAccessGame()){openAuth('register','Crée un compte gratuit pour jouer.',()=>this.startGame());return;}
+    this.stopGame();this._gameRec=false;this._pendingDeadKey=null;
+    this.game={on:false,over:false,score:0,lives:3,words:[],spawnAcc:0,
+      tierIdx:0,tierFlash:0,
+      wordsTyped:0,errorCount:0,totalKeys:0,
+      startTime:null,combo:0,maxCombo:0,tierHistory:[]};
     this.renderCurrent();
+    this._startCountdown(3);
   },
-  stopGame(){if(this._gameLoop){clearInterval(this._gameLoop);this._gameLoop=null;}},
-  spawnWord(){return{id:++this._wid,text:WORDS[Math.floor(Math.random()*WORDS.length)],x:6+Math.random()*70,y:-4,typedLen:0};},
+  _startCountdown(n){
+    // Inject inside .game-arena (position:absolute) so it doesn't cover the whole page
+    const arena=document.querySelector('.game-arena');
+    let el=document.getElementById('game-cd');
+    if(!el){
+      el=document.createElement('div');el.id='game-cd';
+      (arena||document.body).appendChild(el);
+    }
+    el.innerHTML=n>0
+      ?`<span class="cd-n" style="animation:cdPop .85s ease forwards">${n}</span><div style="font-size:13px;color:rgba(255,255,255,.4);margin-top:10px">Prépare tes doigts…</div>`
+      :`<span class="cd-go" style="animation:cdPop .5s ease forwards">GO !</span>`;
+    if(n>0){
+      this._cdTimer=setTimeout(()=>this._startCountdown(n-1),1000);
+    }else{
+      setTimeout(()=>{document.getElementById('game-cd')?.remove();},700);
+      if(this.game){this.game.on=true;}
+      this._gameLoop=setInterval(()=>this.gameTick(),60);
+    }
+  },
+  _showTierBanner(tier,idx){
+    // Suspend game loop so renderCurrent() doesn't rebuild the arena and destroy the banner
+    if(this._gameLoop){clearInterval(this._gameLoop);this._gameLoop=null;}
+    document.getElementById('tier-banner')?.remove();
+    const speeds=['Lente','Lente +','Modérée','Rapide','Maximum !'];
+    const changes=[
+      '',
+      'Les accents font leur entrée\né, è, à, ê, û, î, ô…',
+      'Les mots s\'allongent\nverbes, adjectifs, mots de 6 à 8 lettres',
+      'Vocabulaire exigeant\nmots de 8+ lettres, terminologies précises',
+      'Mots composés avec tirets\narc-en-ciel, peut-être, rendez-vous…'
+    ];
+    const arena=document.querySelector('.game-arena');
+    const el=document.createElement('div');el.id='tier-banner';
+    el.style.cssText='position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;pointer-events:none;border-radius:24px;overflow:hidden;animation:tbFade 3.3s ease forwards';
+    el.innerHTML=`<div class="tb-card">
+      <div class="tb-label">PALIER SUIVANT</div>
+      <div class="tb-name" style="animation:tbName .55s cubic-bezier(.2,1.5,.4,1) forwards">${tier.label}</div>
+      <div class="tb-change">${(changes[idx]||tier.desc).replace(/\n/g,'<br>')}</div>
+      <div class="tb-speed">Vitesse : ${speeds[idx]||''}</div>
+    </div>`;
+    (arena||document.body).appendChild(el);
+    // Resume game loop after banner fades out
+    setTimeout(()=>{
+      el.style.transition='opacity .5s';el.style.opacity='0';
+      setTimeout(()=>{
+        el.remove();
+        if(this.game&&this.game.on){this._gameLoop=setInterval(()=>this.gameTick(),60);}
+      },500);
+    },2800);
+  },
+  stopGame(){
+    if(this._gameLoop){clearInterval(this._gameLoop);this._gameLoop=null;}
+    if(this._cdTimer){clearTimeout(this._cdTimer);this._cdTimer=null;}
+    document.getElementById('game-cd')?.remove();
+    document.getElementById('tier-banner')?.remove();
+  },
+  spawnWord(){
+    const g=this.game;
+    const tier=getGameTier(g.score);const tierIdx=GAME_TIERS.indexOf(tier);
+    let pool=tier.words;
+    if(tierIdx>0&&Math.random()<0.25){pool=GAME_TIERS[Math.floor(Math.random()*tierIdx)].words;}
+    return{id:++this._wid,text:pool[Math.floor(Math.random()*pool.length)],x:4+Math.random()*72,y:-4,typedLen:0};
+  },
   gameTick(){
     const g=this.game;if(!g||!g.on)return;
-    const speed=0.55+Math.min(g.score/120,0.5);
+    const tierIdx=g.tierIdx||0;
+    const tierSpeeds=[0.40,0.48,0.58,0.80,1.15];
+    const tierNextSpeeds=[0.48,0.58,0.80,1.15,1.50];
+    const tier=getGameTier(g.score);const nextTier=GAME_TIERS[tierIdx+1];
+    const withinTierPct=nextTier?Math.min(1,(g.score-tier.score)/(nextTier.score-tier.score)):1;
+    const speed=tierSpeeds[Math.min(tierIdx,4)]+(tierNextSpeeds[Math.min(tierIdx,4)]-tierSpeeds[Math.min(tierIdx,4)])*withinTierPct;
     g.words=g.words.map(w=>({...w,y:w.y+speed}));
     g.spawnAcc=(g.spawnAcc||0)+1;
-    const interval=Math.max(13,32-Math.floor(g.score/35));
+    const interval=Math.max(12,38-Math.floor(g.score/40));
     if(g.spawnAcc>=interval){g.spawnAcc=0;g.words.push(this.spawnWord());}
+    const newTierIdx=GAME_TIERS.indexOf(getGameTier(g.score));
+    if(newTierIdx>tierIdx){
+      const newT=GAME_TIERS[newTierIdx];
+      g.tierIdx=newTierIdx;g.tierFlash=60;
+      g.words=[];g.spawnAcc=0;
+      g.tierHistory.push({label:newT.label,score:g.score});
+      this._showTierBanner(newT,newTierIdx);
+      return; // don't call renderCurrent() this tick — it would destroy the just-injected banner
+    }
+    if(g.tierFlash>0)g.tierFlash--;
     let lives=g.lives;const survivors=[];
     g.words.forEach(w=>{if(w.y>=93)lives--;else survivors.push(w);});
     g.words=survivors;g.lives=lives;
@@ -1517,15 +1618,31 @@ const app={
     this.renderCurrent();
   },
   gameKey(e){
-    const k=e.key;if(k.length!==1)return;e.preventDefault();
+    const k=e.key;
+    // Dead key handling — use e.code when key='Dead' to know WHICH dead key (e.g. ^ = BracketLeft on AZERTY)
+    const CODE_TO_DEAD={'BracketLeft':'^','BracketRight':'¨','Equal':'`'};
+    if(k==='Dead'){this._pendingDeadKey=CODE_TO_DEAD[e.code]||null;return;}
+    if(DEAD_COMPOSE[k]){this._pendingDeadKey=k;return;} // ^ fires as '^' on some setups
+    if(k.length!==1)return;
+    e.preventDefault();
+    let char=k;
+    if(this._pendingDeadKey){char=(DEAD_COMPOSE[this._pendingDeadKey]||{})[k]||k;}
+    this._pendingDeadKey=null;
     const g=this.game;if(!g||!g.on)return;
+    if(!g.startTime)g.startTime=Date.now();
+    g.totalKeys++;
     let active=g.words.find(w=>w.typedLen>0);
     if(!active){
-      const cands=g.words.filter(w=>w.text[0]===k).sort((a,b)=>b.y-a.y);
-      if(cands.length){const c=cands[0];c.typedLen=1;if(c.typedLen>=c.text.length){g.score+=c.text.length;g.words=g.words.filter(w=>w!==c);}}
+      const cands=g.words.filter(w=>w.text[0]===char).sort((a,b)=>b.y-a.y);
+      if(cands.length){
+        const c=cands[0];c.typedLen=1;
+        if(c.typedLen>=c.text.length){g.score+=c.text.length;g.wordsTyped++;g.combo++;g.maxCombo=Math.max(g.maxCombo,g.combo);g.words=g.words.filter(w=>w!==c);}
+      }else{g.errorCount++;g.combo=0;}
     }else{
-      if(active.text[active.typedLen]===k){active.typedLen++;if(active.typedLen>=active.text.length){g.score+=active.text.length;g.words=g.words.filter(w=>w!==active);}}
-      else active.typedLen=0;
+      if(active.text[active.typedLen]===char){
+        active.typedLen++;
+        if(active.typedLen>=active.text.length){g.score+=active.text.length;g.wordsTyped++;g.combo++;g.maxCombo=Math.max(g.maxCombo,g.combo);g.words=g.words.filter(w=>w!==active);}
+      }else{g.errorCount++;active.typedLen=0;g.combo=0;}
     }
     this.renderCurrent();
   },
@@ -1534,6 +1651,9 @@ const app={
     this.view=v;
     if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopBoss();this.duelLeave();this.activeGame=null;}
     if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
+    // Vider les pages avec #tb-scroll pour éviter les IDs dupliqués
+    if(v!=='test')document.getElementById('page-test').innerHTML='';
+    if(v!=='lessons')document.getElementById('page-lessons').innerHTML='';
     ['home','test','lessons','games','stats'].forEach(p=>{document.getElementById('page-'+p).style.display=p===v?'block':'none';});
     ['home','test','lessons','games','stats'].forEach(id=>{document.getElementById('nav-'+id).classList.toggle('active',id===v);});
     window.scrollTo({top:0,behavior:'instant'});
@@ -1817,18 +1937,16 @@ const app={
     requestAnimationFrame(()=>app.scrollToCursor());
   },
   scrollToCursor(){
-    const box=document.querySelector('.typing-box');
     const inner=document.getElementById('tb-scroll');
-    const cur=document.querySelector('.ch.cur');
-    if(!box||!inner||!cur)return;
+    if(!inner)return;
+    const box=inner.closest('.typing-box');
+    const cur=inner.querySelector('.ch.cur');
+    if(!box||!cur)return;
     const boxRect=box.getBoundingClientRect();
     const curRect=cur.getBoundingClientRect();
     const match=inner.style.transform.match(/translateX\((-?[\d.]+)px\)/);
     const currentX=match?parseFloat(match[1]):0;
-    // curRect.left already reflects the current transform visually
-    // curNaturalLeft = where cursor sits without any transform
     const curNaturalLeft=curRect.left-boxRect.left-currentX;
-    // Keep cursor at 35% from left edge (further right = more context)
     const newX=Math.min(0,boxRect.width*0.35-curNaturalLeft);
     inner.style.transform=`translateX(${newX}px)`;
   },
@@ -1936,7 +2054,7 @@ const app={
     }).join('');
 
     const goalsHtml=currentUser?`<div class="goals-bar">
-      <div class="goal-item"><span class="goal-label">Objectif vitesse</span><button class="goal-btn" onclick="app.setGoal('minWpm',-5)">–</button><span class="goal-val">${goals.minWpm}</span><button class="goal-btn" onclick="app.setGoal('minWpm',5)">+</button><span style="font-size:13px;color:var(--muted)">mpm</span></div>
+      <div class="goal-item"><span class="goal-label">Objectif vitesse</span><button class="goal-btn" onclick="app.setGoal('minWpm',-1)">–</button><span class="goal-val">${goals.minWpm}</span><button class="goal-btn" onclick="app.setGoal('minWpm',1)">+</button><span style="font-size:13px;color:var(--muted)">mpm</span></div>
       <div class="goal-item"><span class="goal-label">Max erreurs</span><button class="goal-btn" onclick="app.setGoal('maxErrors',-1)">–</button><span class="goal-val">${goals.maxErrors}</span><button class="goal-btn" onclick="app.setGoal('maxErrors',1)">+</button></div>
     </div>`:'';
 
@@ -2033,12 +2151,51 @@ const app={
   },
   renderFrappe(){
     const g=this.game;
-    const gameOn=!!(g&&g.on);const gameOver=!!(g&&g.over);const gameIdle=!g||(!gameOn&&!gameOver);
+    // g.on=false during countdown (game loop not started yet), g.on=true when playing
+    const gameOn=!!(g&&g.on);const gameOver=!!(g&&g.over);
+    const gameCounting=!!(g&&!g.on&&!g.over); // countdown phase
+    const gameIdle=!g||(!gameOn&&!gameOver&&!gameCounting);
     const score=g?g.score:0;const lives=g?g.lives:3;const best=currentUser&&this.stats?this.stats.gameBest||0:0;
     const hearts=[0,1,2].map(i=>`<span style="font-size:20px;color:${i<lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
     const wordsHTML=(g&&g.words?g.words:[]).map(w=>`<div class="gword" style="left:${w.x}%;top:${w.y}%"><span class="gtyped">${w.text.slice(0,w.typedLen)}</span><span class="grest">${w.text.slice(w.typedLen)}</span></div>`).join('');
-    const guestOverlay=!currentUser?`<div class="game-overlay"><h2>Frappe-mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`:'';
-    const overlay=!currentUser?guestOverlay:gameIdle?`<div class="game-overlay"><h2>Frappe-mots</h2><p>Mots qui tombent, doigts qui dansent.<br>Meilleur : <b style="color:#fff">${best} pts</b></p><button class="game-play-btn" onclick="app.startGame()">Jouer ▸</button></div>`:gameOver?`<div class="game-overlay"><h2>${score>best?'Nouveau record !':'Fin de partie'}</h2><div class="game-final">${score} pts</div><p>${score>best?'🎉 Tu bats ton record !':'Meilleur : '+best+' pts'}</p><button class="game-play-btn" onclick="app.startGame()">Rejouer ▸</button></div>`:'';
+    const tier=g?getGameTier(g.score):GAME_TIERS[0];
+    const tierFlash=g&&g.tierFlash>0;
+    const tierIdx=g?GAME_TIERS.indexOf(tier):0;
+    const nextTier=GAME_TIERS[tierIdx+1];
+    const tierBarPct=nextTier?Math.min(100,((score-(tier.score||0))/(nextTier.score-(tier.score||0)))*100):100;
+    // HUD tier widget (only while actively playing)
+    const tierHTML=gameOn?`<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+      <div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase">
+        ${tier.label}
+      </div>
+      ${nextTier?`<div style="width:100px;height:3px;background:rgba(255,255,255,0.12);border-radius:4px;overflow:hidden"><div style="width:${tierBarPct}%;height:100%;background:var(--accent);transition:width .4s"></div></div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.3)">→ ${nextTier.label} à ${nextTier.score} pts</div>`:'<div style="font-size:10px;color:var(--accent)">Niveau max !</div>'}
+    </div>`:'';
+    // Game-over overlay with performance history
+    const accuracy=g&&g.totalKeys>0?Math.round(100*(g.totalKeys-g.errorCount)/g.totalKeys):100;
+    const elapsed=g&&g.startTime?Math.round((Date.now()-g.startTime)/1000):0;
+    const elapsedStr=elapsed>=60?`${Math.floor(elapsed/60)}m${elapsed%60}s`:`${elapsed}s`;
+    const tierHistHTML=(g&&g.tierHistory&&g.tierHistory.length)?g.tierHistory.map(t=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:rgba(255,255,255,0.06);border-radius:8px;gap:16px"><span style="font-size:13px;font-weight:700;color:var(--accent)">${t.label}</span><span style="font-size:12px;color:rgba(255,255,255,0.4)">${t.score} pts</span></div>`).join(''):'';
+    const gameOverOverlay=`<div class="game-overlay" style="gap:8px;padding:28px 24px;overflow-y:auto;max-height:100%">
+      <h2 style="margin:0">${score>best?'Nouveau record !':'Fin de partie'}</h2>
+      <div class="game-final">${score} pts</div>
+      ${score>best?'<p style="color:var(--accent);font-weight:700;margin:0">Tu bats ton record !</p>':'<p style="color:rgba(255,255,255,0.5);margin:0">Meilleur : '+best+' pts</p>'}
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%;margin:8px 0">
+        <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px">MOTS</div><div style="font-size:22px;font-weight:700;color:#fff">${g?g.wordsTyped:0}</div></div>
+        <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px">PRÉCISION</div><div style="font-size:22px;font-weight:700;color:#fff">${accuracy}%</div></div>
+        <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px">DURÉE</div><div style="font-size:22px;font-weight:700;color:#fff">${elapsedStr}</div></div>
+      </div>
+      <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:10px;width:100%;text-align:center;margin-bottom:2px"><div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:2px">PALIER ATTEINT</div><div style="font-size:18px;font-weight:700;color:var(--accent)">${tier.label}</div></div>
+      ${tierHistHTML?`<div style="width:100%;display:flex;flex-direction:column;gap:4px"><div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Paliers franchis</div>${tierHistHTML}</div>`:''}
+      <button class="game-play-btn" onclick="app.startGame()" style="margin-top:8px">Rejouer ▸</button>
+    </div>`;
+    const tierPillsHTML=GAME_TIERS.map((t,i)=>`<div style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(255,255,255,${i===0?'.15':'.07'});color:rgba(255,255,255,${i===0?'.9':'.4'})">${t.label}<span style="font-size:10px;font-weight:400;margin-left:4px">${i===0?'départ':t.score+'pts'}</span></div>`).join('');
+    const idleOverlay=`<div class="game-overlay"><h2>Frappe-mots</h2><p style="margin-bottom:6px">Mots qui tombent, doigts qui dansent.<br>Meilleur : <b style="color:#fff">${best} pts</b></p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:8px 0 4px">${tierPillsHTML}</div>
+      <button class="game-play-btn" onclick="app.startGame()" style="margin-top:12px">Jouer ▸</button></div>`;
+    const guestOverlay=`<div class="game-overlay"><h2>Frappe-mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
+    // Countdown/tierBanner are body-injected — no overlay needed here
+    const overlay=!currentUser?guestOverlay:gameIdle?idleOverlay:gameOver?gameOverOverlay:'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
         <button onclick="app.activeGame=null;app.stopGame();app.game=null;app.renderGames()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>
@@ -2046,7 +2203,7 @@ const app={
         <span class="game-sel-tag free">GRATUIT</span>
       </div>
       <div class="game-arena" style="max-width:1120px;margin:0 auto;margin-left:24px;margin-right:24px">
-        <div class="game-hud"><div class="game-score-val">${score}<span> pts</span></div><div style="display:flex;gap:5px">${hearts}</div></div>
+        <div class="game-hud"><div class="game-score-val">${score}<span> pts</span></div>${tierHTML}<div style="display:flex;gap:5px">${hearts}</div></div>
         ${wordsHTML}${overlay}
       </div>
     </div>`;
