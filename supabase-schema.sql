@@ -68,3 +68,37 @@ create index if not exists weekly_scores_rank_idx on weekly_scores(challenge_id,
 
 alter table weekly_challenges enable row level security;
 alter table weekly_scores     enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Jeu « Duel 1v1 » : course en temps réel entre deux joueurs.
+-- La progression live passe par Supabase Realtime (broadcast/presence,
+-- éphémère). Création / départ chronométré / résultat sont gérés par les
+-- fonctions serverless (clé service). RLS sans policy => accès anon refusé.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists duel_rooms (
+  id uuid default gen_random_uuid() primary key,
+  text text not null,
+  status text default 'lobby' check (status in ('lobby','racing','done')),
+  host_user_id uuid references users(id) on delete set null,
+  guest_user_id uuid references users(id) on delete set null,
+  guest_label text,
+  start_at timestamptz,                      -- départ synchronisé (serveur)
+  winner text check (winner in ('host','guest','draw')),
+  created_at timestamptz default now()
+);
+
+create table if not exists duel_results (
+  id uuid default gen_random_uuid() primary key,
+  room_id uuid references duel_rooms(id) on delete cascade,
+  user_id uuid references users(id) on delete set null,
+  role text check (role in ('host','guest')),
+  wpm integer,
+  accuracy integer,
+  finished boolean default false,
+  time_ms integer,
+  created_at timestamptz default now()
+);
+create index if not exists duel_results_room_idx on duel_results(room_id);
+
+alter table duel_rooms   enable row level security;
+alter table duel_results enable row level security;

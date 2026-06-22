@@ -500,6 +500,13 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .lb-sub{color:var(--muted);font-weight:500;font-size:12px}
 .lb-ellipsis{text-align:center;color:var(--muted);font-size:18px;line-height:1;padding:2px}
 
+/* DUEL 1v1 */
+.duel-link{display:flex;gap:8px;margin-bottom:18px}
+.duel-link input{flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--txt);outline:none}
+.duel-link button{padding:11px 18px;background:var(--txt);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.duel-status{font-size:14px;font-weight:600;margin-bottom:18px}
+.duel-wait{color:var(--muted)}
+
 /* FOOTER */
 footer{border-top:1px solid var(--border);margin-top:10px}
 .footer-inner{max-width:1120px;margin:0 auto;padding:26px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:14px;color:#A39C8D}
@@ -1350,8 +1357,8 @@ const ALL_LESSONS=[],ALL_MODULES=[];
 
 /* ── APP ── */
 const app={
-  view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,simon:null,boss:null,activeGame:null,now:Date.now(),
-  _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
+  view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,simon:null,boss:null,duel:null,activeGame:null,now:Date.now(),
+  _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
 
   init(){
     this.stats=loadStats();
@@ -1360,7 +1367,7 @@ const app={
     window.addEventListener('keydown',this._onKey);
   },
   stopAll(){
-    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopBoss();
+    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopBoss();this.duelLeave();
     if(this._onKey){window.removeEventListener('keydown',this._onKey);this._onKey=null;}
     this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.course=null;this.simon=null;this.boss=null;this.activeGame=null;
   },
@@ -1437,6 +1444,7 @@ const app={
     if(this.view==='games'&&this.activeGame==='course'&&this.course&&this.course.on){this.courseKey(e);return;}
     if(this.view==='games'&&this.activeGame==='simon'&&this.simon&&this.simon.on){this.simonKey(e);return;}
     if(this.view==='games'&&this.activeGame==='boss'&&this.boss&&this.boss.phase==='playing'){this.bossKey(e);return;}
+    if(this.view==='games'&&this.activeGame==='duel'&&this.duel&&this.duel.phase==='racing'){this.duelKey(e);return;}
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   exitActiveGame(){
@@ -1524,7 +1532,7 @@ const app={
 
   renderView(v){
     this.view=v;
-    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopBoss();this.activeGame=null;}
+    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopBoss();this.duelLeave();this.activeGame=null;}
     if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
     ['home','test','lessons','games','stats'].forEach(p=>{document.getElementById('page-'+p).style.display=p===v?'block':'none';});
     ['home','test','lessons','games','stats'].forEach(id=>{document.getElementById('nav-'+id).classList.toggle('active',id===v);});
@@ -1946,6 +1954,7 @@ const app={
     if(this.activeGame==='course'){this.renderCourse();return;}
     if(this.activeGame==='simon'){this.renderSimon();return;}
     if(this.activeGame==='boss'){this.renderBoss();return;}
+    if(this.activeGame==='duel'){this.renderDuel();return;}
     // selector
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;max-width:1120px;margin:0 auto;padding:0 24px 20px">Jeux de frappe</h2>
@@ -1980,6 +1989,12 @@ const app={
           <div class="game-sel-desc">Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
         </div>
+        <div class="game-sel-card expert-card" onclick="app.selectGame('duel')">
+          <div class="game-sel-icon">⚔️</div>
+          <div class="game-sel-name">Duel 1v1</div>
+          <div class="game-sel-desc">Défie un ami en temps réel sur le même texte. Partage un lien, comptez 3-2-1, et que le plus rapide gagne !</div>
+          <span class="game-sel-tag expert">EXPERT</span>
+        </div>
         <div class="game-sel-card expert-card" onclick="app.selectGame('boss')">
           <div class="game-sel-icon">🏆</div>
           <div class="game-sel-name">Boss de la semaine</div>
@@ -2008,6 +2023,10 @@ const app={
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('boss'));return;}
       if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='boss';this.boss=null;this.startBossLoop();this.bossLoad();
+    } else if(which==='duel'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('duel'));return;}
+      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
+      this.duelLeave();this.activeGame='duel';this.duel={phase:'menu'};this.renderGames();
     } else {
       this.activeGame='frappe';this.game=null;this.renderGames();
     }
@@ -2621,6 +2640,237 @@ const app={
     document.getElementById('page-games').innerHTML=`<div class="games-section">${head}<div style="max-width:760px;margin:0 auto;padding:0 24px">${body}</div></div>`;
   },
 
+  /* ── DUEL 1v1 (temps réel) ── */
+  duelLoadSupabase(){
+    return new Promise((res,rej)=>{
+      if(window.supabase&&window.supabase.createClient)return res(window.supabase);
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+      s.onload=()=>window.supabase&&window.supabase.createClient?res(window.supabase):rej(new Error('global'));
+      s.onerror=()=>rej(new Error('cdn'));
+      document.head.appendChild(s);
+    });
+  },
+  async duelEnsureClient(){
+    const lib=await this.duelLoadSupabase();
+    if(!this._duelSbClient){
+      const cfg=await fetch('/api/realtime-config',{method:'POST',headers:{'Content-Type':'application/json'}}).then(r=>r.json());
+      if(!cfg||!cfg.url||!cfg.anonKey)throw new Error('not-configured');
+      this._duelSbClient=lib.createClient(cfg.url,cfg.anonKey,{realtime:{params:{eventsPerSecond:20}}});
+    }
+    return this._duelSbClient;
+  },
+  async duelCreate(){
+    this.duel={phase:'creating'};this.renderCurrent();
+    try{
+      const r=await fetch('/api/duel-create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})}).then(r=>r.json());
+      if(r.error){this.duel={phase:'error',msg:r.error};this.renderCurrent();return;}
+      this.duel=this._duelBlank('host',r.roomId,r.text,r.hostLabel);
+      await this.duelOpenChannel();
+      this.renderCurrent();
+    }catch{this.duel={phase:'error',msg:'Erreur réseau.'};this.renderCurrent();}
+  },
+  async duelJoin(roomId){
+    this.activeGame='duel';this.duel={phase:'creating'};this.renderCurrent();
+    try{
+      const r=await fetch('/api/duel-join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,roomId})}).then(r=>r.json());
+      if(r.error){this.duel={phase:'error',msg:r.error};this.renderCurrent();return;}
+      this.duel=this._duelBlank(r.role,r.roomId,r.text,r.hostLabel);
+      if(r.startAt)this.duel.startAt=new Date(r.startAt).getTime();
+      await this.duelOpenChannel();
+      if(this.duel.startAt&&this.duel.startAt>Date.now())this._duelBeginCountdown();
+      this.renderCurrent();
+    }catch{this.duel={phase:'error',msg:'Erreur réseau.'};this.renderCurrent();}
+  },
+  _duelBlank(role,roomId,text,hostLabel){
+    return {phase:'lobby',role,roomId,text,hostLabel,oppLabel:null,oppPresent:false,startAt:0,
+      typed:[],correct:0,keystrokes:0,started:false,startTime:0,endTime:0,finished:false,myFinishMs:0,
+      myProg:0,oppProg:0,oppFinished:false,oppForfeit:false,oppWpm:0,oppAcc:0,oppFinishMs:0,
+      myWpm:0,myAcc:0,winner:null,_channel:null,_copied:false,_lastSent:0};
+  },
+  async duelOpenChannel(){
+    const d=this.duel;let sb;
+    try{sb=await this.duelEnsureClient();}
+    catch(e){this.duel={phase:'error',msg:'Le mode temps réel n\'est pas configuré (clé Realtime manquante côté serveur).'};this.renderCurrent();return;}
+    const ch=sb.channel('duel:'+d.roomId,{config:{presence:{key:currentUser},broadcast:{self:false}}});
+    const syncPresence=()=>{
+      const d2=this.duel;if(!d2||!d2._channel)return;
+      const st=ch.presenceState();const others=Object.keys(st).filter(k=>k!==currentUser);
+      d2.oppPresent=others.length>0;
+      if(others.length&&st[others[0]][0])d2.oppLabel=st[others[0]][0].label;
+    };
+    ch.on('broadcast',{event:'start'},({payload})=>{const d2=this.duel;if(!d2)return;d2.startAt=new Date(payload.startAt).getTime();this._duelBeginCountdown();})
+      .on('broadcast',{event:'prog'},({payload})=>{const d2=this.duel;if(!d2||payload.role===d2.role)return;d2.oppProg=payload.prog;if(payload.finished)d2.oppFinished=true;if(d2.phase==='racing')this.renderCurrent();})
+      .on('broadcast',{event:'done'},({payload})=>{const d2=this.duel;if(!d2||payload.role===d2.role)return;d2.oppFinished=true;d2.oppWpm=payload.wpm;d2.oppAcc=payload.acc;d2.oppFinishMs=payload.timeMs;d2.oppProg=1;this._duelMaybeResolve();})
+      .on('presence',{event:'sync'},()=>{syncPresence();if(this.duel&&this.duel.phase==='lobby')this.renderCurrent();})
+      .on('presence',{event:'leave'},()=>{syncPresence();const d2=this.duel;if(!d2)return;if(d2.phase==='racing'&&!d2.oppPresent&&!d2.oppFinished){d2.oppForfeit=true;this._duelMaybeResolve();}if(d2.phase==='lobby')this.renderCurrent();});
+    d._channel=ch;
+    ch.subscribe(async(status)=>{if(status==='SUBSCRIBED'){try{await ch.track({role:d.role,label:currentUser});}catch{}}});
+  },
+  async duelStart(){
+    const d=this.duel;if(!d||d.role!=='host')return;
+    try{
+      const r=await fetch('/api/duel-start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,roomId:d.roomId})}).then(r=>r.json());
+      if(r.error){d.msg=r.error;this.renderCurrent();return;}
+      d.startAt=new Date(r.startAt).getTime();
+      if(d._channel)d._channel.send({type:'broadcast',event:'start',payload:{startAt:r.startAt}});
+      this._duelBeginCountdown();
+    }catch{d.msg='Erreur réseau.';this.renderCurrent();}
+  },
+  _duelBeginCountdown(){const d=this.duel;if(!d)return;d.phase='countdown';this._startDuelLoop();this.renderCurrent();},
+  _startDuelLoop(){if(this._duelLoop)return;this._duelLoop=setInterval(()=>this.duelLoopTick(),100);},
+  stopDuelLoop(){if(this._duelLoop){clearInterval(this._duelLoop);this._duelLoop=null;}},
+  duelLoopTick(){
+    const d=this.duel;if(!d)return;
+    if(d.phase==='countdown'){if(Date.now()>=d.startAt)d.phase='racing';this.renderCurrent();}
+    else if(d.phase==='racing'){this.renderCurrent();}
+  },
+  duelCopyLink(){
+    const d=this.duel;if(!d)return;
+    const link=location.origin+'/?duel='+d.roomId;
+    const done=()=>{if(this.duel){this.duel._copied=true;this.renderCurrent();setTimeout(()=>{if(this.duel)this.duel._copied=false;this.renderCurrent();},2000);}};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(done,done);else done();
+  },
+  _duelCorrectPrefix(){const d=this.duel;let n=0;for(let i=0;i<d.typed.length;i++){if(d.typed[i]===d.text[i])n++;else break;}return n;},
+  duelKey(e){
+    const d=this.duel;if(!d||d.phase!=='racing'||d.finished)return;
+    if(Date.now()<d.startAt)return;
+    const k=e.key;
+    if(k==='Backspace'){e.preventDefault();if(d.typed.length>0){d.typed.pop();this._duelAfterType();}return;}
+    if(k.length!==1)return;
+    e.preventDefault();
+    if(!d.started){d.started=true;d.startTime=Date.now();}
+    const i=d.typed.length;if(i>=d.text.length)return;
+    d.keystrokes++;if(k===d.text[i])d.correct++;
+    d.typed.push(k);
+    this._duelAfterType();
+  },
+  _duelAfterType(){
+    const d=this.duel;
+    const prefix=this._duelCorrectPrefix();
+    d.myProg=prefix/d.text.length;
+    this._duelBroadcastProg(false);
+    if(d.typed.length===d.text.length&&prefix===d.text.length){
+      d.finished=true;d.endTime=Date.now();d.myFinishMs=d.endTime-d.startTime;
+      const mins=Math.max(d.myFinishMs/60000,1/600);
+      d.myWpm=Math.round((d.text.length/5)/mins);
+      d.myAcc=d.keystrokes?Math.round(100*d.correct/d.keystrokes):100;
+      this._duelBroadcastProg(true);
+      if(d._channel)d._channel.send({type:'broadcast',event:'done',payload:{role:d.role,wpm:d.myWpm,acc:d.myAcc,timeMs:d.myFinishMs}});
+      fetch('/api/duel-finish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,roomId:d.roomId,role:d.role,wpm:d.myWpm,accuracy:d.myAcc,timeMs:d.myFinishMs,finished:true})}).catch(()=>{});
+      this._duelMaybeResolve();
+    }
+    this.renderCurrent();
+  },
+  _duelBroadcastProg(finished){
+    const d=this.duel;if(!d||!d._channel)return;
+    const now=Date.now();
+    if(!finished&&d._lastSent&&now-d._lastSent<80)return;
+    d._lastSent=now;
+    try{d._channel.send({type:'broadcast',event:'prog',payload:{role:d.role,prog:d.myProg,finished:!!finished}});}catch{}
+  },
+  _duelMaybeResolve(){
+    const d=this.duel;if(!d||d.phase==='result')return;
+    if(d.finished&&(d.oppFinished||d.oppForfeit)){
+      if(d.oppForfeit&&!d.oppFinished)d.winner=d.role;
+      else d.winner=(d.myFinishMs<=d.oppFinishMs)?d.role:(d.role==='host'?'guest':'host');
+      d.phase='result';this.stopDuelLoop();this.renderCurrent();
+    }
+  },
+  duelLeave(){
+    if(this._duelLoop){clearInterval(this._duelLoop);this._duelLoop=null;}
+    if(this.duel&&this.duel._channel){try{this.duel._channel.unsubscribe();}catch{} try{this._duelSbClient&&this._duelSbClient.removeChannel(this.duel._channel);}catch{}}
+    this.duel=null;
+  },
+  _duelLanesHTML(){
+    const d=this.duel;
+    const oppName=(d.role==='host'?(d.oppLabel||'Adversaire'):(d.hostLabel||d.oppLabel||'Hôte'));
+    return`<div class="race-track">
+      <div class="race-lane you"><div class="race-lane-name">Toi 🏎️</div><div class="race-strip"><div class="race-car" style="left:${Math.round((d.myProg||0)*100)}%">🏎️</div></div></div>
+      <div class="race-lane"><div class="race-lane-name">${oppName}</div><div class="race-strip"><div class="race-car" style="left:${Math.round((d.oppProg||0)*100)}%">🚗</div></div></div>
+    </div>`;
+  },
+  renderDuel(){
+    const d=this.duel;
+    const back=`<button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>`;
+    const head=`<div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">${back}<h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Duel 1v1 ⚔️</h2><span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span></div>`;
+    let body='';
+    if(!d||d.phase==='menu'){
+      body=`<div class="boss-card" style="text-align:center">
+        <div style="font-size:46px;margin-bottom:8px">⚔️</div>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;margin-bottom:8px">Défie un ami en direct</h2>
+        <p style="color:var(--muted);font-size:15px;margin-bottom:22px;line-height:1.6">Crée un duel, partage le lien, et affrontez-vous sur le même texte en temps réel. Le premier à finir gagne !</p>
+        <button class="btn-primary" onclick="app.duelCreate()">Créer un duel ▸</button>
+      </div>`;
+    } else if(d.phase==='creating'){
+      body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Connexion au duel…</div></div>`;
+    } else if(d.phase==='error'){
+      body=`<div class="boss-card"><div class="empty-hint" style="padding:40px">${d.msg||'Une erreur est survenue.'}<br><button class="btn-sm btn-dark" style="margin-top:14px" onclick="app.exitActiveGame()">← Jeux</button></div></div>`;
+    } else if(d.phase==='lobby'){
+      const link=location.origin+'/?duel='+d.roomId;
+      if(d.role==='host'){
+        body=`<div class="boss-card" style="text-align:center">
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px">Salle de duel créée</h2>
+          <p style="color:var(--muted);font-size:14px;margin-bottom:18px">Partage ce lien à ton adversaire :</p>
+          <div class="duel-link"><input readonly value="${link}" onclick="this.select()"><button onclick="app.duelCopyLink()">${d._copied?'Copié ✓':'Copier'}</button></div>
+          <div class="duel-status">${d.oppPresent?`<span style="color:#1FA971">● ${d.oppLabel||'Adversaire'} a rejoint</span>`:'<span class="duel-wait">● En attente de l\'adversaire…</span>'}</div>
+          <button class="btn-primary" style="margin-top:8px;${d.oppPresent?'':'opacity:.5;cursor:default'}" ${d.oppPresent?'onclick="app.duelStart()"':'disabled'}>Lancer le duel ▸</button>
+          ${d.msg?`<p style="color:#E5484D;font-size:13px;margin-top:10px">${d.msg}</p>`:''}
+        </div>`;
+      } else {
+        body=`<div class="boss-card" style="text-align:center">
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px">Duel rejoint !</h2>
+          <p style="color:var(--muted);font-size:15px;margin-bottom:18px">Tu affrontes <b style="color:var(--txt)">${d.hostLabel||'l\'hôte'}</b>.</p>
+          <div class="duel-status"><span class="duel-wait">● En attente du lancement par l'hôte…</span></div>
+        </div>`;
+      }
+    } else if(d.phase==='countdown'){
+      const cd=Math.max(0,Math.ceil((d.startAt-Date.now())/1000));
+      body=`<div class="boss-card" style="position:relative">
+        ${this._duelLanesHTML()}
+        <div class="race-overlay" style="position:static;background:none;backdrop-filter:none;padding:20px 0"><div class="race-count">${cd>0?cd:'GO !'}</div><p>Prépare tes doigts…</p></div>
+      </div>`;
+    } else if(d.phase==='racing'){
+      let textHTML='';
+      let word=[];const flushWord=()=>{if(word.length){textHTML+='<span class="race-word">'+word.join('')+'</span>';word=[];}};
+      d.text.split('').forEach((ch,i)=>{
+        let cls='sprint-todo';
+        if(i<d.typed.length)cls=d.typed[i]===ch?'sprint-ok':'sprint-wrong';
+        else if(i===d.typed.length)cls='sprint-cur';
+        if(ch===' '){flushWord();textHTML+=`<span class="${cls} race-space"> </span>`;}
+        else word.push(`<span class="${cls}">${ch}</span>`);
+      });flushWord();
+      const prefix=this._duelCorrectPrefix();
+      const mins=d.started?Math.max((Date.now()-d.startTime)/60000,1/600):1/600;
+      const liveWpm=d.started?Math.round((prefix/5)/mins):0;
+      body=`<div class="boss-card">
+        ${this._duelLanesHTML()}
+        <div class="sprint-hint" style="margin-bottom:10px">${d.finished?'Terminé ! En attente de l\'adversaire…':'Tape le texte — corrige tes fautes pour avancer.'} · <b>${liveWpm} mpm</b></div>
+        <div class="race-text-box">${textHTML}</div>
+      </div>`;
+    } else if(d.phase==='result'){
+      const iWon=d.winner===d.role;const draw=d.winner==='draw';
+      const title=draw?'Égalité !':iWon?'Victoire ! 🎉':'Défaite';
+      const emoji=draw?'🤝':iWon?'🏆':'😤';
+      body=`<div class="boss-card">
+        <div class="sprint-result">
+          <div style="font-size:48px;line-height:1">${emoji}</div>
+          <h2>${title}</h2>
+          ${d.oppForfeit&&!d.oppFinished?'<p style="color:var(--muted);margin-bottom:14px">Ton adversaire a abandonné.</p>':''}
+          <div class="sprint-result-grid" style="grid-template-columns:1fr 1fr">
+            <div class="stat-box"><div class="stat-label">Toi</div><div class="stat-val acc" style="font-size:30px">${d.myWpm||0}<span class="stat-unit"> mpm</span></div><div style="font-size:12px;color:var(--muted)">${d.myAcc||0}% précision</div></div>
+            <div class="stat-box"><div class="stat-label">${d.oppLabel||'Adversaire'}</div><div class="stat-val" style="font-size:30px">${d.oppFinished?d.oppWpm:'—'}${d.oppFinished?'<span class="stat-unit"> mpm</span>':''}</div><div style="font-size:12px;color:var(--muted)">${d.oppFinished?d.oppAcc+'% précision':'abandon'}</div></div>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;margin-top:4px">
+            <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="app.duelLeave();app.activeGame='duel';app.duel={phase:'menu'};app.renderGames()">Nouveau duel</button>
+            <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="app.exitActiveGame()">← Jeux</button>
+          </div>
+        </div>
+      </div>`;
+    }
+    document.getElementById('page-games').innerHTML=`<div class="games-section">${head}<div style="max-width:760px;margin:0 auto;padding:0 24px">${body}</div></div>`;
+  },
+
   /* ── STATS ── */
   renderStats(){
     if(!currentUser){
@@ -2697,6 +2947,16 @@ async function submitSchoolContact(){
   }
 }
 
+function handleDuelReturn(){
+  const params=new URLSearchParams(location.search);
+  const rid=params.get('duel');
+  if(!rid)return;
+  history.replaceState({},'',location.pathname);
+  const joinNow=()=>{app.renderView('games');app.duelJoin(rid);};
+  if(!currentUser)openAuth('login','Connecte-toi pour rejoindre le duel.',joinNow);
+  else joinNow();
+}
+
 /* ── INIT ── */
 function go(view){app.renderView(view);}
 loadSession();
@@ -2706,6 +2966,7 @@ go('home');
 updateNavUser();
 handlePaymentReturn();
 handleVerificationReturn();
+handleDuelReturn();
 </script>
 </body>
 </html>
