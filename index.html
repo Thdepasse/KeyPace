@@ -464,6 +464,23 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .race-overlay p{color:var(--muted);font-size:15px}
 .race-count{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:80px;line-height:1;color:var(--accent)}
 
+/* SIMON DES MOTS */
+.simon-arena{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:28px;max-width:1120px;margin:0 auto;position:relative;min-height:380px}
+.simon-hud{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.simon-hearts span{font-size:20px;margin-left:2px}
+.simon-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;min-height:230px;text-align:center}
+.simon-prompt{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;color:var(--muted)}
+.simon-words{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:760px}
+.simon-word{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:24px;padding:10px 18px;border-radius:12px;background:var(--light);border:1.5px solid var(--border);min-width:48px}
+.simon-word.ok{background:rgba(31,169,113,0.12);border-color:#1FA971;color:#1FA971}
+.simon-word.cur{border-color:var(--accent);background:rgba(255,77,46,0.08);color:var(--txt)}
+.simon-word.todo{color:var(--muted);letter-spacing:.12em}
+.simon-caret{display:inline-block;width:2px;height:1em;background:var(--accent);margin-left:1px;vertical-align:-2px;animation:simonblink 1s steps(2) infinite}
+@keyframes simonblink{50%{opacity:0}}
+.simon-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:14px;max-width:420px;width:100%}
+.simon-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#ff8a5c);border-radius:3px;transition:width .1s linear}
+@media(prefers-reduced-motion:reduce){.simon-caret{animation:none}.simon-bar-fill{transition:none}.race-car{transition:none}.ttarget-life-fill{transition:none}}
+
 /* FOOTER */
 footer{border-top:1px solid var(--border);margin-top:10px}
 .footer-inner{max-width:1120px;margin:0 auto;padding:26px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:14px;color:#A39C8D}
@@ -1021,7 +1038,7 @@ async function handlePaymentReturn(){
 /* ── DATA ── */
 let _saveDebounce=null;
 function mergeStats(remote){
-  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,goals:{minWpm:20,maxErrors:8}};
+  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,simonBest:null,goals:{minWpm:20,maxErrors:8}};
   const s=Object.assign(def, remote||{});
   s.tests=s.tests||[];s.lessons=s.lessons||{};s.goals=s.goals||{};
   if(typeof s.goals.minWpm!=='number')s.goals.minWpm=20;
@@ -1314,8 +1331,8 @@ const ALL_LESSONS=[],ALL_MODULES=[];
 
 /* ── APP ── */
 const app={
-  view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,activeGame:null,now:Date.now(),
-  _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
+  view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,simon:null,activeGame:null,now:Date.now(),
+  _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_simonLoop:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
 
   init(){
     this.stats=loadStats();
@@ -1324,9 +1341,9 @@ const app={
     window.addEventListener('keydown',this._onKey);
   },
   stopAll(){
-    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();
+    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();
     if(this._onKey){window.removeEventListener('keydown',this._onKey);this._onKey=null;}
-    this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.course=null;this.activeGame=null;
+    this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.course=null;this.simon=null;this.activeGame=null;
   },
 
   lessonRec(id){const v=(this.stats&&this.stats.lessons||{})[id];if(!v)return{bestWpm:0,bestErr:null,cleared:false};if(typeof v==='number')return{bestWpm:v,bestErr:null,cleared:true};return v;},
@@ -1399,11 +1416,12 @@ const app={
     if(this.view==='games'&&this.activeGame==='frappe'&&this.game&&this.game.on){this.gameKey(e);return;}
     if(this.view==='games'&&this.activeGame==='tireur'&&this.tireur&&this.tireur.on){this.tireurKey(e);return;}
     if(this.view==='games'&&this.activeGame==='course'&&this.course&&this.course.on){this.courseKey(e);return;}
+    if(this.view==='games'&&this.activeGame==='simon'&&this.simon&&this.simon.on){this.simonKey(e);return;}
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   exitActiveGame(){
-    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();
-    this.activeGame=null;this.game=null;this.sprint=null;this.tireur=null;this.course=null;
+    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();
+    this.activeGame=null;this.game=null;this.sprint=null;this.tireur=null;this.course=null;this.simon=null;
     this.renderGames();
   },
   typeKey(e){
@@ -1485,7 +1503,7 @@ const app={
 
   renderView(v){
     this.view=v;
-    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.activeGame=null;}
+    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.activeGame=null;}
     if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
     ['home','test','lessons','games','stats'].forEach(p=>{document.getElementById('page-'+p).style.display=p===v?'block':'none';});
     ['home','test','lessons','games','stats'].forEach(id=>{document.getElementById('nav-'+id).classList.toggle('active',id===v);});
@@ -1905,6 +1923,7 @@ const app={
     if(this.activeGame==='frappe'){this.renderFrappe();return;}
     if(this.activeGame==='tireur'){this.renderTireur();return;}
     if(this.activeGame==='course'){this.renderCourse();return;}
+    if(this.activeGame==='simon'){this.renderSimon();return;}
     // selector
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;max-width:1120px;margin:0 auto;padding:0 24px 20px">Jeux de frappe</h2>
@@ -1933,6 +1952,12 @@ const app={
           <div class="game-sel-desc">30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace — chaque seconde compte.</div>
           <span class="game-sel-tag expert">EXPERT</span>
         </div>
+        <div class="game-sel-card" onclick="app.selectGame('simon')">
+          <div class="game-sel-icon">🧠</div>
+          <div class="game-sel-name">Simon des mots</div>
+          <div class="game-sel-desc">Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.</div>
+          <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
+        </div>
       </div>
     </div>`;
   },
@@ -1948,6 +1973,9 @@ const app={
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('course'));return;}
       if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='course';this.course=null;this.renderGames();
+    } else if(which==='simon'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('simon'));return;}
+      this.activeGame='simon';this.simon=null;this.renderGames();
     } else {
       this.activeGame='frappe';this.game=null;this.renderGames();
     }
@@ -2267,6 +2295,151 @@ const app={
     </div>`;
   },
 
+  /* ── SIMON DES MOTS ── */
+  startSimon(){
+    if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startSimon());return;}
+    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();
+    this.activeGame='simon';
+    this.simon={on:true,over:false,phase:'show',level:1,lives:3,score:0,maxSeq:0,
+      words:[],currentWord:'',wordIdx:0,showUntil:0,failUntil:0,inputStart:0,_showTotal:0,_lastBonus:0};
+    this.simonNewSequence();
+    this.renderCurrent();
+    this._simonLoop=setInterval(()=>this.simonLoop(),100);
+  },
+  stopSimon(){if(this._simonLoop){clearInterval(this._simonLoop);this._simonLoop=null;}},
+  simonNewSequence(){
+    const s=this.simon;const lvl=s.level;
+    const pool=lvl<4?TIREUR_EASY:lvl<8?TIREUR_MID:[...TIREUR_MID,...TIREUR_ACCENTS];
+    const words=[];for(let i=0;i<lvl;i++)words.push(pool[Math.floor(Math.random()*pool.length)]);
+    s.words=words;s.currentWord='';s.wordIdx=0;s.phase='show';
+    const perWord=Math.max(500,850-lvl*45);
+    s._showTotal=Math.max(1000,perWord*lvl);
+    s.showUntil=Date.now()+s._showTotal;
+  },
+  simonLoop(){
+    const s=this.simon;if(!s||!s.on)return;
+    const now=Date.now();
+    if(s.phase==='show'){
+      if(now>=s.showUntil){s.phase='input';s.inputStart=now;}
+      this.renderCurrent();
+    } else if(s.phase==='fail'){
+      if(now>=s.failUntil)this.simonNewSequence();
+      this.renderCurrent();
+    }
+  },
+  simonKey(e){
+    const s=this.simon;if(!s||!s.on||s.phase!=='input')return;
+    const k=e.key;
+    if(k==='Backspace'){e.preventDefault();if(s.currentWord.length)s.currentWord=s.currentWord.slice(0,-1);this.renderCurrent();return;}
+    if(k==='Enter'||k===' '){e.preventDefault();this._simonSubmitWord();return;}
+    if(k.length!==1)return;
+    e.preventDefault();
+    s.currentWord+=k;this.renderCurrent();
+  },
+  _simonSubmitWord(){
+    const s=this.simon;
+    if(!s.currentWord)return;
+    const expected=s.words[s.wordIdx];
+    if(s.currentWord.toLowerCase()===expected.toLowerCase()){
+      s.wordIdx++;s.currentWord='';
+      if(s.wordIdx>=s.words.length)this._simonSuccess();
+      else this.renderCurrent();
+    } else {
+      this._simonFail();
+    }
+  },
+  _simonSuccess(){
+    const s=this.simon;
+    const n=s.words.length;
+    const elapsed=Date.now()-s.inputStart;
+    const bonus=Math.max(0,Math.round((n*2000-elapsed)/50));
+    s.score+=n*10+bonus;s._lastBonus=bonus;
+    s.maxSeq=Math.max(s.maxSeq,n);
+    s.level++;
+    this.simonNewSequence();
+    this.renderCurrent();
+  },
+  _simonFail(){
+    const s=this.simon;
+    s.lives--;s.currentWord='';
+    if(s.lives<=0){s.on=false;s.over=true;this.stopSimon();this.afterSimon();this.renderCurrent();return;}
+    s.phase='fail';s.failUntil=Date.now()+1500;
+    this.renderCurrent();
+  },
+  afterSimon(){
+    const s=this.simon;s._isRecord=false;
+    if(currentUser&&this.stats){
+      const b=this.stats.simonBest;
+      if((!b||s.score>b.score)&&s.score>0){s._isRecord=true;this.stats.simonBest={score:s.score,maxSeq:s.maxSeq,date:Date.now()};saveStats(this.stats);}
+    }
+    this.renderCurrent();
+  },
+  renderSimon(){
+    const s=this.simon;
+    const over=!!(s&&s.over),idle=!s||(!s.on&&!s.over);
+    const best=currentUser&&this.stats&&this.stats.simonBest?this.stats.simonBest:null;
+    const reduce=PREFERS_REDUCED_MOTION();
+    const hearts=[0,1,2].map(i=>`<span style="color:${s&&i<s.lives?'var(--accent)':'var(--border)'}">♥</span>`).join('');
+    let stage='';
+    if(s&&s.phase==='show'){
+      const rem=Math.max(0,s.showUntil-Date.now());
+      const pct=Math.round(100*rem/s._showTotal);
+      stage=`<div class="simon-prompt">Mémorise la séquence…</div>
+        <div class="simon-words">${s.words.map(w=>`<span class="simon-word">${w}</span>`).join('')}</div>
+        <div class="simon-bar" style="width:100%"><div class="simon-bar-fill" style="width:${pct}%"></div></div>`;
+    } else if(s&&s.phase==='input'){
+      const chips=s.words.map((w,i)=>{
+        if(i<s.wordIdx)return`<span class="simon-word ok">${w}</span>`;
+        if(i===s.wordIdx)return`<span class="simon-word cur">${s.currentWord||''}<span class="simon-caret"></span></span>`;
+        return`<span class="simon-word todo">•••</span>`;
+      }).join('');
+      stage=`<div class="simon-prompt">Retape la séquence (${s.wordIdx}/${s.words.length})</div>
+        <div class="simon-words">${chips}</div>
+        <div style="font-size:13px;color:var(--muted)">Espace ou Entrée pour valider chaque mot</div>`;
+    } else if(s&&s.phase==='fail'){
+      stage=`<div class="simon-prompt" style="color:#E5484D;font-size:24px">Raté !</div>
+        <div style="font-size:15px;color:var(--muted)">Il te reste ${s.lives} vie${s.lives>1?'s':''}. Nouvelle séquence…</div>`;
+    }
+    let overlay='';
+    if(IS_TOUCH_ONLY()&&idle){
+      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>Simon des mots se joue au clavier physique. Reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+    } else if(!currentUser){
+      overlay=`<div class="race-overlay"><h2>Simon des mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="btn-primary" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
+    } else if(idle){
+      overlay=`<div class="race-overlay"><h2>Simon des mots</h2><p>Mémorise une séquence de mots puis retape-la. Elle s'allonge à chaque réussite.${best?'<br>Record : <b style="color:var(--accent)">'+best.score+' pts</b> (séquence de '+best.maxSeq+')':''}</p><button class="btn-primary" onclick="app.startSimon()">Jouer ▸</button></div>`;
+    } else if(over){
+      const badge=s.maxSeq>=8?'Mémoire d\'éléphant !':s.maxSeq>=5?'Excellente mémoire !':s.maxSeq>=3?'Bien joué !':'Continue !';
+      overlay=`<div class="race-overlay">
+        <div style="font-size:46px;line-height:1">🧠</div>
+        <h2>${badge}</h2>
+        <p style="font-size:15px">Score : <b style="color:var(--accent);font-family:'JetBrains Mono',monospace">${s.score} pts</b><br>Séquence max : <b>${s.maxSeq} mots</b>${s._isRecord?'<br>🏆 Nouveau record !':''}</p>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:6px">
+          <button class="btn-primary" onclick="app.startSimon()">Rejouer ▸</button>
+          <button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button>
+        </div>
+      </div>`;
+    }
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Simon des mots 🧠</h2>
+        <span class="game-sel-tag free">GRATUIT</span>
+      </div>
+      <div class="simon-arena">
+        <div class="simon-hud">
+          <div style="display:flex;gap:22px;align-items:flex-end">
+            <div><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em">NIVEAU</div><div class="sprint-score-val" style="color:var(--txt)">${s?s.maxSeq+ (s.over?0:1):1}</div></div>
+            <div><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em">SCORE</div><div class="sprint-score-val">${s?s.score:0}</div></div>
+          </div>
+          <div class="simon-hearts">${hearts}</div>
+        </div>
+        <div class="simon-stage">${stage}</div>
+        <div aria-live="polite" class="sr-live">${s&&s.phase==='input'?'À toi de retaper la séquence.':over?'Partie terminée. Score '+s.score+'.':''}</div>
+        ${overlay}
+      </div>
+    </div>`;
+  },
+
   /* ── STATS ── */
   renderStats(){
     if(!currentUser){
@@ -2310,6 +2483,7 @@ const app={
         <div class="spanel" style="margin-bottom:0"><h3>🎯 Frappe-mots — meilleur score</h3><div class="scard-val acc" style="font-size:36px;margin-top:8px">${gameBest} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div>${gameBest===0?'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le jeu pour établir un score !</p>':''}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏹 Tireur d'élite — précision record</h3>${this.stats.tireurBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.tireurBest.precision}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.tireurBest.wpm} mpm</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le Tireur d\'élite pour établir ton record de précision !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏎️ Course de dactylo — record</h3>${this.stats.courseBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.courseBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.courseBest.acc}% précision · ${this.stats.courseBest.rank===1?'1ʳᵉ place 🥇':this.stats.courseBest.rank+'ᵉ place'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour établir ton record !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3>🧠 Simon des mots — record</h3>${this.stats.simonBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.simonBest.score} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">séquence max : ${this.stats.simonBest.maxSeq} mots</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance Simon des mots pour établir ton record de mémoire !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint — record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
       </div>
       <div style="text-align:center;padding:8px 0 24px;color:var(--muted);font-size:13px">${tests.length} exercice${tests.length>1?'s':''} réalisé${tests.length>1?'s':''}</div>
