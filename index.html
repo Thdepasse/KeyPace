@@ -433,6 +433,20 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .sprint-progress{height:6px;background:var(--border);border-radius:3px;margin-bottom:8px;overflow:hidden}
 .sprint-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),#ff8a5c);transition:width .1s}
 
+/* TIREUR D'ÉLITE */
+.ttarget{position:absolute;transform:translate(-50%,-50%);background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.16);border-radius:13px;padding:8px 13px 9px;text-align:center;z-index:2}
+.ttarget.active{border-color:var(--accent);background:rgba(255,77,46,0.13);box-shadow:0 0 0 3px rgba(255,77,46,0.22)}
+.ttarget-word{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:18px;white-space:nowrap;line-height:1}
+.ttarget .ttyped{color:var(--accent)}
+.ttarget .trest{color:rgba(255,255,255,0.92)}
+.ttarget-life{height:4px;border-radius:2px;background:rgba(255,255,255,0.16);margin-top:8px;overflow:hidden}
+.ttarget-life-fill{height:100%;border-radius:2px;background:#1FA971;transition:width .05s linear}
+.ttarget-life-fill.low{background:var(--accent)}
+.timpact{position:absolute;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:30px;pointer-events:none;z-index:4}
+.tireur-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:420px;margin:0 auto}
+.tireur-chip{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.85);border-radius:7px;padding:3px 9px}
+.sr-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
 /* FOOTER */
 footer{border-top:1px solid var(--border);margin-top:10px}
 .footer-inner{max-width:1120px;margin:0 auto;padding:26px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:14px;color:#A39C8D}
@@ -990,7 +1004,7 @@ async function handlePaymentReturn(){
 /* ── DATA ── */
 let _saveDebounce=null;
 function mergeStats(remote){
-  const def={tests:[],lessons:{},gameBest:0,goals:{minWpm:20,maxErrors:8}};
+  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,goals:{minWpm:20,maxErrors:8}};
   const s=Object.assign(def, remote||{});
   s.tests=s.tests||[];s.lessons=s.lessons||{};s.goals=s.goals||{};
   if(typeof s.goals.minWpm!=='number')s.goals.minWpm=20;
@@ -1251,6 +1265,16 @@ const CURRICULUM=[
 const MOD_COLORS=['#EE6B5E','#F4A04C','#D9A60C','#5BA84A','#3FA6B2','#6E8BE8','#A77BD6','#E8729A','#4CB8C4','#9B59B6','#E67E22','#27AE60','#2980B9'];
 const WORDS=["clé","jour","main","vite","mot","feu","ami","pain","eau","ciel","fleur","temps","doigt","clavier","rapide","facile","bravo","frappe","lettre","texte","école","vélo","chat","rêve","soleil","plume","note","page","ligne","espace","saut","tape","juste","cadence","jeu","but","top"];
 const SPRINT_WORDS=["le","la","les","un","une","de","des","et","ou","dans","sur","avec","pour","par","pas","ne","se","ce","ma","ta","sa","qui","que","quoi","où","tout","bien","très","faire","voir","aller","venir","avoir","être","dire","vouloir","pouvoir","savoir","prendre","mettre","partir","sortir","entrer","rester","trouver","donner","penser","parler","aimer","vivre","tenir","tomber","ouvrir","fermer","lire","écrire","taper","apprendre","comprendre","répondre","attendre","perdre","gagner","jouer","courir","marcher","chanter","danser","rire","pleurer","manger","boire","dormir","réveiller","travailler","voyager","revenir","passer","laisser","suivre","montrer","décider","commencer","finir","continuer","arriver","repartir","rentrer","retourner"];
+/* Banque de mots accentués + tiers de difficulté pour les jeux (réutilise WORDS/SPRINT_WORDS) */
+const TIREUR_ACCENTS=["école","élève","fenêtre","château","préféré","règle","forêt","crème","théâtre","numéro","côté","cœur","français","intérêt","élément","problème","éléphant","lumière","révéler","différent"];
+const TIREUR_EASY=SPRINT_WORDS.filter(w=>w.length<=4);
+const TIREUR_MID=[...WORDS,...SPRINT_WORDS].filter(w=>w.length>=5&&w.length<=7);
+const TIREUR_HARD=[...new Set([...[...WORDS,...SPRINT_WORDS].filter(w=>w.length>=7),...TIREUR_ACCENTS])];
+
+/* Helpers transverses jeux : accessibilité + détection clavier */
+const PREFERS_REDUCED_MOTION=()=>!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const IS_TOUCH_ONLY=()=>!!(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches&&!window.matchMedia('(pointer:fine)').matches);
+
 function genSprintText(){
   const pool=[...SPRINT_WORDS,...WORDS];
   const pick=()=>pool[Math.floor(Math.random()*pool.length)];
@@ -1262,8 +1286,8 @@ const ALL_LESSONS=[],ALL_MODULES=[];
 
 /* ── APP ── */
 const app={
-  view:'home',sess:null,stats:null,game:null,sprint:null,activeGame:null,now:Date.now(),
-  _timer:null,_gameLoop:null,_sprintLoop:null,_onKey:null,_wid:0,_gameRec:false,
+  view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,activeGame:null,now:Date.now(),
+  _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,
 
   init(){
     this.stats=loadStats();
@@ -1272,9 +1296,9 @@ const app={
     window.addEventListener('keydown',this._onKey);
   },
   stopAll(){
-    this.stopTimer();this.stopGame();this.stopSprint();
+    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();
     if(this._onKey){window.removeEventListener('keydown',this._onKey);this._onKey=null;}
-    this.game=null;this.sess=null;this.sprint=null;this.activeGame=null;
+    this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.activeGame=null;
   },
 
   lessonRec(id){const v=(this.stats&&this.stats.lessons||{})[id];if(!v)return{bestWpm:0,bestErr:null,cleared:false};if(typeof v==='number')return{bestWpm:v,bestErr:null,cleared:true};return v;},
@@ -1342,9 +1366,16 @@ const app={
 
   keyMatches(key,ch){if(ch==null)return false;const low=ch.toLowerCase();if(key.l.toLowerCase()===low)return true;if(key.s&&key.s===ch)return true;return false;},
   handleKey(e){
+    if(e.key==='Escape'&&this.view==='games'&&this.activeGame){this.exitActiveGame();return;}
     if(this.view==='games'&&this.activeGame==='sprint'&&this.sprint&&this.sprint.on){this.sprintKey(e);return;}
     if(this.view==='games'&&this.activeGame==='frappe'&&this.game&&this.game.on){this.gameKey(e);return;}
+    if(this.view==='games'&&this.activeGame==='tireur'&&this.tireur&&this.tireur.on){this.tireurKey(e);return;}
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
+  },
+  exitActiveGame(){
+    this.stopGame();this.stopSprint();this.stopTireur();
+    this.activeGame=null;this.game=null;this.sprint=null;this.tireur=null;
+    this.renderGames();
   },
   typeKey(e){
     const k=e.key;
@@ -1425,7 +1456,7 @@ const app={
 
   renderView(v){
     this.view=v;
-    if(v!=='games'){this.stopGame();this.stopSprint();this.activeGame=null;}
+    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.activeGame=null;}
     if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
     ['home','test','lessons','games','stats'].forEach(p=>{document.getElementById('page-'+p).style.display=p===v?'block':'none';});
     ['home','test','lessons','games','stats'].forEach(id=>{document.getElementById('nav-'+id).classList.toggle('active',id===v);});
@@ -1843,6 +1874,7 @@ const app={
   renderGames(){
     if(this.activeGame==='sprint'){this.renderSprint();return;}
     if(this.activeGame==='frappe'){this.renderFrappe();return;}
+    if(this.activeGame==='tireur'){this.renderTireur();return;}
     // selector
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;max-width:1120px;margin:0 auto;padding:0 24px 20px">Jeux de frappe</h2>
@@ -1851,6 +1883,12 @@ const app={
           <div class="game-sel-icon">🎯</div>
           <div class="game-sel-name">Frappe-mots</div>
           <div class="game-sel-desc">Des mots tombent du ciel — tape-les avant qu'ils touchent le sol. Vitesse et réactivité.</div>
+          <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
+        </div>
+        <div class="game-sel-card" onclick="app.selectGame('tireur')">
+          <div class="game-sel-icon">🏹</div>
+          <div class="game-sel-name">Tireur d'élite</div>
+          <div class="game-sel-desc">Tape chaque mot sans la moindre faute. Une seule erreur et la cible est ratée — la précision avant tout.</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
         </div>
         <div class="game-sel-card expert-card" onclick="app.selectGame('sprint')">
@@ -1867,6 +1905,9 @@ const app={
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sprint'));return;}
       if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='sprint';this.sprint=null;this.renderGames();
+    } else if(which==='tireur'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('tireur'));return;}
+      this.activeGame='tireur';this.tireur=null;this.renderGames();
     } else {
       this.activeGame='frappe';this.game=null;this.renderGames();
     }
@@ -1888,6 +1929,162 @@ const app={
       <div class="game-arena" style="max-width:1120px;margin:0 auto;margin-left:24px;margin-right:24px">
         <div class="game-hud"><div class="game-score-val">${score}<span> pts</span></div><div style="display:flex;gap:5px">${hearts}</div></div>
         ${wordsHTML}${overlay}
+      </div>
+    </div>`;
+  },
+
+  /* ── TIREUR D'ÉLITE ── */
+  startTireur(){
+    if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startTireur());return;}
+    this.stopGame();this.stopSprint();this.stopTireur();
+    this.activeGame='tireur';this._tireurRec=false;
+    this.tireur={on:true,over:false,targets:[],fx:[],roundSize:20,spawned:0,resolved:0,hits:0,
+      missed:[],errKeys:{},correctChars:0,started:false,startTime:0,endTime:0,spawnAcc:0,_id:0};
+    this.renderCurrent();
+    this._tireurLoop=setInterval(()=>this.tireurTick(),50);
+  },
+  stopTireur(){if(this._tireurLoop){clearInterval(this._tireurLoop);this._tireurLoop=null;}},
+  _tireurWord(){
+    const p=this.tireur.spawned;
+    const pool=p<7?TIREUR_EASY:p<14?TIREUR_MID:TIREUR_HARD;
+    return pool[Math.floor(Math.random()*pool.length)];
+  },
+  spawnTarget(){
+    const t=this.tireur;
+    const dur=Math.max(1800,3600-t.spawned*90);
+    let x=50,y=50,ok=false,guard=0;
+    while(!ok&&guard++<30){
+      x=12+Math.random()*76;y=16+Math.random()*64;
+      ok=t.targets.every(o=>Math.abs(o.x-x)>14||Math.abs(o.y-y)>13);
+    }
+    t.targets.push({id:++t._id,text:this._tireurWord(),x,y,typedLen:0,life:1,dur});
+    t.spawned++;
+  },
+  tireurTick(){
+    const t=this.tireur;if(!t||!t.on)return;
+    const dt=50;
+    const survivors=[];
+    t.targets.forEach(tg=>{
+      if(tg.typedLen>0){survivors.push(tg);return;} // cible en cours : ne s'efface pas
+      tg.life-=dt/tg.dur;
+      if(tg.life<=0){t.missed.push(tg.text);t.resolved++;t.fx.push({x:tg.x,y:tg.y,type:'miss',t:6});}
+      else survivors.push(tg);
+    });
+    t.targets=survivors;
+    t.fx=t.fx.map(f=>({...f,t:f.t-1})).filter(f=>f.t>0);
+    t.spawnAcc+=dt;
+    const interval=Math.max(700,1300-t.spawned*30);
+    if(t.spawned<t.roundSize&&t.targets.length<5&&t.spawnAcc>=interval){t.spawnAcc=0;this.spawnTarget();}
+    if(t.resolved>=t.roundSize&&t.targets.length===0){t.on=false;t.over=true;t.endTime=Date.now();}
+    this.renderCurrent();
+    if(t.over&&!this._tireurRec){this._tireurRec=true;this.stopTireur();this.afterTireur();}
+  },
+  tireurKey(e){
+    const k=e.key;
+    if(k==='Backspace'){e.preventDefault();return;} // pas de correction
+    if(k.length!==1)return;
+    e.preventDefault();
+    const t=this.tireur;if(!t||!t.on)return;
+    if(!t.started){t.started=true;t.startTime=Date.now();}
+    const norm=c=>c.toLowerCase();
+    let active=t.targets.find(tg=>tg.typedLen>0);
+    if(!active){
+      const cands=t.targets.filter(tg=>norm(tg.text[0])===norm(k)).sort((a,b)=>a.life-b.life);
+      if(!cands.length)return; // touche sans cible correspondante : sans effet
+      active=cands[0];active.typedLen=1;t.correctChars++;
+      if(active.typedLen>=active.text.length)this._tireurHit(active);
+    } else {
+      if(norm(active.text[active.typedLen])===norm(k)){
+        active.typedLen++;t.correctChars++;
+        if(active.typedLen>=active.text.length)this._tireurHit(active);
+      } else {
+        t.errKeys[k]=(t.errKeys[k]||0)+1;
+        t.missed.push(active.text);t.resolved++;
+        t.fx.push({x:active.x,y:active.y,type:'miss',t:6});
+        t.targets=t.targets.filter(tg=>tg!==active);
+      }
+    }
+    this.renderCurrent();
+  },
+  _tireurHit(tg){
+    const t=this.tireur;
+    t.hits++;t.resolved++;
+    t.fx.push({x:tg.x,y:tg.y,type:'hit',t:6});
+    t.targets=t.targets.filter(x=>x!==tg);
+  },
+  afterTireur(){
+    const t=this.tireur;
+    const precision=Math.round(100*t.hits/t.roundSize);
+    const mins=t.started?Math.max((t.endTime-t.startTime)/60000,1/600):1/600;
+    const wpm=Math.round((t.correctChars/5)/mins);
+    t._precision=precision;t._wpm=wpm;t._isRecord=false;
+    if(currentUser&&this.stats){
+      const b=this.stats.tireurBest;
+      if((!b||precision>b.precision||(precision===b.precision&&wpm>b.wpm))&&precision>0){
+        t._isRecord=true;
+        this.stats.tireurBest={precision,wpm,date:Date.now()};
+        saveStats(this.stats);
+      }
+    }
+    this.renderCurrent();
+  },
+  renderTireur(){
+    const t=this.tireur;
+    const over=!!(t&&t.over),idle=!t||(!t.on&&!t.over);
+    const best=currentUser&&this.stats&&this.stats.tireurBest?this.stats.tireurBest:null;
+    const resolved=t?t.resolved:0,hits=t?t.hits:0,roundSize=t?t.roundSize:20;
+    const livePrec=resolved>0?Math.round(100*hits/resolved):100;
+    const reduce=PREFERS_REDUCED_MOTION();
+    const targetsHTML=(t&&t.targets?t.targets:[]).map(tg=>{
+      const lifePct=Math.max(0,Math.round(tg.life*100));
+      const low=tg.life<0.35;
+      return`<div class="ttarget${tg.typedLen>0?' active':''}" style="left:${tg.x}%;top:${tg.y}%">
+        <div class="ttarget-word"><span class="ttyped">${tg.text.slice(0,tg.typedLen)}</span><span class="trest">${tg.text.slice(tg.typedLen)}</span></div>
+        <div class="ttarget-life"><div class="ttarget-life-fill${low?' low':''}" style="width:${lifePct}%"></div></div>
+      </div>`;
+    }).join('');
+    const fxHTML=(t&&t.fx?t.fx:[]).map(f=>{
+      const op=f.t/6;const scale=f.type==='hit'?(1+(1-op)*0.9):1;
+      const sym=f.type==='hit'?'✓':'✕';const col=f.type==='hit'?'#1FA971':'#E5484D';
+      return`<div class="timpact" style="left:${f.x}%;top:${f.y}%;color:${col};opacity:${reduce?0.9:op};transform:translate(-50%,-50%) scale(${reduce?1:scale})">${sym}</div>`;
+    }).join('');
+    let overlay='';
+    if(IS_TOUCH_ONLY()&&idle){
+      overlay=`<div class="game-overlay"><h2>⌨️ Clavier requis</h2><p>Le Tireur d'élite se joue au clavier physique. Reviens sur ordinateur pour cette épreuve.</p><button class="game-play-btn" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+    } else if(!currentUser){
+      overlay=`<div class="game-overlay"><h2>Tireur d'élite</h2><p>Crée un compte gratuit pour jouer.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
+    } else if(idle){
+      overlay=`<div class="game-overlay"><h2>Tireur d'élite</h2><p>Tape chaque mot sans la moindre faute.<br>Une erreur = cible ratée.${best?'<br>Record : <b style="color:#fff">'+best.precision+'% de précision</b>':''}</p><button class="game-play-btn" onclick="app.startTireur()">Jouer ▸</button></div>`;
+    } else if(over){
+      const prec=t._precision,wpm=t._wpm;
+      const badge=prec>=90?"Tireur d'élite !":prec>=70?'Belle précision !':prec>=50?'Continue !':'Vise mieux !';
+      const uniqMissed=[...new Set(t.missed)];
+      const topKeys=Object.keys(t.errKeys).sort((a,b)=>t.errKeys[b]-t.errKeys[a]).slice(0,5);
+      overlay=`<div class="game-overlay">
+        <h2>${badge}</h2>
+        <div class="game-final">${prec}<span style="font-size:24px"> %</span></div>
+        <p>${wpm} mpm · ${hits}/${roundSize} cibles touchées${t._isRecord?'<br>🏆 Nouveau record de précision !':''}</p>
+        ${uniqMissed.length?`<div style="text-align:center"><div style="color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;margin-bottom:6px;letter-spacing:.04em">MOTS RATÉS</div><div class="tireur-chips">${uniqMissed.slice(0,12).map(w=>`<span class="tireur-chip">${w}</span>`).join('')}</div></div>`:'<p style="color:#1FA971;font-weight:700">Sans faute ! 🎉</p>'}
+        ${topKeys.length?`<div style="color:rgba(255,255,255,0.5);font-size:12px">Touches à surveiller : ${topKeys.map(k=>`<b style="color:#fff">${k===' '?'espace':k}</b>`).join(' · ')}</div>`:''}
+        <button class="game-play-btn" onclick="app.startTireur()">Rejouer ▸</button>
+      </div>`;
+    }
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Tireur d'élite 🏹</h2>
+        <span class="game-sel-tag free">GRATUIT</span>
+      </div>
+      <div class="game-arena" style="max-width:1120px;margin:0 auto;margin-left:24px;margin-right:24px">
+        <div class="game-hud">
+          <div style="display:flex;gap:22px;align-items:flex-end">
+            <div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:.04em">PRÉCISION</div><div class="game-score-val" style="color:var(--accent)">${livePrec}<span> %</span></div></div>
+            <div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:.04em">CIBLES</div><div class="game-score-val">${resolved}<span> / ${roundSize}</span></div></div>
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:right">Une faute<br>= cible ratée</div>
+        </div>
+        <div aria-live="polite" class="sr-live">${over&&t?`Partie terminée. ${t._precision}% de précision.`:''}</div>
+        ${targetsHTML}${fxHTML}${overlay}
       </div>
     </div>`;
   },
@@ -1931,8 +2128,9 @@ const app={
         <div class="spanel"><h3>Vitesse récente</h3><div class="chart">${chartHTML}</div></div>
         <div class="spanel" style="margin-bottom:0"><h3>Derniers tests</h3><div class="recent-list">${recentHTML}</div></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:22px">
         <div class="spanel" style="margin-bottom:0"><h3>🎯 Frappe-mots — meilleur score</h3><div class="scard-val acc" style="font-size:36px;margin-top:8px">${gameBest} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div>${gameBest===0?'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le jeu pour établir un score !</p>':''}</div>
+        <div class="spanel" style="margin-bottom:0"><h3>🏹 Tireur d'élite — précision record</h3>${this.stats.tireurBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.tireurBest.precision}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.tireurBest.wpm} mpm</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le Tireur d\'élite pour établir ton record de précision !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint — record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
       </div>
       <div style="text-align:center;padding:8px 0 24px;color:var(--muted);font-size:13px">${tests.length} exercice${tests.length>1?'s':''} réalisé${tests.length>1?'s':''}</div>
