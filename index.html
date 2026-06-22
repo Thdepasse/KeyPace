@@ -447,6 +447,23 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .tireur-chip{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.85);border-radius:7px;padding:3px 9px}
 .sr-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
+/* COURSE DE DACTYLO */
+.race-track{background:var(--light);border:1px solid var(--border);border-radius:14px;padding:6px 14px;margin-bottom:18px}
+.race-lane{position:relative;display:flex;align-items:center;height:34px;border-bottom:1px dashed var(--border)}
+.race-lane:last-child{border-bottom:none}
+.race-lane-name{width:96px;flex-shrink:0;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.race-lane.you .race-lane-name{color:var(--accent)}
+.race-strip{position:relative;flex:1;height:100%;border-left:2px solid var(--border)}
+.race-strip::after{content:'🏁';position:absolute;right:-4px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.7}
+.race-car{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:20px;transition:left .12s linear;z-index:2}
+.race-text-box{background:#faf9f5;border:1.5px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:19px;line-height:1.9;letter-spacing:.01em;white-space:normal;word-break:normal;overflow-wrap:break-word}
+.race-word{display:inline-block}
+.race-space{white-space:normal}
+.race-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(255,255,255,0.82);backdrop-filter:blur(3px);border-radius:24px;z-index:5;text-align:center}
+.race-overlay h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px}
+.race-overlay p{color:var(--muted);font-size:15px}
+.race-count{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:80px;line-height:1;color:var(--accent)}
+
 /* FOOTER */
 footer{border-top:1px solid var(--border);margin-top:10px}
 .footer-inner{max-width:1120px;margin:0 auto;padding:26px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:14px;color:#A39C8D}
@@ -1004,7 +1021,7 @@ async function handlePaymentReturn(){
 /* ── DATA ── */
 let _saveDebounce=null;
 function mergeStats(remote){
-  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,goals:{minWpm:20,maxErrors:8}};
+  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,goals:{minWpm:20,maxErrors:8}};
   const s=Object.assign(def, remote||{});
   s.tests=s.tests||[];s.lessons=s.lessons||{};s.goals=s.goals||{};
   if(typeof s.goals.minWpm!=='number')s.goals.minWpm=20;
@@ -1271,6 +1288,17 @@ const TIREUR_EASY=SPRINT_WORDS.filter(w=>w.length<=4);
 const TIREUR_MID=[...WORDS,...SPRINT_WORDS].filter(w=>w.length>=5&&w.length<=7);
 const TIREUR_HARD=[...new Set([...[...WORDS,...SPRINT_WORDS].filter(w=>w.length>=7),...TIREUR_ACCENTS])];
 
+/* Course de dactylo : textes FR cohérents (réutilise PASSAGES) + bots locaux */
+const RACE_TEXTS=[...PASSAGES,
+  "apprendre à taper vite ressemble à une course : au début chaque mot compte, puis le rythme s'installe et les doigts trouvent leur chemin tout seuls.",
+  "la pluie tombe sur les toits de la vieille ville, les rues brillent sous les lampadaires et un chat traverse sans bruit la place déserte.",
+  "chaque champion a commencé débutant ; la vraie différence se joue dans la régularité, la patience et le plaisir de progresser un peu chaque jour.",
+  "le train file à travers la campagne verte, les collines défilent derrière la vitre et le voyageur sourit en pensant au bord de mer qui l'attend."];
+const COURSE_BOTS=[
+  {name:'Tortue',emoji:'🐢',wpm:30,color:'#5BA84A'},
+  {name:'Lièvre',emoji:'🐇',wpm:50,color:'#6E8BE8'},
+  {name:'Guépard',emoji:'🐆',wpm:72,color:'#E8729A'}];
+
 /* Helpers transverses jeux : accessibilité + détection clavier */
 const PREFERS_REDUCED_MOTION=()=>!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 const IS_TOUCH_ONLY=()=>!!(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches&&!window.matchMedia('(pointer:fine)').matches);
@@ -1286,8 +1314,8 @@ const ALL_LESSONS=[],ALL_MODULES=[];
 
 /* ── APP ── */
 const app={
-  view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,activeGame:null,now:Date.now(),
-  _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,
+  view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,activeGame:null,now:Date.now(),
+  _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
 
   init(){
     this.stats=loadStats();
@@ -1296,9 +1324,9 @@ const app={
     window.addEventListener('keydown',this._onKey);
   },
   stopAll(){
-    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();
+    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();
     if(this._onKey){window.removeEventListener('keydown',this._onKey);this._onKey=null;}
-    this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.activeGame=null;
+    this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.course=null;this.activeGame=null;
   },
 
   lessonRec(id){const v=(this.stats&&this.stats.lessons||{})[id];if(!v)return{bestWpm:0,bestErr:null,cleared:false};if(typeof v==='number')return{bestWpm:v,bestErr:null,cleared:true};return v;},
@@ -1370,11 +1398,12 @@ const app={
     if(this.view==='games'&&this.activeGame==='sprint'&&this.sprint&&this.sprint.on){this.sprintKey(e);return;}
     if(this.view==='games'&&this.activeGame==='frappe'&&this.game&&this.game.on){this.gameKey(e);return;}
     if(this.view==='games'&&this.activeGame==='tireur'&&this.tireur&&this.tireur.on){this.tireurKey(e);return;}
+    if(this.view==='games'&&this.activeGame==='course'&&this.course&&this.course.on){this.courseKey(e);return;}
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   exitActiveGame(){
-    this.stopGame();this.stopSprint();this.stopTireur();
-    this.activeGame=null;this.game=null;this.sprint=null;this.tireur=null;
+    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();
+    this.activeGame=null;this.game=null;this.sprint=null;this.tireur=null;this.course=null;
     this.renderGames();
   },
   typeKey(e){
@@ -1456,7 +1485,7 @@ const app={
 
   renderView(v){
     this.view=v;
-    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.activeGame=null;}
+    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.activeGame=null;}
     if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
     ['home','test','lessons','games','stats'].forEach(p=>{document.getElementById('page-'+p).style.display=p===v?'block':'none';});
     ['home','test','lessons','games','stats'].forEach(id=>{document.getElementById('nav-'+id).classList.toggle('active',id===v);});
@@ -1875,6 +1904,7 @@ const app={
     if(this.activeGame==='sprint'){this.renderSprint();return;}
     if(this.activeGame==='frappe'){this.renderFrappe();return;}
     if(this.activeGame==='tireur'){this.renderTireur();return;}
+    if(this.activeGame==='course'){this.renderCourse();return;}
     // selector
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;max-width:1120px;margin:0 auto;padding:0 24px 20px">Jeux de frappe</h2>
@@ -1890,6 +1920,12 @@ const app={
           <div class="game-sel-name">Tireur d'élite</div>
           <div class="game-sel-desc">Tape chaque mot sans la moindre faute. Une seule erreur et la cible est ratée — la précision avant tout.</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
+        </div>
+        <div class="game-sel-card expert-card" onclick="app.selectGame('course')">
+          <div class="game-sel-icon">🏎️</div>
+          <div class="game-sel-name">Course de dactylo</div>
+          <div class="game-sel-desc">Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste — premier sur la ligne d'arrivée !</div>
+          <span class="game-sel-tag expert">EXPERT</span>
         </div>
         <div class="game-sel-card expert-card" onclick="app.selectGame('sprint')">
           <div class="game-sel-icon">🏁</div>
@@ -1908,6 +1944,10 @@ const app={
     } else if(which==='tireur'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('tireur'));return;}
       this.activeGame='tireur';this.tireur=null;this.renderGames();
+    } else if(which==='course'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('course'));return;}
+      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
+      this.activeGame='course';this.course=null;this.renderGames();
     } else {
       this.activeGame='frappe';this.game=null;this.renderGames();
     }
@@ -2089,6 +2129,144 @@ const app={
     </div>`;
   },
 
+  /* ── COURSE DE DACTYLO ── */
+  startCourse(){
+    if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startCourse());return;}
+    if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
+    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();
+    this.activeGame='course';this._courseRec=false;
+    const text=RACE_TEXTS[Math.floor(Math.random()*RACE_TEXTS.length)];
+    this.course={on:true,over:false,text,typed:[],correct:0,keystrokes:0,
+      raceStarted:false,startAt:Date.now()+3000,startTime:0,endTime:0,finished:false,
+      bots:COURSE_BOTS.map(b=>({...b,prog:0,finished:false,finishTime:0,_jit:0.85+Math.random()*0.3})),rank:0};
+    this.renderCurrent();
+    this._courseLoop=setInterval(()=>this.courseTick(),100);
+  },
+  stopCourse(){if(this._courseLoop){clearInterval(this._courseLoop);this._courseLoop=null;}},
+  courseTick(){
+    const c=this.course;if(!c||!c.on)return;
+    const now=Date.now();
+    if(!c.raceStarted){
+      if(now>=c.startAt){c.raceStarted=true;c.startTime=now;}
+      this.renderCurrent();return;
+    }
+    c.bots.forEach(b=>{
+      if(b.finished)return;
+      const frac=(b.wpm*5/600)/c.text.length*b._jit; // fraction de texte par 100 ms
+      b.prog=Math.min(1,b.prog+frac);
+      if(b.prog>=1){b.finished=true;b.finishTime=now-c.startTime;}
+    });
+    this.renderCurrent();
+  },
+  _courseCorrectPrefix(){
+    const c=this.course;let n=0;
+    for(let i=0;i<c.typed.length;i++){if(c.typed[i]===c.text[i])n++;else break;}
+    return n;
+  },
+  courseKey(e){
+    const c=this.course;if(!c||!c.on||!c.raceStarted||c.finished)return;
+    const k=e.key;
+    if(k==='Backspace'){e.preventDefault();if(c.typed.length>0){c.typed.pop();this.renderCurrent();}return;}
+    if(k.length!==1)return;
+    e.preventDefault();
+    const i=c.typed.length;
+    if(i>=c.text.length)return;
+    c.keystrokes++;
+    if(k===c.text[i])c.correct++;
+    c.typed.push(k);
+    if(c.typed.length===c.text.length&&this._courseCorrectPrefix()===c.text.length){
+      c.finished=true;c.endTime=Date.now();c.on=false;c.over=true;
+      c.rank=1+c.bots.filter(b=>b.finished).length;
+      this.stopCourse();this.afterCourse();
+    }
+    this.renderCurrent();
+  },
+  afterCourse(){
+    const c=this.course;
+    const mins=Math.max((c.endTime-c.startTime)/60000,1/600);
+    const wpm=Math.round((c.text.length/5)/mins);
+    const acc=c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
+    c._wpm=wpm;c._acc=acc;c._isRecord=false;
+    if(currentUser&&this.stats){
+      const b=this.stats.courseBest;
+      if(!b||wpm>b.wpm){c._isRecord=true;this.stats.courseBest={wpm,acc,rank:c.rank,date:Date.now()};saveStats(this.stats);}
+    }
+    this.renderCurrent();
+  },
+  renderCourse(){
+    const c=this.course;
+    const over=!!(c&&c.over),idle=!c||(!c.on&&!c.over);
+    const best=currentUser&&this.stats&&this.stats.courseBest?this.stats.courseBest:null;
+    const len=c?c.text.length:1;
+    const prefix=c?this._courseCorrectPrefix():0;
+    const playerProg=c?prefix/len:0;
+    const elapsedMin=c&&c.raceStarted?Math.max((Date.now()-c.startTime)/60000,1/600):1/600;
+    const liveWpm=c&&c.raceStarted?Math.round((prefix/5)/elapsedMin):0;
+    const liveAcc=c&&c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
+    // pistes
+    const lanes=c?[{name:'Toi',emoji:'🏎️',prog:playerProg,color:'var(--accent)',you:true},...c.bots]:[];
+    const lanesHTML=lanes.map(l=>`<div class="race-lane${l.you?' you':''}">
+      <div class="race-lane-name">${l.you?'Toi':l.emoji+' '+l.name}</div>
+      <div class="race-strip"><div class="race-car" style="left:${Math.round((l.prog||0)*100)}%">${l.emoji}</div></div>
+    </div>`).join('');
+    // texte
+    let textHTML='';
+    if(c){
+      let word=[];const flushWord=()=>{if(word.length){textHTML+='<span class="race-word">'+word.join('')+'</span>';word=[];}};
+      c.text.split('').forEach((ch,i)=>{
+        let cls='sprint-todo';
+        if(i<c.typed.length)cls=c.typed[i]===ch?'sprint-ok':'sprint-wrong';
+        else if(i===c.typed.length)cls='sprint-cur';
+        if(ch===' '){flushWord();textHTML+=`<span class="${cls} race-space"> </span>`;}
+        else word.push(`<span class="${cls}">${ch}</span>`);
+      });flushWord();
+    }
+    let overlay='';
+    if(IS_TOUCH_ONLY()&&idle){
+      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>La Course de dactylo se joue au clavier physique. Reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+    } else if(c&&!c.raceStarted){
+      const cd=Math.max(0,Math.ceil((c.startAt-Date.now())/1000));
+      overlay=`<div class="race-overlay"><div class="race-count">${cd>0?cd:'GO !'}</div><p>Prépare tes doigts…</p></div>`;
+    }
+    const result=over?`<div class="sprint-result">
+      <div style="font-size:48px;line-height:1">${c.rank===1?'🥇':c.rank===2?'🥈':c.rank===3?'🥉':'🏁'}</div>
+      <h2>${c.rank===1?'1ʳᵉ place !':c.rank+'ᵉ place'}</h2>
+      ${c._isRecord?'<div class="sprint-record show">🏆 Nouveau record de vitesse !</div>':''}
+      <div class="sprint-result-grid">
+        <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val acc" style="font-size:36px">${c._wpm}<span class="stat-unit"> mpm</span></div></div>
+        <div class="stat-box"><div class="stat-label">Précision</div><div class="stat-val" style="font-size:36px">${c._acc}<span class="stat-unit"> %</span></div></div>
+        <div class="stat-box"><div class="stat-label">Classement</div><div class="stat-val" style="font-size:36px">${c.rank}<span class="stat-unit"> / ${c.bots.length+1}</span></div></div>
+      </div>
+      ${best?`<p style="font-size:14px;color:var(--muted);margin-bottom:20px">Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best.wpm} mpm</b></p>`:''}
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="app.startCourse()">Rejouer</button>
+        <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="app.exitActiveGame()">← Jeux</button>
+      </div>
+    </div>`:'';
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Course de dactylo 🏎️</h2>
+        <span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span>
+      </div>
+      <div class="sprint-arena" style="position:relative">
+        ${idle&&!IS_TOUCH_ONLY()?`<div class="sprint-result"><h2 style="margin-bottom:12px">Prêt à courir ?</h2><p style="color:var(--muted);font-size:15px;margin-bottom:20px">Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary" onclick="app.startCourse()">Lancer la course ▸</button></div>`:''}
+        ${c?`
+          <div class="sprint-hud">
+            <div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:var(--muted);font-weight:500"> mpm</span></div></div>
+            <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">PRÉCISION</div><div class="sprint-score-val" style="color:var(--txt)">${liveAcc}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div></div>
+          </div>
+          <div class="race-track">${lanesHTML}</div>
+          ${over?'':`<div class="race-text-box">${textHTML}</div>`}
+          ${over?'':`<div class="sprint-hint">${c.raceStarted?'Corrige tes fautes (retour arrière) pour continuer à avancer.':'La course démarre dans un instant…'}</div>`}
+          ${result}
+          ${overlay}
+        `:''}
+        <div aria-live="polite" class="sr-live">${over&&c?`Course terminée, ${c.rank}ᵉ place, ${c._wpm} mots par minute.`:''}</div>
+      </div>
+    </div>`;
+  },
+
   /* ── STATS ── */
   renderStats(){
     if(!currentUser){
@@ -2131,6 +2309,7 @@ const app={
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:22px">
         <div class="spanel" style="margin-bottom:0"><h3>🎯 Frappe-mots — meilleur score</h3><div class="scard-val acc" style="font-size:36px;margin-top:8px">${gameBest} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div>${gameBest===0?'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le jeu pour établir un score !</p>':''}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏹 Tireur d'élite — précision record</h3>${this.stats.tireurBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.tireurBest.precision}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.tireurBest.wpm} mpm</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le Tireur d\'élite pour établir ton record de précision !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3>🏎️ Course de dactylo — record</h3>${this.stats.courseBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.courseBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.courseBest.acc}% précision · ${this.stats.courseBest.rank===1?'1ʳᵉ place 🥇':this.stats.courseBest.rank+'ᵉ place'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour établir ton record !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint — record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
       </div>
       <div style="text-align:center;padding:8px 0 24px;color:var(--muted);font-size:13px">${tests.length} exercice${tests.length>1?'s':''} réalisé${tests.length>1?'s':''}</div>
