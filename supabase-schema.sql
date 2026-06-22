@@ -38,3 +38,33 @@ create index if not exists users_session_token_idx on users(session_token);
 create index if not exists users_stripe_customer_id_idx on users(stripe_customer_id);
 create index if not exists users_institution_id_idx on users(institution_id);
 create index if not exists institutions_slug_idx on institutions(slug);
+
+-- ───────────────────────────────────────────────────────────────
+-- Jeu « Boss de la semaine » : défi hebdomadaire commun + classement
+-- Tout l'accès se fait via les fonctions serverless (clé service).
+-- RLS activée sans policy => accès anonyme refusé (lecture/écriture serveur only).
+-- ───────────────────────────────────────────────────────────────
+create table if not exists weekly_challenges (
+  id uuid default gen_random_uuid() primary key,
+  iso_week text unique not null,            -- ex. '2026-W26'
+  text text not null,
+  starts_at timestamptz not null,
+  ends_at   timestamptz not null,
+  created_at timestamptz default now()
+);
+
+create table if not exists weekly_scores (
+  id uuid default gen_random_uuid() primary key,
+  challenge_id uuid references weekly_challenges(id) on delete cascade,
+  user_id uuid references users(id) on delete cascade,
+  username text not null,
+  score numeric not null,
+  wpm integer not null,
+  accuracy integer not null,
+  created_at timestamptz default now(),
+  unique (challenge_id, user_id)            -- 1 meilleur score par joueur / semaine
+);
+create index if not exists weekly_scores_rank_idx on weekly_scores(challenge_id, score desc);
+
+alter table weekly_challenges enable row level security;
+alter table weekly_scores     enable row level security;
