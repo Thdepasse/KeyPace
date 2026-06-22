@@ -192,12 +192,6 @@ button{font-family:inherit;cursor:pointer}
 .auth-field select{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:11px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--txt);outline:none;transition:.15s;appearance:none;cursor:pointer}
 .auth-field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,0.12)}
 .auth-inst-hint{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4}
-/* oauth */
-.oauth-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:13px}
-.oauth-divider::before,.oauth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.oauth-btn{width:100%;padding:11px 16px;border:1.5px solid var(--border);border-radius:13px;background:#fff;font-size:14px;font-weight:600;color:var(--txt);display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:.15s;margin-bottom:8px}
-.oauth-btn:hover{background:var(--light);border-color:#ccc}
-.oauth-btn svg{flex-shrink:0}
 
 /* upgrade modal */
 .upgrade-hero{text-align:center;padding:8px 0 20px}
@@ -502,18 +496,6 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Créer un compte</button>
     </div>
     <div id="auth-error" class="auth-error"></div>
-
-    <!-- OAuth -->
-    <button class="oauth-btn" onclick="oauthLogin('google')">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/></svg>
-      Continuer avec Google
-    </button>
-    <button class="oauth-btn" onclick="oauthLogin('apple')">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.47 0c.072.97-.27 1.93-.87 2.64-.6.72-1.54 1.28-2.5 1.21-.1-.95.3-1.93.87-2.61C10.6.54 11.57 0 12.47 0ZM15.8 12.4c-.44.97-.65 1.4-1.22 2.26-.79 1.2-1.9 2.69-3.29 2.7-1.23.01-1.54-.8-3.21-.79-1.67.01-2.01.81-3.24.8-1.39-.02-2.43-1.34-3.22-2.54C-.1 12.24-.38 8.88.98 7.08c.95-1.27 2.44-2.01 3.84-2.01 1.43 0 2.33.8 3.51.8 1.14 0 1.84-.8 3.49-.8 1.25 0 2.57.62 3.51 1.7-.67.38-2.38 1.39-2.19 3.67.17 1.85 1.53 2.65 2.66 2.96Z"/></svg>
-      Continuer avec Apple
-    </button>
-    <div class="oauth-divider">ou</div>
-
     <div class="auth-field"><label>Nom d'utilisateur</label><input type="text" id="auth-username" placeholder="ex: jean42" autocomplete="username"></div>
     <div class="auth-field" id="auth-email-wrap" style="display:none"><label>Adresse email</label><input type="email" id="auth-email" placeholder="ex: jean@email.com" autocomplete="email"></div>
     <div class="auth-field"><label>Mot de passe</label><input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password"></div>
@@ -961,33 +943,6 @@ function showEmailPendingBanner(username){
   setTimeout(()=>{if(el.parentNode)el.remove();},12000);
 }
 
-function oauthLogin(provider){
-  window.location.href='/api/oauth-init?provider='+provider;
-}
-
-function handleOAuthReturn(){
-  const params=new URLSearchParams(location.search);
-  const token=params.get('oauth_token');
-  const username=params.get('oauth_user');
-  const plan=params.get('oauth_plan');
-  const error=params.get('oauth_error');
-  if(!token&&!error)return;
-  history.replaceState({},'',location.pathname);
-  if(error){
-    const msgs={missing_code:'Connexion annulée.',token_exchange:'Erreur de connexion avec le fournisseur.',no_email:'Impossible de récupérer ton email.',user_creation:'Erreur lors de la création du compte.'};
-    const el=document.createElement('div');
-    el.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:600;max-width:480px;width:calc(100% - 32px);background:#fff;border:1.5px solid #E7E1D5;border-radius:18px;padding:22px 24px;box-shadow:0 12px 36px rgba(0,0,0,0.13)';
-    el.innerHTML=`<div style="display:flex;gap:14px;align-items:flex-start"><div style="font-size:28px">❌</div><div style="flex:1"><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:16px;margin-bottom:4px">Erreur de connexion</div><div style="font-size:13px;color:#7A7365">${msgs[error]||'Une erreur est survenue.'}</div></div><button onclick="this.closest('div[style]').remove()" style="background:none;border:none;font-size:18px;color:#A39C8D;cursor:pointer">✕</button></div>`;
-    document.body.appendChild(el);
-    return;
-  }
-  saveSession(username, plan, token);
-  app.stats=mergeStats();
-  app.init();
-  updateNavUser();
-  app.renderCurrent();
-  fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,data:{}})}).catch(()=>{});
-}
 
 function handleVerificationReturn(){
   const params=new URLSearchParams(location.search);
@@ -2016,7 +1971,6 @@ if(currentUser) app.stats = mergeStats();
 app.init();
 go('home');
 updateNavUser();
-handleOAuthReturn();
 handlePaymentReturn();
 handleVerificationReturn();
 </script>
