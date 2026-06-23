@@ -1419,14 +1419,59 @@ const CURRICULUM=[
   /* ── MODULE 4 : construire des phrases ──────────────────────────────────── */
   {name:'4. Construire des phrases',lessons:[
     {id:'w1',title:'Rythme et syllabes',keys:'toutes lettres',
+     tuto:{
+       intro:"Tu as toutes les lettres en main. Place maintenant au rythme : enchaîner des syllabes régulières pour fluidifier ta frappe.",
+       rules:[
+         {icon:'🎵',t:'Un tempo régulier',d:"Tape les syllabes à intervalle constant, comme un métronome. La régularité vaut mieux que des à-coups rapides."},
+         {icon:'🔗',t:'Pense en syllabes',d:"Ton cerveau ne tape pas lettre par lettre mais par petits groupes. Ressens chaque syllabe comme un seul geste."},
+         {icon:'😌',t:'Reste détendu',d:"Épaules et poignets relâchés : la tension casse le rythme et fatigue les mains."}
+       ],
+       tip:"Objectif : trouver un rythme régulier et fluide sur des syllabes simples."
+     },
      text:'fa fo fi fe sa so si se la lo li le da do di de na no ni ne ba bo bi be ma mo mi me va vo vi ve'},
     {id:'w2',title:'Mots outils essentiels',keys:'vocabulaire',
+     tuto:{
+       intro:"Les petits mots outils (le, la, des, et, mais...) reviennent dans toutes les phrases. Les automatiser, c'est gagner partout.",
+       rules:[
+         {icon:'⚡',t:'Des mots ultra-fréquents',d:"Ces mots représentent une énorme part de tout texte français. Plus ils sont automatiques, plus tu écris vite globalement."},
+         {icon:'🔗',t:'Un mot, un geste',d:"Vise à taper chaque petit mot d'un seul élan, sans réfléchir lettre par lettre."},
+         {icon:'👀',t:'Garde les yeux devant',d:"Lis le mot suivant pendant que tes doigts finissent le précédent."}
+       ],
+       tip:"Objectif : taper les mots outils sans hésitation, comme des réflexes."
+     },
      text:'le la les un une du des au aux et ou ni car mais donc or parce que pourtant cependant alors'},
     {id:'w3',title:'Mots fréquents du quotidien',keys:'vocabulaire',
+     tuto:{
+       intro:"On élargit aux mots courants du quotidien. Plus ton stock de mots automatiques grandit, plus ta frappe devient fluide.",
+       rules:[
+         {icon:'🧠',t:'Construis des automatismes',d:"Un mot répété assez souvent finit par se taper tout seul. C'est le but : libérer ta tête pour penser au sens."},
+         {icon:'🎵',t:'Garde le rythme',d:"Ne ralentis pas brutalement sur un mot plus long. Lisse ta cadence sur l'ensemble de la ligne."},
+         {icon:'✅',t:'Vise juste d\'abord',d:"Si un mot te fait fauter souvent, ralentis dessus quelques répétitions, puis reprends le tempo."}
+       ],
+       tip:"Objectif : enchaîner des mots courants avec aisance et régularité."
+     },
      text:'avec pour dans sous chez bien tout sans nous vous leur quand alors aussi depuis souvent toujours jamais'},
     {id:'w4',title:'Vocabulaire de la vie courante',keys:'vocabulaire',
+     tuto:{
+       intro:"Des mots plus longs et concrets. C'est l'occasion de tenir ton rythme sur des mots de plusieurs syllabes.",
+       rules:[
+         {icon:'🔗',t:'Découpe en syllabes',d:"Un mot long se tape comme une suite de petits gestes. mai-son, jar-din, cui-sine : pense par morceaux."},
+         {icon:'🎯',t:'Précision sur la longueur',d:"Plus le mot est long, plus une faute coûte cher. Garde une frappe propre plutôt que pressée."},
+         {icon:'👀',t:'Anticipe la fin du mot',d:"Pendant que tu tapes le début, ton regard a déjà capté la fin. Laisse les doigts suivre."}
+       ],
+       tip:"Objectif : taper des mots plus longs sans casser ton rythme ni ta précision."
+     },
      text:'maison jardin cuisine voiture travail famille enfant bureau table chaise livre journal fenêtre porte mur'},
     {id:'w5',title:'Premières phrases naturelles',keys:'fluidité',
+     tuto:{
+       intro:"Tu passes aux vraies phrases. L'enjeu n'est plus la touche, mais la fluidité d'un bout à l'autre de la phrase.",
+       rules:[
+         {icon:'➡️',t:'Pense par groupes de mots',d:"Lis et tape par petits groupes (le chat / dort / sur le banc) plutôt que mot par mot isolé."},
+         {icon:'👍',t:"N'oublie pas l'espace",d:"L'espace se frappe avec le pouce, sans casser le rythme. C'est la touche la plus utilisée du clavier."},
+         {icon:'✍️',t:'Ponctue proprement',d:"Le point se colle au dernier mot, puis une espace avant la majuscule suivante."}
+       ],
+       tip:"Objectif : taper des phrases entières d'un mouvement continu et fluide."
+     },
      text:'le chat dort sur le banc. la maison est grande et claire. il fait beau dehors. tu aimes lire et voyager loin.'},
   ]},
 
@@ -1677,7 +1722,9 @@ const app={
     const newKeys=(les.keys||'').split(/\s+/).filter(Boolean);
     const onSet=new Set(newKeys.map(k=>k.toLowerCase()));
     const kb=KB.map(row=>`<div class="tuto-kb-row">${row.map(k=>{const on=onSet.has(k.l.toLowerCase());return`<div class="tuto-key${on?' on':''}"${on?` style="background:${FINGERS[k.f]};border-color:${FINGERS[k.f]}"`:''}>${k.l.toLowerCase()}</div>`;}).join('')}</div>`).join('');
-    const cards=newKeys.map(k=>this._fingerInfo(k)).filter(Boolean).map(i=>`<div class="tuto-keycard"><div class="k" style="background:${i.color}">${i.label}</div><div class="meta"><b>${i.label}</b>${i.finger} · ${i.hand}</div></div>`).join('');
+    const infos=newKeys.map(k=>this._fingerInfo(k)).filter(Boolean);
+    const showKb=infos.length>0;
+    const cards=infos.map(i=>`<div class="tuto-keycard"><div class="k" style="background:${i.color}">${i.label}</div><div class="meta"><b>${i.label}</b>${i.finger} · ${i.hand}</div></div>`).join('');
     const t=les.tuto||{};
     const rules=(t.rules||[]).map(r=>`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>${r.t}</strong>${r.d}</div></div>`).join('');
     document.getElementById('lesson-tuto-body').innerHTML=`
@@ -1685,8 +1732,7 @@ const app={
       <div class="tuto-badge">${les.module||''}</div>
       <h2 class="tuto-title">${les.title}</h2>
       ${t.intro?`<p class="tuto-intro">${t.intro}</p>`:''}
-      <div class="tuto-kb">${kb}</div>
-      ${cards?`<div class="tuto-keys-info">${cards}</div>`:''}
+      ${showKb?`<div class="tuto-kb">${kb}</div><div class="tuto-keys-info">${cards}</div>`:''}
       ${rules?`<div class="intro-rules" style="margin-bottom:18px">${rules}</div>`:''}
       ${t.tip?`<div class="lesson-tip"><div class="lesson-tip-icon">🎯</div><div>${t.tip}</div></div>`:''}
       <button class="intro-start-btn" onclick="app.confirmTuto()">Commencer la leçon →</button>`;
