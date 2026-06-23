@@ -4347,35 +4347,41 @@ const app={
     const s=this.stats||{};
     const classes=s.classes||[];
     document.getElementById(pageId).innerHTML=`
-      <div class="stats-header"><h1>Gestion de classes</h1><p>Suis les performances de tes élèves par classe.</p></div>
-      <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-          <h2 style="font-size:18px;font-weight:700;margin:0">Mes classes</h2>
-          <button class="btn-primary" style="padding:8px 18px;font-size:14px" onclick="app.createClass()">+ Nouvelle classe</button>
+      <div class="stats-header" style="padding-bottom:32px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+          <div><h1 style="margin-bottom:4px">Gestion de classes</h1><p style="margin:0">Suis les performances de tes élèves par classe.</p></div>
+          <button class="btn-primary" style="padding:10px 20px;font-size:14px;white-space:nowrap" onclick="app.createClass()">+ Nouvelle classe</button>
         </div>
+      </div>
+      <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
         ${classes.length===0?`
-          <div style="text-align:center;padding:60px 20px;color:var(--muted)">
-            <div style="font-size:48px;margin-bottom:16px">🏫</div>
-            <div style="font-size:17px;font-weight:600;margin-bottom:8px">Aucune classe encore</div>
-            <div style="font-size:14px">Crée ta première classe pour y ajouter des élèves et suivre leurs progrès.</div>
+          <div style="text-align:center;padding:80px 20px;color:var(--muted)">
+            <div style="font-size:52px;margin-bottom:16px">🏫</div>
+            <div style="font-size:18px;font-weight:700;color:var(--txt);margin-bottom:8px">Aucune classe encore</div>
+            <div style="font-size:14px;max-width:320px;margin:0 auto;line-height:1.6">Crée ta première classe, partage le lien d'invitation et suis les progrès de tes élèves.</div>
           </div>
-        `:classes.map((cl,i)=>`
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:12px;cursor:pointer" onclick="app.viewClass(${i})">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div style="font-size:16px;font-weight:700">${cl.name}</div>
-                <div style="font-size:13px;color:var(--muted);margin-top:2px">${(cl.students||[]).length} élève${(cl.students||[]).length!==1?'s':''}</div>
-              </div>
-              <div style="display:flex;gap:8px;align-items:center">
-                <div style="text-align:right">
-                  <div style="font-size:11px;color:var(--muted)">MOY. VITESSE</div>
-                  <div style="font-size:18px;font-weight:700">${cl.avgWpm||'—'}<span style="font-size:12px;color:var(--muted);font-weight:500"> mpm</span></div>
+        `:`<div style="display:flex;flex-direction:column;gap:10px">
+          ${classes.map((cl,i)=>{
+            const n=(cl.students||[]).length;
+            const initials=cl.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+            return`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:0;overflow:hidden;cursor:pointer;transition:box-shadow .15s" onclick="app.viewClass(${i})" onmouseenter="this.style.boxShadow='0 4px 18px rgba(0,0,0,0.07)'" onmouseleave="this.style.boxShadow='none'">
+              <div style="display:flex;align-items:center;gap:16px;padding:18px 20px">
+                <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--accent);flex-shrink:0;font-family:'JetBrains Mono',monospace">${initials}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:16px;font-weight:700;color:var(--txt)">${cl.name}</div>
+                  <div style="font-size:13px;color:var(--muted);margin-top:2px">${n} élève${n!==1?'s':''}</div>
                 </div>
-                <button onclick="event.stopPropagation();app.deleteClass(${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:4px 8px;border-radius:8px" title="Supprimer">✕</button>
+                <div style="display:flex;align-items:center;gap:20px">
+                  <div style="text-align:center">
+                    <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">VITESSE MOY.</div>
+                    <div style="font-size:20px;font-weight:800;color:var(--txt);margin-top:2px">${cl.avgWpm??'—'}<span style="font-size:12px;color:var(--muted);font-weight:500"> mpm</span></div>
+                  </div>
+                  <button onclick="event.stopPropagation();app.deleteClass(${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:6px;border-radius:8px;line-height:1;opacity:.6" title="Supprimer" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
+                </div>
               </div>
-            </div>
-          </div>
-        `).join('')}
+            </div>`;
+          }).join('')}
+        </div>`}
       </div>`;
   },
 
@@ -4405,49 +4411,76 @@ const app={
     if(s.classes[i]&&!s.classes[i].inviteToken){s.classes[i].inviteToken=crypto.randomUUID();saveStats(s);}
     const cl=s.classes[i];
     const students=cl.students||[];
+    const inviteLink=cl.inviteToken&&currentUserId?`${location.origin}?join=${currentUserId}_${i}_${cl.inviteToken}`:'';
+    const avgWpm=students.length&&students.some(s=>s.wpm!=null)?Math.round(students.filter(s=>s.wpm!=null).reduce((a,s)=>a+s.wpm,0)/students.filter(s=>s.wpm!=null).length):null;
+    const avgAcc=students.length&&students.some(s=>s.acc!=null)?Math.round(students.filter(s=>s.acc!=null).reduce((a,s)=>a+s.acc,0)/students.filter(s=>s.acc!=null).length):null;
     document.getElementById(pageId).innerHTML=`
-      <div class="stats-header">
-        <button onclick="app.renderClasses()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Toutes les classes</button>
-        <h1>${cl.name}</h1>
-        <p>${students.length} élève${students.length!==1?'s':''}</p>
+      <div class="stats-header" style="padding-bottom:24px">
+        <button onclick="app.renderClasses()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Toutes les classes</button>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+          <div>
+            <h1 style="margin-bottom:4px">${cl.name}</h1>
+            <p style="margin:0">${students.length} élève${students.length!==1?'s':''}</p>
+          </div>
+          <button onclick="app.refreshClass(${i})" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt)">↻ Actualiser les stats</button>
+        </div>
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
-        ${cl.inviteToken&&currentUserId?`
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:4px">LIEN D'INVITATION</div>
-            <div style="font-size:13px;color:var(--txt);word-break:break-all;font-family:'JetBrains Mono',monospace">${location.origin}?join=${currentUserId}_${i}_${cl.inviteToken}</div>
+
+        ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ÉLÈVES</div>
+            <div style="font-size:28px;font-weight:800">${students.length}</div>
           </div>
-          <button onclick="app.copyInviteLink(${i})" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">Copier le lien</button>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">VITESSE MOY.</div>
+            <div style="font-size:28px;font-weight:800">${avgWpm??'—'}<span style="font-size:14px;color:var(--muted);font-weight:500"> mpm</span></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">PRÉCISION MOY.</div>
+            <div style="font-size:28px;font-weight:800">${avgAcc??'—'}<span style="font-size:14px;color:var(--muted);font-weight:500">${avgAcc!=null?' %':''}</span></div>
+          </div>
         </div>`:''}
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-          <h2 style="font-size:18px;font-weight:700;margin:0">Élèves</h2>
-          <button onclick="app.refreshClass(${i})" style="background:none;border:1px solid var(--border);border-radius:10px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt)">↻ Actualiser les stats</button>
-        </div>
+
+        ${inviteLink?`
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🔗</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:2px">LIEN D'INVITATION</div>
+            <div style="font-size:12px;color:var(--muted);word-break:break-all;font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${inviteLink}</div>
+          </div>
+          <button id="copy-invite-btn-${i}" onclick="app.copyInviteLink(${i})" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Copier le lien</button>
+        </div>`:''}
+
         ${students.length===0?`
-          <div style="text-align:center;padding:60px 20px;color:var(--muted)">
-            <div style="font-size:40px;margin-bottom:12px">👩‍🎓</div>
-            <div style="font-size:16px;font-weight:600;margin-bottom:6px">Aucun élève encore</div>
-            <div style="font-size:13px">Partage le lien d'invitation ci-dessus. Les élèves rejoindront la classe automatiquement.</div>
+          <div style="text-align:center;padding:64px 20px;color:var(--muted)">
+            <div style="width:60px;height:60px;border-radius:16px;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 16px">👩‍🎓</div>
+            <div style="font-size:16px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun élève encore</div>
+            <div style="font-size:13px;max-width:280px;margin:0 auto;line-height:1.6">Partage le lien d'invitation. Les élèves rejoindront la classe automatiquement en cliquant dessus.</div>
           </div>
         `:`
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-            <div style="display:grid;grid-template-columns:1fr 100px 100px 100px 40px;gap:0;padding:10px 20px;border-bottom:1px solid var(--border)">
+            <div style="display:grid;grid-template-columns:1fr 110px 110px 80px 36px;padding:10px 20px;border-bottom:1px solid var(--border)">
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">ÉLÈVE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">VITESSE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">PRÉCISION</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">TESTS</div>
               <div></div>
             </div>
-            ${students.map((st,j)=>`
-              <div style="display:grid;grid-template-columns:1fr 100px 100px 100px 40px;gap:0;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center">
-                <div style="font-weight:600">${st.username}<div style="font-size:12px;color:var(--muted);font-weight:400">ajouté le ${new Date(st.addedAt).toLocaleDateString('fr-FR')}</div></div>
-                <div style="text-align:center;font-weight:700">${st.wpm!=null?st.wpm+'<span style="font-size:11px;color:var(--muted);font-weight:400"> mpm</span>':'—'}</div>
-                <div style="text-align:center;font-weight:700">${st.acc!=null?st.acc+'<span style="font-size:11px;color:var(--muted);font-weight:400">%</span>':'—'}</div>
-                <div style="text-align:center;color:var(--muted)">${st.tests||0}</div>
-                <div style="text-align:center"><button onclick="app.removeStudent(${i},${j})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px" title="Retirer">✕</button></div>
-              </div>
-            `).join('')}
+            ${students.map((st,j)=>{
+              const wpmColor=st.wpm==null?'var(--muted)':st.wpm>=50?'#1FA971':st.wpm>=30?'var(--txt)':'#E5484D';
+              const accColor=st.acc==null?'var(--muted)':st.acc>=95?'#1FA971':st.acc>=80?'var(--txt)':'#E5484D';
+              return`<div style="display:grid;grid-template-columns:1fr 110px 110px 80px 36px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center">
+                <div>
+                  <div style="font-weight:600;font-size:14px">${st.username}</div>
+                  <div style="font-size:11px;color:var(--muted);margin-top:1px">Depuis le ${new Date(st.addedAt).toLocaleDateString('fr-FR')}</div>
+                </div>
+                <div style="text-align:center;font-size:16px;font-weight:800;color:${wpmColor}">${st.wpm!=null?st.wpm+'<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span>':'—'}</div>
+                <div style="text-align:center;font-size:16px;font-weight:800;color:${accColor}">${st.acc!=null?st.acc+'<span style="font-size:11px;font-weight:500;color:var(--muted)">%</span>':'—'}</div>
+                <div style="text-align:center;font-size:14px;color:var(--muted);font-weight:600">${st.tests||'—'}</div>
+                <div style="text-align:center"><button onclick="app.removeStudent(${i},${j})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;border-radius:6px;opacity:.5" title="Retirer" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.5';this.style.color='var(--muted)'">✕</button></div>
+              </div>`;
+            }).join('')}
           </div>
         `}
       </div>`;
@@ -4459,9 +4492,8 @@ const app={
     if(!cl||!cl.inviteToken||!currentUserId)return;
     const link=`${location.origin}?join=${currentUserId}_${classIdx}_${cl.inviteToken}`;
     navigator.clipboard.writeText(link).then(()=>{
-      // feedback visuel bref
-      const btns=document.querySelectorAll('button');
-      btns.forEach(b=>{if(b.textContent==='Copier le lien'){b.textContent='✓ Copié !';setTimeout(()=>{b.textContent='Copier le lien';},2000);}});
+      const btn=document.getElementById(`copy-invite-btn-${classIdx}`);
+      if(btn){btn.textContent='✓ Copié !';setTimeout(()=>{btn.textContent='Copier le lien';},2000);}
     });
   },
 
