@@ -2658,9 +2658,9 @@ const app={
   async bossLoad(){
     this.boss={phase:'loading'};this.renderCurrent();
     try{
-      const ch=await fetch('/api/boss-challenge',{method:'POST',headers:{'Content-Type':'application/json'}}).then(r=>r.json());
+      const ch=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-challenge'})}).then(r=>r.json());
       if(ch.error)throw new Error(ch.error);
-      const lb=await fetch('/api/boss-leaderboard',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})}).then(r=>r.json());
+      const lb=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-leaderboard',token:currentToken})}).then(r=>r.json());
       this.boss={phase:'lobby',challenge:ch,lb,secondsLeft:ch.secondsLeft};
     }catch(e){this.boss={phase:'error',msg:'Impossible de charger le défi pour le moment. Réessaie plus tard.'};}
     if(this.activeGame==='boss')this.renderCurrent();
@@ -2700,9 +2700,9 @@ const app={
     b._wpm=wpm;b._acc=acc;b._score=Math.round(wpm*Math.pow(acc/100,2)*10)/10;
     b.phase='submitting';this.renderCurrent();
     try{
-      const sub=await fetch('/api/boss-submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,wpm,accuracy:acc})}).then(r=>r.json());
+      const sub=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-submit',token:currentToken,wpm,accuracy:acc})}).then(r=>r.json());
       b._submitErr=sub.error||null;b._serverScore=sub.score;
-      const lb=await fetch('/api/boss-leaderboard',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})}).then(r=>r.json());
+      const lb=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-leaderboard',token:currentToken})}).then(r=>r.json());
       b.lb=lb;
     }catch(e){b._submitErr='Erreur réseau, score peut-être non enregistré.';}
     b.phase='result';if(this.activeGame==='boss')this.renderCurrent();
@@ -2811,7 +2811,7 @@ const app={
   async duelEnsureClient(){
     const lib=await this.duelLoadSupabase();
     if(!this._duelSbClient){
-      const cfg=await fetch('/api/realtime-config',{method:'POST',headers:{'Content-Type':'application/json'}}).then(r=>r.json());
+      const cfg=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'realtime-config'})}).then(r=>r.json());
       if(!cfg||!cfg.url||!cfg.anonKey)throw new Error('not-configured');
       this._duelSbClient=lib.createClient(cfg.url,cfg.anonKey,{realtime:{params:{eventsPerSecond:20}}});
     }
@@ -2820,7 +2820,7 @@ const app={
   async duelCreate(){
     this.duel={phase:'creating'};this.renderCurrent();
     try{
-      const r=await fetch('/api/duel-create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})}).then(r=>r.json());
+      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-create',token:currentToken})}).then(r=>r.json());
       if(r.error){this.duel={phase:'error',msg:r.error};this.renderCurrent();return;}
       this.duel=this._duelBlank('host',r.roomId,r.text,r.hostLabel);
       await this.duelOpenChannel();
@@ -2830,7 +2830,7 @@ const app={
   async duelJoin(roomId){
     this.activeGame='duel';this.duel={phase:'creating'};this.renderCurrent();
     try{
-      const r=await fetch('/api/duel-join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,roomId})}).then(r=>r.json());
+      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-join',token:currentToken,roomId})}).then(r=>r.json());
       if(r.error){this.duel={phase:'error',msg:r.error};this.renderCurrent();return;}
       this.duel=this._duelBlank(r.role,r.roomId,r.text,r.hostLabel);
       if(r.startAt)this.duel.startAt=new Date(r.startAt).getTime();
@@ -2867,7 +2867,7 @@ const app={
   async duelStart(){
     const d=this.duel;if(!d||d.role!=='host')return;
     try{
-      const r=await fetch('/api/duel-start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,roomId:d.roomId})}).then(r=>r.json());
+      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-start',token:currentToken,roomId:d.roomId})}).then(r=>r.json());
       if(r.error){d.msg=r.error;this.renderCurrent();return;}
       d.startAt=new Date(r.startAt).getTime();
       if(d._channel)d._channel.send({type:'broadcast',event:'start',payload:{startAt:r.startAt}});
@@ -2914,7 +2914,7 @@ const app={
       d.myAcc=d.keystrokes?Math.round(100*d.correct/d.keystrokes):100;
       this._duelBroadcastProg(true);
       if(d._channel)d._channel.send({type:'broadcast',event:'done',payload:{role:d.role,wpm:d.myWpm,acc:d.myAcc,timeMs:d.myFinishMs}});
-      fetch('/api/duel-finish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,roomId:d.roomId,role:d.role,wpm:d.myWpm,accuracy:d.myAcc,timeMs:d.myFinishMs,finished:true})}).catch(()=>{});
+      fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-finish',token:currentToken,roomId:d.roomId,role:d.role,wpm:d.myWpm,accuracy:d.myAcc,timeMs:d.myFinishMs,finished:true})}).catch(()=>{});
       this._duelMaybeResolve();
     }
     this.renderCurrent();
