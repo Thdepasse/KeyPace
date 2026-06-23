@@ -2701,7 +2701,7 @@ const app={
     document.getElementById(pageId).innerHTML=`<div class="typing-section">
       <div class="typing-header">
         <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
-        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')">💡 Explication</button>`:''}${!isLesson?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()">${this._gaze.enabled?'👁 Traqueur actif':'👁 Activer traqueur des yeux'}</button></div>
+        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')">💡 Explication</button>`:''}${!isLesson?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()">${this._gaze.enabled?'👁 Traqueur actif':'👁 Activer traqueur des yeux'}</button>${this._gaze.permError?`<span style="font-size:11px;color:#E5484D;max-width:220px;text-align:right">${this._gaze.permError}</span>`:''}</div></div>
       </div>
       <div class="live-stats">
         <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val">${s&&s.started?liveWpm+'<span class="stat-unit"> mpm</span>':'·'}</div></div>
@@ -4078,28 +4078,29 @@ const app={
       const ok=await this._gazeLoadLib();
       if(!ok){g._wgPromise=null;return false;}
       try{
-        webgazer
-          .setRegression('weightedRidge')
-          .setTracker('TFFaceMesh')
-          .setCameraConstraints({width:{ideal:1280},height:{ideal:720},facingMode:'user'})
-          .setGazeListener((p)=>{
-            if(!g.active)return;
-            const vw=window.innerWidth,vh=window.innerHeight;
-            const onScreen=p!=null&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
-            g.samples.push(onScreen?1:0);
-          })
-          .showVideoPreview(false)
-          .showPredictionPoints(false)
-          .saveDataAcrossSessions(true);
-        webgazer.params.smoothingEnabled=false;
+        // Appels défensifs : chaque méthode optionnelle est wrappée séparément
+        try{webgazer.setRegression('weightedRidge');}catch{}
+        try{webgazer.showVideoPreview(false);}catch{}
+        try{webgazer.showPredictionPoints(false);}catch{}
+        try{webgazer.saveDataAcrossSessions(true);}catch{}
+        webgazer.setGazeListener((p)=>{
+          if(!g.active)return;
+          const vw=window.innerWidth,vh=window.innerHeight;
+          const onScreen=p!=null&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
+          g.samples.push(onScreen?1:0);
+        });
         await webgazer.begin();
+        // Optionnels post-begin
+        try{webgazer.showVideoPreview(false);}catch{}
+        try{webgazer.showPredictionPoints(false);}catch{}
         g._wgRunning=true;
         g._wgPromise=null;
         return true;
       }catch(err){
         g._wgPromise=null;
-        if(err&&err.name==='NotAllowedError')g.permError='Accès caméra refusé. Active la caméra dans les paramètres de ton navigateur.';
-        else g.permError='Impossible d\'activer le suivi du regard.';
+        console.error('[WebGazer] erreur init:', err);
+        if(err&&err.name==='NotAllowedError')g.permError='Caméra refusée — autorise l\'accès dans les paramètres du navigateur.';
+        else g.permError=`Erreur caméra : ${err&&err.message?err.message:'réessaie dans un autre navigateur.'}`;
         g.enabled=false;
         this.renderCurrent();
         return false;
