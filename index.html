@@ -248,6 +248,8 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .btn-sm{padding:9px 14px;border-radius:10px;font-size:14px;font-weight:600;border:none}
 .btn-outline{background:var(--card);border:1px solid var(--border);color:var(--txt)}
 .btn-dark{background:var(--txt);color:#fff}
+.btn-quit{background:var(--light);border:1px solid var(--border);border-radius:10px;padding:7px 13px;font-family:inherit;font-size:13px;font-weight:700;color:var(--txt);cursor:pointer;flex-shrink:0}
+.btn-quit:hover{background:var(--border)}
 
 /* HOME */
 .home-hero{max-width:1120px;margin:0 auto;padding:64px 24px 36px;display:grid;grid-template-columns:1.05fr 0.95fr;gap:48px;align-items:center}
@@ -2441,7 +2443,7 @@ const app={
 
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
-        <button onclick="app.activeGame=null;app.sprint=null;app.stopSprint();app.renderGames()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>
+        <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
         <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Le Sprint 🏁</h2>
         <span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span>
       </div>
@@ -2904,7 +2906,7 @@ const app={
     const overlay=!currentUser?guestOverlay:gameIdle?idleOverlay:gameOver?gameOverOverlay:'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
-        <button onclick="app.activeGame=null;app.stopGame();app.game=null;app.renderGames()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>
+        <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
         <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Frappe-mots 🎯</h2>
         <span class="game-sel-tag free">GRATUIT</span>
       </div>
@@ -3053,7 +3055,7 @@ const app={
     }
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>
+        <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
         <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Tireur d'élite 🏹</h2>
         <span class="game-sel-tag free">GRATUIT</span>
       </div>
@@ -3187,7 +3189,7 @@ const app={
     </div>`:'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>
+        <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
         <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Course de dactylo 🏎️</h2>
         <span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span>
       </div>
@@ -3335,7 +3337,7 @@ const app={
     }
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>
+        <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
         <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Simon des mots 🧠</h2>
         <span class="game-sel-tag free">GRATUIT</span>
       </div>
@@ -3434,7 +3436,7 @@ const app={
   },
   renderBoss(){
     const b=this.boss;
-    const back=`<button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>`;
+    const back=`<button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>`;
     const head=`<div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">${back}<h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Boss de la semaine 🏆</h2><span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span></div>`;
     let body='';
     if(!b||b.phase==='loading'){
@@ -3655,7 +3657,7 @@ const app={
   },
   renderDuel(){
     const d=this.duel;
-    const back=`<button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted)">← Jeux</button>`;
+    const back=`<button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>`;
     const head=`<div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">${back}<h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Duel 1v1 ⚔️</h2><span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span></div>`;
     let body='';
     if(!d||d.phase==='menu'){
