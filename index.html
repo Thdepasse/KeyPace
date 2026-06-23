@@ -1814,43 +1814,177 @@ const CURRICULUM=[
 
   /* ── MODULE 11 : symboles courants ──────────────────────────────────────── */
   {name:'11. Symboles courants',lessons:[
-    {id:'sym1',title:'@ et # — email et hashtag',keys:'@ #',
+    {id:'sym1',title:'@ et # : email et hashtag',keys:'@ #',
+     tuto:{
+       intro:"Les symboles comme @ et # s'obtiennent avec AltGr (la touche Alt à droite de la barre d'espace) maintenue, puis la touche.",
+       rules:[
+         {icon:'⌨️',t:'La touche AltGr',d:"AltGr est à droite de la barre d'espace. Maintiens-la avec le pouce droit, puis frappe la touche du symbole."},
+         {icon:'📧',t:'@ pour les emails',d:"L'arobase relie le nom et le domaine d'une adresse : contact@keypace.be. Indispensable au quotidien."},
+         {icon:'#️⃣',t:'# le hashtag',d:"Le croisillon sert aux mots-clés et au code. Sur AZERTY, @ et # s'atteignent via AltGr sur la rangée du haut."}
+       ],
+       tip:"Objectif : produire @ et # avec AltGr, sans casser ta position de repos."
+     },
      text:'contact@keypace.be #keypace @user info@site.com #top @jean #apprendre #clavier @monde contact@mail.fr'},
     {id:'sym2',title:'Parenthèses () et crochets []',keys:'() []',
+     tuto:{
+       intro:"Parenthèses et crochets vont par paire : on apprend à toujours ouvrir ET fermer.",
+       rules:[
+         {icon:'🧩',t:'Toujours par paire',d:"Une parenthèse ou un crochet ouvert se ferme toujours. Tape la paire, puis reviens écrire au milieu."},
+         {icon:'⇧',t:'Parenthèses avec Shift',d:"Sur AZERTY, ( et ) s'obtiennent avec Shift sur la rangée des chiffres. Shift de la main opposée, comme d'habitude."},
+         {icon:'⌨️',t:'Crochets avec AltGr',d:"Les crochets [ ] passent par AltGr. Maintiens AltGr puis frappe la touche : utile pour le code et les listes."}
+       ],
+       tip:"Objectif : ouvrir et fermer parenthèses et crochets, sans en oublier."
+     },
      text:'(bonjour) [monde] fonctions(x) tableau[0] résultat(42) liste[fin] (ok) [a-z] valeur(2+3) index[i]'},
-    {id:'sym3',title:'/ et | — chemins et pipes',keys:'/ |',
+    {id:'sym3',title:'/ et | : chemins et pipes',keys:'/ |',
+     tuto:{
+       intro:"La barre oblique / et la barre verticale | servent aux adresses web, chemins de fichiers et commandes.",
+       rules:[
+         {icon:'🌐',t:'Le slash /',d:"La barre oblique sépare les parties d'une URL ou d'un chemin : http://site.fr, dossier/fichier. Sur AZERTY, c'est Shift + : ."},
+         {icon:'⌨️',t:'Le pipe |',d:"La barre verticale s'obtient avec AltGr. En informatique, elle relie deux commandes : cat fichier | grep mot."},
+         {icon:'💻',t:'Symboles de l\'informatique',d:"Ces deux signes sont partout dès qu'on touche au web ou au terminal. Repère bien leur combinaison."}
+       ],
+       tip:"Objectif : taper / (Shift) et | (AltGr) pour les chemins et les commandes."
+     },
      text:'http://site.fr chemin/vers/fichier cat fichier | grep mot droite | gauche /home/user a/b | c/d /var/log'},
-    {id:'sym4',title:'* = + — calculs et code',keys:'* = +',
+    {id:'sym4',title:'* = + : calculs et code',keys:'* = +',
+     tuto:{
+       intro:"Les opérateurs * = + servent aux calculs et au code. On les enchaîne dans des expressions.",
+       rules:[
+         {icon:'🧮',t:'Les opérateurs',d:"* pour multiplier, + pour additionner, = pour le résultat ou l'affectation : 2*3=6, a+b=c."},
+         {icon:'⇧',t:'Souvent avec Shift',d:"Sur AZERTY, + et = demandent Shift sur la rangée des chiffres. Pense à la main opposée pour le maintenir."},
+         {icon:'🔗',t:'Sans espace dans les formules',d:"Dans une expression simple, on colle souvent les opérateurs : x*y+z. Repère le rythme touche par touche."}
+       ],
+       tip:"Objectif : enchaîner * = + dans des expressions, sans hésiter sur Shift."
+     },
      text:'2*3=6 a+b=c x*y+z=0 total=prix*quantité résultat=a+b+c valeur*2=8 score=temps*précision vitesse+1=ok'},
-    {id:'sym5',title:'% et _ — taux et variables',keys:'% _',
+    {id:'sym5',title:'% et _ : taux et variables',keys:'% _',
+     tuto:{
+       intro:"Le pourcentage % et le tiret bas _ (underscore) reviennent souvent dans les chiffres et les noms techniques.",
+       rules:[
+         {icon:'📊',t:'Le pourcentage %',d:"Il se colle au nombre : 50%, 100%. Sur AZERTY, % s'obtient avec Shift sur la touche ù, à droite."},
+         {icon:'➿',t:'Le tiret bas _',d:"L'underscore relie des mots sans espace dans les noms techniques : ma_variable, nom_fichier. C'est Shift + 8."},
+         {icon:'💻',t:'Usage technique',d:"% et _ sont surtout utiles en informatique et dans les données. Mémorise leur position pour ne pas ralentir."}
+       ],
+       tip:"Objectif : placer % et _ (tous deux avec Shift) sans regarder."
+     },
      text:'50% 75% ma_variable nom_fichier 100% style_css mon_pseudo classe_active taux_erreur score_max_wpm'},
   ]},
 
   /* ── MODULE 12 : symboles avancés ───────────────────────────────────────── */
   {name:'12. Symboles avancés',lessons:[
-    {id:'sym6',title:'{} et <> — code et HTML',keys:'{} <>',
+    {id:'sym6',title:'{} et <> : code et HTML',keys:'{} <>',
+     tuto:{
+       intro:"Les accolades {} et chevrons <> sont les symboles du code et du HTML. Eux aussi vont par paire.",
+       rules:[
+         {icon:'⌨️',t:'Accolades avec AltGr',d:"Les accolades { } s'obtiennent avec AltGr sur la rangée des chiffres. Elles encadrent des blocs de code : {code}."},
+         {icon:'🔠',t:'Chevrons à gauche',d:"Les chevrons sont sur la touche à gauche du W : < en direct, > avec Shift. Ils ouvrent et ferment les balises HTML."},
+         {icon:'🧩',t:'Toujours fermer',d:"Comme les parenthèses, accolades et balises s'ouvrent ET se ferment : <p>texte</p>, {return x}."}
+       ],
+       tip:"Objectif : ouvrir et fermer accolades et chevrons, AltGr pour les accolades."
+     },
      text:'{code: true} <html> </html> {style: "bold"} <div class="main"> </div> {return x+y} <p>texte</p>'},
-    {id:'sym7',title:'"" et ~ — chaînes et chemins',keys:'"" ~',
+    {id:'sym7',title:'"" et ~ : chaînes et chemins',keys:'"" ~',
+     tuto:{
+       intro:"Les guillemets droits et le tilde ~ servent aux chaînes de caractères et aux chemins système.",
+       rules:[
+         {icon:'⌨️',t:'Guillemets droits',d:"Le guillemet droit (différent des « » français) entoure les chaînes en code. Sur AZERTY, c'est Shift + 3."},
+         {icon:'〜',t:'Le tilde ~',d:"Le tilde désigne le dossier personnel sous Linux et Mac : ~/documents. Il s'obtient avec AltGr (touche é / 2)."},
+         {icon:'💻',t:'Surtout en code',d:"Ces deux signes sont rares à l'écrit courant mais essentiels en programmation et au terminal."}
+       ],
+       tip:"Objectif : taper le guillemet droit (Shift) et ~ (AltGr) sans les confondre avec les signes français."
+     },
      text:'"bonjour" "monde" ~/documents ~user "valeur": true ~/bureau "clé": "données" ~root "résultat": 42'},
-    {id:'sym8',title:'\\ et ` — code et terminal',keys:'\\ `',
+    {id:'sym8',tuto:{
+       intro:"L'antislash et l'accent grave (le backtick) sont des symboles purement techniques, fréquents en code.",
+       rules:[
+         {icon:'⌨️',t:"L'antislash",d:"Il sépare les dossiers sous Windows et marque les caractères spéciaux en code. On l'obtient avec AltGr."},
+         {icon:'⌨️',t:'Le backtick',d:"L'accent grave seul entoure le code en ligne et les variables en programmation. Lui aussi via AltGr."},
+         {icon:'💻',t:'Réservés au technique',d:"Tu ne t'en serviras qu'en code ou au terminal. Mémorise-les si tu programmes, sinon retiens juste leur existence."}
+       ],
+       tip:"Objectif : situer l'antislash et le backtick (tous deux AltGr) et les taper sans regarder."
+     },title:'\\ et ` : code et terminal',keys:'\\ `',
      text:'C:\\Users\\theo `code inline` \\n \\t `variable` C:\\Windows `npm install` \\r\\n `git commit -m "fix"`'},
-    {id:'sym9',title:'Révision — tous les symboles en texte',keys:'tous symboles',
+    {id:'sym9',title:'Révision : tous les symboles en texte',keys:'tous symboles',
+     tuto:{
+       intro:"On réunit tous les symboles dans un texte mêlant email, web, code et pourcentages. Le grand mélange !",
+       rules:[
+         {icon:'🧩',t:'Tous les combos',d:"Shift, AltGr, touches mortes... Chaque symbole a son geste. Mobilise tout ce que tu as appris dans les deux modules."},
+         {icon:'🧭',t:'Repère le geste',d:"Avant chaque symbole, identifie : direct, Shift ou AltGr ? Ce réflexe te fait gagner du temps."},
+         {icon:'💻',t:'Le clavier complet',d:"Maîtriser les symboles, c'est taper une adresse, un bout de code ou une formule sans jamais bloquer."}
+       ],
+       tip:"Objectif : enchaîner tous les symboles dans un texte réel, chaque combo au bon moment."
+     },
      text:'contact@site.fr (2024) http://url.be #tag {css: bold} <html> 50%=ok a+b=c [fin] ~/home "valeur"'},
   ]},
 
   /* ── MODULE 13 : vitesse et fluidité ────────────────────────────────────── */
   {name:'13. Vitesse et fluidité',lessons:[
     {id:'flu1',title:'Enchaînement de phrases courtes',keys:'fluidité',
+     tuto:{
+       intro:"Place à la vitesse. On enchaîne des phrases courtes pour travailler la fluidité d'un bout à l'autre.",
+       rules:[
+         {icon:'🎵',t:'Un flux continu',d:"Ne t'arrête pas entre les phrases. Le point, l'espace et la majuscule s'enchaînent dans le même mouvement."},
+         {icon:'👀',t:'Lis en avance',d:"Garde une longueur d'avance des yeux sur les doigts : c'est le secret d'une frappe rapide et fluide."},
+         {icon:'😌',t:'Reste détendu',d:"La vitesse vient de la souplesse, pas de la force. Relâche les épaules et les poignets."}
+       ],
+       tip:"Objectif : enchaîner des phrases courtes sans temps mort entre elles."
+     },
      text:'le jour se lève. les oiseaux chantent. le café est prêt. on y va ensemble. allons-y, vite ! bonne journée.'},
     {id:'flu2',title:'Phrases moyennes naturelles',keys:'fluidité',
+     tuto:{
+       intro:"Des phrases plus longues, comme dans la vraie vie. L'objectif : tenir le rythme sur la durée.",
+       rules:[
+         {icon:'🌬️',t:'Respire et continue',d:"Sur une phrase longue, ne bloque pas si tu fais une faute : corrige et repars. La continuité prime."},
+         {icon:'➡️',t:'Par groupes de sens',d:"Tape par groupes de mots qui vont ensemble, pas mot à mot. La phrase devient une suite de petits élans."},
+         {icon:'🎯',t:'Garde la précision',d:"Plus la phrase est longue, plus une faute coûte. Vise une vitesse que tu tiens proprement."}
+       ],
+       tip:"Objectif : taper une phrase moyenne d'un seul flux, sans perdre le rythme."
+     },
      text:"chaque matin, elle ouvre la fenêtre et respire l'air frais avant de commencer sa journée de travail chargée."},
     {id:'flu3',title:'Paragraphe narratif complet',keys:'paragraphe',
+     tuto:{
+       intro:"Un paragraphe entier à taper. C'est l'endurance : garder concentration et régularité jusqu'au bout.",
+       rules:[
+         {icon:'🏃',t:'Tiens la distance',d:"Un paragraphe demande de l'endurance. Installe un rythme confortable que tu peux maintenir sans fatigue."},
+         {icon:'👀',t:'Ne quitte pas l\'écran',d:"Plus le texte est long, plus la tentation de regarder le clavier revient. Garde les yeux devant."},
+         {icon:'✍️',t:'Ponctuation comprise',d:"Virgules, points, apostrophes font partie du flux. Intègre-les sans casser ta cadence."}
+       ],
+       tip:"Objectif : taper un paragraphe complet à rythme régulier, du début à la fin."
+     },
      text:"taper sans regarder ses doigts demande de la patience, mais chaque jour de pratique rend les mains plus rapides et plus sûres. C'est une question d'habitude."},
     {id:'flu4',title:'Texte professionnel',keys:'style pro',
+     tuto:{
+       intro:"Un texte de type professionnel : email, courrier, avec adresse et numéro. Le genre de texte que tu écriras vraiment.",
+       rules:[
+         {icon:'💼',t:'Le registre pro',d:"Formules de politesse, majuscules, ponctuation soignée : un texte pro ne tolère pas l'à-peu-près."},
+         {icon:'🔀',t:'Lettres, chiffres, symboles',d:"Numéros, emails, @ : tu mélanges tout ce que tu as appris. C'est la synthèse de ton apprentissage."},
+         {icon:'🎯',t:'Zéro faute visée',d:"Dans un cadre pro, la précision compte autant que la vitesse. Relis-toi mentalement en tapant."}
+       ],
+       tip:"Objectif : taper un texte professionnel propre, lettres, chiffres et symboles mêlés."
+     },
      text:"Veuillez trouver ci-joint notre offre. N'hésitez pas à nous contacter au 04 98 76 54 32 ou par email : contact@keypace.be. Bien cordialement."},
     {id:'flu5',title:'Texte technique avec symboles',keys:'mixte complet',
+     tuto:{
+       intro:"Le défi complet : du code et de la configuration, avec accolades, guillemets, chemins et chiffres.",
+       rules:[
+         {icon:'💻',t:'Tout à la fois',d:"Accolades, guillemets, deux-points, chiffres... Ce texte mobilise Shift et AltGr en continu. L'épreuve la plus dense en symboles."},
+         {icon:'🧭',t:'Anticipe chaque combo',d:"Repère à l'avance si le prochain signe est direct, Shift ou AltGr. La préparation évite les blocages."},
+         {icon:'🎯',t:'Précision maximale',d:"En code, une faute casse tout. Ici, mieux vaut lent et exact que rapide et approximatif."}
+       ],
+       tip:"Objectif : taper un texte technique mêlant code, symboles et chiffres, proprement."
+     },
      text:'le fichier config.json : {"version": "1.0", "debug": false, "port": 3000}. Lancer : `npm start` dans ~/projet.'},
-    {id:'flu6',title:'Sprint de vitesse — texte long',keys:'vitesse maximale',
+    {id:'flu6',title:'Sprint de vitesse : texte long',keys:'vitesse maximale',
+     tuto:{
+       intro:"L'épreuve finale : un texte long à taper le plus vite et le plus juste possible. Donne tout !",
+       rules:[
+         {icon:'🚀',t:'Pousse ta vitesse',d:"C'est le moment de tester tes limites. Cherche ta vitesse maximale tout en restant lisible."},
+         {icon:'⚖️',t:'Vitesse ET précision',d:"Un sprint propre vaut mieux qu'un sprint truffé de fautes. Trouve le point où tu vas vite sans déraper."},
+         {icon:'🏆',t:'Le bout du parcours',d:"Si tu tapes ce texte sans regarder le clavier, tu as atteint l'objectif de KeyPace. Félicitations !"}
+       ],
+       tip:"Objectif : taper un texte long à ta vitesse maximale, sans regarder le clavier."
+     },
      text:"Écrire vite s'apprend avec de la régularité ; entraîne-toi chaque jour, garde les yeux sur l'écran, et laisse tes doigts trouver leur place tout seuls sur le clavier AZERTY. Bonne chance !"},
   ]},
 ];
