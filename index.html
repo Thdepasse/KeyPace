@@ -568,6 +568,21 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .lb-sub{color:var(--muted);font-weight:500;font-size:12px}
 .lb-ellipsis{text-align:center;color:var(--muted);font-size:18px;line-height:1;padding:2px}
 
+/* GAZE PLUGIN */
+.gaze-toggle{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+.gaze-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.gaze-toggle.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.gaze-toggle.error{border-color:#E5484D;color:#E5484D}
+.gaze-result{margin-top:14px;padding:14px 16px;background:var(--light);border-radius:12px;text-align:left}
+.gaze-result-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.gaze-timeline{height:10px;border-radius:6px;overflow:hidden;display:flex;gap:1px;margin-bottom:8px}
+.gaze-timeline-seg{flex:1;min-width:2px}
+.gaze-timeline-seg.on{background:#1FA971}
+.gaze-timeline-seg.off{background:#E8729A}
+.gaze-stat-row{display:flex;gap:12px;font-size:13px}
+.gaze-stat{display:flex;align-items:center;gap:4px;font-weight:600}
+.gaze-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
 /* DUEL 1v1 */
 .duel-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px}
 @media(max-width:580px){.duel-menu-grid{grid-template-columns:1fr}}
@@ -2061,6 +2076,7 @@ const ALL_LESSONS=[],ALL_MODULES=[];
 const app={
   view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,simon:null,boss:null,duel:null,activeGame:null,now:Date.now(),
   _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
+  _gaze:{enabled:localStorage.getItem('gaze-enabled')==='1',loaded:false,active:false,samples:[],permError:null,_interval:null},
 
   init(){
     this.stats=loadStats();
@@ -2168,8 +2184,8 @@ const app={
     this.renderCurrent();
   },
   backLessons(){this.stopTimer();this.sess=null;this.renderCurrent();},
-  restart(){if(!this.sess)return;this.stopTimer();this.sess=this.makeSession(this.sess.mode,this.sess.lessonId);this.renderCurrent();},
-  newPassage(){this.stopTimer();this.sess=this.makeSession('test');this.renderCurrent();},
+  restart(){if(!this.sess)return;this.stopTimer();this._gazeStop();this.sess=this.makeSession(this.sess.mode,this.sess.lessonId);this.renderCurrent();},
+  newPassage(){this.stopTimer();this._gazeStop();this.sess=this.makeSession('test');this.renderCurrent();},
   goNextLesson(){
     if(!this.sess||!this.sess.lessonId)return;
     const i=ALL_LESSONS.findIndex(l=>l.id===this.sess.lessonId);
@@ -2205,11 +2221,11 @@ const app={
     if(k.length!==1)return;
     e.preventDefault();
     const s=this.sess;
-    if(!s.started){s.started=true;s.startTime=Date.now();this.startTimer();}
+    if(!s.started){s.started=true;s.startTime=Date.now();this.startTimer();this._gazeStart();}
     const expected=s.text[s.idx];s.keystrokes++;
     if(k===expected){s.typed[s.idx]='c';s.correct++;}else{s.typed[s.idx]='w';}
     s.idx++;
-    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();const res=this.computeResult(s);this.recordResult(s.mode,res,s.lessonId);this.renderCurrent();return;}
+    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats();const res=this.computeResult(s);this.recordResult(s.mode,res,s.lessonId);this.renderCurrent();return;}
     this._patchTypingBox();
   },
   computeResult(s){
@@ -2638,7 +2654,7 @@ const app={
     document.getElementById(pageId).innerHTML=`<div class="typing-section">
       <div class="typing-header">
         <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
-        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')">💡 Explication</button>`:''}${!isLesson?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button></div>
+        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')">💡 Explication</button>`:''}${!isLesson?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()" title="${this._gaze.permError||'Suivre les yeux pendant la frappe'}">👁 ${this._gaze.enabled?'Yeux ON':'Yeux'}</button></div>
       </div>
       <div class="live-stats">
         <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val">${s&&s.started?liveWpm+'<span class="stat-unit"> mpm</span>':'·'}</div></div>
@@ -2657,6 +2673,7 @@ const app={
           <div class="stat-box"><div class="stat-label">Temps</div><div class="stat-val">${resTime}<span class="stat-unit"> s</span></div></div>
           <div class="stat-box"><div class="stat-label">Erreurs</div><div class="stat-val">${resErrors}</div></div>
         </div>
+        ${s._gazeStats?this._gazeResultHTML(s._gazeStats):''}
         <div class="result-actions">
           ${isLesson&&lessonPassed&&hasNext?`<button class="res-btn pri" onclick="app.goNextLesson()">Leçon suivante →</button>`:`<button class="res-btn pri" onclick="app.restart()">${isLesson?'Réessayer':'Recommencer'}</button>`}
           <button class="res-btn sec" onclick="${isLesson?'app.backLessons()':'go(\'stats\')'}">${isLesson?'Tous les cours':'Voir mes progrès'}</button>
@@ -3843,6 +3860,76 @@ const app={
       </div>`;
     }
     document.getElementById('page-games').innerHTML=`<div class="games-section">${head}<div style="max-width:760px;margin:0 auto;padding:0 24px">${body}</div></div>`;
+  },
+
+  /* ── GAZE PLUGIN ── */
+  gazeToggle(){
+    const g=this._gaze;
+    g.permError=null;
+    if(g.enabled){
+      g.enabled=false;localStorage.removeItem('gaze-enabled');
+      g.active=false;g._started=false;
+      try{webgazer.end();}catch{}
+    } else {
+      g.enabled=true;localStorage.setItem('gaze-enabled','1');
+    }
+    this.renderCurrent();
+  },
+  async _gazeLoadLib(){
+    const g=this._gaze;if(g.loaded)return true;
+    return new Promise(resolve=>{
+      const s=document.createElement('script');
+      s.src='https://webgazer.cs.brown.edu/webgazer.js';
+      s.onload=()=>{g.loaded=true;resolve(true);};
+      s.onerror=()=>{g.permError='Impossible de charger WebGazer.';resolve(false);};
+      document.head.appendChild(s);
+    });
+  },
+  async _gazeStart(){
+    const g=this._gaze;if(!g.enabled||g.active)return;
+    const ok=await this._gazeLoadLib();if(!ok)return;
+    g.samples=[];g.permError=null;
+    const vw=window.innerWidth,vh=window.innerHeight;
+    const listener=(p)=>{
+      if(!g.active)return;
+      const onScreen=p&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
+      g.samples.push(onScreen?1:0);
+    };
+    try{
+      webgazer.setGazeListener(listener).showVideoPreview(true).showPredictionPoints(false);
+      if(!g._started){await webgazer.begin();g._started=true;}
+      else{webgazer.resume();}
+      g.active=true;
+    }catch(err){
+      if(err&&err.name==='NotAllowedError')g.permError='Accès caméra refusé. Active la caméra dans les paramètres de ton navigateur.';
+      else g.permError='Impossible d\'activer le suivi du regard.';
+      g.enabled=false;g._started=false;localStorage.removeItem('gaze-enabled');
+      this.renderCurrent();
+    }
+  },
+  _gazeStop(){
+    const g=this._gaze;if(!g.active)return;
+    g.active=false;
+    try{if(g._started)webgazer.pause();}catch{}
+  },
+  _gazeStats(){
+    const g=this._gaze;if(!g.samples.length)return null;
+    const pct=Math.round(100*g.samples.filter(v=>v===1).length/g.samples.length);
+    return{pct,samples:[...g.samples]};
+  },
+  _gazeResultHTML(stats){
+    if(!stats)return'';
+    const segs=stats.samples.map(v=>`<div class="gaze-timeline-seg ${v?'on':'off'}"></div>`).join('');
+    const onPct=stats.pct;const offPct=100-onPct;
+    return`<div class="gaze-result">
+      <div class="gaze-result-title">👁 Suivi du regard</div>
+      <div class="gaze-timeline">${segs}</div>
+      <div class="gaze-stat-row">
+        <div class="gaze-stat"><div class="gaze-dot" style="background:#1FA971"></div>Écran : <b>${onPct}%</b></div>
+        <div class="gaze-stat"><div class="gaze-dot" style="background:#E8729A"></div>Clavier : <b>${offPct}%</b></div>
+        <div style="margin-left:auto;font-size:12px;color:var(--muted)">${onPct>=85?'Excellent ! Tu ne regardes presque pas ton clavier.':onPct>=65?'Bien ! Essaie de garder les yeux sur l\'écran.':'Essaie de regarder l\'écran plutôt que tes doigts.'}</div>
+      </div>
+    </div>`;
   },
 
   /* ── STATS ── */
