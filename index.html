@@ -4354,14 +4354,14 @@ const app={
     const pageId='page-classes';
     const s=this.stats||{};
     const classes=s.classes||[];
-    document.getElementById(pageId).innerHTML=`
+    document.getElementById(pageId).innerHTML=`<div class="stats-section">
       <div class="stats-header" style="padding-bottom:32px">
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
           <div><h1 style="margin-bottom:4px">Gestion de classes</h1><p style="margin:0">Suis les performances de tes élèves par classe.</p></div>
           <button class="btn-primary" style="padding:10px 20px;font-size:14px;white-space:nowrap" onclick="app.createClass()">+ Nouvelle classe</button>
         </div>
       </div>
-      <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
+      <div style="max-width:900px;padding-bottom:60px">
         ${classes.length===0?`
           <div style="text-align:center;padding:80px 20px;color:var(--muted)">
             <div style="font-size:52px;margin-bottom:16px">🏫</div>
@@ -4390,7 +4390,7 @@ const app={
             </div>`;
           }).join('')}
         </div>`}
-      </div>`;
+      </div></div>`;
   },
 
   createClass(){
@@ -4422,7 +4422,7 @@ const app={
     const inviteLink=cl.inviteToken&&currentUserId?`${location.origin}?join=${currentUserId}_${i}_${cl.inviteToken}`:'';
     const avgWpm=students.length&&students.some(s=>s.wpm!=null)?Math.round(students.filter(s=>s.wpm!=null).reduce((a,s)=>a+s.wpm,0)/students.filter(s=>s.wpm!=null).length):null;
     const avgAcc=students.length&&students.some(s=>s.acc!=null)?Math.round(students.filter(s=>s.acc!=null).reduce((a,s)=>a+s.acc,0)/students.filter(s=>s.acc!=null).length):null;
-    document.getElementById(pageId).innerHTML=`
+    document.getElementById(pageId).innerHTML=`<div class="stats-section">
       <div class="stats-header" style="padding-bottom:24px">
         <button onclick="app.renderClasses()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Toutes les classes</button>
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
@@ -4491,7 +4491,7 @@ const app={
             }).join('')}
           </div>
         `}
-      </div>`;
+      </div></div>`;
   },
 
   copyInviteLink(classIdx){
