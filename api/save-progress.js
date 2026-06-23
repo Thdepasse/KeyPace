@@ -30,9 +30,18 @@ module.exports = async function handler(req, res) {
   const user = r.data && r.data[0];
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
-  await sb(`/progress?user_id=eq.${user.id}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ data, updated_at: new Date().toISOString() }),
+  // Pas de `data` => lecture : on renvoie la progression enregistrée (utilisé au chargement)
+  if (data === undefined || data === null) {
+    const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
+    const row = pr.data && pr.data[0];
+    return res.json({ ok: true, data: (row && row.data) || {} });
+  }
+
+  // Sinon => écriture en upsert (insère la ligne si elle n'existe pas encore)
+  await sb(`/progress?on_conflict=user_id`, {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates' },
+    body: JSON.stringify({ user_id: user.id, data, updated_at: new Date().toISOString() }),
   });
 
   res.json({ ok: true });

@@ -3822,6 +3822,14 @@ function handleDuelReturn(){
 
 /* ── INIT ── */
 function go(view){app.renderView(view);}
+async function loadProgressFromServer(){
+  if(!currentUser||!currentToken)return;
+  try{
+    const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+    const d=await r.json();
+    if(d&&d.data){app.stats=mergeStats(d.data);app.renderCurrent();}
+  }catch{}
+}
 loadSession();
 if(currentUser) app.stats = mergeStats();
 app.init();
@@ -3830,6 +3838,13 @@ updateNavUser();
 handlePaymentReturn();
 handleVerificationReturn();
 handleDuelReturn();
+loadProgressFromServer();
+// Sauvegarde immédiate de la progression à la fermeture / au changement d'onglet (la sauvegarde normale est différée)
+window.addEventListener('pagehide',()=>{
+  if(currentUser&&currentToken&&app.stats){
+    try{navigator.sendBeacon('/api/save-progress',new Blob([JSON.stringify({token:currentToken,data:app.stats})],{type:'application/json'}));}catch{}
+  }
+});
 </script>
 </body>
 </html>
