@@ -4068,6 +4068,8 @@ const app={
   },
   // Retourne une Promise qui se résout quand WebGazer est prêt.
   // Si déjà en cours de démarrage, retourne la même Promise (pas de double begin()).
+  // Mutex : une seule Promise begin() en vol. Pose le listener dans begin() lui-même
+  // pour que les samples arrivent dès que WebGazer est prêt, même si le test a commencé.
   _gazeEnsureRunning(){
     const g=this._gaze;
     if(g._wgRunning)return Promise.resolve(true);
@@ -4080,6 +4082,12 @@ const app={
           .setRegression('weightedRidge')
           .setTracker('TFFaceMesh')
           .setCameraConstraints({width:{ideal:1280},height:{ideal:720},facingMode:'user'})
+          .setGazeListener((p)=>{
+            if(!g.active)return;
+            const vw=window.innerWidth,vh=window.innerHeight;
+            const onScreen=p!=null&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
+            g.samples.push(onScreen?1:0);
+          })
           .showVideoPreview(false)
           .showPredictionPoints(false)
           .saveDataAcrossSessions(true);
@@ -4111,25 +4119,20 @@ const app={
   },
   async _gazeStart(){
     const g=this._gaze;if(!g.enabled||g.active)return;
-    const ok=await this._gazeEnsureRunning();
-    if(!ok||!g.enabled)return;
+    // active=true AVANT l'await : si begin() résout pendant le test,
+    // le listener (posé dans _gazeEnsureRunning) trouvera g.active=true et pushera les samples.
     g.samples=[];
-    const vw=window.innerWidth,vh=window.innerHeight;
-    // Pose le listener APRES que begin() a résolu — les samples commencent maintenant
-    webgazer.setGazeListener((p,t)=>{
-      if(!g.active)return;
-      const onScreen=p!=null&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
-      g.samples.push(onScreen?1:0);
-    });
     g.active=true;
+    const ok=await this._gazeEnsureRunning();
+    if(!ok||!g.active){g.active=false;}
   },
   _gazeStop(){
     const g=this._gaze;
-    if(!g.active&&!g._wgRunning)return;
     g.active=false;
+    if(!g._wgRunning&&!g._wgPromise)return;
     g._wgRunning=false;
     g._wgPromise=null;
-    try{if(typeof webgazer!=='undefined')webgazer.setGazeListener(null);}catch{}
+    try{if(typeof webgazer!=='undefined')webgazer.setGazeListener(()=>{});}catch{}
     try{if(typeof webgazer!=='undefined')webgazer.end();}catch{}
   },
   _gazeStats(){
