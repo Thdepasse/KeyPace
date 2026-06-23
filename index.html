@@ -252,7 +252,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .btn-quit:hover{background:var(--border)}
 
 /* HOME */
-.home-hero{max-width:1120px;margin:0 auto;padding:64px 24px 36px;display:grid;grid-template-columns:1.05fr 0.95fr;gap:48px;align-items:center}
+.home-hero{max-width:1120px;margin:0 auto;padding:64px 24px 36px;display:grid;grid-template-columns:1.2fr 0.8fr;gap:48px;align-items:center}
 .home-hero h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(36px,4vw,54px);letter-spacing:-0.03em;line-height:1.1;margin-bottom:18px}
 .home-hero p{font-size:17px;color:#7A7365;margin-bottom:32px;line-height:1.6}
 .hero-btns{display:flex;gap:12px;flex-wrap:wrap}
@@ -2501,7 +2501,7 @@ const app={
     document.getElementById('page-home').innerHTML=`
       <div class="home-hero">
         <div>
-          <h1>Apprends à taper<br>en t'amusant !</h1>
+          <h1><span style="white-space:nowrap">Apprends à taper</span><br><span style="white-space:nowrap">en t'amusant !</span></h1>
           <p>La bonne position et les bons réflexes appris en jouant. Tu taperas bientôt sans même y penser.</p>
           <div class="hero-btns">
             <button class="btn-primary" onclick="go('test')">Tester ma vitesse →</button>
