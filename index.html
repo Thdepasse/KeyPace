@@ -237,7 +237,45 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .nav-plan-badge.free{background:var(--light);color:var(--muted)}
 .nav-plan-badge.expert{background:rgba(255,77,46,0.12);color:var(--accent)}
 .nav-username{font-size:13px;font-weight:700;color:var(--muted)}
-.nav-avatar{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700}
+.nav-avatar{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.nav-avatar:hover{opacity:.85}
+/* SETTINGS MODAL */
+.settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:800;display:flex;align-items:center;justify-content:center;padding:20px}
+.settings-modal{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:0;max-width:480px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.16);overflow:hidden}
+.settings-modal-head{padding:24px 28px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.settings-modal-avatar{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;flex-shrink:0}
+.settings-modal-head-info{flex:1}
+.settings-modal-head-info strong{font-size:16px;font-weight:800}
+.settings-modal-head-info span{display:block;font-size:12px;color:var(--muted);margin-top:1px}
+.settings-modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px;line-height:1}
+.settings-section{padding:20px 28px;border-bottom:1px solid var(--border)}
+.settings-section:last-child{border-bottom:none}
+.settings-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:14px}
+.settings-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.settings-row:last-child{margin-bottom:0}
+.settings-row-info{flex:1}
+.settings-row-info strong{font-size:14px;font-weight:700;display:block}
+.settings-row-info span{font-size:13px;color:var(--muted);line-height:1.4}
+.settings-btn{padding:8px 16px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--txt);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s}
+.settings-btn:hover{border-color:var(--accent);color:var(--accent)}
+.settings-btn.danger{border-color:#E5484D;color:#E5484D}
+.settings-btn.danger:hover{background:#E5484D;color:#fff}
+.gaze-calibrated-badge{display:inline-flex;align-items:center;gap:5px;background:#1FA97120;color:#1FA971;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700}
+/* CALIBRATION OVERLAY */
+.calib-overlay{position:fixed;inset:0;background:#0d0d0d;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.calib-header{position:absolute;top:32px;left:0;right:0;text-align:center;color:#fff}
+.calib-header h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin:0 0 6px}
+.calib-header p{font-size:14px;color:rgba(255,255,255,.6);margin:0}
+.calib-progress{position:absolute;top:100px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+.calib-dot-prog{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .3s}
+.calib-dot-prog.done{background:#1FA971}
+.calib-dot-prog.active{background:#fff}
+.calib-point{position:absolute;width:28px;height:28px;border-radius:50%;background:#fff;cursor:pointer;transform:translate(-50%,-50%);transition:transform .2s,background .2s,box-shadow .2s;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(255,255,255,.4)}
+.calib-point.active{background:var(--accent);box-shadow:0 0 0 8px rgba(255,77,46,.25);animation:calib-pulse 1s infinite}
+.calib-point.done{background:#1FA971;cursor:default}
+.calib-point.inactive{background:rgba(255,255,255,.25);cursor:default}
+.calib-point-label{color:#fff;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+@keyframes calib-pulse{0%,100%{box-shadow:0 0 0 8px rgba(255,77,46,.25)}50%{box-shadow:0 0 0 14px rgba(255,77,46,.1)}}
 .nav-logout{background:none;border:1px solid var(--border);border-radius:9px;padding:5px 10px;font-size:13px;font-weight:600;color:var(--muted)}
 .nav-logout:hover{background:var(--light)}
 .nav-upgrade-btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:6px 12px;font-size:13px;font-weight:700;box-shadow:0 4px 10px rgba(255,77,46,0.22)}
@@ -797,7 +835,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <div class="nav-user">
         <span id="nav-plan-badge" class="nav-plan-badge free">GRATUIT</span>
         <span class="nav-username" id="nav-username"></span>
-        <div class="nav-avatar" id="nav-avatar"></div>
+        <div class="nav-avatar" id="nav-avatar" onclick="app.openSettings()"></div>
         <button id="nav-upgrade-btn" class="nav-upgrade-btn" onclick="openModal('upgrade-modal')" style="display:none">Passer Expert</button>
         <button class="nav-logout" onclick="logout()">Déconnexion</button>
       </div>
@@ -3873,6 +3911,110 @@ const app={
     document.getElementById('page-games').innerHTML=`<div class="games-section">${head}<div style="max-width:760px;margin:0 auto;padding:0 24px">${body}</div></div>`;
   },
 
+  /* ── SETTINGS ── */
+  openSettings(section){
+    if(document.getElementById('settings-overlay'))return;
+    const user=currentUser||'';
+    const plan=this.stats&&this.stats.plan?this.stats.plan:'free';
+    const calibrated=!!localStorage.getItem('webgazer-data');
+    const overlay=document.createElement('div');
+    overlay.className='settings-overlay';overlay.id='settings-overlay';
+    overlay.innerHTML=`<div class="settings-modal">
+      <div class="settings-modal-head">
+        <div class="settings-modal-avatar">${user?user[0].toUpperCase():'?'}</div>
+        <div class="settings-modal-head-info"><strong>${user||'Invité'}</strong><span>${plan==='expert'?'Compte Expert':'Compte Gratuit'}</span></div>
+        <button class="settings-modal-close" onclick="app.closeSettings()">✕</button>
+      </div>
+      <div class="settings-section" id="settings-gaze-section">
+        <div class="settings-section-title">👁 Traqueur du regard</div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>Calibration du regard</strong>
+            <span>Clique sur 9 points en les regardant pour que le traqueur apprenne la position de tes yeux. Améliore la précision de détection.</span>
+          </div>
+          ${calibrated?'<span class="gaze-calibrated-badge">✓ Calibré</span>':''}
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <button class="settings-btn" onclick="app.startCalibration()">${calibrated?'Recalibrer':'Calibrer maintenant'}</button>
+          ${calibrated?'<button class="settings-btn danger" onclick="app.resetCalibration()">Réinitialiser</button>':''}
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Compte</div>
+        <div class="settings-row">
+          <div class="settings-row-info"><strong>Déconnexion</strong><span>Te déconnecter de KeyPace</span></div>
+          <button class="settings-btn danger" onclick="app.closeSettings();logout()">Se déconnecter</button>
+        </div>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click',e=>{if(e.target===overlay)this.closeSettings();});
+    if(section==='gaze'){setTimeout(()=>{const el=document.getElementById('settings-gaze-section');if(el)el.scrollIntoView({behavior:'smooth'});},100);}
+  },
+  closeSettings(){document.getElementById('settings-overlay')?.remove();},
+  resetCalibration(){
+    localStorage.removeItem('webgazer-data');
+    this.closeSettings();
+    setTimeout(()=>this.openSettings('gaze'),50);
+  },
+  async startCalibration(){
+    this.closeSettings();
+    const ok=await this._gazeLoadLib();
+    if(!ok){alert('Impossible de charger WebGazer.');return;}
+    const POINTS=[
+      [10,10],[50,10],[90,10],
+      [10,50],[50,50],[90,50],
+      [10,90],[50,90],[90,90],
+    ];
+    let current=0;const clicks=new Array(9).fill(0);
+    const CLICKS_NEEDED=3;
+
+    const overlay=document.createElement('div');
+    overlay.className='calib-overlay';overlay.id='calib-overlay';
+
+    const render=()=>{
+      overlay.innerHTML=`
+        <div class="calib-header">
+          <h2>Calibration du regard</h2>
+          <p>Regarde chaque point blanc et clique dessus ${CLICKS_NEEDED} fois</p>
+        </div>
+        <div class="calib-progress">${POINTS.map((_,i)=>`<div class="calib-dot-prog ${i<current?'done':i===current?'active':''}"></div>`).join('')}</div>
+        ${POINTS.map(([px,py],i)=>{
+          const state=i<current?'done':i===current?'active':'inactive';
+          const progress=i===current?clicks[i]:0;
+          return`<div class="calib-point ${state}" style="left:${px}%;top:${py}%" ${state==='active'?`onclick="app._calibClick(${i})"`:''}>${state==='active'?`<span class="calib-point-label">${CLICKS_NEEDED-progress}</span>`:state==='done'?'✓':''}</div>`;
+        }).join('')}
+        ${current>=9?`<div style="position:absolute;bottom:48px;text-align:center;color:#fff"><h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;margin-bottom:12px">Calibration terminée ✓</h2><p style="color:rgba(255,255,255,.7);margin-bottom:24px">Tes données ont été sauvegardées pour les prochaines sessions.</p><button onclick="app._calibDone()" style="background:var(--accent);color:#fff;border:none;border-radius:14px;padding:14px 32px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer">Fermer</button></div>`:''}
+      `;
+    };
+
+    this._calibState={current,clicks,CLICKS_NEEDED,POINTS,render};
+    document.body.appendChild(overlay);
+
+    try{
+      webgazer.setGazeListener(()=>{}).showVideoPreview(false).showPredictionPoints(false);
+      webgazer.params.saveDataAcrossSessions=true;
+      await webgazer.begin();
+    }catch(err){
+      overlay.remove();
+      const msg=err&&err.name==='NotAllowedError'?'Accès caméra refusé.':'Impossible d\'activer la caméra.';
+      alert(msg);return;
+    }
+    render();
+  },
+  _calibClick(idx){
+    const st=this._calibState;if(!st||idx!==st.current)return;
+    st.clicks[idx]++;
+    try{webgazer.recordScreenPosition(st.POINTS[idx][0]/100*window.innerWidth,st.POINTS[idx][1]/100*window.innerHeight,'click');}catch{}
+    if(st.clicks[idx]>=st.CLICKS_NEEDED){st.current++;}
+    st.render();
+  },
+  _calibDone(){
+    try{localStorage.setItem('webgazer-data','1');webgazer.end();}catch{}
+    document.getElementById('calib-overlay')?.remove();
+    this._calibState=null;
+  },
+
   /* ── GAZE PLUGIN ── */
   gazeToggle(){
     const g=this._gaze;
@@ -3896,7 +4038,7 @@ const app={
         <br><br>
         À la fin du test, tu verras une <strong>timeline colorée</strong> et le pourcentage de temps passé les yeux sur l'écran — un indicateur clé pour progresser en dactylo.
       </div>
-      <div class="gaze-modal-note">⚠️ Valable uniquement pour ce test. Le traqueur se désactive automatiquement à la fin ou si tu recommences.</div>
+      <div class="gaze-modal-note">⚠️ Valable uniquement pour ce test. Le traqueur se désactive automatiquement à la fin ou si tu recommences.<br><br>🎯 Pour une meilleure précision, <span onclick="document.getElementById('gaze-modal-overlay')?.remove();app.openSettings('gaze')" style="cursor:pointer;text-decoration:underline;color:var(--accent);font-weight:700">calibre le traqueur dans les paramètres →</span></div>
       <div class="gaze-modal-actions">
         <button class="sec" onclick="document.getElementById('gaze-modal-overlay').remove()">Annuler</button>
         <button class="pri" onclick="app._gazeConfirm()">Activer</button>
@@ -3937,7 +4079,8 @@ const app={
         .setCameraConstraints({width:{ideal:1280},height:{ideal:720},facingMode:'user'})
         .setGazeListener(listener)
         .showVideoPreview(false)
-        .showPredictionPoints(false);
+        .showPredictionPoints(false)
+        .saveDataAcrossSessions(true);
       webgazer.params.smoothingEnabled=false;
       await webgazer.begin();
       g.active=true;
