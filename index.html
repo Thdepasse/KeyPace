@@ -2123,7 +2123,7 @@ const ALL_LESSONS=[],ALL_MODULES=[];
 const app={
   view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,simon:null,boss:null,duel:null,activeGame:null,now:Date.now(),
   _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
-  _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,samples:[],permError:null},
+  _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,_wgPromise:null,samples:[],permError:null},
 
   init(){
     this.stats=loadStats();
@@ -4031,8 +4031,8 @@ const app={
   gazeToggle(){
     const g=this._gaze;
     if(g.enabled){
-      g.enabled=false;g.active=false;g._wgRunning=false;g.permError=null;
-      try{webgazer.end();}catch{}
+      g.enabled=false;g.active=false;g._wgRunning=false;g._wgPromise=null;g.permError=null;
+      try{if(typeof webgazer!=='undefined')webgazer.end();}catch{}
       this.renderCurrent();
     } else {
       this._gazeShowPopup();
@@ -4063,28 +4063,41 @@ const app={
     document.getElementById('gaze-modal-overlay')?.remove();
     const g=this._gaze;g.enabled=true;g.permError=null;
     this.renderCurrent();
-    this._gazeBegin();// démarre WebGazer maintenant pendant que l'user reprend le texte (~3s)
+    // Lance begin() maintenant, pendant que l'user revient au texte (~3s de marge)
+    this._gazeEnsureRunning();
   },
-  async _gazeBegin(){
-    const g=this._gaze;if(g._wgRunning)return;
-    const ok=await this._gazeLoadLib();if(!ok)return;
-    try{
-      webgazer
-        .setRegression('weightedRidge')
-        .setTracker('TFFaceMesh')
-        .setCameraConstraints({width:{ideal:1280},height:{ideal:720},facingMode:'user'})
-        .showVideoPreview(false)
-        .showPredictionPoints(false)
-        .saveDataAcrossSessions(true);
-      webgazer.params.smoothingEnabled=false;
-      await webgazer.begin();
-      g._wgRunning=true;
-    }catch(err){
-      if(err&&err.name==='NotAllowedError')g.permError='Accès caméra refusé. Active la caméra dans les paramètres de ton navigateur.';
-      else g.permError='Impossible d\'activer le suivi du regard.';
-      g.enabled=false;
-      this.renderCurrent();
-    }
+  // Retourne une Promise qui se résout quand WebGazer est prêt.
+  // Si déjà en cours de démarrage, retourne la même Promise (pas de double begin()).
+  _gazeEnsureRunning(){
+    const g=this._gaze;
+    if(g._wgRunning)return Promise.resolve(true);
+    if(g._wgPromise)return g._wgPromise;
+    g._wgPromise=(async()=>{
+      const ok=await this._gazeLoadLib();
+      if(!ok){g._wgPromise=null;return false;}
+      try{
+        webgazer
+          .setRegression('weightedRidge')
+          .setTracker('TFFaceMesh')
+          .setCameraConstraints({width:{ideal:1280},height:{ideal:720},facingMode:'user'})
+          .showVideoPreview(false)
+          .showPredictionPoints(false)
+          .saveDataAcrossSessions(true);
+        webgazer.params.smoothingEnabled=false;
+        await webgazer.begin();
+        g._wgRunning=true;
+        g._wgPromise=null;
+        return true;
+      }catch(err){
+        g._wgPromise=null;
+        if(err&&err.name==='NotAllowedError')g.permError='Accès caméra refusé. Active la caméra dans les paramètres de ton navigateur.';
+        else g.permError='Impossible d\'activer le suivi du regard.';
+        g.enabled=false;
+        this.renderCurrent();
+        return false;
+      }
+    })();
+    return g._wgPromise;
   },
   async _gazeLoadLib(){
     const g=this._gaze;if(g.loaded)return true;
@@ -4098,25 +4111,26 @@ const app={
   },
   async _gazeStart(){
     const g=this._gaze;if(!g.enabled||g.active)return;
-    // Si WebGazer n'a pas encore fini de démarrer, on attend
-    if(!g._wgRunning){
-      await this._gazeBegin();
-      if(!g._wgRunning)return;
-    }
-    g.samples=[];g.permError=null;
+    const ok=await this._gazeEnsureRunning();
+    if(!ok||!g.enabled)return;
+    g.samples=[];
     const vw=window.innerWidth,vh=window.innerHeight;
-    webgazer.setGazeListener((p)=>{
+    // Pose le listener APRES que begin() a résolu — les samples commencent maintenant
+    webgazer.setGazeListener((p,t)=>{
       if(!g.active)return;
-      const onScreen=p&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
+      const onScreen=p!=null&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
       g.samples.push(onScreen?1:0);
     });
     g.active=true;
   },
   _gazeStop(){
-    const g=this._gaze;if(!g.active)return;
-    g.active=false;g._wgRunning=false;
-    try{webgazer.setGazeListener(null);}catch{}
-    try{webgazer.end();}catch{}
+    const g=this._gaze;
+    if(!g.active&&!g._wgRunning)return;
+    g.active=false;
+    g._wgRunning=false;
+    g._wgPromise=null;
+    try{if(typeof webgazer!=='undefined')webgazer.setGazeListener(null);}catch{}
+    try{if(typeof webgazer!=='undefined')webgazer.end();}catch{}
   },
   _gazeStats(){
     const g=this._gaze;if(!g.samples.length)return null;
