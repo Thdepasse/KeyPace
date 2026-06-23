@@ -4065,8 +4065,11 @@ const app={
       }
       g._wgRunning=true;g._wgPromise=null;
       // ── 4. Boucle de détection à ~10 fps ──
-      // Iris landmarks : 468=iris droit, 473=iris gauche
-      // Eye top : 159 (droit), 386 (gauche) — Eye bottom : 145 (droit), 374 (gauche)
+      // ── Détection : iris Y relatif au nez, normalisé par hauteur du visage ──
+      // Quand la tête est droite (écran) : yeux bien au-dessus du nez → ratio élevé
+      // Quand la tête penche vers le bas (clavier) : yeux et nez au même niveau → ratio faible
+      // Landmark 4 = pointe du nez, 152 = menton, 10 = front
+      // Iris : 468 (droit), 473 (gauche) — fallback : milieu des yeux 159+386+145+374
       const detect=()=>{
         if(!g._wgRunning)return;
         try{
@@ -4074,20 +4077,25 @@ const app={
           if(g.active){
             if(res.faceLandmarks&&res.faceLandmarks.length>0){
               const lm=res.faceLandmarks[0];
-              // Position iris dans l'œil (normalisée 0-1 : 0=haut, 1=bas)
-              const irisY=(lm[468].y+lm[473].y)/2;
-              const eyeTop=(lm[159].y+lm[386].y)/2;
-              const eyeBot=(lm[145].y+lm[374].y)/2;
-              const h=Math.abs(eyeBot-eyeTop);
-              // ratio < 0.55 → iris centré/vers le haut → regarde l'écran
-              const ratio=h>0.001?(irisY-eyeTop)/h:0.5;
-              g.samples.push(ratio<0.55?1:0);
+              const noseY=lm[4].y;
+              const chinY=lm[152].y;
+              const foreheadY=lm[10].y;
+              const faceH=Math.abs(chinY-foreheadY);
+              // Centre des yeux : iris si dispo (478pts), sinon moyenne contour œil
+              const hasIris=lm.length>473&&lm[468]!=null&&lm[473]!=null;
+              const eyeY=hasIris
+                ?(lm[468].y+lm[473].y)/2
+                :(lm[159].y+lm[386].y+lm[145].y+lm[374].y)/4;
+              // (noseY - eyeY) / faceH : grand = yeux loin au-dessus du nez = écran
+              //                           petit/négatif = yeux au niveau du nez = clavier
+              const score=faceH>0.01?(noseY-eyeY)/faceH:0;
+              g.samples.push(score>0.28?1:0);
             }else{
-              g.samples.push(0); // pas de visage = regarde le clavier
+              g.samples.push(0);
             }
           }
-        }catch{}
-        g._raf=setTimeout(detect,100); // 10 fps suffit
+        }catch(e){}
+        g._raf=setTimeout(detect,100);
       };
       detect();
       return true;
