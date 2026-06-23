@@ -2123,7 +2123,7 @@ const ALL_LESSONS=[],ALL_MODULES=[];
 const app={
   view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,simon:null,boss:null,duel:null,activeGame:null,now:Date.now(),
   _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
-  _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,_wgPromise:null,_stream:null,_video:null,_landmarker:null,_raf:null,_baseline:null,_baselineBuf:[],_smooth:null,samples:[],permError:null},
+  _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,_wgPromise:null,_stream:null,_video:null,_landmarker:null,_raf:null,_baseline:null,_baselineBuf:[],_smooth:null,_lastScore:null,_calib:null,samples:[],permError:null},
 
   init(){
     this.stats=loadStats();
@@ -3928,7 +3928,9 @@ const app={
     if(document.getElementById('settings-overlay'))return;
     const user=currentUser||'';
     const plan=this.stats&&this.stats.plan?this.stats.plan:'free';
-    const calibrated=!!localStorage.getItem('webgazer-data');
+    const calibRaw=localStorage.getItem('keypace-gaze-calib');
+    const calibData=calibRaw?JSON.parse(calibRaw):null;
+    const calibrated=!!calibData;
     const overlay=document.createElement('div');
     overlay.className='settings-overlay';overlay.id='settings-overlay';
     overlay.innerHTML=`<div class="settings-modal">
@@ -3942,7 +3944,7 @@ const app={
         <div class="settings-row">
           <div class="settings-row-info">
             <strong>Calibration du regard</strong>
-            <span>Clique sur 9 points en les regardant pour que le traqueur apprenne la position de tes yeux. Améliore la précision de détection.</span>
+            <span>${calibrated?`Calibré le ${new Date(calibData.date).toLocaleDateString('fr-FR')} — seuil ${calibData.threshold.toFixed(3)}`:'Clique sur les zones affichées en les regardant pour calibrer la détection haut/bas.'}</span>
           </div>
           ${calibrated?'<span class="gaze-calibrated-badge">✓ Calibré</span>':''}
         </div>
@@ -3964,14 +3966,91 @@ const app={
     if(section==='gaze'){setTimeout(()=>{const el=document.getElementById('settings-gaze-section');if(el)el.scrollIntoView({behavior:'smooth'});},100);}
   },
   closeSettings(){document.getElementById('settings-overlay')?.remove();},
-  resetCalibration(){this.closeSettings();},
-  startCalibration(){
-    // Avec MediaPipe iris tracking, aucune calibration n'est nécessaire —
-    // la détection est basée sur la position relative des iris dans l'œil.
+  resetCalibration(){
+    localStorage.removeItem('keypace-gaze-calib');
     this.closeSettings();
-    alert('Avec le nouveau système iris, aucune calibration n\'est requise. Active simplement le traqueur avant un test.');
+    this.openSettings('gaze');
   },
-  _calibClick(){},_calibDone(){document.getElementById('calib-overlay')?.remove();},
+  async startCalibration(){
+    this.closeSettings();
+    const g=this._gaze;
+    // S'assurer que le traqueur tourne pour avoir g._lastScore
+    if(!g.enabled){g.enabled=true;}
+    const ok=await this._gazeEnsureRunning();
+    if(!ok){alert('Impossible d\'accéder à la caméra. Active le traqueur d\'abord.');g.enabled=false;return;}
+    // Créer l'overlay de calibration
+    const overlay=document.createElement('div');
+    overlay.id='calib-overlay';
+    overlay.style.cssText='position:fixed;inset:0;background:#0d0d0d;z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:inherit;';
+    document.body.appendChild(overlay);
+    // Phase 1 : 5 points à l'écran (regard vers l'écran)
+    const screenPoints=[
+      {x:'50%',y:'15%',label:'Centre haut'},
+      {x:'15%',y:'50%',label:'Gauche centre'},
+      {x:'85%',y:'50%',label:'Droite centre'},
+      {x:'50%',y:'85%',label:'Centre bas'},
+      {x:'50%',y:'50%',label:'Centre'},
+    ];
+    const screenScores=[];
+    for(let i=0;i<screenPoints.length;i++){
+      const pt=screenPoints[i];
+      await new Promise(resolve=>{
+        overlay.innerHTML=`
+          <div style="color:#888;font-size:14px;margin-bottom:24px;">Phase 1/2 — Regarde l'écran (${i+1}/${screenPoints.length})</div>
+          <div style="color:#fff;font-size:18px;margin-bottom:8px;">Regarde le point et clique dessus</div>
+          <div style="color:#555;font-size:13px;">Garde la tête droite, yeux vers l'écran</div>
+          <div id="calib-dot" style="position:fixed;left:${pt.x};top:${pt.y};transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:#4f8ef7;box-shadow:0 0 0 8px rgba(79,142,247,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;user-select:none;">${i+1}</div>
+        `;
+        document.getElementById('calib-dot').addEventListener('click',()=>{
+          const score=g._lastScore;
+          if(score!=null)screenScores.push(score);
+          resolve();
+        });
+      });
+      await new Promise(r=>setTimeout(r,200));
+    }
+    // Phase 2 : regard vers le clavier (inclinaison de la tête)
+    const keyboardScores=[];
+    const kbPoints=3;
+    for(let i=0;i<kbPoints;i++){
+      await new Promise(resolve=>{
+        overlay.innerHTML=`
+          <div style="color:#888;font-size:14px;margin-bottom:24px;">Phase 2/2 — Regarde ton clavier (${i+1}/${kbPoints})</div>
+          <div style="color:#fff;font-size:24px;margin-bottom:16px;">⌨️</div>
+          <div style="color:#fff;font-size:18px;margin-bottom:8px;">Baisse les yeux vers ton clavier</div>
+          <div style="color:#555;font-size:13px;">Naturellement, comme quand tu tapes</div>
+          <button id="calib-kb-btn" style="margin-top:32px;padding:12px 32px;background:#4f8ef7;border:none;border-radius:8px;color:#fff;font-size:16px;cursor:pointer;">Cliquer (${i+1}/${kbPoints})</button>
+        `;
+        document.getElementById('calib-kb-btn').addEventListener('click',()=>{
+          const score=g._lastScore;
+          if(score!=null)keyboardScores.push(score);
+          resolve();
+        });
+      });
+      await new Promise(r=>setTimeout(r,200));
+    }
+    // Calculer et sauvegarder
+    const screenBaseline=screenScores.length?screenScores.reduce((a,b)=>a+b,0)/screenScores.length:0;
+    const keyboardBaseline=keyboardScores.length?keyboardScores.reduce((a,b)=>a+b,0)/keyboardScores.length:0;
+    const threshold=(screenBaseline+keyboardBaseline)/2;
+    const calib={screenBaseline,keyboardBaseline,threshold,date:Date.now(),screenScores,keyboardScores};
+    localStorage.setItem('keypace-gaze-calib',JSON.stringify(calib));
+    // Résultat
+    overlay.innerHTML=`
+      <div style="color:#4f8ef7;font-size:48px;margin-bottom:16px;">✓</div>
+      <div style="color:#fff;font-size:20px;margin-bottom:8px;">Calibration terminée !</div>
+      <div style="color:#888;font-size:14px;margin-bottom:4px;">Écran : ${screenBaseline.toFixed(3)} | Clavier : ${keyboardBaseline.toFixed(3)}</div>
+      <div style="color:#555;font-size:13px;margin-bottom:32px;">Seuil de détection : ${threshold.toFixed(3)}</div>
+      <button onclick="app._calibDone()" style="padding:12px 32px;background:#4f8ef7;border:none;border-radius:8px;color:#fff;font-size:16px;cursor:pointer;">Fermer</button>
+    `;
+    // Arrêter la caméra si le traqueur n'était pas actif avant
+    if(!g.active){this._gazeStop();}
+  },
+  _calibClick(){},
+  _calibDone(){
+    document.getElementById('calib-overlay')?.remove();
+    this.openSettings('gaze');
+  },
 
   /* ── GAZE PLUGIN (MediaPipe Tasks Vision — iris tracking) ── */
   gazeToggle(){
@@ -4121,24 +4200,32 @@ const app={
                 gazeEye=-((rRatio+lRatio)/2); // négatif=regarde bas, positif=regarde haut
               }
 
-              // ── Score combiné ──
+              // ── Score combiné + stockage pour calibration UI ──
               const score=headPitch*0.65+gazeEye*0.35;
+              g._lastScore=score;
 
-              // ── Auto-calibration sur les premières frames ──
-              if(g._baselineBuf.length<BASELINE_FRAMES){
-                g._baselineBuf.push(score);
-                if(g._baselineBuf.length===BASELINE_FRAMES){
-                  g._baseline=g._baselineBuf.reduce((a,b)=>a+b,0)/BASELINE_FRAMES;
+              if(g.active){
+                if(g._calib){
+                  // ── Mode calibré : seuil personnalisé ──
+                  g._smooth=g._smooth==null?score:g._smooth*0.65+score*0.35;
+                  g.samples.push(g._smooth>g._calib.threshold?1:0);
+                } else {
+                  // ── Auto-calibration sur les premières frames ──
+                  if(g._baselineBuf.length<BASELINE_FRAMES){
+                    g._baselineBuf.push(score);
+                    if(g._baselineBuf.length===BASELINE_FRAMES){
+                      g._baseline=g._baselineBuf.reduce((a,b)=>a+b,0)/BASELINE_FRAMES;
+                    }
+                    g.samples.push(1);
+                  } else {
+                    g._smooth=g._smooth==null?score:g._smooth*0.65+score*0.35;
+                    g.samples.push(g._smooth>(g._baseline-0.12)?1:0);
+                  }
                 }
-                g.samples.push(1); // pendant calibration = écran par hypothèse
-              } else {
-                const threshold=g._baseline-0.12;
-                // ── Lissage EMA ──
-                g._smooth=g._smooth==null?score:g._smooth*0.65+score*0.35;
-                g.samples.push(g._smooth>threshold?1:0);
               }
             }else{
-              g.samples.push(0); // pas de visage détecté
+              g._lastScore=null;
+              if(g.active)g.samples.push(0); // pas de visage détecté
             }
           }
         }catch(e){}
@@ -4151,8 +4238,10 @@ const app={
   },
   async _gazeStart(){
     const g=this._gaze;if(!g.enabled||g.active)return;
-    g.samples=[];g._baseline=null;g._baselineBuf=[];g._smooth=null;
-    g.active=true; // AVANT l'await : samples collectés dès que le landmarker est prêt
+    g.samples=[];g._baseline=null;g._baselineBuf=[];g._smooth=null;g._lastScore=null;
+    // Charger la calibration depuis localStorage si elle existe
+    try{const c=localStorage.getItem('keypace-gaze-calib');g._calib=c?JSON.parse(c):null;}catch{g._calib=null;}
+    g.active=true;
     const ok=await this._gazeEnsureRunning();
     if(!ok||!g.active)g.active=false;
   },
