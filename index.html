@@ -4107,13 +4107,20 @@ const app={
   },
   async _gazeLoadLib(){
     const g=this._gaze;if(g.loaded)return true;
-    return new Promise(resolve=>{
-      const s=document.createElement('script');
-      s.src='https://webgazer.cs.brown.edu/webgazer.js';
-      s.onload=()=>{g.loaded=true;resolve(true);};
-      s.onerror=()=>{g.permError='Impossible de charger WebGazer.';resolve(false);};
+    // Charge TF.js d'abord (requis par WebGazer v2+ pour TFFaceMesh)
+    const loadScript=(src)=>new Promise((res,rej)=>{
+      const s=document.createElement('script');s.src=src;
+      s.onload=()=>res();s.onerror=()=>rej(new Error('load:'+src));
       document.head.appendChild(s);
     });
+    try{
+      if(typeof tf==='undefined')await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js');
+      if(!window.faceLandmarksDetection)await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.6/dist/face-landmarks-detection.min.js');
+      await loadScript('https://webgazer.cs.brown.edu/webgazer.js');
+      g.loaded=true;return true;
+    }catch(e){
+      g.permError='Impossible de charger le traqueur oculaire.';return false;
+    }
   },
   async _gazeStart(){
     const g=this._gaze;if(!g.enabled||g.active)return;
