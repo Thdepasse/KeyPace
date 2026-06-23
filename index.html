@@ -569,11 +569,27 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .lb-ellipsis{text-align:center;color:var(--muted);font-size:18px;line-height:1;padding:2px}
 
 /* DUEL 1v1 */
-.duel-link{display:flex;gap:8px;margin-bottom:18px}
-.duel-link input{flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--txt);outline:none}
-.duel-link button{padding:11px 18px;background:var(--txt);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
-.duel-status{font-size:14px;font-weight:600;margin-bottom:18px}
+.duel-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px}
+@media(max-width:580px){.duel-menu-grid{grid-template-columns:1fr}}
+.duel-card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
+.duel-card-icon{font-size:38px;line-height:1}
+.duel-card h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;margin:0}
+.duel-card p{color:var(--muted);font-size:14px;line-height:1.5;margin:0}
+.duel-code-input-wrap{display:flex;flex-direction:column;gap:8px;width:100%}
+.duel-code-input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-size:20px;font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:6px;text-align:center;text-transform:uppercase;background:var(--bg);color:var(--txt);outline:none;box-sizing:border-box;transition:border-color .15s}
+.duel-code-input:focus{border-color:var(--accent)}
+.duel-code-input.error{border-color:#E5484D}
+.duel-code-error{color:#E5484D;font-size:13px;font-weight:600;min-height:18px;text-align:center}
+.duel-code-display{background:var(--accent);color:#fff;font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;letter-spacing:10px;padding:18px 24px;border-radius:14px;margin:4px 0;cursor:pointer;user-select:all;transition:opacity .15s}
+.duel-code-display:hover{opacity:.85}
+.duel-code-hint{font-size:12px;color:var(--muted);margin-top:-4px}
+.duel-code-copied{font-size:12px;color:#1FA971;font-weight:600;min-height:16px}
+.duel-link{display:flex;gap:8px;margin-bottom:14px}
+.duel-link input{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:11px;font-size:12px;font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--txt);outline:none}
+.duel-link button{padding:10px 16px;background:var(--txt);color:#fff;border:none;border-radius:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.duel-status{font-size:14px;font-weight:600;margin-bottom:14px}
 .duel-wait{color:var(--muted)}
+.duel-opp-badge{display:inline-flex;align-items:center;gap:6px;background:#1FA97120;color:#1FA971;border-radius:8px;padding:6px 12px;font-size:14px;font-weight:700}
 
 /* FOOTER */
 footer{border-top:1px solid var(--border);margin-top:10px}
@@ -3530,7 +3546,7 @@ const app={
     try{
       const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-create',token:currentToken})}).then(r=>r.json());
       if(r.error){this.duel={phase:'error',msg:r.error};this.renderCurrent();return;}
-      this.duel=this._duelBlank('host',r.roomId,r.text,r.hostLabel);
+      this.duel=this._duelBlank('host',r.roomId,r.roomCode,r.text,r.hostLabel);
       await this.duelOpenChannel();
       this.renderCurrent();
     }catch{this.duel={phase:'error',msg:'Erreur réseau.'};this.renderCurrent();}
@@ -3540,15 +3556,28 @@ const app={
     try{
       const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-join',token:currentToken,roomId})}).then(r=>r.json());
       if(r.error){this.duel={phase:'error',msg:r.error};this.renderCurrent();return;}
-      this.duel=this._duelBlank(r.role,r.roomId,r.text,r.hostLabel);
+      this.duel=this._duelBlank(r.role,r.roomId,r.roomCode,r.text,r.hostLabel);
       if(r.startAt)this.duel.startAt=new Date(r.startAt).getTime();
       await this.duelOpenChannel();
       if(this.duel.startAt&&this.duel.startAt>Date.now())this._duelBeginCountdown();
       this.renderCurrent();
     }catch{this.duel={phase:'error',msg:'Erreur réseau.'};this.renderCurrent();}
   },
-  _duelBlank(role,roomId,text,hostLabel){
-    return {phase:'lobby',role,roomId,text,hostLabel,oppLabel:null,oppPresent:false,startAt:0,
+  async duelJoinByCode(code){
+    if(!code||code.trim().length<6){this.duel={phase:'menu',_codeError:'Saisis un code à 6 caractères.'};this.renderCurrent();return;}
+    this.activeGame='duel';this.duel={phase:'creating'};this.renderCurrent();
+    try{
+      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-join-code',token:currentToken,code:code.trim().toUpperCase()})}).then(r=>r.json());
+      if(r.error){this.duel={phase:'menu',_codeError:r.error};this.renderCurrent();return;}
+      this.duel=this._duelBlank(r.role,r.roomId,r.roomCode,r.text,r.hostLabel);
+      if(r.startAt)this.duel.startAt=new Date(r.startAt).getTime();
+      await this.duelOpenChannel();
+      if(this.duel.startAt&&this.duel.startAt>Date.now())this._duelBeginCountdown();
+      this.renderCurrent();
+    }catch{this.duel={phase:'menu',_codeError:'Erreur réseau.'};this.renderCurrent();}
+  },
+  _duelBlank(role,roomId,roomCode,text,hostLabel){
+    return {phase:'lobby',role,roomId,roomCode,text,hostLabel,oppLabel:null,oppPresent:false,startAt:0,
       typed:[],correct:0,keystrokes:0,started:false,startTime:0,endTime:0,finished:false,myFinishMs:0,
       myProg:0,oppProg:0,oppFinished:false,oppForfeit:false,oppWpm:0,oppAcc:0,oppFinishMs:0,
       myWpm:0,myAcc:0,winner:null,_channel:null,_copied:false,_lastSent:0};
@@ -3589,6 +3618,11 @@ const app={
     const d=this.duel;if(!d)return;
     if(d.phase==='countdown'){if(Date.now()>=d.startAt)d.phase='racing';this.renderCurrent();}
     else if(d.phase==='racing'){this.renderCurrent();}
+  },
+  duelCopyCode(){
+    const d=this.duel;if(!d||!d.roomCode)return;
+    const done=()=>{if(this.duel){this.duel._codeCopied=true;this.renderCurrent();setTimeout(()=>{if(this.duel)this.duel._codeCopied=false;this.renderCurrent();},2000);}};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(d.roomCode).then(done,done);else done();
   },
   duelCopyLink(){
     const d=this.duel;if(!d)return;
@@ -3661,11 +3695,31 @@ const app={
     const head=`<div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">${back}<h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Duel 1v1 ⚔️</h2><span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span></div>`;
     let body='';
     if(!d||d.phase==='menu'){
-      body=`<div class="boss-card" style="text-align:center">
-        <div style="font-size:46px;margin-bottom:8px">⚔️</div>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;margin-bottom:8px">Défie un ami en direct</h2>
-        <p style="color:var(--muted);font-size:15px;margin-bottom:22px;line-height:1.6">Crée un duel, partage le lien, et affrontez-vous sur le même texte en temps réel. Le premier à finir gagne !</p>
-        <button class="btn-primary" onclick="app.duelCreate()">Créer un duel ▸</button>
+      const codeErr=d&&d._codeError?d._codeError:'';
+      body=`<div class="boss-card">
+        <div style="text-align:center;margin-bottom:24px">
+          <div style="font-size:44px;margin-bottom:8px">⚔️</div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;margin-bottom:6px">Duel 1v1 en temps réel</h2>
+          <p style="color:var(--muted);font-size:14px;line-height:1.6">Affronte un ami sur le même texte. Le premier à finir gagne !</p>
+        </div>
+        <div class="duel-menu-grid">
+          <div class="duel-card">
+            <div class="duel-card-icon">🚀</div>
+            <h3>Créer un duel</h3>
+            <p>Génère un code à partager à ton adversaire</p>
+            <button class="btn-primary" style="width:100%;margin-top:4px" onclick="app.duelCreate()">Créer ▸</button>
+          </div>
+          <div class="duel-card">
+            <div class="duel-card-icon">🔑</div>
+            <h3>Rejoindre</h3>
+            <p>Entre le code reçu pour rejoindre la partie</p>
+            <div class="duel-code-input-wrap" style="margin-top:4px">
+              <input class="duel-code-input${codeErr?' error':''}" id="duel-code-field" maxlength="6" placeholder="ABC123" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" onkeydown="if(event.key==='Enter')app.duelJoinByCode(document.getElementById('duel-code-field').value)">
+              <div class="duel-code-error">${codeErr}</div>
+              <button class="btn-primary" style="width:100%" onclick="app.duelJoinByCode(document.getElementById('duel-code-field').value)">Rejoindre ▸</button>
+            </div>
+          </div>
+        </div>
       </div>`;
     } else if(d.phase==='creating'){
       body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Connexion au duel…</div></div>`;
@@ -3675,11 +3729,14 @@ const app={
       const link=location.origin+'/?duel='+d.roomId;
       if(d.role==='host'){
         body=`<div class="boss-card" style="text-align:center">
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px">Salle de duel créée</h2>
-          <p style="color:var(--muted);font-size:14px;margin-bottom:18px">Partage ce lien à ton adversaire :</p>
-          <div class="duel-link"><input readonly value="${link}" onclick="this.select()"><button onclick="app.duelCopyLink()">${d._copied?'Copié ✓':'Copier'}</button></div>
-          <div class="duel-status">${d.oppPresent?`<span style="color:#1FA971">● ${d.oppLabel||'Adversaire'} a rejoint</span>`:'<span class="duel-wait">● En attente de l\'adversaire…</span>'}</div>
-          <button class="btn-primary" style="margin-top:8px;${d.oppPresent?'':'opacity:.5;cursor:default'}" ${d.oppPresent?'onclick="app.duelStart()"':'disabled'}>Lancer le duel ▸</button>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;margin-bottom:4px">Salle de duel créée</h2>
+          <p style="color:var(--muted);font-size:14px;margin-bottom:16px">Donne ce code à ton adversaire :</p>
+          <div class="duel-code-display" onclick="app.duelCopyCode()">${d.roomCode||'------'}</div>
+          <div class="duel-code-copied">${d._codeCopied?'Code copié ✓':''}</div>
+          <p style="color:var(--muted);font-size:12px;margin:4px 0 16px">ou partage le lien :</p>
+          <div class="duel-link"><input readonly value="${link}" onclick="this.select()"><button onclick="app.duelCopyLink()">${d._copied?'Copié ✓':'Copier le lien'}</button></div>
+          <div class="duel-status">${d.oppPresent?`<div class="duel-opp-badge">✓ ${d.oppLabel||'Adversaire'} a rejoint</div>`:'<span class="duel-wait">● En attente de l\'adversaire…</span>'}</div>
+          <button class="btn-primary" style="margin-top:12px;${d.oppPresent?'':'opacity:.5;cursor:default'}" ${d.oppPresent?'onclick="app.duelStart()"':'disabled'}>Lancer le duel ▸</button>
           ${d.msg?`<p style="color:#E5484D;font-size:13px;margin-top:10px">${d.msg}</p>`:''}
         </div>`;
       } else {

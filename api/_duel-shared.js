@@ -32,4 +32,11 @@ async function userFromToken(token) {
   return (r.data && r.data[0]) || null;
 }
 
-module.exports = { sb, DUEL_TEXTS, userFromToken };
+function generateRoomCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+module.exports = { sb, DUEL_TEXTS, userFromToken, generateRoomCode };

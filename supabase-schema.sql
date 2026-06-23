@@ -77,6 +77,7 @@ alter table weekly_scores     enable row level security;
 -- ───────────────────────────────────────────────────────────────
 create table if not exists duel_rooms (
   id uuid default gen_random_uuid() primary key,
+  room_code text unique,                     -- code court 6 caractères pour rejoindre
   text text not null,
   status text default 'lobby' check (status in ('lobby','racing','done')),
   host_user_id uuid references users(id) on delete set null,

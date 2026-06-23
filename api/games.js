@@ -2,7 +2,7 @@
 // sous la limite de 12 fonctions du plan Vercel Hobby.
 // Route par `action` dans le body JSON. Helpers dans _boss-shared / _duel-shared.
 const { sb, getCurrentChallenge, computeScore } = require('./_boss-shared');
-const { DUEL_TEXTS, userFromToken } = require('./_duel-shared');
+const { DUEL_TEXTS, userFromToken, generateRoomCode } = require('./_duel-shared');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -83,10 +83,33 @@ module.exports = async function handler(req, res) {
         if (!user) return res.status(401).json({ error: 'Session invalide.' });
         if (user.plan !== 'expert') return res.status(403).json({ error: 'Créer un duel est réservé aux comptes Expert.' });
         const text = DUEL_TEXTS[Math.floor(Math.random() * DUEL_TEXTS.length)];
-        const r = await sb(`/duel_rooms`, { method: 'POST', body: JSON.stringify({ text, status: 'lobby', host_user_id: user.id }) });
-        const room = r.data && r.data[0];
+        let room = null;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const code = generateRoomCode();
+          const r = await sb(`/duel_rooms`, { method: 'POST', body: JSON.stringify({ text, status: 'lobby', host_user_id: user.id, room_code: code }) });
+          if (r.ok && r.data && r.data[0]) { room = r.data[0]; break; }
+        }
         if (!room) return res.status(500).json({ error: 'Création du duel impossible.' });
-        return res.json({ roomId: room.id, text: room.text, role: 'host', hostLabel: user.username });
+        return res.json({ roomId: room.id, roomCode: room.room_code, text: room.text, role: 'host', hostLabel: user.username });
+      }
+      case 'duel-join-code': {
+        const { token, code } = body;
+        if (!code) return res.status(400).json({ error: 'Code manquant.' });
+        const user = await userFromToken(token);
+        if (!user) return res.status(401).json({ error: 'Connecte-toi pour rejoindre le duel.' });
+        const rr = await sb(`/duel_rooms?room_code=eq.${encodeURIComponent(code.toUpperCase().trim())}&status=eq.lobby&select=*`);
+        const room = rr.data && rr.data[0];
+        if (!room) return res.status(404).json({ error: 'Code invalide ou duel déjà commencé.' });
+        const isHost = room.host_user_id === user.id;
+        let hostLabel = null;
+        if (room.host_user_id) {
+          const hu = await sb(`/users?id=eq.${room.host_user_id}&select=username`);
+          hostLabel = hu.data && hu.data[0] ? hu.data[0].username : 'Hôte';
+        }
+        if (!isHost) {
+          await sb(`/duel_rooms?id=eq.${encodeURIComponent(room.id)}`, { method: 'PATCH', body: JSON.stringify({ guest_user_id: user.id, guest_label: user.username }) });
+        }
+        return res.json({ roomId: room.id, roomCode: room.room_code, text: room.text, role: isHost ? 'host' : 'guest', status: room.status, startAt: room.start_at, hostLabel });
       }
       case 'duel-join': {
         const { token, roomId } = body;
@@ -106,7 +129,7 @@ module.exports = async function handler(req, res) {
         if (!isHost) {
           await sb(`/duel_rooms?id=eq.${encodeURIComponent(roomId)}`, { method: 'PATCH', body: JSON.stringify({ guest_user_id: user.id, guest_label: user.username }) });
         }
-        return res.json({ roomId: room.id, text: room.text, role: isHost ? 'host' : 'guest', status: room.status, startAt: room.start_at, hostLabel });
+        return res.json({ roomId: room.id, roomCode: room.room_code, text: room.text, role: isHost ? 'host' : 'guest', status: room.status, startAt: room.start_at, hostLabel });
       }
       case 'duel-start': {
         const { token, roomId } = body;
