@@ -236,6 +236,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .nav-plan-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.04em}
 .nav-plan-badge.free{background:var(--light);color:var(--muted)}
 .nav-plan-badge.expert{background:rgba(255,77,46,0.12);color:var(--accent)}
+.nav-plan-badge.etab{background:rgba(79,142,247,0.12);color:#4f8ef7}
 .nav-username{font-size:13px;font-weight:700;color:var(--muted)}
 .nav-avatar{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
 .nav-avatar:hover{opacity:.85}
@@ -823,6 +824,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <button class="nav-link" id="nav-lessons" onclick="go('lessons')">Cours<span class="underline"></span></button>
       <button class="nav-link" id="nav-games" onclick="go('games')">Jeux<span class="underline"></span></button>
       <button class="nav-link" id="nav-stats" onclick="go('stats')">Progrès<span class="underline"></span></button>
+      <button class="nav-link" id="nav-classes" onclick="go('classes')" style="display:none">Gestion de classes<span class="underline"></span></button>
     </div>
     <div class="nav-spacer"></div>
     <div id="nav-guest" style="display:flex;gap:8px">
@@ -901,6 +903,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <div id="page-lessons" style="display:none"></div>
 <div id="page-games" style="display:none"></div>
 <div id="page-stats" style="display:none"></div>
+<div id="page-classes" style="display:none"></div>
 
 <footer>
   <div class="footer-inner">
@@ -1104,11 +1107,15 @@ function updateNavUser(){
   document.getElementById('nav-username').textContent=currentUser;
   document.getElementById('nav-avatar').textContent=currentUser[0].toUpperCase();
   const plan=getUserPlan();
+  const role=app.stats&&app.stats.role;
+  const isEtab=role==='etablissement';
   const badge=document.getElementById('nav-plan-badge');
   const upgradeBtn=document.getElementById('nav-upgrade-btn');
-  badge.textContent=plan==='expert'?'EXPERT':'GRATUIT';
-  badge.className='nav-plan-badge '+(plan==='expert'?'expert':'free');
-  upgradeBtn.style.display=plan==='expert'?'none':'inline-block';
+  const classesBtn=document.getElementById('nav-classes');
+  if(isEtab){badge.textContent='ÉTABLISSEMENT';badge.className='nav-plan-badge etab';}
+  else{badge.textContent=plan==='expert'?'EXPERT':'GRATUIT';badge.className='nav-plan-badge '+(plan==='expert'?'expert':'free');}
+  upgradeBtn.style.display=(plan==='expert'||isEtab)?'none':'inline-block';
+  if(classesBtn)classesBtn.style.display=isEtab?'inline-flex':'none';
 }
 
 function getUserPlan(){
@@ -2438,8 +2445,8 @@ const app={
     // Vider les pages avec #tb-scroll pour éviter les IDs dupliqués
     if(v!=='test')document.getElementById('page-test').innerHTML='';
     if(v!=='lessons')document.getElementById('page-lessons').innerHTML='';
-    ['home','test','lessons','games','stats'].forEach(p=>{document.getElementById('page-'+p).style.display=p===v?'block':'none';});
-    ['home','test','lessons','games','stats'].forEach(id=>{document.getElementById('nav-'+id).classList.toggle('active',id===v);});
+    ['home','test','lessons','games','stats','classes'].forEach(p=>{const el=document.getElementById('page-'+p);if(el)el.style.display=p===v?'block':'none';});
+    ['home','test','lessons','games','stats','classes'].forEach(id=>{const el=document.getElementById('nav-'+id);if(el)el.classList.toggle('active',id===v);});
     window.scrollTo({top:0,behavior:'instant'});
     this.renderCurrent();
   },
@@ -2451,6 +2458,7 @@ const app={
       case 'lessons':this.renderLessons();break;
       case 'games':this.renderGames();break;
       case 'stats':this.renderStats();break;
+      case 'classes':this.renderClasses();break;
     }
   },
 
@@ -4331,7 +4339,147 @@ const app={
       </div>
       <div style="text-align:center;padding:8px 0 24px;color:var(--muted);font-size:13px">${tests.length} exercice${tests.length>1?'s':''} réalisé${tests.length>1?'s':''}</div>
     </div>`;
-  }
+  },
+
+  renderClasses(){
+    const pageId='page-classes';
+    const s=this.stats||{};
+    const classes=s.classes||[];
+    document.getElementById(pageId).innerHTML=`
+      <div class="stats-header"><h1>Gestion de classes</h1><p>Suis les performances de tes élèves par classe.</p></div>
+      <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h2 style="font-size:18px;font-weight:700;margin:0">Mes classes</h2>
+          <button class="btn-primary" style="padding:8px 18px;font-size:14px" onclick="app.createClass()">+ Nouvelle classe</button>
+        </div>
+        ${classes.length===0?`
+          <div style="text-align:center;padding:60px 20px;color:var(--muted)">
+            <div style="font-size:48px;margin-bottom:16px">🏫</div>
+            <div style="font-size:17px;font-weight:600;margin-bottom:8px">Aucune classe encore</div>
+            <div style="font-size:14px">Crée ta première classe pour y ajouter des élèves et suivre leurs progrès.</div>
+          </div>
+        `:classes.map((cl,i)=>`
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:12px;cursor:pointer" onclick="app.viewClass(${i})">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:16px;font-weight:700">${cl.name}</div>
+                <div style="font-size:13px;color:var(--muted);margin-top:2px">${(cl.students||[]).length} élève${(cl.students||[]).length!==1?'s':''}</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div style="text-align:right">
+                  <div style="font-size:11px;color:var(--muted)">MOY. VITESSE</div>
+                  <div style="font-size:18px;font-weight:700">${cl.avgWpm||'—'}<span style="font-size:12px;color:var(--muted);font-weight:500"> mpm</span></div>
+                </div>
+                <button onclick="event.stopPropagation();app.deleteClass(${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:4px 8px;border-radius:8px" title="Supprimer">✕</button>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>`;
+  },
+
+  createClass(){
+    const name=prompt('Nom de la classe :');
+    if(!name||!name.trim())return;
+    const s=this.stats||{};
+    if(!s.classes)s.classes=[];
+    s.classes.push({name:name.trim(),students:[],avgWpm:null,createdAt:Date.now()});
+    saveStats(s);
+    this.renderClasses();
+  },
+
+  deleteClass(i){
+    if(!confirm('Supprimer cette classe ?'))return;
+    const s=this.stats||{};
+    s.classes.splice(i,1);
+    saveStats(s);
+    this.renderClasses();
+  },
+
+  viewClass(i){
+    const pageId='page-classes';
+    const s=this.stats||{};
+    const cl=s.classes[i];
+    const students=cl.students||[];
+    document.getElementById(pageId).innerHTML=`
+      <div class="stats-header">
+        <button onclick="app.renderClasses()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Toutes les classes</button>
+        <h1>${cl.name}</h1>
+        <p>${students.length} élève${students.length!==1?'s':''}</p>
+      </div>
+      <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h2 style="font-size:18px;font-weight:700;margin:0">Élèves</h2>
+          <button class="btn-primary" style="padding:8px 18px;font-size:14px" onclick="app.addStudent(${i})">+ Ajouter un élève</button>
+        </div>
+        ${students.length===0?`
+          <div style="text-align:center;padding:60px 20px;color:var(--muted)">
+            <div style="font-size:40px;margin-bottom:12px">👩‍🎓</div>
+            <div style="font-size:16px;font-weight:600;margin-bottom:6px">Aucun élève dans cette classe</div>
+            <div style="font-size:13px">Ajoute des élèves par leur nom d'utilisateur KeyPace.</div>
+          </div>
+        `:`
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1fr 100px 100px 100px 40px;gap:0;padding:10px 20px;border-bottom:1px solid var(--border)">
+              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">ÉLÈVE</div>
+              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">VITESSE</div>
+              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">PRÉCISION</div>
+              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">TESTS</div>
+              <div></div>
+            </div>
+            ${students.map((st,j)=>`
+              <div style="display:grid;grid-template-columns:1fr 100px 100px 100px 40px;gap:0;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center">
+                <div style="font-weight:600">${st.username}<div style="font-size:12px;color:var(--muted);font-weight:400">ajouté le ${new Date(st.addedAt).toLocaleDateString('fr-FR')}</div></div>
+                <div style="text-align:center;font-weight:700">${st.wpm!=null?st.wpm+'<span style="font-size:11px;color:var(--muted);font-weight:400"> mpm</span>':'—'}</div>
+                <div style="text-align:center;font-weight:700">${st.acc!=null?st.acc+'<span style="font-size:11px;color:var(--muted);font-weight:400">%</span>':'—'}</div>
+                <div style="text-align:center;color:var(--muted)">${st.tests||0}</div>
+                <div style="text-align:center"><button onclick="app.removeStudent(${i},${j})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px" title="Retirer">✕</button></div>
+              </div>
+            `).join('')}
+          </div>
+          <button class="btn-primary" style="margin-top:20px;padding:10px 20px;font-size:14px" onclick="app.refreshClass(${i})">↻ Actualiser les stats</button>
+        `}
+      </div>`;
+  },
+
+  async addStudent(classIdx){
+    const username=prompt('Nom d\'utilisateur de l\'élève :');
+    if(!username||!username.trim())return;
+    const uname=username.trim();
+    // Vérifier que l'utilisateur existe
+    const r=await fetch(`/api/save-progress`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:this.stats})}).catch(()=>null);
+    // Lookup via login-less route — on utilise Supabase public via un appel léger
+    const check=await fetch(`/api/refresh-plan?username=${encodeURIComponent(uname)}`).catch(()=>null);
+    const s=this.stats||{};
+    if(!s.classes[classIdx].students)s.classes[classIdx].students=[];
+    if(s.classes[classIdx].students.find(st=>st.username===uname)){alert('Cet élève est déjà dans la classe.');return;}
+    s.classes[classIdx].students.push({username:uname,addedAt:Date.now(),wpm:null,acc:null,tests:null});
+    saveStats(s);
+    this.viewClass(classIdx);
+  },
+
+  removeStudent(classIdx,studentIdx){
+    if(!confirm('Retirer cet élève de la classe ?'))return;
+    const s=this.stats||{};
+    s.classes[classIdx].students.splice(studentIdx,1);
+    saveStats(s);
+    this.viewClass(classIdx);
+  },
+
+  async refreshClass(classIdx){
+    const s=this.stats||{};
+    const cl=s.classes[classIdx];
+    // Chercher les stats de chaque élève via l'API
+    for(const st of cl.students||[]){
+      try{
+        const r=await fetch('/api/student-stats',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,username:st.username})});
+        if(r.ok){const d=await r.json();st.wpm=d.wpm;st.acc=d.acc;st.tests=d.tests;}
+      }catch{}
+    }
+    if(cl.students&&cl.students.length){const wpms=cl.students.filter(st=>st.wpm!=null).map(st=>st.wpm);cl.avgWpm=wpms.length?Math.round(wpms.reduce((a,b)=>a+b,0)/wpms.length):null;}
+    saveStats(s);
+    this.viewClass(classIdx);
+  },
 };
 
 /* ── SCHOOL CONTACT ── */
