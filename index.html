@@ -2592,6 +2592,7 @@ const app={
 
   /* ── HOME ── */
   renderHome(){
+    if(this.stats&&this.stats.role==='etablissement'){this._renderHomeEtab();return;}
     const kbHtml=KB.map(row=>'<div class="hkb-row">'+row.map(k=>`<div class="hkb-key${k.home?' home':''}">${k.l.toLowerCase()}</div>`).join('')+'</div>').join('');
     const isGuest=!currentUser;
     document.getElementById('page-home').innerHTML=`
@@ -2668,6 +2669,106 @@ const app={
         </div>
       </div>
       `;
+  },
+
+  _renderHomeEtab(){
+    const s=this.stats||{};
+    const classes=s.classes||[];
+    const totalStudents=classes.reduce((a,c)=>a+(c.students||[]).length,0);
+    const allStudents=classes.flatMap(c=>c.students||[]);
+    const studentsWithWpm=allStudents.filter(st=>st.wpm!=null);
+    const avgWpm=studentsWithWpm.length?Math.round(studentsWithWpm.reduce((a,st)=>a+st.wpm,0)/studentsWithWpm.length):null;
+    const studentsWithAcc=allStudents.filter(st=>st.acc!=null);
+    const avgAcc=studentsWithAcc.length?Math.round(studentsWithAcc.reduce((a,st)=>a+st.acc,0)/studentsWithAcc.length):null;
+    const greet=currentUser?currentUser.charAt(0).toUpperCase()+currentUser.slice(1):'';
+    document.getElementById('page-home').innerHTML=`
+      <div style="max-width:1100px;margin:0 auto;padding:48px 24px 80px">
+
+        <!-- Header de bienvenue -->
+        <div style="margin-bottom:40px">
+          <div style="font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Tableau de bord</div>
+          <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:38px;letter-spacing:-0.03em;margin:0 0 8px">Bonjour, ${greet} 👋</h1>
+          <p style="font-size:17px;color:var(--muted);margin:0">Voici un aperçu de l'activité de ton établissement.</p>
+        </div>
+
+        <!-- Stats clés -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 24px">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px">CLASSES</div>
+            <div style="font-size:36px;font-weight:800;line-height:1">${classes.length}</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px">${classes.length===0?'Aucune classe':'classe${classes.length>1?"s":""} active${classes.length>1?"s":""}'}</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 24px">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px">ÉLÈVES</div>
+            <div style="font-size:36px;font-weight:800;line-height:1">${totalStudents}</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px">${totalStudents===0?'Aucun élève inscrit':totalStudents===1?'élève inscrit':'élèves inscrits'}</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 24px">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px">VITESSE MOY.</div>
+            <div style="font-size:36px;font-weight:800;line-height:1">${avgWpm??'—'}<span style="font-size:16px;font-weight:500;color:var(--muted)"> mpm</span></div>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px">${avgWpm!=null?'sur '+studentsWithWpm.length+' élève'+(studentsWithWpm.length>1?'s':''):'Pas encore de données'}</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 24px">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px">PRÉCISION MOY.</div>
+            <div style="font-size:36px;font-weight:800;line-height:1">${avgAcc??'—'}<span style="font-size:16px;font-weight:500;color:var(--muted)">${avgAcc!=null?' %':''}</span></div>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px">${avgAcc!=null?'sur '+studentsWithAcc.length+' élève'+(studentsWithAcc.length>1?'s':''):'Pas encore de données'}</div>
+          </div>
+        </div>
+
+        <!-- Classes -->
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+              <h2 style="font-size:17px;font-weight:700;margin:0">Mes classes</h2>
+              <button onclick="go('classes')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--accent)">Voir tout →</button>
+            </div>
+            ${classes.length===0?`
+              <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px 24px;text-align:center;color:var(--muted)">
+                <div style="font-size:32px;margin-bottom:10px">🏫</div>
+                <div style="font-size:15px;font-weight:600;color:var(--txt);margin-bottom:6px">Aucune classe encore</div>
+                <div style="font-size:13px;margin-bottom:16px">Crée ta première classe et invite tes élèves.</div>
+                <button class="btn-primary" style="padding:9px 18px;font-size:13px" onclick="go('classes')">Créer une classe</button>
+              </div>
+            `:classes.slice(0,4).map((cl,i)=>{
+              const n=(cl.students||[]).length;
+              const initials=cl.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+              return`<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer" onclick="go('classes');setTimeout(()=>app.viewClass(${i}),0)">
+                <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;flex-shrink:0">${initials}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:14px;font-weight:700">${cl.name}</div>
+                  <div style="font-size:12px;color:var(--muted);margin-top:1px">${n} élève${n!==1?'s':''}</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-size:16px;font-weight:800">${cl.avgWpm??'—'}<span style="font-size:11px;color:var(--muted);font-weight:500"> mpm</span></div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+
+          <!-- Actions rapides -->
+          <div>
+            <div style="font-size:17px;font-weight:700;margin-bottom:14px">Actions rapides</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <button onclick="go('classes');setTimeout(()=>app.createClass(),0)" style="background:var(--accent);color:#fff;border:none;border-radius:14px;padding:16px 18px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px">
+                <span style="font-size:20px">➕</span><span>Nouvelle classe</span>
+              </button>
+              <button onclick="go('classes')" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left;color:var(--txt);display:flex;align-items:center;gap:10px">
+                <span style="font-size:20px">👥</span><span>Gérer les classes</span>
+              </button>
+              <button onclick="app.openSettings('gaze')" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left;color:var(--txt);display:flex;align-items:center;gap:10px">
+                <span style="font-size:20px">⚙️</span><span>Paramètres</span>
+              </button>
+            </div>
+
+            ${classes.length>0&&totalStudents===0?`
+            <div style="background:rgba(255,77,46,0.06);border:1px solid rgba(255,77,46,0.2);border-radius:14px;padding:16px;margin-top:14px">
+              <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px">💡 Conseil</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.5">Partage le lien d'invitation de ta classe pour que tes élèves la rejoignent automatiquement.</div>
+            </div>`:''}
+          </div>
+        </div>
+      </div>
+    `;
   },
 
   /* ── TYPING ── */
