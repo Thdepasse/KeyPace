@@ -3931,7 +3931,14 @@ const app={
       g.samples.push(onScreen?1:0);
     };
     try{
-      webgazer.setGazeListener(listener).showVideoPreview(false).showPredictionPoints(false);
+      webgazer
+        .setRegression('weightedRidge')
+        .setTracker('TFFaceMesh')
+        .setCameraConstraints({width:{ideal:1280},height:{ideal:720},facingMode:'user'})
+        .setGazeListener(listener)
+        .showVideoPreview(false)
+        .showPredictionPoints(false);
+      webgazer.params.smoothingEnabled=false;
       await webgazer.begin();
       g.active=true;
     }catch(err){
