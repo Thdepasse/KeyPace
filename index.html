@@ -2123,7 +2123,7 @@ const ALL_LESSONS=[],ALL_MODULES=[];
 const app={
   view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,simon:null,boss:null,duel:null,activeGame:null,now:Date.now(),
   _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
-  _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,_wgPromise:null,_stream:null,_video:null,_landmarker:null,_raf:null,_baseline:null,_baselineBuf:[],_smooth:null,_lastScore:null,_calib:null,samples:[],permError:null},
+  _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,_wgPromise:null,_stream:null,_video:null,_landmarker:null,_raf:null,_baseline:null,_baselineBuf:[],_smooth:null,_lastScore:null,_calib:null,_sessionThreshold:null,samples:[],permError:null},
 
   init(){
     this.stats=loadStats();
@@ -4205,22 +4205,23 @@ const app={
               g._lastScore=score;
 
               if(g.active){
-                if(g._calib){
-                  // ── Mode calibré : seuil personnalisé ──
-                  g._smooth=g._smooth==null?score:g._smooth*0.65+score*0.35;
-                  g.samples.push(g._smooth>g._calib.threshold?1:0);
-                } else {
-                  // ── Auto-calibration sur les premières frames ──
-                  if(g._baselineBuf.length<BASELINE_FRAMES){
-                    g._baselineBuf.push(score);
-                    if(g._baselineBuf.length===BASELINE_FRAMES){
-                      g._baseline=g._baselineBuf.reduce((a,b)=>a+b,0)/BASELINE_FRAMES;
+                // ── Toujours auto-calibrer sur les premières frames ──
+                if(g._baselineBuf.length<BASELINE_FRAMES){
+                  g._baselineBuf.push(score);
+                  if(g._baselineBuf.length===BASELINE_FRAMES){
+                    g._baseline=g._baselineBuf.reduce((a,b)=>a+b,0)/BASELINE_FRAMES;
+                    // Ajuster le seuil calibré selon le drift de session
+                    if(g._calib){
+                      const drift=g._baseline-g._calib.screenBaseline;
+                      g._sessionThreshold=g._calib.threshold+drift;
                     }
-                    g.samples.push(1);
-                  } else {
-                    g._smooth=g._smooth==null?score:g._smooth*0.65+score*0.35;
-                    g.samples.push(g._smooth>(g._baseline-0.12)?1:0);
                   }
+                  g.samples.push(1); // pendant la collecte de baseline → on considère "écran"
+                } else {
+                  g._smooth=g._smooth==null?score:g._smooth*0.65+score*0.35;
+                  // Seuil : calibré+drift si dispo, sinon auto (baseline - 0.12)
+                  const thr=g._sessionThreshold!=null?g._sessionThreshold:(g._baseline-0.12);
+                  g.samples.push(g._smooth>thr?1:0);
                 }
               }
             }else{
@@ -4238,7 +4239,7 @@ const app={
   },
   async _gazeStart(){
     const g=this._gaze;if(!g.enabled||g.active)return;
-    g.samples=[];g._baseline=null;g._baselineBuf=[];g._smooth=null;g._lastScore=null;
+    g.samples=[];g._baseline=null;g._baselineBuf=[];g._smooth=null;g._lastScore=null;g._sessionThreshold=null;
     // Charger la calibration depuis localStorage si elle existe
     try{const c=localStorage.getItem('keypace-gaze-calib');g._calib=c?JSON.parse(c):null;}catch{g._calib=null;}
     g.active=true;
