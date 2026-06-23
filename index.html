@@ -4577,7 +4577,7 @@ async function loadProgressFromServer(){
   try{
     const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
     const d=await r.json();
-    if(d&&d.data){app.stats=mergeStats(d.data);app.renderCurrent();}
+    if(d&&d.data){app.stats=mergeStats(d.data);updateNavUser();app.renderCurrent();}
   }catch{}
 }
 loadSession();
