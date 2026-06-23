@@ -936,16 +936,23 @@ async function hashPw(pw){
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-function saveSession(username, plan, token, userId){
+function saveSession(username, plan, token, userId, role){
   currentUser=username; currentPlan=plan; currentToken=token; currentUserId=userId||null;
-  localStorage.setItem('klak_session', JSON.stringify({username, plan, token, userId}));
+  localStorage.setItem('klak_session', JSON.stringify({username, plan, token, userId, role:role||null}));
 }
 function clearSession(){
   currentUser=null; currentPlan=null; currentToken=null; currentUserId=null;
   localStorage.removeItem('klak_session');
 }
 function loadSession(){
-  try{const s=JSON.parse(localStorage.getItem('klak_session'));if(s&&s.username){currentUser=s.username;currentPlan=s.plan||'free';currentToken=s.token;currentUserId=s.userId||null;}}catch{}
+  try{
+    const s=JSON.parse(localStorage.getItem('klak_session'));
+    if(s&&s.username){
+      currentUser=s.username;currentPlan=s.plan||'free';currentToken=s.token;currentUserId=s.userId||null;
+      // Pré-charger le rôle pour éviter le flash EXPERT → ÉTABLISSEMENT
+      if(s.role&&!app.stats)app.stats={role:s.role};
+    }
+  }catch{}
 }
 
 function openModal(id){document.getElementById(id).classList.add('open');}
@@ -1043,8 +1050,9 @@ async function authSubmit(){
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,passwordHash})});
       const d=await r.json();
       if(!r.ok){btn.disabled=false;btn.textContent='Se connecter';return showAuthError(d.error||'Erreur.');}
-      saveSession(d.username, d.plan, d.token, d.id);
-      app.stats=mergeStats(d.data);
+      const _mergedData=mergeStats(d.data);
+      saveSession(d.username, d.plan, d.token, d.id, _mergedData.role||null);
+      app.stats=_mergedData;
       loginUser(d.username);
     }
   }catch(e){btn.disabled=false;btn.textContent=currentTab==='login'?'Se connecter':'Créer mon compte';showAuthError('Erreur réseau, réessaie.');}
@@ -4611,7 +4619,7 @@ async function loadProgressFromServer(){
   try{
     const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
     const d=await r.json();
-    if(d&&d.data){app.stats=mergeStats(d.data);if(d.id&&!currentUserId){currentUserId=d.id;const s=JSON.parse(localStorage.getItem('klak_session')||'{}');s.userId=d.id;localStorage.setItem('klak_session',JSON.stringify(s));}updateNavUser();app.renderCurrent();}
+    if(d&&d.data){app.stats=mergeStats(d.data);const _s=JSON.parse(localStorage.getItem('klak_session')||'{}');let _changed=false;if(d.id&&!currentUserId){currentUserId=d.id;_s.userId=d.id;_changed=true;}if(app.stats.role&&_s.role!==app.stats.role){_s.role=app.stats.role||null;_changed=true;}if(_changed)localStorage.setItem('klak_session',JSON.stringify(_s));updateNavUser();app.renderCurrent();}
   }catch{}
 }
 loadSession();
