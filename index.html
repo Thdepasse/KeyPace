@@ -278,6 +278,34 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .pc-btn.pri{background:var(--accent);color:#fff;box-shadow:0 6px 16px rgba(255,77,46,0.3)}
 .pc-btn.sec{background:var(--light);color:var(--txt)}
 
+/* SCHOOL BANNER (CTA établissements) */
+.school-banner{max-width:1120px;margin:0 auto;padding:0 24px 64px}
+.school-banner-inner{position:relative;overflow:hidden;background:linear-gradient(135deg,#FF4D2E 0%,#ff7a4d 100%);border-radius:24px;padding:44px 48px;display:grid;grid-template-columns:1.5fr 0.5fr;gap:28px;align-items:center;box-shadow:0 20px 48px rgba(255,77,46,0.28)}
+.school-banner-inner::before{content:'';position:absolute;top:-60px;right:-40px;width:240px;height:240px;background:rgba(255,255,255,0.10);border-radius:50%}
+.school-banner-inner::after{content:'';position:absolute;bottom:-80px;right:90px;width:160px;height:160px;background:rgba(255,255,255,0.07);border-radius:50%}
+.school-banner-content{position:relative;z-index:1}
+.school-banner-badge{display:inline-block;background:rgba(255,255,255,0.22);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;border-radius:20px;margin-bottom:14px;letter-spacing:.01em}
+.school-banner h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(24px,2.6vw,32px);color:#fff;line-height:1.12;margin-bottom:12px;letter-spacing:-0.02em}
+.school-banner p{font-size:16px;color:rgba(255,255,255,0.94);line-height:1.55;margin-bottom:18px;max-width:580px}
+.school-banner p strong{color:#fff;font-weight:800}
+.school-banner-feats{list-style:none;display:flex;flex-wrap:wrap;gap:8px 22px;margin-bottom:26px}
+.school-banner-feats li{color:#fff;font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+.school-banner-feats li::before{content:'✓';font-weight:800;color:#fff;background:rgba(255,255,255,0.25);width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.school-banner-actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.school-banner-btn{background:#fff;color:var(--accent);border:none;border-radius:13px;padding:15px 28px;font-weight:800;font-size:16px;cursor:pointer;font-family:inherit;box-shadow:0 8px 22px rgba(0,0,0,0.16);transition:transform .15s,box-shadow .15s}
+.school-banner-btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(0,0,0,0.22)}
+.school-banner-link{color:#fff;font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:3px;opacity:.9}
+.school-banner-link:hover{opacity:1}
+.school-banner-visual{position:relative;z-index:1;font-size:130px;text-align:center;line-height:1;filter:drop-shadow(0 10px 20px rgba(0,0,0,0.22))}
+@media(max-width:768px){
+  .school-banner{padding:0 16px 44px}
+  .school-banner-inner{grid-template-columns:1fr;padding:30px 24px;text-align:center}
+  .school-banner-visual{display:none}
+  .school-banner p{margin-left:auto;margin-right:auto}
+  .school-banner-feats{justify-content:center}
+  .school-banner-actions{justify-content:center}
+}
+
 /* TYPING */
 .typing-section{max-width:1120px;margin:0 auto;padding:0 24px 40px}
 .typing-header{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 0 16px;gap:16px}
@@ -1849,12 +1877,24 @@ const app={
           </div>
         </div>
       </div>`:''}
-      <div style="max-width:640px;margin:0 auto;padding:0 24px 64px;text-align:center">
-        <p style="font-size:15px;color:#7A7365;line-height:1.7">
-          Établissement scolaire ou université ?
-          Faites profiter à tous vos étudiants d'un compte en
-          <button onclick="openModal('school-modal')" style="background:none;border:none;padding:0;font-size:15px;font-weight:700;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-family:inherit">cliquant ici</button>.
-        </p>
+      <div class="school-banner">
+        <div class="school-banner-inner">
+          <div class="school-banner-content">
+            <span class="school-banner-badge">🎓 Écoles · Universités · Entreprises</span>
+            <h2>Équipez toute votre classe pour taper plus vite</h2>
+            <p>Offrez un accès <strong>Expert</strong> à chacun de vos étudiants : 65 leçons AZERTY progressives, jeux de frappe et suivi de progression individuel. Tarif établissement dégressif, mise en place en quelques minutes.</p>
+            <ul class="school-banner-feats">
+              <li>Comptes Expert pour tous vos élèves</li>
+              <li>Suivi de progression par étudiant</li>
+              <li>Sans installation, 100% en ligne</li>
+            </ul>
+            <div class="school-banner-actions">
+              <button class="school-banner-btn" onclick="openModal('school-modal')">Demander une licence établissement →</button>
+              <a class="school-banner-link" href="mailto:contact@keypace.be?subject=Licence établissement KeyPace">ou nous écrire directement</a>
+            </div>
+          </div>
+          <div class="school-banner-visual" aria-hidden="true">🎓</div>
+        </div>
       </div>
       `;
   },
