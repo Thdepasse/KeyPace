@@ -234,6 +234,7 @@ module.exports = async function handler(req, res) {
   }
 
   res.json({
+    id: user.id,
     username: user.username,
     plan: user.plan,
     token,

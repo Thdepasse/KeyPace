@@ -927,6 +927,7 @@ const EXPERT_CODE = 'KEYPACE-EXPERT'; // code démo
 let currentUser = null;
 let currentPlan = null;
 let currentToken = null;
+let currentUserId = null;
 let currentTab = 'login';
 let _authCallback = null;
 
@@ -935,16 +936,16 @@ async function hashPw(pw){
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-function saveSession(username, plan, token){
-  currentUser=username; currentPlan=plan; currentToken=token;
-  localStorage.setItem('klak_session', JSON.stringify({username, plan, token}));
+function saveSession(username, plan, token, userId){
+  currentUser=username; currentPlan=plan; currentToken=token; currentUserId=userId||null;
+  localStorage.setItem('klak_session', JSON.stringify({username, plan, token, userId}));
 }
 function clearSession(){
-  currentUser=null; currentPlan=null; currentToken=null;
+  currentUser=null; currentPlan=null; currentToken=null; currentUserId=null;
   localStorage.removeItem('klak_session');
 }
 function loadSession(){
-  try{const s=JSON.parse(localStorage.getItem('klak_session'));if(s&&s.username){currentUser=s.username;currentPlan=s.plan||'free';currentToken=s.token;}}catch{}
+  try{const s=JSON.parse(localStorage.getItem('klak_session'));if(s&&s.username){currentUser=s.username;currentPlan=s.plan||'free';currentToken=s.token;currentUserId=s.userId||null;}}catch{}
 }
 
 function openModal(id){document.getElementById(id).classList.add('open');}
@@ -1042,7 +1043,7 @@ async function authSubmit(){
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,passwordHash})});
       const d=await r.json();
       if(!r.ok){btn.disabled=false;btn.textContent='Se connecter';return showAuthError(d.error||'Erreur.');}
-      saveSession(d.username, d.plan, d.token);
+      saveSession(d.username, d.plan, d.token, d.id);
       app.stats=mergeStats(d.data);
       loginUser(d.username);
     }
@@ -4383,7 +4384,8 @@ const app={
     if(!name||!name.trim())return;
     const s=this.stats||{};
     if(!s.classes)s.classes=[];
-    s.classes.push({name:name.trim(),students:[],avgWpm:null,createdAt:Date.now()});
+    const inviteToken=crypto.randomUUID();
+    s.classes.push({name:name.trim(),students:[],avgWpm:null,createdAt:Date.now(),inviteToken});
     saveStats(s);
     this.renderClasses();
   },
@@ -4408,15 +4410,23 @@ const app={
         <p>${students.length} élève${students.length!==1?'s':''}</p>
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
+        ${cl.inviteToken&&currentUserId?`
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:4px">LIEN D'INVITATION</div>
+            <div style="font-size:13px;color:var(--txt);word-break:break-all;font-family:'JetBrains Mono',monospace">${location.origin}?join=${currentUserId}_${i}_${cl.inviteToken}</div>
+          </div>
+          <button onclick="app.copyInviteLink(${i})" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">Copier le lien</button>
+        </div>`:''}
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
           <h2 style="font-size:18px;font-weight:700;margin:0">Élèves</h2>
-          <button class="btn-primary" style="padding:8px 18px;font-size:14px" onclick="app.addStudent(${i})">+ Ajouter un élève</button>
+          <button onclick="app.refreshClass(${i})" style="background:none;border:1px solid var(--border);border-radius:10px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt)">↻ Actualiser les stats</button>
         </div>
         ${students.length===0?`
           <div style="text-align:center;padding:60px 20px;color:var(--muted)">
             <div style="font-size:40px;margin-bottom:12px">👩‍🎓</div>
-            <div style="font-size:16px;font-weight:600;margin-bottom:6px">Aucun élève dans cette classe</div>
-            <div style="font-size:13px">Ajoute des élèves par leur nom d'utilisateur KeyPace.</div>
+            <div style="font-size:16px;font-weight:600;margin-bottom:6px">Aucun élève encore</div>
+            <div style="font-size:13px">Partage le lien d'invitation ci-dessus. Les élèves rejoindront la classe automatiquement.</div>
           </div>
         `:`
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
@@ -4437,25 +4447,20 @@ const app={
               </div>
             `).join('')}
           </div>
-          <button class="btn-primary" style="margin-top:20px;padding:10px 20px;font-size:14px" onclick="app.refreshClass(${i})">↻ Actualiser les stats</button>
         `}
       </div>`;
   },
 
-  async addStudent(classIdx){
-    const username=prompt('Nom d\'utilisateur de l\'élève :');
-    if(!username||!username.trim())return;
-    const uname=username.trim();
-    // Vérifier que l'utilisateur existe
-    const r=await fetch(`/api/save-progress`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:this.stats})}).catch(()=>null);
-    // Lookup via login-less route — on utilise Supabase public via un appel léger
-    const check=await fetch(`/api/refresh-plan?username=${encodeURIComponent(uname)}`).catch(()=>null);
+  copyInviteLink(classIdx){
     const s=this.stats||{};
-    if(!s.classes[classIdx].students)s.classes[classIdx].students=[];
-    if(s.classes[classIdx].students.find(st=>st.username===uname)){alert('Cet élève est déjà dans la classe.');return;}
-    s.classes[classIdx].students.push({username:uname,addedAt:Date.now(),wpm:null,acc:null,tests:null});
-    saveStats(s);
-    this.viewClass(classIdx);
+    const cl=s.classes[classIdx];
+    if(!cl||!cl.inviteToken||!currentUserId)return;
+    const link=`${location.origin}?join=${currentUserId}_${classIdx}_${cl.inviteToken}`;
+    navigator.clipboard.writeText(link).then(()=>{
+      // feedback visuel bref
+      const btns=document.querySelectorAll('button');
+      btns.forEach(b=>{if(b.textContent==='Copier le lien'){b.textContent='✓ Copié !';setTimeout(()=>{b.textContent='Copier le lien';},2000);}});
+    });
   },
 
   removeStudent(classIdx,studentIdx){
@@ -4518,6 +4523,55 @@ function handleDuelReturn(){
 
 /* ── INIT ── */
 function go(view){app.renderView(view);}
+async function handleClassJoin(){
+  const joinParam=new URLSearchParams(location.search).get('join');
+  if(!joinParam)return;
+  // Nettoyer l'URL
+  history.replaceState(null,'',location.pathname);
+  const parts=joinParam.split('_');
+  if(parts.length<3)return;
+  const teacherUserId=parts[0];
+  const classIdx=parseInt(parts[1]);
+  const inviteToken=parts.slice(2).join('_');
+  // Afficher la modale de confirmation (avec connexion si nécessaire)
+  const doJoin=async()=>{
+    if(!currentToken){return;}
+    const overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:90%;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">🏫</div>
+      <h2 style="margin:0 0 8px;font-size:20px">Rejoindre une classe</h2>
+      <p style="color:var(--muted);font-size:14px;margin:0 0 24px" id="join-class-name">Vérification en cours…</p>
+      <div id="join-actions" style="display:none;gap:10px;flex-direction:column">
+        <button id="join-confirm-btn" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;width:100%">Rejoindre la classe</button>
+        <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px;cursor:pointer;width:100%">Annuler</button>
+      </div>
+      <div id="join-error" style="color:#E5484D;font-size:13px;margin-top:12px;display:none"></div>
+    </div>`;
+    document.body.appendChild(overlay);
+    // Vérifier le lien
+    try{
+      const r=await fetch('/api/join-class',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({studentToken:currentToken,teacherUserId,classIdx,inviteToken,preview:true})});
+      const d=await r.json();
+      if(!r.ok){document.getElementById('join-class-name').textContent=d.error||'Lien invalide.';document.getElementById('join-error').style.display='block';return;}
+      document.getElementById('join-class-name').textContent=`Tu vas rejoindre la classe "${d.className}".`;
+      const actions=document.getElementById('join-actions');actions.style.display='flex';
+      document.getElementById('join-confirm-btn').onclick=async()=>{
+        const btn=document.getElementById('join-confirm-btn');btn.disabled=true;btn.textContent='En cours…';
+        const r2=await fetch('/api/join-class',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({studentToken:currentToken,teacherUserId,classIdx,inviteToken})});
+        const d2=await r2.json();
+        if(!r2.ok){btn.disabled=false;btn.textContent='Rejoindre';document.getElementById('join-error').textContent=d2.error||'Erreur.';document.getElementById('join-error').style.display='block';return;}
+        overlay.querySelector('div').innerHTML=`<div style="font-size:40px;margin-bottom:12px">✓</div><h2 style="margin:0 0 8px">Tu as rejoint la classe !</h2><p style="color:var(--muted);font-size:14px;margin:0 0 24px">Ta progression sera visible par ton professeur.</p><button onclick="this.closest('[style*=fixed]').remove()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer">Continuer</button>`;
+      };
+    }catch{document.getElementById('join-class-name').textContent='Erreur réseau.';document.getElementById('join-error').style.display='block';}
+  };
+  if(currentUser){doJoin();}
+  else{
+    // Demander connexion d'abord, puis rejoindre
+    openAuth('login','Connecte-toi pour rejoindre la classe.',()=>{doJoin();});
+  }
+}
+
 async function loadProgressFromServer(){
   if(!currentUser||!currentToken)return;
   try{
@@ -4535,6 +4589,7 @@ handlePaymentReturn();
 handleVerificationReturn();
 handleDuelReturn();
 loadProgressFromServer();
+handleClassJoin();
 // Sauvegarde immédiate de la progression à la fermeture / au changement d'onglet (la sauvegarde normale est différée)
 window.addEventListener('pagehide',()=>{
   if(currentUser&&currentToken&&app.stats){

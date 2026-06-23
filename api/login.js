@@ -41,5 +41,5 @@ module.exports = async function handler(req, res) {
   const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
   const progress = pr.data && pr.data[0];
 
-  res.json({ username: user.username, plan: user.plan, token, data: progress?.data || {} });
+  res.json({ id: user.id, username: user.username, plan: user.plan, token, data: progress?.data || {} });
 };
