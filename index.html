@@ -4623,7 +4623,11 @@ async function loadProgressFromServer(){
   }catch{}
 }
 loadSession();
-if(currentUser) app.stats = mergeStats();
+if(currentUser){
+  // Préserver le rôle déjà chargé par loadSession() dans mergeStats()
+  const _preRole=app.stats&&app.stats.role;
+  app.stats=mergeStats(_preRole?{role:_preRole}:undefined);
+}
 app.init();
 go('home');
 updateNavUser();
