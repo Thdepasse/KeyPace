@@ -4078,19 +4078,16 @@ const app={
       const ok=await this._gazeLoadLib();
       if(!ok){g._wgPromise=null;return false;}
       try{
-        // Appels défensifs : chaque méthode optionnelle est wrappée séparément
-        try{webgazer.setRegression('weightedRidge');}catch{}
-        try{webgazer.showVideoPreview(false);}catch{}
-        try{webgazer.showPredictionPoints(false);}catch{}
-        try{webgazer.saveDataAcrossSessions(true);}catch{}
         webgazer.setGazeListener((p)=>{
           if(!g.active)return;
           const vw=window.innerWidth,vh=window.innerHeight;
           const onScreen=p!=null&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
           g.samples.push(onScreen?1:0);
         });
-        await webgazer.begin();
-        // Optionnels post-begin
+        // begin() peut être async (Promise) ou sync selon la version — on gère les deux
+        const begun=webgazer.begin();
+        if(begun&&typeof begun.then==='function')await begun;
+        // Masquer le flux vidéo après begin()
         try{webgazer.showVideoPreview(false);}catch{}
         try{webgazer.showPredictionPoints(false);}catch{}
         g._wgRunning=true;
@@ -4100,7 +4097,7 @@ const app={
         g._wgPromise=null;
         console.error('[WebGazer] erreur init:', err);
         if(err&&err.name==='NotAllowedError')g.permError='Caméra refusée — autorise l\'accès dans les paramètres du navigateur.';
-        else g.permError=`Erreur caméra : ${err&&err.message?err.message:'réessaie dans un autre navigateur.'}`;
+        else g.permError=`Erreur : ${err&&err.message?err.message:'réessaie dans un autre navigateur.'}`;
         g.enabled=false;
         this.renderCurrent();
         return false;
