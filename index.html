@@ -2703,7 +2703,7 @@ const app={
         <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
         <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')">💡 Explication</button>`:''}${!isLesson?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()">${this._gaze.enabled?'👁 Traqueur actif':'👁 Activer traqueur des yeux'}</button>${this._gaze.permError?`<span style="font-size:11px;color:#E5484D;max-width:220px;text-align:right">${this._gaze.permError}</span>`:''}</div></div>
       </div>
-      <div class="live-stats" style="${finished?'display:none':''}"
+      <div class="live-stats" style="${finished?'display:none':''}">
         <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val">${s&&s.started?liveWpm+'<span class="stat-unit"> mpm</span>':'·'}</div></div>
         <div class="stat-box"><div class="stat-label">Précision</div><div class="stat-val">${s&&s.started?liveAcc:'·'}</div></div>
         <div class="stat-box"><div class="stat-label">Temps</div><div class="stat-val">${s&&s.started?liveTime+'<span class="stat-unit"> s</span>':'·'}</div></div>
