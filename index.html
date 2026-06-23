@@ -2175,7 +2175,7 @@ const app={
   },
   typeKey(e){
     const k=e.key;
-    if(k==='Backspace'){e.preventDefault();const s=this.sess;if(s.idx>0){s.typed=s.typed.slice(0,s.idx-1);s.idx--;this._patchTypingBox();}return;}
+    if(k==='Backspace'){e.preventDefault();return;} // pas de correction : frappe en avant uniquement
     if(k.length!==1)return;
     e.preventDefault();
     const s=this.sess;
