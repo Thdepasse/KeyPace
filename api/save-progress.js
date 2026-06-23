@@ -34,7 +34,7 @@ module.exports = async function handler(req, res) {
   if (data === undefined || data === null) {
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
     const row = pr.data && pr.data[0];
-    return res.json({ ok: true, data: (row && row.data) || {} });
+    return res.json({ ok: true, id: user.id, data: (row && row.data) || {} });
   }
 
   // Sinon => écriture en upsert (insère la ligne si elle n'existe pas encore)

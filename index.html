@@ -4401,6 +4401,8 @@ const app={
   viewClass(i){
     const pageId='page-classes';
     const s=this.stats||{};
+    // Générer inviteToken si la classe n'en a pas (classes créées avant la fonctionnalité)
+    if(s.classes[i]&&!s.classes[i].inviteToken){s.classes[i].inviteToken=crypto.randomUUID();saveStats(s);}
     const cl=s.classes[i];
     const students=cl.students||[];
     document.getElementById(pageId).innerHTML=`
@@ -4577,7 +4579,7 @@ async function loadProgressFromServer(){
   try{
     const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
     const d=await r.json();
-    if(d&&d.data){app.stats=mergeStats(d.data);updateNavUser();app.renderCurrent();}
+    if(d&&d.data){app.stats=mergeStats(d.data);if(d.id&&!currentUserId){currentUserId=d.id;const s=JSON.parse(localStorage.getItem('klak_session')||'{}');s.userId=d.id;localStorage.setItem('klak_session',JSON.stringify(s));}updateNavUser();app.renderCurrent();}
   }catch{}
 }
 loadSession();
