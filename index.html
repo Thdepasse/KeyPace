@@ -3596,8 +3596,17 @@ const app={
     ch.on('broadcast',{event:'start'},({payload})=>{const d2=this.duel;if(!d2)return;d2.startAt=new Date(payload.startAt).getTime();this._duelBeginCountdown();})
       .on('broadcast',{event:'prog'},({payload})=>{const d2=this.duel;if(!d2||payload.role===d2.role)return;d2.oppProg=payload.prog;if(payload.finished)d2.oppFinished=true;if(d2.phase==='racing')this.renderCurrent();})
       .on('broadcast',{event:'done'},({payload})=>{const d2=this.duel;if(!d2||payload.role===d2.role)return;d2.oppFinished=true;d2.oppWpm=payload.wpm;d2.oppAcc=payload.acc;d2.oppFinishMs=payload.timeMs;d2.oppProg=1;this._duelMaybeResolve();})
+      .on('broadcast',{event:'rematch'},({payload})=>{const d2=this.duel;if(!d2||payload.role===d2.role)return;d2._oppRematch=true;this.renderCurrent();this._duelMaybeRematch();})
+      .on('broadcast',{event:'rematch-go'},({payload})=>{const d2=this.duel;if(!d2||d2.role!=='guest')return;this._duelRematchGo(payload.roomId,payload.roomCode,payload.text,payload.hostLabel);})
       .on('presence',{event:'sync'},()=>{syncPresence();if(this.duel&&this.duel.phase==='lobby')this.renderCurrent();})
-      .on('presence',{event:'leave'},()=>{syncPresence();const d2=this.duel;if(!d2)return;if(d2.phase==='racing'&&!d2.oppPresent&&!d2.oppFinished){d2.oppForfeit=true;this._duelMaybeResolve();}if(d2.phase==='lobby')this.renderCurrent();});
+      .on('presence',{event:'leave'},()=>{
+        const prevPresent=this.duel&&this.duel.oppPresent;
+        syncPresence();
+        const d2=this.duel;if(!d2)return;
+        if(d2.phase==='racing'&&!d2.oppPresent&&!d2.oppFinished){d2.oppForfeit=true;this._duelMaybeResolve();}
+        if(d2.phase==='lobby'&&prevPresent&&!d2.oppPresent){d2.oppLeft=true;}
+        if(d2.phase==='lobby')this.renderCurrent();
+      });
     d._channel=ch;
     ch.subscribe(async(status)=>{if(status==='SUBSCRIBED'){try{await ch.track({role:d.role,label:currentUser});}catch{}}});
   },
@@ -3681,6 +3690,33 @@ const app={
     if(this.duel&&this.duel._channel){try{this.duel._channel.unsubscribe();}catch{} try{this._duelSbClient&&this._duelSbClient.removeChannel(this.duel._channel);}catch{}}
     this.duel=null;
   },
+  duelRematch(){
+    const d=this.duel;if(!d||d.phase!=='result')return;
+    d._myRematch=true;
+    if(d._channel)d._channel.send({type:'broadcast',event:'rematch',payload:{role:d.role}}).catch(()=>{});
+    this.renderCurrent();
+    this._duelMaybeRematch();
+  },
+  async _duelMaybeRematch(){
+    const d=this.duel;if(!d||!d._myRematch||!d._oppRematch||d.role!=='host')return;
+    d._rematchLoading=true;this.renderCurrent();
+    try{
+      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-create',token:currentToken})}).then(r=>r.json());
+      if(r.error||!r.roomId){d._rematchLoading=false;d._rematchError=r.error||'Erreur.';this.renderCurrent();return;}
+      if(d._channel)d._channel.send({type:'broadcast',event:'rematch-go',payload:{roomId:r.roomId,roomCode:r.roomCode,text:r.text,hostLabel:r.hostLabel}}).catch(()=>{});
+      if(d._channel){try{d._channel.unsubscribe();}catch{} try{this._duelSbClient&&this._duelSbClient.removeChannel(d._channel);}catch{}}
+      this.duel=this._duelBlank('host',r.roomId,r.roomCode,r.text,r.hostLabel);
+      await this.duelOpenChannel();
+      this.renderCurrent();
+    }catch{d._rematchLoading=false;d._rematchError='Erreur réseau.';this.renderCurrent();}
+  },
+  async _duelRematchGo(roomId,roomCode,text,hostLabel){
+    const d=this.duel;if(!d)return;
+    if(d._channel){try{d._channel.unsubscribe();}catch{} try{this._duelSbClient&&this._duelSbClient.removeChannel(d._channel);}catch{}}
+    this.duel=this._duelBlank('guest',roomId,roomCode,text,hostLabel);
+    await this.duelOpenChannel();
+    this.renderCurrent();
+  },
   _duelLanesHTML(){
     const d=this.duel;
     const oppName=(d.role==='host'?(d.oppLabel||'Adversaire'):(d.hostLabel||d.oppLabel||'Hôte'));
@@ -3735,7 +3771,7 @@ const app={
           <div class="duel-code-copied">${d._codeCopied?'Code copié ✓':''}</div>
           <p style="color:var(--muted);font-size:12px;margin:4px 0 16px">ou partage le lien :</p>
           <div class="duel-link"><input readonly value="${link}" onclick="this.select()"><button onclick="app.duelCopyLink()">${d._copied?'Copié ✓':'Copier le lien'}</button></div>
-          <div class="duel-status">${d.oppPresent?`<div class="duel-opp-badge">✓ ${d.oppLabel||'Adversaire'} a rejoint</div>`:'<span class="duel-wait">● En attente de l\'adversaire…</span>'}</div>
+          <div class="duel-status">${d.oppPresent?`<div class="duel-opp-badge">✓ ${d.oppLabel||'Adversaire'} a rejoint</div>`:d.oppLeft?'<span style="color:#E5484D;font-weight:600">● Ton adversaire a quitté le lobby</span>':'<span class="duel-wait">● En attente de l\'adversaire…</span>'}</div>
           <button class="btn-primary" style="margin-top:12px;${d.oppPresent?'':'opacity:.5;cursor:default'}" ${d.oppPresent?'onclick="app.duelStart()"':'disabled'}>Lancer le duel ▸</button>
           ${d.msg?`<p style="color:#E5484D;font-size:13px;margin-top:10px">${d.msg}</p>`:''}
         </div>`;
@@ -3743,7 +3779,7 @@ const app={
         body=`<div class="boss-card" style="text-align:center">
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px">Duel rejoint !</h2>
           <p style="color:var(--muted);font-size:15px;margin-bottom:18px">Tu affrontes <b style="color:var(--txt)">${d.hostLabel||'l\'hôte'}</b>.</p>
-          <div class="duel-status"><span class="duel-wait">● En attente du lancement par l'hôte…</span></div>
+          <div class="duel-status">${d.oppLeft?'<span style="color:#E5484D;font-weight:600">● Ton adversaire a quitté le lobby</span>':'<span class="duel-wait">● En attente du lancement par l\'hôte…</span>'}</div>
         </div>`;
       }
     } else if(d.phase==='countdown'){
@@ -3774,17 +3810,33 @@ const app={
       const iWon=d.winner===d.role;const draw=d.winner==='draw';
       const title=draw?'Égalité !':iWon?'Victoire ! 🎉':'Défaite';
       const emoji=draw?'🤝':iWon?'🏆':'😤';
+      const myName=currentUser||'Toi';
+      const oppName=d.oppLabel||'Adversaire';
+      let rematchHTML='';
+      if(d._rematchLoading){
+        rematchHTML=`<p style="color:var(--muted);font-size:14px;margin-top:12px">Nouvelle partie en cours…</p>`;
+      } else if(d._rematchError){
+        rematchHTML=`<p style="color:#E5484D;font-size:13px;margin-top:10px">${d._rematchError}</p>`;
+      } else if(d._myRematch&&d._oppRematch){
+        rematchHTML=`<p style="color:#1FA971;font-size:14px;font-weight:600;margin-top:12px">Les deux joueurs sont prêts — lancement…</p>`;
+      } else if(d._myRematch){
+        rematchHTML=`<p style="color:var(--muted);font-size:14px;margin-top:12px">En attente de ${oppName}…</p>`;
+      } else if(d._oppRematch){
+        rematchHTML=`<p style="color:#1FA971;font-size:14px;font-weight:600;margin-top:12px">${oppName} veut rejouer !</p>`;
+      }
       body=`<div class="boss-card">
         <div class="sprint-result">
           <div style="font-size:48px;line-height:1">${emoji}</div>
           <h2>${title}</h2>
           ${d.oppForfeit&&!d.oppFinished?'<p style="color:var(--muted);margin-bottom:14px">Ton adversaire a abandonné.</p>':''}
           <div class="sprint-result-grid" style="grid-template-columns:1fr 1fr">
-            <div class="stat-box"><div class="stat-label">Toi</div><div class="stat-val acc" style="font-size:30px">${d.myWpm||0}<span class="stat-unit"> mpm</span></div><div style="font-size:12px;color:var(--muted)">${d.myAcc||0}% précision</div></div>
-            <div class="stat-box"><div class="stat-label">${d.oppLabel||'Adversaire'}</div><div class="stat-val" style="font-size:30px">${d.oppFinished?d.oppWpm:'·'}${d.oppFinished?'<span class="stat-unit"> mpm</span>':''}</div><div style="font-size:12px;color:var(--muted)">${d.oppFinished?d.oppAcc+'% précision':'abandon'}</div></div>
+            <div class="stat-box" style="${iWon?'border:2px solid var(--accent)':''}"><div class="stat-label">${myName} ${iWon?'🏆':''}</div><div class="stat-val acc" style="font-size:30px">${d.myWpm||0}<span class="stat-unit"> mpm</span></div><div style="font-size:12px;color:var(--muted)">${d.myAcc||0}% précision</div></div>
+            <div class="stat-box" style="${!iWon&&!draw&&d.oppFinished?'border:2px solid var(--accent)':''}"><div class="stat-label">${oppName} ${!iWon&&!draw&&d.oppFinished?'🏆':''}</div><div class="stat-val" style="font-size:30px">${d.oppFinished?d.oppWpm:'·'}${d.oppFinished?'<span class="stat-unit"> mpm</span>':''}</div><div style="font-size:12px;color:var(--muted)">${d.oppFinished?d.oppAcc+'% précision':'abandon'}</div></div>
           </div>
-          <div style="display:flex;gap:12px;justify-content:center;margin-top:4px">
-            <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="app.duelLeave();app.activeGame='duel';app.duel={phase:'menu'};app.renderGames()">Nouveau duel</button>
+          ${rematchHTML}
+          <div style="display:flex;gap:12px;justify-content:center;margin-top:16px">
+            ${!d._myRematch&&!d._rematchLoading?`<button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="app.duelRematch()">🔁 Rejouer</button>`:''}
+            <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="app.duelLeave();app.activeGame='duel';app.duel={phase:'menu'};app.renderGames()">Nouveau duel</button>
             <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="app.exitActiveGame()">← Jeux</button>
           </div>
         </div>
