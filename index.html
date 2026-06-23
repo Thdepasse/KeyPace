@@ -1737,6 +1737,7 @@ const app={
       ${t.tip?`<div class="lesson-tip"><div class="lesson-tip-icon">🎯</div><div>${t.tip}</div></div>`:''}
       <button class="intro-start-btn" onclick="app.confirmTuto()">Commencer la leçon →</button>`;
     openModal('lesson-tuto-modal');
+    document.getElementById('lesson-tuto-body').scrollTop=0; // toujours ouvrir en haut
   },
   confirmTuto(){this._closeTutoAndStart();},
   skipTuto(){this._closeTutoAndStart();},
