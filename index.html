@@ -2123,7 +2123,7 @@ const ALL_LESSONS=[],ALL_MODULES=[];
 const app={
   view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,simon:null,boss:null,duel:null,activeGame:null,now:Date.now(),
   _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
-  _gaze:{enabled:false,loaded:false,active:false,samples:[],permError:null},
+  _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,samples:[],permError:null},
 
   init(){
     this.stats=loadStats();
@@ -2727,26 +2727,19 @@ const app={
       </div>`:''}
       ${!finished?`<div class="hint-txt">${s&&!s.started?'Commence à taper pour démarrer le chrono…':s&&s.started?'<span style="opacity:.5;font-size:12px">Tab pour recommencer</span>':''}</div>`:''}
       ${(()=>{
-        const gs=this._gaze;
-        if(!gs.enabled&&!(s&&s._gazeStats))return'';
-        if(s&&s._gazeStats){
-          const stats=s._gazeStats;
-          const segs=stats.samples.map(v=>`<div class="gaze-timeline-seg ${v?'on':'off'}"></div>`).join('');
-          const msg=stats.pct>=85?'Excellent ! Tu gardes les yeux sur l\'écran.':stats.pct>=65?'Bien ! Essaie de moins regarder le clavier.':'Entraîne-toi à regarder l\'écran plutôt que tes doigts.';
-          return`<div class="gaze-bar-section">
-            <div class="gaze-bar-title">👁 Suivi du regard</div>
-            <div class="gaze-timeline">${segs}</div>
-            <div class="gaze-bar-stats">
-              <span><span class="gaze-dot" style="background:#1FA971;display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Écran <b>${stats.pct}%</b></span>
-              <span><span class="gaze-dot" style="background:#E5484D;display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Clavier <b>${100-stats.pct}%</b></span>
-              <span style="margin-left:auto;color:var(--muted);font-size:12px">${msg}</span>
-            </div>
-          </div>`;
-        }
-        if(gs.enabled&&!finished){
-          return`<div class="gaze-bar-section"><div class="gaze-bar-title" style="color:#1FA971">👁 Traqueur actif — les données s'enregistrent…</div></div>`;
-        }
-        return'';
+        if(!(s&&s._gazeStats))return'';
+        const stats=s._gazeStats;
+        const segs=stats.samples.map(v=>`<div class="gaze-timeline-seg ${v?'on':'off'}"></div>`).join('');
+        const msg=stats.pct>=85?'Excellent ! Tu gardes les yeux sur l\'écran.':stats.pct>=65?'Bien ! Essaie de moins regarder le clavier.':'Entraîne-toi à regarder l\'écran plutôt que tes doigts.';
+        return`<div class="gaze-bar-section">
+          <div class="gaze-bar-title">👁 Suivi du regard</div>
+          <div class="gaze-timeline">${segs}</div>
+          <div class="gaze-bar-stats">
+            <span><span class="gaze-dot" style="background:#1FA971;display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Écran <b>${stats.pct}%</b></span>
+            <span><span class="gaze-dot" style="background:#E5484D;display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Clavier <b>${100-stats.pct}%</b></span>
+            <span style="margin-left:auto;color:var(--muted);font-size:12px">${msg}</span>
+          </div>
+        </div>`;
       })()}
       <div class="kb-wrap">${kbHTML}<div class="kb-space${next===' '?' on':''}">espace</div></div>
     </div>`;
@@ -4038,7 +4031,7 @@ const app={
   gazeToggle(){
     const g=this._gaze;
     if(g.enabled){
-      g.enabled=false;g.active=false;g.permError=null;
+      g.enabled=false;g.active=false;g._wgRunning=false;g.permError=null;
       try{webgazer.end();}catch{}
       this.renderCurrent();
     } else {
@@ -4070,7 +4063,28 @@ const app={
     document.getElementById('gaze-modal-overlay')?.remove();
     const g=this._gaze;g.enabled=true;g.permError=null;
     this.renderCurrent();
-    this._gazeLoadLib();// pré-charge la lib sans démarrer WebGazer
+    this._gazeBegin();// démarre WebGazer maintenant pendant que l'user reprend le texte (~3s)
+  },
+  async _gazeBegin(){
+    const g=this._gaze;if(g._wgRunning)return;
+    const ok=await this._gazeLoadLib();if(!ok)return;
+    try{
+      webgazer
+        .setRegression('weightedRidge')
+        .setTracker('TFFaceMesh')
+        .setCameraConstraints({width:{ideal:1280},height:{ideal:720},facingMode:'user'})
+        .showVideoPreview(false)
+        .showPredictionPoints(false)
+        .saveDataAcrossSessions(true);
+      webgazer.params.smoothingEnabled=false;
+      await webgazer.begin();
+      g._wgRunning=true;
+    }catch(err){
+      if(err&&err.name==='NotAllowedError')g.permError='Accès caméra refusé. Active la caméra dans les paramètres de ton navigateur.';
+      else g.permError='Impossible d\'activer le suivi du regard.';
+      g.enabled=false;
+      this.renderCurrent();
+    }
   },
   async _gazeLoadLib(){
     const g=this._gaze;if(g.loaded)return true;
@@ -4084,35 +4098,24 @@ const app={
   },
   async _gazeStart(){
     const g=this._gaze;if(!g.enabled||g.active)return;
-    const ok=await this._gazeLoadLib();if(!ok)return;
+    // Si WebGazer n'a pas encore fini de démarrer, on attend
+    if(!g._wgRunning){
+      await this._gazeBegin();
+      if(!g._wgRunning)return;
+    }
     g.samples=[];g.permError=null;
     const vw=window.innerWidth,vh=window.innerHeight;
-    try{
-      webgazer
-        .setRegression('weightedRidge')
-        .setTracker('TFFaceMesh')
-        .setCameraConstraints({width:{ideal:1280},height:{ideal:720},facingMode:'user'})
-        .setGazeListener((p)=>{
-          if(!g.active)return;
-          const onScreen=p&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
-          g.samples.push(onScreen?1:0);
-        })
-        .showVideoPreview(false)
-        .showPredictionPoints(false)
-        .saveDataAcrossSessions(true);
-      webgazer.params.smoothingEnabled=false;
-      await webgazer.begin();
-      g.active=true;// seulement après begin() pour éviter les race conditions
-    }catch(err){
-      if(err&&err.name==='NotAllowedError')g.permError='Accès caméra refusé. Active la caméra dans les paramètres de ton navigateur.';
-      else g.permError='Impossible d\'activer le suivi du regard.';
-      g.enabled=false;
-      this.renderCurrent();
-    }
+    webgazer.setGazeListener((p)=>{
+      if(!g.active)return;
+      const onScreen=p&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
+      g.samples.push(onScreen?1:0);
+    });
+    g.active=true;
   },
   _gazeStop(){
     const g=this._gaze;if(!g.active)return;
-    g.active=false;
+    g.active=false;g._wgRunning=false;
+    try{webgazer.setGazeListener(null);}catch{}
     try{webgazer.end();}catch{}
   },
   _gazeStats(){
