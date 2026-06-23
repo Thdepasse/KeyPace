@@ -990,6 +990,14 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{
   el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});
 });
 
+// Bouton "Quitter" des jeux : écouteur délégué sur pointerdown.
+// Indispensable car les jeux re-rendent tout le HTML en continu (le bouton est
+// recréé entre l'appui et le relâché, donc un 'click' classique ne se déclenche pas).
+document.addEventListener('pointerdown',e=>{
+  const q=e.target.closest&&e.target.closest('.btn-quit');
+  if(q&&app&&app.activeGame){e.preventDefault();app.exitActiveGame();}
+});
+
 function loginUser(username){
   closeModal('auth-modal');
   document.getElementById('auth-password').value='';
