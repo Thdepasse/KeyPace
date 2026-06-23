@@ -345,6 +345,8 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .intro-start-btn{width:100%;padding:14px;border-radius:12px;background:var(--accent);color:#fff;border:none;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s}
 .intro-start-btn:hover{opacity:.88}
 /* LESSON TUTORIAL */
+#lesson-tuto-body{scrollbar-width:none;-ms-overflow-style:none}
+#lesson-tuto-body::-webkit-scrollbar{display:none;width:0;height:0}
 .tuto-badge{display:inline-block;background:rgba(255,77,46,0.1);color:var(--accent);font-size:12px;font-weight:700;padding:4px 11px;border-radius:20px;margin-bottom:10px;letter-spacing:.01em}
 .tuto-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;line-height:1.15;margin-bottom:10px}
 .tuto-intro{font-size:15px;color:#7A7365;line-height:1.55;margin-bottom:18px}
@@ -1170,10 +1172,10 @@ const CURRICULUM=[
   /* ── MODULE 1 : touches de repos ─────────────────────────────────────────── */
   {name:'1. Position de base',lessons:[
     // r1 : f j seulement
-    {id:'r1',title:'F et J — les index',keys:'f j',
-     tip:'Bienvenue ! Pose tes index sur F (main gauche) et J (main droite) — ce sont les touches de référence, les deux petits reliefs que tu sens sous les doigts. Ne regarde pas ton clavier : fais confiance à ta mémoire musculaire.',
+    {id:'r1',title:'F et J, les index',keys:'f j',
+     tip:'Bienvenue ! Pose tes index sur F (main gauche) et J (main droite) : ce sont les touches de référence, les deux petits reliefs que tu sens sous les doigts. Ne regarde pas ton clavier : fais confiance à ta mémoire musculaire.',
      tuto:{
-       intro:"Bienvenue dans ta toute première leçon ! Prends 30 secondes pour comprendre la base de la frappe à dix doigts — c'est ce qui va tout changer pour la suite.",
+       intro:"Bienvenue dans ta toute première leçon ! Prends 30 secondes pour comprendre la base de la frappe à dix doigts, c'est ce qui va tout changer pour la suite.",
        rules:[
          {icon:'🤲',t:'La position de repos',d:"Pose tes huit doigts sur la rangée du milieu. Les deux index vont sur F et J : tu sens deux petits reliefs sous les doigts, c'est ton point de repère pour ne jamais regarder le clavier."},
          {icon:'👁️',t:"Garde les yeux sur l'écran",d:"Ne regarde pas tes doigts. C'est en arrêtant de regarder le clavier que tu construis ta mémoire musculaire — celle qui te rendra vraiment rapide."},
@@ -1527,18 +1529,14 @@ const app={
     const rules=(t.rules||[]).map(r=>`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>${r.t}</strong>${r.d}</div></div>`).join('');
     document.getElementById('lesson-tuto-body').innerHTML=`
       <button class="modal-close" onclick="closeModal('lesson-tuto-modal')">✕</button>
-      <div class="tuto-badge">Leçon ${num} / ${total}${les.module?' · '+les.module:''}</div>
+      <div class="tuto-badge">${les.module||''}</div>
       <h2 class="tuto-title">${les.title}</h2>
       ${t.intro?`<p class="tuto-intro">${t.intro}</p>`:''}
       <div class="tuto-kb">${kb}</div>
       ${cards?`<div class="tuto-keys-info">${cards}</div>`:''}
       ${rules?`<div class="intro-rules" style="margin-bottom:18px">${rules}</div>`:''}
       ${t.tip?`<div class="lesson-tip"><div class="lesson-tip-icon">🎯</div><div>${t.tip}</div></div>`:''}
-      <button class="intro-start-btn" onclick="app.confirmTuto()">Commencer la leçon →</button>
-      <div class="tuto-foot">
-        <button class="tuto-skip" onclick="app.skipTuto()">Passer l'explication</button>
-        <label class="tuto-noshow"><input type="checkbox" id="tuto-noshow-cb"> Ne plus afficher</label>
-      </div>`;
+      <button class="intro-start-btn" onclick="app.confirmTuto()">Commencer la leçon →</button>`;
     openModal('lesson-tuto-modal');
   },
   confirmTuto(){this._closeTutoAndStart();},
