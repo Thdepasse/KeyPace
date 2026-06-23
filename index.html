@@ -589,7 +589,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .gaze-timeline{height:10px;border-radius:6px;overflow:hidden;display:flex;gap:1px;margin-bottom:8px}
 .gaze-timeline-seg{flex:1;min-width:2px}
 .gaze-timeline-seg.on{background:#1FA971}
-.gaze-timeline-seg.off{background:#E8729A}
+.gaze-timeline-seg.off{background:#E5484D}
 .gaze-stat-row{display:flex;gap:12px;font-size:13px}
 .gaze-stat{display:flex;align-items:center;gap:4px;font-weight:600}
 .gaze-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -3931,9 +3931,8 @@ const app={
       g.samples.push(onScreen?1:0);
     };
     try{
-      webgazer.setGazeListener(listener).showVideoPreview(true).showPredictionPoints(false);
-      if(!g._started){await webgazer.begin();g._started=true;}
-      else{webgazer.resume();}
+      webgazer.setGazeListener(listener).showVideoPreview(false).showPredictionPoints(false);
+      await webgazer.begin();
       g.active=true;
     }catch(err){
       if(err&&err.name==='NotAllowedError')g.permError='Accès caméra refusé. Active la caméra dans les paramètres de ton navigateur.';
@@ -3944,8 +3943,8 @@ const app={
   },
   _gazeStop(){
     const g=this._gaze;if(!g.active)return;
-    g.active=false;
-    try{if(g._started)webgazer.pause();}catch{}
+    g.active=false;g._started=false;
+    try{webgazer.end();}catch{}
   },
   _gazeStats(){
     const g=this._gaze;if(!g.samples.length)return null;
@@ -3961,7 +3960,7 @@ const app={
       <div class="gaze-timeline">${segs}</div>
       <div class="gaze-stat-row">
         <div class="gaze-stat"><div class="gaze-dot" style="background:#1FA971"></div>Écran : <b>${onPct}%</b></div>
-        <div class="gaze-stat"><div class="gaze-dot" style="background:#E8729A"></div>Clavier : <b>${offPct}%</b></div>
+        <div class="gaze-stat"><div class="gaze-dot" style="background:#E5484D"></div>Clavier : <b>${offPct}%</b></div>
         <div style="margin-left:auto;font-size:12px;color:var(--muted)">${onPct>=85?'Excellent ! Tu ne regardes presque pas ton clavier.':onPct>=65?'Bien ! Essaie de garder les yeux sur l\'écran.':'Essaie de regarder l\'écran plutôt que tes doigts.'}</div>
       </div>
     </div>`;
