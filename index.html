@@ -1698,7 +1698,7 @@ const app={
       openModal('upgrade-modal');return;
     }
     const les=this.lessonById(id);
-    if(les&&les.tuto&&localStorage.getItem('kp_tuto_skip')!=='1'){
+    if(les&&les.tuto){
       this.openLessonTuto(id);return;
     }
     if(les&&les.intro&&!localStorage.getItem('kp_intro_seen')){
@@ -1741,8 +1741,6 @@ const app={
   confirmTuto(){this._closeTutoAndStart();},
   skipTuto(){this._closeTutoAndStart();},
   _closeTutoAndStart(){
-    const cb=document.getElementById('tuto-noshow-cb');
-    if(cb&&cb.checked)localStorage.setItem('kp_tuto_skip','1');
     closeModal('lesson-tuto-modal');
     const id=this._pendingLessonId;this._pendingLessonId=null;
     if(this.sess&&this.sess.lessonId===id&&this.view==='lessons')return; // déjà en cours : juste fermer
