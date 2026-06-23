@@ -625,7 +625,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .gaze-result{margin-top:14px;padding:14px 16px;background:var(--light);border-radius:12px;text-align:left}
 .gaze-result-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .gaze-timeline{height:10px;border-radius:6px;overflow:hidden;display:flex;gap:1px;margin-bottom:8px}
-.gaze-timeline-seg{flex:1;min-width:2px}
+.gaze-timeline-seg{flex:1;min-width:0}
 .gaze-timeline-seg.on{background:#1FA971}
 .gaze-timeline-seg.off{background:#E5484D}
 .gaze-stat-row{display:flex;gap:12px;font-size:13px}
@@ -4019,7 +4019,7 @@ const app={
   gazeToggle(){
     const g=this._gaze;
     if(g.enabled){
-      g.enabled=false;g.active=false;g._started=false;g.permError=null;
+      g.enabled=false;g.active=false;g._preloaded=false;g.permError=null;
       try{webgazer.end();}catch{}
       this.renderCurrent();
     } else {
@@ -4047,10 +4047,37 @@ const app={
     document.body.appendChild(overlay);
     overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
   },
-  _gazeConfirm(){
+  async _gazeConfirm(){
     document.getElementById('gaze-modal-overlay')?.remove();
     const g=this._gaze;g.enabled=true;g.permError=null;
     this.renderCurrent();
+    // Pré-initialise WebGazer immédiatement pour ne pas perdre les premières secondes
+    const ok=await this._gazeLoadLib();
+    if(!ok)return;
+    g.samples=[];
+    const vw=window.innerWidth,vh=window.innerHeight;
+    try{
+      webgazer
+        .setRegression('weightedRidge')
+        .setTracker('TFFaceMesh')
+        .setCameraConstraints({width:{ideal:1280},height:{ideal:720},facingMode:'user'})
+        .setGazeListener((p)=>{
+          if(!g.active)return;
+          const onScreen=p&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
+          g.samples.push(onScreen?1:0);
+        })
+        .showVideoPreview(false)
+        .showPredictionPoints(false)
+        .saveDataAcrossSessions(true);
+      webgazer.params.smoothingEnabled=false;
+      await webgazer.begin();
+      g._preloaded=true;
+    }catch(err){
+      if(err&&err.name==='NotAllowedError')g.permError='Accès caméra refusé.';
+      else g.permError='Impossible d\'activer la caméra.';
+      g.enabled=false;
+      this.renderCurrent();
+    }
   },
   async _gazeLoadLib(){
     const g=this._gaze;if(g.loaded)return true;
@@ -4064,20 +4091,24 @@ const app={
   },
   async _gazeStart(){
     const g=this._gaze;if(!g.enabled||g.active)return;
+    if(g._preloaded){
+      // WebGazer déjà initialisé depuis _gazeConfirm, on active juste l'enregistrement
+      g.active=true;g.samples=[];return;
+    }
+    // Fallback si _gazeConfirm n'avait pas encore fini
     const ok=await this._gazeLoadLib();if(!ok)return;
     g.samples=[];g.permError=null;
     const vw=window.innerWidth,vh=window.innerHeight;
-    const listener=(p)=>{
-      if(!g.active)return;
-      const onScreen=p&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
-      g.samples.push(onScreen?1:0);
-    };
     try{
       webgazer
         .setRegression('weightedRidge')
         .setTracker('TFFaceMesh')
         .setCameraConstraints({width:{ideal:1280},height:{ideal:720},facingMode:'user'})
-        .setGazeListener(listener)
+        .setGazeListener((p)=>{
+          if(!g.active)return;
+          const onScreen=p&&p.x>=0&&p.x<=vw&&p.y>=0&&p.y<=vh*0.75;
+          g.samples.push(onScreen?1:0);
+        })
         .showVideoPreview(false)
         .showPredictionPoints(false)
         .saveDataAcrossSessions(true);
@@ -4087,19 +4118,26 @@ const app={
     }catch(err){
       if(err&&err.name==='NotAllowedError')g.permError='Accès caméra refusé. Active la caméra dans les paramètres de ton navigateur.';
       else g.permError='Impossible d\'activer le suivi du regard.';
-      g.enabled=false;g._started=false;localStorage.removeItem('gaze-enabled');
+      g.enabled=false;
       this.renderCurrent();
     }
   },
   _gazeStop(){
-    const g=this._gaze;if(!g.active)return;
-    g.active=false;g._started=false;
+    const g=this._gaze;if(!g.active&&!g._preloaded)return;
+    g.active=false;g._preloaded=false;
     try{webgazer.end();}catch{}
   },
   _gazeStats(){
     const g=this._gaze;if(!g.samples.length)return null;
     const pct=Math.round(100*g.samples.filter(v=>v===1).length/g.samples.length);
-    return{pct,samples:[...g.samples]};
+    const N=80;
+    const size=Math.max(1,Math.floor(g.samples.length/N));
+    const buckets=[];
+    for(let i=0;i<g.samples.length;i+=size){
+      const slice=g.samples.slice(i,i+size);
+      buckets.push(slice.reduce((a,v)=>a+v,0)/slice.length>=0.5?1:0);
+    }
+    return{pct,samples:buckets};
   },
   _gazeResultHTML(stats){
     if(!stats)return'';
