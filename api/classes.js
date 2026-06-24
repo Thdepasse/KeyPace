@@ -156,6 +156,18 @@ async function joinByCode(req, res) {
   return res.json({ ok: true, className: cls.name });
 }
 
+/* ── Élève : lister les classes que j'ai rejointes ── */
+async function myClasses(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const r = await sb(`/class_members?student_id=eq.${encodeURIComponent(user.id)}&select=joined_at,classes(id,name,invite_code,archived)&order=joined_at.desc`);
+  const rows = Array.isArray(r.data) ? r.data : [];
+  const classes = rows
+    .filter((m) => m.classes && !m.classes.archived)
+    .map((m) => ({ id: m.classes.id, name: m.classes.name, inviteCode: m.classes.invite_code, joinedAt: m.joined_at }));
+  return res.json({ classes });
+}
+
 /* ── Migration des classes jsonb (ancien modèle) vers les tables ── */
 async function migrateSelf(req, res) {
   const user = await userFromToken(req.body.token);
@@ -258,6 +270,7 @@ module.exports = async function handler(req, res) {
       case 'class-archive': return await classArchive(req, res);
       case 'class-detail': return await classDetail(req, res);
       case 'join-code': return await joinByCode(req, res);
+      case 'my-classes': return await myClasses(req, res);
       case 'migrate-self': return await migrateSelf(req, res);
       // legacy (ancien modèle jsonb)
       case 'join': return await legacyJoin(req, res);
@@ -265,6 +278,6 @@ module.exports = async function handler(req, res) {
       default: return res.status(400).json({ error: 'Action inconnue.' });
     }
   } catch (e) {
-    return res.status(500).json({ error: 'Erreur serveur.', detail: String((e && e.message) || e) });
+    return res.status(500).json({ error: 'Erreur serveur.' });
   }
 };

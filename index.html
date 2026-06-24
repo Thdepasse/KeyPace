@@ -824,7 +824,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <button class="nav-link" id="nav-lessons" onclick="go('lessons')">Cours<span class="underline"></span></button>
       <button class="nav-link" id="nav-games" onclick="go('games')">Jeux<span class="underline"></span></button>
       <button class="nav-link" id="nav-stats" onclick="go('stats')">Progrès<span class="underline"></span></button>
-      <button class="nav-link" id="nav-join" onclick="joinClassPrompt()" style="display:none">Rejoindre une classe<span class="underline"></span></button>
+      <button class="nav-link" id="nav-join" onclick="go('classes')" style="display:none">Classe<span class="underline"></span></button>
       <button class="nav-link" id="nav-classes" onclick="go('classes')" style="display:none">Gestion de classes<span class="underline"></span></button>
       <div id="nav-apercu" style="display:none;position:relative;align-items:center">
         <button class="nav-link" onclick="toggleApercu(event)" style="display:inline-flex">Aperçu ▾<span class="underline"></span></button>
@@ -2494,7 +2494,7 @@ const app={
       case 'lessons':this.renderLessons();break;
       case 'games':this.renderGames();break;
       case 'stats':this.renderStats();break;
-      case 'classes':this.renderClasses();break;
+      case 'classes':isTeacher()?this.renderClasses():this.renderStudentClasses();break;
     }
   },
 
@@ -4582,6 +4582,55 @@ const app={
     </div>`;
   },
 
+  async loadMyClasses(){
+    if(!currentToken){this._myClasses=[];return;}
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'my-classes',token:currentToken})});
+      this._myClasses=r.ok?((await r.json()).classes||[]):[];
+    }catch{this._myClasses=[];}
+    if(this.view==='classes'&&!isTeacher())this.renderStudentClasses();
+  },
+
+  renderStudentClasses(){
+    const pageId='page-classes';
+    if(!this._myClasses){
+      this.loadMyClasses();
+      document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
+      return;
+    }
+    const list=this._myClasses;
+    document.getElementById(pageId).innerHTML=`<div class="stats-section">
+      <div class="stats-header" style="padding-bottom:28px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+          <div><h1 style="margin-bottom:4px">Mes classes</h1><p style="margin:0">Les classes que tu as rejointes.</p></div>
+          <button class="btn-primary" style="padding:10px 20px;font-size:14px;white-space:nowrap" onclick="joinClassPrompt()">+ Rejoindre une classe</button>
+        </div>
+      </div>
+      <div style="max-width:760px;padding-bottom:60px">
+        ${list.length===0?`
+          <div style="text-align:center;padding:72px 20px;color:var(--muted)">
+            <div style="font-size:48px;margin-bottom:16px">🎓</div>
+            <div style="font-size:17px;font-weight:700;color:var(--txt);margin-bottom:8px">Tu n'as rejoint aucune classe</div>
+            <div style="font-size:14px;max-width:360px;margin:0 auto 22px;line-height:1.6">Demande son code à ton professeur, puis clique sur « Rejoindre une classe » et saisis-le.</div>
+            <button class="btn-primary" style="padding:10px 22px;font-size:14px" onclick="joinClassPrompt()">+ Rejoindre une classe</button>
+          </div>
+        `:`<div style="display:flex;flex-direction:column;gap:10px">
+          ${list.map(c=>{
+            const init=(c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+            const since=c.joinedAt?new Date(c.joinedAt).toLocaleDateString('fr-FR'):'';
+            return`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 20px;display:flex;align-items:center;gap:16px">
+              <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--accent);flex-shrink:0;font-family:'JetBrains Mono',monospace">${init}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:16px;font-weight:700;color:var(--txt)">${c.name}</div>
+                <div style="font-size:13px;color:var(--muted);margin-top:2px">Rejointe le ${since}</div>
+              </div>
+              <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em">${c.inviteCode||''}</div>
+            </div>`;
+          }).join('')}
+        </div>`}
+      </div></div>`;
+  },
+
   renderClasses(){
     if(!isTeacher()){go('home');return;}
     const etab=this.etab;
@@ -4742,7 +4791,7 @@ const app={
       if(mr.ok){const md=await mr.json();if(md&&md.role&&this.stats&&this.stats.role!==md.role){this.stats.role=md.role;const ss=JSON.parse(localStorage.getItem('klak_session')||'{}');ss.role=md.role;localStorage.setItem('klak_session',JSON.stringify(ss));updateNavUser();}}
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'teacher-overview',token:currentToken})});
       if(r.ok){const data=await r.json();data.loaded=true;this.etab=data;}
-      else{failed=true;const d=await r.json().catch(()=>({}));errMsg=(d.error||('Erreur '+r.status))+(d.detail?' — '+d.detail:'');}
+      else{failed=true;const d=await r.json().catch(()=>({}));errMsg=d.error||('Erreur '+r.status);}
     }catch(e){failed=true;errMsg='Erreur réseau.';}
     this._etabLoading=false;
     if(failed&&(!this.etab||this.etab.error)){this.etab={loaded:true,error:errMsg,classes:[],global:{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null},series:[]};}
@@ -4865,6 +4914,7 @@ async function startClassJoin(code){
       const d2=await r2.json();
       if(!r2.ok){b.disabled=false;b.textContent='Rejoindre la classe';const e=document.getElementById('cj-error');e.textContent=d2.error||'Erreur.';e.style.display='block';return;}
       overlay.querySelector('div').innerHTML=`<div style="font-size:40px;margin-bottom:12px">✓</div><h2 style="margin:0 0 8px">Tu as rejoint la classe « ${d2.className} » !</h2><p style="color:var(--muted);font-size:14px;margin:0 0 24px">Ta progression sera visible par ton professeur.</p><button onclick="this.closest('[style*=fixed]').remove()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer">Continuer</button>`;
+      app._myClasses=null;if(app.view==='classes'&&!isTeacher())app.renderStudentClasses();
     };
   }catch{document.getElementById('cj-name').textContent='Erreur réseau.';}
 }
