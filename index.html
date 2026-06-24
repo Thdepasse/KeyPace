@@ -1119,7 +1119,14 @@ function logout(){
 function updateNavUser(){
   const guest=document.getElementById('nav-guest');
   const logged=document.getElementById('nav-logged');
-  if(!currentUser){guest.style.display='flex';logged.style.display='none';return;}
+  if(!currentUser){
+    guest.style.display='flex';logged.style.display='none';
+    // Restaurer la nav publique par défaut (notamment après déconnexion d'un compte prof).
+    ['nav-test','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='';});
+    const cb=document.getElementById('nav-classes');if(cb)cb.style.display='none';
+    const ap=document.getElementById('nav-apercu');if(ap)ap.style.display='none';
+    return;
+  }
   guest.style.display='none';logged.style.display='block';
   document.getElementById('nav-username').textContent=currentUser;
   document.getElementById('nav-avatar').textContent=currentUser[0].toUpperCase();
