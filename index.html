@@ -4774,6 +4774,7 @@ const app={
     }catch{document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">Erreur réseau.</div></div>`;return;}
     const students=d.students||[];
     const agg=d.agg||{};
+    this._classDetail=d;
     const link=`${location.origin}?classe=${d.inviteCode}`;
     let asg=[];
     try{const ar=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-list',token:currentToken,classId:id})});if(ar.ok)asg=(await ar.json()).assignments||[];}catch{}
@@ -4800,7 +4801,11 @@ const app={
         <button onclick="app.renderClasses()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Toutes les classes</button>
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
           <div><h1 style="margin-bottom:4px">${d.name}</h1><p style="margin:0">${students.length} élève${students.length!==1?'s':''}</p></div>
-          <button onclick="app.viewClass('${d.id}')" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt)">↻ Actualiser</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="app.exportClassCSV()" ${students.length?'':'disabled'} style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:${students.length?'pointer':'not-allowed'};color:var(--txt);opacity:${students.length?'1':'.5'}">⬇ CSV</button>
+            <button onclick="app.exportClassPDF()" ${students.length?'':'disabled'} style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:${students.length?'pointer':'not-allowed'};color:var(--txt);opacity:${students.length?'1':'.5'}">⬇ PDF</button>
+            <button onclick="app.viewClass('${d.id}')" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt)">↻ Actualiser</button>
+          </div>
         </div>
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
@@ -4910,6 +4915,50 @@ const app={
     if(!confirm('Supprimer ce devoir ?'))return;
     try{await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-delete',token:currentToken,assignmentId:id})});}catch{}
     this.viewClass(classId);
+  },
+
+  exportClassCSV(){
+    const d=this._classDetail;if(!d||!(d.students||[]).length)return;
+    const rows=[['Élève','Vitesse moy (mpm)','Précision moy (%)','Tests','Leçons validées','Inactivité (jours)','Inscrit le']];
+    d.students.forEach(s=>{
+      rows.push([s.username, s.avgWpm==null?'':s.avgWpm, s.avgAcc==null?'':s.avgAcc, s.sessions||0, s.clearedLessons||0, s.daysSinceActive==null?'':s.daysSinceActive, s.joinedAt?new Date(s.joinedAt).toLocaleDateString('fr-FR'):'']);
+    });
+    const csv=rows.map(r=>r.map(c=>{const v=String(c);return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(';')).join('\r\n');
+    const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='keypace-'+(d.name||'classe').replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'.csv';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  },
+
+  exportClassPDF(){
+    const d=this._classDetail;if(!d||!(d.students||[]).length)return;
+    const agg=d.agg||{};
+    const date=new Date().toLocaleDateString('fr-FR');
+    const esc=v=>String(v==null?'':v).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    const rowsHtml=d.students.map(s=>{
+      const last=s.daysSinceActive==null?'jamais':s.daysSinceActive===0?"aujourd'hui":s.daysSinceActive+' j';
+      return`<tr><td>${esc(s.username)}</td><td class="n">${s.avgWpm==null?'—':s.avgWpm}</td><td class="n">${s.avgAcc==null?'—':s.avgAcc+'%'}</td><td class="n">${s.sessions||0}</td><td class="n">${s.clearedLessons||0}</td><td class="n">${last}</td></tr>`;
+    }).join('');
+    const html='<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>KeyPace — '+esc(d.name)+'</title>'
+      +'<style>*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#16140F;padding:36px;margin:0}'
+      +'.hd{display:flex;align-items:center;gap:10px;margin-bottom:4px}.logo{width:30px;height:30px;border-radius:8px;background:#FF4D2E;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}'
+      +'h1{font-size:24px;margin:14px 0 2px}.sub{color:#7A7365;font-size:13px;margin:0 0 20px}'
+      +'.cards{display:flex;gap:12px;margin-bottom:22px}.card{flex:1;border:1px solid #E7E1D5;border-radius:12px;padding:12px 14px}.card .l{font-size:10px;font-weight:700;color:#8A8275;letter-spacing:.05em}.card .v{font-size:22px;font-weight:800;margin-top:4px}'
+      +'table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #E7E1D5}th{font-size:11px;color:#8A8275;text-transform:uppercase;letter-spacing:.04em}td.n,th.n{text-align:center}'
+      +'@media print{body{padding:0}}</style></head><body>'
+      +'<div class="hd"><div class="logo">K</div><div style="font-weight:800;font-size:18px">KeyPace</div></div>'
+      +'<h1>'+esc(d.name)+'</h1><p class="sub">Rapport de classe · '+d.students.length+' élève(s) · édité le '+date+'</p>'
+      +'<div class="cards">'
+      +'<div class="card"><div class="l">ÉLÈVES ACTIFS / SEM.</div><div class="v">'+(agg.activeThisWeek||0)+'</div></div>'
+      +'<div class="card"><div class="l">VITESSE MOY.</div><div class="v">'+(agg.avgWpm!=null?agg.avgWpm+' mpm':'—')+'</div></div>'
+      +'<div class="card"><div class="l">PRÉCISION MOY.</div><div class="v">'+(agg.avgAcc!=null?agg.avgAcc+' %':'—')+'</div></div>'
+      +'</div>'
+      +'<table><thead><tr><th>Élève</th><th class="n">Vitesse</th><th class="n">Précision</th><th class="n">Tests</th><th class="n">Leçons</th><th class="n">Dernière activité</th></tr></thead><tbody>'+rowsHtml+'</tbody></table>'
+      +'<script>window.onload=function(){window.print();}<\/script></body></html>';
+    const w=window.open('','_blank');
+    if(!w){alert('Autorise les fenêtres pop-up pour exporter en PDF.');return;}
+    w.document.write(html);w.document.close();
   },
 
   async viewStudent(classId,studentId){
