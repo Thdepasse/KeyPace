@@ -824,6 +824,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <button class="nav-link" id="nav-lessons" onclick="go('lessons')">Cours<span class="underline"></span></button>
       <button class="nav-link" id="nav-games" onclick="go('games')">Jeux<span class="underline"></span></button>
       <button class="nav-link" id="nav-stats" onclick="go('stats')">Progrès<span class="underline"></span></button>
+      <button class="nav-link" id="nav-join" onclick="joinClassPrompt()" style="display:none">Rejoindre une classe<span class="underline"></span></button>
       <button class="nav-link" id="nav-classes" onclick="go('classes')" style="display:none">Gestion de classes<span class="underline"></span></button>
       <div id="nav-apercu" style="display:none;position:relative;align-items:center">
         <button class="nav-link" onclick="toggleApercu(event)" style="display:inline-flex">Aperçu ▾<span class="underline"></span></button>
@@ -1127,6 +1128,7 @@ function updateNavUser(){
     ['nav-test','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='';});
     const cb=document.getElementById('nav-classes');if(cb)cb.style.display='none';
     const ap=document.getElementById('nav-apercu');if(ap)ap.style.display='none';
+    const jb=document.getElementById('nav-join');if(jb)jb.style.display='none';
     return;
   }
   guest.style.display='none';logged.style.display='block';
@@ -1144,6 +1146,7 @@ function updateNavUser(){
   if(classesBtn)classesBtn.style.display=teacher?'inline-flex':'none';
   ['nav-test','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=teacher?'none':'';});
   const apercu=document.getElementById('nav-apercu');if(apercu)apercu.style.display=teacher?'inline-flex':'none';
+  const joinBtn=document.getElementById('nav-join');if(joinBtn)joinBtn.style.display=teacher?'none':'inline-flex';
 }
 
 function isTeacher(){const r=(typeof app!=='undefined')&&app.stats&&app.stats.role;return r==='prof'||r==='admin'||r==='etablissement';}
@@ -4833,42 +4836,49 @@ async function handleClassJoin(){
   }
 }
 
+async function startClassJoin(code){
+  if(!code)return;
+  if(!currentUser){openAuth('login','Connecte-toi avec ton adresse scolaire pour rejoindre la classe.',()=>startClassJoin(code));return;}
+  if(!currentToken)return;
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center';
+  overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:90%;text-align:center">
+    <div style="font-size:40px;margin-bottom:12px">🏫</div>
+    <h2 style="margin:0 0 8px;font-size:20px">Rejoindre une classe</h2>
+    <p style="color:var(--muted);font-size:14px;margin:0 0 24px" id="cj-name">Vérification du code « ${code} »…</p>
+    <div id="cj-actions" style="display:none;gap:10px;flex-direction:column">
+      <button id="cj-confirm" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;width:100%">Rejoindre la classe</button>
+      <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px;cursor:pointer;width:100%">Annuler</button>
+    </div>
+    <div id="cj-error" style="color:#E5484D;font-size:13px;margin-top:12px;display:none"></div>
+  </div>`;
+  document.body.appendChild(overlay);
+  try{
+    const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join-code',token:currentToken,code,preview:true})});
+    const d=await r.json();
+    if(!r.ok){document.getElementById('cj-name').textContent=d.error||'Code invalide.';return;}
+    document.getElementById('cj-name').textContent=`Tu vas rejoindre la classe « ${d.className} ».`;
+    document.getElementById('cj-actions').style.display='flex';
+    document.getElementById('cj-confirm').onclick=async()=>{
+      const b=document.getElementById('cj-confirm');b.disabled=true;b.textContent='En cours…';
+      const r2=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join-code',token:currentToken,code})});
+      const d2=await r2.json();
+      if(!r2.ok){b.disabled=false;b.textContent='Rejoindre la classe';const e=document.getElementById('cj-error');e.textContent=d2.error||'Erreur.';e.style.display='block';return;}
+      overlay.querySelector('div').innerHTML=`<div style="font-size:40px;margin-bottom:12px">✓</div><h2 style="margin:0 0 8px">Tu as rejoint la classe « ${d2.className} » !</h2><p style="color:var(--muted);font-size:14px;margin:0 0 24px">Ta progression sera visible par ton professeur.</p><button onclick="this.closest('[style*=fixed]').remove()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer">Continuer</button>`;
+    };
+  }catch{document.getElementById('cj-name').textContent='Erreur réseau.';}
+}
+
+function joinClassPrompt(){
+  const code=prompt('Entre le code de ta classe (donné par ton professeur, ex. ABC123) :');
+  if(code&&code.trim())startClassJoin(code.trim().toUpperCase());
+}
+
 async function handleClassCodeJoin(){
   const code=new URLSearchParams(location.search).get('classe');
   if(!code)return;
   history.replaceState(null,'',location.pathname);
-  const doJoin=async()=>{
-    if(!currentToken)return;
-    const overlay=document.createElement('div');
-    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center';
-    overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:90%;text-align:center">
-      <div style="font-size:40px;margin-bottom:12px">🏫</div>
-      <h2 style="margin:0 0 8px;font-size:20px">Rejoindre une classe</h2>
-      <p style="color:var(--muted);font-size:14px;margin:0 0 24px" id="cj-name">Vérification en cours…</p>
-      <div id="cj-actions" style="display:none;gap:10px;flex-direction:column">
-        <button id="cj-confirm" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;width:100%">Rejoindre la classe</button>
-        <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px;cursor:pointer;width:100%">Annuler</button>
-      </div>
-      <div id="cj-error" style="color:#E5484D;font-size:13px;margin-top:12px;display:none"></div>
-    </div>`;
-    document.body.appendChild(overlay);
-    try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join-code',token:currentToken,code,preview:true})});
-      const d=await r.json();
-      if(!r.ok){document.getElementById('cj-name').textContent=d.error||'Code invalide.';return;}
-      document.getElementById('cj-name').textContent=`Tu vas rejoindre la classe « ${d.className} ».`;
-      document.getElementById('cj-actions').style.display='flex';
-      document.getElementById('cj-confirm').onclick=async()=>{
-        const b=document.getElementById('cj-confirm');b.disabled=true;b.textContent='En cours…';
-        const r2=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join-code',token:currentToken,code})});
-        const d2=await r2.json();
-        if(!r2.ok){b.disabled=false;b.textContent='Rejoindre la classe';const e=document.getElementById('cj-error');e.textContent=d2.error||'Erreur.';e.style.display='block';return;}
-        overlay.querySelector('div').innerHTML=`<div style="font-size:40px;margin-bottom:12px">✓</div><h2 style="margin:0 0 8px">Tu as rejoint la classe !</h2><p style="color:var(--muted);font-size:14px;margin:0 0 24px">Ta progression sera visible par ton professeur.</p><button onclick="this.closest('[style*=fixed]').remove()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer">Continuer</button>`;
-      };
-    }catch{document.getElementById('cj-name').textContent='Erreur réseau.';}
-  };
-  if(currentUser){doJoin();}
-  else{openAuth('login','Connecte-toi avec ton adresse scolaire pour rejoindre la classe.',()=>{doJoin();});}
+  startClassJoin(code.toUpperCase());
 }
 
 async function loadProgressFromServer(){
