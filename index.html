@@ -4043,6 +4043,10 @@ const app={
     if(document.getElementById('settings-overlay'))return;
     const user=currentUser||'';
     const plan=this.stats&&this.stats.plan?this.stats.plan:'free';
+    const role=this.stats&&this.stats.role;
+    const isEtab=role==='etablissement';
+    const planLabel=isEtab?'Compte Établissement':plan==='expert'?'Compte Expert':'Compte Gratuit';
+    const planColor=isEtab?'var(--accent)':plan==='expert'?'#7C3AED':'var(--muted)';
     const calibRaw=localStorage.getItem('keypace-gaze-calib');
     const calibData=calibRaw?JSON.parse(calibRaw):null;
     const calibrated=!!calibData;
@@ -4050,8 +4054,13 @@ const app={
     overlay.className='settings-overlay';overlay.id='settings-overlay';
     overlay.innerHTML=`<div class="settings-modal">
       <div class="settings-modal-head">
-        <div class="settings-modal-avatar">${user?user[0].toUpperCase():'?'}</div>
-        <div class="settings-modal-head-info"><strong>${user||'Invité'}</strong><span>${plan==='expert'?'Compte Expert':'Compte Gratuit'}</span></div>
+        <div class="settings-modal-avatar" style="background:${isEtab?'var(--accent)':plan==='expert'?'#7C3AED':'var(--accent)'}">${user?user[0].toUpperCase():'?'}</div>
+        <div class="settings-modal-head-info">
+          <strong>${user||'Invité'}</strong>
+          <span style="display:flex;align-items:center;gap:6px;margin-top:3px">
+            <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.04em;background:${isEtab?'rgba(255,77,46,0.1)':plan==='expert'?'rgba(124,58,237,0.1)':'var(--light)'};color:${planColor}">${planLabel.toUpperCase()}</span>
+          </span>
+        </div>
         <button class="settings-modal-close" onclick="app.closeSettings()">✕</button>
       </div>
       <div class="settings-section" id="settings-gaze-section">
@@ -4071,6 +4080,14 @@ const app={
       <div class="settings-section">
         <div class="settings-section-title">Compte</div>
         <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>Mot de passe</strong>
+            <span>Recevoir un lien de réinitialisation par email</span>
+          </div>
+          <button class="settings-btn" id="reset-pw-btn" onclick="app.requestPasswordReset(this)">Réinitialiser</button>
+        </div>
+        <div id="reset-pw-msg" style="display:none;font-size:13px;margin-top:6px;padding:10px 12px;border-radius:10px"></div>
+        <div class="settings-row" style="margin-top:10px">
           <div class="settings-row-info"><strong>Déconnexion</strong><span>Te déconnecter de KeyPace</span></div>
           <button class="settings-btn danger" onclick="app.closeSettings();logout()">Se déconnecter</button>
         </div>
@@ -4081,6 +4098,80 @@ const app={
     if(section==='gaze'){setTimeout(()=>{const el=document.getElementById('settings-gaze-section');if(el)el.scrollIntoView({behavior:'smooth'});},100);}
   },
   closeSettings(){document.getElementById('settings-overlay')?.remove();},
+  async requestPasswordReset(btn){
+    if(!currentToken)return;
+    btn.disabled=true;btn.textContent='Envoi…';
+    const msg=document.getElementById('reset-pw-msg');
+    try{
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'reset-request',token:currentToken})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+      msg.style.display='block';
+      msg.style.background='rgba(31,169,113,0.1)';msg.style.color='#1FA971';
+      msg.textContent='Email envoyé ! Vérifie ta boîte mail pour choisir un nouveau mot de passe.';
+      btn.textContent='Email envoyé';
+    }catch(e){
+      msg.style.display='block';
+      msg.style.background='rgba(229,72,77,0.1)';msg.style.color='#E5484D';
+      msg.textContent=e.message;
+      btn.disabled=false;btn.textContent='Réinitialiser';
+    }
+  },
+  showResetPasswordModal(resetToken){
+    const overlay=document.createElement('div');
+    overlay.className='settings-overlay';overlay.id='reset-pw-overlay';
+    overlay.style.zIndex='1200';
+    overlay.innerHTML=`<div class="settings-modal" style="max-width:400px">
+      <div class="settings-modal-head">
+        <div class="settings-modal-avatar">🔑</div>
+        <div class="settings-modal-head-info"><strong>Nouveau mot de passe</strong><span style="color:var(--muted);font-size:12px">Choisis un mot de passe sécurisé</span></div>
+      </div>
+      <div class="settings-section">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">NOUVEAU MOT DE PASSE</label>
+            <input type="password" id="reset-pw-new" placeholder="••••••••" autocomplete="new-password"
+              style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">CONFIRMER</label>
+            <input type="password" id="reset-pw-confirm" placeholder="••••••••" autocomplete="new-password"
+              style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+          </div>
+          <div id="reset-pw-modal-msg" style="display:none;font-size:13px;padding:10px 12px;border-radius:10px"></div>
+          <button id="reset-pw-submit" class="btn-primary" style="margin-top:4px" onclick="app._confirmPasswordReset('${resetToken}')">Enregistrer le nouveau mot de passe</button>
+        </div>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    // Nettoyer l'URL
+    window.history.replaceState({},'',window.location.pathname);
+  },
+  async _confirmPasswordReset(resetToken){
+    const pw=document.getElementById('reset-pw-new')?.value;
+    const pw2=document.getElementById('reset-pw-confirm')?.value;
+    const msg=document.getElementById('reset-pw-modal-msg');
+    const btn=document.getElementById('reset-pw-submit');
+    const showMsg=(text,ok)=>{msg.style.display='block';msg.style.background=ok?'rgba(31,169,113,0.1)':'rgba(229,72,77,0.1)';msg.style.color=ok?'#1FA971':'#E5484D';msg.textContent=text;};
+    if(!pw||pw.length<6)return showMsg('Le mot de passe doit faire au moins 6 caractères.',false);
+    if(pw!==pw2)return showMsg('Les mots de passe ne correspondent pas.',false);
+    btn.disabled=true;btn.textContent='Enregistrement…';
+    try{
+      const newPasswordHash=await hashPw(pw);
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'reset-confirm',resetToken,newPasswordHash})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+      showMsg('Mot de passe mis à jour ! Connexion en cours…',true);
+      const role=d.data&&d.data.role;
+      saveSession(d.username,d.plan,d.token,d.id,role||null);
+      const _preRole=role;
+      app.stats=mergeStats(_preRole?{role:_preRole}:d.data);
+      setTimeout(()=>{document.getElementById('reset-pw-overlay')?.remove();updateNavUser();app.renderCurrent();},1200);
+    }catch(e){
+      showMsg(e.message,false);
+      btn.disabled=false;btn.textContent='Enregistrer le nouveau mot de passe';
+    }
+  },
   resetCalibration(){
     localStorage.removeItem('keypace-gaze-calib');
     this.closeSettings();
@@ -4732,6 +4823,8 @@ updateNavUser();
 handlePaymentReturn();
 handleVerificationReturn();
 handleDuelReturn();
+// Réinitialisation de mot de passe via lien email (?reset=TOKEN)
+(()=>{const p=new URLSearchParams(window.location.search);const rt=p.get('reset');if(rt)setTimeout(()=>app.showResetPasswordModal(rt),300);})();
 loadProgressFromServer();
 handleClassJoin();
 // Sauvegarde immédiate de la progression à la fermeture / au changement d'onglet (la sauvegarde normale est différée)
