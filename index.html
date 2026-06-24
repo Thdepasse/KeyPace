@@ -4748,24 +4748,26 @@ const app={
           </div>
         `:`
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-            <div style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px;padding:10px 20px;border-bottom:1px solid var(--border)">
+            <div style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px 16px;padding:10px 20px;border-bottom:1px solid var(--border)">
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">ÉLÈVE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">VITESSE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">PRÉCISION</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">TESTS</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:right">DERNIÈRE ACTIVITÉ</div>
+              <div></div>
             </div>
             ${students.map(st=>{
               const wpmColor=st.avgWpm==null?'var(--muted)':st.avgWpm>=50?'#1FA971':st.avgWpm>=30?'var(--txt)':'#E5484D';
               const accColor=st.avgAcc==null?'var(--muted)':st.avgAcc>=95?'#1FA971':st.avgAcc>=80?'var(--txt)':'#E5484D';
               const last=st.daysSinceActive==null?'jamais':st.daysSinceActive===0?"aujourd'hui":st.daysSinceActive===1?'hier':'il y a '+st.daysSinceActive+' j';
               const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'#E5722B':'var(--muted)';
-              return`<div style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center">
+              return`<div onclick="app.viewStudent('${d.id}','${st.studentId}')" style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px 16px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
                 <div><div style="font-weight:600;font-size:14px">${st.username}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${st.clearedLessons} leçon${st.clearedLessons!==1?'s':''} validée${st.clearedLessons!==1?'s':''}</div></div>
                 <div style="text-align:center;font-size:16px;font-weight:800;color:${wpmColor}">${st.avgWpm!=null?st.avgWpm:'—'}</div>
                 <div style="text-align:center;font-size:16px;font-weight:800;color:${accColor}">${st.avgAcc!=null?st.avgAcc+'%':'—'}</div>
                 <div style="text-align:center;font-size:14px;color:var(--muted);font-weight:600">${st.sessions||'—'}</div>
                 <div style="text-align:right;font-size:13px;font-weight:600;color:${lastColor}">${last}</div>
+                <div style="text-align:right;color:var(--muted);font-size:14px">›</div>
               </div>`;
             }).join('')}
           </div>
@@ -4778,6 +4780,44 @@ const app={
       const btn=document.getElementById('copy-code-btn');
       if(btn){btn.textContent='✓ Copié !';setTimeout(()=>{btn.textContent='Copier le lien';},2000);}
     });
+  },
+
+  async viewStudent(classId,studentId){
+    const pageId='page-classes';
+    document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
+    let d;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'student-detail',token:currentToken,classId,studentId})});
+      d=await r.json();
+      if(!r.ok){document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">${d.error||'Erreur.'}<br><button onclick="app.viewClass('${classId}')" style="margin-top:14px;background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;cursor:pointer">← Retour</button></div></div>`;return;}
+    }catch{document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">Erreur réseau.</div></div>`;return;}
+    const s=d.summary||{};
+    const hist=(d.history||[]).slice(-20);
+    const accColor=s.avgAcc!=null&&s.avgAcc>=90?'#1FA971':(s.avgAcc!=null&&s.avgAcc<75?'#E5484D':'var(--txt)');
+    const last=s.daysSinceActive==null?'jamais':s.daysSinceActive===0?"aujourd'hui":s.daysSinceActive===1?'hier':'il y a '+s.daysSinceActive+' j';
+    const card=(label,val,unit,valColor)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">${label}</div><div style="font-size:26px;font-weight:800;color:${valColor||'var(--txt)'}">${val}<span style="font-size:13px;color:var(--muted);font-weight:500">${unit||''}</span></div></div>`;
+    const maxW=Math.max(1,...hist.map(t=>t.wpm||0));
+    const bars=hist.length?hist.map(t=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px" title="${new Date(t.t).toLocaleDateString('fr-FR')} · ${t.wpm} mpm · ${t.acc}%">
+        <div style="width:70%;background:var(--accent);border-radius:4px 4px 0 0;height:${Math.max(3,Math.round((t.wpm||0)/maxW*90))}px"></div>
+      </div>`).join(''):'<div style="color:var(--muted);font-size:13px;padding:24px 0;text-align:center;width:100%">Aucun test pour l\'instant.</div>';
+    document.getElementById(pageId).innerHTML=`<div class="stats-section">
+      <div class="stats-header" style="padding-bottom:24px">
+        <button onclick="app.viewClass('${classId}')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Retour à la classe</button>
+        <h1 style="margin-bottom:4px">${d.username}</h1>
+        <p style="margin:0">Inscrit le ${d.joinedAt?new Date(d.joinedAt).toLocaleDateString('fr-FR'):'—'} · dernière activité : ${last}</p>
+      </div>
+      <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+          ${card('SESSIONS',s.sessions||0,'')}
+          ${card('VITESSE MOY.',s.avgWpm!=null?s.avgWpm:'—',s.avgWpm!=null?' mpm':'')}
+          ${card('PRÉCISION MOY.',s.avgAcc!=null?s.avgAcc:'—',s.avgAcc!=null?' %':'',accColor)}
+          ${card('LEÇONS VALIDÉES',s.clearedLessons||0,'')}
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 22px">
+          <div style="font-size:13px;font-weight:700;margin-bottom:16px">Évolution de la vitesse (20 derniers tests)</div>
+          <div style="display:flex;align-items:flex-end;gap:5px;height:110px">${bars}</div>
+        </div>
+      </div></div>`;
   },
 
   async loadEtab(force){

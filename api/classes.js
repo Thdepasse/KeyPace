@@ -134,8 +134,32 @@ async function classDetail(req, res) {
   const pmap = await fetchProgressMap(members.map((m) => m.student_id));
   const now = Date.now();
   const datas = members.map((m) => pmap[m.student_id] || {});
-  const students = members.map((m, i) => ({ username: m.username, joinedAt: m.joined_at, ...studentSummary(datas[i], now) }));
+  const students = members.map((m, i) => ({ studentId: m.student_id, username: m.username, joinedAt: m.joined_at, ...studentSummary(datas[i], now) }));
   return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now) });
+}
+
+/* ── Détail d'un élève (pour le prof qui gère la classe) ── */
+async function studentDetail(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  const { cls, error, status } = await loadClassForManage(user, req.body.classId);
+  if (error) return res.status(status).json({ error });
+  const studentId = req.body.studentId;
+  if (!studentId) return res.status(400).json({ error: 'Élève manquant.' });
+  const mem = await sb(`/class_members?class_id=eq.${cls.id}&student_id=eq.${encodeURIComponent(studentId)}&select=student_id,joined_at,users(username)`);
+  const m = mem.data && mem.data[0];
+  if (!m) return res.status(404).json({ error: 'Élève introuvable dans cette classe.' });
+  const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(studentId)}&select=data`);
+  const data = (pr.data && pr.data[0] && pr.data[0].data) || {};
+  const tests = Array.isArray(data.tests) ? data.tests : [];
+  return res.json({
+    username: m.users ? m.users.username : '?',
+    joinedAt: m.joined_at,
+    summary: studentSummary(data, Date.now()),
+    history: tests.slice(-30),
+    keyStats: data.keyStats || null,
+  });
 }
 
 /* ── Élève : rejoindre une classe par code ── */
@@ -269,6 +293,7 @@ module.exports = async function handler(req, res) {
       case 'class-rename': return await classRename(req, res);
       case 'class-archive': return await classArchive(req, res);
       case 'class-detail': return await classDetail(req, res);
+      case 'student-detail': return await studentDetail(req, res);
       case 'join-code': return await joinByCode(req, res);
       case 'my-classes': return await myClasses(req, res);
       case 'migrate-self': return await migrateSelf(req, res);
