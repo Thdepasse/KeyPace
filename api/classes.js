@@ -192,6 +192,102 @@ async function myClasses(req, res) {
   return res.json({ classes });
 }
 
+/* ── Devoirs / exercices assignés ── */
+// Un devoir est "fait" si l'élève a validé la leçon visée (et atteint l'objectif vitesse si fixé),
+// ou, pour un test libre avec objectif, s'il a un test atteignant la vitesse demandée.
+function assignmentDone(data, a) {
+  const d = data || {};
+  if (a.lesson_id) {
+    const rec = (d.lessons || {})[a.lesson_id];
+    if (!rec || !rec.cleared) return false;
+    if (a.target_wpm) return (rec.bestWpm || 0) >= a.target_wpm;
+    return true;
+  }
+  if (a.target_wpm) {
+    return (Array.isArray(d.tests) ? d.tests : []).some((t) => (t.wpm || 0) >= a.target_wpm);
+  }
+  return false;
+}
+
+async function assignmentCreate(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  const { cls, error, status } = await loadClassForManage(user, req.body.classId);
+  if (error) return res.status(status).json({ error });
+  const title = (req.body.title || '').trim();
+  if (!title) return res.status(400).json({ error: 'Titre requis.' });
+  const row = {
+    class_id: cls.id,
+    lesson_id: req.body.lessonId || null,
+    title,
+    target_wpm: req.body.targetWpm ? parseInt(req.body.targetWpm, 10) : null,
+    due_date: req.body.dueDate || null,
+  };
+  const r = await sb('/assignments', { method: 'POST', body: JSON.stringify(row) });
+  if (!r.ok || !r.data || !r.data[0]) return res.status(500).json({ error: 'Création impossible.' });
+  return res.json({ id: r.data[0].id });
+}
+
+async function assignmentList(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const { cls, error, status } = await loadClassForManage(user, req.body.classId);
+  if (error) return res.status(status).json({ error });
+  const aR = await sb(`/assignments?class_id=eq.${cls.id}&select=*&order=created_at.desc`);
+  const assignments = Array.isArray(aR.data) ? aR.data : [];
+  const members = await membersOf(cls.id);
+  const pmap = await fetchProgressMap(members.map((m) => m.student_id));
+  const out = assignments.map((a) => ({
+    id: a.id,
+    lessonId: a.lesson_id,
+    title: a.title,
+    targetWpm: a.target_wpm,
+    dueDate: a.due_date,
+    createdAt: a.created_at,
+    total: members.length,
+    doneCount: members.filter((m) => assignmentDone(pmap[m.student_id] || {}, a)).length,
+  }));
+  return res.json({ assignments: out });
+}
+
+async function assignmentDelete(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const aR = await sb(`/assignments?id=eq.${encodeURIComponent(req.body.assignmentId)}&select=*`);
+  const a = aR.data && aR.data[0];
+  if (!a) return res.status(404).json({ error: 'Devoir introuvable.' });
+  const { error, status } = await loadClassForManage(user, a.class_id);
+  if (error) return res.status(status).json({ error });
+  await sb(`/assignments?id=eq.${a.id}`, { method: 'DELETE' });
+  return res.json({ ok: true });
+}
+
+async function myAssignments(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const memR = await sb(`/class_members?student_id=eq.${encodeURIComponent(user.id)}&select=class_id,classes(name)`);
+  const mems = Array.isArray(memR.data) ? memR.data : [];
+  const classMap = {};
+  mems.forEach((m) => { classMap[m.class_id] = m.classes ? m.classes.name : ''; });
+  const ids = Object.keys(classMap);
+  if (!ids.length) return res.json({ assignments: [] });
+  const aR = await sb(`/assignments?class_id=in.(${ids.join(',')})&select=*&order=created_at.desc`);
+  const assignments = Array.isArray(aR.data) ? aR.data : [];
+  const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(user.id)}&select=data`);
+  const data = (pr.data && pr.data[0] && pr.data[0].data) || {};
+  const out = assignments.map((a) => ({
+    id: a.id,
+    lessonId: a.lesson_id,
+    title: a.title,
+    targetWpm: a.target_wpm,
+    dueDate: a.due_date,
+    className: classMap[a.class_id] || '',
+    done: assignmentDone(data, a),
+  }));
+  return res.json({ assignments: out });
+}
+
 /* ── Migration des classes jsonb (ancien modèle) vers les tables ── */
 async function migrateSelf(req, res) {
   const user = await userFromToken(req.body.token);
@@ -296,6 +392,10 @@ module.exports = async function handler(req, res) {
       case 'student-detail': return await studentDetail(req, res);
       case 'join-code': return await joinByCode(req, res);
       case 'my-classes': return await myClasses(req, res);
+      case 'assignment-create': return await assignmentCreate(req, res);
+      case 'assignment-list': return await assignmentList(req, res);
+      case 'assignment-delete': return await assignmentDelete(req, res);
+      case 'my-assignments': return await myAssignments(req, res);
       case 'migrate-self': return await migrateSelf(req, res);
       // legacy (ancien modèle jsonb)
       case 'join': return await legacyJoin(req, res);

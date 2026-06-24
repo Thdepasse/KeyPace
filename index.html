@@ -2338,6 +2338,7 @@ const app={
       this.stats.lessons[lessonId]=rec;
     }
     saveStats(this.stats);
+    this._myClasses=null; // forcer le rechargement des devoirs (statut "terminé") au prochain affichage
   },
 
   // Accumule les fautes par touche attendue (persisté via saveStats à la fin du test).
@@ -4623,11 +4624,15 @@ const app={
   },
 
   async loadMyClasses(){
-    if(!currentToken){this._myClasses=[];return;}
+    if(!currentToken){this._myClasses=[];this._myAssignments=[];return;}
     try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'my-classes',token:currentToken})});
-      this._myClasses=r.ok?((await r.json()).classes||[]):[];
-    }catch{this._myClasses=[];}
+      const [rc,ra]=await Promise.all([
+        fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'my-classes',token:currentToken})}),
+        fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'my-assignments',token:currentToken})}),
+      ]);
+      this._myClasses=rc.ok?((await rc.json()).classes||[]):[];
+      this._myAssignments=ra.ok?((await ra.json()).assignments||[]):[];
+    }catch{this._myClasses=this._myClasses||[];this._myAssignments=this._myAssignments||[];}
     if(this.view==='classes'&&!isTeacher())this.renderStudentClasses();
   },
 
@@ -4639,6 +4644,20 @@ const app={
       return;
     }
     const list=this._myClasses;
+    const asg=this._myAssignments||[];
+    const devoirs=asg.length?`<div style="margin-bottom:30px">
+        <h2 style="font-size:18px;margin:0 0 12px">Mes devoirs</h2>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${asg.map(a=>{
+            const due=a.dueDate?new Date(a.dueDate).toLocaleDateString('fr-FR'):null;
+            return`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+              <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':'📝'}</div>
+              <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.className}${a.targetWpm?(' · objectif '+a.targetWpm+' mpm'):''}${due?(' · pour le '+due):''}</div></div>
+              ${a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Faire l'exercice</button>`}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`:'';
     document.getElementById(pageId).innerHTML=`<div class="stats-section">
       <div class="stats-header" style="padding-bottom:28px">
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
@@ -4647,6 +4666,7 @@ const app={
         </div>
       </div>
       <div style="max-width:760px;padding-bottom:60px">
+        ${devoirs}
         ${list.length===0?`
           <div style="text-align:center;padding:72px 20px;color:var(--muted)">
             <div style="font-size:48px;margin-bottom:16px">🎓</div>
@@ -4755,6 +4775,26 @@ const app={
     const students=d.students||[];
     const agg=d.agg||{};
     const link=`${location.origin}?classe=${d.inviteCode}`;
+    let asg=[];
+    try{const ar=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-list',token:currentToken,classId:id})});if(ar.ok)asg=(await ar.json()).assignments||[];}catch{}
+    const asgHtml=`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)">
+        <div style="font-size:15px;font-weight:700">Devoirs</div>
+        <button onclick="app.openAssignModal('${d.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">+ Assigner</button>
+      </div>
+      ${asg.length===0?`<div style="padding:26px 20px;text-align:center;color:var(--muted);font-size:13px">Aucun devoir. Assigne un exercice à réaliser pour la classe.</div>`:asg.map(a=>{
+        const pct=a.total?Math.round(a.doneCount/a.total*100):0;
+        const due=a.dueDate?new Date(a.dueDate).toLocaleDateString('fr-FR'):null;
+        return`<div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border)">
+          <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.targetWpm?('Objectif '+a.targetWpm+' mpm · '):''}${due?('Échéance '+due):'Sans échéance'}</div></div>
+          <div style="min-width:130px;text-align:right">
+            <div style="font-size:13px;font-weight:700;color:${pct>=100?'#1FA971':'var(--txt)'}">${a.doneCount}/${a.total} terminé${a.doneCount>1?'s':''}</div>
+            <div style="height:6px;background:var(--light);border-radius:4px;margin-top:5px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct>=100?'#1FA971':'var(--accent)'}"></div></div>
+          </div>
+          <button onclick="app.deleteAssignment('${a.id}','${d.id}')" title="Supprimer" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;opacity:.6" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
+        </div>`;
+      }).join('')}
+    </div>`;
     document.getElementById(pageId).innerHTML=`<div class="stats-section">
       <div class="stats-header" style="padding-bottom:24px">
         <button onclick="app.renderClasses()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Toutes les classes</button>
@@ -4779,6 +4819,8 @@ const app={
           </div>
           <button id="copy-code-btn" onclick="app.copyClassLink('${link}')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Copier le lien</button>
         </div>
+
+        ${asgHtml}
 
         ${students.length===0?`
           <div style="text-align:center;padding:64px 20px;color:var(--muted)">
@@ -4820,6 +4862,54 @@ const app={
       const btn=document.getElementById('copy-code-btn');
       if(btn){btn.textContent='✓ Copié !';setTimeout(()=>{btn.textContent='Copier le lien';},2000);}
     });
+  },
+
+  openAssignModal(classId){
+    const opts=ALL_LESSONS.map(l=>`<option value="${l.id}">${l.title}</option>`).join('');
+    const ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3000;display:flex;align-items:center;justify-content:center';
+    ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:440px;width:92%">
+      <h2 style="margin:0 0 16px;font-size:20px">Assigner un devoir</h2>
+      <label style="font-size:12px;font-weight:700;color:var(--muted)">Exercice</label>
+      <select id="asg-lesson" style="width:100%;margin:6px 0 14px;padding:10px;border:1px solid var(--border);border-radius:10px;font:inherit;background:var(--bg)">
+        <option value="">Test de vitesse libre</option>${opts}
+      </select>
+      <label style="font-size:12px;font-weight:700;color:var(--muted)">Objectif de vitesse (mpm, optionnel pour une leçon)</label>
+      <input id="asg-wpm" type="number" min="1" placeholder="ex. 30" style="width:100%;margin:6px 0 14px;padding:10px;border:1px solid var(--border);border-radius:10px;font:inherit;background:var(--bg);box-sizing:border-box">
+      <label style="font-size:12px;font-weight:700;color:var(--muted)">Échéance (optionnel)</label>
+      <input id="asg-due" type="date" style="width:100%;margin:6px 0 16px;padding:10px;border:1px solid var(--border);border-radius:10px;font:inherit;background:var(--bg);box-sizing:border-box">
+      <div id="asg-err" style="color:#E5484D;font-size:13px;margin-bottom:10px;display:none"></div>
+      <div style="display:flex;gap:10px">
+        <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;background:none;border:1px solid var(--border);border-radius:11px;padding:11px;font:inherit;font-size:14px;cursor:pointer">Annuler</button>
+        <button id="asg-save" onclick="app.createAssignment('${classId}')" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:11px;padding:11px;font:inherit;font-size:14px;font-weight:700;cursor:pointer">Assigner</button>
+      </div>
+    </div>`;
+    document.body.appendChild(ov);
+    this._asgOverlay=ov;
+  },
+
+  async createAssignment(classId){
+    const lessonId=document.getElementById('asg-lesson').value;
+    const wpm=document.getElementById('asg-wpm').value;
+    const due=document.getElementById('asg-due').value;
+    const err=document.getElementById('asg-err');
+    let title;
+    if(lessonId){const l=this.lessonById(lessonId);title=l?l.title:'Exercice';}
+    else{if(!wpm){err.textContent='Pour un test libre, fixe un objectif de vitesse.';err.style.display='block';return;}title='Test de vitesse — '+wpm+' mpm';}
+    const btn=document.getElementById('asg-save');btn.disabled=true;btn.textContent='…';
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-create',token:currentToken,classId,lessonId:lessonId||null,title,targetWpm:wpm||null,dueDate:due||null})});
+      const d=await r.json();
+      if(!r.ok){btn.disabled=false;btn.textContent='Assigner';err.textContent=d.error||'Erreur.';err.style.display='block';return;}
+      if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}
+      this.viewClass(classId);
+    }catch{btn.disabled=false;btn.textContent='Assigner';err.textContent='Erreur réseau.';err.style.display='block';}
+  },
+
+  async deleteAssignment(id,classId){
+    if(!confirm('Supprimer ce devoir ?'))return;
+    try{await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-delete',token:currentToken,assignmentId:id})});}catch{}
+    this.viewClass(classId);
   },
 
   async viewStudent(classId,studentId){
