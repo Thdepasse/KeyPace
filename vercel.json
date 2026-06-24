@@ -1,6 +1,10 @@
 {
   "rewrites": [
     { "source": "/conditions", "destination": "/conditions.html" },
+    { "source": "/mentions-legales", "destination": "/mentions-legales.html" },
+    { "source": "/confidentialite", "destination": "/confidentialite.html" },
+    { "source": "/cookies", "destination": "/cookies.html" },
+    { "source": "/cgv", "destination": "/cgv.html" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

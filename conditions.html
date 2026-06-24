@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="index, follow">
   <title>Conditions d'utilisation — KeyPace</title>
-  <meta name="description" content="Conditions générales d'utilisation de KeyPace, application d'apprentissage de la dactylographie AZERTY.">
+  <meta name="description" content="Conditions Générales d'Utilisation de KeyPace : compte, accès, formules, données personnelles, propriété intellectuelle et responsabilité.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -19,34 +20,33 @@
       --light: #F3F0E8;
     }
     body { background: var(--bg); color: var(--txt); font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.7; }
-
-    /* Nav */
     nav { border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--bg); z-index: 10; }
     .nav-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px; color: var(--txt); letter-spacing: -0.02em; }
     .nav-logo-icon { width: 30px; height: 30px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700; color: #fff; }
     .nav-back { font-size: 13px; font-weight: 600; color: var(--muted); text-decoration: none; transition: color .15s; }
     .nav-back:hover { color: var(--txt); }
-
-    /* Content */
     .page { max-width: 720px; margin: 0 auto; padding: 56px 24px 96px; }
     .page-label { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 10px; }
     h1 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 36px; letter-spacing: -0.03em; margin-bottom: 8px; line-height: 1.1; }
     .updated { font-size: 13px; color: var(--muted); margin-bottom: 48px; }
-
     h2 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 19px; letter-spacing: -0.01em; margin: 40px 0 12px; }
+    h3 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 15px; margin: 24px 0 8px; }
     p { color: #3A352B; margin-bottom: 14px; }
     ul { color: #3A352B; margin: 0 0 14px 20px; }
     ul li { margin-bottom: 6px; }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-
+    code { background: var(--light); border-radius: 5px; padding: 1px 5px; font-family: 'Courier New', monospace; font-size: 13px; }
     .highlight { background: var(--light); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 20px 0; font-size: 14px; color: #3A352B; }
-
-    /* Footer */
+    .note { background: var(--light); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 20px 0; font-size: 14px; color: #3A352B; }
+    .note p { margin-bottom: 8px; } .note p:last-child { margin-bottom: 0; }
     footer { border-top: 1px solid var(--border); }
     .footer-inner { max-width: 1120px; margin: 0 auto; padding: 22px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
     .footer-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--txt); font-family: 'Bricolage Grotesque', sans-serif; }
     .flogo-icon { width: 24px; height: 24px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Courier New', monospace; font-size: 12px; font-weight: 700; color: #fff; }
+    .footer-links { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .footer-links a { color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--txt); }
   </style>
 </head>
 <body>
@@ -61,74 +61,96 @@
 
 <div class="page">
   <div class="page-label">Légal</div>
-  <h1>Conditions d'utilisation</h1>
+  <h1>Conditions Générales d'Utilisation (CGU)</h1>
   <p class="updated">Dernière mise à jour : 24 juin 2026</p>
 
-  <p>Les présentes conditions régissent l'utilisation du site <strong>keypace.be</strong> et de ses services (ci-après « KeyPace »), édité par Théo Depasse, Belgique. En créant un compte ou en utilisant le service, tu acceptes ces conditions.</p>
+  <div class="note"><p><strong>Note</strong> : version améliorée de la CGU existante. Champs à compléter entre crochets <code>[...]</code>. Les aspects strictement commerciaux (prix, paiement, rétractation) sont désormais détaillés dans les <a href="/cgv">Conditions Générales de Vente</a>, auxquelles cette CGU renvoie pour éviter les doublons et les incohérences.</p></div>
 
-  <h2>1. Description du service</h2>
+  <p>Les présentes conditions régissent l'utilisation du site <strong>keypace.be</strong> et de ses services (ci-après « KeyPace » ou « le Service »), édité par <strong>Théo Depasse</strong>, entrepreneur individuel, Belgique — numéro d'entreprise [BE 0XXX.XXX.XXX]. En créant un compte ou en utilisant le Service, tu reconnais avoir lu, compris et accepté les présentes conditions.</p>
+
+  <h2>1. Définitions</h2>
+  <ul>
+    <li><strong>Service / KeyPace :</strong> le site keypace.be et l'ensemble de ses fonctionnalités.</li>
+    <li><strong>Utilisateur :</strong> toute personne utilisant le Service, avec ou sans compte.</li>
+    <li><strong>Compte :</strong> espace personnel créé après inscription.</li>
+    <li><strong>Plan Gratuit / Abonnement Expert / Licence établissement :</strong> les formules d'accès décrites à l'article 3.</li>
+  </ul>
+
+  <h2>2. Description du service</h2>
   <p>KeyPace est une application web d'apprentissage de la dactylographie sur clavier AZERTY. Elle propose des leçons progressives, des tests de vitesse, des jeux de frappe et un suivi de progression. Une partie du contenu est accessible sans compte (plan Gratuit) ; d'autres fonctionnalités nécessitent un abonnement Expert ou une licence établissement.</p>
 
-  <h2>2. Création de compte</h2>
+  <h2>3. Accès, formules et tarifs</h2>
+  <ul>
+    <li><strong>Plan Gratuit :</strong> accès aux 10 premières leçons et au test de vitesse, sans engagement.</li>
+    <li><strong>Abonnement Expert :</strong> accès à l'intégralité des fonctionnalités (65 leçons, jeux avancés, Sprint, statistiques complètes). Proposé en formule <strong>mensuelle (4,99 €/mois)</strong> ou <strong>annuelle</strong>.</li>
+    <li><strong>Licence établissement :</strong> formule à la demande pour les écoles, universités et centres de formation, aux conditions convenues par email.</li>
+  </ul>
+  <p>Les conditions de prix, de paiement, de renouvellement, de résiliation et de droit de rétractation sont détaillées dans les <a href="/cgv">Conditions Générales de Vente</a>. Le paiement est traité par <strong>Stripe</strong> ; KeyPace ne stocke aucune donnée de carte bancaire.</p>
+
+  <h2>4. Création de compte</h2>
   <p>Pour créer un compte, tu dois :</p>
   <ul>
     <li>fournir un nom d'utilisateur unique et une adresse email valide ;</li>
     <li>choisir un mot de passe d'au moins 6 caractères ;</li>
     <li>confirmer ton adresse email via le lien envoyé à l'inscription.</li>
   </ul>
-  <p>Tu es responsable de la confidentialité de tes identifiants. KeyPace ne peut être tenu responsable d'un accès non autorisé résultant d'une négligence de ta part.</p>
+  <p>Tu t'engages à fournir des informations exactes et à les tenir à jour. Tu es responsable de la confidentialité de tes identifiants et de toute activité réalisée depuis ton compte. KeyPace ne peut être tenu responsable d'un accès non autorisé résultant d'une négligence de ta part. Préviens-nous sans délai à <a href="mailto:contact@keypace.be">contact@keypace.be</a> en cas d'utilisation non autorisée.</p>
 
-  <h2>3. Plans et paiement</h2>
-  <p><strong>Plan Gratuit :</strong> accès à un sous-ensemble de leçons et au test de vitesse, sans engagement.</p>
-  <p><strong>Plan Expert :</strong> accès à l'intégralité des fonctionnalités (65 leçons, jeux avancés, suivi complet). Le paiement est traité via Stripe. L'abonnement est mensuel ou annuel selon l'offre choisie au moment de l'achat.</p>
-  <p><strong>Licence établissement :</strong> formule à la demande pour les écoles, universités et centres de formation. Les conditions tarifaires sont convenues par email.</p>
-
-  <div class="highlight">Les paiements sont gérés par <strong>Stripe</strong>. KeyPace ne stocke aucune donnée de carte bancaire.</div>
-
-  <h2>4. Résiliation et remboursement</h2>
-  <p>Tu peux annuler ton abonnement Expert à tout moment depuis ton espace compte. L'accès aux fonctionnalités Expert reste actif jusqu'à la fin de la période déjà payée. Conformément à la législation belge sur les consommateurs, un droit de rétractation de 14 jours s'applique à compter du premier paiement, sauf si le service a été pleinement utilisé.</p>
-
-  <h2>5. Données personnelles (RGPD)</h2>
-  <p>KeyPace collecte et traite les données suivantes :</p>
+  <h2>5. Âge minimum et mineurs</h2>
+  <p>Le Service peut être utilisé par des mineurs dans un cadre pédagogique.</p>
   <ul>
-    <li><strong>Adresse email et nom d'utilisateur</strong> — pour l'authentification et les communications liées au compte (confirmation, réinitialisation de mot de passe).</li>
-    <li><strong>Données de progression</strong> — résultats de tests, leçons complétées, statistiques de vitesse et précision — stockées sur nos serveurs pour afficher ton historique.</li>
-    <li><strong>Données de navigation</strong> — aucune publicité, aucun cookie de traçage tiers. Nous utilisons uniquement un cookie de session local (<code>localStorage</code>).</li>
+    <li>En cas d'inscription individuelle, si tu as moins de <strong>13 ans</strong>, l'accord d'un titulaire de l'autorité parentale est requis.</li>
+    <li>Lorsque l'accès est fourni via une <strong>école partenaire</strong>, l'établissement est responsable des autorisations nécessaires auprès des élèves et de leurs représentants légaux.</li>
   </ul>
-  <p>Ces données sont hébergées sur <strong>Supabase</strong> (infrastructure dans l'Union européenne). Elles ne sont pas vendues ni partagées avec des tiers, sauf obligations légales.</p>
-  <p>Tu disposes d'un droit d'accès, de rectification et de suppression de tes données. Pour l'exercer, contacte-nous à <a href="mailto:contact@keypace.be">contact@keypace.be</a>. La suppression d'un compte entraîne l'effacement de toutes les données associées dans un délai de 30 jours.</p>
+  <p>Le traitement des données des mineurs est décrit dans la <a href="/confidentialite">Politique de confidentialité</a>.</p>
 
-  <h2>6. Propriété intellectuelle</h2>
-  <p>L'ensemble du contenu de KeyPace (textes de leçons, code, design, marque) est la propriété exclusive de ses auteurs. Toute reproduction, même partielle, sans autorisation écrite est interdite. Les utilisateurs conservent la propriété de leurs propres données de progression.</p>
+  <h2>6. Plans et paiement</h2>
+  <p>Les modalités financières (prix, moyens de paiement, renouvellement automatique, facturation, résiliation, remboursement et droit de rétractation) sont régies par les <a href="/cgv">Conditions Générales de Vente</a>. En cas de divergence sur ces points, les CGV prévalent.</p>
+  <p>En résumé : tu peux <strong>annuler ton abonnement Expert à tout moment</strong> depuis ton espace compte ; l'accès reste actif jusqu'à la fin de la période déjà payée. Un <strong>droit de rétractation de 14 jours</strong> s'applique dans les conditions et limites prévues par les CGV.</p>
 
-  <h2>7. Comportement des utilisateurs</h2>
+  <h2>7. Données personnelles (RGPD)</h2>
+  <p>Le traitement de tes données personnelles est décrit en détail dans la <a href="/confidentialite">Politique de confidentialité</a> et la <a href="/cookies">Politique de cookies</a>. En synthèse : KeyPace collecte ton email, ton nom d'utilisateur et tes données de progression pour fournir le Service ; les données sont hébergées dans l'Union européenne (Supabase) ; elles ne sont ni vendues ni partagées à des fins commerciales. Tu disposes d'un droit d'accès, de rectification et de suppression à <a href="mailto:contact@keypace.be">contact@keypace.be</a>, et la suppression d'un compte entraîne l'effacement des données associées sous 30 jours (hors obligations légales de conservation).</p>
+
+  <h2>8. Propriété intellectuelle</h2>
+  <p>L'ensemble du contenu de KeyPace (textes des leçons, code, design, marque, logo) est la propriété exclusive de l'éditeur. Toute reproduction, représentation ou exploitation, même partielle, sans autorisation écrite préalable, est interdite. Tu conserves la propriété de tes propres données de progression. En utilisant le Service, tu bénéficies d'un droit d'usage personnel, non exclusif et non transférable, limité à la durée de ton accès.</p>
+
+  <h2>9. Comportement des utilisateurs</h2>
   <p>Il est interdit d'utiliser KeyPace pour :</p>
   <ul>
-    <li>automatiser des interactions (bots, scripts) dans le but de fausser les classements ;</li>
-    <li>tenter d'accéder aux données d'autres utilisateurs ;</li>
-    <li>perturber le fonctionnement du service.</li>
+    <li>automatiser des interactions (bots, scripts) dans le but de fausser les classements ou les statistiques ;</li>
+    <li>tenter d'accéder aux données ou au compte d'autres utilisateurs ;</li>
+    <li>contourner les restrictions d'accès ou les mesures de sécurité ;</li>
+    <li>perturber, surcharger ou compromettre le fonctionnement du Service ;</li>
+    <li>utiliser le Service à des fins illégales ou contraires à l'ordre public.</li>
   </ul>
-  <p>KeyPace se réserve le droit de suspendre tout compte en violation de ces règles.</p>
+  <p>KeyPace se réserve le droit de suspendre ou de supprimer, sans préavis, tout compte en violation de ces règles, sans remboursement en cas de manquement grave.</p>
 
-  <h2>8. Limitation de responsabilité</h2>
-  <p>KeyPace est fourni « en l'état ». Nous nous efforçons d'assurer une disponibilité optimale, mais ne garantissons pas un service ininterrompu. KeyPace ne saurait être tenu responsable d'une perte de données due à un incident technique imprévu.</p>
+  <h2>10. Disponibilité et limitation de responsabilité</h2>
+  <p>KeyPace est fourni « en l'état » et « selon disponibilité ». Nous nous efforçons d'assurer une disponibilité optimale, mais ne garantissons pas un service ininterrompu ou exempt d'erreurs (maintenance, incidents techniques, force majeure). Dans les limites permises par la loi, KeyPace ne saurait être tenu responsable des dommages indirects ni d'une perte de données due à un incident technique imprévu. Aucune clause des présentes ne limite la responsabilité de l'éditeur en cas de dol, de faute lourde, ou pour les droits impératifs reconnus aux consommateurs.</p>
 
-  <h2>9. Modifications</h2>
-  <p>Ces conditions peuvent évoluer. En cas de modification significative, les utilisateurs connectés seront informés par email. La poursuite de l'utilisation du service après notification vaut acceptation des nouvelles conditions.</p>
+  <h2>11. Liens et services tiers</h2>
+  <p>Le Service s'appuie sur des prestataires tiers (notamment Stripe pour le paiement et Supabase pour l'hébergement). Leur utilisation est soumise à leurs propres conditions et politiques de confidentialité.</p>
 
-  <h2>10. Droit applicable</h2>
-  <p>Ces conditions sont régies par le droit belge. Tout litige relève de la compétence exclusive des tribunaux de Belgique.</p>
+  <h2>12. Modifications des conditions</h2>
+  <p>Ces conditions peuvent évoluer. En cas de modification significative, les utilisateurs connectés seront informés par email. La poursuite de l'utilisation du Service après notification vaut acceptation des nouvelles conditions. La date de dernière mise à jour figure en haut de cette page.</p>
+
+  <h2>13. Droit applicable et litiges</h2>
+  <p>Ces conditions sont régies par le <strong>droit belge</strong>. En cas de litige de consommation, tu peux recourir au Service de Médiation pour le Consommateur (<a href="https://www.mediationconsommateur.be" target="_blank" rel="noopener">www.mediationconsommateur.be</a>) ou à la plateforme européenne RLL (<a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">https://ec.europa.eu/consumers/odr</a>). À défaut de résolution amiable, les tribunaux belges sont seuls compétents, sans préjudice des droits impératifs du consommateur.</p>
 
   <h2>Contact</h2>
-  <p>Pour toute question relative à ces conditions ou à tes données personnelles : <a href="mailto:contact@keypace.be">contact@keypace.be</a></p>
+  <p>Pour toute question relative à ces conditions ou à tes données personnelles : <strong><a href="mailto:contact@keypace.be">contact@keypace.be</a></strong>.</p>
 </div>
 
 <footer>
   <div class="footer-inner">
     <div class="footer-logo"><div class="flogo-icon">K</div> KeyPace</div>
-    <div style="display:flex;align-items:center;gap:16px">
-      <a href="/conditions" style="color:var(--muted);text-decoration:none">Conditions d'utilisation</a>
-      <a href="mailto:contact@keypace.be" style="color:var(--muted);text-decoration:none">Contact</a>
+    <div class="footer-links">
+      <a href="/conditions">Conditions d'utilisation</a>
+      <a href="/cgv">CGV</a>
+      <a href="/confidentialite">Confidentialité</a>
+      <a href="/cookies">Cookies</a>
+      <a href="/mentions-legales">Mentions légales</a>
+      <a href="mailto:contact@keypace.be">Contact</a>
     </div>
     <div>© 2026 KeyPace</div>
   </div>
