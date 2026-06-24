@@ -103,3 +103,43 @@ create index if not exists duel_results_room_idx on duel_results(room_id);
 
 alter table duel_rooms   enable row level security;
 alter table duel_results enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- REFONTE COMPTE ÉTABLISSEMENT — Phase 0 : modèle de données
+-- Remplace le hack "progress.data.role + progress.data.classes (jsonb)"
+-- par un vrai rôle utilisateur et des tables relationnelles.
+-- Accès via fonctions serverless (clé service) ; RLS sans policy => anon refusé.
+-- ───────────────────────────────────────────────────────────────
+
+-- Rôle applicatif : eleve (défaut), prof (gère ses classes), admin (gère un établissement + ses profs, Phase 3)
+alter table users
+  add column if not exists role text default 'eleve' check (role in ('eleve','prof','admin'));
+
+-- Une classe appartient à un prof (teacher_id) et, à terme, à un établissement (institution_id).
+create table if not exists classes (
+  id uuid default gen_random_uuid() primary key,
+  institution_id uuid references institutions(id) on delete set null,
+  teacher_id uuid references users(id) on delete cascade,
+  name text not null,
+  invite_code text unique,                 -- code court pour rejoindre la classe
+  archived boolean default false,
+  created_at timestamptz default now()
+);
+create index if not exists classes_teacher_idx on classes(teacher_id);
+create index if not exists classes_institution_idx on classes(institution_id);
+
+-- Appartenance élève -> classe (un élève peut être dans plusieurs classes).
+create table if not exists class_members (
+  id uuid default gen_random_uuid() primary key,
+  class_id uuid references classes(id) on delete cascade,
+  student_id uuid references users(id) on delete cascade,
+  joined_at timestamptz default now(),
+  unique (class_id, student_id)
+);
+create index if not exists class_members_class_idx on class_members(class_id);
+create index if not exists class_members_student_idx on class_members(student_id);
+
+create index if not exists users_role_idx on users(role);
+
+alter table classes       enable row level security;
+alter table class_members enable row level security;
