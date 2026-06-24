@@ -58,6 +58,26 @@ function detectAlerts(students, now, { stuckMinSessions = 5 } = {}) {
   return { inactive, stuck };
 }
 
+// Série d'activité jour par jour (par défaut 7 jours), du plus ancien au plus récent.
+// Retourne [{sessions, avgWpm}] pour alimenter la courbe d'évolution du cockpit.
+function dailySeries(studentsData, now, days = 7) {
+  const dayMs = 24 * 60 * 60 * 1000;
+  const startOfToday = now - (now % dayMs);
+  const buckets = Array.from({ length: days }, () => ({ sessions: 0, wpmSum: 0, wpmN: 0 }));
+  for (const d of studentsData) {
+    const tests = Array.isArray(d && d.tests) ? d.tests : [];
+    for (const t of tests) {
+      const dayStart = t.t - (t.t % dayMs);
+      const idx = days - 1 - Math.round((startOfToday - dayStart) / dayMs);
+      if (idx >= 0 && idx < days) {
+        buckets[idx].sessions++;
+        if (t.wpm != null) { buckets[idx].wpmSum += t.wpm; buckets[idx].wpmN++; }
+      }
+    }
+  }
+  return buckets.map((b) => ({ sessions: b.sessions, avgWpm: b.wpmN ? Math.round(b.wpmSum / b.wpmN) : null }));
+}
+
 // Permissions : qui peut piloter/voir une classe.
 function canActAsTeacher(user) {
   return !!user && (user.role === 'prof' || user.role === 'admin');
@@ -74,4 +94,4 @@ function canManageClass(user, cls) {
   return false;
 }
 
-module.exports = { studentSummary, aggregateClass, detectAlerts, canActAsTeacher, canManageClass, WEEK_MS };
+module.exports = { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, WEEK_MS };

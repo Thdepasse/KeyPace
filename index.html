@@ -825,6 +825,16 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <button class="nav-link" id="nav-games" onclick="go('games')">Jeux<span class="underline"></span></button>
       <button class="nav-link" id="nav-stats" onclick="go('stats')">Progrès<span class="underline"></span></button>
       <button class="nav-link" id="nav-classes" onclick="go('classes')" style="display:none">Gestion de classes<span class="underline"></span></button>
+      <div id="nav-apercu" style="display:none;position:relative;align-items:center">
+        <button class="nav-link" onclick="toggleApercu(event)" style="display:inline-flex">Aperçu ▾<span class="underline"></span></button>
+        <div id="apercu-menu" style="display:none;position:absolute;top:130%;left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:200px;box-shadow:0 12px 32px rgba(0,0,0,.14);z-index:50">
+          <div style="font-size:11px;color:var(--muted);padding:6px 10px 4px;font-weight:700;letter-spacing:.04em">Tester comme un élève</div>
+          <button onclick="go('test');closeApercu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:14px;color:var(--txt);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='none'">Test de vitesse</button>
+          <button onclick="go('lessons');closeApercu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:14px;color:var(--txt);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='none'">Cours</button>
+          <button onclick="go('games');closeApercu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:14px;color:var(--txt);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='none'">Jeux</button>
+          <button onclick="go('stats');closeApercu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:14px;color:var(--txt);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='none'">Progrès</button>
+        </div>
+      </div>
     </div>
     <div class="nav-spacer"></div>
     <div id="nav-guest" style="display:flex;gap:8px">
@@ -977,7 +987,7 @@ function switchTab(tab){
   document.getElementById('tab-register').classList.toggle('active',tab==='register');
   document.getElementById('auth-confirm-wrap').style.display=tab==='register'?'block':'none';
   document.getElementById('auth-email-wrap').style.display=tab==='register'?'block':'none';
-  document.getElementById('auth-institution-wrap').style.display=tab==='register'?'block':'none';
+  document.getElementById('auth-institution-wrap').style.display='none';
   document.getElementById('auth-inst-pw-wrap').style.display='none';
   document.getElementById('auth-submit').textContent=tab==='login'?'Se connecter':'Créer mon compte';
   document.getElementById('auth-forgot-wrap').style.display=tab==='login'?'block':'none';
@@ -1026,15 +1036,8 @@ async function authSubmit(){
       if(password!==confirm){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Les mots de passe ne correspondent pas.');}
       if(password.length<6){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Mot de passe trop court (6 caractères min).');}
       if(!email||!email.includes('@')){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Entre une adresse email valide.');}
-      const institutionId=document.getElementById('auth-institution').value||null;
-      const instPw=document.getElementById('auth-inst-password').value;
-      let institutionPasswordHash=null;
-      if(institutionId){
-        if(!instPw){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Entre le mot de passe de ton établissement.');}
-        institutionPasswordHash=await hashPw(instPw);
-      }
+      // Le rattachement à un établissement se fait automatiquement via le domaine de l'email scolaire (côté serveur).
       const body={username,email,passwordHash};
-      if(institutionId){body.institutionId=institutionId;body.institutionPasswordHash=institutionPasswordHash;}
       const r=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
       const d=await r.json();
       if(!r.ok){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError(d.error||'Erreur.');}
@@ -1054,9 +1057,11 @@ async function authSubmit(){
       const d=await r.json();
       if(!r.ok){btn.disabled=false;btn.textContent='Se connecter';return showAuthError(d.error||'Erreur.');}
       const _mergedData=mergeStats(d.data);
+      if(d.role)_mergedData.role=d.role;
       saveSession(d.username, d.plan, d.token, d.id, _mergedData.role||null);
       app.stats=_mergedData;
       loginUser(d.username);
+      if(isTeacher())app.loadEtab(true);
     }
   }catch(e){btn.disabled=false;btn.textContent=currentTab==='login'?'Se connecter':'Créer mon compte';showAuthError('Erreur réseau, réessaie.');}
 }
@@ -1120,15 +1125,22 @@ function updateNavUser(){
   document.getElementById('nav-avatar').textContent=currentUser[0].toUpperCase();
   const plan=getUserPlan();
   const role=app.stats&&app.stats.role;
-  const isEtab=role==='etablissement';
+  const teacher=isTeacher();
   const badge=document.getElementById('nav-plan-badge');
   const upgradeBtn=document.getElementById('nav-upgrade-btn');
   const classesBtn=document.getElementById('nav-classes');
-  if(isEtab){badge.textContent='ÉTABLISSEMENT';badge.className='nav-plan-badge etab';}
+  if(teacher){badge.textContent=role==='admin'?'ADMIN':'ENSEIGNANT';badge.className='nav-plan-badge etab';}
   else{badge.textContent=plan==='expert'?'EXPERT':'GRATUIT';badge.className='nav-plan-badge '+(plan==='expert'?'expert':'free');}
-  upgradeBtn.style.display=(plan==='expert'||isEtab)?'none':'inline-block';
-  if(classesBtn)classesBtn.style.display=isEtab?'inline-flex':'none';
+  upgradeBtn.style.display=(plan==='expert'||teacher)?'none':'inline-block';
+  if(classesBtn)classesBtn.style.display=teacher?'inline-flex':'none';
+  ['nav-test','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=teacher?'none':'';});
+  const apercu=document.getElementById('nav-apercu');if(apercu)apercu.style.display=teacher?'inline-flex':'none';
 }
+
+function isTeacher(){const r=(typeof app!=='undefined')&&app.stats&&app.stats.role;return r==='prof'||r==='admin'||r==='etablissement';}
+function toggleApercu(e){if(e)e.stopPropagation();const m=document.getElementById('apercu-menu');if(m)m.style.display=m.style.display==='block'?'none':'block';}
+function closeApercu(){const m=document.getElementById('apercu-menu');if(m)m.style.display='none';}
+document.addEventListener('click',e=>{const a=document.getElementById('nav-apercu');if(a&&!a.contains(e.target))closeApercu();});
 
 function getUserPlan(){
   if(!currentUser)return null;
@@ -2595,7 +2607,7 @@ const app={
 
   /* ── HOME ── */
   renderHome(){
-    if(this.stats&&this.stats.role==='etablissement'){this._renderHomeEtab();return;}
+    if(isTeacher()){this._renderHomeEtab();return;}
     const kbHtml=KB.map(row=>'<div class="hkb-row">'+row.map(k=>`<div class="hkb-key${k.home?' home':''}">${k.l.toLowerCase()}</div>`).join('')+'</div>').join('');
     const isGuest=!currentUser;
     document.getElementById('page-home').innerHTML=`
@@ -2675,97 +2687,103 @@ const app={
   },
 
   _renderHomeEtab(){
-    const s=this.stats||{};
-    const classes=s.classes||[];
-    const ns=classes.reduce((a,c)=>a+(c.students||[]).length,0);
-    const allStudents=classes.flatMap(c=>c.students||[]);
-    const withWpm=allStudents.filter(st=>st.wpm!=null);
-    const withAcc=allStudents.filter(st=>st.acc!=null);
-    const avgWpm=withWpm.length?Math.round(withWpm.reduce((a,st)=>a+st.wpm,0)/withWpm.length):null;
-    const avgAcc=withAcc.length?Math.round(withAcc.reduce((a,st)=>a+st.acc,0)/withAcc.length):null;
-    const nc=classes.length;
-    const classSub=nc===0?'Aucune classe':nc===1?'1 classe active':nc+' classes actives';
-    const stuSub=ns===0?'Aucun élève inscrit':ns===1?'1 élève inscrit':ns+' élèves inscrits';
-    const wpmSub=avgWpm!=null?'sur '+withWpm.length+' élève'+(withWpm.length>1?'s':''):'Pas encore de données';
-    const accSub=avgAcc!=null?'sur '+withAcc.length+' élève'+(withAcc.length>1?'s':''):'Pas encore de données';
-    const accColor=avgAcc!=null&&avgAcc>=90?'#1FA971':avgAcc!=null&&avgAcc<75?'#E5484D':'var(--txt)';
+    const etab=this.etab;
+    if(!etab||!etab.loaded){
+      this.loadEtab();
+      document.getElementById('page-home').innerHTML=`
+        <div style="max-width:1100px;margin:0 auto;padding:80px 24px;text-align:center;color:var(--muted)">
+          <div style="font-size:14px">Chargement de ton tableau de bord…</div>
+        </div>`;
+      return;
+    }
+    const classes=etab.classes||[];
+    const g=etab.global||{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null};
+    const series=etab.series||[];
 
+    if(classes.length===0){
+      document.getElementById('page-home').innerHTML=`
+        <div style="max-width:760px;margin:0 auto;padding:56px 24px 80px">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">Espace enseignant</div>
+          <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;letter-spacing:-0.03em;margin:0 0 10px">Bienvenue !</h1>
+          <p style="font-size:15px;color:var(--muted);margin:0 0 32px;line-height:1.6">Crée ta première classe, partage le code à tes élèves, et suis leur progression ici. Tu peux à tout moment tester l'app comme un élève via le menu Aperçu.</p>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;gap:16px;align-items:flex-start">
+              <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,77,46,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0">1</div>
+              <div><div style="font-weight:700;font-size:15px;margin-bottom:2px">Crée une classe</div><div style="font-size:13px;color:var(--muted);line-height:1.5">Donne-lui un nom (ex. « 6e A »). Un code d'invitation unique est généré.</div></div>
+            </div>
+            <div style="display:flex;gap:16px;align-items:flex-start">
+              <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,77,46,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0">2</div>
+              <div><div style="font-weight:700;font-size:15px;margin-bottom:2px">Partage le code</div><div style="font-size:13px;color:var(--muted);line-height:1.5">Tes élèves se connectent avec leur adresse email scolaire et rejoignent la classe avec le code.</div></div>
+            </div>
+            <div style="display:flex;gap:16px;align-items:flex-start">
+              <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,77,46,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0">3</div>
+              <div><div style="font-weight:700;font-size:15px;margin-bottom:2px">Suis la progression</div><div style="font-size:13px;color:var(--muted);line-height:1.5">Vitesse, précision, élèves actifs et alertes : tout est ici, classe par classe.</div></div>
+            </div>
+            <button class="btn-primary" style="align-self:flex-start;padding:11px 22px;font-size:14px" onclick="app.createClass()">+ Créer ma première classe</button>
+          </div>
+        </div>`;
+      return;
+    }
+
+    const accColor=g.avgAcc!=null&&g.avgAcc>=90?'#1FA971':(g.avgAcc!=null&&g.avgAcc<75?'#E5484D':'var(--txt)');
     const statCard=(label,val,unit,sub,valColor)=>`
       <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 24px">
         <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:10px">${label}</div>
-        <div style="font-size:34px;font-weight:800;line-height:1;color:${valColor||'var(--txt)'}">
-          ${val}<span style="font-size:15px;font-weight:500;color:var(--muted)">${unit}</span>
-        </div>
+        <div style="font-size:34px;font-weight:800;line-height:1;color:${valColor||'var(--txt)'}">${val}<span style="font-size:15px;font-weight:500;color:var(--muted)">${unit}</span></div>
         <div style="font-size:12px;color:var(--muted);margin-top:6px">${sub}</div>
       </div>`;
 
-    const classRows=classes.slice(0,5).map((cl,i)=>{
-      const n=(cl.students||[]).length;
-      const init=cl.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      const wpmSts=(cl.students||[]).filter(st=>st.wpm!=null);
-      const clAvg=wpmSts.length?Math.round(wpmSts.reduce((a,st)=>a+st.wpm,0)/wpmSts.length):null;
-      return`<div onclick="go('classes');setTimeout(()=>app.viewClass(${i}),50)" style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:12px;cursor:pointer;transition:background .12s" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
-        <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;flex-shrink:0">${init}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:700;color:var(--txt)">${cl.name}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:1px">${n} élève${n!==1?'s':''}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-size:15px;font-weight:800;color:var(--txt)">${clAvg!=null?clAvg:'—'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div>
-        </div>
+    const dayNames=['D','L','M','M','J','V','S'];
+    const today=new Date();
+    const labels=Array.from({length:series.length},(_,i)=>{const d=new Date(today);d.setDate(today.getDate()-(series.length-1-i));return dayNames[d.getDay()];});
+    const maxS=Math.max(1,...series.map(p=>p.sessions));
+    const bars=series.map((p,i)=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px" title="${p.sessions} session${p.sessions!==1?'s':''}${p.avgWpm!=null?' · '+p.avgWpm+' mpm':''}">
+        <div style="width:62%;background:var(--accent);border-radius:5px 5px 0 0;height:${Math.max(3,Math.round(p.sessions/maxS*70))}px;opacity:${p.sessions?1:.2}"></div>
+        <div style="font-size:10px;color:var(--muted)">${labels[i]}</div>
+      </div>`).join('');
+
+    const inactive=[];const stuck=[];
+    classes.forEach(c=>{((c.alerts&&c.alerts.inactive)||[]).forEach(a=>inactive.push({username:a.username,days:a.days,cls:c.name}));((c.alerts&&c.alerts.stuck)||[]).forEach(a=>stuck.push({username:a.username,sessions:a.sessions,cls:c.name}));});
+    const alertRow=(txt,sub)=>`<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)"><div style="color:#E5722B;font-size:14px;line-height:1.3">●</div><div><div style="font-size:13px;font-weight:600;color:var(--txt)">${txt}</div><div style="font-size:12px;color:var(--muted)">${sub}</div></div></div>`;
+    const alertsHtml=(inactive.length||stuck.length)
+      ? inactive.slice(0,6).map(a=>alertRow(a.username+' inactif depuis '+a.days+' j',a.cls)).join('')+stuck.slice(0,6).map(a=>alertRow(a.username+' semble bloqué',a.cls+' · '+a.sessions+' sessions, aucune leçon validée')).join('')
+      : `<div style="padding:18px 0;color:var(--muted);font-size:13px">Aucune alerte. Tes élèves sont sur les rails.</div>`;
+
+    const classRows=classes.map(c=>`<div onclick="app.viewClass('${c.id}')" style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:12px;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
+        <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;flex-shrink:0">${c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--txt)">${c.name}</div><div style="font-size:12px;color:var(--muted);margin-top:1px">${c.memberCount} élève${c.memberCount!==1?'s':''} · ${c.agg.activeThisWeek} actif${c.agg.activeThisWeek!==1?'s':''} cette semaine</div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:800;color:var(--txt)">${c.agg.avgWpm!=null?c.agg.avgWpm:'—'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div></div>
         <div style="color:var(--muted);font-size:14px">›</div>
-      </div>`;
-    }).join('');
+      </div>`).join('');
 
     document.getElementById('page-home').innerHTML=`
       <div style="max-width:1100px;margin:0 auto;padding:44px 24px 80px">
-
-        <div style="margin-bottom:36px">
-          <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">Tableau de bord établissement</div>
-          <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:36px;letter-spacing:-0.03em;margin:0 0 6px">Bonjour !</h1>
-          <p style="font-size:15px;color:var(--muted);margin:0">Voici l'activité de tes classes en ce moment.</p>
+        <div style="margin-bottom:32px">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">Tableau de bord</div>
+          <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:36px;letter-spacing:-0.03em;margin:0 0 6px">Bonjour ${currentUser} !</h1>
+          <p style="font-size:15px;color:var(--muted);margin:0">L'activité de tes classes en un coup d'oeil.</p>
         </div>
 
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:36px">
-          ${statCard('CLASSES',nc,'',classSub)}
-          ${statCard('ÉLÈVES',ns,'',stuSub)}
-          ${statCard('VITESSE MOY.',avgWpm!=null?avgWpm:'—',avgWpm!=null?' mpm':'',wpmSub)}
-          ${statCard('PRÉCISION MOY.',avgAcc!=null?avgAcc:'—',avgAcc!=null?' %':'',accSub,accColor)}
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+          ${statCard('ÉLÈVES ACTIFS',g.activeThisWeek,'','cette semaine sur '+g.total)}
+          ${statCard('SESSIONS',g.totalSessions,'','cumulées')}
+          ${statCard('VITESSE MOY.',g.avgWpm!=null?g.avgWpm:'—',g.avgWpm!=null?' mpm':'',g.avgWpm!=null?'tous élèves confondus':'Pas encore de données')}
+          ${statCard('PRÉCISION MOY.',g.avgAcc!=null?g.avgAcc:'—',g.avgAcc!=null?' %':'',g.avgAcc!=null?'tous élèves confondus':'Pas encore de données',accColor)}
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 22px;margin-bottom:20px">
+          <div style="font-size:13px;font-weight:700;margin-bottom:16px">Activité des 7 derniers jours</div>
+          <div style="display:flex;align-items:flex-end;gap:6px;height:90px">${bars}</div>
+        </div>
 
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--border)">
-              <div style="font-size:15px;font-weight:700">Mes classes</div>
-              <button onclick="go('classes')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--accent);padding:0">Tout voir →</button>
-            </div>
-            ${nc===0?`
-              <div style="padding:48px 24px;text-align:center;color:var(--muted)">
-                <div style="width:52px;height:52px;border-radius:14px;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px">🏫</div>
-                <div style="font-size:14px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucune classe encore</div>
-                <div style="font-size:13px;margin-bottom:18px;line-height:1.5">Crée ta première classe et partage le lien d'invitation à tes élèves.</div>
-                <button class="btn-primary" style="padding:9px 20px;font-size:13px" onclick="go('classes');setTimeout(()=>app.createClass(),50)">+ Nouvelle classe</button>
-              </div>
-            `:`<div style="padding:6px 4px">${classRows}</div>
-              ${nc>5?`<div style="padding:10px 20px;border-top:1px solid var(--border);text-align:center"><button onclick="go('classes')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted)">+ ${nc-5} autres classes</button></div>`:''}
-            `}
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--border)"><div style="font-size:15px;font-weight:700">Mes classes</div><button onclick="go('classes')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--accent);padding:0">Gérer →</button></div>
+            <div style="padding:6px 4px">${classRows}</div>
           </div>
-
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <button onclick="go('classes');setTimeout(()=>app.createClass(),50)" style="background:var(--accent);color:#fff;border:none;border-radius:14px;padding:14px 18px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:left;width:100%;display:flex;flex-direction:column;gap:2px">
-              <span>+ Nouvelle classe</span>
-              <span style="font-size:11px;font-weight:500;opacity:.75">Créer et partager un lien d'invitation</span>
-            </button>
-            <button onclick="go('classes')" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:left;color:var(--txt);width:100%;display:flex;flex-direction:column;gap:2px">
-              <span>Gérer les classes</span>
-              <span style="font-size:11px;font-weight:500;color:var(--muted)">Voir les élèves et leurs stats</span>
-            </button>
-            ${nc>0&&ns===0?`<div style="background:rgba(255,77,46,0.06);border:1px solid rgba(255,77,46,0.15);border-radius:14px;padding:14px 16px;margin-top:2px">
-              <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px">Prochaine étape</div>
-              <div style="font-size:12px;color:var(--muted);line-height:1.55">Partage le lien d'invitation de ta classe pour que tes élèves la rejoignent automatiquement.</div>
-              <button onclick="go('classes')" style="margin-top:10px;background:none;border:none;padding:0;font-family:inherit;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer">Voir les liens →</button>
-            </div>`:''}
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 20px">
+            <div style="font-size:15px;font-weight:700;margin-bottom:6px">Alertes actionnables</div>
+            ${alertsHtml}
           </div>
         </div>
       </div>`;
@@ -4543,10 +4561,14 @@ const app={
   },
 
   renderClasses(){
-    const pageId='page-classes';
-    const s=this.stats||{};
-    const classes=s.classes||[];
-    document.getElementById(pageId).innerHTML=`<div class="stats-section">
+    const etab=this.etab;
+    if(!etab||!etab.loaded){
+      this.loadEtab();
+      document.getElementById('page-classes').innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
+      return;
+    }
+    const classes=etab.classes||[];
+    document.getElementById('page-classes').innerHTML=`<div class="stats-section">
       <div class="stats-header" style="padding-bottom:32px">
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
           <div><h1 style="margin-bottom:4px">Gestion de classes</h1><p style="margin:0">Suis les performances de tes élèves par classe.</p></div>
@@ -4558,25 +4580,25 @@ const app={
           <div style="text-align:center;padding:80px 20px;color:var(--muted)">
             <div style="font-size:52px;margin-bottom:16px">🏫</div>
             <div style="font-size:18px;font-weight:700;color:var(--txt);margin-bottom:8px">Aucune classe encore</div>
-            <div style="font-size:14px;max-width:320px;margin:0 auto;line-height:1.6">Crée ta première classe, partage le lien d'invitation et suis les progrès de tes élèves.</div>
+            <div style="font-size:14px;max-width:340px;margin:0 auto 22px;line-height:1.6">Crée ta première classe, partage le code d'invitation et suis les progrès de tes élèves.</div>
+            <button class="btn-primary" style="padding:10px 22px;font-size:14px" onclick="app.createClass()">+ Créer une classe</button>
           </div>
         `:`<div style="display:flex;flex-direction:column;gap:10px">
-          ${classes.map((cl,i)=>{
-            const n=(cl.students||[]).length;
-            const initials=cl.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-            return`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:0;overflow:hidden;cursor:pointer;transition:box-shadow .15s" onclick="app.viewClass(${i})" onmouseenter="this.style.boxShadow='0 4px 18px rgba(0,0,0,0.07)'" onmouseleave="this.style.boxShadow='none'">
+          ${classes.map(c=>{
+            const init=c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+            return`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;cursor:pointer;transition:box-shadow .15s" onclick="app.viewClass('${c.id}')" onmouseenter="this.style.boxShadow='0 4px 18px rgba(0,0,0,0.07)'" onmouseleave="this.style.boxShadow='none'">
               <div style="display:flex;align-items:center;gap:16px;padding:18px 20px">
-                <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--accent);flex-shrink:0;font-family:'JetBrains Mono',monospace">${initials}</div>
+                <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--accent);flex-shrink:0;font-family:'JetBrains Mono',monospace">${init}</div>
                 <div style="flex:1;min-width:0">
-                  <div style="font-size:16px;font-weight:700;color:var(--txt)">${cl.name}</div>
-                  <div style="font-size:13px;color:var(--muted);margin-top:2px">${n} élève${n!==1?'s':''}</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--txt)">${c.name}</div>
+                  <div style="font-size:13px;color:var(--muted);margin-top:2px">${c.memberCount} élève${c.memberCount!==1?'s':''} · ${c.agg.activeThisWeek} actif${c.agg.activeThisWeek!==1?'s':''} cette semaine</div>
                 </div>
                 <div style="display:flex;align-items:center;gap:20px">
                   <div style="text-align:center">
                     <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">VITESSE MOY.</div>
-                    <div style="font-size:20px;font-weight:800;color:var(--txt);margin-top:2px">${cl.avgWpm??'—'}<span style="font-size:12px;color:var(--muted);font-weight:500"> mpm</span></div>
+                    <div style="font-size:20px;font-weight:800;color:var(--txt);margin-top:2px">${c.agg.avgWpm!=null?c.agg.avgWpm:'—'}<span style="font-size:12px;color:var(--muted);font-weight:500"> mpm</span></div>
                   </div>
-                  <button onclick="event.stopPropagation();app.deleteClass(${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:6px;border-radius:8px;line-height:1;opacity:.6" title="Supprimer" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
+                  <button onclick="event.stopPropagation();app.deleteClass('${c.id}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:6px;border-radius:8px;line-height:1;opacity:.6" title="Archiver" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
                 </div>
               </div>
             </div>`;
@@ -4585,100 +4607,93 @@ const app={
       </div></div>`;
   },
 
-  createClass(){
+  async createClass(){
     const name=prompt('Nom de la classe :');
     if(!name||!name.trim())return;
-    const s=this.stats||{};
-    if(!s.classes)s.classes=[];
-    const inviteToken=crypto.randomUUID();
-    s.classes.push({name:name.trim(),students:[],avgWpm:null,createdAt:Date.now(),inviteToken});
-    saveStats(s);
-    this.renderClasses();
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-create',token:currentToken,name:name.trim()})});
+      const d=await r.json();
+      if(!r.ok){alert(d.error||'Création impossible.');return;}
+      await this.loadEtab(true);
+      this.viewClass(d.id);
+    }catch{alert('Erreur réseau.');}
   },
 
-  deleteClass(i){
-    if(!confirm('Supprimer cette classe ?'))return;
-    const s=this.stats||{};
-    s.classes.splice(i,1);
-    saveStats(s);
-    this.renderClasses();
+  async deleteClass(id){
+    const cls=((this.etab&&this.etab.classes)||[]).find(c=>c.id===id);
+    const name=cls?cls.name:'';
+    if(!confirm('Archiver la classe « '+name+' » ? Les élèves ne pourront plus la rejoindre.'))return;
+    try{
+      await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-archive',token:currentToken,classId:id})});
+      await this.loadEtab(true);
+      this.renderClasses();
+    }catch{alert('Erreur réseau.');}
   },
 
-  viewClass(i){
+  async viewClass(id){
     const pageId='page-classes';
-    const s=this.stats||{};
-    // Générer inviteToken si la classe n'en a pas (classes créées avant la fonctionnalité)
-    if(s.classes[i]&&!s.classes[i].inviteToken){s.classes[i].inviteToken=crypto.randomUUID();saveStats(s);}
-    const cl=s.classes[i];
-    const students=cl.students||[];
-    const inviteLink=cl.inviteToken&&currentUserId?`${location.origin}?join=${currentUserId}_${i}_${cl.inviteToken}`:'';
-    const avgWpm=students.length&&students.some(s=>s.wpm!=null)?Math.round(students.filter(s=>s.wpm!=null).reduce((a,s)=>a+s.wpm,0)/students.filter(s=>s.wpm!=null).length):null;
-    const avgAcc=students.length&&students.some(s=>s.acc!=null)?Math.round(students.filter(s=>s.acc!=null).reduce((a,s)=>a+s.acc,0)/students.filter(s=>s.acc!=null).length):null;
+    if(this.view!=='classes')go('classes');
+    document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
+    let d;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-detail',token:currentToken,classId:id})});
+      d=await r.json();
+      if(!r.ok){document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">${d.error||'Erreur.'}<br><button onclick="app.renderClasses()" style="margin-top:14px;background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;cursor:pointer">← Retour</button></div></div>`;return;}
+    }catch{document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">Erreur réseau.</div></div>`;return;}
+    const students=d.students||[];
+    const agg=d.agg||{};
+    const link=`${location.origin}?classe=${d.inviteCode}`;
     document.getElementById(pageId).innerHTML=`<div class="stats-section">
       <div class="stats-header" style="padding-bottom:24px">
         <button onclick="app.renderClasses()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Toutes les classes</button>
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
-          <div>
-            <h1 style="margin-bottom:4px">${cl.name}</h1>
-            <p style="margin:0">${students.length} élève${students.length!==1?'s':''}</p>
-          </div>
-          <button onclick="app.refreshClass(${i})" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt)">↻ Actualiser les stats</button>
+          <div><h1 style="margin-bottom:4px">${d.name}</h1><p style="margin:0">${students.length} élève${students.length!==1?'s':''}</p></div>
+          <button onclick="app.viewClass('${d.id}')" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt)">↻ Actualiser</button>
         </div>
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
-
-        ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px">
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ÉLÈVES</div>
-            <div style="font-size:28px;font-weight:800">${students.length}</div>
-          </div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">VITESSE MOY.</div>
-            <div style="font-size:28px;font-weight:800">${avgWpm??'—'}<span style="font-size:14px;color:var(--muted);font-weight:500"> mpm</span></div>
-          </div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">PRÉCISION MOY.</div>
-            <div style="font-size:28px;font-weight:800">${avgAcc??'—'}<span style="font-size:14px;color:var(--muted);font-weight:500">${avgAcc!=null?' %':''}</span></div>
-          </div>
+        ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ÉLÈVES</div><div style="font-size:28px;font-weight:800">${agg.total!=null?agg.total:students.length}</div></div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ACTIFS / SEM.</div><div style="font-size:28px;font-weight:800">${agg.activeThisWeek||0}</div></div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">VITESSE MOY.</div><div style="font-size:28px;font-weight:800">${agg.avgWpm!=null?agg.avgWpm:'—'}<span style="font-size:14px;color:var(--muted);font-weight:500"> mpm</span></div></div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">PRÉCISION MOY.</div><div style="font-size:28px;font-weight:800">${agg.avgAcc!=null?agg.avgAcc:'—'}<span style="font-size:14px;color:var(--muted);font-weight:500">${agg.avgAcc!=null?' %':''}</span></div></div>
         </div>`:''}
 
-        ${inviteLink?`
         <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🔗</div>
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🔑</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:2px">LIEN D'INVITATION</div>
-            <div style="font-size:12px;color:var(--muted);word-break:break-all;font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${inviteLink}</div>
+            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:2px">CODE D'INVITATION</div>
+            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:.12em;color:var(--accent)">${d.inviteCode}</div>
           </div>
-          <button id="copy-invite-btn-${i}" onclick="app.copyInviteLink(${i})" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Copier le lien</button>
-        </div>`:''}
+          <button id="copy-code-btn" onclick="app.copyClassLink('${link}')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Copier le lien</button>
+        </div>
 
         ${students.length===0?`
           <div style="text-align:center;padding:64px 20px;color:var(--muted)">
             <div style="width:60px;height:60px;border-radius:16px;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 16px">👩‍🎓</div>
             <div style="font-size:16px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun élève encore</div>
-            <div style="font-size:13px;max-width:280px;margin:0 auto;line-height:1.6">Partage le lien d'invitation. Les élèves rejoindront la classe automatiquement en cliquant dessus.</div>
+            <div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Partage le code <b style="color:var(--accent);font-family:'JetBrains Mono',monospace">${d.inviteCode}</b> ou le lien. Tes élèves rejoignent la classe en quelques secondes.</div>
           </div>
         `:`
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-            <div style="display:grid;grid-template-columns:1fr 110px 110px 80px 36px;padding:10px 20px;border-bottom:1px solid var(--border)">
+            <div style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px;padding:10px 20px;border-bottom:1px solid var(--border)">
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">ÉLÈVE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">VITESSE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">PRÉCISION</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">TESTS</div>
-              <div></div>
+              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:right">DERNIÈRE ACTIVITÉ</div>
             </div>
-            ${students.map((st,j)=>{
-              const wpmColor=st.wpm==null?'var(--muted)':st.wpm>=50?'#1FA971':st.wpm>=30?'var(--txt)':'#E5484D';
-              const accColor=st.acc==null?'var(--muted)':st.acc>=95?'#1FA971':st.acc>=80?'var(--txt)':'#E5484D';
-              return`<div style="display:grid;grid-template-columns:1fr 110px 110px 80px 36px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center">
-                <div>
-                  <div style="font-weight:600;font-size:14px">${st.username}</div>
-                  <div style="font-size:11px;color:var(--muted);margin-top:1px">Depuis le ${new Date(st.addedAt).toLocaleDateString('fr-FR')}</div>
-                </div>
-                <div style="text-align:center;font-size:16px;font-weight:800;color:${wpmColor}">${st.wpm!=null?st.wpm+'<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span>':'—'}</div>
-                <div style="text-align:center;font-size:16px;font-weight:800;color:${accColor}">${st.acc!=null?st.acc+'<span style="font-size:11px;font-weight:500;color:var(--muted)">%</span>':'—'}</div>
-                <div style="text-align:center;font-size:14px;color:var(--muted);font-weight:600">${st.tests||'—'}</div>
-                <div style="text-align:center"><button onclick="app.removeStudent(${i},${j})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;border-radius:6px;opacity:.5" title="Retirer" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.5';this.style.color='var(--muted)'">✕</button></div>
+            ${students.map(st=>{
+              const wpmColor=st.avgWpm==null?'var(--muted)':st.avgWpm>=50?'#1FA971':st.avgWpm>=30?'var(--txt)':'#E5484D';
+              const accColor=st.avgAcc==null?'var(--muted)':st.avgAcc>=95?'#1FA971':st.avgAcc>=80?'var(--txt)':'#E5484D';
+              const last=st.daysSinceActive==null?'jamais':st.daysSinceActive===0?"aujourd'hui":st.daysSinceActive===1?'hier':'il y a '+st.daysSinceActive+' j';
+              const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'#E5722B':'var(--muted)';
+              return`<div style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center">
+                <div><div style="font-weight:600;font-size:14px">${st.username}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${st.clearedLessons} leçon${st.clearedLessons!==1?'s':''} validée${st.clearedLessons!==1?'s':''}</div></div>
+                <div style="text-align:center;font-size:16px;font-weight:800;color:${wpmColor}">${st.avgWpm!=null?st.avgWpm:'—'}</div>
+                <div style="text-align:center;font-size:16px;font-weight:800;color:${accColor}">${st.avgAcc!=null?st.avgAcc+'%':'—'}</div>
+                <div style="text-align:center;font-size:14px;color:var(--muted);font-weight:600">${st.sessions||'—'}</div>
+                <div style="text-align:right;font-size:13px;font-weight:600;color:${lastColor}">${last}</div>
               </div>`;
             }).join('')}
           </div>
@@ -4686,38 +4701,24 @@ const app={
       </div></div>`;
   },
 
-  copyInviteLink(classIdx){
-    const s=this.stats||{};
-    const cl=s.classes[classIdx];
-    if(!cl||!cl.inviteToken||!currentUserId)return;
-    const link=`${location.origin}?join=${currentUserId}_${classIdx}_${cl.inviteToken}`;
+  copyClassLink(link){
     navigator.clipboard.writeText(link).then(()=>{
-      const btn=document.getElementById(`copy-invite-btn-${classIdx}`);
+      const btn=document.getElementById('copy-code-btn');
       if(btn){btn.textContent='✓ Copié !';setTimeout(()=>{btn.textContent='Copier le lien';},2000);}
     });
   },
 
-  removeStudent(classIdx,studentIdx){
-    if(!confirm('Retirer cet élève de la classe ?'))return;
-    const s=this.stats||{};
-    s.classes[classIdx].students.splice(studentIdx,1);
-    saveStats(s);
-    this.viewClass(classIdx);
-  },
-
-  async refreshClass(classIdx){
-    const s=this.stats||{};
-    const cl=s.classes[classIdx];
-    // Chercher les stats de chaque élève via l'API
-    for(const st of cl.students||[]){
-      try{
-        const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'stats',token:currentToken,username:st.username})});
-        if(r.ok){const d=await r.json();st.wpm=d.wpm;st.acc=d.acc;st.tests=d.tests;}
-      }catch{}
-    }
-    if(cl.students&&cl.students.length){const wpms=cl.students.filter(st=>st.wpm!=null).map(st=>st.wpm);cl.avgWpm=wpms.length?Math.round(wpms.reduce((a,b)=>a+b,0)/wpms.length):null;}
-    saveStats(s);
-    this.viewClass(classIdx);
+  async loadEtab(force){
+    if(this.etab&&this.etab.loaded&&!force)return this.etab;
+    if(!currentToken)return null;
+    try{
+      const mr=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'migrate-self',token:currentToken})});
+      if(mr.ok){const md=await mr.json();if(md&&md.role&&this.stats&&this.stats.role!==md.role){this.stats.role=md.role;const ss=JSON.parse(localStorage.getItem('klak_session')||'{}');ss.role=md.role;localStorage.setItem('klak_session',JSON.stringify(ss));updateNavUser();}}
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'teacher-overview',token:currentToken})});
+      if(r.ok){const data=await r.json();data.loaded=true;this.etab=data;}
+    }catch{}
+    if(this.view==='home')this.renderHome();else if(this.view==='classes')this.renderClasses();
+    return this.etab;
   },
 };
 
@@ -4806,12 +4807,50 @@ async function handleClassJoin(){
   }
 }
 
+async function handleClassCodeJoin(){
+  const code=new URLSearchParams(location.search).get('classe');
+  if(!code)return;
+  history.replaceState(null,'',location.pathname);
+  const doJoin=async()=>{
+    if(!currentToken)return;
+    const overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:90%;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">🏫</div>
+      <h2 style="margin:0 0 8px;font-size:20px">Rejoindre une classe</h2>
+      <p style="color:var(--muted);font-size:14px;margin:0 0 24px" id="cj-name">Vérification en cours…</p>
+      <div id="cj-actions" style="display:none;gap:10px;flex-direction:column">
+        <button id="cj-confirm" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;width:100%">Rejoindre la classe</button>
+        <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px;cursor:pointer;width:100%">Annuler</button>
+      </div>
+      <div id="cj-error" style="color:#E5484D;font-size:13px;margin-top:12px;display:none"></div>
+    </div>`;
+    document.body.appendChild(overlay);
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join-code',token:currentToken,code,preview:true})});
+      const d=await r.json();
+      if(!r.ok){document.getElementById('cj-name').textContent=d.error||'Code invalide.';return;}
+      document.getElementById('cj-name').textContent=`Tu vas rejoindre la classe « ${d.className} ».`;
+      document.getElementById('cj-actions').style.display='flex';
+      document.getElementById('cj-confirm').onclick=async()=>{
+        const b=document.getElementById('cj-confirm');b.disabled=true;b.textContent='En cours…';
+        const r2=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join-code',token:currentToken,code})});
+        const d2=await r2.json();
+        if(!r2.ok){b.disabled=false;b.textContent='Rejoindre la classe';const e=document.getElementById('cj-error');e.textContent=d2.error||'Erreur.';e.style.display='block';return;}
+        overlay.querySelector('div').innerHTML=`<div style="font-size:40px;margin-bottom:12px">✓</div><h2 style="margin:0 0 8px">Tu as rejoint la classe !</h2><p style="color:var(--muted);font-size:14px;margin:0 0 24px">Ta progression sera visible par ton professeur.</p><button onclick="this.closest('[style*=fixed]').remove()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer">Continuer</button>`;
+      };
+    }catch{document.getElementById('cj-name').textContent='Erreur réseau.';}
+  };
+  if(currentUser){doJoin();}
+  else{openAuth('login','Connecte-toi avec ton adresse scolaire pour rejoindre la classe.',()=>{doJoin();});}
+}
+
 async function loadProgressFromServer(){
   if(!currentUser||!currentToken)return;
   try{
     const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
     const d=await r.json();
-    if(d&&d.data){app.stats=mergeStats(d.data);const _s=JSON.parse(localStorage.getItem('klak_session')||'{}');let _changed=false;if(d.id&&!currentUserId){currentUserId=d.id;_s.userId=d.id;_changed=true;}if(app.stats.role&&_s.role!==app.stats.role){_s.role=app.stats.role||null;_changed=true;}if(_changed)localStorage.setItem('klak_session',JSON.stringify(_s));updateNavUser();app.renderCurrent();}
+    if(d&&d.data){app.stats=mergeStats(d.data);const _s=JSON.parse(localStorage.getItem('klak_session')||'{}');let _changed=false;if(d.id&&!currentUserId){currentUserId=d.id;_s.userId=d.id;_changed=true;}if(app.stats.role&&_s.role!==app.stats.role){_s.role=app.stats.role||null;_changed=true;}if(_changed)localStorage.setItem('klak_session',JSON.stringify(_s));updateNavUser();app.renderCurrent();if(isTeacher())app.loadEtab();}
   }catch{}
 }
 loadSession();
@@ -4830,6 +4869,7 @@ handleDuelReturn();
 (()=>{const p=new URLSearchParams(window.location.search);const rt=p.get('reset');if(rt)setTimeout(()=>app.showResetPasswordModal(rt),300);})();
 loadProgressFromServer();
 handleClassJoin();
+handleClassCodeJoin();
 // Sauvegarde immédiate de la progression à la fermeture / au changement d'onglet (la sauvegarde normale est différée)
 window.addEventListener('pagehide',()=>{
   if(currentUser&&currentToken&&app.stats){

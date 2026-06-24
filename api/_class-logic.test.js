@@ -2,7 +2,7 @@
 // Lancer : node --test api/_class-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { studentSummary, aggregateClass, detectAlerts, canActAsTeacher, canManageClass } = require('./_class-logic');
+const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass } = require('./_class-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -49,6 +49,19 @@ test('detectAlerts : inactifs >=7j et bloqués sans leçon validée', () => {
   const { inactive, stuck } = detectAlerts(students, NOW);
   assert.deepEqual(inactive.map((x) => x.username), ['tom']);
   assert.deepEqual(stuck.map((x) => x.username), ['sam']);
+});
+
+test('dailySeries : répartit les sessions par jour sur 7 jours (ancien -> récent)', () => {
+  const students = [
+    { tests: [{ t: NOW, wpm: 40 }, { t: NOW - 2 * DAY, wpm: 30 }] },
+    { tests: [{ t: NOW, wpm: 50 }, { t: NOW - 10 * DAY, wpm: 99 }] }, // le -10j est hors fenêtre
+  ];
+  const series = dailySeries(students, NOW, 7);
+  assert.equal(series.length, 7);
+  assert.equal(series[6].sessions, 2); // aujourd'hui : 2 sessions
+  assert.equal(series[6].avgWpm, 45); // (40+50)/2
+  assert.equal(series[4].sessions, 1); // il y a 2 jours : 1 session
+  assert.equal(series.reduce((a, b) => a + b.sessions, 0), 3); // le test à -10j est exclu
 });
 
 test('canActAsTeacher : prof et admin oui, élève non', () => {

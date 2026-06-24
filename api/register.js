@@ -169,20 +169,30 @@ module.exports = async function handler(req, res) {
   const emailCheck = await sb(`/users?email=eq.${encodeURIComponent(email)}&select=id`);
   if (emailCheck.data && emailCheck.data.length > 0) return res.status(409).json({ error: 'Cet email est déjà utilisé.' });
 
-  // Institution check
+  // Rattachement à un établissement.
   let institution = null;
-  if (institutionId) {
+
+  // 1) Par domaine de l'email institutionnel (clé d'appartenance, recommandé).
+  const emailDomain = (email.split('@')[1] || '').toLowerCase();
+  if (emailDomain) {
+    const byDomain = await sb(`/institutions?domains=cs.{"${emailDomain}"}&select=*`);
+    institution = byDomain.data && byDomain.data[0];
+  }
+
+  // 2) Sinon, ancien flux par mot de passe d'établissement (compat).
+  if (!institution && institutionId) {
     if (!institutionPasswordHash)
       return res.status(400).json({ error: 'Mot de passe établissement manquant.' });
-
     const instR = await sb(`/institutions?id=eq.${encodeURIComponent(institutionId)}&select=*`);
     institution = instR.data && instR.data[0];
     if (!institution) return res.status(404).json({ error: 'Établissement introuvable.' });
-
     if (institution.password_hash !== institutionPasswordHash)
       return res.status(401).json({ error: 'Mot de passe établissement incorrect.' });
+  }
 
-    const seatsR = await sb(`/users?institution_id=eq.${encodeURIComponent(institutionId)}&select=id`);
+  // Contrôle des places disponibles (quelle que soit la voie de rattachement).
+  if (institution) {
+    const seatsR = await sb(`/users?institution_id=eq.${encodeURIComponent(institution.id)}&select=id`);
     const usedSeats = seatsR.data ? seatsR.data.length : 0;
     if (usedSeats >= institution.seat_count)
       return res.status(403).json({ error: 'Plus de places disponibles pour cet établissement.' });

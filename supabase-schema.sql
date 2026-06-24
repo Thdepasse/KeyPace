@@ -24,6 +24,10 @@ create table if not exists institutions (
   created_at timestamptz default now()
 );
 
+-- Domaines email autorisés pour l'auto-rattachement des élèves (ex. {"uliege.be","etudiant.uliege.be"}).
+-- L'email institutionnel sert de clé d'appartenance : un externe ne peut pas profiter de la licence.
+alter table institutions add column if not exists domains text[] default '{}';
+
 alter table users
   add column if not exists institution_id uuid references institutions(id) on delete set null,
   add column if not exists email text unique,

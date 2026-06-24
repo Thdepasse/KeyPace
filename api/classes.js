@@ -1,6 +1,6 @@
 // API établissement (Phase 0) : routeur d'actions sur les tables classes/class_members.
 // Tout passe par la clé service (RLS deny-anon). Logique pure dans _class-logic.
-const { aggregateClass, detectAlerts, studentSummary, canActAsTeacher, canManageClass } = require('./_class-logic');
+const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass } = require('./_class-logic');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -73,7 +73,7 @@ async function teacherOverview(req, res) {
     out.push({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, memberCount: members.length, agg, alerts });
   }
 
-  return res.json({ classes: out, global: aggregateClass(allData, now) });
+  return res.json({ classes: out, global: aggregateClass(allData, now), series: dailySeries(allData, now) });
 }
 
 async function classCreate(req, res) {
