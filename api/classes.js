@@ -45,7 +45,8 @@ async function fetchProgressMap(studentIds) {
 
 async function membersOf(classId) {
   const r = await sb(`/class_members?class_id=eq.${encodeURIComponent(classId)}&select=student_id,joined_at,users(id,username)`);
-  return (r.data || []).map((m) => ({ student_id: m.student_id, joined_at: m.joined_at, username: m.users ? m.users.username : '?' }));
+  if (!r.ok || !Array.isArray(r.data)) throw new Error('membersOf ' + r.status + ': ' + JSON.stringify(r.data));
+  return r.data.map((m) => ({ student_id: m.student_id, joined_at: m.joined_at, username: m.users ? m.users.username : '?' }));
 }
 
 /* ── Cockpit : toutes les classes du prof + agrégats + alertes, en un appel ── */
@@ -58,7 +59,8 @@ async function teacherOverview(req, res) {
     ? `institution_id=eq.${user.institution_id}`
     : `teacher_id=eq.${user.id}`;
   const clsR = await sb(`/classes?${filter}&archived=eq.false&select=*&order=created_at.asc`);
-  const classes = clsR.data || [];
+  if (!clsR.ok || !Array.isArray(clsR.data)) throw new Error('classes ' + clsR.status + ': ' + JSON.stringify(clsR.data));
+  const classes = clsR.data;
 
   const now = Date.now();
   const allData = [];
@@ -263,6 +265,6 @@ module.exports = async function handler(req, res) {
       default: return res.status(400).json({ error: 'Action inconnue.' });
     }
   } catch (e) {
-    return res.status(500).json({ error: 'Erreur serveur.' });
+    return res.status(500).json({ error: 'Erreur serveur.', detail: String((e && e.message) || e) });
   }
 };

@@ -4729,7 +4729,7 @@ const app={
       if(mr.ok){const md=await mr.json();if(md&&md.role&&this.stats&&this.stats.role!==md.role){this.stats.role=md.role;const ss=JSON.parse(localStorage.getItem('klak_session')||'{}');ss.role=md.role;localStorage.setItem('klak_session',JSON.stringify(ss));updateNavUser();}}
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'teacher-overview',token:currentToken})});
       if(r.ok){const data=await r.json();data.loaded=true;this.etab=data;}
-      else{failed=true;const d=await r.json().catch(()=>({}));errMsg=d.error||('Erreur '+r.status);}
+      else{failed=true;const d=await r.json().catch(()=>({}));errMsg=(d.error||('Erreur '+r.status))+(d.detail?' — '+d.detail:'');}
     }catch(e){failed=true;errMsg='Erreur réseau.';}
     this._etabLoading=false;
     if(failed&&(!this.etab||this.etab.error)){this.etab={loaded:true,error:errMsg,classes:[],global:{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null},series:[]};}
