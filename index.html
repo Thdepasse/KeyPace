@@ -2696,6 +2696,16 @@ const app={
         </div>`;
       return;
     }
+    if(etab.error){
+      document.getElementById('page-home').innerHTML=`
+        <div style="max-width:560px;margin:0 auto;padding:72px 24px;text-align:center">
+          <div style="width:52px;height:52px;border-radius:14px;background:rgba(229,72,77,0.1);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px">⚠️</div>
+          <div style="font-size:17px;font-weight:700;margin-bottom:8px">Impossible de charger le tableau de bord</div>
+          <div style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:22px">${etab.error}${/réserv|enseignant|403/i.test(etab.error)?'<br>Ton compte n\'a pas encore le rôle enseignant en base. Demande à l\'administrateur de le passer en « prof ».':''}</div>
+          <button class="btn-primary" style="padding:10px 22px;font-size:14px" onclick="app.loadEtab(true)">Réessayer</button>
+        </div>`;
+      return;
+    }
     const classes=etab.classes||[];
     const g=etab.global||{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null};
     const series=etab.series||[];
@@ -4709,14 +4719,20 @@ const app={
   },
 
   async loadEtab(force){
-    if(this.etab&&this.etab.loaded&&!force)return this.etab;
+    if(this.etab&&this.etab.loaded&&!this.etab.error&&!force)return this.etab;
     if(!currentToken)return null;
+    if(this._etabLoading)return null; // anti ré-entrance : évite la boucle de rendu
+    this._etabLoading=true;
+    let failed=false,errMsg='';
     try{
       const mr=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'migrate-self',token:currentToken})});
       if(mr.ok){const md=await mr.json();if(md&&md.role&&this.stats&&this.stats.role!==md.role){this.stats.role=md.role;const ss=JSON.parse(localStorage.getItem('klak_session')||'{}');ss.role=md.role;localStorage.setItem('klak_session',JSON.stringify(ss));updateNavUser();}}
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'teacher-overview',token:currentToken})});
       if(r.ok){const data=await r.json();data.loaded=true;this.etab=data;}
-    }catch{}
+      else{failed=true;const d=await r.json().catch(()=>({}));errMsg=d.error||('Erreur '+r.status);}
+    }catch(e){failed=true;errMsg='Erreur réseau.';}
+    this._etabLoading=false;
+    if(failed&&(!this.etab||this.etab.error)){this.etab={loaded:true,error:errMsg,classes:[],global:{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null},series:[]};}
     if(this.view==='home')this.renderHome();else if(this.view==='classes')this.renderClasses();
     return this.etab;
   },
