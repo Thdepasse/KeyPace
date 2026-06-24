@@ -1111,9 +1111,11 @@ function loginUser(username){
 function logout(){
   clearSession();
   app.stats=null;
+  app.etab=null;
   app.stopAll();
   updateNavUser();
-  app.renderCurrent();
+  // Quitter toute vue réservée au prof (ex. Gestion de classes) et revenir à l'accueil public.
+  go('home');
 }
 
 function updateNavUser(){
@@ -4578,6 +4580,7 @@ const app={
   },
 
   renderClasses(){
+    if(!isTeacher()){go('home');return;}
     const etab=this.etab;
     if(!etab||!etab.loaded){
       this.loadEtab();
