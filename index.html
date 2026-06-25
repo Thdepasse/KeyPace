@@ -5275,7 +5275,7 @@ const app={
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'prof-invite-create',token:currentToken,email:email||null})});
       const d=await r.json();
-      if(!r.ok){btn.disabled=false;btn.textContent='Générer le lien';err.textContent=(d.error||'Erreur.')+(d.detail?(' ['+d.detail+']'):'');err.style.display='block';return;}
+      if(!r.ok){btn.disabled=false;btn.textContent='Générer le lien';err.textContent=d.error||'Erreur.';err.style.display='block';return;}
       document.getElementById('inv-step1').style.display='none';
       document.getElementById('inv-step2').style.display='block';
       document.getElementById('inv-link').value=`${location.origin}?prof=${d.token}`;
