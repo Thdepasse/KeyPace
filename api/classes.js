@@ -402,13 +402,14 @@ async function profInviteCreate(req, res) {
   const { user, error, status } = await adminFromToken(req.body.token);
   if (error) return res.status(status).json({ error });
   const email = (req.body.email || '').trim() || null;
-  let created = null;
+  let created = null, lastErr = null;
   for (let i = 0; i < 5; i++) {
     const token = genInviteCode() + genInviteCode(); // 12 caractères
     const r = await sb('/prof_invites', { method: 'POST', body: JSON.stringify({ institution_id: user.institution_id, email, token }) });
     if (r.ok && r.data && r.data[0]) { created = r.data[0]; break; }
+    lastErr = r.data;
   }
-  if (!created) return res.status(500).json({ error: 'Création impossible.' });
+  if (!created) return res.status(500).json({ error: 'Création impossible.', detail: (lastErr && (lastErr.message || JSON.stringify(lastErr))) || null });
   return res.json({ id: created.id, token: created.token, email: created.email });
 }
 
