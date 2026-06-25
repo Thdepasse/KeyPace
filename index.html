@@ -210,11 +210,13 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA}
-body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--txt);min-height:100vh}
+body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',Arial,sans-serif;color:var(--txt);min-height:100vh;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button{font-family:inherit;cursor:pointer}
+/* Le reset *{padding:0} retire l'indentation des listes : éviter que les puces (list-style outside) soient clippées hors de la boîte sur certains navigateurs. */
+ul,ol{list-style-position:inside}
 
 /* ── MODAL OVERLAY ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(22,20,15,0.45);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(22,20,15,0.45);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px}
 .modal-overlay.open{display:flex}
 .modal-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,0.14);position:relative;max-height:90vh;overflow-y:auto}
 .modal-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;color:var(--muted);line-height:1;padding:4px 8px;border-radius:8px}
@@ -249,8 +251,9 @@ button{font-family:inherit;cursor:pointer}
 .plan-card .plan-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;margin-bottom:6px}
 .plan-card .plan-price{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:22px;color:var(--accent);margin-bottom:10px}
 .plan-card .plan-price span{font-size:13px;color:var(--muted);font-weight:500}
-.plan-feat{font-size:13px;color:#7A7365;line-height:1.7;text-align:left}
-.plan-feat li{padding-left:4px}
+.plan-feat{font-size:13px;color:#7A7365;line-height:1.7;text-align:left;list-style:none}
+.plan-feat li{position:relative;padding-left:18px}
+.plan-feat li::before{content:"✓";position:absolute;left:0;top:0;color:var(--accent);font-weight:700}
 .upgrade-btn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-weight:700;font-size:16px;box-shadow:0 8px 20px rgba(255,77,46,0.3)}
 .upgrade-btn:hover{box-shadow:0 12px 28px rgba(255,77,46,0.4);transform:translateY(-1px);transition:.15s}
 .upgrade-code-wrap{margin-top:14px;display:flex;gap:8px}
@@ -270,6 +273,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .nav-link .underline{position:absolute;left:12px;right:12px;bottom:1px;height:2.5px;border-radius:2px;background:var(--accent);display:none}
 .nav-link.active .underline{display:block}
 .nav-spacer{flex:1}
+.nav-burger{display:none;background:none;border:1.5px solid var(--border);border-radius:10px;width:40px;height:40px;font-size:19px;color:var(--txt);align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent}
 /* logged-out nav */
 .nav-login-btn{background:none;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;font-size:14px;font-weight:600;color:var(--txt)}
 .nav-login-btn:hover{background:var(--light)}
@@ -717,14 +721,21 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 .gate-btn-sec{background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:14px;font-weight:600;color:var(--txt)}
 
 @media(max-width:768px){
-  /* nav */
-  .nav-inner{padding:10px 14px;gap:6px}
-  .nav-links{gap:0}
-  .nav-link{font-size:13px;padding:6px 8px}
+  /* nav : menu hamburger */
+  .nav-inner{padding:10px 14px;gap:8px}
+  .nav-burger{display:inline-flex}
+  .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:2px;margin:0;background:var(--card);border-bottom:1px solid var(--border);padding:8px;display:none;box-shadow:0 14px 30px rgba(0,0,0,.12);max-height:78vh;overflow-y:auto}
+  .nav-links.open{display:flex}
+  .nav-link{font-size:15px;font-weight:600;padding:12px 14px;text-align:left;width:100%;border-radius:10px}
+  .nav-link.active{background:var(--light)}
+  .nav-link .underline{display:none!important}
+  #nav-apercu{position:static!important}
+  #apercu-menu{position:static!important;box-shadow:none;border:none;padding:0 0 0 8px;min-width:0;margin-top:2px}
   .nav-login-btn{display:none}
-  .nav-signup-btn{font-size:12px;padding:6px 10px}
+  .nav-signup-btn{font-size:13px;padding:8px 12px}
   .nav-upgrade-btn{font-size:12px;padding:5px 8px}
   .nav-username{display:none}
+  .nav-logout{display:none}/* déconnexion accessible via l'avatar -> Réglages */
   /* hero */
   .home-hero{grid-template-columns:1fr;padding:28px 16px 20px}
   .hero-kb{display:none}
@@ -746,6 +757,12 @@ footer{border-top:1px solid var(--border);margin-top:10px}
   .sess-box{padding:20px 16px}
   .kb-row{gap:3px}
   .key{min-width:28px;height:36px;font-size:11px}
+  .typing-section{padding:0 12px 40px}
+  .typing-header{flex-direction:column;align-items:stretch;gap:10px}
+  .typing-actions{flex-wrap:wrap;gap:8px}
+  .typing-box{padding:18px 16px;font-size:17px}
+  .kb-row-t{gap:3px}
+  .kb-key-t{min-width:clamp(22px,7.7vw,40px);height:clamp(34px,9vw,48px);font-size:11px;border-bottom-width:3px}
 }
 </style>
 </head>
@@ -912,6 +929,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
         <button class="nav-logout" onclick="logout()">Déconnexion</button>
       </div>
     </div>
+    <button class="nav-burger" id="nav-burger" onclick="toggleNavMenu(event)" aria-label="Menu">☰</button>
   </div>
 </nav>
 
@@ -1222,6 +1240,9 @@ function isTeacher(){const r=(typeof app!=='undefined')&&app.stats&&app.stats.ro
 function isAdmin(){return (typeof app!=='undefined')&&app.stats&&app.stats.role==='admin';}
 function toggleApercu(e){if(e)e.stopPropagation();const m=document.getElementById('apercu-menu');if(m)m.style.display=m.style.display==='block'?'none':'block';}
 function closeApercu(){const m=document.getElementById('apercu-menu');if(m)m.style.display='none';}
+function toggleNavMenu(e){if(e)e.stopPropagation();document.querySelector('.nav-links')?.classList.toggle('open');}
+function closeNavMenu(){document.querySelector('.nav-links')?.classList.remove('open');}
+document.addEventListener('click',e=>{const nl=document.querySelector('.nav-links');const b=document.getElementById('nav-burger');if(nl&&nl.classList.contains('open')&&!nl.contains(e.target)&&b&&!b.contains(e.target))closeNavMenu();});
 document.addEventListener('click',e=>{const a=document.getElementById('nav-apercu');if(a&&!a.contains(e.target))closeApercu();});
 
 function getUserPlan(){
@@ -5788,7 +5809,7 @@ function handleDuelReturn(){
 }
 
 /* ── INIT ── */
-function go(view){app.renderView(view);}
+function go(view){closeNavMenu();app.renderView(view);}
 async function handleClassJoin(){
   const joinParam=new URLSearchParams(location.search).get('join');
   if(!joinParam)return;
