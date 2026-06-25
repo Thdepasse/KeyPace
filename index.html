@@ -4209,7 +4209,7 @@ const app={
   openSettings(section){
     if(document.getElementById('settings-overlay'))return;
     const user=currentUser||'';
-    const plan=this.stats&&this.stats.plan?this.stats.plan:'free';
+    const plan=getUserPlan()||'free'; // même source que le badge nav (évite l'incohérence Gratuit/Expert)
     const role=this.stats&&this.stats.role;
     const isEtab=role==='admin';
     const planLabel=isEtab?'Compte Établissement':role==='prof'?'Compte Enseignant':plan==='expert'?'Compte Expert':'Compte Gratuit';
