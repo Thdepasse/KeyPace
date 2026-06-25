@@ -1446,7 +1446,7 @@ const CURRICULUM=[
        ],
        tip:"Objectif : activer les auriculaires sans casser ta position de repos. Lenteur et régularité avant tout."
      },
-     text:'qm mq qs ml qslm mljk qmdf jklm qmsl slqm qlsm mqdj qsdfg hjklm qmsl mqdj'},
+     text:'qm mq qs ml qslm mljk qmdf jklm qmsl slqm qlsm mqdj qsdmj mjkls qmsl mqdj'},
     // r5 : + g h  : on peut presque faire des syllabes
     {id:'r5',title:'G et H, index intérieurs',keys:'g h',
      tip:'G et H sont tapés par les index qui s\'avancent légèrement vers le centre. Ce mouvement doit rester petit : l\'index glisse, ne saute pas. Reviens sur F ou J après chaque frappe.',
@@ -2223,6 +2223,7 @@ function getGameTier(score){let t=GAME_TIERS[0];for(const tier of GAME_TIERS){if
 const WORDS=GAME_TIERS[0].words;
 // Dead key composition for AZERTY (handles ^ as '^' not 'Dead' on some setups)
 const DEAD_COMPOSE={'^':{a:'â',e:'ê',i:'î',o:'ô',u:'û',A:'Â',E:'Ê',I:'Î',O:'Ô',U:'Û'},'¨':{a:'ä',e:'ë',i:'ï',o:'ö',u:'ü',y:'ÿ',A:'Ä',E:'Ë',I:'Ï',O:'Ö',U:'Ü'},'`':{a:'à',e:'è',i:'ì',o:'ò',u:'ù',A:'À',E:'È',I:'Ì',O:'Ò',U:'Ù'}};
+const CODE_TO_DEAD={'BracketLeft':'^','BracketRight':'¨','Equal':'`'};
 const SPRINT_WORDS=["le","la","les","un","une","de","des","et","ou","dans","sur","avec","pour","par","pas","ne","se","ce","ma","ta","sa","qui","que","quoi","où","tout","bien","très","faire","voir","aller","venir","avoir","être","dire","vouloir","pouvoir","savoir","prendre","mettre","partir","sortir","entrer","rester","trouver","donner","penser","parler","aimer","vivre","tenir","tomber","ouvrir","fermer","lire","écrire","taper","apprendre","comprendre","répondre","attendre","perdre","gagner","jouer","courir","marcher","chanter","danser","rire","pleurer","manger","boire","dormir","réveiller","travailler","voyager","revenir","passer","laisser","suivre","montrer","décider","commencer","finir","continuer","arriver","repartir","rentrer","retourner"];
 /* Banque de mots accentués + tiers de difficulté pour les jeux (réutilise WORDS/SPRINT_WORDS) */
 const TIREUR_ACCENTS=["école","élève","fenêtre","château","préféré","règle","forêt","crème","théâtre","numéro","côté","cœur","français","intérêt","élément","problème","éléphant","lumière","révéler","différent"];
@@ -2414,7 +2415,11 @@ const app={
 
   keyMatches(key,ch){if(ch==null)return false;const low=ch.toLowerCase();if(key.l.toLowerCase()===low)return true;if(key.s&&key.s===ch)return true;return false;},
   handleKey(e){
-    if(document.getElementById('lesson-tuto-modal').classList.contains('open'))return; // ne pas taper derrière le tuto
+    if(document.getElementById('lesson-tuto-modal').classList.contains('open'))return;
+    // Centralised dead-key composition (^+u→û etc.) for all modes
+    if(e.key==='Dead'){this._pendingDeadKey=CODE_TO_DEAD[e.code]||null;return;}
+    if(DEAD_COMPOSE[e.key]&&e.key.length===1){this._pendingDeadKey=e.key;return;}
+    if(this._pendingDeadKey){e._composedKey=(DEAD_COMPOSE[this._pendingDeadKey]||{})[e.key]||e.key;this._pendingDeadKey=null;}
     if(e.key==='Escape'&&this.view==='games'&&this.activeGame){this.exitActiveGame();return;}
     if(this.view==='games'&&this.activeGame==='sprint'&&this.sprint&&this.sprint.on){this.sprintKey(e);return;}
     if(this.view==='games'&&this.activeGame==='frappe'&&this.game&&this.game.on){this.gameKey(e);return;}
@@ -2432,7 +2437,7 @@ const app={
     this.renderGames();
   },
   typeKey(e){
-    const k=e.key;
+    const k=e._composedKey||e.key;
     if(k==='Backspace'){e.preventDefault();return;} // pas de correction : frappe en avant uniquement
     if(k.length!==1)return;
     e.preventDefault();
@@ -2617,16 +2622,10 @@ const app={
     this.renderCurrent();
   },
   gameKey(e){
-    const k=e.key;
-    // Dead key handling : use e.code when key='Dead' to know WHICH dead key (e.g. ^ = BracketLeft on AZERTY)
-    const CODE_TO_DEAD={'BracketLeft':'^','BracketRight':'¨','Equal':'`'};
-    if(k==='Dead'){this._pendingDeadKey=CODE_TO_DEAD[e.code]||null;return;}
-    if(DEAD_COMPOSE[k]){this._pendingDeadKey=k;return;} // ^ fires as '^' on some setups
+    const k=e._composedKey||e.key;
     if(k.length!==1)return;
     e.preventDefault();
-    let char=k;
-    if(this._pendingDeadKey){char=(DEAD_COMPOSE[this._pendingDeadKey]||{})[k]||k;}
-    this._pendingDeadKey=null;
+    const char=k;
     const g=this.game;if(!g||!g.on)return;
     if(!g.startTime)g.startTime=Date.now();
     g.totalKeys++;
@@ -2698,7 +2697,7 @@ const app={
     }
   },
   sprintKey(e){
-    const k=e.key;
+    const k=e._composedKey||e.key;
     if(k==='Backspace'){e.preventDefault();return;}
     if(k.length!==1)return;
     e.preventDefault();
@@ -3404,7 +3403,7 @@ const app={
     if(t.over&&!this._tireurRec){this._tireurRec=true;this.stopTireur();this.afterTireur();}
   },
   tireurKey(e){
-    const k=e.key;
+    const k=e._composedKey||e.key;
     if(k==='Backspace'){e.preventDefault();return;} // pas de correction
     if(k.length!==1)return;
     e.preventDefault();
@@ -3549,7 +3548,7 @@ const app={
   },
   courseKey(e){
     const c=this.course;if(!c||!c.on||!c.raceStarted||c.finished)return;
-    const k=e.key;
+    const k=e._composedKey||e.key;
     if(k==='Backspace'){e.preventDefault();if(c.typed.length>0){c.typed.pop();this.renderCurrent();}return;}
     if(k.length!==1)return;
     e.preventDefault();
@@ -3825,7 +3824,7 @@ const app={
   },
   bossKey(e){
     const b=this.boss;if(!b||b.phase!=='playing'||b.finished)return;
-    const k=e.key;
+    const k=e._composedKey||e.key;
     if(k==='Backspace'){e.preventDefault();if(b.typed.length>0){b.typed.pop();this.renderCurrent();}return;}
     if(k.length!==1)return;
     e.preventDefault();
@@ -4067,7 +4066,7 @@ const app={
   duelKey(e){
     const d=this.duel;if(!d||d.phase!=='racing'||d.finished)return;
     if(Date.now()<d.startAt)return;
-    const k=e.key;
+    const k=e._composedKey||e.key;
     if(k==='Backspace'){e.preventDefault();if(d.typed.length>0){d.typed.pop();this._duelAfterType();}return;}
     if(k.length!==1)return;
     e.preventDefault();
