@@ -43,7 +43,7 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const appUrl = process.env.APP_URL || 'https://keypace.be';
+  const appUrl = (process.env.APP_URL || 'https://keypace.be').trim();
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
     payment_method_types: ['card'],

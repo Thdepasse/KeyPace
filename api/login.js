@@ -3,7 +3,7 @@ const { Resend } = require('resend');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const APP_URL = process.env.APP_URL || 'https://keypace.be';
+const APP_URL = (process.env.APP_URL || 'https://keypace.be').trim();
 const FROM_EMAIL = process.env.FROM_EMAIL || 'KeyPace <noreply@keypace.be>';
 
 async function sb(path, opts = {}) {

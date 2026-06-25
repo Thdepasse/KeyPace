@@ -1,6 +1,9 @@
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
-const APP_URL = process.env.APP_URL || 'https://keypace.be';
+// .trim() : la variable d'env peut contenir un retour à la ligne / espace en fin,
+// ce qui rendait l'en-tête Location invalide (ERR_INVALID_CHAR) et faisait planter
+// la fonction à chaque confirmation d'email.
+const APP_URL = (process.env.APP_URL || 'https://keypace.be').trim();
 
 async function sb(path, opts = {}) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
@@ -21,7 +24,7 @@ async function sb(path, opts = {}) {
 // runtime, ce qui faisait planter la fonction en FUNCTION_INVOCATION_FAILED).
 function redirect(res, url) {
   res.statusCode = 302;
-  res.setHeader('Location', url);
+  res.setHeader('Location', String(url).replace(/[\r\n]+/g, '')); // garde-fou en-tête valide
   res.end();
 }
 
@@ -30,7 +33,6 @@ module.exports = async function handler(req, res) {
 
   try {
     const token = (req.query && req.query.token) || (new URL(req.url, `https://${req.headers.host}`).searchParams.get('token'));
-    if (token === '__ping__') { res.statusCode = 200; res.setHeader('Content-Type', 'text/plain'); res.end('pong-v3'); return; }
     if (!token) return redirect(res, `${APP_URL}?verified=invalid`);
 
     const r = await sb(`/users?verification_token=eq.${encodeURIComponent(token)}&select=id,email_verified,verification_expires_at`);
@@ -49,9 +51,6 @@ module.exports = async function handler(req, res) {
 
     return redirect(res, `${APP_URL}?verified=success`);
   } catch (e) {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('CATCH: ' + (e && (e.stack || e.message) || String(e)));
-    return;
+    return redirect(res, `${APP_URL}?verified=error`);
   }
 };
