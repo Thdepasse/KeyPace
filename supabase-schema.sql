@@ -147,3 +147,27 @@ create index if not exists users_role_idx on users(role);
 
 alter table classes       enable row level security;
 alter table class_members enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Phase 2 : devoirs assignés par le prof à une classe.
+-- lesson_id = id de leçon du curriculum (texte) ou null pour un test de vitesse libre.
+-- Accès via fonctions serverless (clé service) ; RLS sans policy => anon refusé.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists assignments (
+  id uuid default gen_random_uuid() primary key,
+  class_id uuid references classes(id) on delete cascade,
+  lesson_id text,                          -- null => test de vitesse libre
+  title text not null,
+  target_wpm integer,                      -- objectif de vitesse (mpm), optionnel
+  due_date date,                           -- échéance, optionnelle
+  created_at timestamptz default now()
+);
+-- Réparation idempotente si une table partielle existait déjà
+alter table assignments add column if not exists class_id uuid references classes(id) on delete cascade;
+alter table assignments add column if not exists lesson_id text;
+alter table assignments add column if not exists title text;
+alter table assignments add column if not exists target_wpm integer;
+alter table assignments add column if not exists due_date date;
+alter table assignments add column if not exists created_at timestamptz default now();
+create index if not exists assignments_class_idx on assignments(class_id);
+alter table assignments enable row level security;
