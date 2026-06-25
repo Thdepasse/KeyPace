@@ -241,26 +241,31 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .nav-avatar{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
 .nav-avatar:hover{opacity:.85}
 /* SETTINGS MODAL */
-.settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:800;display:flex;align-items:center;justify-content:center;padding:20px}
-.settings-modal{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:0;max-width:480px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.16);overflow:hidden}
-.settings-modal-head{padding:24px 28px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
-.settings-modal-avatar{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;flex-shrink:0}
-.settings-modal-head-info{flex:1}
-.settings-modal-head-info strong{font-size:16px;font-weight:800}
+.settings-overlay{position:fixed;inset:0;background:rgba(20,16,12,.45);backdrop-filter:blur(6px);z-index:800;display:flex;align-items:center;justify-content:center;padding:20px;animation:settings-fade .18s ease}
+@keyframes settings-fade{from{opacity:0}to{opacity:1}}
+.settings-modal{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:0;max-width:500px;width:100%;box-shadow:0 30px 80px rgba(20,16,12,.28);overflow:hidden;max-height:90vh;display:flex;flex-direction:column;animation:settings-pop .22s cubic-bezier(.16,1,.3,1)}
+@keyframes settings-pop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.settings-modal-head{padding:26px 28px 22px;display:flex;align-items:center;gap:15px;background:linear-gradient(135deg,rgba(255,77,46,.10),rgba(124,58,237,.07));border-bottom:1px solid var(--border);flex-shrink:0}
+.settings-modal-avatar{width:52px;height:52px;border-radius:15px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:23px;font-weight:700;flex-shrink:0;box-shadow:0 6px 18px rgba(255,77,46,.32)}
+.settings-modal-head-info{flex:1;min-width:0}
+.settings-modal-head-info strong{font-size:18px;font-weight:800;letter-spacing:-.01em}
 .settings-modal-head-info span{display:block;font-size:12px;color:var(--muted);margin-top:1px}
-.settings-modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px;line-height:1}
-.settings-section{padding:20px 28px;border-bottom:1px solid var(--border)}
+.settings-modal-close{background:rgba(20,16,12,.06);border:none;font-size:16px;cursor:pointer;color:var(--muted);width:32px;height:32px;border-radius:50%;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.settings-modal-close:hover{background:rgba(20,16,12,.12);color:var(--txt)}
+.settings-modal-body{overflow-y:auto;flex:1}
+.settings-section{padding:22px 28px;border-bottom:1px solid var(--border)}
 .settings-section:last-child{border-bottom:none}
-.settings-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:14px}
-.settings-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.settings-section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.settings-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:13px;background:var(--bg);border:1px solid var(--border);margin-bottom:10px;transition:border-color .15s}
+.settings-row:hover{border-color:rgba(255,77,46,.35)}
 .settings-row:last-child{margin-bottom:0}
-.settings-row-info{flex:1}
+.settings-row-info{flex:1;min-width:0}
 .settings-row-info strong{font-size:14px;font-weight:700;display:block}
-.settings-row-info span{font-size:13px;color:var(--muted);line-height:1.4}
-.settings-btn{padding:8px 16px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--txt);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s}
-.settings-btn:hover{border-color:var(--accent);color:var(--accent)}
-.settings-btn.danger{border-color:#E5484D;color:#E5484D}
-.settings-btn.danger:hover{background:#E5484D;color:#fff}
+.settings-row-info span{font-size:12.5px;color:var(--muted);line-height:1.45}
+.settings-btn{padding:9px 16px;border-radius:11px;border:1.5px solid var(--border);background:var(--card);color:var(--txt);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.settings-btn:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,77,46,.15)}
+.settings-btn.danger{border-color:rgba(229,72,77,.5);color:#E5484D}
+.settings-btn.danger:hover{background:#E5484D;color:#fff;border-color:#E5484D;box-shadow:0 4px 12px rgba(229,72,77,.25)}
 .gaze-calibrated-badge{display:inline-flex;align-items:center;gap:5px;background:#1FA97120;color:#1FA971;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700}
 /* CALIBRATION OVERLAY */
 .calib-overlay{position:fixed;inset:0;background:#0d0d0d;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -4225,8 +4230,9 @@ const app={
         </div>
         <button class="settings-modal-close" onclick="app.closeSettings()">✕</button>
       </div>
+      <div class="settings-modal-body">
       <div class="settings-section" id="settings-gaze-section">
-        <div class="settings-section-title">👁 Traqueur du regard</div>
+        <div class="settings-section-title"><span>👁</span> Traqueur du regard</div>
         <div class="settings-row">
           <div class="settings-row-info">
             <strong>Calibration du regard</strong>
@@ -4240,7 +4246,7 @@ const app={
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title">Compte</div>
+        <div class="settings-section-title"><span>🔐</span> Compte</div>
         <div class="settings-row">
           <div class="settings-row-info">
             <strong>Mot de passe</strong>
@@ -4255,7 +4261,7 @@ const app={
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title">Confidentialité (RGPD)</div>
+        <div class="settings-section-title"><span>🛡️</span> Confidentialité (RGPD)</div>
         <div class="settings-row">
           <div class="settings-row-info">
             <strong>Exporter mes données</strong>
@@ -4270,6 +4276,7 @@ const app={
           </div>
           <button class="settings-btn danger" onclick="app.deleteMyAccount()">Supprimer</button>
         </div>
+      </div>
       </div>
     </div>`;
     document.body.appendChild(overlay);
@@ -4822,9 +4829,41 @@ const app={
       if(confirm("La certification exige le traqueur des yeux calibré (regard ≥ 90% requis). Le calibrer maintenant ?"))this.startCalibration();
       return;
     }
-    let name=(this._myCert&&this._myCert.fullName)||this._certName||'';
-    if(!name){name=(prompt('Ton nom et prénom (il figurera sur le certificat) :')||'').trim();if(!name)return;}
-    this._certName=name;this._certMode=mode;
+    const name=(this._myCert&&this._myCert.fullName)||this._certName||'';
+    if(!name){this._certNameModal(mode);return;}
+    this._certName=name;this._launchCertExam(mode);
+  },
+  _certNameModal(mode){
+    document.getElementById('cert-name-modal')?.remove();
+    const ov=document.createElement('div');ov.id='cert-name-modal';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(20,16,12,.45);backdrop-filter:blur(6px);z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px;animation:settings-fade .18s ease';
+    ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:22px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(20,16,12,.28);animation:settings-pop .22s cubic-bezier(.16,1,.3,1)">
+      <div style="padding:28px 28px 14px;text-align:center">
+        <div style="width:58px;height:58px;border-radius:17px;background:linear-gradient(135deg,var(--accent),#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 15px;box-shadow:0 8px 22px rgba(255,77,46,.3)">🎓</div>
+        <h2 style="margin:0 0 6px;font-size:20px;letter-spacing:-.01em">Examen de certification</h2>
+        <p style="margin:0;font-size:13.5px;color:var(--muted);line-height:1.55">Indique ton nom complet : il figurera sur ton certificat officiel.</p>
+      </div>
+      <div style="padding:6px 28px 24px">
+        <input id="cert-name-input" placeholder="Prénom et nom" autocomplete="name" style="width:100%;padding:13px 15px;border:1.5px solid var(--border);border-radius:12px;font:inherit;font-size:15px;background:var(--bg);color:var(--txt);box-sizing:border-box;text-align:center" onkeydown="if(event.key==='Enter')app._certNameGo('${mode}')">
+        <div id="cert-name-err" style="color:#E5484D;font-size:12.5px;margin-top:8px;display:none;text-align:center"></div>
+        <div style="display:flex;gap:10px;margin-top:16px">
+          <button onclick="document.getElementById('cert-name-modal').remove()" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px;font:inherit;font-size:14px;font-weight:600;cursor:pointer">Annuler</button>
+          <button onclick="app._certNameGo('${mode}')" style="flex:1.4;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 5px 16px rgba(255,77,46,.32)">Commencer l'examen</button>
+        </div>
+      </div>
+    </div>`;
+    document.body.appendChild(ov);
+    setTimeout(()=>document.getElementById('cert-name-input')?.focus(),60);
+  },
+  _certNameGo(mode){
+    const v=(document.getElementById('cert-name-input').value||'').trim();
+    if(v.length<2){const e=document.getElementById('cert-name-err');e.textContent='Entre ton nom et prénom.';e.style.display='block';return;}
+    this._certName=v;
+    document.getElementById('cert-name-modal')?.remove();
+    this._launchCertExam(mode);
+  },
+  _launchCertExam(mode){
+    this._certMode=mode;
     this.stopTimer();this._showIntro=false;
     this._gaze.enabled=true;this._gaze.permError=null;
     this.sess={mode:'test',lessonId:null,text:CERT_TEXT,idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false,cert:true,certMode:mode,vocal:mode==='vocal',title:'Examen de certification — '+(mode==='vocal'?'dictée vocale':'écrit')};
@@ -5241,49 +5280,57 @@ const app={
   openAssignModal(classId){
     const opts=ALL_LESSONS.map(l=>`<option value="${l.id}">${l.title}</option>`).join('');
     const ov=document.createElement('div');
-    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3000;display:flex;align-items:center;justify-content:center';
-    const fld='width:100%;margin:6px 0 14px;padding:10px;border:1px solid var(--border);border-radius:10px;font:inherit;background:var(--bg);box-sizing:border-box';
-    const lbl='font-size:12px;font-weight:700;color:var(--muted)';
-    ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:460px;width:92%;max-height:90vh;overflow:auto">
-      <h2 style="margin:0 0 16px;font-size:20px">Assigner un devoir</h2>
-      <label style="${lbl}">Type de devoir</label>
-      <select id="asg-type" onchange="app._asgType()" style="${fld}">
-        <option value="lesson">Exercice du curriculum / test de vitesse</option>
-        <option value="custom">Texte personnalisé</option>
-      </select>
-      <div id="asg-block-lesson">
-        <label style="${lbl}">Exercice</label>
-        <select id="asg-lesson" style="${fld}">
-          <option value="">Test de vitesse libre</option>${opts}
-        </select>
+    ov.style.cssText='position:fixed;inset:0;background:rgba(20,16,12,.45);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;animation:settings-fade .18s ease';
+    const fld='width:100%;margin:6px 0 14px;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font:inherit;background:var(--bg);box-sizing:border-box;color:var(--txt)';
+    const lbl='display:block;font-size:12px;font-weight:700;color:var(--muted)';
+    ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:22px;max-width:480px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(20,16,12,.28);animation:settings-pop .22s cubic-bezier(.16,1,.3,1)">
+      <div style="padding:24px 28px 18px;background:linear-gradient(135deg,rgba(255,77,46,.10),rgba(124,58,237,.06));border-bottom:1px solid var(--border);display:flex;align-items:center;gap:13px">
+        <div style="width:46px;height:46px;border-radius:13px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 6px 16px rgba(255,77,46,.3)">📝</div>
+        <div style="flex:1;min-width:0"><h2 style="margin:0;font-size:19px;letter-spacing:-.01em">Assigner un devoir</h2><div style="font-size:12.5px;color:var(--muted);margin-top:2px">Un exercice du parcours ou ton propre texte</div></div>
+        <button onclick="this.closest('[style*=fixed]').remove()" style="background:rgba(20,16,12,.06);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--muted);font-size:15px;flex-shrink:0">✕</button>
       </div>
-      <div id="asg-block-custom" style="display:none">
-        <label style="${lbl}">Titre du devoir</label>
-        <input id="asg-title" placeholder="ex. Dictée sur les accents" style="${fld}">
-        <label style="${lbl}">Texte à taper par l'élève</label>
-        <textarea id="asg-text" rows="5" placeholder="Colle ou écris le texte du devoir…" style="${fld};resize:vertical;min-height:90px"></textarea>
-        <label style="${lbl}">Présentation pour l'élève</label>
-        <select id="asg-mode" style="${fld}">
-          <option value="written">📄 Écrit — l'élève voit le texte et le recopie</option>
-          <option value="vocal">🔊 Vocal — dictée : le texte est lu, l'élève ne le voit pas</option>
-        </select>
+      <div style="padding:22px 28px;overflow-y:auto">
+        <input type="hidden" id="asg-type" value="lesson">
+        <div style="display:flex;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:13px;padding:5px;margin-bottom:18px">
+          <button type="button" id="asg-seg-lesson" onclick="app._asgSetType('lesson')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:all .15s">📚 Exercice</button>
+          <button type="button" id="asg-seg-custom" onclick="app._asgSetType('custom')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">✍️ Texte personnalisé</button>
+        </div>
+        <div id="asg-block-lesson">
+          <label style="${lbl}">Exercice</label>
+          <select id="asg-lesson" style="${fld}"><option value="">Test de vitesse libre</option>${opts}</select>
+        </div>
+        <div id="asg-block-custom" style="display:none">
+          <label style="${lbl}">Titre du devoir</label>
+          <input id="asg-title" placeholder="ex. Dictée sur les accents" style="${fld}">
+          <label style="${lbl}">Texte à taper par l'élève</label>
+          <textarea id="asg-text" rows="5" placeholder="Colle ou écris le texte du devoir…" style="${fld};resize:vertical;min-height:96px;line-height:1.5"></textarea>
+          <label style="${lbl}">Présentation</label>
+          <div style="display:flex;gap:10px;margin:6px 0 14px">
+            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="written" checked style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px">📄 Écrit</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">L'élève voit le texte et le recopie</span></span></label>
+            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="vocal" style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px">🔊 Vocal</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">Dictée : le texte est lu, caché</span></span></label>
+          </div>
+        </div>
+        <label style="${lbl}">Objectif de vitesse <span style="font-weight:400">(mpm, optionnel)</span></label>
+        <input id="asg-wpm" type="number" min="1" placeholder="ex. 30" style="${fld}">
+        <label style="${lbl}">Échéance <span style="font-weight:400">(optionnel)</span></label>
+        <input id="asg-due" type="date" style="${fld};margin-bottom:2px">
+        <div id="asg-err" style="color:#E5484D;font-size:13px;margin:10px 0 0;display:none"></div>
       </div>
-      <label style="${lbl}">Objectif de vitesse (mpm, optionnel)</label>
-      <input id="asg-wpm" type="number" min="1" placeholder="ex. 30" style="${fld}">
-      <label style="${lbl}">Échéance (optionnel)</label>
-      <input id="asg-due" type="date" style="${fld};margin-bottom:16px">
-      <div id="asg-err" style="color:#E5484D;font-size:13px;margin-bottom:10px;display:none"></div>
-      <div style="display:flex;gap:10px">
-        <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;background:none;border:1px solid var(--border);border-radius:11px;padding:11px;font:inherit;font-size:14px;cursor:pointer">Annuler</button>
-        <button id="asg-save" onclick="app.createAssignment('${classId}')" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:11px;padding:11px;font:inherit;font-size:14px;font-weight:700;cursor:pointer">Assigner</button>
+      <div style="padding:16px 28px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0">
+        <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px;font:inherit;font-size:14px;font-weight:600;cursor:pointer">Annuler</button>
+        <button id="asg-save" onclick="app.createAssignment('${classId}')" style="flex:1.4;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 5px 16px rgba(255,77,46,.32)">Assigner le devoir</button>
       </div>
     </div>`;
     document.body.appendChild(ov);
     this._asgOverlay=ov;
   },
 
-  _asgType(){
-    const custom=document.getElementById('asg-type').value==='custom';
+  _asgSetType(type){
+    document.getElementById('asg-type').value=type;
+    const custom=type==='custom';
+    const L=document.getElementById('asg-seg-lesson'),C=document.getElementById('asg-seg-custom');
+    L.style.background=custom?'transparent':'var(--accent)';L.style.color=custom?'var(--muted)':'#fff';
+    C.style.background=custom?'var(--accent)':'transparent';C.style.color=custom?'#fff':'var(--muted)';
     document.getElementById('asg-block-lesson').style.display=custom?'none':'';
     document.getElementById('asg-block-custom').style.display=custom?'':'none';
   },
@@ -5298,7 +5345,7 @@ const app={
     if(type==='custom'){
       title=document.getElementById('asg-title').value.trim();
       customText=document.getElementById('asg-text').value.trim();
-      mode=document.getElementById('asg-mode').value;
+      mode=(document.querySelector('input[name="asg-mode"]:checked')||{}).value||'written';
       if(!title)return fail('Donne un titre au devoir.');
       if(!customText)return fail('Saisis le texte à taper.');
     }else{
