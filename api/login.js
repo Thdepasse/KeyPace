@@ -131,6 +131,51 @@ module.exports = async function handler(req, res) {
     return res.json({ ok: true, id: updated.id, username: updated.username, plan: updated.plan, token: newSession, data: progress?.data || {} });
   }
 
+  // — RGPD : export des données personnelles (droit d'accès)
+  if (body.action === 'export-me') {
+    const { token } = body;
+    if (!token) return res.status(400).json({ error: 'Token de session manquant.' });
+    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,email,role,plan,email_verified,created_at,institution_id`);
+    const user = uR.data && uR.data[0];
+    if (!user) return res.status(401).json({ error: 'Session invalide.' });
+
+    const pr = await sb(`/progress?user_id=eq.${user.id}&select=data,updated_at`);
+    const progress = (pr.data && pr.data[0]) || null;
+    const mR = await sb(`/class_members?student_id=eq.${user.id}&select=joined_at,classes(name)`);
+    const memberships = (mR.data || []).map((m) => ({ classe: m.classes ? m.classes.name : null, rejointeLe: m.joined_at }));
+    let institution = null;
+    if (user.institution_id) {
+      const iR = await sb(`/institutions?id=eq.${user.institution_id}&select=name,slug`);
+      institution = (iR.data && iR.data[0]) || null;
+    }
+    let teaching;
+    if (user.role === 'prof' || user.role === 'admin') {
+      const cR = await sb(`/classes?teacher_id=eq.${user.id}&select=name,invite_code,created_at`);
+      teaching = cR.data || [];
+    }
+    return res.json({
+      exportLe: new Date().toISOString(),
+      compte: { username: user.username, email: user.email, role: user.role || 'eleve', plan: user.plan, emailVerifie: !!user.email_verified, creeLe: user.created_at },
+      etablissement: institution,
+      progression: progress ? progress.data : {},
+      classesRejointes: memberships,
+      ...(teaching !== undefined ? { classesEnseignees: teaching } : {}),
+    });
+  }
+
+  // — RGPD : suppression définitive du compte (droit à l'effacement, ré-auth requise)
+  if (body.action === 'delete-me') {
+    const { token, passwordHash } = body;
+    if (!token || !passwordHash) return res.status(400).json({ error: 'Mot de passe requis.' });
+    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,password_hash`);
+    const user = uR.data && uR.data[0];
+    if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    if (user.password_hash !== passwordHash) return res.status(401).json({ error: 'Mot de passe incorrect.' });
+    // Les FK on delete cascade nettoient progress, class_members, scores, etc.
+    await sb(`/users?id=eq.${user.id}`, { method: 'DELETE' });
+    return res.json({ ok: true });
+  }
+
   // — Connexion normale
   const { username, passwordHash } = body;
   if (!username || !passwordHash) return res.status(400).json({ error: 'Champs manquants.' });

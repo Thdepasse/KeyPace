@@ -4184,12 +4184,85 @@ const app={
           <button class="settings-btn danger" onclick="app.closeSettings();logout()">Se déconnecter</button>
         </div>
       </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Confidentialité (RGPD)</div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>Exporter mes données</strong>
+            <span>Télécharger toutes tes données personnelles au format JSON</span>
+          </div>
+          <button class="settings-btn" id="export-data-btn" onclick="app.exportMyData(this)">Exporter</button>
+        </div>
+        <div class="settings-row" style="margin-top:10px">
+          <div class="settings-row-info">
+            <strong>Supprimer mon compte</strong>
+            <span>Effacement définitif de ton compte et de toutes tes données. Irréversible.</span>
+          </div>
+          <button class="settings-btn danger" onclick="app.deleteMyAccount()">Supprimer</button>
+        </div>
+      </div>
     </div>`;
     document.body.appendChild(overlay);
     overlay.addEventListener('click',e=>{if(e.target===overlay)this.closeSettings();});
     if(section==='gaze'){setTimeout(()=>{const el=document.getElementById('settings-gaze-section');if(el)el.scrollIntoView({behavior:'smooth'});},100);}
   },
   closeSettings(){document.getElementById('settings-overlay')?.remove();},
+  async exportMyData(btn){
+    if(!currentToken)return;
+    const old=btn.textContent;btn.disabled=true;btn.textContent='Export…';
+    try{
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'export-me',token:currentToken})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+      const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download='keypace-mes-donnees.json';
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+      btn.textContent='Téléchargé ✓';setTimeout(()=>{btn.disabled=false;btn.textContent=old;},2000);
+    }catch(e){btn.disabled=false;btn.textContent=old;alert(e.message||'Erreur lors de l\'export.');}
+  },
+  deleteMyAccount(){
+    const overlay=document.createElement('div');
+    overlay.className='settings-overlay';overlay.id='delete-acct-overlay';overlay.style.zIndex='1200';
+    overlay.innerHTML=`<div class="settings-modal" style="max-width:420px">
+      <div class="settings-modal-head">
+        <div class="settings-modal-avatar" style="background:#E5484D">⚠️</div>
+        <div class="settings-modal-head-info"><strong>Supprimer mon compte</strong><span style="color:var(--muted);font-size:12px">Cette action est définitive</span></div>
+      </div>
+      <div class="settings-section">
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin:0 0 14px">Toutes tes données seront effacées : progression, statistiques${isTeacher()?', et tes classes':''}. Cette action est <strong style="color:var(--txt)">irréversible</strong>. Saisis ton mot de passe pour confirmer.</p>
+        <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">MOT DE PASSE</label>
+        <input type="password" id="del-acct-pw" placeholder="••••••••" autocomplete="current-password" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+        <div id="del-acct-msg" style="display:none;font-size:13px;margin-top:10px;padding:10px 12px;border-radius:10px"></div>
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <button onclick="document.getElementById('delete-acct-overlay').remove()" style="flex:1;background:none;border:1px solid var(--border);border-radius:11px;padding:11px;font:inherit;font-size:14px;cursor:pointer">Annuler</button>
+          <button id="del-acct-confirm" onclick="app._confirmDeleteAccount()" style="flex:1;background:#E5484D;color:#fff;border:none;border-radius:11px;padding:11px;font:inherit;font-size:14px;font-weight:700;cursor:pointer">Supprimer définitivement</button>
+        </div>
+      </div>
+    </div>`;
+    overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
+    document.body.appendChild(overlay);
+  },
+  async _confirmDeleteAccount(){
+    const pw=document.getElementById('del-acct-pw')?.value;
+    const msg=document.getElementById('del-acct-msg');
+    const btn=document.getElementById('del-acct-confirm');
+    const showErr=(t)=>{msg.style.display='block';msg.style.background='rgba(229,72,77,0.1)';msg.style.color='#E5484D';msg.textContent=t;};
+    if(!pw)return showErr('Saisis ton mot de passe.');
+    btn.disabled=true;btn.textContent='Suppression…';
+    try{
+      const passwordHash=await hashPw(pw);
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete-me',token:currentToken,passwordHash})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+      document.getElementById('delete-acct-overlay')?.remove();
+      this.closeSettings();
+      this.admin=null;
+      logout();
+      alert('Ton compte et tes données ont été supprimés. À bientôt.');
+    }catch(e){btn.disabled=false;btn.textContent='Supprimer définitivement';showErr(e.message||'Erreur.');}
+  },
   async requestPasswordReset(btn){
     if(!currentToken)return;
     btn.disabled=true;btn.textContent='Envoi…';
@@ -5030,6 +5103,19 @@ const app={
 
   _sdSetFilter(f){this._sdFilter=f;this._renderSD();},
 
+  async adminDeleteStudent(studentId){
+    const name=(this._sd&&this._sd.username)||'cet élève';
+    if(!confirm('Supprimer définitivement '+name+' et toutes ses données ? Cette action est irréversible (RGPD).'))return;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'admin-delete-student',token:currentToken,studentId})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+      const cid=this._sd&&this._sd.classId;
+      this.admin=null; // forcer le refetch des agrégats établissement
+      if(cid)this.viewClass(cid);else this.renderInstitution();
+    }catch(e){alert(e.message||'Suppression impossible.');}
+  },
+
   _renderSD(){
     const pageId='page-classes';
     const d=this._sd;if(!d)return;
@@ -5057,6 +5143,7 @@ const app={
         <button onclick="app.viewClass('${d.classId}')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Retour à la classe</button>
         <h1 style="margin-bottom:4px">${d.username}</h1>
         <p style="margin:0">Inscrit le ${d.joinedAt?new Date(d.joinedAt).toLocaleDateString('fr-FR'):'—'} · dernière activité : ${last}</p>
+        ${isAdmin()?`<button onclick="app.adminDeleteStudent('${d.studentId}')" style="margin-top:12px;background:none;border:1px solid #E5484D;color:#E5484D;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Supprimer cet élève (RGPD)</button>`:''}
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">

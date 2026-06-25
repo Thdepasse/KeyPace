@@ -438,6 +438,21 @@ async function profInviteRevoke(req, res) {
   return res.json({ ok: true });
 }
 
+// RGPD : supprime définitivement un élève de l'établissement (droit à l'effacement).
+async function adminDeleteStudent(req, res) {
+  const { user, error, status } = await adminFromToken(req.body.token);
+  if (error) return res.status(status).json({ error });
+  const studentId = req.body.studentId;
+  if (!studentId) return res.status(400).json({ error: 'Élève manquant.' });
+  const sR = await sb(`/users?id=eq.${encodeURIComponent(studentId)}&select=id,role,institution_id`);
+  const student = sR.data && sR.data[0];
+  if (!student || student.institution_id !== user.institution_id || student.role !== 'eleve')
+    return res.status(404).json({ error: 'Élève introuvable.' });
+  // FK on delete cascade : progress, class_members, scores sont nettoyés.
+  await sb(`/users?id=eq.${encodeURIComponent(studentId)}`, { method: 'DELETE' });
+  return res.json({ ok: true });
+}
+
 // Archive un prof : exclu des vues établissement, ses classes sont conservées.
 async function profArchive(req, res) {
   const { user, error, status } = await adminFromToken(req.body.token);
@@ -528,6 +543,7 @@ module.exports = async function handler(req, res) {
       case 'prof-invite-list': return await profInviteList(req, res);
       case 'prof-invite-revoke': return await profInviteRevoke(req, res);
       case 'prof-archive': return await profArchive(req, res);
+      case 'admin-delete-student': return await adminDeleteStudent(req, res);
       // legacy (ancien modèle jsonb)
       case 'join': return await legacyJoin(req, res);
       case 'stats': return await legacyStudentStats(req, res);
