@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KeyPace : Apprends à taper vite sur clavier AZERTY</title>
-<meta name="description" content="Apprends à taper sans regarder ton clavier avec 65 leçons progressives AZERTY. Test de vitesse, jeu de frappe, suivi de progression. Gratuit, en français.">
-<meta name="keywords" content="apprendre à taper, clavier AZERTY, dactylo, frappe rapide, cours de frappe, mots par minute, wpm, exercices clavier, touch typing">
+<title>KeyPace – Application de dactylographie AZERTY gratuite en français</title>
+<meta name="description" content="KeyPace : apprenez à taper vite sur clavier AZERTY avec 65 leçons progressives, test de vitesse et jeux de frappe. Gratuit, en français, sans installation.">
+<meta name="keywords" content="KeyPace, apprendre à taper, clavier AZERTY, dactylo, dactylographie, frappe rapide, cours de frappe, mots par minute, wpm, exercices clavier, touch typing, frappe 10 doigts">
 <meta name="author" content="KeyPace">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <link rel="canonical" href="https://keypace.be/">
@@ -22,7 +22,7 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://keypace.be/">
-<meta property="og:title" content="KeyPace : Apprends à taper vite sur clavier AZERTY">
+<meta property="og:title" content="KeyPace – Application de dactylographie AZERTY gratuite en français">
 <meta property="og:description" content="65 leçons progressives AZERTY, test de vitesse et jeu de frappe. Gratuit et en français.">
 <meta property="og:image" content="https://keypace.be/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -34,7 +34,7 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="KeyPace : Apprends à taper vite sur clavier AZERTY">
+<meta name="twitter:title" content="KeyPace – Application de dactylographie AZERTY gratuite en français">
 <meta name="twitter:description" content="65 leçons progressives AZERTY, test de vitesse et jeu de frappe. Gratuit et en français.">
 <meta name="twitter:image" content="https://keypace.be/og-image.png">
 <meta name="twitter:image:alt" content="KeyPace : apprends à taper vite sur clavier AZERTY">
@@ -181,12 +181,20 @@
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "KeyPace",
+  "legalName": "KeyPace",
   "url": "https://keypace.be",
-  "logo": "https://keypace.be/apple-touch-icon.png",
-  "description": "KeyPace est une application web gratuite d'apprentissage de la dactylographie sur clavier AZERTY, en français, avec leçons progressives, tests de vitesse, jeux et certification de niveau.",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://keypace.be/apple-touch-icon.png",
+    "width": 180,
+    "height": 180
+  },
+  "image": "https://keypace.be/og-image.png",
+  "description": "KeyPace est une application web gratuite d'apprentissage de la dactylographie sur clavier AZERTY, en français, avec 65 leçons progressives, tests de vitesse, jeux et certification de niveau.",
   "email": "contact@keypace.be",
   "areaServed": ["FR", "BE", "CH", "LU", "CA"],
-  "knowsLanguage": "fr"
+  "knowsLanguage": "fr",
+  "sameAs": ["https://keypace.be"]
 }
 </script>
 
@@ -196,11 +204,19 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "KeyPace",
-  "alternateName": "KeyPace dactylo AZERTY",
+  "alternateName": ["KeyPace dactylo", "KeyPace AZERTY", "keypace.be"],
   "url": "https://keypace.be",
   "inLanguage": "fr",
-  "description": "Apprends à taper vite et sans regarder le clavier AZERTY : leçons progressives, test de vitesse, jeux de frappe et certification.",
-  "publisher": { "@type": "Organization", "name": "KeyPace", "url": "https://keypace.be" }
+  "description": "KeyPace — application de dactylographie AZERTY gratuite en français : 65 leçons progressives, test de vitesse, jeux de frappe et certification de niveau.",
+  "publisher": { "@type": "Organization", "name": "KeyPace", "url": "https://keypace.be" },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://keypace.be/?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
 }
 </script>
 
