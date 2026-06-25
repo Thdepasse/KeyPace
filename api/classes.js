@@ -201,6 +201,14 @@ async function myClasses(req, res) {
 // ou, pour un test libre avec objectif, s'il a un test atteignant la vitesse demandée.
 function assignmentDone(data, a) {
   const d = data || {};
+  // Texte personnalisé : fait dès que l'élève a complété CE devoir (clé = id), avec
+  // l'objectif vitesse atteint le cas échéant.
+  if (a.custom_text) {
+    const rec = (d.assignmentsDone || {})[a.id];
+    if (!rec) return false;
+    if (a.target_wpm) return (rec.wpm || 0) >= a.target_wpm;
+    return true;
+  }
   if (a.lesson_id) {
     const rec = (d.lessons || {})[a.lesson_id];
     if (!rec || !rec.cleared) return false;
@@ -221,12 +229,16 @@ async function assignmentCreate(req, res) {
   if (error) return res.status(status).json({ error });
   const title = (req.body.title || '').trim();
   if (!title) return res.status(400).json({ error: 'Titre requis.' });
+  const customText = (req.body.customText || '').trim() || null;
+  const mode = customText ? (req.body.mode === 'vocal' ? 'vocal' : 'written') : null;
   const row = {
     class_id: cls.id,
     lesson_id: req.body.lessonId || null,
     title,
     target_wpm: req.body.targetWpm ? parseInt(req.body.targetWpm, 10) : null,
     due_date: req.body.dueDate || null,
+    custom_text: customText,
+    mode,
   };
   const r = await sb('/assignments', { method: 'POST', body: JSON.stringify(row) });
   if (!r.ok || !r.data || !r.data[0]) return res.status(500).json({ error: 'Création impossible.' });
@@ -248,6 +260,8 @@ async function assignmentList(req, res) {
     title: a.title,
     targetWpm: a.target_wpm,
     dueDate: a.due_date,
+    customText: a.custom_text || null,
+    mode: a.mode || null,
     createdAt: a.created_at,
     total: members.length,
     doneCount: members.filter((m) => assignmentDone(pmap[m.student_id] || {}, a)).length,
@@ -287,6 +301,8 @@ async function myAssignments(req, res) {
     title: a.title,
     targetWpm: a.target_wpm,
     dueDate: a.due_date,
+    customText: a.custom_text || null,
+    mode: a.mode || null,
     className: classMap[a.class_id] || '',
     done: assignmentDone(data, a),
   }));

@@ -156,10 +156,12 @@ alter table class_members enable row level security;
 create table if not exists assignments (
   id uuid default gen_random_uuid() primary key,
   class_id uuid references classes(id) on delete cascade,
-  lesson_id text,                          -- null => test de vitesse libre
+  lesson_id text,                          -- null => test de vitesse libre ou texte perso
   title text not null,
   target_wpm integer,                      -- objectif de vitesse (mpm), optionnel
   due_date date,                           -- échéance, optionnelle
+  custom_text text,                        -- texte personnalisé saisi par le prof (sinon null)
+  mode text,                               -- 'written' | 'vocal' (dictée) pour un texte perso
   created_at timestamptz default now()
 );
 -- Réparation idempotente si une table partielle existait déjà
@@ -168,6 +170,8 @@ alter table assignments add column if not exists lesson_id text;
 alter table assignments add column if not exists title text;
 alter table assignments add column if not exists target_wpm integer;
 alter table assignments add column if not exists due_date date;
+alter table assignments add column if not exists custom_text text;
+alter table assignments add column if not exists mode text;
 alter table assignments add column if not exists created_at timestamptz default now();
 create index if not exists assignments_class_idx on assignments(class_id);
 alter table assignments enable row level security;
