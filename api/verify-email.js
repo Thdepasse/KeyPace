@@ -26,10 +26,10 @@ function redirect(res, url) {
 }
 
 module.exports = async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).end();
+  if (req.method !== 'GET') { res.statusCode = 405; res.end(); return; }
 
   try {
-    const token = req.query.token;
+    const token = (req.query && req.query.token) || (new URL(req.url, `https://${req.headers.host}`).searchParams.get('token'));
     if (!token) return redirect(res, `${APP_URL}?verified=invalid`);
 
     const r = await sb(`/users?verification_token=eq.${encodeURIComponent(token)}&select=id,email_verified,verification_expires_at`);
