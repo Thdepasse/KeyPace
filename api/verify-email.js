@@ -30,6 +30,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const token = (req.query && req.query.token) || (new URL(req.url, `https://${req.headers.host}`).searchParams.get('token'));
+    if (token === '__ping__') { res.statusCode = 200; res.setHeader('Content-Type', 'text/plain'); res.end('pong-v3'); return; }
     if (!token) return redirect(res, `${APP_URL}?verified=invalid`);
 
     const r = await sb(`/users?verification_token=eq.${encodeURIComponent(token)}&select=id,email_verified,verification_expires_at`);
