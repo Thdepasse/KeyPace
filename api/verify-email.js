@@ -17,23 +17,37 @@ async function sb(path, opts = {}) {
   return { ok: r.ok, status: r.status, data: text ? JSON.parse(text) : null };
 }
 
+// Redirection robuste : ne dépend pas du helper res.redirect (absent selon le
+// runtime, ce qui faisait planter la fonction en FUNCTION_INVOCATION_FAILED).
+function redirect(res, url) {
+  res.statusCode = 302;
+  res.setHeader('Location', url);
+  res.end();
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
-  const token = req.query.token;
-  if (!token) return res.redirect(`${APP_URL}?verified=invalid`);
+  try {
+    const token = req.query.token;
+    if (!token) return redirect(res, `${APP_URL}?verified=invalid`);
 
-  const r = await sb(`/users?verification_token=eq.${encodeURIComponent(token)}&select=id,email_verified,verification_expires_at`);
-  const user = r.data && r.data[0];
+    const r = await sb(`/users?verification_token=eq.${encodeURIComponent(token)}&select=id,email_verified,verification_expires_at`);
+    const user = r.data && r.data[0];
 
-  if (!user) return res.redirect(`${APP_URL}?verified=invalid`);
-  if (user.email_verified) return res.redirect(`${APP_URL}?verified=already`);
-  if (new Date(user.verification_expires_at) < new Date()) return res.redirect(`${APP_URL}?verified=expired`);
+    if (!user) return redirect(res, `${APP_URL}?verified=invalid`);
+    if (user.email_verified) return redirect(res, `${APP_URL}?verified=already`);
+    // N'expire que si une date est réellement fixée (null => on n'expire pas).
+    if (user.verification_expires_at && new Date(user.verification_expires_at) < new Date())
+      return redirect(res, `${APP_URL}?verified=expired`);
 
-  await sb(`/users?id=eq.${user.id}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ email_verified: true, verification_token: null, verification_expires_at: null }),
-  });
+    await sb(`/users?id=eq.${user.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ email_verified: true, verification_token: null, verification_expires_at: null }),
+    });
 
-  res.redirect(`${APP_URL}?verified=success`);
+    return redirect(res, `${APP_URL}?verified=success`);
+  } catch (e) {
+    return redirect(res, `${APP_URL}?verified=error`);
+  }
 };

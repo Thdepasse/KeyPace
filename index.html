@@ -1237,6 +1237,7 @@ function handleVerificationReturn(){
     already:{icon:'✅',title:'Déjà confirmé',body:'Ton adresse email est déjà vérifiée. Connecte-toi.',cta:'Se connecter',action:"openAuth('login')"},
     expired:{icon:'⏱️',title:'Lien expiré',body:'Le lien a expiré (24h). Crée un nouveau compte ou contacte le support.',cta:'Créer un compte',action:"openAuth('register')"},
     invalid:{icon:'❌',title:'Lien invalide',body:'Ce lien de confirmation n\'est pas valide.',cta:'Retour à l\'accueil',action:''},
+    error:{icon:'⚠️',title:'Erreur temporaire',body:'La confirmation a échoué côté serveur. Réessaie en recliquant sur le lien dans quelques instants.',cta:'Retour à l\'accueil',action:''},
   };
   const m=messages[verified]||messages.invalid;
   const el=document.createElement('div');
