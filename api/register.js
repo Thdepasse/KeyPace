@@ -160,7 +160,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { username, email, passwordHash, institutionId, institutionPasswordHash } = req.body || {};
+  const { username, email, passwordHash, institutionId, institutionPasswordHash, profInviteToken } = req.body || {};
   if (!username || !passwordHash || !email) return res.status(400).json({ error: 'Champs manquants.' });
 
   const check = await sb(`/users?username=eq.${encodeURIComponent(username)}&select=id`);
@@ -171,10 +171,24 @@ module.exports = async function handler(req, res) {
 
   // Rattachement à un établissement.
   let institution = null;
+  let isProf = false;
+
+  // 0) Invitation enseignant émise par un établissement (lien ?prof=TOKEN).
+  //    Prioritaire : crée un compte prof rattaché à l'établissement de l'invitation.
+  let profInvite = null;
+  if (profInviteToken) {
+    const invR = await sb(`/prof_invites?token=eq.${encodeURIComponent(profInviteToken)}&used_by=is.null&revoked=eq.false&select=*`);
+    profInvite = invR.data && invR.data[0];
+    if (!profInvite) return res.status(400).json({ error: "Lien d'invitation enseignant invalide ou déjà utilisé." });
+    const instR = await sb(`/institutions?id=eq.${encodeURIComponent(profInvite.institution_id)}&select=*`);
+    institution = instR.data && instR.data[0];
+    if (!institution) return res.status(404).json({ error: 'Établissement introuvable.' });
+    isProf = true;
+  }
 
   // 1) Par domaine de l'email institutionnel (clé d'appartenance, recommandé).
   const emailDomain = (email.split('@')[1] || '').toLowerCase();
-  if (emailDomain) {
+  if (!institution && emailDomain) {
     const byDomain = await sb(`/institutions?domains=cs.{"${emailDomain}"}&select=*`);
     institution = byDomain.data && byDomain.data[0];
   }
@@ -190,9 +204,10 @@ module.exports = async function handler(req, res) {
       return res.status(401).json({ error: 'Mot de passe établissement incorrect.' });
   }
 
-  // Contrôle des places disponibles (quelle que soit la voie de rattachement).
-  if (institution) {
-    const seatsR = await sb(`/users?institution_id=eq.${encodeURIComponent(institution.id)}&select=id`);
+  // Contrôle des places disponibles (élèves uniquement ; un prof invité ne
+  // consomme pas un siège licencié).
+  if (institution && !isProf) {
+    const seatsR = await sb(`/users?institution_id=eq.${encodeURIComponent(institution.id)}&role=eq.eleve&select=id`);
     const usedSeats = seatsR.data ? seatsR.data.length : 0;
     if (usedSeats >= institution.seat_count)
       return res.status(403).json({ error: 'Plus de places disponibles pour cet établissement.' });
@@ -215,11 +230,17 @@ module.exports = async function handler(req, res) {
       verification_token: verificationToken,
       verification_expires_at: verificationExpiresAt,
       ...(institution ? { institution_id: institution.id } : {}),
+      ...(isProf ? { role: 'prof' } : {}),
     }),
   });
   if (!create.ok) return res.status(500).json({ error: 'Erreur création compte.' });
 
   const user = create.data[0];
+
+  // Marque l'invitation enseignant comme utilisée (lie le prof à l'invitation).
+  if (profInvite) {
+    await sb(`/prof_invites?id=eq.${profInvite.id}`, { method: 'PATCH', body: JSON.stringify({ used_by: user.id }) });
+  }
 
   await sb('/progress', {
     method: 'POST',

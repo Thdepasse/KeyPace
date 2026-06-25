@@ -94,4 +94,33 @@ function canManageClass(user, cls) {
   return false;
 }
 
-module.exports = { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, WEEK_MS };
+// Établissement : seul un admin rattaché à une institution pilote ses profs.
+function canActAsAdmin(user) {
+  return !!user && user.role === 'admin' && !!user.institution_id;
+}
+
+// Résumé par professeur pour la vue d'ensemble établissement.
+// profEntries: [{ profId, username, classCount, studentsData: [progress.data, …] }]
+function institutionProfSummary(profEntries, now) {
+  return profEntries.map((p) => {
+    const studentsData = Array.isArray(p.studentsData) ? p.studentsData : [];
+    const agg = aggregateClass(studentsData, now);
+    let lastActivity = null;
+    for (const d of studentsData) {
+      const s = studentSummary(d, now);
+      if (s.lastTest != null && (lastActivity == null || s.lastTest > lastActivity)) lastActivity = s.lastTest;
+    }
+    return {
+      profId: p.profId,
+      username: p.username,
+      classCount: p.classCount || 0,
+      studentCount: agg.total,
+      activeThisWeek: agg.activeThisWeek,
+      avgWpm: agg.avgWpm,
+      avgAcc: agg.avgAcc,
+      lastActivity,
+    };
+  });
+}
+
+module.exports = { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary, WEEK_MS };

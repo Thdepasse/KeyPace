@@ -171,3 +171,30 @@ alter table assignments add column if not exists due_date date;
 alter table assignments add column if not exists created_at timestamptz default now();
 create index if not exists assignments_class_idx on assignments(class_id);
 alter table assignments enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Phase 3 : compte établissement (role 'admin') au-dessus du professeur.
+-- L'établissement gère ses profs (invitation/archivage) et voit ses élèves
+-- déclinés par prof. Un prof = users.role='prof' + institution_id ;
+-- un établissement = users.role='admin' + institution_id.
+-- Accès via fonctions serverless (clé service) ; RLS sans policy => anon refusé.
+-- ───────────────────────────────────────────────────────────────
+
+-- Archivage d'un prof par son établissement : exclu des vues, classes conservées.
+alter table users add column if not exists archived boolean default false;
+create index if not exists users_archived_idx on users(archived);
+
+-- Invitations enseignant émises par un établissement. Le prof complète son
+-- inscription via le lien ?prof=TOKEN et choisit son propre mot de passe.
+create table if not exists prof_invites (
+  id uuid default gen_random_uuid() primary key,
+  institution_id uuid references institutions(id) on delete cascade,
+  email text,                              -- optionnel : invitation ciblée
+  token text unique not null,
+  used_by uuid references users(id) on delete set null,
+  revoked boolean default false,
+  created_at timestamptz default now()
+);
+create index if not exists prof_invites_token_idx on prof_invites(token);
+create index if not exists prof_invites_institution_idx on prof_invites(institution_id);
+alter table prof_invites enable row level security;

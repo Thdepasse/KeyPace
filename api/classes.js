@@ -1,6 +1,6 @@
 // API établissement (Phase 0) : routeur d'actions sur les tables classes/class_members.
 // Tout passe par la clé service (RLS deny-anon). Logique pure dans _class-logic.
-const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass } = require('./_class-logic');
+const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary } = require('./_class-logic');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -49,20 +49,10 @@ async function membersOf(classId) {
   return r.data.map((m) => ({ student_id: m.student_id, joined_at: m.joined_at, username: m.users ? m.users.username : '?' }));
 }
 
-/* ── Cockpit : toutes les classes du prof + agrégats + alertes, en un appel ── */
-async function teacherOverview(req, res) {
-  const user = await userFromToken(req.body.token);
-  if (!user) return res.status(401).json({ error: 'Session invalide.' });
-  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
-
-  const filter = user.role === 'admin' && user.institution_id
-    ? `institution_id=eq.${user.institution_id}`
-    : `teacher_id=eq.${user.id}`;
-  const clsR = await sb(`/classes?${filter}&archived=eq.false&select=*&order=created_at.asc`);
-  if (!clsR.ok || !Array.isArray(clsR.data)) throw new Error('classes ' + clsR.status + ': ' + JSON.stringify(clsR.data));
-  const classes = clsR.data;
-
-  const now = Date.now();
+/* ── Cockpit : construit l'aperçu (classes + agrégats + alertes + courbe) pour
+   un ensemble de classes donné. Réutilisé par le cockpit prof et la vue prof
+   côté établissement. ── */
+async function buildOverview(classes, now) {
   const allData = [];
   const out = [];
   for (const cls of classes) {
@@ -74,8 +64,22 @@ async function teacherOverview(req, res) {
     const alerts = detectAlerts(members.map((m) => ({ username: m.username, data: pmap[m.student_id] || {} })), now);
     out.push({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, memberCount: members.length, agg, alerts });
   }
+  return { classes: out, global: aggregateClass(allData, now), series: dailySeries(allData, now) };
+}
 
-  return res.json({ classes: out, global: aggregateClass(allData, now), series: dailySeries(allData, now) });
+/* ── Cockpit : toutes les classes du prof (ou de l'établissement) + agrégats ── */
+async function teacherOverview(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+
+  const filter = user.role === 'admin' && user.institution_id
+    ? `institution_id=eq.${user.institution_id}`
+    : `teacher_id=eq.${user.id}`;
+  const clsR = await sb(`/classes?${filter}&archived=eq.false&select=*&order=created_at.asc`);
+  if (!clsR.ok || !Array.isArray(clsR.data)) throw new Error('classes ' + clsR.status + ': ' + JSON.stringify(clsR.data));
+
+  return res.json(await buildOverview(clsR.data, Date.now()));
 }
 
 async function classCreate(req, res) {
@@ -328,6 +332,125 @@ async function migrateSelf(req, res) {
   return res.json({ migrated, role: user.role });
 }
 
+/* ────────────────────────────────────────────────────────────────
+   Phase 3 : compte établissement (role 'admin').
+   Gère ses profs et voit ses élèves déclinés par professeur.
+   ──────────────────────────────────────────────────────────────── */
+
+// Charge l'admin depuis le token et vérifie le rôle établissement.
+async function adminFromToken(token) {
+  const user = await userFromToken(token);
+  if (!user) return { error: 'Session invalide.', status: 401 };
+  if (!canActAsAdmin(user)) return { error: 'Réservé aux comptes établissement.', status: 403 };
+  return { user };
+}
+
+// Vue d'ensemble établissement : infos institution + résumé par prof + agrégat global.
+async function adminOverview(req, res) {
+  const { user, error, status } = await adminFromToken(req.body.token);
+  if (error) return res.status(status).json({ error });
+
+  const instR = await sb(`/institutions?id=eq.${user.institution_id}&select=id,name,slug,seat_count`);
+  const institution = (instR.data && instR.data[0]) || null;
+
+  const profsR = await sb(`/users?institution_id=eq.${user.institution_id}&role=eq.prof&archived=eq.false&select=id,username&order=username.asc`);
+  const profs = Array.isArray(profsR.data) ? profsR.data : [];
+
+  const clsR = await sb(`/classes?institution_id=eq.${user.institution_id}&archived=eq.false&select=id,teacher_id`);
+  const classes = Array.isArray(clsR.data) ? clsR.data : [];
+
+  const now = Date.now();
+  const allData = [];
+  const profEntries = [];
+  for (const p of profs) {
+    const profClasses = classes.filter((c) => c.teacher_id === p.id);
+    const studentsData = [];
+    for (const c of profClasses) {
+      const members = await membersOf(c.id);
+      const pmap = await fetchProgressMap(members.map((m) => m.student_id));
+      members.forEach((m) => { const d = pmap[m.student_id] || {}; studentsData.push(d); allData.push(d); });
+    }
+    profEntries.push({ profId: p.id, username: p.username, classCount: profClasses.length, studentsData });
+  }
+
+  return res.json({
+    institution,
+    profs: institutionProfSummary(profEntries, now),
+    global: aggregateClass(allData, now),
+    series: dailySeries(allData, now),
+  });
+}
+
+// Détail d'un prof (ses classes + agrégats), pour l'établissement.
+async function profDetail(req, res) {
+  const { user, error, status } = await adminFromToken(req.body.token);
+  if (error) return res.status(status).json({ error });
+  const profId = req.body.profId;
+  if (!profId) return res.status(400).json({ error: 'Professeur manquant.' });
+
+  const pR = await sb(`/users?id=eq.${encodeURIComponent(profId)}&select=id,username,role,institution_id`);
+  const prof = pR.data && pR.data[0];
+  if (!prof || prof.institution_id !== user.institution_id) return res.status(404).json({ error: 'Professeur introuvable.' });
+
+  const clsR = await sb(`/classes?teacher_id=eq.${encodeURIComponent(profId)}&archived=eq.false&select=*&order=created_at.asc`);
+  const overview = await buildOverview(Array.isArray(clsR.data) ? clsR.data : [], Date.now());
+  return res.json({ prof: { id: prof.id, username: prof.username }, ...overview });
+}
+
+// Crée une invitation enseignant (lien ?prof=TOKEN).
+async function profInviteCreate(req, res) {
+  const { user, error, status } = await adminFromToken(req.body.token);
+  if (error) return res.status(status).json({ error });
+  const email = (req.body.email || '').trim() || null;
+  let created = null;
+  for (let i = 0; i < 5; i++) {
+    const token = genInviteCode() + genInviteCode(); // 12 caractères
+    const r = await sb('/prof_invites', { method: 'POST', body: JSON.stringify({ institution_id: user.institution_id, email, token }) });
+    if (r.ok && r.data && r.data[0]) { created = r.data[0]; break; }
+  }
+  if (!created) return res.status(500).json({ error: 'Création impossible.' });
+  return res.json({ id: created.id, token: created.token, email: created.email });
+}
+
+// Liste les invitations en attente + les profs actifs de l'établissement.
+async function profInviteList(req, res) {
+  const { user, error, status } = await adminFromToken(req.body.token);
+  if (error) return res.status(status).json({ error });
+
+  const invR = await sb(`/prof_invites?institution_id=eq.${user.institution_id}&used_by=is.null&revoked=eq.false&select=id,token,email,created_at&order=created_at.desc`);
+  const profsR = await sb(`/users?institution_id=eq.${user.institution_id}&role=eq.prof&archived=eq.false&select=id,username&order=username.asc`);
+  return res.json({
+    invites: Array.isArray(invR.data) ? invR.data : [],
+    profs: Array.isArray(profsR.data) ? profsR.data : [],
+  });
+}
+
+// Révoque une invitation enseignant non utilisée.
+async function profInviteRevoke(req, res) {
+  const { user, error, status } = await adminFromToken(req.body.token);
+  if (error) return res.status(status).json({ error });
+  const inviteId = req.body.inviteId;
+  if (!inviteId) return res.status(400).json({ error: 'Invitation manquante.' });
+  const iR = await sb(`/prof_invites?id=eq.${encodeURIComponent(inviteId)}&select=institution_id`);
+  const inv = iR.data && iR.data[0];
+  if (!inv || inv.institution_id !== user.institution_id) return res.status(404).json({ error: 'Invitation introuvable.' });
+  await sb(`/prof_invites?id=eq.${encodeURIComponent(inviteId)}`, { method: 'PATCH', body: JSON.stringify({ revoked: true }) });
+  return res.json({ ok: true });
+}
+
+// Archive un prof : exclu des vues établissement, ses classes sont conservées.
+async function profArchive(req, res) {
+  const { user, error, status } = await adminFromToken(req.body.token);
+  if (error) return res.status(status).json({ error });
+  const profId = req.body.profId;
+  if (!profId) return res.status(400).json({ error: 'Professeur manquant.' });
+  const pR = await sb(`/users?id=eq.${encodeURIComponent(profId)}&select=id,institution_id,role`);
+  const prof = pR.data && pR.data[0];
+  if (!prof || prof.institution_id !== user.institution_id || prof.role !== 'prof') return res.status(404).json({ error: 'Professeur introuvable.' });
+  await sb(`/users?id=eq.${encodeURIComponent(profId)}`, { method: 'PATCH', body: JSON.stringify({ archived: true }) });
+  return res.json({ ok: true });
+}
+
 /* ── Legacy (ancien modèle jsonb) — conservé tant que le front Phase 1 n'est pas livré ── */
 async function legacyJoin(req, res) {
   const { studentToken, teacherUserId, classIdx, inviteToken, preview } = req.body || {};
@@ -398,6 +521,13 @@ module.exports = async function handler(req, res) {
       case 'assignment-delete': return await assignmentDelete(req, res);
       case 'my-assignments': return await myAssignments(req, res);
       case 'migrate-self': return await migrateSelf(req, res);
+      // établissement (role admin)
+      case 'admin-overview': return await adminOverview(req, res);
+      case 'prof-detail': return await profDetail(req, res);
+      case 'prof-invite-create': return await profInviteCreate(req, res);
+      case 'prof-invite-list': return await profInviteList(req, res);
+      case 'prof-invite-revoke': return await profInviteRevoke(req, res);
+      case 'prof-archive': return await profArchive(req, res);
       // legacy (ancien modèle jsonb)
       case 'join': return await legacyJoin(req, res);
       case 'stats': return await legacyStudentStats(req, res);

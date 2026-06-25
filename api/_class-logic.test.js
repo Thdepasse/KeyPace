@@ -2,7 +2,7 @@
 // Lancer : node --test api/_class-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass } = require('./_class-logic');
+const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary } = require('./_class-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -81,4 +81,36 @@ test('canManageClass : prof = ses classes, admin = son établissement', () => {
   assert.equal(canManageClass(admin, cls), true); // même établissement
   assert.equal(canManageClass(admin, { teacher_id: 'p9', institution_id: 'i2' }), false);
   assert.equal(canManageClass({ role: 'eleve', id: 's1' }, cls), false);
+});
+
+test('canActAsAdmin : admin rattaché à une institution oui, sinon non', () => {
+  assert.equal(canActAsAdmin({ role: 'admin', institution_id: 'i1' }), true);
+  assert.equal(canActAsAdmin({ role: 'admin', institution_id: null }), false); // admin sans institution
+  assert.equal(canActAsAdmin({ role: 'prof', institution_id: 'i1' }), false);
+  assert.equal(canActAsAdmin(null), false);
+});
+
+test('institutionProfSummary : agrège par prof + dernière activité', () => {
+  const profs = [
+    {
+      profId: 'p1', username: 'mme.durand', classCount: 2,
+      studentsData: [
+        { tests: [{ t: NOW - 2 * DAY, wpm: 40, acc: 95 }] },
+        { tests: [{ t: NOW - 20 * DAY, wpm: 30, acc: 80 }] },
+        {},
+      ],
+    },
+    { profId: 'p2', username: 'm.leroy', classCount: 0, studentsData: [] },
+  ];
+  const [a, b] = institutionProfSummary(profs, NOW);
+  assert.equal(a.profId, 'p1');
+  assert.equal(a.classCount, 2);
+  assert.equal(a.studentCount, 3);
+  assert.equal(a.activeThisWeek, 1); // seul l'élève à -2j est actif
+  assert.equal(a.avgWpm, 35); // (40+30)/2, le vide ignoré
+  assert.equal(a.lastActivity, NOW - 2 * DAY); // test le plus récent
+  // prof sans classe ni élève
+  assert.equal(b.studentCount, 0);
+  assert.equal(b.avgWpm, null);
+  assert.equal(b.lastActivity, null);
 });
