@@ -278,6 +278,7 @@ async function myAssignments(req, res) {
   const data = (pr.data && pr.data[0] && pr.data[0].data) || {};
   const out = assignments.map((a) => ({
     id: a.id,
+    classId: a.class_id,
     lessonId: a.lesson_id,
     title: a.title,
     targetWpm: a.target_wpm,

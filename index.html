@@ -4682,16 +4682,53 @@ const app={
           ${list.map(c=>{
             const init=(c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
             const since=c.joinedAt?new Date(c.joinedAt).toLocaleDateString('fr-FR'):'';
-            return`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 20px;display:flex;align-items:center;gap:16px">
+            const cAsg=asg.filter(a=>a.classId===c.id);
+            const todo=cAsg.filter(a=>!a.done).length;
+            const badge=cAsg.length?`<span style="font-size:12px;font-weight:700;white-space:nowrap;color:${todo?'var(--accent)':'#1FA971'}">${todo?(todo+' devoir'+(todo>1?'s':'')+' à faire'):'Devoirs à jour'}</span>`:`<span style="font-size:12px;color:var(--muted)">Aucun devoir</span>`;
+            return`<div onclick="app.viewStudentClass('${c.id}')" style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:box-shadow .15s" onmouseenter="this.style.boxShadow='0 4px 18px rgba(0,0,0,0.07)'" onmouseleave="this.style.boxShadow='none'">
               <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--accent);flex-shrink:0;font-family:'JetBrains Mono',monospace">${init}</div>
               <div style="flex:1;min-width:0">
                 <div style="font-size:16px;font-weight:700;color:var(--txt)">${c.name}</div>
                 <div style="font-size:13px;color:var(--muted);margin-top:2px">Rejointe le ${since}</div>
               </div>
-              <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em">${c.inviteCode||''}</div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">${badge}<span style="font-size:11px;color:var(--muted);opacity:.7">Voir ›</span></div>
             </div>`;
           }).join('')}
         </div>`}
+      </div></div>`;
+  },
+
+  viewStudentClass(classId){
+    const pageId='page-classes';
+    const c=(this._myClasses||[]).find(x=>x.id===classId);
+    if(!c){this.renderStudentClasses();return;}
+    const asg=(this._myAssignments||[]).filter(a=>a.classId===classId);
+    const since=c.joinedAt?new Date(c.joinedAt).toLocaleDateString('fr-FR'):'';
+    const todo=asg.filter(a=>!a.done).length;
+    const devoirs=asg.length?`<div style="display:flex;flex-direction:column;gap:10px">
+      ${asg.map(a=>{
+        const due=a.dueDate?new Date(a.dueDate).toLocaleDateString('fr-FR'):null;
+        return`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px">
+          <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':'📝'}</div>
+          <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.targetWpm?('objectif '+a.targetWpm+' mpm'):'Exercice libre'}${due?(' · pour le '+due):''}</div></div>
+          ${a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Faire l'exercice</button>`}
+        </div>`;
+      }).join('')}
+    </div>`:`<div style="text-align:center;padding:56px 20px;color:var(--muted)">
+        <div style="font-size:40px;margin-bottom:14px">📭</div>
+        <div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun devoir pour l'instant</div>
+        <div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Ton professeur n'a pas encore assigné de devoir dans cette classe.</div>
+      </div>`;
+    document.getElementById(pageId).innerHTML=`<div class="stats-section">
+      <div class="stats-header" style="padding-bottom:24px">
+        <button onclick="app.renderStudentClasses()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;padding:0 0 14px;display:flex;align-items:center;gap:6px">‹ Mes classes</button>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+          <div><h1 style="margin-bottom:4px">${c.name}</h1><p style="margin:0">Rejointe le ${since}${c.inviteCode?(' · code '+c.inviteCode):''}</p></div>
+        </div>
+      </div>
+      <div style="max-width:760px;padding-bottom:60px">
+        <h2 style="font-size:18px;margin:0 0 12px">Devoirs ${asg.length?`<span style="font-size:13px;font-weight:600;color:var(--muted)">· ${todo} à faire sur ${asg.length}</span>`:''}</h2>
+        ${devoirs}
       </div></div>`;
   },
 
