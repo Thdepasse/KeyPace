@@ -2,8 +2,31 @@
 // Tout passe par la clé service (RLS deny-anon). Logique pure dans _class-logic.
 const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary } = require('./_class-logic');
 
+const crypto = require('crypto');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
+// Secret de signature des certificats (réutilise le secret OAuth déjà en place).
+const CERT_SECRET = process.env.OAUTH_STATE_SECRET || process.env.SUPABASE_SECRET_KEY || 'dev-cert';
+const CERT_MIN_WPM = 20, CERT_MIN_ACC = 90, CERT_MIN_GAZE = 90;
+
+function levelFor(wpm) {
+  if (wpm >= 55) return 'Expert';
+  if (wpm >= 40) return 'Avancé';
+  if (wpm >= 25) return 'Intermédiaire';
+  return 'Débutant';
+}
+function certSign(o) {
+  const payload = `cert|${o.code}|${o.userId}|${o.w || ''}|${o.v || ''}|${o.name}`;
+  return crypto.createHmac('sha256', CERT_SECRET).update(payload).digest('hex').slice(0, 32);
+}
+function certPublic(c) {
+  return {
+    code: c.code, fullName: c.full_name, level: c.level,
+    writtenWpm: c.written_wpm, vocalWpm: c.vocal_wpm,
+    writtenGaze: c.written_gaze, vocalGaze: c.vocal_gaze,
+    issuedAt: c.issued_at, updatedAt: c.updated_at,
+  };
+}
 
 async function sb(path, opts = {}) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
@@ -482,6 +505,76 @@ async function profArchive(req, res) {
   return res.json({ ok: true });
 }
 
+/* ────────────────────────────────────────────────────────────────
+   Certificats de niveau (dactylographie). Émis et signés par le serveur,
+   vérifiables publiquement par code/QR. 1 certificat par utilisateur.
+   ──────────────────────────────────────────────────────────────── */
+
+function genCertCode() {
+  return 'KP-' + genInviteCode() + genInviteCode(); // ex. KP-AB12CD-EF34GH (sans le tiret interne)
+}
+
+// L'élève soumet le résultat d'un examen de certification (écrit ou dictée vocale).
+async function certExamPass(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const mode = req.body.mode === 'vocal' ? 'vocal' : 'written';
+  const wpm = parseInt(req.body.wpm, 10) || 0;
+  const acc = parseInt(req.body.acc, 10) || 0;
+  const gaze = parseInt(req.body.gazePct, 10) || 0;
+  const fullName = (req.body.fullName || '').trim();
+  if (!fullName) return res.status(400).json({ error: 'Nom complet requis.' });
+  if (gaze < CERT_MIN_GAZE) return res.status(400).json({ error: `Regard sur l'écran insuffisant (${gaze}% < ${CERT_MIN_GAZE}%). Refais l'examen en gardant les yeux sur l'écran.`, code: 'GAZE' });
+  if (acc < CERT_MIN_ACC) return res.status(400).json({ error: `Précision insuffisante (${acc}% < ${CERT_MIN_ACC}%).`, code: 'ACC' });
+  if (wpm < CERT_MIN_WPM) return res.status(400).json({ error: `Vitesse insuffisante (${wpm} < ${CERT_MIN_WPM} mpm).`, code: 'WPM' });
+
+  const exR = await sb(`/certificates?user_id=eq.${user.id}&select=*`);
+  const ex = exR.data && exR.data[0];
+  const f = {
+    full_name: fullName,
+    written_wpm: ex ? ex.written_wpm : null,
+    vocal_wpm: ex ? ex.vocal_wpm : null,
+    written_gaze: ex ? ex.written_gaze : null,
+    vocal_gaze: ex ? ex.vocal_gaze : null,
+  };
+  if (mode === 'written') { f.written_wpm = wpm; f.written_gaze = gaze; }
+  else { f.vocal_wpm = wpm; f.vocal_gaze = gaze; }
+  const best = Math.max(f.written_wpm || 0, f.vocal_wpm || 0);
+  const level = levelFor(best);
+  const code = ex ? ex.code : genCertCode();
+  const signature = certSign({ code, userId: user.id, w: f.written_wpm, v: f.vocal_wpm, name: fullName });
+
+  if (ex) {
+    await sb(`/certificates?id=eq.${ex.id}`, { method: 'PATCH', body: JSON.stringify({ ...f, level, signature, updated_at: new Date().toISOString() }) });
+  } else {
+    const ins = await sb('/certificates', { method: 'POST', body: JSON.stringify({ user_id: user.id, code, ...f, level, signature }) });
+    if (!ins.ok || !ins.data || !ins.data[0]) return res.status(500).json({ error: 'Émission impossible.' });
+  }
+  const r2 = await sb(`/certificates?user_id=eq.${user.id}&select=*`);
+  return res.json({ ok: true, certificate: certPublic((r2.data && r2.data[0]) || { code, full_name: fullName, level, ...f }) });
+}
+
+// Récupère le certificat de l'utilisateur connecté (pour la page Progrès).
+async function certGet(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const r = await sb(`/certificates?user_id=eq.${user.id}&select=*`);
+  const c = r.data && r.data[0];
+  return res.json({ certificate: c ? certPublic(c) : null });
+}
+
+// Vérification PUBLIQUE d'un certificat par code (page ?cert=CODE / QR). Sans auth.
+async function certVerify(req, res) {
+  const code = (req.body.code || '').trim().toUpperCase();
+  if (!code) return res.status(400).json({ error: 'Code manquant.' });
+  const r = await sb(`/certificates?code=eq.${encodeURIComponent(code)}&select=*`);
+  const c = r.data && r.data[0];
+  if (!c) return res.status(404).json({ valid: false, error: 'Certificat introuvable.' });
+  const expect = certSign({ code: c.code, userId: c.user_id, w: c.written_wpm, v: c.vocal_wpm, name: c.full_name });
+  if (expect !== c.signature) return res.status(409).json({ valid: false, error: 'Signature invalide : ce certificat a été altéré.' });
+  return res.json({ valid: true, certificate: certPublic(c) });
+}
+
 /* ── Legacy (ancien modèle jsonb) — conservé tant que le front Phase 1 n'est pas livré ── */
 async function legacyJoin(req, res) {
   const { studentToken, teacherUserId, classIdx, inviteToken, preview } = req.body || {};
@@ -560,6 +653,10 @@ module.exports = async function handler(req, res) {
       case 'prof-invite-revoke': return await profInviteRevoke(req, res);
       case 'prof-archive': return await profArchive(req, res);
       case 'admin-delete-student': return await adminDeleteStudent(req, res);
+      // certificats
+      case 'cert-exam-pass': return await certExamPass(req, res);
+      case 'cert-get': return await certGet(req, res);
+      case 'cert-verify': return await certVerify(req, res);
       // legacy (ancien modèle jsonb)
       case 'join': return await legacyJoin(req, res);
       case 'stats': return await legacyStudentStats(req, res);

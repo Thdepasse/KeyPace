@@ -202,3 +202,28 @@ create table if not exists prof_invites (
 create index if not exists prof_invites_token_idx on prof_invites(token);
 create index if not exists prof_invites_institution_idx on prof_invites(institution_id);
 alter table prof_invites enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Certificats de niveau (dactylographie). Émis par le serveur, signés (HMAC),
+-- vérifiables publiquement via un code court + QR (page ?cert=CODE).
+-- Un certificat par utilisateur, cumulatif (écrit et/ou dictée vocale).
+-- Conditions d'obtention (vérifiées côté client puis enregistrées) :
+-- regard sur l'écran >= 90%, précision >= 90%, vitesse >= seuil, sur un
+-- examen standardisé. RLS sans policy => accès via serverless only.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists certificates (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references users(id) on delete cascade unique,
+  code text unique not null,                 -- code public court (vérif/QR)
+  full_name text not null,
+  written_wpm integer,                       -- mpm en mode écrit (null si non passé)
+  vocal_wpm integer,                         -- mpm en dictée vocale (null si non passé)
+  written_gaze integer,                      -- % de regard écran (écrit)
+  vocal_gaze integer,                        -- % de regard écran (dictée)
+  level text,                                -- libellé du niveau global
+  signature text not null,                   -- HMAC du contenu (intégrité)
+  issued_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists certificates_code_idx on certificates(code);
+alter table certificates enable row level security;
