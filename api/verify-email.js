@@ -49,6 +49,9 @@ module.exports = async function handler(req, res) {
 
     return redirect(res, `${APP_URL}?verified=success`);
   } catch (e) {
-    return redirect(res, `${APP_URL}?verified=error`);
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('CATCH: ' + (e && (e.stack || e.message) || String(e)));
+    return;
   }
 };
