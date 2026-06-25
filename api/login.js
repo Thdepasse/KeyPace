@@ -176,6 +176,18 @@ module.exports = async function handler(req, res) {
     return res.json({ ok: true });
   }
 
+  // — Connexion par session_token (utilisée après le SSO OAuth)
+  if (body.action === 'session-login') {
+    const { token } = body;
+    if (!token) return res.status(400).json({ error: 'Token de session manquant.' });
+    const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=*`);
+    const user = r.data && r.data[0];
+    if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
+    const progress = pr.data && pr.data[0];
+    return res.json({ id: user.id, username: user.username, plan: user.plan, role: user.role || 'eleve', token, data: progress?.data || {} });
+  }
+
   // — Connexion normale
   const { username, passwordHash } = body;
   if (!username || !passwordHash) return res.status(400).json({ error: 'Champs manquants.' });
