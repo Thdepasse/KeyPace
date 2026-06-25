@@ -5524,7 +5524,7 @@ const app={
       try{
         const ab=await this._asgRecBlob.arrayBuffer();
         const b64=btoa(String.fromCharCode(...new Uint8Array(ab)));
-        const upR=await fetch('/api/audio-upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,audioBase64:b64,mimeType:this._asgRecBlob.type||'audio/webm',prevPath:this._asgPrevStoragePath||null})});
+        const upR=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'audio-upload',token:currentToken,audioBase64:b64,mimeType:this._asgRecBlob.type||'audio/webm',prevPath:this._asgPrevStoragePath||null})});
         const upD=await upR.json();
         if(!upR.ok){btn.disabled=false;btn.textContent='Assigner';fail(upD.error||'Erreur upload audio.');return;}
         audioUrl=upD.audioUrl;

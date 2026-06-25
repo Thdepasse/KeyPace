@@ -636,6 +636,59 @@ async function legacyStudentStats(req, res) {
   return res.json({ wpm, acc, tests: data.tests.length });
 }
 
+const AUDIO_BUCKET = 'dictation-audio';
+const MAX_AUDIO_PER_TEACHER = 10;
+
+async function audioUpload(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (user.role !== 'teacher' && user.plan !== 'expert') {
+    return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  }
+  const { audioBase64, mimeType = 'audio/webm', prevPath } = req.body;
+  if (!audioBase64) return res.status(400).json({ error: 'Audio manquant.' });
+
+  // Limite : compter les devoirs actifs avec audio_url pour ce prof
+  const clsR = await sb(`/classes?teacher_id=eq.${encodeURIComponent(user.id)}&archived=eq.false&select=id`);
+  const classIds = Array.isArray(clsR.data) ? clsR.data.map(c => c.id) : [];
+  if (classIds.length) {
+    const aR = await sb(`/assignments?class_id=in.(${classIds.join(',')})&audio_url=not.is.null&select=id`);
+    const count = Array.isArray(aR.data) ? aR.data.length : 0;
+    if (count >= MAX_AUDIO_PER_TEACHER) {
+      return res.status(429).json({ error: `Limite de ${MAX_AUDIO_PER_TEACHER} dictées audio atteinte. Supprime un devoir avec audio pour en créer un nouveau.` });
+    }
+  }
+
+  // Supprimer l'ancien fichier si réenregistrement
+  if (prevPath) {
+    const safe = prevPath.replace(/[^a-zA-Z0-9/_.-]/g, '');
+    if (/^[0-9a-f-]+\/\d+\.webm$/.test(safe)) {
+      await fetch(`${SUPABASE_URL}/storage/v1/object/${AUDIO_BUCKET}/${safe}`, {
+        method: 'DELETE',
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+      }).catch(() => {});
+    }
+  }
+
+  // Upload vers Supabase Storage
+  const audioBuffer = Buffer.from(audioBase64, 'base64');
+  const fileName = `${user.id}/${Date.now()}.webm`;
+  const upR = await fetch(`${SUPABASE_URL}/storage/v1/object/${AUDIO_BUCKET}/${fileName}`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': mimeType,
+      'x-upsert': 'false',
+    },
+    body: audioBuffer,
+  });
+  if (!upR.ok) return res.status(500).json({ error: "Erreur lors de l'upload audio." });
+
+  const audioUrl = `${SUPABASE_URL}/storage/v1/object/public/${AUDIO_BUCKET}/${fileName}`;
+  return res.json({ audioUrl, storagePath: fileName });
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -658,6 +711,7 @@ module.exports = async function handler(req, res) {
       case 'assignment-list': return await assignmentList(req, res);
       case 'assignment-delete': return await assignmentDelete(req, res);
       case 'my-assignments': return await myAssignments(req, res);
+      case 'audio-upload': return await audioUpload(req, res);
       case 'migrate-self': return await migrateSelf(req, res);
       // établissement (role admin)
       case 'admin-overview': return await adminOverview(req, res);
