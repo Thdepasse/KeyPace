@@ -245,7 +245,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 @keyframes settings-fade{from{opacity:0}to{opacity:1}}
 .settings-modal{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:0;max-width:500px;width:100%;box-shadow:0 30px 80px rgba(20,16,12,.28);overflow:hidden;max-height:90vh;display:flex;flex-direction:column;animation:settings-pop .22s cubic-bezier(.16,1,.3,1)}
 @keyframes settings-pop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
-.settings-modal-head{padding:26px 28px 22px;display:flex;align-items:center;gap:15px;background:linear-gradient(135deg,rgba(255,77,46,.10),rgba(124,58,237,.07));border-bottom:1px solid var(--border);flex-shrink:0}
+.settings-modal-head{padding:26px 28px 22px;display:flex;align-items:center;gap:15px;background:linear-gradient(135deg,rgba(255,77,46,.13),rgba(255,77,46,.03));border-bottom:1px solid var(--border);flex-shrink:0}
 .settings-modal-avatar{width:52px;height:52px;border-radius:15px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:23px;font-weight:700;flex-shrink:0;box-shadow:0 6px 18px rgba(255,77,46,.32)}
 .settings-modal-head-info{flex:1;min-width:0}
 .settings-modal-head-info strong{font-size:18px;font-weight:800;letter-spacing:-.01em}
@@ -4213,7 +4213,7 @@ const app={
     const role=this.stats&&this.stats.role;
     const isEtab=role==='admin';
     const planLabel=isEtab?'Compte Établissement':role==='prof'?'Compte Enseignant':plan==='expert'?'Compte Expert':'Compte Gratuit';
-    const planColor=(isEtab||role==='prof')?'var(--accent)':plan==='expert'?'#7C3AED':'var(--muted)';
+    const planColor=(isEtab||role==='prof'||plan==='expert')?'var(--accent)':'var(--muted)';
     const calibRaw=localStorage.getItem('keypace-gaze-calib');
     const calibData=calibRaw?JSON.parse(calibRaw):null;
     const calibrated=!!calibData;
@@ -4221,11 +4221,11 @@ const app={
     overlay.className='settings-overlay';overlay.id='settings-overlay';
     overlay.innerHTML=`<div class="settings-modal">
       <div class="settings-modal-head">
-        <div class="settings-modal-avatar" style="background:${isEtab?'var(--accent)':plan==='expert'?'#7C3AED':'var(--accent)'}">${user?user[0].toUpperCase():'?'}</div>
+        <div class="settings-modal-avatar">${user?user[0].toUpperCase():'?'}</div>
         <div class="settings-modal-head-info">
           <strong>${user||'Invité'}</strong>
           <span style="display:flex;align-items:center;gap:6px;margin-top:3px">
-            <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.04em;background:${isEtab?'rgba(255,77,46,0.1)':plan==='expert'?'rgba(124,58,237,0.1)':'var(--light)'};color:${planColor}">${planLabel.toUpperCase()}</span>
+            <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.04em;background:${(isEtab||role==='prof'||plan==='expert')?'rgba(255,77,46,0.1)':'var(--light)'};color:${planColor}">${planLabel.toUpperCase()}</span>
           </span>
         </div>
         <button class="settings-modal-close" onclick="app.closeSettings()">✕</button>
@@ -4798,12 +4798,12 @@ const app={
   },
   _certPanel(){
     const c=this._myCert;
-    const wrap=(inner)=>`<div class="spanel" style="margin-bottom:22px;background:linear-gradient(135deg,rgba(255,77,46,0.06),rgba(124,58,237,0.06))"><h3>🎓 Certification de niveau</h3>${inner}</div>`;
+    const wrap=(inner)=>`<div class="spanel" style="margin-bottom:22px;background:linear-gradient(135deg,rgba(255,77,46,0.09),rgba(255,77,46,0.02))"><h3>🎓 Certification de niveau</h3>${inner}</div>`;
     if(c===undefined)return wrap(`<div style="color:var(--muted);font-size:14px;padding:8px 0">Chargement…</div>`);
     if(!c)return wrap(`<div style="font-size:14px;color:var(--muted);line-height:1.6;margin:6px 0 16px">Obtiens un certificat officiel de ton niveau de dactylographie. Conditions : <b>regard sur l'écran ≥ 90%</b> (traqueur des yeux activé) et <b>précision ≥ 90%</b>, sur un texte standardisé. Passe-le en mode écrit et/ou en dictée vocale.</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn-primary" style="padding:10px 18px;font-size:14px" onclick="app.startCertExam('written')">📄 Examen écrit</button>
-        <button class="btn-primary" style="padding:10px 18px;font-size:14px;background:#7C3AED" onclick="app.startCertExam('vocal')">🔊 Dictée de certification</button>
+        <button class="btn-primary" style="padding:10px 18px;font-size:14px" onclick="app.startCertExam('vocal')">🔊 Dictée de certification</button>
       </div>`);
     const lines=[];
     if(c.writtenWpm!=null)lines.push(`📄 Écrit <b>${c.writtenWpm} mpm</b>`);
@@ -4839,7 +4839,7 @@ const app={
     ov.style.cssText='position:fixed;inset:0;background:rgba(20,16,12,.45);backdrop-filter:blur(6px);z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px;animation:settings-fade .18s ease';
     ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:22px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(20,16,12,.28);animation:settings-pop .22s cubic-bezier(.16,1,.3,1)">
       <div style="padding:28px 28px 14px;text-align:center">
-        <div style="width:58px;height:58px;border-radius:17px;background:linear-gradient(135deg,var(--accent),#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 15px;box-shadow:0 8px 22px rgba(255,77,46,.3)">🎓</div>
+        <div style="width:58px;height:58px;border-radius:17px;background:linear-gradient(135deg,#FF7A4D,var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 15px;box-shadow:0 8px 22px rgba(255,77,46,.3)">🎓</div>
         <h2 style="margin:0 0 6px;font-size:20px;letter-spacing:-.01em">Examen de certification</h2>
         <p style="margin:0;font-size:13.5px;color:var(--muted);line-height:1.55">Indique ton nom complet : il figurera sur ton certificat officiel.</p>
       </div>
@@ -5284,7 +5284,7 @@ const app={
     const fld='width:100%;margin:6px 0 14px;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font:inherit;background:var(--bg);box-sizing:border-box;color:var(--txt)';
     const lbl='display:block;font-size:12px;font-weight:700;color:var(--muted)';
     ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:22px;max-width:480px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(20,16,12,.28);animation:settings-pop .22s cubic-bezier(.16,1,.3,1)">
-      <div style="padding:24px 28px 18px;background:linear-gradient(135deg,rgba(255,77,46,.10),rgba(124,58,237,.06));border-bottom:1px solid var(--border);display:flex;align-items:center;gap:13px">
+      <div style="padding:24px 28px 18px;background:linear-gradient(135deg,rgba(255,77,46,.13),rgba(255,77,46,.03));border-bottom:1px solid var(--border);display:flex;align-items:center;gap:13px">
         <div style="width:46px;height:46px;border-radius:13px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 6px 16px rgba(255,77,46,.3)">📝</div>
         <div style="flex:1;min-width:0"><h2 style="margin:0;font-size:19px;letter-spacing:-.01em">Assigner un devoir</h2><div style="font-size:12.5px;color:var(--muted);margin-top:2px">Un exercice du parcours ou ton propre texte</div></div>
         <button onclick="this.closest('[style*=fixed]').remove()" style="background:rgba(20,16,12,.06);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--muted);font-size:15px;flex-shrink:0">✕</button>
