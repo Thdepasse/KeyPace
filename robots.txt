@@ -1,4 +1,58 @@
+# KeyPace — robots.txt
+# Tout le monde est le bienvenu, y compris les robots d'IA / LLM.
+
 User-agent: *
 Allow: /
 
+# ── Crawlers IA explicitement autorisés (navigation, indexation, réponses) ──
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
 Sitemap: https://keypace.be/sitemap.xml
+
+# Aperçu structuré pour les LLM : https://keypace.be/llms.txt
