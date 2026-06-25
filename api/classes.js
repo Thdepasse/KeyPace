@@ -254,6 +254,7 @@ async function assignmentCreate(req, res) {
   if (!title) return res.status(400).json({ error: 'Titre requis.' });
   const customText = (req.body.customText || '').trim() || null;
   const mode = customText ? (req.body.mode === 'vocal' ? 'vocal' : 'written') : null;
+  const audioUrl = (mode === 'vocal' && req.body.audioUrl) ? req.body.audioUrl : null;
   const row = {
     class_id: cls.id,
     lesson_id: req.body.lessonId || null,
@@ -262,6 +263,7 @@ async function assignmentCreate(req, res) {
     due_date: req.body.dueDate || null,
     custom_text: customText,
     mode,
+    audio_url: audioUrl,
   };
   const r = await sb('/assignments', { method: 'POST', body: JSON.stringify(row) });
   if (!r.ok || !r.data || !r.data[0]) return res.status(500).json({ error: 'Création impossible.' });
@@ -285,6 +287,7 @@ async function assignmentList(req, res) {
     dueDate: a.due_date,
     customText: a.custom_text || null,
     mode: a.mode || null,
+    audioUrl: a.audio_url || null,
     createdAt: a.created_at,
     total: members.length,
     doneCount: members.filter((m) => assignmentDone(pmap[m.student_id] || {}, a)).length,
@@ -300,6 +303,16 @@ async function assignmentDelete(req, res) {
   if (!a) return res.status(404).json({ error: 'Devoir introuvable.' });
   const { error, status } = await loadClassForManage(user, a.class_id);
   if (error) return res.status(status).json({ error });
+  // Supprimer l'audio du storage si présent
+  if (a.audio_url) {
+    const match = a.audio_url.match(/dictation-audio\/(.+)$/);
+    if (match) {
+      await fetch(`${SUPABASE_URL}/storage/v1/object/dictation-audio/${match[1]}`, {
+        method: 'DELETE',
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+      }).catch(() => {});
+    }
+  }
   await sb(`/assignments?id=eq.${a.id}`, { method: 'DELETE' });
   return res.json({ ok: true });
 }
@@ -326,6 +339,7 @@ async function myAssignments(req, res) {
     dueDate: a.due_date,
     customText: a.custom_text || null,
     mode: a.mode || null,
+    audioUrl: a.audio_url || null,
     className: classMap[a.class_id] || '',
     done: assignmentDone(data, a),
   }));

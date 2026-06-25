@@ -2389,11 +2389,19 @@ const app={
     if(this.sess.vocal)setTimeout(()=>this.speakAssignment(),450);
   },
   _makeCustomSess(a){
-    return{mode:'test',lessonId:null,text:a.customText,idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false,custom:true,vocal:a.mode==='vocal',assignmentId:a.id,title:a.title};
+    return{mode:'test',lessonId:null,text:a.customText,idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false,custom:true,vocal:a.mode==='vocal',audioUrl:a.audioUrl||null,assignmentId:a.id,title:a.title};
   },
-  // Lit le texte de la dictée via la synthèse vocale du navigateur (voix française).
+  // Lit la dictée : audio du prof si disponible, sinon synthèse vocale FR.
   speakAssignment(){
     const s=this.sess;if(!s||!s.text)return;
+    if(s.audioUrl){
+      // Lecture de l'audio enregistré par le prof
+      if(this._dictAudio){this._dictAudio.pause();this._dictAudio=null;}
+      const audio=new Audio(s.audioUrl);
+      this._dictAudio=audio;
+      audio.play().catch(()=>{});
+      return;
+    }
     try{
       window.speechSynthesis.cancel();
       const u=new SpeechSynthesisUtterance(s.text);
@@ -5340,7 +5348,86 @@ const app={
     });
   },
 
+  _asgOnModeChange(){
+    const vocal=(document.querySelector('input[name="asg-mode"]:checked')||{}).value==='vocal';
+    const block=document.getElementById('asg-record-block');
+    if(block)block.style.display=vocal?'':'none';
+    if(!vocal)this._asgStopRecording();
+  },
+  _asgRecToggle(){
+    if(this._asgMediaRecorder&&this._asgMediaRecorder.state==='recording'){
+      this._asgStopRecording();
+    }else{
+      this._asgStartRecording();
+    }
+  },
+  async _asgStartRecording(){
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      this._asgRecChunks=[];
+      this._asgRecStream=stream;
+      const mr=new MediaRecorder(stream,{mimeType:MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm'});
+      this._asgMediaRecorder=mr;
+      mr.ondataavailable=e=>{if(e.data&&e.data.size>0)this._asgRecChunks.push(e.data);};
+      mr.onstop=()=>this._asgOnRecStop();
+      mr.start(200);
+      // UI
+      const btn=document.getElementById('asg-rec-btn');
+      const timer=document.getElementById('asg-rec-timer');
+      const status=document.getElementById('asg-rec-status');
+      const preview=document.getElementById('asg-rec-preview-wrap');
+      if(btn){btn.textContent='⏹️ Arrêter';btn.style.background='#E5484D';}
+      if(timer){timer.style.display='';timer.textContent='0:00';}
+      if(status)status.textContent='Enregistrement en cours…';
+      if(preview)preview.style.display='none';
+      // Timer
+      const start=Date.now();
+      this._asgRecInterval=setInterval(()=>{
+        const s=Math.floor((Date.now()-start)/1000);
+        if(timer)timer.textContent=Math.floor(s/60)+':'+(s%60<10?'0':'')+(s%60);
+      },500);
+    }catch(e){
+      const status=document.getElementById('asg-rec-status');
+      if(status)status.textContent='Micro inaccessible — vérifie les permissions.';
+    }
+  },
+  _asgStopRecording(){
+    if(this._asgMediaRecorder&&this._asgMediaRecorder.state==='recording')this._asgMediaRecorder.stop();
+    if(this._asgRecStream)this._asgRecStream.getTracks().forEach(t=>t.stop());
+    if(this._asgRecInterval){clearInterval(this._asgRecInterval);this._asgRecInterval=null;}
+    const btn=document.getElementById('asg-rec-btn');
+    if(btn){btn.textContent='🎙️ Enregistrer';btn.style.background='var(--accent)';}
+    const timer=document.getElementById('asg-rec-timer');
+    if(timer)timer.style.display='none';
+  },
+  _asgOnRecStop(){
+    const blob=new Blob(this._asgRecChunks,{type:'audio/webm'});
+    this._asgRecBlob=blob;
+    const url=URL.createObjectURL(blob);
+    const preview=document.getElementById('asg-rec-preview');
+    const wrap=document.getElementById('asg-rec-preview-wrap');
+    const status=document.getElementById('asg-rec-status');
+    if(preview){preview.src=url;if(wrap)wrap.style.display='';}
+    if(status)status.textContent='Écoute l\'enregistrement, puis clique sur "Assigner" ou réenregistre.';
+    this._asgAudioUrl=null; // sera uploadé à la soumission
+    this._asgPrevStoragePath=null;
+  },
+  _asgRecRetry(){
+    this._asgStopRecording();
+    this._asgRecBlob=null;
+    this._asgAudioUrl=null;
+    const wrap=document.getElementById('asg-rec-preview-wrap');
+    const status=document.getElementById('asg-rec-status');
+    const preview=document.getElementById('asg-rec-preview');
+    if(wrap)wrap.style.display='none';
+    if(status)status.textContent='';
+    if(preview)preview.src='';
+  },
   openAssignModal(classId){
+    // Réinitialiser l'état d'enregistrement à chaque ouverture
+    this._asgRecBlob=null;this._asgAudioUrl=null;this._asgPrevStoragePath=null;
+    this._asgMediaRecorder=null;this._asgRecStream=null;this._asgRecChunks=[];
+    if(this._asgRecInterval){clearInterval(this._asgRecInterval);this._asgRecInterval=null;}
     const opts=ALL_LESSONS.map(l=>`<option value="${l.id}">${l.title}</option>`).join('');
     const ov=document.createElement('div');
     ov.style.cssText='position:fixed;inset:0;background:rgba(20,16,12,.45);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;animation:settings-fade .18s ease';
@@ -5350,7 +5437,7 @@ const app={
       <div style="padding:24px 28px 18px;background:linear-gradient(135deg,rgba(255,77,46,.10),rgba(124,58,237,.06));border-bottom:1px solid var(--border);display:flex;align-items:center;gap:13px">
         <div style="width:46px;height:46px;border-radius:13px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 6px 16px rgba(255,77,46,.3)">📝</div>
         <div style="flex:1;min-width:0"><h2 style="margin:0;font-size:19px;letter-spacing:-.01em">Assigner un devoir</h2><div style="font-size:12.5px;color:var(--muted);margin-top:2px">Un exercice du parcours ou ton propre texte</div></div>
-        <button onclick="this.closest('[style*=fixed]').remove()" style="background:rgba(20,16,12,.06);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--muted);font-size:15px;flex-shrink:0">✕</button>
+        <button onclick="app._asgStopRecording();this.closest('[style*=fixed]').remove()" style="background:rgba(20,16,12,.06);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--muted);font-size:15px;flex-shrink:0">✕</button>
       </div>
       <div style="padding:22px 28px;overflow-y:auto">
         <input type="hidden" id="asg-type" value="lesson">
@@ -5369,8 +5456,21 @@ const app={
           <textarea id="asg-text" rows="5" placeholder="Colle ou écris le texte du devoir…" style="${fld};resize:vertical;min-height:96px;line-height:1.5"></textarea>
           <label style="${lbl}">Présentation</label>
           <div style="display:flex;gap:10px;margin:6px 0 14px">
-            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="written" checked style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px">📄 Écrit</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">L'élève voit le texte et le recopie</span></span></label>
-            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="vocal" style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px">🔊 Vocal</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">Dictée : le texte est lu, caché</span></span></label>
+            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="written" checked onchange="app._asgOnModeChange()" style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px">📄 Écrit</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">L'élève voit le texte et le recopie</span></span></label>
+            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="vocal" onchange="app._asgOnModeChange()" style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px">🔊 Vocal</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">Dictée : le texte est lu, caché</span></span></label>
+          </div>
+          <div id="asg-record-block" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px">
+            <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px">ENREGISTREMENT VOCAL DU PROF</div>
+            <div id="asg-rec-hint" style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Enregistre ta voix lisant le texte. L'élève entendra ton audio à la place de la synthèse vocale.</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <button id="asg-rec-btn" type="button" onclick="app._asgRecToggle()" style="display:flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">🎙️ Enregistrer</button>
+              <span id="asg-rec-timer" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);display:none">0:00</span>
+              <span id="asg-rec-status" style="font-size:12px;color:var(--muted)"></span>
+            </div>
+            <div id="asg-rec-preview-wrap" style="display:none;margin-top:12px">
+              <audio id="asg-rec-preview" controls style="width:100%;height:36px;border-radius:8px"></audio>
+              <button type="button" onclick="app._asgRecRetry()" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:9px;padding:7px 13px;font:inherit;font-size:12px;color:var(--muted);cursor:pointer">↩️ Réenregistrer</button>
+            </div>
           </div>
         </div>
         <label style="${lbl}">Objectif de vitesse <span style="font-weight:400">(mpm, optionnel)</span></label>
@@ -5380,7 +5480,7 @@ const app={
         <div id="asg-err" style="color:#E5484D;font-size:13px;margin:10px 0 0;display:none"></div>
       </div>
       <div style="padding:16px 28px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0">
-        <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px;font:inherit;font-size:14px;font-weight:600;cursor:pointer">Annuler</button>
+        <button onclick="app._asgStopRecording();this.closest('[style*=fixed]').remove()" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px;font:inherit;font-size:14px;font-weight:600;cursor:pointer">Annuler</button>
         <button id="asg-save" onclick="app.createAssignment('${classId}')" style="flex:1.4;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 5px 16px rgba(255,77,46,.32)">Assigner le devoir</button>
       </div>
     </div>`;
@@ -5417,8 +5517,24 @@ const app={
       else{if(!wpm)return fail('Pour un test libre, fixe un objectif de vitesse.');title='Test de vitesse — '+wpm+' mpm';}
     }
     const btn=document.getElementById('asg-save');btn.disabled=true;btn.textContent='…';
+    // Upload audio si mode vocal et enregistrement en attente
+    let audioUrl=this._asgAudioUrl||null;
+    if(mode==='vocal'&&this._asgRecBlob&&!audioUrl){
+      btn.textContent='Upload audio…';
+      try{
+        const ab=await this._asgRecBlob.arrayBuffer();
+        const b64=btoa(String.fromCharCode(...new Uint8Array(ab)));
+        const upR=await fetch('/api/audio-upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,audioBase64:b64,mimeType:this._asgRecBlob.type||'audio/webm',prevPath:this._asgPrevStoragePath||null})});
+        const upD=await upR.json();
+        if(!upR.ok){btn.disabled=false;btn.textContent='Assigner';fail(upD.error||'Erreur upload audio.');return;}
+        audioUrl=upD.audioUrl;
+        this._asgAudioUrl=audioUrl;
+        this._asgPrevStoragePath=upD.storagePath;
+      }catch{btn.disabled=false;btn.textContent='Assigner';fail('Erreur réseau lors de l\'upload audio.');return;}
+      btn.textContent='…';
+    }
     try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-create',token:currentToken,classId,lessonId:lessonId||null,title,targetWpm:wpm||null,dueDate:due||null,customText,mode})});
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-create',token:currentToken,classId,lessonId:lessonId||null,title,targetWpm:wpm||null,dueDate:due||null,customText,mode,audioUrl:audioUrl||null})});
       const d=await r.json();
       if(!r.ok){btn.disabled=false;btn.textContent='Assigner';fail(d.error||'Erreur.');return;}
       if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}

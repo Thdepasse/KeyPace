@@ -172,6 +172,7 @@ alter table assignments add column if not exists target_wpm integer;
 alter table assignments add column if not exists due_date date;
 alter table assignments add column if not exists custom_text text;
 alter table assignments add column if not exists mode text;
+alter table assignments add column if not exists audio_url text;
 alter table assignments add column if not exists created_at timestamptz default now();
 create index if not exists assignments_class_idx on assignments(class_id);
 alter table assignments enable row level security;
