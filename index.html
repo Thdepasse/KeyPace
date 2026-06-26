@@ -806,6 +806,8 @@ footer{border-top:1px solid var(--border);margin-top:10px}
   /* features desktop → masqué sur mobile */
   .home-features-desktop{display:none}
   .features-grid{grid-template-columns:1fr;padding:0 16px 24px}
+  /* pricing masqué sur mobile (remplacé par home-mobile-cta) */
+  .pricing-section{display:none}
   /* pricing */
   .pricing-section{padding:10px 16px 40px}
   .pricing-grid{grid-template-columns:1fr}
@@ -2927,12 +2929,12 @@ const app={
         <div class="home-features-title">CE QUE TU VAS APPRENDRE</div>
         <div class="home-feat-row" onclick="go('lessons')">
           <div class="home-feat-icon" style="background:rgba(255,77,46,0.1)">⌨️</div>
-          <div class="home-feat-text"><strong>Taper sans regarder</strong><span>65 leçons du débutant à l'expert AZERTY</span></div>
+          <div class="home-feat-text"><strong>Taper sans regarder</strong><span>65 leçons progressives, du débutant à l'expert</span></div>
           <div class="home-feat-arrow">›</div>
         </div>
         <div class="home-feat-row" onclick="go('test')">
           <div class="home-feat-icon" style="background:rgba(234,179,8,0.1)">⚡</div>
-          <div class="home-feat-text"><strong>Gagner en vitesse</strong><span>Test chronométré, mots/minute en temps réel</span></div>
+          <div class="home-feat-text"><strong>Gagner en vitesse</strong><span>Test chronométré de mots/minute et précision</span></div>
           <div class="home-feat-arrow">›</div>
         </div>
         <div class="home-feat-row" onclick="go('games')">
