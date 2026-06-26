@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KeyPace – Application de dactylographie AZERTY gratuite en français</title>
 <meta name="description" content="KeyPace : apprenez à taper vite sur clavier AZERTY avec 65 leçons progressives, test de vitesse et jeux de frappe. Gratuit, en français, sans installation.">
+<meta name="google-site-verification" content="wBYddgSlkFIdV9JdCfAXul6Etj9o8hYiFhZYDplfq2E" />
 <meta name="keywords" content="KeyPace, apprendre à taper, clavier AZERTY, dactylo, dactylographie, frappe rapide, cours de frappe, mots par minute, wpm, exercices clavier, touch typing, frappe 10 doigts">
 <meta name="author" content="KeyPace">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
@@ -234,7 +235,9 @@ ul,ol{list-style-position:inside}
 /* ── MODAL OVERLAY ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(22,20,15,0.45);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:16px}
 .modal-overlay.open{display:flex}
-.modal-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,0.14);position:relative;max-height:90vh;overflow-y:auto}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,0.14);position:relative;max-height:90vh;overflow-y:auto;scrollbar-width:none}
+.modal-box::-webkit-scrollbar{display:none}
+@media(max-height:700px){.modal-box{padding:20px;}.upgrade-hero{padding:4px 0 12px}.upgrade-hero h2{font-size:22px}.plan-cards{margin-bottom:12px}.plan-card{padding:12px}.plan-card .plan-price{font-size:18px;margin-bottom:6px}}
 .modal-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;color:var(--muted);line-height:1;padding:4px 8px;border-radius:8px}
 .modal-close:hover{background:var(--light)}
 
