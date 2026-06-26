@@ -240,14 +240,18 @@ ul,ol{list-style-position:inside}
 .modal-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,0.14);position:relative;max-height:90vh;overflow-y:auto;scrollbar-width:none}
 .modal-box::-webkit-scrollbar{display:none}
 /* ── HOME MOBILE BLOCKS ── */
-.home-pills{display:none;gap:8px;padding:0 16px 20px;flex-wrap:wrap}
-.home-pill{background:var(--card);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--txt);white-space:nowrap}
+.home-feat-grid{display:none;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 20px}
+.home-feat-cell{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.home-feat-cell:active{background:var(--light)}
+.home-feat-cell-icon{font-size:26px;width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.home-feat-cell-title{font-weight:800;font-size:14px;color:var(--txt);margin-bottom:3px;font-family:'Bricolage Grotesque',sans-serif}
+.home-feat-cell-sub{font-size:12px;color:var(--muted);line-height:1.4}
 .home-hero-secondary{display:none}
 .home-mobile-cta{display:none;margin:8px 16px 32px;text-align:center}
 .home-mobile-cta-price{font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:500}
 .home-mobile-cta-sub{font-size:12px;color:var(--muted);margin-top:10px}
 @media(max-width:600px){
-  .home-pills{display:flex}
+  .home-feat-grid{display:grid}
   .home-hero-secondary{display:block}
   .home-mobile-cta{display:block}
   .hero-btns .btn-secondary:not(.home-hero-secondary){display:none}
@@ -2916,31 +2920,28 @@ const app={
         <div class="hero-kb">${kbHtml}</div>
       </div>
 
-      <div class="home-pills">
-        <span class="home-pill">📚 65 leçons</span>
-        <span class="home-pill">🆓 Gratuit</span>
-        <span class="home-pill">🇧🇪 AZERTY</span>
-        <span class="home-pill">⚡ Sans install.</span>
-      </div>
-
       ${resumeBlock}
 
-      <div class="home-features-list">
-        <div class="home-features-title">CE QUE TU VAS APPRENDRE</div>
-        <div class="home-feat-row" onclick="go('lessons')">
-          <div class="home-feat-icon" style="background:rgba(255,77,46,0.1)">⌨️</div>
-          <div class="home-feat-text"><strong>Taper sans regarder</strong><span>65 leçons progressives, du débutant à l'expert</span></div>
-          <div class="home-feat-arrow">›</div>
+      <div class="home-feat-grid">
+        <div class="home-feat-cell" onclick="go('lessons')">
+          <div class="home-feat-cell-icon" style="background:rgba(255,77,46,0.1)">⌨️</div>
+          <div class="home-feat-cell-title">65 leçons</div>
+          <div class="home-feat-cell-sub">Débutant à expert, clavier AZERTY</div>
         </div>
-        <div class="home-feat-row" onclick="go('test')">
-          <div class="home-feat-icon" style="background:rgba(234,179,8,0.1)">⚡</div>
-          <div class="home-feat-text"><strong>Gagner en vitesse</strong><span>Test chronométré de mots/minute et précision</span></div>
-          <div class="home-feat-arrow">›</div>
+        <div class="home-feat-cell" onclick="go('test')">
+          <div class="home-feat-cell-icon" style="background:rgba(234,179,8,0.1)">⚡</div>
+          <div class="home-feat-cell-title">Test de vitesse</div>
+          <div class="home-feat-cell-sub">Mesure tes mots/minute</div>
         </div>
-        <div class="home-feat-row" onclick="go('games')">
-          <div class="home-feat-icon" style="background:rgba(34,197,94,0.1)">🎮</div>
-          <div class="home-feat-text"><strong>Progresser en jouant</strong><span>Jeux de frappe pour ancrer les réflexes</span></div>
-          <div class="home-feat-arrow">›</div>
+        <div class="home-feat-cell" onclick="go('games')">
+          <div class="home-feat-cell-icon" style="background:rgba(34,197,94,0.1)">🎮</div>
+          <div class="home-feat-cell-title">Jeux de frappe</div>
+          <div class="home-feat-cell-sub">Apprends en t'amusant</div>
+        </div>
+        <div class="home-feat-cell" onclick="go('stats')">
+          <div class="home-feat-cell-icon" style="background:rgba(99,102,241,0.1)">📊</div>
+          <div class="home-feat-cell-title">Tes progrès</div>
+          <div class="home-feat-cell-sub">Vitesse et précision</div>
         </div>
       </div>
 
