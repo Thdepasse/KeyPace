@@ -239,6 +239,33 @@ ul,ol{list-style-position:inside}
 .modal-overlay.open{display:flex}
 .modal-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,0.14);position:relative;max-height:90vh;overflow-y:auto;scrollbar-width:none}
 .modal-box::-webkit-scrollbar{display:none}
+/* ── HOME MOBILE BLOCKS ── */
+.home-resume{background:var(--accent);border-radius:20px;margin:0 16px 20px;padding:20px;display:none}
+.home-resume-label{font-size:10px;font-weight:800;letter-spacing:.1em;color:rgba(255,255,255,0.7);margin-bottom:14px}
+.home-resume-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.home-resume-stat{background:rgba(255,255,255,0.15);border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;transition:background .15s}
+.home-resume-stat:active{background:rgba(255,255,255,0.25)}
+.home-resume-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:26px;color:#fff;line-height:1}
+.home-resume-unit{font-size:11px;color:rgba(255,255,255,0.75);margin-top:4px;line-height:1.3}
+.home-features-list{margin:0 16px 8px;display:none}
+.home-features-title{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;padding:0 4px}
+.home-feat-row{display:flex;align-items:center;gap:14px;padding:14px 12px;background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:8px;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.home-feat-row:active{background:var(--light)}
+.home-feat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.home-feat-text{flex:1;min-width:0}
+.home-feat-text strong{display:block;font-size:15px;font-weight:700;color:var(--txt);margin-bottom:2px}
+.home-feat-text span{display:block;font-size:13px;color:var(--muted);line-height:1.4}
+.home-feat-arrow{font-size:22px;color:var(--muted);font-weight:300;flex-shrink:0}
+.home-kb-color{margin:12px 16px 24px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;display:none}
+.home-kb-color-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;margin-bottom:6px}
+.home-kb-color-sub{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px}
+.home-kb-color-row{display:flex;gap:4px;justify-content:center}
+.home-kb-key{flex:1;min-width:0;background:var(--light);border-radius:8px;padding:8px 0;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:var(--txt)}
+@media(max-width:600px){
+  .home-resume{display:block}
+  .home-features-list{display:block}
+  .home-kb-color{display:block}
+}
 @media(max-height:700px){.modal-box{padding:20px;}.upgrade-hero{padding:4px 0 12px}.upgrade-hero h2{font-size:22px}.plan-cards{margin-bottom:12px}.plan-card{padding:12px}.plan-card .plan-price{font-size:18px;margin-bottom:6px}}
 .modal-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;color:var(--muted);line-height:1;padding:4px 8px;border-radius:8px}
 .modal-close:hover{background:var(--light)}
@@ -760,8 +787,9 @@ footer{border-top:1px solid var(--border);margin-top:10px}
   /* hero */
   .home-hero{grid-template-columns:1fr;padding:28px 16px 20px}
   .hero-kb{display:none}
-  .home-hero h1{font-size:clamp(28px,8vw,40px)}
-  /* features */
+  .home-hero h1{font-size:clamp(30px,9vw,42px)}
+  /* features desktop → masqué sur mobile */
+  .home-features-desktop{display:none}
   .features-grid{grid-template-columns:1fr;padding:0 16px 24px}
   /* pricing */
   .pricing-section{padding:10px 16px 40px}
@@ -2825,10 +2853,43 @@ const app={
     if(isTeacher()){this._renderHomeEtab();return;}
     const kbHtml=KB.map(row=>'<div class="hkb-row">'+row.map(k=>`<div class="hkb-key${k.home?' home':''}">${k.l.toLowerCase()}</div>`).join('')+'</div>').join('');
     const isGuest=!currentUser;
+
+    // Stats for logged-in users (mobile resume block)
+    let resumeBlock='';
+    if(!isGuest&&this.stats){
+      const tests=this.stats.tests||[];
+      const bestWpm=tests.length?Math.max(...tests.map(t=>t.wpm)):0;
+      const clearedLessons=ALL_LESSONS.filter(l=>this.lessonRec(l.id).cleared).length;
+      const dset=new Set(tests.map(t=>{const d=new Date(t.t);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();}));
+      let streak=0;const cur=new Date();
+      for(let i=0;i<60;i++){const k=cur.getFullYear()+'-'+cur.getMonth()+'-'+cur.getDate();if(dset.has(k)){streak++;cur.setDate(cur.getDate()-1);}else if(i===0){cur.setDate(cur.getDate()-1);}else break;}
+      resumeBlock=`<div class="home-resume">
+        <div class="home-resume-label">REPRENDS TON ENTRAÎNEMENT</div>
+        <div class="home-resume-stats">
+          <div class="home-resume-stat" onclick="go('test')">
+            <div class="home-resume-val">${bestWpm||'—'}</div>
+            <div class="home-resume-unit">mpm record</div>
+          </div>
+          <div class="home-resume-stat" onclick="go('lessons')">
+            <div class="home-resume-val">${clearedLessons}</div>
+            <div class="home-resume-unit">leçons validées</div>
+          </div>
+          <div class="home-resume-stat" onclick="go('stats')">
+            <div class="home-resume-val">${streak}</div>
+            <div class="home-resume-unit">jours de suite</div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // Keyboard home row color preview (mobile)
+    const homeRow=[{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li'},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri'},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}];
+    const kbColorHtml=homeRow.map(k=>`<div class="home-kb-key" style="border-bottom:3px solid ${FINGERS[k.f]}">${k.l}</div>`).join('');
+
     document.getElementById('page-home').innerHTML=`
       <div class="home-hero">
         <div>
-          <h1><span style="white-space:nowrap">Apprends à taper</span><br><span style="white-space:nowrap">en t'amusant !</span></h1>
+          <h1><span style="white-space:nowrap">Apprends à taper</span><br><span style="white-space:nowrap">en t'<span style="color:var(--accent)">amusant.</span></span></h1>
           <p>La bonne position et les bons réflexes appris en jouant. Tu taperas bientôt sans même y penser.</p>
           <div class="hero-btns">
             <button class="btn-primary" onclick="go('test')">Tester ma vitesse →</button>
@@ -2837,7 +2898,40 @@ const app={
         </div>
         <div class="hero-kb">${kbHtml}</div>
       </div>
-      <div class="features-grid">
+
+      ${resumeBlock}
+
+      <div class="home-features-list">
+        <div class="home-features-title">AU PROGRAMME</div>
+        <div class="home-feat-row" onclick="go('lessons')">
+          <div class="home-feat-icon" style="background:rgba(255,77,46,0.1)">📚</div>
+          <div class="home-feat-text"><strong>Cours progressifs</strong><span>65 leçons couvrant tout le clavier AZERTY.</span></div>
+          <div class="home-feat-arrow">›</div>
+        </div>
+        <div class="home-feat-row" onclick="go('test')">
+          <div class="home-feat-icon" style="background:rgba(234,179,8,0.1)">⚡</div>
+          <div class="home-feat-text"><strong>Test de vitesse</strong><span>Mesure tes mots/minute et ta précision.</span></div>
+          <div class="home-feat-arrow">›</div>
+        </div>
+        <div class="home-feat-row" onclick="go('games')">
+          <div class="home-feat-icon" style="background:rgba(34,197,94,0.1)">🎮</div>
+          <div class="home-feat-text"><strong>Jeu de mots</strong><span>Tape les mots avant qu'ils touchent le sol.</span></div>
+          <div class="home-feat-arrow">›</div>
+        </div>
+        <div class="home-feat-row" onclick="go('stats')">
+          <div class="home-feat-icon" style="background:rgba(99,102,241,0.1)">📊</div>
+          <div class="home-feat-text"><strong>Suivi des progrès</strong><span>Vitesse, précision et série de jours.</span></div>
+          <div class="home-feat-arrow">›</div>
+        </div>
+      </div>
+
+      <div class="home-kb-color">
+        <div class="home-kb-color-title">Un doigt, une couleur</div>
+        <div class="home-kb-color-sub">Chaque touche a la couleur du doigt qui la presse. Tu mémorises sans baisser les yeux.</div>
+        <div class="home-kb-color-row">${kbColorHtml}</div>
+      </div>
+
+      <div class="features-grid home-features-desktop">
         <div class="feature-card"><div class="icon">⌨️</div><h3>Cours progressifs</h3><p>65 leçons progressives couvrant tout le clavier AZERTY, des bases aux accents et symboles.</p></div>
         <div class="feature-card"><div class="icon">⚡</div><h3>Test de vitesse</h3><p>Mesure tes mots par minute et ta précision sur des textes variés.</p></div>
         <div class="feature-card"><div class="icon">🎮</div><h3>Jeu de mots</h3><p>Des mots tombent du ciel : tape-les avant qu'ils touchent le sol !</p></div>
