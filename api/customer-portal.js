@@ -17,6 +17,9 @@ async function sb(path, opts = {}) {
   return { ok: r.ok, status: r.status, data: text ? JSON.parse(text) : null };
 }
 
+// Portail de facturation Stripe : le client y gère son abonnement lui-même
+// (résiliation, factures, moyen de paiement). Nécessite d'avoir activé le
+// « Customer portal » dans le dashboard Stripe (Réglages → Facturation).
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -27,31 +30,16 @@ module.exports = async function handler(req, res) {
   const { token } = req.body || {};
   if (!token) return res.status(400).json({ error: 'Token manquant.' });
 
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,stripe_customer_id`);
+  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,stripe_customer_id`);
   const user = r.data && r.data[0];
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!user.stripe_customer_id) return res.status(400).json({ error: 'Aucun abonnement associé à ce compte.' });
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-  let customerId = user.stripe_customer_id;
-  if (!customerId) {
-    const customer = await stripe.customers.create({ metadata: { username: user.username } });
-    customerId = customer.id;
-    await sb(`/users?id=eq.${user.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ stripe_customer_id: customerId }),
-    });
-  }
-
   const appUrl = (process.env.APP_URL || 'https://keypace.be').trim();
-  const session = await stripe.checkout.sessions.create({
-    customer: customerId,
-    payment_method_types: ['card'],
-    line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
-    mode: 'subscription',
-    allow_promotion_codes: true,
-    success_url: `${appUrl}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${appUrl}?payment=cancel`,
+  const session = await stripe.billingPortal.sessions.create({
+    customer: user.stripe_customer_id,
+    return_url: appUrl,
   });
 
   res.json({ url: session.url });

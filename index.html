@@ -1564,8 +1564,14 @@ function handleVerificationReturn(){
 async function handlePaymentReturn(){
   const params=new URLSearchParams(location.search);
   if(params.get('payment')==='success'&&currentToken){
-    const r=await fetch('/api/refresh-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
-    const d=await r.json();
+    // Le webhook Stripe peut arriver après la redirection : on réessaie un peu
+    let d={};
+    for(let i=0;i<4;i++){
+      const r=await fetch('/api/refresh-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+      d=await r.json();
+      if(d.plan==='expert')break;
+      await new Promise(rs=>setTimeout(rs,1500));
+    }
     if(d.plan){
       currentPlan=d.plan;
       const s=JSON.parse(localStorage.getItem('klak_session')||'{}');
@@ -4684,6 +4690,13 @@ const app={
           <button class="settings-btn" id="reset-pw-btn" onclick="app.requestPasswordReset(this)">Réinitialiser</button>
         </div>
         <div id="reset-pw-msg" style="display:none;font-size:13px;margin-top:6px;padding:10px 12px;border-radius:10px"></div>
+        ${currentPlan==='expert'?`<div class="settings-row" style="margin-top:10px">
+          <div class="settings-row-info">
+            <strong>Abonnement Expert</strong>
+            <span>Factures, moyen de paiement, résiliation — via le portail sécurisé Stripe</span>
+          </div>
+          <button class="settings-btn" id="billing-portal-btn" onclick="app.openBillingPortal(this)">Gérer</button>
+        </div>`:''}
         <div class="settings-row" style="margin-top:10px">
           <div class="settings-row-info"><strong>Déconnexion</strong><span>Te déconnecter de KeyPace</span></div>
           <button class="settings-btn danger" onclick="app.closeSettings();logout()">Se déconnecter</button>
@@ -4713,6 +4726,16 @@ const app={
     if(section==='gaze'){setTimeout(()=>{const el=document.getElementById('settings-gaze-section');if(el)el.scrollIntoView({behavior:'smooth'});},100);}
   },
   closeSettings(){document.getElementById('settings-overlay')?.remove();},
+  async openBillingPortal(btn){
+    if(!currentToken)return;
+    const old=btn.textContent;btn.disabled=true;btn.textContent='Ouverture…';
+    try{
+      const r=await fetch('/api/customer-portal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+      const d=await r.json();
+      if(!r.ok||!d.url)throw new Error(d.error||'Erreur');
+      location.href=d.url;
+    }catch(e){btn.disabled=false;btn.textContent=old;alert(e.message||'Impossible d\'ouvrir le portail de facturation.');}
+  },
   async exportMyData(btn){
     if(!currentToken)return;
     const old=btn.textContent;btn.disabled=true;btn.textContent='Export…';

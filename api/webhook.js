@@ -31,17 +31,42 @@ module.exports = async function handler(req, res) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const customerId = session.customer;
+  const setPlan = async (customerId, plan) => {
+    if (!customerId) return;
+    // institution_id=is.null : ne jamais rétrograder un compte géré par un
+    // établissement (licence B2B), même si son abonnement Stripe perso s'arrête
+    const filter = plan === 'free' ? '&institution_id=is.null' : '';
+    await sb(`/users?stripe_customer_id=eq.${customerId}${filter}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ plan }),
+    });
+  };
 
-    const r = await sb(`/users?stripe_customer_id=eq.${customerId}&select=id`);
-    const user = r.data && r.data[0];
-    if (user) {
-      await sb(`/users?id=eq.${user.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ plan: 'expert' }),
-      });
+  switch (event.type) {
+    // Paiement initial réussi → activation immédiate
+    case 'checkout.session.completed':
+      await setPlan(event.data.object.customer, 'expert');
+      break;
+
+    // Fin d'abonnement (résiliation arrivée à échéance, ou impayé définitif
+    // selon les réglages Stripe) → retour au plan gratuit.
+    // Une résiliation en cours de mois (cancel_at_period_end) ne déclenche cet
+    // événement qu'à la fin de la période déjà payée : l'accès est conservé
+    // jusque-là, comme prévu par les CGV.
+    case 'customer.subscription.deleted':
+      await setPlan(event.data.object.customer, 'free');
+      break;
+
+    // Changement d'état : réactivation, ou passage en impayé
+    case 'customer.subscription.updated': {
+      const sub = event.data.object;
+      if (sub.status === 'active' || sub.status === 'trialing') {
+        await setPlan(sub.customer, 'expert');
+      } else if (sub.status === 'canceled' || sub.status === 'unpaid') {
+        await setPlan(sub.customer, 'free');
+      }
+      // 'past_due' : Stripe relance la carte automatiquement, on ne coupe pas
+      break;
     }
   }
 
