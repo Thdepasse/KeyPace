@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>KeyPace Battle Royale — Écran géant</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Palette KeyPace inversée : fond sombre pour la projection en salle */
+:root{--bg:#16140F;--txt:#faf9f5;--muted:#8A8275;--border:#3A352B;--card:#211E17;--accent:#FF4D2E;--ok:#1FA971;--err:#E5484D;--gold:#D9A60C;--silver:#B5AE9F;--bronze:#E5722B}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:'Bricolage Grotesque',-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 36px;border-bottom:1px solid var(--border)}
+.logo{font-weight:800;font-size:26px}
+.logo span{color:var(--accent)}
+.hud{display:flex;gap:34px;font-size:16px;color:var(--muted)}
+.hud b{color:var(--txt);font-size:24px;display:block}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;width:100%}
+.screen{display:none;flex-direction:column;align-items:center;gap:24px;width:100%;max-width:1400px}
+.screen.on{display:flex}
+h1{font-size:clamp(34px,4.5vw,64px);font-weight:800;text-align:center;line-height:1.1}
+h1 em{color:var(--accent);font-style:normal}
+.sub{color:var(--muted);font-size:20px;text-align:center}
+/* Entrée code */
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px;display:flex;gap:14px;align-items:center}
+input{padding:16px 20px;border:2px solid var(--border);border-radius:12px;font-size:26px;letter-spacing:6px;width:260px;background:var(--bg);color:var(--txt);font-family:'JetBrains Mono',monospace;text-transform:lowercase}
+input:focus{outline:none;border-color:var(--accent)}
+button{cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:20px;font-weight:700;font-family:inherit;background:var(--accent);color:#fff}
+.msg{color:var(--err);font-size:16px;min-height:22px}
+/* Lobby */
+#cdBig{font-size:190px;font-weight:800;color:var(--accent);line-height:1}
+.qrhint{font-size:22px;color:var(--muted)}
+.qrhint b{color:var(--txt);font-size:34px;letter-spacing:5px}
+/* Leaderboard */
+.board{width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:10px 26px}
+.brow{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 16px;transition:opacity .3s}
+.brow .rk{width:52px;font-size:26px;font-weight:800;color:var(--muted);text-align:center}
+.brow.top1 .rk{color:var(--gold)}.brow.top2 .rk{color:var(--silver)}.brow.top3 .rk{color:var(--bronze)}
+.brow .nm{width:190px;font-size:20px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brow .bar{flex:1;height:16px;background:var(--bg);border-radius:99px;overflow:hidden}
+.brow .bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .2s linear}
+.brow.top1 .bar i{background:var(--gold)}
+.brow .wpm{width:90px;text-align:right;font-size:17px;color:var(--muted)}
+.brow .wpm b{color:var(--txt)}
+.brow.out{opacity:.32}
+.brow.out .bar i{background:var(--muted)}
+.brow.finished .bar i{background:var(--ok)}
+/* Bannière élimination */
+#banner{position:fixed;top:96px;left:50%;transform:translateX(-50%) translateY(-30px);background:var(--err);color:#fff;font-size:24px;font-weight:800;padding:14px 34px;border-radius:99px;opacity:0;transition:all .35s;pointer-events:none;z-index:10}
+#banner.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* Podium final */
+.podium{display:flex;align-items:flex-end;gap:26px}
+.step{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;width:270px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:26px 14px;gap:8px;animation:rise .7s ease both}
+.step .medal{font-size:62px}
+.step .nm{font-weight:800;font-size:30px;text-align:center;word-break:break-word}
+.step .wpm{font-size:19px;color:var(--muted)}
+.step.p1{height:360px;border-top:8px solid var(--gold);animation-delay:.5s}
+.step.p2{height:280px;border-top:8px solid var(--silver);animation-delay:.25s}
+.step.p3{height:225px;border-top:8px solid var(--bronze);animation-delay:0s}
+@keyframes rise{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Key<span>Pace</span> · Battle Royale</div>
+  <div class="hud">
+    <div>Salon<b class="mono" id="hudRoom">—</b></div>
+    <div>En course<b id="hudAlive">—</b></div>
+    <div>Chrono<b class="mono" id="hudTime">0:00</b></div>
+  </div>
+</header>
+<div id="banner"></div>
+<main>
+
+  <section id="s-code" class="screen on">
+    <h1>Écran <em>géant</em></h1>
+    <p class="sub">Entrez le code du salon à projeter</p>
+    <div class="card">
+      <input id="codeInput" maxlength="8" placeholder="code" autocomplete="off">
+      <button id="btnGo">Projeter</button>
+    </div>
+    <p class="msg" id="codeMsg"></p>
+  </section>
+
+  <section id="s-wait" class="screen">
+    <h1>En attente des joueurs…</h1>
+    <p class="qrhint">Rejoignez sur <b id="waitUrl">keypace.fr/jeu</b> avec le code <b class="mono" id="waitCode"></b></p>
+    <p class="sub" id="waitCount"></p>
+  </section>
+
+  <section id="s-count" class="screen">
+    <div id="cdBig">5</div>
+  </section>
+
+  <section id="s-race" class="screen">
+    <div class="board" id="board"></div>
+  </section>
+
+  <section id="s-end" class="screen">
+    <h1>🏆 Podium</h1>
+    <div class="podium" id="podium"></div>
+    <p class="sub" id="endStats"></p>
+  </section>
+
+</main>
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+<script>
+'use strict';
+const qs = new URLSearchParams(location.search);
+const SERVER_URL = qs.get('server') || localStorage.getItem('kp_game_server') || 'http://localhost:3001';
+if (qs.get('server')) localStorage.setItem('kp_game_server', qs.get('server'));
+
+const $ = (id) => document.getElementById(id);
+const screens = ['s-code','s-wait','s-count','s-race','s-end'];
+function show(id){ screens.forEach(s => $(s).classList.toggle('on', s === id)); }
+
+let socket = null;
+let playerCount = 0;
+
+function spectate(roomId){
+  socket = io(SERVER_URL, { transports: ['websocket','polling'] });
+  socket.on('connect_error', () => $('codeMsg').textContent = 'Serveur injoignable (' + SERVER_URL + ')');
+  socket.on('connect', () => {
+    socket.emit('room:spectate', { roomId }, (res) => {
+      if (res.error) { $('codeMsg').textContent = res.error; return; }
+      $('hudRoom').textContent = roomId;
+      $('waitCode').textContent = roomId;
+      $('waitUrl').textContent = location.host + '/jeu.html';
+      show('s-wait');
+    });
+  });
+
+  socket.on('room:spectating', (d) => {
+    playerCount = d.playerCount;
+    $('waitCount').textContent = playerCount + ' joueur(s) dans le salon';
+    if (d.state === 'playing') show('s-race');
+  });
+  socket.on('room:playerJoined', (d) => {
+    playerCount = d.playerCount;
+    $('waitCount').textContent = playerCount + '/' + d.maxPlayers + ' joueurs — minimum ' + d.minPlayers;
+  });
+  socket.on('room:playerLeft', (d) => {
+    playerCount = d.playerCount;
+    $('waitCount').textContent = playerCount + ' joueur(s) dans le salon';
+  });
+
+  socket.on('game:countdown', (d) => { $('cdBig').textContent = d.seconds; show('s-count'); });
+  socket.on('game:start', () => show('s-race'));
+
+  socket.on('leaderboard:update', (d) => {
+    if (!$('s-race').classList.contains('on')) show('s-race');
+    $('hudAlive').textContent = d.alive;
+    $('hudTime').textContent = fmtTime(d.elapsedMs);
+    renderBoard(d.entries);
+  });
+
+  socket.on('room:playerEliminated', (d) => banner('💀 ' + d.name + ' est éliminé !'));
+  socket.on('room:playerDisqualified', (d) => banner('🚫 ' + d.name + ' disqualifié (anti-triche)'));
+
+  socket.on('game:end', (d) => {
+    const pod = $('podium'); pod.innerHTML = '';
+    const MEDALS = ['🥇','🥈','🥉'];
+    [1, 0, 2].forEach(i => {
+      const p = d.podium[i]; if (!p) return;
+      const s = document.createElement('div');
+      s.className = 'step p' + p.rank;
+      s.innerHTML = '<div class="medal">' + MEDALS[p.rank - 1] + '</div><div class="nm"></div><div class="wpm">' + p.wpm + ' WPM</div>';
+      s.querySelector('.nm').textContent = p.name;
+      pod.appendChild(s);
+    });
+    $('endStats').textContent = d.ranking.length + ' joueurs · ' + fmtTime(d.durationMs) + ' de course';
+    show('s-end');
+  });
+}
+
+function renderBoard(entries){
+  const board = $('board');
+  board.innerHTML = '';
+  entries.forEach(e => {
+    const out = e.status === 'eliminated' || e.status === 'disqualified' || e.status === 'disconnected';
+    const r = document.createElement('div');
+    r.className = 'brow' + (e.rank <= 3 ? ' top' + e.rank : '') + (out ? ' out' : '') + (e.status === 'finished' ? ' finished' : '');
+    r.innerHTML = '<span class="rk">' + e.rank + '</span><span class="nm"></span>' +
+      '<span class="bar"><i style="width:' + Math.round(e.progress * 100) + '%"></i></span>' +
+      '<span class="wpm"><b>' + e.wpm + '</b> WPM</span>';
+    r.querySelector('.nm').textContent = e.name + (e.status === 'finished' ? ' 🏁' : out ? ' ✕' : '');
+    board.appendChild(r);
+  });
+}
+
+let bannerTimer = null;
+function banner(text){
+  const b = $('banner');
+  b.textContent = text;
+  b.classList.add('show');
+  clearTimeout(bannerTimer);
+  bannerTimer = setTimeout(() => b.classList.remove('show'), 3000);
+}
+
+function fmtTime(ms){
+  const s = Math.floor(ms / 1000);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+$('btnGo').onclick = () => {
+  const code = $('codeInput').value.trim().toLowerCase();
+  if (code) spectate(code);
+};
+$('codeInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('btnGo').click(); });
+if (qs.get('room')) { $('codeInput').value = qs.get('room'); spectate(qs.get('room')); }
+</script>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>KeyPace Battle Royale — Jouer</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf9f5;--txt:#16140F;--muted:#8A8275;--border:#E7E1D5;--card:#fff;--accent:#FF4D2E;--light:#F4F1EA;--ok:#1FA971;--err:#E5484D}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:'Bricolage Grotesque',-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+.mono{font-family:'JetBrains Mono',monospace}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border)}
+header .logo{font-weight:800;font-size:20px;text-decoration:none;color:var(--txt)}
+header .logo span{color:var(--accent)}
+header .badge{font-size:12px;background:var(--txt);color:#fff;padding:4px 10px;border-radius:99px;font-weight:700}
+main{flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 16px;width:100%;max-width:960px;margin:0 auto}
+.screen{width:100%;display:none;flex-direction:column;align-items:center;gap:20px}
+.screen.on{display:flex}
+h1{font-size:clamp(26px,5vw,40px);font-weight:800;text-align:center;line-height:1.15}
+h1 em{color:var(--accent);font-style:normal}
+.sub{color:var(--muted);text-align:center;max-width:480px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px}
+label{font-size:13px;font-weight:700;color:var(--muted)}
+input[type=text]{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;font-family:inherit;background:var(--bg)}
+input[type=text]:focus{outline:none;border-color:var(--accent)}
+button{cursor:pointer;border:none;border-radius:10px;padding:13px 20px;font-size:16px;font-weight:700;font-family:inherit;transition:transform .06s}
+button:active{transform:scale(.98)}
+button.primary{background:var(--accent);color:#fff}
+button.ghost{background:var(--light);color:var(--txt)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+details{font-size:13px;color:var(--muted)}
+details input{margin-top:8px}
+.msg{font-size:14px;text-align:center;min-height:20px}
+.msg.err{color:var(--err)}
+/* Lobby */
+.roomcode{display:flex;align-items:center;gap:12px;background:var(--light);border:1.5px dashed var(--border);border-radius:12px;padding:14px 18px}
+.roomcode b{font-size:28px;letter-spacing:4px}
+.players{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:600px}
+.chip{background:var(--card);border:1px solid var(--border);border-radius:99px;padding:6px 14px;font-size:14px;font-weight:600}
+.chip.me{border-color:var(--accent);color:var(--accent)}
+.count{font-size:15px;color:var(--muted)}
+/* Countdown */
+#cdNum{font-size:120px;font-weight:800;color:var(--accent)}
+/* Race */
+.race{width:100%;display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:start}
+@media(max-width:760px){.race{grid-template-columns:1fr}}
+.textbox{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;font-size:22px;line-height:2;max-height:200px;overflow:hidden;user-select:none}
+.textbox .w{color:var(--muted);margin-right:.45em;display:inline-block}
+.textbox .w.done{color:var(--ok)}
+.textbox .w.cur{color:var(--txt);background:var(--light);border-radius:6px;padding:0 4px;outline:2px solid var(--accent)}
+#typeInput{font-size:22px;padding:14px 16px;border-radius:12px;font-family:'JetBrains Mono',monospace}
+#typeInput.bad{border-color:var(--err);background:#FDECEC}
+.stats{display:flex;gap:18px;justify-content:center;font-size:14px;color:var(--muted)}
+.stats b{color:var(--txt);font-size:18px}
+.board{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.board h3{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.brow{display:flex;align-items:center;gap:8px;font-size:13px}
+.brow .rk{width:22px;font-weight:800;color:var(--muted)}
+.brow .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.brow.me .nm{color:var(--accent)}
+.brow .bar{flex:2;height:8px;background:var(--light);border-radius:99px;overflow:hidden}
+.brow .bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .2s linear}
+.brow.out{opacity:.4}
+.brow.out .bar i{background:var(--muted)}
+/* Overlays fin */
+.bigstate{font-size:clamp(30px,6vw,52px);font-weight:800}
+.bigstate.red{color:var(--err)}
+.bigstate.green{color:var(--ok)}
+.podium{display:flex;align-items:flex-end;gap:14px;margin-top:10px}
+.step{background:var(--card);border:1px solid var(--border);border-radius:14px 14px 0 0;width:130px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:14px 8px;gap:4px}
+.step .medal{font-size:30px}
+.step .nm{font-weight:800;font-size:15px;text-align:center;word-break:break-word}
+.step .wpm{font-size:12px;color:var(--muted)}
+.step.p1{height:190px;border-top:4px solid #D9A60C}
+.step.p2{height:150px;border-top:4px solid #A39C8D}
+.step.p3{height:120px;border-top:4px solid #E5722B}
+.fullrank{width:100%;max-width:420px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.fullrank .r{display:flex;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px}
+.fullrank .r b{width:28px}
+.fullrank .r .st{margin-left:auto;color:var(--muted);font-size:12px}
+footer{text-align:center;padding:14px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">Key<span>Pace</span></a>
+  <span class="badge">BATTLE ROYALE</span>
+</header>
+<main>
+
+  <!-- ÉCRAN 1 : accueil -->
+  <section id="s-home" class="screen on">
+    <h1>Le dernier à taper <em>a perdu</em></h1>
+    <p class="sub">Jusqu'à 50 joueurs, un même texte, un classement en direct. Le plus lent est éliminé régulièrement. Survivez jusqu'au podium.</p>
+    <div class="card">
+      <div>
+        <label for="nameInput">Votre pseudo</label>
+        <input type="text" id="nameInput" maxlength="24" placeholder="Ex. TurboDoigts" autocomplete="off">
+      </div>
+      <button class="primary" id="btnCreate">Créer un salon</button>
+      <div class="divider">ou rejoindre</div>
+      <div class="row">
+        <input type="text" id="codeInput" class="mono" maxlength="8" placeholder="CODE" autocomplete="off" style="text-transform:lowercase">
+        <button class="ghost" id="btnJoin">Rejoindre</button>
+      </div>
+      <details>
+        <summary>Options du salon (si vous créez)</summary>
+        <label for="minInput">Joueurs minimum pour démarrer (2–50)</label>
+        <input type="text" id="minInput" inputmode="numeric" value="10">
+      </details>
+      <p class="msg err" id="homeMsg"></p>
+    </div>
+  </section>
+
+  <!-- ÉCRAN 2 : lobby -->
+  <section id="s-lobby" class="screen">
+    <h1>Salon d'attente</h1>
+    <div class="roomcode">
+      <div>
+        <div style="font-size:12px;color:var(--muted);font-weight:700">CODE DU SALON</div>
+        <b class="mono" id="lobbyCode">--------</b>
+      </div>
+      <button class="ghost" id="btnCopy">Copier</button>
+    </div>
+    <p class="count" id="lobbyCount"></p>
+    <div class="players" id="lobbyPlayers"></div>
+    <button class="primary" id="btnStart">Lancer la partie</button>
+    <p class="msg err" id="lobbyMsg"></p>
+  </section>
+
+  <!-- ÉCRAN 3 : compte à rebours -->
+  <section id="s-count" class="screen">
+    <h1>Préparez vos doigts…</h1>
+    <div id="cdNum">5</div>
+  </section>
+
+  <!-- ÉCRAN 4 : course -->
+  <section id="s-race" class="screen">
+    <div class="stats">
+      <span>Position <b id="stRank">–</b></span>
+      <span>Vitesse <b id="stWpm">0</b> WPM</span>
+      <span>Mots <b id="stWords">0/0</b></span>
+      <span>En course <b id="stAlive">–</b></span>
+    </div>
+    <div class="race">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="textbox" id="textBox"></div>
+        <input type="text" id="typeInput" placeholder="Tapez ici…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <p class="msg" id="raceMsg"></p>
+      </div>
+      <div class="board">
+        <h3>Classement</h3>
+        <div id="raceBoard"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÉCRAN 5 : fin -->
+  <section id="s-end" class="screen">
+    <div class="bigstate" id="endTitle"></div>
+    <p class="sub" id="endSub"></p>
+    <div class="podium" id="podium"></div>
+    <div class="fullrank" id="fullRank"></div>
+    <button class="primary" onclick="location.reload()">Rejouer</button>
+  </section>
+
+</main>
+<footer>KeyPace Battle Royale — anti-triche actif (max 250 mots/min)</footer>
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+<script>
+'use strict';
+// URL du serveur de jeu : ?server=https://... prioritaire, sinon localhost en dev
+const qs = new URLSearchParams(location.search);
+const SERVER_URL = qs.get('server') || localStorage.getItem('kp_game_server') || 'http://localhost:3001';
+if (qs.get('server')) localStorage.setItem('kp_game_server', qs.get('server'));
+
+const $ = (id) => document.getElementById(id);
+const screens = ['s-home','s-lobby','s-count','s-race','s-end'];
+function show(id){ screens.forEach(s => $(s).classList.toggle('on', s === id)); }
+
+let socket = null;
+let me = { playerId: null, roomId: null, name: '' };
+let words = [];
+let wordIndex = 0;
+let raceOver = false;   // fini / éliminé / disqualifié → on ne tape plus
+let myState = 'typing';
+
+// ── Connexion ──
+function connect(){
+  if (socket) return socket;
+  socket = io(SERVER_URL, { transports: ['websocket','polling'] });
+  socket.on('connect_error', () => {
+    $('homeMsg').textContent = 'Serveur de jeu injoignable (' + SERVER_URL + ')';
+  });
+  bindGameEvents(socket);
+  return socket;
+}
+
+function getName(){
+  const n = $('nameInput').value.trim();
+  if (!n) { $('homeMsg').textContent = 'Choisissez un pseudo'; return null; }
+  localStorage.setItem('kp_pseudo', n);
+  return n;
+}
+$('nameInput').value = localStorage.getItem('kp_pseudo') || '';
+if (qs.get('room')) $('codeInput').value = qs.get('room');
+
+// ── Créer / rejoindre ──
+$('btnCreate').onclick = () => {
+  const name = getName(); if (!name) return;
+  const minPlayers = Math.min(50, Math.max(2, parseInt($('minInput').value, 10) || 10));
+  connect().emit('room:create', { name, config: { minPlayers } }, onJoined);
+};
+$('btnJoin').onclick = () => {
+  const name = getName(); if (!name) return;
+  const roomId = $('codeInput').value.trim().toLowerCase();
+  if (!roomId) { $('homeMsg').textContent = 'Entrez le code du salon'; return; }
+  connect().emit('room:join', { roomId, name }, onJoined);
+};
+
+const lobby = new Map(); // playerId -> name
+function onJoined(res){
+  if (res.error) { $('homeMsg').textContent = res.error; return; }
+  me.playerId = res.playerId; me.roomId = res.roomId; me.name = $('nameInput').value.trim();
+  lobby.clear();
+  res.players.forEach(p => lobby.set(p.id, p.name));
+  $('lobbyCode').textContent = res.roomId;
+  renderLobby(res.players.length, res.config.minPlayers, res.config.maxPlayers);
+  show('s-lobby');
+}
+
+function renderLobby(count, min, max){
+  $('lobbyCount').textContent = count + '/' + max + ' joueurs — minimum ' + min + ' pour démarrer';
+  $('lobbyPlayers').innerHTML = '';
+  for (const [id, name] of lobby) {
+    const c = document.createElement('span');
+    c.className = 'chip' + (id === me.playerId ? ' me' : '');
+    c.textContent = name;
+    $('lobbyPlayers').appendChild(c);
+  }
+  $('btnStart').disabled = count < min;
+}
+
+$('btnCopy').onclick = async () => {
+  const link = location.origin + location.pathname + '?room=' + me.roomId +
+    (qs.get('server') ? '&server=' + encodeURIComponent(SERVER_URL) : '');
+  try { await navigator.clipboard.writeText(link); $('btnCopy').textContent = 'Copié !'; }
+  catch { $('btnCopy').textContent = me.roomId; }
+  setTimeout(() => $('btnCopy').textContent = 'Copier', 1500);
+};
+
+$('btnStart').onclick = () => {
+  socket.emit('room:start', { playerId: me.playerId }, (res) => {
+    if (res && res.error) $('lobbyMsg').textContent = res.error;
+  });
+};
+
+// ── Événements de jeu ──
+function bindGameEvents(s){
+  let cfg = { min: 10, max: 50 };
+
+  s.on('room:playerJoined', (d) => {
+    lobby.set(d.player.id, d.player.name);
+    cfg = { min: d.minPlayers, max: d.maxPlayers };
+    if ($('s-lobby').classList.contains('on')) renderLobby(d.playerCount, cfg.min, cfg.max);
+  });
+  s.on('room:playerLeft', (d) => {
+    lobby.delete(d.playerId);
+    if ($('s-lobby').classList.contains('on')) renderLobby(d.playerCount, cfg.min, cfg.max);
+  });
+
+  s.on('game:countdown', (d) => {
+    if (d.words) { words = d.words; wordIndex = 0; raceOver = false; myState = 'typing'; }
+    $('cdNum').textContent = d.seconds;
+    show('s-count');
+  });
+
+  s.on('game:start', (d) => {
+    $('stWords').textContent = '0/' + d.totalWords;
+    renderWords();
+    show('s-race');
+    $('typeInput').value = '';
+    $('typeInput').focus();
+  });
+
+  s.on('leaderboard:update', (d) => {
+    if (!$('s-race').classList.contains('on')) return;
+    $('stAlive').textContent = d.alive;
+    renderBoard(d.entries);
+    const mine = d.entries.find(e => e.id === me.playerId);
+    if (mine) { $('stRank').textContent = '#' + mine.rank; $('stWpm').textContent = mine.wpm; }
+  });
+
+  s.on('player:progressRejected', (d) => {
+    // Anti-triche ou retard réseau : on se resynchronise sur la position validée
+    wordIndex = d.wordIndex;
+    renderWords();
+    $('raceMsg').textContent = 'Progression resynchronisée';
+    setTimeout(() => $('raceMsg').textContent = '', 2000);
+  });
+
+  s.on('player:finished', (d) => {
+    raceOver = true; myState = 'finished';
+    $('raceMsg').textContent = '🏁 Terminé ! Position #' + d.rank + ' — ' + d.wpm + ' WPM. En attente du podium…';
+    $('typeInput').disabled = true;
+  });
+  s.on('player:eliminated', () => {
+    raceOver = true; myState = 'eliminated';
+    $('raceMsg').textContent = '💀 Éliminé ! Vous étiez le plus lent. La course continue sans vous…';
+    $('typeInput').disabled = true;
+  });
+  s.on('player:disqualified', (d) => {
+    raceOver = true; myState = 'disqualified';
+    $('raceMsg').textContent = '🚫 Disqualifié par l\'anti-triche : ' + d.reason;
+    $('typeInput').disabled = true;
+  });
+
+  s.on('game:end', (d) => showEnd(d));
+}
+
+// ── Saisie ──
+const input = $('typeInput');
+input.addEventListener('input', () => {
+  if (raceOver || !words.length) return;
+  const target = words[wordIndex];
+  const val = input.value;
+  const isLast = wordIndex === words.length - 1;
+  if (val === target + ' ' || (isLast && val === target)) {
+    wordIndex++;
+    input.value = '';
+    input.classList.remove('bad');
+    $('stWords').textContent = wordIndex + '/' + words.length;
+    renderWords();
+    socket.emit('player:progress', { wordIndex });
+  } else {
+    input.classList.toggle('bad', !(target + ' ').startsWith(val));
+  }
+});
+
+function renderWords(){
+  const box = $('textBox');
+  box.innerHTML = '';
+  words.forEach((w, i) => {
+    const s = document.createElement('span');
+    s.className = 'w' + (i < wordIndex ? ' done' : i === wordIndex ? ' cur' : '');
+    s.textContent = w;
+    box.appendChild(s);
+  });
+  const cur = box.querySelector('.cur');
+  if (cur) box.scrollTop = Math.max(0, cur.offsetTop - box.clientHeight / 2);
+}
+
+function renderBoard(entries){
+  const el = $('raceBoard');
+  el.innerHTML = '';
+  entries.slice(0, 12).forEach(e => {
+    const r = document.createElement('div');
+    const out = e.status === 'eliminated' || e.status === 'disqualified' || e.status === 'disconnected';
+    r.className = 'brow' + (e.id === me.playerId ? ' me' : '') + (out ? ' out' : '');
+    r.innerHTML = '<span class="rk">' + e.rank + '</span><span class="nm"></span>' +
+      '<span class="bar"><i style="width:' + Math.round(e.progress * 100) + '%"></i></span>';
+    r.querySelector('.nm').textContent = e.name + (e.status === 'finished' ? ' 🏁' : out ? ' ✕' : '');
+    el.appendChild(r);
+  });
+  if (entries.length > 12) {
+    const more = document.createElement('div');
+    more.className = 'brow'; more.style.color = 'var(--muted)';
+    more.textContent = '+ ' + (entries.length - 12) + ' autres joueurs';
+    el.appendChild(more);
+  }
+}
+
+// ── Fin de partie ──
+const MEDALS = ['🥇','🥈','🥉'];
+const STATUS_FR = { finished:'a fini', eliminated:'éliminé', disqualified:'disqualifié', disconnected:'déconnecté', typing:'en course', waiting:'' };
+function showEnd(d){
+  const mine = d.ranking.find(p => p.id === me.playerId);
+  const myRank = mine ? mine.rank : null;
+  if (myState === 'disqualified') {
+    $('endTitle').textContent = 'Disqualifié 🚫'; $('endTitle').className = 'bigstate red';
+    $('endSub').textContent = 'L\'anti-triche a jugé votre vitesse impossible (max 250 mots/min).';
+  } else if (myRank === 1) {
+    $('endTitle').textContent = 'Victoire ! 👑'; $('endTitle').className = 'bigstate green';
+    $('endSub').textContent = 'Personne ne tape plus vite que vous.';
+  } else if (myRank && myRank <= 3) {
+    $('endTitle').textContent = 'Podium ! #' + myRank; $('endTitle').className = 'bigstate green';
+    $('endSub').textContent = 'Sur la boîte. La prochaine sera la bonne.';
+  } else {
+    $('endTitle').textContent = myState === 'eliminated' ? 'Éliminé 💀' : 'Terminé';
+    $('endTitle').className = 'bigstate';
+    $('endSub').textContent = myRank ? 'Position finale : #' + myRank + ' sur ' + d.ranking.length : '';
+  }
+
+  const pod = $('podium'); pod.innerHTML = '';
+  const order = [1, 0, 2]; // 2e | 1er | 3e
+  order.forEach(i => {
+    const p = d.podium[i]; if (!p) return;
+    const s = document.createElement('div');
+    s.className = 'step p' + p.rank;
+    s.innerHTML = '<div class="medal">' + MEDALS[p.rank - 1] + '</div><div class="nm"></div><div class="wpm">' + p.wpm + ' WPM</div>';
+    s.querySelector('.nm').textContent = p.name;
+    pod.appendChild(s);
+  });
+
+  const fr = $('fullRank'); fr.innerHTML = '';
+  d.ranking.forEach(p => {
+    const r = document.createElement('div');
+    r.className = 'r';
+    r.innerHTML = '<b>#' + p.rank + '</b><span class="nm"></span><span class="st">' + p.wpm + ' WPM · ' + (STATUS_FR[p.status] ?? '') + '</span>';
+    r.querySelector('.nm').textContent = p.name + (p.id === me.playerId ? ' (vous)' : '');
+    fr.appendChild(r);
+  });
+  show('s-end');
+}
+</script>
+</body>
+</html>

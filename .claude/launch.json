@@ -7,6 +7,12 @@
       "runtimeArgs": ["serve", "."],
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "game-server",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["game-server/dist/server.js"],
+      "port": 3001
     }
   ]
 }
