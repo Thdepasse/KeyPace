@@ -189,6 +189,8 @@ alter table assignments enable row level security;
 alter table users add column if not exists archived boolean default false;
 create index if not exists users_archived_idx on users(archived);
 
+alter table users add column if not exists onboarding_completed boolean default false;
+
 -- Invitations enseignant émises par un établissement. Le prof complète son
 -- inscription via le lien ?prof=TOKEN et choisit son propre mot de passe.
 create table if not exists prof_invites (

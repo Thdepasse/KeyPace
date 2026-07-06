@@ -123,12 +123,12 @@ module.exports = async function handler(req, res) {
     });
 
     // Récupérer les infos pour reconnecter l'utilisateur
-    const userR = await sb(`/users?id=eq.${user.id}&select=id,username,plan`);
+    const userR = await sb(`/users?id=eq.${user.id}&select=id,username,plan,onboarding_completed`);
     const updated = userR.data && userR.data[0];
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
     const progress = pr.data && pr.data[0];
 
-    return res.json({ ok: true, id: updated.id, username: updated.username, plan: updated.plan, token: newSession, data: progress?.data || {} });
+    return res.json({ ok: true, id: updated.id, username: updated.username, plan: updated.plan, token: newSession, onboarding_completed: updated.onboarding_completed || false, data: progress?.data || {} });
   }
 
   // — RGPD : export des données personnelles (droit d'accès)
@@ -176,6 +176,17 @@ module.exports = async function handler(req, res) {
     return res.json({ ok: true });
   }
 
+  // — Marquer l'onboarding comme terminé
+  if (body.action === 'onboarding-done') {
+    const { token } = body;
+    if (!token) return res.status(400).json({ error: 'Token manquant.' });
+    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id`);
+    const user = uR.data && uR.data[0];
+    if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ onboarding_completed: true }) });
+    return res.json({ ok: true });
+  }
+
   // — Connexion par session_token (utilisée après le SSO OAuth)
   if (body.action === 'session-login') {
     const { token } = body;
@@ -185,7 +196,7 @@ module.exports = async function handler(req, res) {
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
     const progress = pr.data && pr.data[0];
-    return res.json({ id: user.id, username: user.username, plan: user.plan, role: user.role || 'eleve', token, data: progress?.data || {} });
+    return res.json({ id: user.id, username: user.username, plan: user.plan, role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, token, data: progress?.data || {} });
   }
 
   // — Connexion normale
@@ -207,5 +218,5 @@ module.exports = async function handler(req, res) {
   const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
   const progress = pr.data && pr.data[0];
 
-  res.json({ id: user.id, username: user.username, plan: user.plan, role: user.role || 'eleve', token, data: progress?.data || {} });
+  res.json({ id: user.id, username: user.username, plan: user.plan, role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, token, data: progress?.data || {} });
 };

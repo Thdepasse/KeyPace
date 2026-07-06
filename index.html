@@ -12,6 +12,7 @@
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <link rel="canonical" href="https://keypace.be/">
 <link rel="alternate" hreflang="fr" href="https://keypace.be/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="alternate" hreflang="x-default" href="https://keypace.be/">
 <meta name="theme-color" content="#FF4D2E">
 <meta name="color-scheme" content="light">
@@ -225,11 +226,15 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA}
 body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',Arial,sans-serif;color:var(--txt);min-height:100vh;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@keyframes _pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+[id^="page-"]{contain:layout style;}
+._pgAnim{animation:_pgIn .18s ease both}
 button{font-family:inherit;cursor:pointer}
 /* Le reset *{padding:0} retire l'indentation des listes : éviter que les puces (list-style outside) soient clippées hors de la boîte sur certains navigateurs. */
 ul,ol{list-style-position:inside}
@@ -258,6 +263,29 @@ ul,ol{list-style-position:inside}
   .hero-btns{flex-direction:column;gap:10px}
   .hero-btns .btn-primary{width:100%;padding:15px;font-size:16px;border-radius:14px;text-align:center}
   .hero-btns .home-hero-secondary{width:100%;padding:12px;font-size:15px;border-radius:14px;text-align:center;background:none;border:1.5px solid var(--border);color:var(--txt);font-weight:600;cursor:pointer;font-family:inherit}
+  /* ── Etablissement mobile ── */
+  .etab-wrap{padding:0 16px 60px!important}
+  .etab-hero{padding:32px 0 28px!important}
+  .etab-hero h1{font-size:24px!important;line-height:1.15!important}
+  .etab-hero p{font-size:15px!important;margin-bottom:20px!important}
+  .etab-hero-btns{flex-direction:column!important;gap:10px!important}
+  .etab-hero-btns button{width:100%!important;padding:14px 20px!important;font-size:15px!important}
+  .etab-stats{grid-template-columns:1fr 1fr!important;gap:0!important;margin-bottom:36px!important}
+  .etab-problem{grid-template-columns:1fr!important;gap:20px!important;margin-bottom:44px!important}
+  .etab-avant-apres{font-family:inherit!important;font-size:14px!important;padding:20px!important}
+  .etab-section-mb{margin-bottom:44px!important}
+  .etab-features-grid{grid-template-columns:1fr!important;gap:10px!important}
+  .etab-parcours-card{grid-template-columns:1fr!important;gap:0!important;padding:24px 18px!important;margin-bottom:36px!important}
+  .etab-dashboard{display:none!important}
+  .etab-steps{grid-template-columns:1fr!important;gap:10px!important}
+  .etab-student-section{padding:28px 18px!important;margin-bottom:36px!important}
+  .etab-student-grid{grid-template-columns:1fr 1fr!important;gap:10px!important}
+  .etab-faq{margin-bottom:36px!important}
+  .etab-cta{padding:36px 20px!important;border-radius:20px!important}
+  .etab-cta h2{font-size:22px!important}
+  .etab-cta p{font-size:14px!important;margin-bottom:20px!important}
+  .etab-cta-btns{flex-direction:column!important;gap:10px!important}
+  .etab-cta-btns button{width:100%!important;padding:14px 20px!important;font-size:15px!important}
 }
 .home-resume{background:var(--accent);border-radius:20px;margin:0 16px 20px;padding:20px;display:none}
 .home-resume-label{font-size:10px;font-weight:800;letter-spacing:.1em;color:rgba(255,255,255,0.7);margin-bottom:14px}
@@ -732,6 +760,25 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .gaze-toggle.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .gaze-toggle.error{border-color:#E5484D;color:#E5484D}
 .gaze-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:900;display:flex;align-items:center;justify-content:center;padding:20px}
+/* ── Onboarding modal ── */
+/* ── Onboarding tooltip walkthrough ── */
+#ob-overlay{position:fixed;inset:0;z-index:1100;display:none;background:rgba(22,20,15,.62)}
+#ob-overlay.active{display:block}
+#ob-tooltip{position:fixed;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 22px 18px;width:290px;box-shadow:0 16px 48px rgba(22,20,15,.28);z-index:1102;transition:opacity .15s ease,left .22s cubic-bezier(.4,0,.2,1),top .22s cubic-bezier(.4,0,.2,1)}
+#ob-tooltip.ob-fading{opacity:0;pointer-events:none}
+#ob-tooltip::before{content:'';position:absolute;top:-7px;left:var(--arrow-left,50%);transform:translateX(-50%);width:13px;height:7px;background:var(--card);clip-path:polygon(50% 0%,100% 100%,0% 100%)}
+.ob-highlight{position:relative;z-index:1101;border-radius:10px;padding:5px 12px;box-shadow:0 0 0 2.5px var(--accent)}
+.nav-link.ob-highlight{background:#fff}
+.ob-tt-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-bottom:5px}
+.ob-tt-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;letter-spacing:-.01em;margin-bottom:6px;color:var(--txt)}
+.ob-tt-desc{font-size:13px;color:#5A5248;line-height:1.55;margin-bottom:16px}
+.ob-tt-footer{display:flex;align-items:center;justify-content:space-between}
+.ob-tt-counter{font-size:12px;color:var(--muted);font-weight:600}
+.ob-tt-actions{display:flex;gap:8px;align-items:center}
+.ob-btn-skip{background:none;border:none;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;padding:0;outline:none;text-decoration:underline}
+.ob-btn-skip:hover{color:var(--txt)}
+.ob-btn-next{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;outline:none;transition:opacity .15s;white-space:nowrap}
+.ob-btn-next:hover{opacity:.88}
 .gaze-modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:420px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.18)}
 .gaze-modal-icon{font-size:42px;text-align:center;margin-bottom:12px}
 .gaze-modal h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin:0 0 12px;text-align:center}
@@ -957,6 +1004,23 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <!-- LESSON TUTORIAL MODAL -->
 <div class="modal-overlay" id="lesson-tuto-modal">
   <div class="modal-box" id="lesson-tuto-body" style="max-width:580px"></div>
+</div>
+
+<!-- ONBOARDING MODAL -->
+<!-- ONBOARDING TOOLTIP WALKTHROUGH -->
+<div id="ob-overlay">
+  <div id="ob-tooltip">
+    <div class="ob-tt-label" id="ob-tt-label"></div>
+    <div class="ob-tt-title" id="ob-tt-title"></div>
+    <div class="ob-tt-desc" id="ob-tt-desc"></div>
+    <div class="ob-tt-footer">
+      <span class="ob-tt-counter" id="ob-tt-counter"></span>
+      <div class="ob-tt-actions">
+        <button class="ob-btn-skip" onclick="obClose(true)">Passer</button>
+        <button class="ob-btn-next" id="ob-btn-next" onclick="obNext()">Suivant →</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- APP -->
@@ -1217,6 +1281,8 @@ async function authSubmit(){
       if(d.role)_mergedData.role=d.role;
       saveSession(d.username, d.plan, d.token, d.id, _mergedData.role||null);
       app.stats=_mergedData;
+      window._needsOnboarding = !d.onboarding_completed;
+      if(!d.onboarding_completed)localStorage.removeItem('klak_ob');else localStorage.setItem('klak_ob','1');
       loginUser(d.username);
       if(isAdmin())app.loadAdmin(true);else if(isTeacher())app.loadEtab(true);
     }
@@ -1228,7 +1294,7 @@ document.addEventListener('keydown',e=>{
     if(document.getElementById('auth-modal').classList.contains('open'))authSubmit();
   }
   if(e.key==='Escape'){
-    closeModal('auth-modal');closeModal('upgrade-modal');closeModal('school-modal');closeModal('lesson-tuto-modal');
+    closeModal('auth-modal');closeModal('upgrade-modal');closeModal('school-modal');closeModal('lesson-tuto-modal');if(document.getElementById('ob-overlay')?.classList.contains('active'))obClose(false);
   }
   // Tab to restart the current typing session (standard in typing apps)
   if(e.key==='Tab'){
@@ -1263,7 +1329,93 @@ function loginUser(username){
   app.init();
   app.renderCurrent();
   if(_authCallback){const cb=_authCallback;_authCallback=null;cb();}
+  if(window._needsOnboarding){window._needsOnboarding=false;setTimeout(obOpen,400);}
 }
+
+// ── Onboarding tooltip walkthrough ─────────────────────────────
+const OB_STEPS=[
+  {sel:'#nav-lessons', label:'Par où commencer', title:'Cours',   desc:'65 leçons progressives. Commence par la Leçon 1 : elle t\'apprend la rangée de base, doigt par doigt.'},
+  {sel:'#nav-test',    label:'Teste-toi',         title:'Test',    desc:'Mesure ta vitesse en mots par minute et ta précision sur un texte libre, à tout moment.'},
+  {sel:'#nav-games',   label:'Pour progresser',   title:'Jeux',    desc:'Boss de la semaine, Duel 1v1 et Sprint chronométré. Pour te challenger et rendre la pratique addictive.'},
+  {sel:'#nav-stats',   label:'Suis tes progrès',  title:'Progrès', desc:'Ton historique de vitesse et de précision au fil du temps. Tu verras tes progrès semaine après semaine.'},
+  {sel:'#nav-avatar',  label:'Tes paramètres',    title:'Compte',  desc:'Accède à tes paramètres, réinitialise ton mot de passe ou retrouve ce guide via "Revoir le tutoriel".'},
+];
+let _obStep=0;
+let _obPrevEl=null;
+
+function obOpen(){
+  _obStep=0;
+  document.getElementById('ob-overlay').classList.add('active');
+  obRender();
+}
+
+function obRender(){
+  // Retirer le highlight de l'étape précédente
+  if(_obPrevEl){_obPrevEl.classList.remove('ob-highlight');_obPrevEl=null;}
+
+  const step=OB_STEPS[_obStep];
+  const total=OB_STEPS.length;
+  const el=document.querySelector(step.sel);
+
+  // Textes
+  document.getElementById('ob-tt-label').textContent=step.label;
+  document.getElementById('ob-tt-title').textContent=step.title;
+  document.getElementById('ob-tt-desc').textContent=step.desc;
+  document.getElementById('ob-tt-counter').textContent=(_obStep+1)+' / '+total;
+  document.getElementById('ob-btn-next').textContent=_obStep===total-1?'Terminer ✓':'Suivant →';
+
+  if(!el)return;
+
+  // Highlight de l'élément ciblé
+  el.classList.add('ob-highlight');
+  _obPrevEl=el;
+
+
+  // Positionner le tooltip sous l'élément
+  const rect=el.getBoundingClientRect();
+  const tt=document.getElementById('ob-tooltip');
+  const ttW=290;
+  let left=rect.left+rect.width/2-ttW/2;
+  left=Math.max(12,Math.min(left,window.innerWidth-ttW-12));
+  const top=rect.bottom+12;
+  tt.style.left=left+'px';
+  tt.style.top=top+'px';
+
+  // Flèche alignée sur l'élément
+  const arrowLeft=Math.max(18,Math.min(rect.left+rect.width/2-left,ttW-18));
+  tt.style.setProperty('--arrow-left',arrowLeft+'px');
+}
+
+function obNext(){
+  if(_obStep>=OB_STEPS.length-1){obClose(true);return;}
+  const tt=document.getElementById('ob-tooltip');
+  tt.classList.add('ob-fading');
+  setTimeout(()=>{
+    _obStep++;
+    obRender();
+    tt.classList.remove('ob-fading');
+  },150);
+}
+
+async function obClose(markDone){
+  if(_obPrevEl){_obPrevEl.classList.remove('ob-highlight');_obPrevEl=null;}
+  document.getElementById('ob-overlay').classList.remove('active');
+  if(markDone){
+    localStorage.setItem('klak_ob','1');
+    if(currentToken){
+      try{await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'onboarding-done',token:currentToken})});}
+      catch(e){}
+    }
+  }
+}
+
+function obReplay(){
+  app.closeSettings&&app.closeSettings();
+  setTimeout(obOpen,200);
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('ob-overlay').classList.contains('active'))obClose(false);});
+// ───────────────────────────────────────────────────────────────
 
 function logout(){
   clearSession();
@@ -2333,7 +2485,7 @@ const CERT_TEXT="La maîtrise du clavier ne se mesure pas à la vitesse seule, m
 const app={
   view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,simon:null,boss:null,duel:null,activeGame:null,now:Date.now(),
   _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
-  _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,_wgPromise:null,_stream:null,_video:null,_landmarker:null,_raf:null,_baseline:null,_baselineBuf:[],_smooth:null,_lastScore:null,_calib:null,_sessionThreshold:null,samples:[],permError:null},
+  _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,_wgPromise:null,_stream:null,_video:null,_landmarker:null,_raf:null,_baseline:null,_baselineBuf:[],_smooth:null,_lastScore:null,_lastGazeOn:null,_calib:null,_sessionThreshold:null,samples:[],permError:null,_fixBaseline:null},
 
   init(){
     this.stats=loadStats();
@@ -2526,8 +2678,18 @@ const app={
     const _ok=(k===expected);
     if(_ok){s.typed[s.idx]='c';s.correct++;}else{s.typed[s.idx]='w';}
     this._recordKey(expected,_ok);
+    // Lier la frappe à l'état du regard à cet instant précis
+    if(this._gaze.active){
+      const g=this._gaze;
+      // Priorité : _lastGazeOn (toujours cohérent avec samples), fallback sur dernier sample
+      const gazeOn=g._lastGazeOn!=null?g._lastGazeOn:(g.samples.length>0?g.samples[g.samples.length-1]:null);
+      if(gazeOn!=null){
+        if(!s._gazeKeys)s._gazeKeys=[];
+        s._gazeKeys.push({t:Date.now()-s.startTime,gazeOn,ok:_ok?1:0});
+      }
+    }
     s.idx++;
-    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats();const res=this.computeResult(s);this.recordResult(s.mode,res,s.lessonId);this.renderCurrent();if(s.cert)this._finishCertExam(s,res);return;}
+    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats(s);const res=this.computeResult(s);if(currentUser){const _pr=s.mode==='lesson'?this.lessonRec(s.lessonId).bestWpm||0:Math.max(0,...(this.stats?.tests||[]).map(t=>t.wpm));s._prevBestWpm=_pr;}this.recordResult(s.mode,res,s.lessonId,s._gazeStats);this.renderCurrent();if(s.cert)this._finishCertExam(s,res);return;}
     this._patchTypingBox();
   },
   computeResult(s){
@@ -2536,9 +2698,10 @@ const app={
     const acc=s.keystrokes?Math.round(100*s.correct/s.keystrokes):100;
     return{wpm,acc,time:Math.round((s.endTime-s.startTime)/1000),errors:s.keystrokes-s.correct};
   },
-  recordResult(mode,res,lessonId){
+  recordResult(mode,res,lessonId,gazeStats){
     if(!currentUser||!this.stats)return;
-    this.stats.tests.push({t:Date.now(),wpm:res.wpm,acc:res.acc,mode,...(lessonId?{lessonId}:{})});
+    const gazeExtra=gazeStats!=null?{gaze:gazeStats.pct,...(gazeStats.onAcc!=null?{gazeOnAcc:gazeStats.onAcc}:{}),...(gazeStats.offAcc!=null?{gazeOffAcc:gazeStats.offAcc}:{}),...(gazeStats.onWpm!=null?{gazeOnWpm:gazeStats.onWpm}:{}),...(gazeStats.offWpm!=null?{gazeOffWpm:gazeStats.offWpm}:{})}:{};
+    this.stats.tests.push({t:Date.now(),wpm:res.wpm,acc:res.acc,mode,...(lessonId?{lessonId}:{}),...gazeExtra});
     // Devoir « texte personnalisé » : marque ce devoir comme fait (statut côté prof/élève).
     if(this.sess&&this.sess.assignmentId){
       if(!this.stats.assignmentsDone)this.stats.assignmentsDone={};
@@ -2731,9 +2894,22 @@ const app={
     // Vider les pages avec #tb-scroll pour éviter les IDs dupliqués
     if(v!=='test')document.getElementById('page-test').innerHTML='';
     if(v!=='lessons')document.getElementById('page-lessons').innerHTML='';
-    ['home','test','lessons','games','stats','classes','etablissement'].forEach(p=>{const el=document.getElementById('page-'+p);if(el)el.style.display=p===v?'block':'none';});
+    ['home','test','lessons','games','stats','classes','etablissement'].forEach(p=>{const el=document.getElementById('page-'+p);if(!el)return;if(p===v){el.style.display='block';el.classList.remove('_pgAnim');void el.offsetWidth;el.classList.add('_pgAnim');}else el.style.display='none';});
     ['home','test','lessons','games','stats','classes'].forEach(id=>{const el=document.getElementById('nav-'+id);if(el)el.classList.toggle('active',id===v);});
     window.scrollTo({top:0,behavior:'instant'});
+    const _meta={
+      home:['KeyPace – Apprenez à taper vite sur clavier AZERTY','KeyPace : 65 leçons progressives pour apprendre la dactylographie AZERTY. Test de vitesse, jeux de frappe et suivi de progression. Gratuit, en français, sans installation.'],
+      lessons:['Cours de dactylographie AZERTY – KeyPace','Parcourez les 65 leçons KeyPace et progressez du niveau zéro à 60 mots/min sur clavier AZERTY. Exercices progressifs avec feedback immédiat.'],
+      test:['Test de vitesse de frappe – KeyPace','Mesurez votre vitesse de frappe en mots par minute et votre précision. Test chronométré sur clavier AZERTY, résultats instantanés.'],
+      games:['Jeux de dactylographie – KeyPace','Entraînez-vous en vous amusant : Tireur d\'élite, Course de dactylo, Simon des mots, Sprint et Boss de la semaine. Progressez sans vous en rendre compte.'],
+      stats:['Mes progrès – KeyPace','Suivez votre progression en dactylographie : vitesse (mots/min), précision, série de jours, leçons validées et touches difficiles.'],
+      classes:['Ma classe – KeyPace','Gérez vos classes, suivez vos élèves et assignez des devoirs depuis votre tableau de bord KeyPace.'],
+      etablissement:['KeyPace pour les établissements scolaires','Plateforme de dactylographie AZERTY pour écoles, universités et centres de formation. Tableau de bord enseignant, devoirs assignables, 65 leçons progressives.'],
+    };
+    const [t,d]=_meta[v]||_meta.home;
+    document.title=t;
+    const desc=document.querySelector('meta[name="description"]');
+    if(desc)desc.setAttribute('content',d);
     this.renderCurrent();
   },
   renderCurrent(){
@@ -3193,6 +3369,13 @@ const app={
         <div class="stat-box"><div class="stat-label">Précision</div><div class="stat-val">${s&&s.started?liveAcc:'·'}</div></div>
         <div class="stat-box"><div class="stat-label">Temps</div><div class="stat-val">${s&&s.started?liveTime+'<span class="stat-unit"> s</span>':'·'}</div></div>
         <div class="stat-box"><div class="stat-label">Progression</div><div class="stat-val">${s&&s.idx>0?progress+'<span class="stat-unit"> %</span>':'·'}</div></div>
+        ${(()=>{
+          if(!currentUser||!this.stats)return'';
+          const pb=isLesson?this.lessonRec(s?.lessonId).bestWpm||0:Math.max(0,...(this.stats.tests||[]).map(t=>t.wpm));
+          if(!pb)return'';
+          const beating=s&&s.started&&liveWpm>pb;
+          return`<div class="stat-box" style="border-left:1px solid var(--border)"><div class="stat-label" style="color:${beating?'#1FA971':'var(--muted)'}">Record</div><div class="stat-val" style="font-size:22px;color:${beating?'#1FA971':'var(--muted)'}">${pb}<span class="stat-unit"> mpm</span></div></div>`;
+        })()}
       </div>
       <div class="prog-wrap"><div class="prog-fill" style="width:${progress}%"></div></div>
       ${!finished&&isLesson&&les&&les.tip&&s&&!s.started?`<div class="lesson-tip"><div class="lesson-tip-icon">💡</div><div>${les.tip}</div></div>`:''}
@@ -3209,6 +3392,28 @@ const app={
           <div class="stat-box"><div class="stat-label">Temps</div><div class="stat-val">${resTime}<span class="stat-unit"> s</span></div></div>
           <div class="stat-box"><div class="stat-label">Erreurs</div><div class="stat-val">${resErrors}</div></div>
         </div>
+        ${(()=>{
+          if(!currentUser||s._prevBestWpm==null)return'';
+          const prev=s._prevBestWpm;
+          const isRecord=resWpm>prev&&prev>0;
+          const isFirst=resWpm>0&&prev===0;
+          const _card=(icon,iconBg,iconColor,title,titleColor,sub,rightVal,barPct,barColor,leftLbl,rightLbl)=>`<div style="margin-top:16px;background:var(--light);border:1px solid var(--border);border-radius:16px;padding:18px 20px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:38px;height:38px;border-radius:10px;background:${iconBg};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${icon}</div>
+                <div><div style="font-size:14px;font-weight:700;color:${titleColor}">${title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${sub}</div></div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;margin-left:12px"><span style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:${titleColor}">${rightVal}</span><span style="font-size:13px;color:var(--muted);font-weight:500"> mpm</span></div>
+            </div>
+            <div style="height:6px;border-radius:3px;background:var(--border);overflow:hidden"><div style="height:100%;width:${barPct}%;background:${barColor};border-radius:3px"></div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:11px;color:var(--muted)">${leftLbl}</span><span style="font-size:11px;color:var(--muted)">${rightLbl}</span></div>
+          </div>`;
+          if(isFirst)return _card('🏅','rgba(31,169,113,.15)','#1FA971','Premier record établi !','#1FA971',`Ton score de <b style="color:#1FA971">${resWpm} mpm</b> est maintenant ta référence.`,resWpm,100,'#1FA971',`${resWpm} mpm (ce test)`,'1er record');
+          if(isRecord){const diff=resWpm-prev;return _card('🏆','rgba(31,169,113,.15)','#1FA971','Nouveau record personnel !','#1FA971',`Tu bats ton ancien record de <b style="color:#1FA971">+${diff} mpm</b>.`,resWpm,100,'#1FA971',`Ancien : ${prev} mpm`,`Nouveau : ${resWpm} mpm ✓`);}
+          const gap=prev-resWpm;const pct=Math.min(99,Math.round(100*resWpm/prev));
+          const equalRecord=resWpm===prev;
+          return _card(equalRecord?'🎯':'📈',equalRecord?'rgba(31,169,113,.15)':'rgba(255,77,46,.1)',equalRecord?'#1FA971':'var(--accent)',equalRecord?'Record égalé !':'Meilleur score à battre','var(--txt)',equalRecord?'Tu es au niveau de ton record.':gap===1?'Il te manque <b style="color:var(--accent)">1 mpm</b> pour le record.':`Il te manque <b style="color:var(--accent)">${gap} mpm</b> pour le record.`,prev,pct,equalRecord?'#1FA971':'var(--accent)',`${resWpm} mpm (ce test)`,`Record : ${prev} mpm`);
+        })()}
         ${(custom||cert)?`<div style="margin-top:16px;text-align:left;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px">
           <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px">${vocal?'Texte de la dictée':cert?"Texte de l'examen":'Texte du devoir'}</div>
           <div style="font-size:14px;line-height:1.6;color:var(--txt);white-space:pre-wrap">${s.text.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</div>
@@ -4466,6 +4671,13 @@ const app={
         <div class="settings-section-title"><span>🔐</span> Compte</div>
         <div class="settings-row">
           <div class="settings-row-info">
+            <strong>Tutoriel de démarrage</strong>
+            <span>Revoir le guide d'introduction à KeyPace</span>
+          </div>
+          <button class="settings-btn" onclick="obReplay()">Revoir</button>
+        </div>
+        <div class="settings-row" style="margin-top:10px">
+          <div class="settings-row-info">
             <strong>Mot de passe</strong>
             <span>Recevoir un lien de réinitialisation par email</span>
           </div>
@@ -4749,11 +4961,37 @@ const app={
     document.body.appendChild(overlay);
     overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
   },
-  _gazeConfirm(){
+  async _gazeConfirm(){
     document.getElementById('gaze-modal-overlay')?.remove();
     const g=this._gaze;g.enabled=true;g.permError=null;
     this.renderCurrent();
-    this._gazeEnsureRunning(); // démarre en arrière-plan pendant que l'user reprend le texte
+    this._gazeEnsureRunning();
+    await this._gazeFixationPrompt();
+  },
+  _gazeFixationPrompt(){
+    return new Promise(resolve=>{
+      this._gaze._fixBaseline=[];
+      const el=document.createElement('div');
+      el.id='gaze-fix';
+      el.style.cssText='position:fixed;inset:0;background:rgba(22,20,15,.82);z-index:1200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;backdrop-filter:blur(3px)';
+      el.innerHTML=`
+        <p style="color:rgba(255,255,255,.72);font-size:15px;font-weight:600;margin:0;letter-spacing:.01em">Regardez ce point avant de commencer</p>
+        <div style="position:relative;width:80px;height:80px">
+          <svg width="80" height="80" viewBox="0 0 80 80" style="position:absolute;top:0;left:0;transform:rotate(-90deg)">
+            <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="5"/>
+            <circle id="gaze-fix-ring" cx="40" cy="40" r="34" fill="none" stroke="#FF6B2B" stroke-width="5" stroke-dasharray="213.6" stroke-dashoffset="213.6" stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px">👁</div>
+        </div>
+        <p style="color:rgba(255,255,255,.38);font-size:13px;margin:0">Le test commence automatiquement</p>
+      `;
+      document.body.appendChild(el);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        const ring=document.getElementById('gaze-fix-ring');
+        if(ring){ring.style.transition='stroke-dashoffset 2s linear';ring.style.strokeDashoffset='0';}
+      }));
+      setTimeout(()=>{el.remove();resolve();},2000);
+    });
   },
   // Mutex : une seule initialisation en vol à la fois
   _gazeEnsureRunning(){
@@ -4829,73 +5067,74 @@ const app={
       //
       // Lissage EMA (α=0.35) pour filtrer les frames isolées bruitées.
       // ══════════════════════════════════════════════════════════════
-      const BASELINE_FRAMES=15;
+      const BASELINE_FRAMES=20;
       const detect=()=>{
         if(!g._wgRunning)return;
         try{
           const res=g._landmarker.detectForVideo(g._video,performance.now());
-          if(g.active){
-            if(res.faceLandmarks&&res.faceLandmarks.length>0){
-              const lm=res.faceLandmarks[0];
+          if(res.faceLandmarks&&res.faceLandmarks.length>0){
+            const lm=res.faceLandmarks[0];
 
-              // ── Signal A : head pitch depuis matrice 4×4 ──
-              let headPitch=0;
-              const mats=res.facialTransformationMatrixes;
-              if(mats&&mats.length>0&&mats[0].data){
-                const m=mats[0].data; // Float32Array, col-major
-                headPitch=Math.asin(Math.max(-1,Math.min(1,-m[6])));
-                // radians : ~+0.1→+0.3 = regard écran ; ~-0.2→-0.5 = regard clavier
-              } else {
-                // Fallback : ratio nez-yeux normalisé par hauteur visage
-                const faceH=Math.abs(lm[152].y-lm[10].y);
-                const eyeY=(lm[159].y+lm[386].y)/2;
-                headPitch=faceH>0.01?(lm[4].y-eyeY)/faceH*0.8:0;
-              }
-
-              // ── Signal B : position iris dans l'œil ──
-              let gazeEye=0;
-              const hasIris=lm.length>473&&lm[468]&&lm[473];
-              if(hasIris){
-                // Iris droit (cam) = lm[468], contour : top=159, bot=145
-                const rH=Math.abs(lm[145].y-lm[159].y);
-                const rRatio=rH>0.001?(lm[468].y-(lm[159].y+lm[145].y)/2)/rH:0;
-                // Iris gauche (cam) = lm[473], contour : top=386, bot=374
-                const lH=Math.abs(lm[374].y-lm[386].y);
-                const lRatio=lH>0.001?(lm[473].y-(lm[386].y+lm[374].y)/2)/lH:0;
-                gazeEye=-((rRatio+lRatio)/2); // négatif=regarde bas, positif=regarde haut
-              }
-
-              // ── Score combiné + stockage pour calibration UI ──
-              const score=headPitch*0.65+gazeEye*0.35;
-              g._lastScore=score;
-
-              if(g.active){
-                // ── Toujours auto-calibrer sur les premières frames ──
-                if(g._baselineBuf.length<BASELINE_FRAMES){
-                  g._baselineBuf.push(score);
-                  if(g._baselineBuf.length===BASELINE_FRAMES){
-                    g._baseline=g._baselineBuf.reduce((a,b)=>a+b,0)/BASELINE_FRAMES;
-                    // Ajuster le seuil calibré selon le drift de session
-                    if(g._calib){
-                      const drift=g._baseline-g._calib.screenBaseline;
-                      g._sessionThreshold=g._calib.threshold+drift;
-                    }
-                  }
-                  g.samples.push(1); // pendant la collecte de baseline → on considère "écran"
-                } else {
-                  g._smooth=g._smooth==null?score:g._smooth*0.65+score*0.35;
-                  // Seuil : calibré+drift si dispo, sinon auto (baseline - 0.12)
-                  const thr=g._sessionThreshold!=null?g._sessionThreshold:(g._baseline-0.12);
-                  g.samples.push(g._smooth>thr?1:0);
-                }
-              }
-            }else{
-              g._lastScore=null;
-              if(g.active)g.samples.push(0); // pas de visage détecté
+            // ── Signal A : head pitch + yaw depuis matrice 4×4 ──
+            let headPitch=0,headYaw=0;
+            const mats=res.facialTransformationMatrixes;
+            if(mats&&mats.length>0&&mats[0].data){
+              const m=mats[0].data; // Float32Array, col-major
+              headPitch=Math.asin(Math.max(-1,Math.min(1,-m[6])));
+              headYaw=Math.atan2(m[2],m[10]); // rotation horizontale
+            } else {
+              const faceH=Math.abs(lm[152].y-lm[10].y);
+              const eyeY=(lm[159].y+lm[386].y)/2;
+              headPitch=faceH>0.01?(lm[4].y-eyeY)/faceH*0.8:0;
             }
+            // Pénalité si la tête tourne latéralement (regarde sur le côté)
+            const yawPenalty=Math.abs(headYaw)>0.35?-0.1:0;
+
+            // ── Signal B : position VERTICALE de l'iris dans l'œil ──
+            let gazeEyeV=0;
+            const hasIris=lm.length>473&&lm[468]&&lm[473];
+            if(hasIris){
+              const rH=Math.abs(lm[145].y-lm[159].y);
+              const rRatio=rH>0.003?(lm[468].y-(lm[159].y+lm[145].y)/2)/rH:0;
+              const lH=Math.abs(lm[374].y-lm[386].y);
+              const lRatio=lH>0.003?(lm[473].y-(lm[386].y+lm[374].y)/2)/lH:0;
+              gazeEyeV=-((rRatio+lRatio)/2); // >0=regarde haut, <0=regarde bas
+            }
+
+            // ── Score combiné : tête 50% + iris 50% + pénalité yaw ──
+            const score=headPitch*0.5+gazeEyeV*0.5+yawPenalty;
+            g._lastScore=score;
+
+            // ── Collecte baseline pendant la phase de fixation ──
+            if(g._fixBaseline!==null&&!g.active){
+              g._fixBaseline.push(score);
+            }
+
+            if(g.active){
+              if(g._baselineBuf.length<BASELINE_FRAMES){
+                g._baselineBuf.push(score);
+                if(g._baselineBuf.length===BASELINE_FRAMES){
+                  g._baseline=g._baselineBuf.reduce((a,b)=>a+b,0)/BASELINE_FRAMES;
+                  if(g._calib){
+                    const drift=g._baseline-g._calib.screenBaseline;
+                    g._sessionThreshold=g._calib.threshold+drift;
+                  }
+                }
+                g.samples.push(1);
+              } else {
+                g._smooth=g._smooth==null?score:g._smooth*0.4+score*0.6;
+                const thr=g._sessionThreshold!=null?g._sessionThreshold:(g._baseline!=null?g._baseline-0.08:-0.05);
+                const gazeOn=(hasIris&&gazeEyeV<-0.32)?0:(g._smooth>thr?1:0);
+                g._lastGazeOn=gazeOn;
+                g.samples.push(gazeOn);
+              }
+            }
+          }else{
+            g._lastScore=null;
+            if(g.active)g.samples.push(0);
           }
         }catch(e){}
-        g._raf=setTimeout(detect,100);
+        g._raf=setTimeout(detect,80); // 12.5 fps au lieu de 10
       };
       detect();
       return true;
@@ -4904,9 +5143,17 @@ const app={
   },
   async _gazeStart(){
     const g=this._gaze;if(!g.enabled||g.active)return;
-    g.samples=[];g._baseline=null;g._baselineBuf=[];g._smooth=null;g._lastScore=null;g._sessionThreshold=null;
-    // Charger la calibration depuis localStorage si elle existe
+    g.samples=[];g._smooth=null;g._lastScore=null;g._sessionThreshold=null;
     try{const c=localStorage.getItem('keypace-gaze-calib');g._calib=c?JSON.parse(c):null;}catch{g._calib=null;}
+    // Réutiliser la baseline collectée pendant la phase de fixation si dispo
+    if(g._fixBaseline&&g._fixBaseline.length>=5){
+      g._baselineBuf=[...g._fixBaseline];
+      g._baseline=g._baselineBuf.reduce((a,b)=>a+b,0)/g._baselineBuf.length;
+      if(g._calib){const drift=g._baseline-g._calib.screenBaseline;g._sessionThreshold=g._calib.threshold+drift;}
+    } else {
+      g._baseline=null;g._baselineBuf=[];
+    }
+    g._fixBaseline=null;
     g.active=true;
     const ok=await this._gazeEnsureRunning();
     if(!ok||!g.active)g.active=false;
@@ -4920,7 +5167,7 @@ const app={
     if(g._stream){g._stream.getTracks().forEach(t=>t.stop());g._stream=null;}
     if(g._video){try{g._video.remove();}catch{}g._video=null;}
   },
-  _gazeStats(){
+  _gazeStats(sess){
     const g=this._gaze;if(!g.samples.length)return null;
     const pct=Math.round(100*g.samples.filter(v=>v===1).length/g.samples.length);
     const N=80;
@@ -4930,7 +5177,33 @@ const app={
       const slice=g.samples.slice(i,i+size);
       buckets.push(slice.reduce((a,v)=>a+v,0)/slice.length>=0.5?1:0);
     }
-    return{pct,samples:buckets};
+    // ── Corrélations par frappe ──
+    let onAcc=null,offAcc=null,onWpm=null,offWpm=null;
+    const keys=sess&&sess._gazeKeys;
+    if(keys&&keys.length>=10){
+      const onKeys=keys.filter(k=>k.gazeOn===1);
+      const offKeys=keys.filter(k=>k.gazeOn===0);
+      if(onKeys.length>=3) onAcc=Math.round(100*onKeys.filter(k=>k.ok).length/onKeys.length);
+      if(offKeys.length>=3) offAcc=Math.round(100*offKeys.filter(k=>k.ok).length/offKeys.length);
+      // Vitesse par fenêtres de 4s (durée réelle pour la dernière)
+      const WIN=4000;
+      const dur=keys[keys.length-1].t;
+      const onWpms=[],offWpms=[];
+      for(let t=0;t<=dur;t+=WIN){
+        const w=keys.filter(k=>k.t>=t&&k.t<t+WIN);
+        if(w.length<4)continue;
+        const correct=w.filter(k=>k.ok).length;
+        const actualDur=Math.min(WIN,dur-t+200);
+        const wpm=Math.round((correct/5)/(actualDur/60000));
+        if(wpm<=0||wpm>300)continue;
+        const gazeRatio=w.filter(k=>k.gazeOn).length/w.length;
+        if(gazeRatio>=0.7)onWpms.push(wpm);
+        else if(gazeRatio<=0.3)offWpms.push(wpm);
+      }
+      if(onWpms.length) onWpm=Math.round(onWpms.reduce((a,b)=>a+b,0)/onWpms.length);
+      if(offWpms.length) offWpm=Math.round(offWpms.reduce((a,b)=>a+b,0)/offWpms.length);
+    }
+    return{pct,samples:buckets,onAcc,offAcc,onWpm,offWpm};
   },
   _gazeResultHTML(stats){
     if(!stats)return'';
@@ -4947,33 +5220,107 @@ const app={
     </div>`;
   },
 
+  _gazeAnalysisPanel(tests){
+    const MIN_TESTS=5;
+    const gazed=tests.filter(t=>t.gaze!=null);
+    const n=gazed.length;
+    if(n===0)return'';
+    const locked=n<MIN_TESTS;
+    const avg=a=>a.length?Math.round(a.reduce((s,v)=>s+v,0)/a.length):null;
+    const bar=(val,ref,max,color)=>{
+      const pct=Math.min(100,Math.round(100*val/Math.max(max,1)));
+      const refPct=ref!=null?Math.min(100,Math.round(100*ref/Math.max(max,1))):null;
+      return`<div style="height:8px;border-radius:4px;background:var(--border);overflow:hidden;margin-top:5px;position:relative">
+        <div style="height:100%;width:${pct}%;background:${color};border-radius:4px;transition:width .4s"></div>
+        ${refPct!=null?`<div style="position:absolute;top:0;left:${refPct}%;width:2px;height:100%;background:rgba(0,0,0,.2);border-radius:1px"></div>`:''}
+      </div>`;
+    };
+    if(locked){
+      return`<div class="spanel" style="margin-bottom:22px">
+        <h3>👁 Analyse regard × performance <span style="font-size:12px;font-weight:600;background:var(--light);color:var(--muted);border-radius:6px;padding:2px 8px;margin-left:8px">🔒 ${n} / ${MIN_TESTS} tests</span></h3>
+        <p style="color:var(--muted);font-size:14px;margin:10px 0 16px;line-height:1.6">Active le traqueur du regard pendant <b>${MIN_TESTS-n} test${MIN_TESTS-n>1?'s':''} supplémentaire${MIN_TESTS-n>1?'s':''}</b> pour débloquer la corrélation regard ↔ vitesse / précision.</p>
+        <div style="display:flex;gap:6px">${Array.from({length:MIN_TESTS},(_,i)=>`<div style="flex:1;height:5px;border-radius:3px;background:${i<n?'var(--accent)':'var(--border)'}"></div>`).join('')}</div>
+      </div>`;
+    }
+    const onAccs=gazed.filter(t=>t.gazeOnAcc!=null).map(t=>t.gazeOnAcc);
+    const offAccs=gazed.filter(t=>t.gazeOffAcc!=null).map(t=>t.gazeOffAcc);
+    const onWpms=gazed.filter(t=>t.gazeOnWpm!=null).map(t=>t.gazeOnWpm);
+    const offWpms=gazed.filter(t=>t.gazeOffWpm!=null).map(t=>t.gazeOffWpm);
+    const avgOnAcc=avg(onAccs),avgOffAcc=avg(offAccs);
+    const avgOnWpm=avg(onWpms),avgOffWpm=avg(offWpms);
+    const avgGaze=avg(gazed.map(t=>t.gaze));
+    const hasAcc=avgOnAcc!=null&&avgOffAcc!=null;
+    const hasWpm=avgOnWpm!=null&&avgOffWpm!=null;
+    // Tendance sur les 5 derniers tests avec gaze (regard écran en hausse ?)
+    const recent=gazed.slice(-5).map(t=>t.gaze);
+    let trendHTML='';
+    if(recent.length>=3){
+      const half=Math.floor(recent.length/2);
+      const early=avg(recent.slice(0,half)),late=avg(recent.slice(-half));
+      const diff=late-early;
+      const arrow=diff>3?'↑':diff<-3?'↓':'→';
+      const col=diff>3?'#1FA971':diff<-3?'#E5484D':'var(--muted)';
+      trendHTML=`<span style="color:${col};font-weight:700;margin-left:10px">${arrow} ${diff>0?'+':''}${diff}% sur les ${recent.length} derniers tests</span>`;
+    }
+    // Insight combiné
+    const insights=[];
+    if(hasAcc){const d=avgOnAcc-avgOffAcc;if(Math.abs(d)>=3)insights.push(d>0?`+${d}% de précision en regardant l'écran`:`${d}% de précision (clavier meilleur — données à confirmer)`);}
+    if(hasWpm){const d=avgOnWpm-avgOffWpm;if(Math.abs(d)>=3)insights.push(d>0?`+${d} mpm en regardant l'écran`:`${d} mpm (vitesse similaire selon le regard)`);}
+    const insightText=insights.length?insights.join(' · '):`Continue à t'entraîner avec le traqueur pour affiner l'analyse.`;
+    const maxAcc=100;
+    const maxWpm=Math.max(avgOnWpm||0,avgOffWpm||0,20)*1.25;
+    const cols=hasAcc&&hasWpm?'1fr 1fr':'1fr';
+    return`<div class="spanel" style="margin-bottom:22px">
+      <h3>👁 Analyse regard × performance <span style="font-size:12px;font-weight:600;background:#1FA97120;color:#1FA971;border-radius:6px;padding:2px 8px;margin-left:8px">✓ ${n} tests</span></h3>
+      <p style="color:var(--muted);font-size:13px;margin:6px 0 18px">Regard sur l'écran en moyenne : <b style="color:var(--txt)">${avgGaze}%</b>${trendHTML}</p>
+      <div style="display:grid;grid-template-columns:${cols};gap:14px;margin-bottom:14px">
+        ${hasAcc?`<div style="background:var(--light);border-radius:14px;padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Précision par regard</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:3px"><span>👁 Écran</span><b>${avgOnAcc}%</b></div>
+          ${bar(avgOnAcc,avgOffAcc,maxAcc,'#1FA971')}
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin:10px 0 3px"><span>⌨️ Clavier</span><b>${avgOffAcc}%</b></div>
+          ${bar(avgOffAcc,avgOnAcc,maxAcc,'#E5484D')}
+        </div>`:''}
+        ${hasWpm?`<div style="background:var(--light);border-radius:14px;padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Vitesse par regard (mpm)</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:3px"><span>👁 Écran</span><b>${avgOnWpm}</b></div>
+          ${bar(avgOnWpm,avgOffWpm,maxWpm,'#1FA971')}
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin:10px 0 3px"><span>⌨️ Clavier</span><b>${avgOffWpm}</b></div>
+          ${bar(avgOffWpm,avgOnWpm,maxWpm,'#E5484D')}
+        </div>`:''}
+        ${!hasAcc&&!hasWpm?`<div style="color:var(--muted);font-size:14px;padding:8px 0">Pas encore assez de données par-frappe. Refais quelques tests avec le traqueur.</div>`:''}
+      </div>
+      <div style="background:rgba(31,169,113,.08);border-left:3px solid #1FA971;border-radius:0 10px 10px 0;padding:10px 14px;font-size:14px;color:var(--txt);line-height:1.5">💡 ${insightText}</div>
+    </div>`;
+  },
+
   /* ── STATS ── */
   renderEtablissement(){
     const A='var(--accent)';
     const rows=[
       ['65',"leçons progressives","du niveau zéro à 60 mots/min"],
-      ['100%',"en ligne, sans installation","fonctionne sur n’importe quel PC de l’école"],
+      ['100%',"en ligne, sans installation","fonctionne sur n'importe quel PC de l'école"],
       ['5 min',"pour créer une classe","et inviter tous vos élèves"],
       ['AZERTY',"clavier français natif","conçu pour le français dès le départ"],
     ];
     const avantItems=[
       ['❌',"frappe à 2 index, regard sur le clavier"],
       ['❌',"rédactions bâclées par manque de temps"],
-      ['❌',"fatigue cognitive liée à l’effort de frappe"],
-      ['❌',"aucun suivi possible pour l’enseignant"],
+      ['❌',"fatigue cognitive liée à l'effort de frappe"],
+      ['❌',"aucun suivi possible pour l'enseignant"],
       ['❌',"TBI et logiciels lourds à installer"],
     ];
     const apresItems=[
-      ['✅',"frappe à 10 doigts, regard sur l’écran"],
+      ['✅',"frappe à 10 doigts, regard sur l'écran"],
       ['✅',"rédactions plus longues et mieux construites"],
-      ['✅',"toute l’énergie cognitive pour le fond"],
+      ['✅',"toute l'énergie cognitive pour le fond"],
       ['✅',"tableau de bord élève par élève en temps réel"],
       ['✅',"100% web, aucune installation, aucun IT"],
     ];
     const features=[
-      ['📊','Suivi individuel en temps réel',"Vitesse (mots/min), précision, leçons validées, temps d’inactivité — tout est visible d’un coup d’œil pour chaque élève."],
+      ['📊','Suivi individuel en temps réel',"Vitesse (mots/min), précision, leçons validées, temps d'inactivité — tout est visible d'un coup d'œil pour chaque élève."],
       ['📝','Devoirs assignables en 3 clics',"Leçon du parcours, test de vitesse libre, texte personnalisé ou dictée vocale — choisissez, ciblez, envoyez."],
-      ['🎙️','Dictées avec votre propre voix',"Enregistrez votre voix sur n’importe quel texte. L’élève entend votre audio et tape ce qu’il entend, texte caché."],
+      ['🎙️','Dictées avec votre propre voix',"Enregistrez votre voix sur n'importe quel texte. L'élève entend votre audio et tape ce qu'il entend, texte caché."],
       ['⚠️','Alertes automatiques',"KeyPace détecte les élèves bloqués ou inactifs depuis trop longtemps et vous le signale proactivement."],
       ['📄','Export CSV en un clic',"Extrayez les résultats de toute la classe pour vos bulletins ou rapports pédagogiques."],
       ['🏫','Multi-classes, multi-profs',"Un compte établissement peut gérer plusieurs classes et plusieurs enseignants indépendants."],
@@ -4993,32 +5340,32 @@ const app={
       ['Sofia L.','38 mpm','91%','15/65','🟢'],
     ];
     const steps=[
-      ['1','Créez votre compte établissement',"Contactez-nous, on configure votre accès en moins d’une heure. Vous recevez un lien d’invitation unique pour votre classe."],
-      ['2','Invitez vos élèves',"Partagez le lien ou le code d’invitation. Chaque élève crée son compte gratuitement et obtient l’accès Expert automatiquement."],
+      ['1','Créez votre compte établissement',"Contactez-nous, on configure votre accès en moins d'une heure. Vous recevez un lien d'invitation unique pour votre classe."],
+      ['2','Invitez vos élèves',"Partagez le lien ou le code d'invitation. Chaque élève crée son compte gratuitement et obtient l'accès Expert automatiquement."],
       ['3','Suivez et guidez',"Assignez des devoirs, suivez la progression en temps réel, identifiez les élèves en difficulté. Tout depuis votre tableau de bord."],
     ];
     const studentFeats=[
-      ['🎮','Jeux de frappe compétitifs',"Le Tireur, la Course contre des bots, le Simon de la frappe — apprendre sans avoir l’impression de travailler."],
+      ['🎮','Jeux de frappe compétitifs',"Le Tireur, la Course contre des bots, le Simon de la frappe — apprendre sans avoir l'impression de travailler."],
       ['🏆','Certification de niveau',"Un examen officiel KeyPace avec un certificat numérique partageable. Un objectif concret qui motive."],
-      ['📈','Progrès visibles en temps réel',"Courbes de vitesse, précision par touche, leçons validées — l’élève voit clairement où il en est."],
-      ['🎯','Objectifs personnalisés',"L’enseignant fixe le seuil à atteindre (ex. 30 mpm, max 5 erreurs). L’élève sait exactement ce qu’on attend de lui."],
+      ['📈','Progrès visibles en temps réel',"Courbes de vitesse, précision par touche, leçons validées — l'élève voit clairement où il en est."],
+      ['🎯','Objectifs personnalisés',"L'enseignant fixe le seuil à atteindre (ex. 30 mpm, max 5 erreurs). L'élève sait exactement ce qu'on attend de lui."],
     ];
     const faqs=[
-      ['Quel matériel est nécessaire ?',"N’importe quel ordinateur avec un navigateur web récent (Chrome, Firefox, Edge, Safari). Pas d’application à installer, pas de plugin. Un clavier AZERTY physique est recommandé pour un apprentissage optimal — les claviers de laptops suffisent."],
-      ['Combien coûte une licence établissement ?',"Le tarif est établi au cas par cas selon la taille de l’établissement et le nombre de classes. Contactez-nous pour un devis personnalisé — nous proposons des tarifs très accessibles pour le secteur éducatif."],
-      ['Les élèves peuvent-ils utiliser KeyPace depuis chez eux ?',"Oui, 100%. KeyPace est une application web accessible depuis n’importe où. Les élèves s’entraînent autant à la maison qu’en classe, et leur progression est synchronisée."],
-      ['Un élève peut-il rejoindre plusieurs classes ?',"Oui. Un même compte élève peut appartenir à plusieurs classes (utile si un prof de français et un prof d’informatique utilisent KeyPace en parallèle)."],
-      ['Peut-on importer une liste d’élèves ?',"Actuellement les élèves s’inscrivent eux-mêmes via un lien d’invitation. L’import CSV est sur notre roadmap. Contactez-nous si c’est un besoin prioritaire."],
+      ['Quel matériel est nécessaire ?',"N'importe quel ordinateur avec un navigateur web récent (Chrome, Firefox, Edge, Safari). Pas d'application à installer, pas de plugin. Un clavier AZERTY physique est recommandé pour un apprentissage optimal — les claviers de laptops suffisent."],
+      ['Combien coûte une licence établissement ?',"Le tarif est établi au cas par cas selon la taille de l'établissement et le nombre de classes. Contactez-nous pour un devis personnalisé — nous proposons des tarifs très accessibles pour le secteur éducatif."],
+      ['Les élèves peuvent-ils utiliser KeyPace depuis chez eux ?',"Oui, 100%. KeyPace est une application web accessible depuis n'importe où. Les élèves s'entraînent autant à la maison qu'en classe, et leur progression est synchronisée."],
+      ['Un élève peut-il rejoindre plusieurs classes ?',"Oui. Un même compte élève peut appartenir à plusieurs classes (utile si un prof de français et un prof d'informatique utilisent KeyPace en parallèle)."],
+      ["Peut-on importer une liste d'élèves ?","Actuellement les élèves s'inscrivent eux-mêmes via un lien d'invitation. L'import CSV est sur notre roadmap. Contactez-nous si c'est un besoin prioritaire."],
     ];
     const fld='flex:1;border:1.5px solid var(--border);border-radius:14px;padding:16px 24px;';
     document.getElementById('page-etablissement').innerHTML=`
-<div style="max-width:1120px;margin:0 auto;padding:0 24px 80px">
+<div class="etab-wrap" style="max-width:1120px;margin:0 auto;padding:0 24px 80px">
   <!-- BACK -->
   <div style="padding:20px 0 0">
     <button onclick="go('home')" style="background:none;border:none;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0">← Retour à l'accueil</button>
   </div>
   <!-- HERO -->
-  <div style="text-align:center;padding:60px 0 52px">
+  <div class="etab-hero" style="text-align:center;padding:60px 0 52px">
     <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,77,46,.1);color:${A};font-size:13px;font-weight:700;padding:6px 14px;border-radius:20px;margin-bottom:22px;letter-spacing:.02em">
       🎓 Écoles · Universités · Centres de formation
     </div>
@@ -5028,44 +5375,44 @@ const app={
     <p style="font-size:18px;color:var(--muted);max-width:600px;margin:0 auto 36px;line-height:1.6">
       KeyPace est la plateforme de dactylographie pensée pour les établissements francophones : pédagogie progressive, tableau de bord enseignant et devoirs assignables en quelques clics.
     </p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <div class="etab-hero-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
       <button onclick="openModal('school-modal')" style="background:${A};color:#fff;border:none;border-radius:14px;padding:16px 32px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(255,77,46,.35);transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Demander une démo gratuite →</button>
       <button onclick="go('lessons')" style="background:var(--card);color:var(--txt);border:1.5px solid var(--border);border-radius:14px;padding:16px 28px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Tester les cours maintenant</button>
     </div>
   </div>
   <!-- CHIFFRES -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:72px">
+  <div class="etab-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:72px">
     ${rows.map(([n,l,s])=>`<div style="background:var(--card);padding:28px 24px;text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:${A};margin-bottom:6px">${n}</div><div style="font-size:14px;font-weight:700;margin-bottom:4px">${l}</div><div style="font-size:12px;color:var(--muted);line-height:1.4">${s}</div></div>`).join('')}
   </div>
   <!-- PROBLÈME -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-bottom:80px">
+  <div class="etab-problem etab-section-mb" style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-bottom:80px">
     <div>
       <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:12px">LE PROBLÈME</div>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,32px);line-height:1.15;margin:0 0 18px">Chaque heure de cours perdue à taper lentement ne se rattrape pas</h2>
       <p style="color:var(--muted);font-size:15px;line-height:1.7;margin:0 0 14px">Un élève qui tape à 15 mots/min met 4× plus de temps à rédiger un devoir. Cette friction invisible plombe la concentration, la qualité des écrits et la confiance en soi.</p>
       <p style="color:var(--muted);font-size:15px;line-height:1.7;margin:0">La frappe ne s'apprend pas naturellement — elle demande une progression structurée, des exercices répétés et du feedback immédiat. C'est exactement ce que fait KeyPace.</p>
     </div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8">
-      <div style="color:var(--muted);margin-bottom:14px;font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.06em">AVANT KEYPACE</div>
+    <div class="etab-avant-apres" style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8">
+      <div style="color:var(--muted);margin-bottom:14px;font-size:11px;font-weight:700;letter-spacing:.06em">AVANT KEYPACE</div>
       ${avantItems.map(([ic,t])=>`<div style="display:flex;gap:10px;padding:3px 0"><span>${ic}</span><span style="color:var(--muted)">${t}</span></div>`).join('')}
       <div style="border-top:1px solid var(--border);margin:14px 0"></div>
-      <div style="color:${A};margin-bottom:14px;font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.06em">AVEC KEYPACE</div>
+      <div style="color:${A};margin-bottom:14px;font-size:11px;font-weight:700;letter-spacing:.06em">AVEC KEYPACE</div>
       ${apresItems.map(([ic,t])=>`<div style="display:flex;gap:10px;padding:3px 0"><span>${ic}</span><span>${t}</span></div>`).join('')}
     </div>
   </div>
   <!-- FEATURES PROF -->
-  <div style="margin-bottom:80px">
+  <div class="etab-section-mb" style="margin-bottom:80px">
     <div style="text-align:center;margin-bottom:40px">
       <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:10px">POUR LES ENSEIGNANTS</div>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,34px);margin:0 0 12px">Un tableau de bord qui vous fait gagner du temps</h2>
       <p style="color:var(--muted);font-size:15px;max-width:480px;margin:0 auto">Suivez la progression de chaque élève sans quitter votre navigateur. Assignez des devoirs ciblés en 30 secondes.</p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+    <div class="etab-features-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
       ${features.map(([ic,t,d])=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 20px"><div style="font-size:28px;margin-bottom:12px">${ic}</div><div style="font-weight:700;font-size:15px;margin-bottom:7px">${t}</div><div style="color:var(--muted);font-size:13.5px;line-height:1.55">${d}</div></div>`).join('')}
     </div>
   </div>
   <!-- PARCOURS + DASHBOARD MOCK -->
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 40px;margin-bottom:72px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
+  <div class="etab-parcours-card" style="background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 40px;margin-bottom:72px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
     <div>
       <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:12px">LE PARCOURS</div>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(18px,2.5vw,28px);line-height:1.2;margin:0 0 14px">65 leçons du niveau zéro à la frappe experte</h2>
@@ -5074,7 +5421,7 @@ const app={
         ${modules.map(([dot,mod,desc])=>`<div style="display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:10px;padding:10px 14px"><span style="font-size:10px">${dot}</span><div><b style="font-size:13px">${mod}</b> <span style="color:var(--muted);font-size:12px">— ${desc}</span></div></div>`).join('')}
       </div>
     </div>
-    <div>
+    <div class="etab-dashboard">
       <div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:20px">
         <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:14px">APERÇU TABLEAU DE BORD</div>
         <div style="display:flex;flex-direction:column;gap:8px">
@@ -5085,43 +5432,43 @@ const app={
     </div>
   </div>
   <!-- MISE EN PLACE -->
-  <div style="margin-bottom:80px">
+  <div class="etab-section-mb" style="margin-bottom:80px">
     <div style="text-align:center;margin-bottom:40px">
       <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:10px">MISE EN PLACE</div>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,34px);margin:0 0 12px">Opérationnel en 5 minutes, sans votre service informatique</h2>
       <p style="color:var(--muted);font-size:15px;max-width:460px;margin:0 auto">Aucun logiciel à installer, aucun serveur à configurer. Juste un navigateur.</p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+    <div class="etab-steps" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
       ${steps.map(([n,t,d])=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px 24px"><div style="width:36px;height:36px;border-radius:50%;background:${A};color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'JetBrains Mono',monospace">${n}</div><div style="font-weight:700;font-size:16px;margin-bottom:8px">${t}</div><div style="color:var(--muted);font-size:13.5px;line-height:1.55">${d}</div></div>`).join('')}
     </div>
   </div>
   <!-- POUR LES ÉLÈVES -->
-  <div style="background:linear-gradient(135deg,rgba(255,77,46,.07),rgba(124,58,237,.05));border:1px solid rgba(255,77,46,.15);border-radius:24px;padding:48px 40px;margin-bottom:72px">
+  <div class="etab-student-section" style="background:linear-gradient(135deg,rgba(255,77,46,.07),rgba(124,58,237,.05));border:1px solid rgba(255,77,46,.15);border-radius:24px;padding:48px 40px;margin-bottom:72px">
     <div style="text-align:center;margin-bottom:36px">
       <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:10px">POUR LES ÉLÈVES</div>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,32px);margin:0 0 12px">Une expérience qui donne envie de progresser</h2>
       <p style="color:var(--muted);font-size:15px;max-width:500px;margin:0 auto">Pas un simple exercice scolaire — un vrai produit avec des jeux, des défis et une progression visible qui accroche les élèves.</p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+    <div class="etab-student-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
       ${studentFeats.map(([ic,t,d])=>`<div style="background:rgba(255,255,255,.7);border:1px solid rgba(255,77,46,.12);border-radius:16px;padding:20px"><div style="font-size:26px;margin-bottom:10px">${ic}</div><div style="font-weight:700;font-size:14px;margin-bottom:6px">${t}</div><div style="color:var(--muted);font-size:13px;line-height:1.5">${d}</div></div>`).join('')}
     </div>
   </div>
   <!-- FAQ -->
-  <div style="max-width:720px;margin:0 auto 72px">
+  <div class="etab-faq" style="max-width:720px;margin:0 auto 72px">
     <div style="text-align:center;margin-bottom:32px"><h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,2.5vw,30px);margin:0">Questions fréquentes</h2></div>
     <div style="display:flex;flex-direction:column;gap:2px">
       ${faqs.map(([q,a],i)=>`<details style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden" ${i===0?'open':''}><summary style="padding:16px 20px;font-weight:700;font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">${q}<span style="color:${A};font-size:18px;flex-shrink:0;margin-left:12px">+</span></summary><div style="padding:0 20px 18px;color:var(--muted);font-size:14px;line-height:1.65">${a}</div></details>`).join('')}
     </div>
   </div>
   <!-- CTA FINAL -->
-  <div style="text-align:center;background:${A};border-radius:28px;padding:56px 40px;color:#fff;position:relative;overflow:hidden">
+  <div class="etab-cta" style="text-align:center;background:${A};border-radius:28px;padding:56px 40px;color:#fff;position:relative;overflow:hidden">
     <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%"></div>
     <div style="position:absolute;bottom:-60px;left:-30px;width:250px;height:250px;background:rgba(0,0,0,.06);border-radius:50%"></div>
     <div style="position:relative;z-index:1">
       <div style="font-size:52px;margin-bottom:16px">🎓</div>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:clamp(22px,4vw,38px);margin:0 0 14px;line-height:1.1">Prêt à équiper votre établissement ?</h2>
-      <p style="font-size:16px;opacity:.9;max-width:480px;margin:0 auto 32px;line-height:1.5">Contactez-nous pour une démonstration gratuite ou pour obtenir un devis. Mise en place en moins d’une heure.</p>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <p style="font-size:16px;opacity:.9;max-width:480px;margin:0 auto 32px;line-height:1.5">Contactez-nous pour une démonstration gratuite ou pour obtenir un devis. Mise en place en moins d'une heure.</p>
+      <div class="etab-cta-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
         <button onclick="openModal('school-modal')" style="background:#fff;color:${A};border:none;border-radius:14px;padding:16px 32px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Demander une démo gratuite →</button>
         <button onclick="go('lessons')" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:14px;padding:16px 24px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Essayer les cours gratuitement</button>
       </div>
@@ -5179,6 +5526,7 @@ const app={
         <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint : record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
       </div>
       <div class="spanel" style="margin-bottom:22px"><h3>⌨️ Tes touches difficiles</h3><div style="font-size:13px;color:var(--muted);margin:4px 0 16px">Les touches en rouge sont celles où tu fais le plus de fautes. Concentre-toi dessus !</div>${this._keyHeatmap(this.stats.keyStats)}</div>
+      ${this._gazeAnalysisPanel(tests)}
       <div style="text-align:center;padding:8px 0 24px;color:var(--muted);font-size:13px">${tests.length} exercice${tests.length>1?'s':''} réalisé${tests.length>1?'s':''}</div>
     </div>`;
   },
@@ -6392,6 +6740,8 @@ async function handleSSOReturn(){
     if(d.role)_mergedData.role=d.role;
     saveSession(d.username,d.plan,d.token,d.id,_mergedData.role||null);
     app.stats=_mergedData;
+    window._needsOnboarding = !d.onboarding_completed;
+    if(!d.onboarding_completed)localStorage.removeItem('klak_ob');else localStorage.setItem('klak_ob','1');
     closeModal('auth-modal');
     loginUser(d.username);
     if(isAdmin())app.loadAdmin(true);else if(isTeacher())app.loadEtab(true);
@@ -6411,6 +6761,7 @@ if(currentUser){
   // Préserver le rôle déjà chargé par loadSession() dans mergeStats()
   const _preRole=app.stats&&app.stats.role;
   app.stats=mergeStats(_preRole?{role:_preRole}:undefined);
+  if(localStorage.getItem('klak_ob')!=='1')setTimeout(obOpen,600);
 }
 app.init();
 go('home');
