@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Page introuvable — KeyPace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #FAF9F5;
+      --txt: #16140F;
+      --muted: #A39C8D;
+      --border: #E7E1D5;
+      --card: #fff;
+      --accent: #FF4D2E;
+      --light: #F3F0E8;
+    }
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--txt);
+      letter-spacing: -0.02em;
+    }
+    .nav-logo-icon {
+      width: 30px;
+      height: 30px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px 80px;
+      text-align: center;
+    }
+    .code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(72px, 20vw, 128px);
+      font-weight: 700;
+      line-height: 1;
+      color: var(--accent);
+      letter-spacing: -0.04em;
+      margin-bottom: 24px;
+      position: relative;
+      display: inline-block;
+    }
+    .code::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--accent);
+      opacity: 0.15;
+      border-radius: 2px;
+    }
+    h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: clamp(22px, 5vw, 32px);
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      line-height: 1.15;
+    }
+    p {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 420px;
+      margin-bottom: 36px;
+    }
+    .btns {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform .15s;
+    }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-secondary {
+      background: var(--card);
+      color: var(--txt);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 22px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform .15s;
+    }
+    .btn-secondary:hover { transform: translateY(-1px); }
+    .keys {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 52px;
+      flex-wrap: wrap;
+    }
+    .key {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-bottom: 3px solid var(--border);
+      border-radius: 8px;
+      width: 40px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .key.accent {
+      background: rgba(255,77,46,.08);
+      border-color: rgba(255,77,46,.25);
+      border-bottom-color: rgba(255,77,46,.4);
+      color: var(--accent);
+    }
+    footer {
+      border-top: 1px solid var(--border);
+    }
+    .footer-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .footer-links { display: flex; gap: 16px; flex-wrap: wrap; }
+    .footer-links a { color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--txt); }
+    @media(max-width:600px) {
+      .btns { flex-direction: column; }
+      .btns a { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-icon">K</div>
+    KeyPace
+  </a>
+</nav>
+
+<main>
+  <div class="code">404</div>
+  <h1>Cette page n'existe pas</h1>
+  <p>Elle a peut-être été déplacée ou supprimée. Retourne à l'accueil pour continuer à t'entraîner.</p>
+  <div class="btns">
+    <a href="/" class="btn-primary">← Retour à l'accueil</a>
+    <a href="/conditions" class="btn-secondary">Aide & contact</a>
+  </div>
+  <div class="keys">
+    <div class="key">A</div>
+    <div class="key">Z</div>
+    <div class="key">E</div>
+    <div class="key">R</div>
+    <div class="key accent">T</div>
+    <div class="key accent">Y</div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span>© 2026 KeyPace</span>
+    <div class="footer-links">
+      <a href="/conditions">CGU</a>
+      <a href="/confidentialite">Confidentialité</a>
+      <a href="mailto:contact@keypace.be">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
