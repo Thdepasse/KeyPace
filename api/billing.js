@@ -17,6 +17,11 @@ async function sb(path, opts = {}) {
   return { ok: r.ok, status: r.status, data: text ? JSON.parse(text) : null };
 }
 
+// Endpoint de facturation unifie.
+// Remplace create-checkout.js et customer-portal.js pour rester sous la
+// limite de 12 fonctions serverless du plan Hobby de Vercel.
+//   POST /api/billing  { action: 'checkout', token }  -> ouvre le paiement
+//   POST /api/billing  { action: 'portal',   token }  -> ouvre le portail client
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -24,18 +29,37 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { token } = req.body || {};
+  const { action, token } = req.body || {};
   if (!token) return res.status(400).json({ error: 'Token manquant.' });
+  if (action !== 'checkout' && action !== 'portal') {
+    return res.status(400).json({ error: 'Action inconnue.' });
+  }
 
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,stripe_customer_id`);
+  const r = await sb(
+    `/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,stripe_customer_id`
+  );
   const user = r.data && r.data[0];
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const appUrl = (process.env.APP_URL || 'https://keypace.be').trim();
+
+  if (action === 'portal') {
+    if (!user.stripe_customer_id) {
+      return res.status(400).json({ error: 'Aucun abonnement associe a ce compte.' });
+    }
+    const session = await stripe.billingPortal.sessions.create({
+      customer: user.stripe_customer_id,
+      return_url: appUrl,
+    });
+    return res.json({ url: session.url });
+  }
 
   let customerId = user.stripe_customer_id;
   if (!customerId) {
-    const customer = await stripe.customers.create({ metadata: { username: user.username } });
+    const customer = await stripe.customers.create({
+      metadata: { username: user.username },
+    });
     customerId = customer.id;
     await sb(`/users?id=eq.${user.id}`, {
       method: 'PATCH',
@@ -43,7 +67,6 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const appUrl = (process.env.APP_URL || 'https://keypace.be').trim();
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
     payment_method_types: ['card'],

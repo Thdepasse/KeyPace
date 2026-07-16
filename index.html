@@ -993,11 +993,6 @@ footer{border-top:1px solid var(--border);margin-top:10px}
     </div>
     <button class="upgrade-btn" id="stripe-pay-btn" onclick="startCheckout()">Passer à Expert : Payer →</button>
     <div id="upgrade-msg" style="text-align:center;font-size:13px;color:var(--muted);margin-top:12px;display:none"></div>
-    <div class="upgrade-code-wrap">
-      <input type="text" class="upgrade-code-input" id="expert-code" placeholder="Code promo / licence">
-      <button class="upgrade-code-btn" onclick="redeemCode()">Activer</button>
-    </div>
-    <div id="code-msg" style="font-size:13px;margin-top:8px;font-weight:600;display:none"></div>
   </div>
 </div>
 
@@ -1153,7 +1148,6 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 
 /* ── PLAN CONFIG ── */
 const FREE_LESSON_IDS = ['r1','r2','r3','r4','r5','r6','h1','h2','h3','h4']; // 10 leçons gratuites
-const EXPERT_CODE = 'KEYPACE-EXPERT'; // code démo
 
 /* ── AUTH ── */
 let currentUser = null;
@@ -1488,31 +1482,11 @@ async function startCheckout(){
   const btn=document.getElementById('stripe-pay-btn');
   btn.disabled=true;btn.textContent='Redirection…';
   try{
-    const r=await fetch('/api/create-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+    const r=await fetch('/api/billing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'checkout',token:currentToken})});
     const d=await r.json();
     if(d.url)window.location.href=d.url;
     else{btn.disabled=false;btn.textContent='Passer à Expert : Payer →';alert('Erreur paiement : '+( d.error||'réessaie.'));}
   }catch{btn.disabled=false;btn.textContent='Passer à Expert : Payer →';alert('Erreur réseau.');}
-}
-
-async function redeemCode(){
-  const code=document.getElementById('expert-code').value.trim().toUpperCase();
-  const msg=document.getElementById('code-msg');
-  if(code==='KEYPACE-EXPERT'){
-    // demo code : activate directly via DB
-    if(!currentUser)return;
-    await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:app.stats||{}})});
-    // update plan via a small helper
-    await fetch('/api/activate-expert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
-    currentPlan='expert';
-    const s=JSON.parse(localStorage.getItem('klak_session')||'{}');
-    s.plan='expert';localStorage.setItem('klak_session',JSON.stringify(s));
-    updateNavUser();
-    msg.textContent='✓ Code valide !';msg.style.color='#1FA971';msg.style.display='block';
-    setTimeout(()=>{closeModal('upgrade-modal');app.renderCurrent();},1200);
-  } else {
-    msg.textContent='✗ Code invalide.';msg.style.color='#E5484D';msg.style.display='block';
-  }
 }
 
 function showEmailPendingBanner(username){
@@ -4730,7 +4704,7 @@ const app={
     if(!currentToken)return;
     const old=btn.textContent;btn.disabled=true;btn.textContent='Ouverture…';
     try{
-      const r=await fetch('/api/customer-portal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+      const r=await fetch('/api/billing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'portal',token:currentToken})});
       const d=await r.json();
       if(!r.ok||!d.url)throw new Error(d.error||'Erreur');
       location.href=d.url;
