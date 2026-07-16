@@ -521,6 +521,9 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .kb-space{width:46%;min-width:200px;height:clamp(38px,4.4vw,52px);border-radius:9px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#9A9281;transition:transform .08s,box-shadow .08s,background .08s;display:flex;align-items:center;justify-content:center}
 .kb-space.on{background:var(--accent);color:#fff;border-color:transparent;transform:translateY(-3px);box-shadow:0 10px 22px rgba(255,77,46,0.42)}
 .hint-txt{font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px;min-height:20px}
+.hint-txt._nudge{color:var(--accent);font-weight:600;animation:hintPulse 1.4s ease-in-out infinite;will-change:transform}
+@keyframes hintPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@media (prefers-reduced-motion:reduce){.hint-txt._nudge{animation:none}}
 .lesson-tip{background:#FFF8F0;border:1.5px solid #FFDCC0;border-radius:14px;padding:14px 18px;margin-bottom:16px;font-size:14px;line-height:1.6;color:#5C4A30;display:flex;gap:12px;align-items:flex-start}
 .lesson-tip-icon{font-size:20px;flex-shrink:0;margin-top:1px}
 .intro-screen{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:16px;max-width:680px;margin-left:auto;margin-right:auto}
@@ -2653,7 +2656,7 @@ const app={
     if(k.length!==1)return;
     e.preventDefault();
     const s=this.sess;
-    if(!s.started){s.started=true;s.startTime=Date.now();this.startTimer();this._gazeStart();}
+    if(!s.started){s.started=true;s.startTime=Date.now();this.startTimer();this._gazeStart();this._clearNudge();}
     const expected=s.text[s.idx];s.keystrokes++;
     const _ok=(k===expected);
     if(_ok){s.typed[s.idx]='c';s.correct++;}else{s.typed[s.idx]='w';}
@@ -3295,8 +3298,11 @@ const app={
 
   /* ── TYPING ── */
   renderTyping(){
-    if(this.sess&&this.sess.mode==='lesson'&&this.view==='lessons'){this._renderTypingInto('page-lessons');return;}
+    const _s=this.sess;
+    const _arm=()=>{if(_s&&!_s.started&&!_s.finished)this._armNudge();else this._clearNudge();};
+    if(this.sess&&this.sess.mode==='lesson'&&this.view==='lessons'){this._renderTypingInto('page-lessons');_arm();return;}
     this._renderTypingInto('page-test');
+    _arm();
   },
   _renderTypingInto(pageId){
     if(this._showIntro){
@@ -3474,6 +3480,22 @@ const app={
     const hint=document.querySelector('.hint-txt');
     if(hint)hint.innerHTML=s.started?'<span style="opacity:.45;font-size:12px">Tab pour recommencer</span>':'Commence à taper pour démarrer le chrono…';
     requestAnimationFrame(()=>this.scrollToCursor());
+  },
+
+  _clearNudge(){
+    if(this._nudgeTimer){clearTimeout(this._nudgeTimer);this._nudgeTimer=null;}
+    const h=document.querySelector('.hint-txt');
+    if(h)h.classList.remove('_nudge');
+  },
+
+  _armNudge(){
+    this._clearNudge();
+    this._nudgeTimer=setTimeout(()=>{
+      const s=this.sess;
+      if(s&&s.started)return;
+      const h=document.querySelector('.hint-txt');
+      if(h)h.classList.add('_nudge');
+    },1500);
   },
 
   /* ── LESSONS ── */
