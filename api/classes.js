@@ -1,6 +1,7 @@
 // API établissement (Phase 0) : routeur d'actions sur les tables classes/class_members.
 // Tout passe par la clé service (RLS deny-anon). Logique pure dans _class-logic.
-const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary } = require('./_class-logic');
+const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary,
+  essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats } = require('./_class-logic');
 
 const crypto = require('crypto');
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -252,9 +253,18 @@ async function assignmentCreate(req, res) {
   if (error) return res.status(status).json({ error });
   const title = (req.body.title || '').trim();
   if (!title) return res.status(400).json({ error: 'Titre requis.' });
-  const customText = (req.body.customText || '').trim() || null;
-  const mode = customText ? (req.body.mode === 'vocal' ? 'vocal' : 'written') : null;
-  const audioUrl = (mode === 'vocal' && req.body.audioUrl) ? req.body.audioUrl : null;
+  const isEssay = req.body.mode === 'essay';
+  const customText = isEssay ? null : ((req.body.customText || '').trim() || null);
+  const mode = isEssay ? 'essay' : (customText ? (req.body.mode === 'vocal' ? 'vocal' : 'written') : null);
+  // Une transcription garde son audio source ; les autres essais n'en ont pas.
+  const audioUrl = ((mode === 'vocal' || (isEssay && req.body.essayType === 'transcription')) && req.body.audioUrl) ? req.body.audioUrl : null;
+  // Consignes d'essai : validées à part (logique pure, testable).
+  let essayCols = {};
+  if (isEssay) {
+    const ev = validateEssayBrief(req.body);
+    if (!ev.ok) return res.status(400).json({ error: ev.error });
+    essayCols = ev.value;
+  }
   const row = {
     class_id: cls.id,
     lesson_id: req.body.lessonId || null,
@@ -264,6 +274,7 @@ async function assignmentCreate(req, res) {
     custom_text: customText,
     mode,
     audio_url: audioUrl,
+    ...essayCols,
   };
   const r = await sb('/assignments', { method: 'POST', body: JSON.stringify(row) });
   if (!r.ok || !r.data || !r.data[0]) return res.status(500).json({ error: 'Création impossible.' });
@@ -689,6 +700,162 @@ async function audioUpload(req, res) {
   return res.json({ audioUrl, storagePath: fileName });
 }
 
+/* ── Essais : rendu élève + lecture prof ─────────────────────────
+   Contrairement aux autres devoirs (booléen déduit de progress.data),
+   un essai est stocké dans essay_submissions et relu par le prof. ── */
+
+// Charge un devoir de type essai + sa classe, en vérifiant que l'élève y appartient.
+async function loadEssayForStudent(user, assignmentId) {
+  const aR = await sb(`/assignments?id=eq.${encodeURIComponent(assignmentId)}&select=*`);
+  const a = aR.data && aR.data[0];
+  if (!a) return { error: 'Devoir introuvable.', status: 404 };
+  if (a.mode !== 'essay') return { error: 'Ce devoir n’est pas un essai.', status: 400 };
+  const mR = await sb(`/class_members?class_id=eq.${encodeURIComponent(a.class_id)}&student_id=eq.${encodeURIComponent(user.id)}&select=id`);
+  if (!mR.data || !mR.data[0]) return { error: 'Accès refusé.', status: 403 };
+  return { a };
+}
+
+// Élève : dépose ou met à jour son essai.
+async function essaySubmit(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const { a, error, status } = await loadEssayForStudent(user, req.body.assignmentId);
+  if (error) return res.status(status).json({ error });
+
+  const content = sanitizeEssayContent(a.essay_type, req.body.content);
+  if (!content) return res.status(400).json({ error: 'Type d’essai inconnu.' });
+  const v = validateEssaySubmission(a, content);
+  if (!v.ok) return res.status(400).json({ error: v.error });
+
+  const row = {
+    assignment_id: a.id,
+    student_id: user.id,
+    content,
+    word_count: v.words,
+    keystroke_stats: sanitizeEssayStats(req.body.stats),
+    updated_at: new Date().toISOString(),
+  };
+  // Upsert sur (assignment_id, student_id) : l'élève peut corriger son rendu.
+  const r = await sb('/essay_submissions', {
+    method: 'POST',
+    headers: { Prefer: 'return=representation,resolution=merge-duplicates' },
+    body: JSON.stringify(row),
+  });
+  if (!r.ok) return res.status(500).json({ error: 'Enregistrement impossible.' });
+
+  // Marque le devoir comme fait dans progress.data (cohérent avec assignmentDone).
+  try {
+    const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(user.id)}&select=data`);
+    const data = (pr.data && pr.data[0] && pr.data[0].data) || {};
+    data.assignmentsDone = data.assignmentsDone || {};
+    data.assignmentsDone[a.id] = { t: Date.now(), essay: true, words: v.words };
+    await sb(`/progress?user_id=eq.${encodeURIComponent(user.id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ data, updated_at: new Date().toISOString() }),
+    });
+  } catch { /* le rendu est enregistré : ne pas échouer sur le marqueur */ }
+
+  return res.json({ ok: true, words: v.words });
+}
+
+// Élève : relit son propre rendu (pour reprendre sa copie).
+async function essayMine(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const { a, error, status } = await loadEssayForStudent(user, req.body.assignmentId);
+  if (error) return res.status(status).json({ error });
+  const sR = await sb(`/essay_submissions?assignment_id=eq.${a.id}&student_id=eq.${encodeURIComponent(user.id)}&select=content,word_count,updated_at`);
+  const s = sR.data && sR.data[0];
+  return res.json({
+    assignment: {
+      id: a.id, title: a.title, essayType: a.essay_type, essayBrief: a.essay_brief,
+      minWords: a.min_words, maxWords: a.max_words, dueDate: a.due_date, audioUrl: a.audio_url || null,
+    },
+    submission: s ? { content: s.content || {}, words: s.word_count, updatedAt: s.updated_at } : null,
+  });
+}
+
+// Prof : liste les copies rendues d'un essai (sans le texte intégral).
+async function essayList(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  const aR = await sb(`/assignments?id=eq.${encodeURIComponent(req.body.assignmentId)}&select=*`);
+  const a = aR.data && aR.data[0];
+  if (!a) return res.status(404).json({ error: 'Devoir introuvable.' });
+  const { cls, error, status } = await loadClassForManage(user, a.class_id);
+  if (error) return res.status(status).json({ error });
+
+  const members = await membersOf(cls.id);
+  const sR = await sb(`/essay_submissions?assignment_id=eq.${a.id}&select=student_id,word_count,keystroke_stats,updated_at`);
+  const subs = {};
+  (sR.data || []).forEach((s) => { subs[s.student_id] = s; });
+  const pmap = await fetchProgressMap(members.map((m) => m.student_id));
+  const now = Date.now();
+
+  const rows = members.map((m) => {
+    const s = subs[m.student_id];
+    if (!s) return { studentId: m.student_id, username: m.username, submitted: false };
+    const baseline = studentSummary(pmap[m.student_id] || {}, now).avgWpm;
+    const sig = essayWritingSignals(s.keystroke_stats, s.word_count, { baselineWpm: baseline });
+    return {
+      studentId: m.student_id, username: m.username, submitted: true,
+      words: s.word_count, updatedAt: s.updated_at,
+      suspicion: sig.suspicion, flags: sig.flags,
+    };
+  });
+  rows.sort((x, y) => Number(y.submitted) - Number(x.submitted) || x.username.localeCompare(y.username));
+
+  return res.json({
+    assignment: {
+      id: a.id, title: a.title, essayType: a.essay_type, essayBrief: a.essay_brief,
+      minWords: a.min_words, maxWords: a.max_words, dueDate: a.due_date,
+    },
+    total: members.length,
+    submittedCount: rows.filter((r) => r.submitted).length,
+    rows,
+  });
+}
+
+// Prof : lit une copie complète + ses signaux d'écriture.
+async function essayDetail(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  const aR = await sb(`/assignments?id=eq.${encodeURIComponent(req.body.assignmentId)}&select=*`);
+  const a = aR.data && aR.data[0];
+  if (!a) return res.status(404).json({ error: 'Devoir introuvable.' });
+  const { error, status } = await loadClassForManage(user, a.class_id);
+  if (error) return res.status(status).json({ error });
+
+  const sR = await sb(`/essay_submissions?assignment_id=eq.${a.id}&student_id=eq.${encodeURIComponent(req.body.studentId)}&select=*,users(username)`);
+  const s = sR.data && sR.data[0];
+  if (!s) return res.status(404).json({ error: 'Aucun rendu de cet élève.' });
+
+  const pmap = await fetchProgressMap([s.student_id]);
+  const baseline = studentSummary(pmap[s.student_id] || {}, Date.now()).avgWpm;
+  const sig = essayWritingSignals(s.keystroke_stats, s.word_count, { baselineWpm: baseline });
+  const def = essayTypeDef(a.essay_type);
+
+  return res.json({
+    assignment: {
+      id: a.id, title: a.title, essayType: a.essay_type, essayBrief: a.essay_brief,
+      minWords: a.min_words, maxWords: a.max_words,
+    },
+    fields: def ? def.fields.map((f) => ({ key: f.key, label: f.label, multiline: f.multiline })) : [],
+    submission: {
+      studentId: s.student_id,
+      username: s.users ? s.users.username : '?',
+      content: s.content || {},
+      words: s.word_count,
+      submittedAt: s.submitted_at,
+      updatedAt: s.updated_at,
+    },
+    signals: sig,
+    baselineWpm: baseline,
+  });
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -712,6 +879,11 @@ module.exports = async function handler(req, res) {
       case 'assignment-delete': return await assignmentDelete(req, res);
       case 'my-assignments': return await myAssignments(req, res);
       case 'audio-upload': return await audioUpload(req, res);
+      // essais
+      case 'essay-submit': return await essaySubmit(req, res);
+      case 'essay-mine': return await essayMine(req, res);
+      case 'essay-list': return await essayList(req, res);
+      case 'essay-detail': return await essayDetail(req, res);
       case 'migrate-self': return await migrateSelf(req, res);
       // établissement (role admin)
       case 'admin-overview': return await adminOverview(req, res);

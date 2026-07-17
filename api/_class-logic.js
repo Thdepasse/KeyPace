@@ -123,4 +123,209 @@ function institutionProfSummary(profEntries, now) {
   });
 }
 
-module.exports = { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary, WEEK_MS };
+/* ───────────────────────────────────────────────────────────────
+   ESSAIS — logique pure (validation, comptage, signaux de frappe).
+   Le contenu d'un essai est un objet { champ: texte } stocké en jsonb :
+   ajouter un type ne touche pas au schéma.
+   ─────────────────────────────────────────────────────────────── */
+
+// Types d'essai et leurs champs. `key` = clé dans content, `multiline` = <textarea>.
+// `counted` = le champ entre dans le compte de mots (un objet de mail ne compte pas).
+const ESSAY_TYPES = {
+  mail: {
+    label: 'Mail',
+    fields: [
+      { key: 'to', label: 'Destinataire', multiline: false, counted: false },
+      { key: 'subject', label: 'Objet', multiline: false, counted: false },
+      { key: 'body', label: 'Corps du message', multiline: true, counted: true },
+    ],
+  },
+  histoire: {
+    label: 'Histoire',
+    fields: [
+      { key: 'title', label: 'Titre', multiline: false, counted: false },
+      { key: 'body', label: 'Récit', multiline: true, counted: true },
+    ],
+  },
+  transcription: {
+    label: 'Transcription',
+    fields: [{ key: 'body', label: 'Transcription', multiline: true, counted: true }],
+  },
+  lettre: {
+    label: 'Lettre formelle',
+    fields: [
+      { key: 'from', label: 'Expéditeur', multiline: false, counted: false },
+      { key: 'to', label: 'Destinataire', multiline: false, counted: false },
+      { key: 'subject', label: 'Objet', multiline: false, counted: false },
+      { key: 'body', label: 'Corps de la lettre', multiline: true, counted: true },
+      { key: 'closing', label: 'Formule de politesse', multiline: false, counted: false },
+    ],
+  },
+  'compte-rendu': {
+    label: 'Compte-rendu',
+    fields: [
+      { key: 'title', label: 'Titre', multiline: false, counted: false },
+      { key: 'body', label: 'Compte-rendu', multiline: true, counted: true },
+    ],
+  },
+  dissertation: {
+    label: 'Dissertation',
+    fields: [
+      { key: 'title', label: 'Titre', multiline: false, counted: false },
+      { key: 'intro', label: 'Introduction', multiline: true, counted: true },
+      { key: 'dev', label: 'Développement', multiline: true, counted: true },
+      { key: 'ccl', label: 'Conclusion', multiline: true, counted: true },
+    ],
+  },
+  note: {
+    label: 'Note libre',
+    fields: [
+      { key: 'title', label: 'Titre', multiline: false, counted: false },
+      { key: 'body', label: 'Texte', multiline: true, counted: true },
+    ],
+  },
+};
+
+function essayTypeDef(type) {
+  return ESSAY_TYPES[type] || null;
+}
+
+function countWords(s) {
+  if (!s || typeof s !== 'string') return 0;
+  const m = s.trim().match(/[\p{L}\p{N}'’-]+/gu);
+  return m ? m.length : 0;
+}
+
+// Mots d'un contenu, limité aux champs `counted` du type.
+function essayWordCount(type, content) {
+  const def = essayTypeDef(type);
+  if (!def || !content) return 0;
+  return def.fields
+    .filter((f) => f.counted)
+    .reduce((n, f) => n + countWords(content[f.key]), 0);
+}
+
+// Nettoie le contenu reçu : ne garde que les champs connus du type, en texte,
+// borné à 20 000 caractères par champ (garde-fou payload).
+function sanitizeEssayContent(type, raw) {
+  const def = essayTypeDef(type);
+  if (!def) return null;
+  const out = {};
+  for (const f of def.fields) {
+    const v = raw && raw[f.key];
+    out[f.key] = typeof v === 'string' ? v.slice(0, 20000) : '';
+  }
+  return out;
+}
+
+// Valide un rendu contre les consignes. Retourne { ok, error }.
+function validateEssaySubmission(assignment, content) {
+  const type = assignment.essay_type;
+  const def = essayTypeDef(type);
+  if (!def) return { ok: false, error: 'Type d’essai inconnu.' };
+  for (const f of def.fields) {
+    if (f.counted && !String(content[f.key] || '').trim()) {
+      return { ok: false, error: `Le champ « ${f.label} » est vide.` };
+    }
+  }
+  const words = essayWordCount(type, content);
+  const min = assignment.min_words, max = assignment.max_words;
+  if (min && words < min) return { ok: false, error: `Minimum ${min} mots (tu en as ${words}).` };
+  if (max && words > max) return { ok: false, error: `Maximum ${max} mots (tu en as ${words}).` };
+  return { ok: true, words };
+}
+
+// Consignes de création d'un essai côté prof. Retourne { ok, error, value }.
+function validateEssayBrief(body) {
+  const type = body.essayType;
+  if (!essayTypeDef(type)) return { ok: false, error: 'Type d’essai inconnu.' };
+  const toInt = (v) => {
+    if (v == null || v === '') return null;
+    const n = parseInt(v, 10);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  };
+  const min = toInt(body.minWords), max = toInt(body.maxWords);
+  if (min && max && min > max) return { ok: false, error: 'Le minimum de mots dépasse le maximum.' };
+  return {
+    ok: true,
+    value: {
+      essay_type: type,
+      essay_brief: (body.essayBrief || '').trim().slice(0, 5000) || null,
+      min_words: min,
+      max_words: max,
+    },
+  };
+}
+
+/* ── Signaux d'écriture ──────────────────────────────────────────
+   Pas de verdict automatique : on mesure, le prof juge. Un faux positif
+   qui accuse un élève honnête coûte plus cher qu'une triche qui passe.
+
+   stats (envoyées par le client) :
+     pasteAttempts  nb de collages bloqués
+     bigInserts     nb d'insertions > 30 caractères d'un coup
+     insertedChars  total de caractères arrivés par insertion massive
+     typedChars     caractères saisis touche à touche
+     activeMs       temps d'écriture actif (hors pauses > 5 s)
+     durationMs     temps total entre ouverture et rendu
+─────────────────────────────────────────────────────────────────── */
+function essayWritingSignals(stats, words, opts = {}) {
+  const s = stats || {};
+  const num = (v) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : 0);
+  const pasteAttempts = num(s.pasteAttempts);
+  const bigInserts = num(s.bigInserts);
+  const insertedChars = num(s.insertedChars);
+  const typedChars = num(s.typedChars);
+  const activeMs = num(s.activeMs);
+  const totalChars = typedChars + insertedChars;
+
+  // Vitesse apparente sur le temps réellement actif.
+  const activeMin = activeMs / 60000;
+  const apparentWpm = activeMin > 0.05 ? Math.round(words / activeMin) : null;
+
+  // Part du texte arrivée autrement qu'au clavier.
+  const insertedRatio = totalChars > 0 ? insertedChars / totalChars : 0;
+
+  const flags = [];
+  if (pasteAttempts > 0) flags.push({ code: 'paste', label: `${pasteAttempts} collage(s) bloqué(s)` });
+  if (bigInserts > 0) flags.push({ code: 'insert', label: `${bigInserts} insertion(s) massive(s)` });
+  if (insertedRatio >= 0.2) flags.push({ code: 'ratio', label: `${Math.round(insertedRatio * 100)} % du texte non tapé` });
+
+  // Vitesse incohérente : comparée à la moyenne connue de l'élève (baseline),
+  // pas à un seuil absolu — un élève rapide n'est pas un tricheur.
+  const baseline = typeof opts.baselineWpm === 'number' && opts.baselineWpm > 0 ? opts.baselineWpm : null;
+  if (apparentWpm != null && baseline && apparentWpm > baseline * 2 && apparentWpm > 60) {
+    flags.push({ code: 'speed', label: `${apparentWpm} mpm apparents vs ${baseline} habituels` });
+  }
+
+  return {
+    apparentWpm,
+    insertedRatio: Math.round(insertedRatio * 100) / 100,
+    pasteAttempts,
+    bigInserts,
+    activeMs,
+    durationMs: num(s.durationMs),
+    flags,
+    suspicion: flags.length === 0 ? 'none' : flags.length >= 2 ? 'high' : 'low',
+  };
+}
+
+// Nettoie les stats client avant stockage (elles sont déclaratives : bornées, jamais crues).
+function sanitizeEssayStats(raw) {
+  const s = raw || {};
+  const clamp = (v, max) => {
+    const n = typeof v === 'number' && Number.isFinite(v) && v >= 0 ? Math.floor(v) : 0;
+    return Math.min(n, max);
+  };
+  return {
+    pasteAttempts: clamp(s.pasteAttempts, 1000),
+    bigInserts: clamp(s.bigInserts, 1000),
+    insertedChars: clamp(s.insertedChars, 200000),
+    typedChars: clamp(s.typedChars, 200000),
+    activeMs: clamp(s.activeMs, 24 * 3600 * 1000),
+    durationMs: clamp(s.durationMs, 24 * 3600 * 1000),
+  };
+}
+
+module.exports = { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
+  ESSAY_TYPES, essayTypeDef, countWords, essayWordCount, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats };
