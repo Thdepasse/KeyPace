@@ -2584,6 +2584,352 @@ const app={
   newPassage(){this.stopTimer();this._gazeStop();this._gaze.enabled=false;this.sess=this.makeSession('test');this.renderCurrent();},
 
   // Devoir « texte personnalisé » : lance une session sur le texte du prof (écrit ou dictée vocale).
+/* ═══════════════════════════════════════════════════════════════
+   ESSAIS — UI (lot 2)
+   Prof : consignes dans le modal d'assignation (onglet ✍️ Essai)
+   Élève : éditeur avec compteur de mots + garde anti-collage
+   Prof : liste des copies rendues + lecture d'une copie
+   ═══════════════════════════════════════════════════════════════ */
+
+  // Miroir de ESSAY_TYPES (api/_class-logic.js). Garder les deux synchronisés.
+  _essayTypes:{
+    mail:{label:'Mail',icon:'✉️',fields:[
+      {key:'to',label:'Destinataire',ml:false,counted:false,ph:'ex. directeur@ecole.be'},
+      {key:'subject',label:'Objet',ml:false,counted:false,ph:'ex. Demande de salle'},
+      {key:'body',label:'Corps du message',ml:true,counted:true,ph:'Bonjour…'}]},
+    histoire:{label:'Histoire',icon:'📖',fields:[
+      {key:'title',label:'Titre',ml:false,counted:false,ph:'Le titre de ton récit'},
+      {key:'body',label:'Récit',ml:true,counted:true,ph:'Il était une fois…'}]},
+    transcription:{label:'Transcription',icon:'🔊',fields:[
+      {key:'body',label:'Transcription',ml:true,counted:true,ph:'Écris ce que tu entends…'}]},
+    lettre:{label:'Lettre formelle',icon:'📜',fields:[
+      {key:'from',label:'Expéditeur',ml:false,counted:false,ph:'Ton nom et adresse'},
+      {key:'to',label:'Destinataire',ml:false,counted:false,ph:'Nom et adresse du destinataire'},
+      {key:'subject',label:'Objet',ml:false,counted:false,ph:'ex. Candidature spontanée'},
+      {key:'body',label:'Corps de la lettre',ml:true,counted:true,ph:'Madame, Monsieur,…'},
+      {key:'closing',label:'Formule de politesse',ml:false,counted:false,ph:'Veuillez agréer…'}]},
+    'compte-rendu':{label:'Compte-rendu',icon:'📋',fields:[
+      {key:'title',label:'Titre',ml:false,counted:false,ph:'Objet du compte-rendu'},
+      {key:'body',label:'Compte-rendu',ml:true,counted:true,ph:'Résume ici…'}]},
+    dissertation:{label:'Dissertation',icon:'🎓',fields:[
+      {key:'title',label:'Titre',ml:false,counted:false,ph:'Le titre de ta dissertation'},
+      {key:'intro',label:'Introduction',ml:true,counted:true,ph:'Amène le sujet, pose la problématique…'},
+      {key:'dev',label:'Développement',ml:true,counted:true,ph:'Développe tes arguments…'},
+      {key:'ccl',label:'Conclusion',ml:true,counted:true,ph:'Réponds à la problématique…'}]},
+    note:{label:'Note libre',icon:'📝',fields:[
+      {key:'title',label:'Titre',ml:false,counted:false,ph:'Titre'},
+      {key:'body',label:'Texte',ml:true,counted:true,ph:'Écris ici…'}]},
+  },
+
+  // Échappement : le texte des élèves passe dans du innerHTML côté prof.
+  _esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));},
+
+  _essayCountWords(s){
+    if(!s)return 0;
+    const m=String(s).trim().match(/[\p{L}\p{N}'’-]+/gu);
+    return m?m.length:0;
+  },
+
+  /* ── PROF : bloc consignes dans le modal d'assignation ───────── */
+
+  _essayBriefHtml(fld,lbl){
+    const opts=Object.entries(this._essayTypes).map(([k,t])=>`<option value="${k}">${t.icon} ${t.label}</option>`).join('');
+    return `<div id="asg-block-essay" style="display:none">
+      <label style="${lbl}">Titre du devoir</label>
+      <input id="asg-essay-title" placeholder="ex. Mail au directeur" style="${fld}">
+      <label style="${lbl}">Type d'essai</label>
+      <select id="asg-essay-type" onchange="app._asgEssayTypeChange()" style="${fld}">${opts}</select>
+      <div id="asg-essay-fields-hint" style="font-size:11.5px;color:var(--muted);margin:-8px 0 14px;line-height:1.5"></div>
+      <label style="${lbl}">Consignes <span style="font-weight:400">(contexte, sujet, thème…)</span></label>
+      <textarea id="asg-essay-brief" rows="3" placeholder="ex. Tu écris au directeur pour demander une salle pour le club de lecture." style="${fld};resize:vertical;min-height:70px;line-height:1.5"></textarea>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1"><label style="${lbl}">Minimum de mots</label><input id="asg-essay-min" type="number" min="1" placeholder="ex. 80" style="${fld}"></div>
+        <div style="flex:1"><label style="${lbl}">Maximum de mots</label><input id="asg-essay-max" type="number" min="1" placeholder="ex. 200" style="${fld}"></div>
+      </div>
+      <div id="asg-essay-audio-note" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:var(--muted);line-height:1.5">
+        🔊 <b style="color:var(--txt)">Transcription</b> — enregistre l'audio que l'élève devra transcrire via l'onglet « Texte personnalisé » en mode Vocal, ou laisse vide pour une transcription à partir d'un document externe.
+      </div>
+    </div>`;
+  },
+
+  _asgEssayTypeChange(){
+    const t=document.getElementById('asg-essay-type').value;
+    const def=this._essayTypes[t];
+    const hint=document.getElementById('asg-essay-fields-hint');
+    if(hint&&def)hint.textContent='Champs demandés à l\u2019élève : '+def.fields.map(f=>f.label).join(', ')+'.';
+    const note=document.getElementById('asg-essay-audio-note');
+    if(note)note.style.display=t==='transcription'?'':'none';
+  },
+
+  /* ── ÉLÈVE : éditeur d'essai ─────────────────────────────────── */
+
+  async openEssay(assignmentId){
+    if(!currentUser){openAuth('login','Connecte-toi pour faire ce devoir.',()=>this.openEssay(assignmentId));return;}
+    const ov=document.createElement('div');
+    ov.id='essay-overlay';
+    ov.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:3200;overflow-y:auto;animation:settings-fade .18s ease';
+    ov.innerHTML=`<div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement du sujet…</div>`;
+    document.body.appendChild(ov);
+    this._essayOverlay=ov;
+    let d;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'essay-mine',token:currentToken,assignmentId})});
+      d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+    }catch(e){
+      ov.innerHTML=`<div style="padding:80px 20px;text-align:center"><div style="color:var(--muted);margin-bottom:16px">${this._esc(e.message||'Erreur de chargement.')}</div><button class="btn-secondary" style="padding:10px 18px" onclick="app.closeEssay()">Fermer</button></div>`;
+      return;
+    }
+    this._essayData=d;
+    this._essayStats={pasteAttempts:0,bigInserts:0,insertedChars:0,typedChars:0,activeMs:0,durationMs:0};
+    this._essayT0=Date.now();
+    this._essayLastKey=0;
+    this.renderEssayEditor();
+  },
+
+  closeEssay(){
+    if(this._essayOverlay){this._essayOverlay.remove();this._essayOverlay=null;}
+    this._essayData=null;
+  },
+
+  renderEssayEditor(){
+    const d=this._essayData,a=d.assignment;
+    const def=this._essayTypes[a.essayType]||this._essayTypes.note;
+    const sub=d.submission;
+    const val=(k)=>this._esc((sub&&sub.content&&sub.content[k])||'');
+    const fld='width:100%;margin:6px 0 16px;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font:inherit;background:var(--card);box-sizing:border-box;color:var(--txt)';
+    const lbl='display:block;font-size:12px;font-weight:700;color:var(--muted)';
+    const bounds=[a.minWords?`min. ${a.minWords} mots`:'',a.maxWords?`max. ${a.maxWords} mots`:''].filter(Boolean).join(' · ');
+
+    const fields=def.fields.map(f=>{
+      const id='essay-f-'+f.key;
+      const common=`id="${id}" data-ekey="${f.key}" oninput="app._essayInput(event)" onpaste="app._essayPaste(event)" ondrop="app._essayPaste(event)" oncut="return true"`;
+      return `<label style="${lbl}">${f.label}${f.counted?' <span style="font-weight:400;color:var(--muted)">(compté)</span>':''}</label>`+
+        (f.ml
+          ? `<textarea ${common} rows="${f.key==='dev'?10:6}" placeholder="${f.ph}" style="${fld};resize:vertical;min-height:${f.key==='dev'?200:120}px;line-height:1.65">${val(f.key)}</textarea>`
+          : `<input ${common} placeholder="${f.ph}" style="${fld}" value="${val(f.key)}">`);
+    }).join('');
+
+    this._essayOverlay.innerHTML=`<div style="max-width:780px;margin:0 auto;padding:28px 20px 100px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+        <button onclick="app.closeEssay()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0;display:flex;align-items:center;gap:5px">‹ Retour</button>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:20px">
+        <div style="width:46px;height:46px;border-radius:13px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${def.icon}</div>
+        <div style="flex:1;min-width:0">
+          <h1 style="margin:0;font-size:22px;letter-spacing:-.01em">${this._esc(a.title)}</h1>
+          <div style="font-size:13px;color:var(--muted);margin-top:3px">${def.label}${bounds?' · '+bounds:''}${a.dueDate?' · pour le '+new Date(a.dueDate).toLocaleDateString('fr-FR'):''}</div>
+        </div>
+      </div>
+      ${a.essayBrief?`<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;padding:14px 16px;margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">CONSIGNES</div>
+        <div style="font-size:14px;line-height:1.65;white-space:pre-wrap">${this._esc(a.essayBrief)}</div>
+      </div>`:''}
+      ${a.audioUrl?`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px">AUDIO À TRANSCRIRE</div>
+        <audio controls src="${this._esc(a.audioUrl)}" style="width:100%;height:38px;border-radius:8px"></audio>
+      </div>`:''}
+      <div style="background:rgba(255,77,46,.06);border:1px solid rgba(255,77,46,.2);border-radius:12px;padding:11px 14px;margin-bottom:22px;font-size:12.5px;color:var(--muted);line-height:1.5">
+        ✍️ Ce devoir se rédige au clavier : le collage est désactivé. Écris ton texte toi-même.
+      </div>
+      ${fields}
+      <div id="essay-err" style="color:#E5484D;font-size:13px;margin:0 0 12px;display:none"></div>
+      ${sub?`<div style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Dernier envoi : ${new Date(sub.updatedAt).toLocaleString('fr-FR')} · ${sub.words} mots. Tu peux corriger et renvoyer.</div>`:''}
+      <div style="position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 22%);padding:18px 0 0;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div id="essay-count" style="font-size:13px;font-weight:700;color:var(--muted);font-family:'JetBrains Mono',monospace"></div>
+        <div style="flex:1"></div>
+        <button onclick="app.closeEssay()" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 20px;font:inherit;font-size:14px;font-weight:600;cursor:pointer">Annuler</button>
+        <button id="essay-save" onclick="app.submitEssay()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 26px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 5px 16px rgba(255,77,46,.32)">${sub?'Renvoyer':'Rendre mon essai'}</button>
+      </div>
+    </div>`;
+    this._essayUpdateCount();
+  },
+
+  // Anti-collage : bloque paste et drop, et compte les tentatives.
+  // Le blocage client décourage l'élève pressé ; les compteurs, eux, remontent
+  // au prof (le serveur ne refuse jamais un rendu sur cette seule base).
+  _essayPaste(e){
+    e.preventDefault();
+    if(this._essayStats)this._essayStats.pasteAttempts++;
+    const el=e.target;
+    const prev=el.style.borderColor;
+    el.style.borderColor='#E5484D';
+    setTimeout(()=>{el.style.borderColor=prev||'';},600);
+    this._essayToast('Le collage est désactivé pour ce devoir — écris ton texte toi-même.');
+    return false;
+  },
+
+  _essayToast(msg){
+    let t=document.getElementById('essay-toast');
+    if(!t){
+      t=document.createElement('div');t.id='essay-toast';
+      t.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:32px;background:var(--txt);color:var(--bg);padding:12px 20px;border-radius:12px;font-size:13.5px;font-weight:600;z-index:3400;box-shadow:0 10px 30px rgba(20,16,12,.3);max-width:90vw;text-align:center';
+      document.body.appendChild(t);
+    }
+    t.textContent=msg;t.style.opacity='1';
+    clearTimeout(this._essayToastT);
+    this._essayToastT=setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .4s';},2600);
+  },
+
+  // Mesure la frappe : temps actif (pauses > 5 s exclues), caractères tapés vs insérés.
+  _essayInput(e){
+    const s=this._essayStats;if(!s)return;
+    const now=Date.now();
+    if(this._essayLastKey){
+      const dt=now-this._essayLastKey;
+      if(dt<5000)s.activeMs+=dt;   // au-delà de 5 s, l'élève réfléchit ou est parti
+    }
+    this._essayLastKey=now;
+    const n=(e.data||'').length;
+    if(e.inputType==='insertText'&&n<=2)s.typedChars+=Math.max(1,n);
+    else if(n>30){s.bigInserts++;s.insertedChars+=n;}
+    else if(n>0)s.typedChars+=n;
+    else if(e.inputType&&e.inputType.startsWith('insert'))s.typedChars+=1;
+    this._essayUpdateCount();
+  },
+
+  _essayCollect(){
+    const def=this._essayTypes[this._essayData.assignment.essayType]||this._essayTypes.note;
+    const c={};
+    def.fields.forEach(f=>{const el=document.getElementById('essay-f-'+f.key);c[f.key]=el?el.value:'';});
+    return c;
+  },
+
+  _essayUpdateCount(){
+    const el=document.getElementById('essay-count');if(!el||!this._essayData)return;
+    const a=this._essayData.assignment;
+    const def=this._essayTypes[a.essayType]||this._essayTypes.note;
+    const c=this._essayCollect();
+    const w=def.fields.filter(f=>f.counted).reduce((n,f)=>n+this._essayCountWords(c[f.key]),0);
+    let color='var(--muted)',suffix='';
+    if(a.minWords&&w<a.minWords){color='#E5722B';suffix=' · min. '+a.minWords;}
+    else if(a.maxWords&&w>a.maxWords){color='#E5484D';suffix=' · max. '+a.maxWords;}
+    else if(a.minWords||a.maxWords){color='#1FA971';suffix=' ✓';}
+    el.style.color=color;
+    el.textContent=w+' mot'+(w!==1?'s':'')+suffix;
+  },
+
+  async submitEssay(){
+    const btn=document.getElementById('essay-save');
+    const err=document.getElementById('essay-err');
+    const fail=(m)=>{err.textContent=m;err.style.display='block';btn.disabled=false;btn.textContent='Rendre mon essai';};
+    err.style.display='none';
+    btn.disabled=true;btn.textContent='Envoi…';
+    const stats={...this._essayStats,durationMs:Date.now()-this._essayT0};
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        action:'essay-submit',token:currentToken,assignmentId:this._essayData.assignment.id,
+        content:this._essayCollect(),stats,
+      })});
+      const d=await r.json();
+      if(!r.ok)return fail(d.error||'Erreur.');
+      this.closeEssay();
+      this._essayToast('✓ Essai rendu ('+d.words+' mots)');
+      this.loadMyClasses();
+    }catch{fail('Erreur réseau.');}
+  },
+
+  /* ── PROF : copies rendues ───────────────────────────────────── */
+
+  async viewEssays(assignmentId){
+    const ov=document.createElement('div');
+    ov.id='essays-overlay';
+    ov.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:3200;overflow-y:auto;animation:settings-fade .18s ease';
+    ov.innerHTML=`<div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement des copies…</div>`;
+    document.body.appendChild(ov);
+    this._essaysOverlay=ov;
+    let d;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'essay-list',token:currentToken,assignmentId})});
+      d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+    }catch(e){
+      ov.innerHTML=`<div style="padding:80px 20px;text-align:center"><div style="color:var(--muted);margin-bottom:16px">${this._esc(e.message||'Erreur.')}</div><button class="btn-secondary" style="padding:10px 18px" onclick="app.closeEssays()">Fermer</button></div>`;
+      return;
+    }
+    const a=d.assignment;
+    const def=this._essayTypes[a.essayType]||this._essayTypes.note;
+    const badge=(s)=>s==='high'?'<span style="font-size:11px;font-weight:700;color:#E5484D;background:rgba(229,72,77,.1);padding:3px 8px;border-radius:6px;white-space:nowrap">⚠ à vérifier</span>'
+      :s==='low'?'<span style="font-size:11px;font-weight:700;color:#E5722B;background:rgba(229,114,43,.1);padding:3px 8px;border-radius:6px;white-space:nowrap">à regarder</span>':'';
+    ov.innerHTML=`<div style="max-width:900px;margin:0 auto;padding:28px 20px 80px">
+      <button onclick="app.closeEssays()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 16px;display:flex;align-items:center;gap:5px">‹ Retour à la classe</button>
+      <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:8px">
+        <div style="width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0">${def.icon}</div>
+        <div style="flex:1;min-width:0">
+          <h1 style="margin:0;font-size:22px;letter-spacing:-.01em">${this._esc(a.title)}</h1>
+          <div style="font-size:13px;color:var(--muted);margin-top:3px">${def.label} · ${d.submittedCount}/${d.total} rendu${d.submittedCount>1?'s':''}</div>
+        </div>
+      </div>
+      ${a.essayBrief?`<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;padding:12px 15px;margin:18px 0;font-size:13.5px;line-height:1.6;white-space:pre-wrap">${this._esc(a.essayBrief)}</div>`:'<div style="height:18px"></div>'}
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+        ${d.rows.map(r=>r.submitted?`
+          <div onclick="app.viewEssayDetail('${a.id}','${r.studentId}')" style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background=''">
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:600;font-size:14px">${this._esc(r.username)}</div>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${r.words} mots · ${new Date(r.updatedAt).toLocaleDateString('fr-FR')}</div>
+            </div>
+            ${badge(r.suspicion)}
+            <div style="color:var(--muted);font-size:14px">›</div>
+          </div>`:`
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);opacity:.55">
+            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${this._esc(r.username)}</div><div style="font-size:11.5px;color:var(--muted);margin-top:2px">Pas encore rendu</div></div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  },
+
+  closeEssays(){if(this._essaysOverlay){this._essaysOverlay.remove();this._essaysOverlay=null;}},
+
+  async viewEssayDetail(assignmentId,studentId){
+    const ov=this._essaysOverlay;if(!ov)return;
+    const prev=ov.innerHTML;
+    ov.innerHTML=`<div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement de la copie…</div>`;
+    let d;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'essay-detail',token:currentToken,assignmentId,studentId})});
+      d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+    }catch(e){ov.innerHTML=prev;this._essayToast('Erreur de chargement.');return;}
+    const s=d.submission,sig=d.signals,a=d.assignment;
+    const tone=sig.suspicion==='high'?{c:'#E5484D',bg:'rgba(229,72,77,.08)',t:'Signaux d\u2019écriture inhabituels'}
+      :sig.suspicion==='low'?{c:'#E5722B',bg:'rgba(229,114,43,.08)',t:'Un signal à regarder'}
+      :{c:'#1FA971',bg:'rgba(31,169,113,.08)',t:'Écriture cohérente'};
+    ov.innerHTML=`<div style="max-width:820px;margin:0 auto;padding:28px 20px 80px">
+      <button onclick="app.viewEssays('${assignmentId}')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 16px;display:flex;align-items:center;gap:5px">‹ Toutes les copies</button>
+      <h1 style="margin:0 0 4px;font-size:22px;letter-spacing:-.01em">${this._esc(s.username)}</h1>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:20px">${this._esc(a.title)} · ${s.words} mots · rendu le ${new Date(s.updatedAt).toLocaleString('fr-FR')}</div>
+
+      <div style="background:${tone.bg};border:1px solid ${tone.c}33;border-radius:14px;padding:14px 16px;margin-bottom:22px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:${sig.flags.length?'10px':'0'}">
+          <span style="font-size:12px;font-weight:800;color:${tone.c};letter-spacing:.03em">${tone.t.toUpperCase()}</span>
+        </div>
+        ${sig.flags.length?`<ul style="margin:0;padding-left:18px;font-size:13px;color:var(--txt);line-height:1.7">${sig.flags.map(f=>`<li>${this._esc(f.label)}</li>`).join('')}</ul>`:''}
+        <div style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">
+          Vitesse apparente ${sig.apparentWpm==null?'—':sig.apparentWpm+' mpm'}${d.baselineWpm?' · moyenne habituelle de l\u2019élève '+d.baselineWpm+' mpm':''} · ${Math.round(sig.activeMs/60000)} min d'écriture active.
+          ${sig.flags.length?'Ces indices sont indicatifs, pas une preuve : à recouper avec ce que tu sais de l\u2019élève.':''}
+        </div>
+      </div>
+
+      ${d.fields.map(f=>{
+        const v=s.content[f.key];
+        if(!v||!String(v).trim())return '';
+        return `<div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:7px">${this._esc(f.label).toUpperCase()}</div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:${f.multiline?'16px 18px':'11px 14px'};font-size:${f.multiline?'14.5px':'14px'};line-height:1.75;white-space:pre-wrap;word-break:break-word">${this._esc(v)}</div>
+        </div>`;
+      }).join('')}
+
+      <button onclick="app._essayCopy('${assignmentId}','${studentId}')" style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px 18px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)">📋 Copier le texte</button>
+    </div>`;
+    this._essayLast=d;
+  },
+
+  _essayCopy(){
+    const d=this._essayLast;if(!d)return;
+    const txt=d.fields.map(f=>{const v=d.submission.content[f.key];return v&&String(v).trim()?f.label+' : '+v:'';}).filter(Boolean).join('\n\n');
+    navigator.clipboard.writeText(txt).then(()=>this._essayToast('✓ Copie dans le presse-papier'));
+  },
+
   startAssignment(id){
     const a=(this._myAssignments||[]).find(x=>x.id===id);
     if(!a)return;
@@ -5781,9 +6127,9 @@ const app={
           ${asg.map(a=>{
             const due=a.dueDate?new Date(a.dueDate).toLocaleDateString('fr-FR'):null;
             return`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px">
-              <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':'📝'}</div>
+              <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':(a.mode==='essay'?'✍️':'📝')}</div>
               <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.className}${a.targetWpm?(' · objectif '+a.targetWpm+' mpm'):''}${due?(' · pour le '+due):''}</div></div>
-              ${a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.customText?`app.startAssignment('${a.id}')`:a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.customText&&a.mode==='vocal'?'🔊 Faire la dictée':"Faire l'exercice"}</button>`}
+              ${a.mode==='essay'?`<button onclick="app.openEssay('${a.id}')" style="background:${a.done?'var(--card)':'var(--accent)'};color:${a.done?'var(--muted)':'#fff'};border:${a.done?'1px solid var(--border)':'none'};border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.done?'Revoir ma copie':'✍️ Rédiger'}</button>`:a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.customText?`app.startAssignment('${a.id}')`:a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.customText&&a.mode==='vocal'?'🔊 Faire la dictée':"Faire l'exercice"}</button>`}
             </div>`;
           }).join('')}
         </div>
@@ -5835,9 +6181,9 @@ const app={
       ${asg.map(a=>{
         const due=a.dueDate?new Date(a.dueDate).toLocaleDateString('fr-FR'):null;
         return`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px">
-          <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':'📝'}</div>
+          <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':(a.mode==='essay'?'✍️':'📝')}</div>
           <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.targetWpm?('objectif '+a.targetWpm+' mpm'):'Exercice libre'}${due?(' · pour le '+due):''}</div></div>
-          ${a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.customText?`app.startAssignment('${a.id}')`:a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.customText&&a.mode==='vocal'?'🔊 Faire la dictée':"Faire l'exercice"}</button>`}
+          ${a.mode==='essay'?`<button onclick="app.openEssay('${a.id}')" style="background:${a.done?'var(--card)':'var(--accent)'};color:${a.done?'var(--muted)':'#fff'};border:${a.done?'1px solid var(--border)':'none'};border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.done?'Revoir ma copie':'✍️ Rédiger'}</button>`:a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.customText?`app.startAssignment('${a.id}')`:a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.customText&&a.mode==='vocal'?'🔊 Faire la dictée':"Faire l'exercice"}</button>`}
         </div>`;
       }).join('')}
     </div>`:`<div style="text-align:center;padding:56px 20px;color:var(--muted)">
@@ -5966,6 +6312,7 @@ const app={
             <div style="font-size:13px;font-weight:700;color:${pct>=100?'#1FA971':'var(--txt)'}">${a.doneCount}/${a.total} terminé${a.doneCount>1?'s':''}</div>
             <div style="height:6px;background:var(--light);border-radius:4px;margin-top:5px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct>=100?'#1FA971':'var(--accent)'}"></div></div>
           </div>
+          ${a.mode==='essay'?`<button onclick="app.viewEssays('${a.id}')" style="background:var(--light);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--txt);white-space:nowrap;margin-right:4px">📄 Voir les copies</button>`:''}
           <button onclick="app.deleteAssignment('${a.id}','${d.id}')" title="Supprimer" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;opacity:.6" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
         </div>`;
       }).join('')}
@@ -6138,7 +6485,8 @@ const app={
         <input type="hidden" id="asg-type" value="lesson">
         <div style="display:flex;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:13px;padding:5px;margin-bottom:18px">
           <button type="button" id="asg-seg-lesson" onclick="app._asgSetType('lesson')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:all .15s">📚 Exercice</button>
-          <button type="button" id="asg-seg-custom" onclick="app._asgSetType('custom')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">✍️ Texte personnalisé</button>
+          <button type="button" id="asg-seg-custom" onclick="app._asgSetType('custom')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">✍️ Texte</button>
+          <button type="button" id="asg-seg-essay" onclick="app._asgSetType('essay')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">📄 Essai</button>
         </div>
         <div id="asg-block-lesson">
           <label style="${lbl}">Exercice</label>
@@ -6168,9 +6516,12 @@ const app={
             </div>
           </div>
         </div>
+        ${app._essayBriefHtml(fld,lbl)}
+        <div id="asg-speed-block">
         <label style="${lbl}">Objectif de vitesse <span style="font-weight:400">(mpm, optionnel)</span></label>
         <input id="asg-wpm" type="number" min="1" placeholder="ex. 30" style="${fld}">
         <label style="${lbl}">Échéance <span style="font-weight:400">(optionnel)</span></label>
+        </div>
         <input id="asg-due" type="date" style="${fld};margin-bottom:2px">
         <div id="asg-err" style="color:#E5484D;font-size:13px;margin:10px 0 0;display:none"></div>
       </div>
@@ -6185,12 +6536,21 @@ const app={
 
   _asgSetType(type){
     document.getElementById('asg-type').value=type;
-    const custom=type==='custom';
-    const L=document.getElementById('asg-seg-lesson'),C=document.getElementById('asg-seg-custom');
-    L.style.background=custom?'transparent':'var(--accent)';L.style.color=custom?'var(--muted)':'#fff';
-    C.style.background=custom?'var(--accent)':'transparent';C.style.color=custom?'#fff':'var(--muted)';
-    document.getElementById('asg-block-lesson').style.display=custom?'none':'';
-    document.getElementById('asg-block-custom').style.display=custom?'':'none';
+    const segs={lesson:'asg-seg-lesson',custom:'asg-seg-custom',essay:'asg-seg-essay'};
+    Object.entries(segs).forEach(([k,id])=>{
+      const el=document.getElementById(id);if(!el)return;
+      const on=k===type;
+      el.style.background=on?'var(--accent)':'transparent';
+      el.style.color=on?'#fff':'var(--muted)';
+    });
+    document.getElementById('asg-block-lesson').style.display=type==='lesson'?'':'none';
+    document.getElementById('asg-block-custom').style.display=type==='custom'?'':'none';
+    const eb=document.getElementById('asg-block-essay');
+    if(eb)eb.style.display=type==='essay'?'':'none';
+    // Un essai n'a pas d'objectif de vitesse : on rédige, on ne recopie pas.
+    const sb=document.getElementById('asg-speed-block');
+    if(sb)sb.style.display=type==='essay'?'none':'';
+    if(type==='essay')app._asgEssayTypeChange();
   },
 
   async createAssignment(classId){
@@ -6200,6 +6560,7 @@ const app={
     const err=document.getElementById('asg-err');
     const fail=(m)=>{err.textContent=m;err.style.display='block';};
     let title,lessonId=null,customText=null,mode=null;
+    if(type==='essay')return this._createEssayAssignment(classId,due,fail);
     if(type==='custom'){
       title=document.getElementById('asg-title').value.trim();
       customText=document.getElementById('asg-text').value.trim();
@@ -6235,6 +6596,28 @@ const app={
       if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}
       this.viewClass(classId);
     }catch{btn.disabled=false;btn.textContent='Assigner';fail('Erreur réseau.');}
+  },
+
+  async _createEssayAssignment(classId,due,fail){
+    const title=document.getElementById('asg-essay-title').value.trim();
+    const essayType=document.getElementById('asg-essay-type').value;
+    const brief=document.getElementById('asg-essay-brief').value.trim();
+    const min=document.getElementById('asg-essay-min').value;
+    const max=document.getElementById('asg-essay-max').value;
+    if(!title)return fail('Donne un titre au devoir.');
+    if(min&&max&&parseInt(min,10)>parseInt(max,10))return fail('Le minimum de mots dépasse le maximum.');
+    const btn=document.getElementById('asg-save');btn.disabled=true;btn.textContent='…';
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        action:'assignment-create',token:currentToken,classId,title,mode:'essay',
+        essayType,essayBrief:brief||null,minWords:min||null,maxWords:max||null,
+        dueDate:due||null,audioUrl:this._asgAudioUrl||null,
+      })});
+      const d=await r.json();
+      if(!r.ok){btn.disabled=false;btn.textContent='Assigner le devoir';return fail(d.error||'Erreur.');}
+      if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}
+      this.viewClass(classId);
+    }catch{btn.disabled=false;btn.textContent='Assigner le devoir';fail('Erreur réseau.');}
   },
 
   async deleteAssignment(id,classId){
