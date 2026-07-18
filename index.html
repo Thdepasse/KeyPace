@@ -1564,7 +1564,7 @@ async function handlePaymentReturn(){
 /* ── DATA ── */
 let _saveDebounce=null;
 function mergeStats(remote){
-  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,simonBest:null,goals:{minWpm:20,maxErrors:8}};
+  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,simonBest:null,sourisBest:0,goals:{minWpm:20,maxErrors:8}};
   const s=Object.assign(def, remote||{});
   s.tests=s.tests||[];s.lessons=s.lessons||{};s.goals=s.goals||{};
   if(typeof s.goals.minWpm!=='number')s.goals.minWpm=20;
@@ -2477,7 +2477,7 @@ const app={
     window.addEventListener('keydown',this._onKey);
   },
   stopAll(){
-    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopBoss();this.duelLeave();
+    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();
     if(this._onKey){window.removeEventListener('keydown',this._onKey);this._onKey=null;}
     this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.course=null;this.simon=null;this.boss=null;this.activeGame=null;
   },
@@ -2991,7 +2991,7 @@ const app={
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   exitActiveGame(){
-    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopBoss();
+    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();this.stopBoss();
     if(this.duel)this.duelLeave();
     this.activeGame=null;this.game=null;this.sprint=null;this.tireur=null;this.course=null;this.simon=null;this.boss=null;
     this.renderGames();
@@ -3218,7 +3218,7 @@ const app={
 
   renderView(v){
     this.view=v;
-    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopBoss();this.duelLeave();this.activeGame=null;}
+    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;}
     if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
     // Vider les pages avec #tb-scroll pour éviter les IDs dupliqués
     if(v!=='test')document.getElementById('page-test').innerHTML='';
@@ -3919,6 +3919,497 @@ const app={
   },
 
   /* ── GAMES ── */
+/* ═══════════════════════════════════════════════════════════════
+   VISÉE — maîtrise de la souris en 5 niveaux progressifs
+   1 survol · 2 clic · 3 discrimination · 4 glisser-déposer · 5 ZQSD
+   Chaque niveau explique sa nouveauté avant de démarrer.
+   Conventions : setInterval + stopSouris(), état dans this.souris.
+   ═══════════════════════════════════════════════════════════════ */
+
+  _sourisLevels:[
+    {n:1,icon:'👆',name:'Survol',
+     tag:'Vise avec la souris',
+     brief:'Des cercles apparaissent. <b>Pose le curseur dessus</b> et garde-le une seconde : pas besoin de cliquer.',
+     newThing:'Déplacer la souris avec précision.',
+     goal:14,lives:3},
+    {n:2,icon:'🖱️',name:'Clic',
+     tag:'Vise et clique',
+     brief:'Cette fois il faut <b>cliquer</b> sur les cibles. Elles rétrécissent avec le temps : sois rapide.',
+     newThing:'Le clic, et des cibles qui disparaissent.',
+     goal:18,lives:3},
+    {n:3,icon:'🎯',name:'Le cœur de cible',
+     tag:'Vise le centre',
+     brief:'Chaque cible a un <b style="color:#FFD84D">cœur doré</b>. Toucher le cœur rapporte <b>3 points</b> au lieu d’un — et <b>5 cœurs d’affilée te rendent une vie</b>.',
+     newThing:'La précision paie : vise le centre, pas le bord.',
+     goal:26,lives:3},
+    {n:4,icon:'⚠️',name:'Pièges',
+     tag:'Ne clique pas n’importe quoi',
+     brief:'Les cibles <b style="color:#1FA971">vertes</b> rapportent des points. Les <b style="color:#E5484D">rouges</b> t’en coûtent. Lis avant de cliquer.',
+     newThing:'Choisir sur quoi cliquer — et sur quoi ne pas cliquer.',
+     goal:22,lives:3},
+    {n:5,icon:'⏱️',name:'Pièges rapides',
+     tag:'Décide vite',
+     brief:'Mêmes règles, mais les cibles sont <b>plus petites et plus pressées</b>. Le cœur doré est toujours là : reste précis sous la pression.',
+     newThing:'Décider vite sans perdre en précision.',
+     goal:24,lives:3},
+    {n:6,icon:'✋',name:'Glisser-déposer',
+     tag:'Attrape et dépose',
+     brief:'Attrape chaque forme et <b>fais-la glisser</b> dans la zone de sa couleur, sans lâcher le bouton.',
+     newThing:'Maintenir le clic en déplaçant la souris.',
+     goal:8,lives:3},
+    {n:7,icon:'🕹️',name:'ZQSD seul',
+     tag:'Apprends à te déplacer',
+     brief:'Pose la souris. Déplace ton personnage avec <b>Z Q S D</b> pour <b>entrer dans les cercles verts</b> et esquiver les zones rouges.',
+     newThing:'Le clavier pour bouger — main gauche seule.',
+     goal:12,lives:3},
+    {n:8,icon:'🎮',name:'Souris + clavier',
+     tag:'Tout en même temps',
+     brief:'Déplace-toi avec <b>Z Q S D</b> pour esquiver les zones rouges, <b>tout en cliquant</b> les cibles. Main gauche au clavier, main droite à la souris.',
+     newThing:'Les deux mains à la fois — comme dans un vrai jeu.',
+     goal:18,lives:3},
+  ],
+
+  // Capacités par niveau : la logique lit cette table, jamais un numéro en dur.
+  // hover=valider au survol · core=cœur de cible · traps=pièges · drag=glisser
+  // move=ZQSD · click=cliquer · pads=cercles à atteindre au clavier
+  _sourisCaps(lvl){
+    return ({
+      1:{hover:1},
+      2:{click:1},
+      3:{click:1,core:1},
+      4:{click:1,core:1,traps:1},
+      5:{click:1,core:1,traps:1,fast:1},
+      6:{drag:1},
+      7:{move:1,pads:1},
+      8:{click:1,core:1,traps:1,move:1,hazards:1},
+    })[lvl]||{};
+  },
+  _sourisBest(){return (this.stats&&this.stats.sourisBest)||0;},
+  _sourisUnlocked(){
+    // Niveau n débloqué si le précédent est réussi. Toujours au moins le 1.
+    return Math.max(1,Math.min(8,(this._sourisBest()||0)+1));
+  },
+
+  selectSouris(lvl){
+    if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectSouris(lvl));return;}
+    if(lvl>this._sourisUnlocked())return;
+    this.activeGame='souris';
+    this.souris={phase:'brief',lvl,score:0,lives:this._sourisLevels[lvl-1].lives,hit:0,miss:0,t0:0};
+    this.renderGames();
+  },
+
+  stopSouris(){
+    if(this._sourisLoop){clearInterval(this._sourisLoop);this._sourisLoop=null;}
+    if(this._sourisKeyH){window.removeEventListener('keydown',this._sourisKeyH);window.removeEventListener('keyup',this._sourisKeyUpH);this._sourisKeyH=null;this._sourisKeyUpH=null;}
+    this._sourisKeys=null;
+  },
+
+  /* ── Rendu ──────────────────────────────────────────────────── */
+
+  renderSouris(){
+    const s=this.souris;
+    if(!s){this.activeGame=null;this.renderGames();return;}
+    if(s.phase==='menu'){return this._sourisRenderMenu();}
+    if(s.phase==='brief'){return this._sourisRenderBrief();}
+    if(s.phase==='over'||s.phase==='win'){return this._sourisRenderEnd();}
+    this._sourisRenderArena();
+  },
+
+  _sourisRenderMenu(){
+    const unlocked=this._sourisUnlocked();
+    const best=this._sourisBest();
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:1120px;margin:0 auto;padding:0 24px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <button onclick="app.activeGame=null;app.souris=null;app.renderGames()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Visée — 5 niveaux</h2>
+        <div style="font-size:13px;color:var(--muted);font-weight:600">${best}/5 réussis</div>
+      </div>
+      <div class="game-selector">
+        ${this._sourisLevels.map(l=>{
+          const open=l.n<=unlocked, done=l.n<=best;
+          return `<div class="game-sel-card${open?'':''}" onclick="${open?`app.selectSouris(${l.n})`:''}" style="${open?'':'opacity:.45;cursor:not-allowed'};position:relative">
+            <div class="game-sel-icon">${open?l.icon:'🔒'}</div>
+            <div class="game-sel-name">Niveau ${l.n} — ${l.name}</div>
+            <div class="game-sel-desc">${l.tag}. ${this._esc(l.newThing)}</div>
+            <span class="game-sel-tag ${done?'free':'free'}" style="${done?'background:rgba(31,169,113,.15);color:#1FA971':''}">${done?'✓ RÉUSSI':open?'À FAIRE':'VERROUILLÉ'}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  },
+
+  _sourisRenderBrief(){
+    const s=this.souris, l=this._sourisLevels[s.lvl-1];
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <button onclick="app.souris={phase:'menu'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Niveaux</button>
+        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
+          <div style="font-size:52px">${l.icon}</div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Niveau ${l.n} — ${l.name}</h2>
+          <div style="background:rgba(255,77,46,.14);border:1px solid rgba(255,77,46,.3);border-radius:12px;padding:9px 16px;font-size:13px;font-weight:700;color:#FF9478">NOUVEAU : ${this._esc(l.newThing)}</div>
+          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">${l.brief}</p>
+          <div style="display:flex;gap:26px;margin-top:4px">
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIF</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:#fff">${l.goal} pts</div></div>
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">${'♥'.repeat(l.lives)}</div></div>
+          </div>
+          <button class="game-play-btn" style="margin-top:8px" onclick="app.startSouris()">Commencer</button>
+        </div>
+      </div>
+    </div>`;
+  },
+
+  _sourisRenderEnd(){
+    const s=this.souris, l=this._sourisLevels[s.lvl-1];
+    const win=s.phase==='win';
+    const acc=(s.hit+s.miss)?Math.round(s.hit/(s.hit+s.miss)*100):0;
+    const last=s.lvl>=8;
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <div class="game-arena" style="height:auto;padding:48px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
+          <div style="font-size:52px">${win?(last?'🏆':'🎉'):'💥'}</div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">${win?(last?'Tous les niveaux réussis !':'Niveau '+l.n+' réussi'):'Perdu'}</h2>
+          <div class="game-final">${s.score} pts</div>
+          <p style="color:rgba(255,255,255,.7);font-size:15px;margin:0">${s.hit} réussite${s.hit>1?'s':''} · ${acc}% de précision${win?'':' · objectif : '+l.goal+' pts'}</p>
+          <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;justify-content:center">
+            ${win&&!last?`<button class="game-play-btn" onclick="app.selectSouris(${s.lvl+1})">Niveau ${s.lvl+1} →</button>`:''}
+            <button class="res-btn sec" style="flex:none;padding:14px 28px" onclick="app.selectSouris(${s.lvl})">${win?'Rejouer':'Réessayer'}</button>
+            <button class="res-btn sec" style="flex:none;padding:14px 28px" onclick="app.souris={phase:'menu'};app.renderSouris()">Niveaux</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  },
+
+  _sourisRenderArena(){
+    const s=this.souris, l=this._sourisLevels[s.lvl-1], cap=this._sourisCaps(s.lvl);
+    const hearts=[0,1,2].map(i=>`<span style="font-size:20px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
+    const pct=Math.min(100,Math.round(s.score/l.goal*100));
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <div class="game-hud">
+          <div class="game-score-val">${s.score} <span>/ ${l.goal} pts</span></div>
+          <div style="flex:1;margin:0 18px;height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--accent);transition:width .2s"></div></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="font-size:12px;color:rgba(255,255,255,.45);font-weight:700">NIV. ${l.n}</div>${hearts}</div>
+        </div>
+        <div class="game-arena" id="souris-arena" style="cursor:${cap.click||cap.drag?'crosshair':'default'};user-select:none"></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:-12px">${cap.pads?'Z Q S D pour entrer dans les cercles verts':cap.move?'Z Q S D pour bouger · clique les cibles':cap.drag?'Attrape et dépose dans la bonne zone':cap.traps?'Clique les vertes, évite les rouges · vise le cœur doré':cap.core?'Vise le cœur doré : 3 pts et 5 d’affilée = +1 vie':cap.click?'Clique les cibles':'Survole les cibles une seconde'}
+          · <button onclick="app.stopSouris();app.souris={phase:'menu'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+      </div>
+    </div>`;
+    this._sourisArena=document.getElementById('souris-arena');
+    this._sourisBindArena();
+    this._sourisPaint();
+  },
+
+  /* ── Boucle ─────────────────────────────────────────────────── */
+
+  startSouris(){
+    const s=this.souris, l=this._sourisLevels[s.lvl-1];
+    this.stopSouris();
+    Object.assign(s,{phase:'play',score:0,lives:l.lives,hit:0,miss:0,t0:Date.now(),targets:[],drag:null,tick:0,strikes:0,hits5:0,streak:0,cores:0,regen:0,hazards:[]});
+    const c=this._sourisCaps(s.lvl);
+    if(c.move||c.pads){
+      s.player={x:50,y:50};
+      s.hazards=[];
+      this._sourisKeys={z:false,q:false,s:false,d:false};
+      this._sourisKeyH=(e)=>{const k=e.key.toLowerCase();if(k in this._sourisKeys){this._sourisKeys[k]=true;e.preventDefault();}};
+      this._sourisKeyUpH=(e)=>{const k=e.key.toLowerCase();if(k in this._sourisKeys)this._sourisKeys[k]=false;};
+      window.addEventListener('keydown',this._sourisKeyH);
+      window.addEventListener('keyup',this._sourisKeyUpH);
+    }
+    this.renderSouris();
+    this._sourisLoop=setInterval(()=>this._sourisTick(),50);
+  },
+
+  _sourisBindArena(){
+    const a=this._sourisArena;if(!a)return;
+    const s=this.souris;
+    a.onmousemove=(e)=>{
+      const r=a.getBoundingClientRect();
+      s.mx=(e.clientX-r.left)/r.width*100;
+      s.my=(e.clientY-r.top)/r.height*100;
+      if(s.drag){s.drag.x=s.mx;s.drag.y=s.my;}
+    };
+    const c=this._sourisCaps(s.lvl);
+    if(c.click)a.onmousedown=(e)=>this._sourisClick(e);
+    if(c.drag){
+      a.onmousedown=(e)=>{
+        const t=this._sourisAt(s.mx,s.my);
+        if(t){s.drag=t;t.grabbed=true;}
+      };
+      a.onmouseup=()=>{
+        if(!s.drag)return;
+        const t=s.drag;t.grabbed=false;s.drag=null;
+        const z=this._sourisZoneAt(t.x,t.y);
+        if(z===t.color){s.score++;s.hit++;s.targets=s.targets.filter(x=>x!==t);this._sourisFlash('#1FA971');}
+        else{s.miss++;this._sourisLoseLife();this._sourisFlash('#E5484D');t.x=t.hx;t.y=t.hy;}
+        this._sourisCheck();
+      };
+    }
+  },
+
+  _sourisAt(x,y){
+    const s=this.souris;
+    return (s.targets||[]).find(t=>{
+      const dx=(t.x-x)*1.6, dy=t.y-y;   // arène large : corriger l'aspect
+      return Math.sqrt(dx*dx+dy*dy)<t.r;
+    });
+  },
+
+  _sourisZoneAt(x,y){
+    // Deux zones de dépôt : gauche (vert), droite (bleu)
+    if(y<62)return null;
+    return x<50?'#1FA971':'#3B82F6';
+  },
+
+  _sourisClick(){
+    const s=this.souris, c=this._sourisCaps(s.lvl);
+    const t=this._sourisAt(s.mx,s.my);
+    if(!t){s.miss++;s.streak=0;this._sourisFlash('rgba(255,255,255,.12)');return;}
+    if(t.bad){                       // piège : coûte des points, jamais une vie
+      s.miss++;s.streak=0;
+      s.score=Math.max(0,s.score-2);
+      this._sourisFlash('#E5484D');
+      s.targets=s.targets.filter(x=>x!==t);
+      return;
+    }
+    // Cœur de cible : le tiers central vaut 3 points et alimente la série.
+    const core=!!c.core&&this._sourisInCore(t,s.mx,s.my);
+    s.score+=core?3:1;
+    s.hit++;
+    if(core){
+      s.streak=(s.streak||0)+1;
+      s.cores=(s.cores||0)+1;
+      if(s.streak>0&&s.streak%5===0&&s.lives<3){   // 5 cœurs d'affilée = 1 vie
+        s.lives++;s.regen=(s.regen||0)+1;
+        this._sourisFlash('#FFD84D');
+        this._sourisRegenPop();
+      }else this._sourisFlash('#FFD84D');
+    }else{
+      s.streak=0;
+      this._sourisFlash('#1FA971');
+    }
+    s.targets=s.targets.filter(x=>x!==t);
+    this._sourisCheck();
+  },
+
+  // Le cœur : tiers central du rayon (aire ~11% du disque) — il faut vraiment viser.
+  _sourisInCore(t,x,y){
+    const dx=(t.x-x)*1.6, dy=t.y-y;
+    return Math.sqrt(dx*dx+dy*dy)<=t.r*0.34;
+  },
+
+  _sourisRegenPop(){
+    const a=this._sourisArena;if(!a)return;
+    const d=document.createElement('div');
+    d.textContent='+1 ♥';
+    d.style.cssText='position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);color:#FFD84D;font-family:JetBrains Mono,monospace;font-weight:800;font-size:34px;text-shadow:0 4px 18px rgba(0,0,0,.6);pointer-events:none;z-index:5;transition:all .7s ease-out';
+    a.appendChild(d);
+    setTimeout(()=>{d.style.top='24%';d.style.opacity='0';},30);
+    setTimeout(()=>{d.remove();},760);
+  },
+
+  _sourisFlash(color){
+    const a=this._sourisArena;if(!a)return;
+    a.style.boxShadow='inset 0 0 0 3px '+color;
+    setTimeout(()=>{if(a)a.style.boxShadow='';},120);
+  },
+
+  _sourisLoseLife(){
+    const s=this.souris;
+    s.lives--;
+    if(s.lives<=0){s.phase='over';this.stopSouris();this.renderSouris();}
+  },
+
+  _sourisCheck(){
+    const s=this.souris, l=this._sourisLevels[s.lvl-1];
+    if(s.score>=l.goal){
+      s.phase='win';this.stopSouris();
+      // Progression : le meilleur niveau atteint est mémorisé.
+      if(currentUser&&this.stats&&s.lvl>(this.stats.sourisBest||0)){
+        this.stats.sourisBest=s.lvl;saveStats(this.stats);
+      }
+      this.renderSouris();
+    }
+  },
+
+  _sourisSpawn(){
+    const s=this.souris, c=this._sourisCaps(s.lvl);
+    const rnd=(a,b)=>a+Math.random()*(b-a);
+    if(c.drag){
+      const color=Math.random()<.5?'#1FA971':'#3B82F6';
+      const x=rnd(12,88), y=rnd(10,48);
+      s.targets.push({x,y,hx:x,hy:y,r:5,color,shape:Math.random()<.5?'circle':'square',born:Date.now()});
+      return;
+    }
+    if(c.pads){
+      // Cercle à atteindre au clavier : pas de clic, on entre dedans.
+      s.targets.push({x:rnd(12,88),y:rnd(12,88),r:7,pad:true,born:Date.now(),life:6000,hover:0});
+      return;
+    }
+    const bad=!!c.traps&&Math.random()<.3;
+    s.targets.push({
+      x:rnd(8,92), y:rnd(10,90),
+      r:c.hover?7:(c.fast?rnd(2.8,4.4):rnd(3.4,5.6)),
+      bad, born:Date.now(),
+      life:c.hover?4200:c.fast?2600:(c.move?4600:(c.traps?4000:3000)),
+      hover:0,
+    });
+  },
+
+  _sourisTick(){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    s.tick++;
+    const c=this._sourisCaps(s.lvl);
+    const now=Date.now();
+
+    // Apparition
+    const maxT=c.drag?3:c.pads?2:c.hover?2:3;
+    const rate=c.hover?14:c.pads?26:(c.move?12:10);
+    if((s.targets||[]).length<maxT&&s.tick%rate===0)this._sourisSpawn();
+
+    // Niveau survol : rester sur la cible la valide
+    if(c.hover){
+      const t=this._sourisAt(s.mx,s.my);
+      (s.targets||[]).forEach(x=>{if(x!==t)x.hover=0;});
+      if(t){
+        t.hover+=50;
+        if(t.hover>=800){
+          s.score++;s.hit++;
+          s.targets=s.targets.filter(x=>x!==t);
+          this._sourisFlash('#1FA971');
+          this._sourisCheck();
+        }
+      }
+    }
+
+    // Expiration : laisser filer une cible utile coûte une vie
+    if(!c.drag){
+      const gone=(s.targets||[]).filter(t=>now-t.born>t.life);
+      gone.forEach(t=>{
+        if(t.bad)return;
+        s.miss++;s.streak=0;
+        if(!c.hover&&!c.pads)this._sourisLoseLife();
+      });
+      s.targets=(s.targets||[]).filter(t=>now-t.born<=t.life);
+    }
+
+    // Déplacement ZQSD
+    if(c.move&&s.phase==='play'){
+      const k=this._sourisKeys||{};
+      const sp=1.7;
+      if(k.z)s.player.y-=sp; if(k.s)s.player.y+=sp;
+      if(k.q)s.player.x-=sp; if(k.d)s.player.x+=sp;
+      s.player.x=Math.max(3,Math.min(97,s.player.x));
+      s.player.y=Math.max(4,Math.min(96,s.player.y));
+    }
+
+    // Cercles à atteindre au clavier (niveau ZQSD seul)
+    if(c.pads&&s.phase==='play'){
+      const p=s.player;
+      (s.targets||[]).forEach(t=>{
+        const dx=(t.x-p.x)*1.6, dy=t.y-p.y;
+        if(Math.sqrt(dx*dx+dy*dy)<t.r){
+          t.hover+=50;
+          if(t.hover>=400){
+            s.score++;s.hit++;
+            s.targets=s.targets.filter(x=>x!==t);
+            this._sourisFlash('#1FA971');
+            this._sourisCheck();
+          }
+        } else t.hover=0;
+      });
+    }
+
+    // Zones dangereuses mobiles
+    if(c.hazards&&s.phase==='play'){
+      if(s.tick%60===0&&s.hazards.length<2){
+        s.hazards.push({x:Math.random()*100,y:Math.random()*100,r:8,vx:(Math.random()-.5)*.9,vy:(Math.random()-.5)*.9});
+      }
+      s.hazards.forEach(h=>{
+        h.x+=h.vx;h.y+=h.vy;
+        if(h.x<5||h.x>95)h.vx*=-1;
+        if(h.y<5||h.y>95)h.vy*=-1;
+        const dx=(h.x-s.player.x)*1.6,dy=h.y-s.player.y;
+        if(Math.sqrt(dx*dx+dy*dy)<h.r&&!s._inv){
+          s._inv=true;setTimeout(()=>{s._inv=false;},1400);
+          s.score=Math.max(0,s.score-1);s.streak=0;
+          this._sourisFlash('#E5484D');
+        }
+      });
+    }
+
+    // Zones dangereuses fixes (niveau ZQSD seul) : elles ne tuent pas, elles gênent
+    if(c.pads&&s.phase==='play'){
+      if(!s.hazards.length){
+        for(let i=0;i<2;i++)s.hazards.push({x:30+i*40,y:50,r:9,vx:0,vy:(i?.7:-.7)});
+      }
+      s.hazards.forEach(h=>{
+        h.y+=h.vy;
+        if(h.y<12||h.y>88)h.vy*=-1;
+        const dx=(h.x-s.player.x)*1.6,dy=h.y-s.player.y;
+        if(Math.sqrt(dx*dx+dy*dy)<h.r&&!s._inv){
+          s._inv=true;setTimeout(()=>{s._inv=false;},1400);
+          this._sourisLoseLife();this._sourisFlash('#E5484D');
+        }
+      });
+    }
+
+    if(s.phase==='play')this._sourisPaint();
+  },
+
+  _sourisPaint(){
+    const a=this._sourisArena, s=this.souris;
+    if(!a||!s||s.phase!=='play')return;
+    const c=this._sourisCaps(s.lvl);
+    const now=Date.now();
+    let html='';
+
+    if(c.drag){
+      html+=`<div style="position:absolute;left:0;right:50%;top:62%;bottom:0;background:rgba(31,169,113,.1);border:2px dashed rgba(31,169,113,.5);border-radius:14px;margin:6px;display:flex;align-items:center;justify-content:center;color:rgba(31,169,113,.85);font-weight:800;font-size:13px;letter-spacing:.05em">ZONE VERTE</div>`;
+      html+=`<div style="position:absolute;left:50%;right:0;top:62%;bottom:0;background:rgba(59,130,246,.1);border:2px dashed rgba(59,130,246,.5);border-radius:14px;margin:6px;display:flex;align-items:center;justify-content:center;color:rgba(59,130,246,.85);font-weight:800;font-size:13px;letter-spacing:.05em">ZONE BLEUE</div>`;
+    }
+
+    (s.hazards||[]).forEach(h=>{
+      html+=`<div style="position:absolute;left:${h.x}%;top:${h.y}%;width:${h.r*2}%;aspect-ratio:1;transform:translate(-50%,-50%);background:rgba(229,72,77,.22);border:2px solid rgba(229,72,77,.65);border-radius:50%"></div>`;
+    });
+
+    (s.targets||[]).forEach(t=>{
+      const age=now-t.born;
+      if(c.drag){
+        const sz=t.r*2;
+        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${t.color};border-radius:${t.shape==='circle'?'50%':'8px'};box-shadow:0 6px 18px rgba(0,0,0,.4)${t.grabbed?';outline:3px solid #fff':''};cursor:${t.grabbed?'grabbing':'grab'}"></div>`;
+        return;
+      }
+      if(t.pad){
+        const fill=t.hover?Math.min(1,t.hover/400):0;
+        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${t.r*2}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #1FA971;background:rgba(31,169,113,${.12+fill*.5});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">${fill>0?Math.round(fill*100)+'%':''}</div>`;
+        return;
+      }
+      const left=Math.max(0,1-age/t.life);
+      const sz=t.r*2*(c.hover?1:(.55+left*.45));
+      const col=t.bad?'#E5484D':'#1FA971';
+      const ring=c.hover&&t.hover>0?`<div style="position:absolute;inset:-6px;border-radius:50%;border:3px solid #fff;opacity:${t.hover/800}"></div>`:'';
+      // Cœur doré : visible seulement sur les cibles utiles des niveaux concernés
+      const core=(c.core&&!t.bad)?`<div style="position:absolute;left:50%;top:50%;width:${0.34*2*100}%;height:${0.34*2*100}%;transform:translate(-50%,-50%);border-radius:50%;background:#FFD84D;box-shadow:0 0 10px #FFD84D"></div>`:'';
+      html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${col};border-radius:50%;box-shadow:0 0 ${t.bad?'22':'18'}px ${col}88;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${t.bad?'✕':''}${core}${ring}</div>`;
+    });
+
+    if(c.move||c.pads){
+      html+=`<div style="position:absolute;left:${s.player.x}%;top:${s.player.y}%;width:5%;aspect-ratio:1;transform:translate(-50%,-50%);background:#fff;border-radius:50%;box-shadow:0 0 14px rgba(255,255,255,.7);opacity:${s._inv?.4:1};display:flex;align-items:center;justify-content:center;font-size:12px">🙂</div>`;
+    }
+
+    // Série de cœurs en cours : le joueur doit voir sa progression vers la vie
+    if(c.core&&(s.streak||0)>0){
+      const dots=[0,1,2,3,4].map(i=>`<span style="width:7px;height:7px;border-radius:50%;background:${i<(s.streak%5||5)?'#FFD84D':'rgba(255,255,255,.2)'}"></span>`).join('');
+      html+=`<div style="position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);padding:6px 12px;border-radius:20px">
+        <span style="font-size:11px;font-weight:700;color:#FFD84D;letter-spacing:.04em">SÉRIE</span>${dots}
+        ${s.lives>=3?'<span style="font-size:10px;color:rgba(255,255,255,.45)">vies au max</span>':'<span style="font-size:10px;color:rgba(255,255,255,.6)">5 = +1 ♥</span>'}
+      </div>`;
+    }
+    a.innerHTML=html;
+  },
+
   renderGames(){
     if(this.activeGame==='sprint'){this.renderSprint();return;}
     if(this.activeGame==='frappe'){this.renderFrappe();return;}
@@ -3927,6 +4418,7 @@ const app={
     if(this.activeGame==='simon'){this.renderSimon();return;}
     if(this.activeGame==='boss'){this.renderBoss();return;}
     if(this.activeGame==='duel'){this.renderDuel();return;}
+    if(this.activeGame==='souris'){this.renderSouris();return;}
     // selector
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;max-width:1120px;margin:0 auto;padding:0 24px 20px">Jeux de frappe</h2>
@@ -3959,6 +4451,12 @@ const app={
           <div class="game-sel-icon">🧠</div>
           <div class="game-sel-name">Simon des mots</div>
           <div class="game-sel-desc">Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.</div>
+          <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
+        </div>
+        <div class="game-sel-card" onclick="app.selectGame('souris')">
+          <div class="game-sel-icon">🖱️</div>
+          <div class="game-sel-name">Visée</div>
+          <div class="game-sel-desc">Maîtrise la souris en 5 niveaux : viser, cliquer, éviter les pièges, glisser-déposer, puis ZQSD et souris en même temps.</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
         </div>
         <div class="game-sel-card expert-card" onclick="app.selectGame('duel')">
@@ -3999,6 +4497,9 @@ const app={
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('duel'));return;}
       if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.duelLeave();this.activeGame='duel';this.duel={phase:'menu'};this.renderGames();
+    } else if(which==='souris'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('souris'));return;}
+      this.activeGame='souris';this.souris={phase:'menu'};this.renderGames();
     } else {
       this.activeGame='frappe';this.game=null;this.renderGames();
     }
@@ -4360,7 +4861,7 @@ const app={
   /* ── SIMON DES MOTS ── */
   startSimon(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startSimon());return;}
-    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();
+    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();
     this.activeGame='simon';
     this.simon={on:true,over:false,phase:'show',level:1,lives:3,score:0,maxSeq:0,
       words:[],currentWord:'',wordIdx:0,showUntil:0,failUntil:0,inputStart:0,_showTotal:0,_lastBonus:0};
@@ -4424,7 +4925,7 @@ const app={
   _simonFail(){
     const s=this.simon;
     s.lives--;s.currentWord='';
-    if(s.lives<=0){s.on=false;s.over=true;this.stopSimon();this.afterSimon();this.renderCurrent();return;}
+    if(s.lives<=0){s.on=false;s.over=true;this.stopSimon();this.stopSouris();this.afterSimon();this.renderCurrent();return;}
     s.phase='fail';s.failUntil=Date.now()+1500;
     this.renderCurrent();
   },
