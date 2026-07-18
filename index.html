@@ -3927,46 +3927,54 @@ const app={
    ═══════════════════════════════════════════════════════════════ */
 
   _sourisLevels:[
-    {n:1,icon:'👆',name:'Survol',
-     tag:'Vise avec la souris',
-     brief:'Des cercles apparaissent. <b>Pose le curseur dessus</b> et garde-le une seconde : pas besoin de cliquer.',
+    {n:1,icon:'👆',name:'Survol',tag:'Vise avec la souris',
+     brief:'Des cercles apparaissent. <b>Pose le curseur dessus</b> et garde-le un instant : pas besoin de cliquer.',
      newThing:'Déplacer la souris avec précision.',
-     goal:14,lives:3},
-    {n:2,icon:'🖱️',name:'Clic',
-     tag:'Vise et clique',
+     dur:30,bronze:18,silver:26,gold:34},
+    {n:2,icon:'🖱️',name:'Clic',tag:'Vise et clique',
      brief:'Cette fois il faut <b>cliquer</b> sur les cibles. Elles rétrécissent avec le temps : sois rapide.',
      newThing:'Le clic, et des cibles qui disparaissent.',
-     goal:18,lives:3},
-    {n:3,icon:'🎯',name:'Le cœur de cible',
-     tag:'Vise le centre',
-     brief:'Chaque cible a un <b style="color:#FFD84D">cœur doré</b>. Toucher le cœur rapporte <b>3 points</b> au lieu d’un — et <b>5 cœurs d’affilée te rendent une vie</b>.',
+     dur:30,bronze:25,silver:37,gold:48},
+    {n:3,icon:'🎯',name:'Le cœur de cible',tag:'Vise le centre',
+     brief:'Chaque cible a un <b style="color:#FFD84D">cœur doré</b>, plus petit que la cible. Le toucher rapporte <b>3 points</b> au lieu d’un, et <b>5 cœurs d’affilée rendent une vie</b>.',
      newThing:'La précision paie : vise le centre, pas le bord.',
-     goal:26,lives:3},
-    {n:4,icon:'⚠️',name:'Pièges',
-     tag:'Ne clique pas n’importe quoi',
-     brief:'Les cibles <b style="color:#1FA971">vertes</b> rapportent des points. Les <b style="color:#E5484D">rouges</b> t’en coûtent. Lis avant de cliquer.',
-     newThing:'Choisir sur quoi cliquer — et sur quoi ne pas cliquer.',
-     goal:22,lives:3},
-    {n:5,icon:'⏱️',name:'Pièges rapides',
-     tag:'Décide vite',
-     brief:'Mêmes règles, mais les cibles sont <b>plus petites et plus pressées</b>. Le cœur doré est toujours là : reste précis sous la pression.',
-     newThing:'Décider vite sans perdre en précision.',
-     goal:24,lives:3},
-    {n:6,icon:'✋',name:'Glisser-déposer',
-     tag:'Attrape et dépose',
+     dur:32,bronze:80,silver:115,gold:155},
+    {n:4,icon:'⚡',name:'Cibles express',tag:'Réagis vite',
+     brief:'Les cibles ne restent qu’un <b>court instant</b>. Enchaîne sans hésiter pour garder le rythme.',
+     newThing:'La vitesse de réaction pure.',
+     dur:30,bronze:74,silver:110,gold:145},
+    {n:5,icon:'⚠️',name:'Pièges',tag:'Ne clique pas n’importe quoi',
+     brief:'Les <b style="color:#1FA971">vertes</b> rapportent, les <b style="color:#E5484D">rouges</b> te coûtent des points. Mais toutes ne se ressemblent pas : <b>lis avant de cliquer</b>.',
+     newThing:'Distinguer le bon du piège — le rouge se déguise.',
+     dur:34,bronze:34,silver:50,gold:66},
+    {n:6,icon:'💎',name:'Bonus & choix',tag:'Choisis bien',
+     brief:'Des cibles spéciales apparaissent : <b style="color:#3B82F6">bleue</b> = points doublés un temps, <b style="color:#A855F7">violette</b> = +2 s au chrono, <b style="color:#FFD84D">dorée</b> = jackpot bref. Elles disparaissent vite : <b>vaut-il mieux la chasser ou rester sur les vertes ?</b>',
+     newThing:'Arbitrer : chaque bonus coûte le temps de l’attraper.',
+     dur:34,bronze:130,silver:190,gold:255},
+    {n:7,icon:'⏱️',name:'Pièges express',tag:'Décide vite et bien',
+     brief:'Pièges déguisés <b>et</b> cibles pressées, avec les bonus. La lecture doit être instantanée.',
+     newThing:'Discriminer sous pression de temps.',
+     dur:34,bronze:70,silver:105,gold:135},
+    {n:8,icon:'✋',name:'Glisser-déposer',tag:'Attrape et dépose',
      brief:'Attrape chaque forme et <b>fais-la glisser</b> dans la zone de sa couleur, sans lâcher le bouton.',
      newThing:'Maintenir le clic en déplaçant la souris.',
-     goal:8,lives:3},
-    {n:7,icon:'🕹️',name:'ZQSD seul',
-     tag:'Apprends à te déplacer',
+     dur:34,bronze:35,silver:50,gold:62},
+    {n:9,icon:'🎨',name:'Tri rapide',tag:'Trie sous pression',
+     brief:'Comme le glisser-déposer, mais <b>trois couleurs</b> et un chrono plus serré. Range vite et juste.',
+     newThing:'Trier plusieurs catégories à la fois.',
+     dur:34,bronze:35,silver:50,gold:62},
+    {n:10,icon:'🕹️',name:'ZQSD seul',tag:'Apprends à te déplacer',
      brief:'Pose la souris. Déplace ton personnage avec <b>Z Q S D</b> pour <b>entrer dans les cercles verts</b> et esquiver les zones rouges.',
      newThing:'Le clavier pour bouger — main gauche seule.',
-     goal:12,lives:3},
-    {n:8,icon:'🎮',name:'Souris + clavier',
-     tag:'Tout en même temps',
-     brief:'Déplace-toi avec <b>Z Q S D</b> pour esquiver les zones rouges, <b>tout en cliquant</b> les cibles. Main gauche au clavier, main droite à la souris.',
-     newThing:'Les deux mains à la fois — comme dans un vrai jeu.',
-     goal:18,lives:3},
+     dur:34,bronze:10,silver:14,gold:19},
+    {n:11,icon:'🎮',name:'Souris + clavier',tag:'Tout en même temps',
+     brief:'Déplace-toi avec <b>Z Q S D</b> pour esquiver les zones rouges, <b>tout en cliquant</b> les cibles et leurs cœurs.',
+     newThing:'Les deux mains à la fois — comme un vrai jeu.',
+     dur:36,bronze:74,silver:110,gold:145},
+    {n:12,icon:'🔥',name:'Chaos',tag:'La totale',
+     brief:'Tout, en même temps, plus vite : cœurs, pièges déguisés, bonus, déplacement et zones mobiles. Le test ultime de la coordination.',
+     newThing:'Maîtrise complète : rien ne t’est épargné.',
+     dur:40,bronze:68,silver:100,gold:130},
   ],
 
   // Capacités par niveau : la logique lit cette table, jamais un numéro en dur.
@@ -3977,17 +3985,21 @@ const app={
       1:{hover:1},
       2:{click:1},
       3:{click:1,core:1},
-      4:{click:1,core:1,traps:1},
-      5:{click:1,core:1,traps:1,fast:1},
-      6:{drag:1},
-      7:{move:1,pads:1},
-      8:{click:1,core:1,traps:1,move:1,hazards:1},
+      4:{click:1,core:1,fast:1},
+      5:{click:1,core:1,traps:1,disguise:1},
+      6:{click:1,core:1,bonus:1},
+      7:{click:1,core:1,traps:1,disguise:1,fast:1,bonus:1,smaller:1},
+      8:{drag:1},
+      9:{drag:1,sort3:1},
+      10:{move:1,pads:1},
+      11:{click:1,core:1,move:1,hazards:1},
+      12:{click:1,core:1,traps:1,disguise:1,fast:1,bonus:1,smaller:1,move:1,hazards:1},
     })[lvl]||{};
   },
   _sourisBest(){return (this.stats&&this.stats.sourisBest)||0;},
   _sourisUnlocked(){
     // Niveau n débloqué si le précédent est réussi. Toujours au moins le 1.
-    return Math.max(1,Math.min(8,(this._sourisBest()||0)+1));
+    return Math.max(1,Math.min(12,(this._sourisBest()||0)+1));
   },
 
   selectSouris(lvl){
@@ -4018,20 +4030,23 @@ const app={
   _sourisRenderMenu(){
     const unlocked=this._sourisUnlocked();
     const best=this._sourisBest();
+    const tiers=(this.stats&&this.stats.sourisTiers)||{};
+    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'};
+    const golds=Object.values(tiers).filter(t=>t==='gold').length;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:1120px;margin:0 auto;padding:0 24px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
         <button onclick="app.activeGame=null;app.souris=null;app.renderGames()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Visée — 5 niveaux</h2>
-        <div style="font-size:13px;color:var(--muted);font-weight:600">${best}/5 réussis</div>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Visée — 12 niveaux</h2>
+        <div style="font-size:13px;color:var(--muted);font-weight:600">${best}/12 franchis${golds?' · '+golds+' 🥇':''}</div>
       </div>
       <div class="game-selector">
-        ${this._sourisLevels.map(l=>{
-          const open=l.n<=unlocked, done=l.n<=best;
-          return `<div class="game-sel-card${open?'':''}" onclick="${open?`app.selectSouris(${l.n})`:''}" style="${open?'':'opacity:.45;cursor:not-allowed'};position:relative">
-            <div class="game-sel-icon">${open?l.icon:'🔒'}</div>
-            <div class="game-sel-name">Niveau ${l.n} — ${l.name}</div>
-            <div class="game-sel-desc">${l.tag}. ${this._esc(l.newThing)}</div>
-            <span class="game-sel-tag ${done?'free':'free'}" style="${done?'background:rgba(31,169,113,.15);color:#1FA971':''}">${done?'✓ RÉUSSI':open?'À FAIRE':'VERROUILLÉ'}</span>
+        ${this._sourisLevels.map(lv=>{
+          const open=lv.n<=unlocked, done=lv.n<=best, tier=tiers[lv.n];
+          return `<div class="game-sel-card" onclick="${open?`app.selectSouris(${lv.n})`:''}" style="${open?'':'opacity:.45;cursor:not-allowed'};position:relative">
+            <div class="game-sel-icon">${open?lv.icon:'🔒'}</div>
+            <div class="game-sel-name">Niv. ${lv.n} — ${lv.name} ${tier?medal[tier]:''}</div>
+            <div class="game-sel-desc">${lv.tag}. ${this._esc(lv.newThing)}</div>
+            <span class="game-sel-tag free" style="${done?'background:rgba(31,169,113,.15);color:#1FA971':''}">${tier?medal[tier]+' '+tier.toUpperCase():open?'À FAIRE':'VERROUILLÉ'}</span>
           </div>`;
         }).join('')}
       </div>
@@ -4062,18 +4077,23 @@ const app={
     const s=this.souris, l=this._sourisLevels[s.lvl-1];
     const win=s.phase==='win';
     const acc=(s.hit+s.miss)?Math.round(s.hit/(s.hit+s.miss)*100):0;
-    const last=s.lvl>=8;
+    const last=s.lvl>=12;
+    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[s.tier]||'';
+    const tierLabel={gold:'Médaille d’or',silver:'Médaille d’argent',bronze:'Médaille de bronze'}[s.tier]||'';
+    const nextTier=s.tier==='bronze'?('argent à '+l.silver+' pts'):s.tier==='silver'?('or à '+l.gold+' pts'):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <div class="game-arena" style="height:auto;padding:48px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
-          <div style="font-size:52px">${win?(last?'🏆':'🎉'):'💥'}</div>
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">${win?(last?'Tous les niveaux réussis !':'Niveau '+l.n+' réussi'):'Perdu'}</h2>
+        <div class="game-arena" style="height:auto;padding:48px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
+          <div style="font-size:60px;line-height:1">${win?(medal||'🎉'):'💥'}</div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#fff;margin:0">${win?(last?'Chaos vaincu !':tierLabel):'Palier manqué'}</h2>
           <div class="game-final">${s.score} pts</div>
-          <p style="color:rgba(255,255,255,.7);font-size:15px;margin:0">${s.hit} réussite${s.hit>1?'s':''} · ${acc}% de précision${win?'':' · objectif : '+l.goal+' pts'}</p>
-          <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;justify-content:center">
+          <p style="color:rgba(255,255,255,.7);font-size:14.5px;margin:0">${s.hit} réussite${s.hit>1?'s':''} · ${acc}% de précision${s.cores?' · '+s.cores+' cœur'+(s.cores>1?'s':''):''}${s.regen?' · +'+s.regen+' ♥ régénérée'+(s.regen>1?'s':''):''}</p>
+          ${win&&nextTier?`<div style="font-size:12.5px;color:rgba(255,255,255,.55)">Prochain palier : ${nextTier}</div>`:''}
+          ${!win?`<div style="font-size:13px;color:rgba(255,255,255,.6)">Il fallait ${l.bronze} pts (bronze). Tu y étais${s.score>=l.bronze*0.7?' presque':''}.</div>`:''}
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center">
             ${win&&!last?`<button class="game-play-btn" onclick="app.selectSouris(${s.lvl+1})">Niveau ${s.lvl+1} →</button>`:''}
-            <button class="res-btn sec" style="flex:none;padding:14px 28px" onclick="app.selectSouris(${s.lvl})">${win?'Rejouer':'Réessayer'}</button>
-            <button class="res-btn sec" style="flex:none;padding:14px 28px" onclick="app.souris={phase:'menu'};app.renderSouris()">Niveaux</button>
+            <button class="res-btn sec" style="flex:none;padding:13px 26px" onclick="app.selectSouris(${s.lvl})">${win&&s.tier!=='gold'?'Viser mieux':'Rejouer'}</button>
+            <button class="res-btn sec" style="flex:none;padding:13px 26px" onclick="app.souris={phase:'menu'};app.renderSouris()">Niveaux</button>
           </div>
         </div>
       </div>
@@ -4082,17 +4102,34 @@ const app={
 
   _sourisRenderArena(){
     const s=this.souris, l=this._sourisLevels[s.lvl-1], cap=this._sourisCaps(s.lvl);
-    const hearts=[0,1,2].map(i=>`<span style="font-size:20px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
-    const pct=Math.min(100,Math.round(s.score/l.goal*100));
+    const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
+    const sec=Math.ceil((s.tLeft||0)/1000);
+    const tpct=Math.max(0,Math.min(100,(s.tLeft||0)/((l.dur||30)*1000)*100));
+    const gpct=(v)=>Math.min(100,v/l.gold*100);
+    const spct=Math.min(100,s.score/l.gold*100);
+    const tier=this._sourisTier(l,s.score);
+    const barCol=tier==='gold'?'#FFD84D':tier==='silver'?'#C0C7D0':tier==='bronze'?'#CD7F44':'var(--accent)';
+    const mark=(v,col)=>`<div style="position:absolute;left:${gpct(v)}%;top:-3px;bottom:-3px;width:2px;background:${col}"></div>`;
+    const hint=cap.pads?'Z Q S D pour entrer dans les cercles verts':cap.move&&cap.click?'Z Q S D pour bouger · clique les cibles et leurs cœurs':cap.move?'Z Q S D pour bouger':cap.sort3?'Trie chaque forme dans sa couleur':cap.drag?'Attrape et dépose dans la bonne zone':cap.bonus?'Attrape les bonus… ou reste sur les vertes ?':cap.disguise?'Méfie-toi : certains rouges se déguisent en orange':cap.traps?'Vertes oui, rouges non · vise le cœur':cap.core?'Vise le cœur doré : 3 pts, 5 d’affilée = +1 ♥':cap.click?'Clique les cibles':'Survole les cibles un instant';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
         <div class="game-hud">
-          <div class="game-score-val">${s.score} <span>/ ${l.goal} pts</span></div>
-          <div style="flex:1;margin:0 18px;height:6px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--accent);transition:width .2s"></div></div>
-          <div style="display:flex;align-items:center;gap:10px"><div style="font-size:12px;color:rgba(255,255,255,.45);font-weight:700">NIV. ${l.n}</div>${hearts}</div>
+          <div class="game-score-val" style="min-width:70px">${s.score} <span style="font-size:12px">pts</span></div>
+          <div style="flex:1;margin:0 16px">
+            <div style="position:relative;height:8px;background:rgba(255,255,255,.1);border-radius:4px">
+              <div style="height:100%;width:${spct}%;background:${barCol};border-radius:4px;transition:width .2s"></div>
+              ${mark(l.bronze,'#CD7F44')}${mark(l.silver,'#C0C7D0')}${mark(l.gold,'#FFD84D')}
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:9.5px;color:rgba(255,255,255,.4);font-weight:700;margin-top:3px"><span>🥉${l.bronze}</span><span>🥈${l.silver}</span><span>🥇${l.gold}</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:${sec<=5?'#E5484D':'#fff'};min-width:42px;text-align:right">${sec}s</div>
+            <div style="display:flex;gap:1px">${hearts}</div>
+          </div>
         </div>
+        <div style="position:relative;height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin:-6px 0 12px;overflow:hidden"><div style="height:100%;width:${tpct}%;background:${sec<=5?'#E5484D':'rgba(255,255,255,.35)'};transition:width .05s linear"></div></div>
         <div class="game-arena" id="souris-arena" style="cursor:${cap.click||cap.drag?'crosshair':'default'};user-select:none"></div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:-12px">${cap.pads?'Z Q S D pour entrer dans les cercles verts':cap.move?'Z Q S D pour bouger · clique les cibles':cap.drag?'Attrape et dépose dans la bonne zone':cap.traps?'Clique les vertes, évite les rouges · vise le cœur doré':cap.core?'Vise le cœur doré : 3 pts et 5 d’affilée = +1 vie':cap.click?'Clique les cibles':'Survole les cibles une seconde'}
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:-12px">${hint}
           · <button onclick="app.stopSouris();app.souris={phase:'menu'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
@@ -4106,7 +4143,7 @@ const app={
   startSouris(){
     const s=this.souris, l=this._sourisLevels[s.lvl-1];
     this.stopSouris();
-    Object.assign(s,{phase:'play',score:0,lives:l.lives,hit:0,miss:0,t0:Date.now(),targets:[],drag:null,tick:0,strikes:0,hits5:0,streak:0,cores:0,regen:0,hazards:[]});
+    Object.assign(s,{phase:'play',score:0,lives:3,hit:0,miss:0,t0:Date.now(),targets:[],drag:null,tick:0,streak:0,cores:0,regen:0,hazards:[],tLeft:(l.dur||30)*1000,mult:1,multUntil:0});
     const c=this._sourisCaps(s.lvl);
     if(c.move||c.pads){
       s.player={x:50,y:50};
@@ -4142,8 +4179,7 @@ const app={
         const t=s.drag;t.grabbed=false;s.drag=null;
         const z=this._sourisZoneAt(t.x,t.y);
         if(z===t.color){s.score++;s.hit++;s.targets=s.targets.filter(x=>x!==t);this._sourisFlash('#1FA971');}
-        else{s.miss++;this._sourisLoseLife();this._sourisFlash('#E5484D');t.x=t.hx;t.y=t.hy;}
-        this._sourisCheck();
+        else{s.miss++;s.score=Math.max(0,s.score-1);this._sourisFlash('#E5484D');t.x=t.hx;t.y=t.hy;}
       };
     }
   },
@@ -4157,8 +4193,10 @@ const app={
   },
 
   _sourisZoneAt(x,y){
-    // Deux zones de dépôt : gauche (vert), droite (bleu)
-    if(y<62)return null;
+    if(y<58)return null;
+    if(this._sourisCaps(this.souris.lvl).sort3){
+      return x<33.3?'#1FA971':x<66.6?'#3B82F6':'#E5722B';
+    }
     return x<50?'#1FA971':'#3B82F6';
   },
 
@@ -4166,39 +4204,57 @@ const app={
     const s=this.souris, c=this._sourisCaps(s.lvl);
     const t=this._sourisAt(s.mx,s.my);
     if(!t){s.miss++;s.streak=0;this._sourisFlash('rgba(255,255,255,.12)');return;}
-    if(t.bad){                       // piège : coûte des points, jamais une vie
+    if(t.bonus){
+      s.targets=s.targets.filter(x=>x!==t);
+      s.hit++;
+      if(t.bonus==='points'){s.mult=2;s.multUntil=Date.now()+5000;this._sourisFlash('#3B82F6');this._sourisPop('×2 !','#3B82F6');}
+      else if(t.bonus==='time'){s.tLeft=(s.tLeft||0)+2000;this._sourisFlash('#A855F7');this._sourisPop('+2s','#A855F7');}
+      else if(t.bonus==='jackpot'){const g=8;s.score+=g;this._sourisFlash('#FFD84D');this._sourisPop('+'+g,'#FFD84D');}
+      return;
+    }
+    if(t.bad){
       s.miss++;s.streak=0;
       s.score=Math.max(0,s.score-2);
       this._sourisFlash('#E5484D');
       s.targets=s.targets.filter(x=>x!==t);
       return;
     }
-    // Cœur de cible : le tiers central vaut 3 points et alimente la série.
+    const mult=(s.mult&&Date.now()<s.multUntil)?s.mult:1;
     const core=!!c.core&&this._sourisInCore(t,s.mx,s.my);
-    s.score+=core?3:1;
+    s.score+=(core?3:1)*mult;
     s.hit++;
     if(core){
       s.streak=(s.streak||0)+1;
       s.cores=(s.cores||0)+1;
-      if(s.streak>0&&s.streak%5===0&&s.lives<3){   // 5 cœurs d'affilée = 1 vie
+      if(s.streak>0&&s.streak%5===0&&s.lives<3){
         s.lives++;s.regen=(s.regen||0)+1;
-        this._sourisFlash('#FFD84D');
-        this._sourisRegenPop();
+        this._sourisFlash('#FFD84D');this._sourisRegenPop();
       }else this._sourisFlash('#FFD84D');
     }else{
       s.streak=0;
       this._sourisFlash('#1FA971');
     }
     s.targets=s.targets.filter(x=>x!==t);
-    this._sourisCheck();
+  },
+
+  _sourisInCore(t,x,y){
+    const c=this._sourisCaps(this.souris.lvl);
+    const frac=c.smaller?0.26:0.30;
+    const dx=(t.x-x)*1.6, dy=t.y-y;
+    return Math.sqrt(dx*dx+dy*dy)<=t.r*frac;
+  },
+
+  _sourisPop(txt,color){
+    const a=this._sourisArena;if(!a)return;
+    const d=document.createElement('div');
+    d.textContent=txt;
+    d.style.cssText='position:absolute;left:'+(this.souris.mx||50)+'%;top:'+(this.souris.my||50)+'%;transform:translate(-50%,-50%);color:'+color+';font-family:JetBrains Mono,monospace;font-weight:800;font-size:22px;text-shadow:0 3px 12px rgba(0,0,0,.6);pointer-events:none;z-index:6;transition:all .6s ease-out';
+    a.appendChild(d);
+    setTimeout(()=>{d.style.top=(this.souris.my-12||38)+'%';d.style.opacity='0';},30);
+    setTimeout(()=>{d.remove();},640);
   },
 
   // Le cœur : tiers central du rayon (aire ~11% du disque) — il faut vraiment viser.
-  _sourisInCore(t,x,y){
-    const dx=(t.x-x)*1.6, dy=t.y-y;
-    return Math.sqrt(dx*dx+dy*dy)<=t.r*0.34;
-  },
-
   _sourisRegenPop(){
     const a=this._sourisArena;if(!a)return;
     const d=document.createElement('div');
@@ -4218,41 +4274,66 @@ const app={
   _sourisLoseLife(){
     const s=this.souris;
     s.lives--;
-    if(s.lives<=0){s.phase='over';this.stopSouris();this.renderSouris();}
+    if(s.lives<=0){s.tier=null;s.phase='over';this.stopSouris();this.renderSouris();}
   },
 
-  _sourisCheck(){
+  _sourisTier(l,score){
+    if(score>=l.gold)return 'gold';
+    if(score>=l.silver)return 'silver';
+    if(score>=l.bronze)return 'bronze';
+    return null;
+  },
+
+  _sourisCheck(){ /* le niveau se termine au chrono, pas à un score seuil */ },
+
+  _sourisTimeUp(){
     const s=this.souris, l=this._sourisLevels[s.lvl-1];
-    if(s.score>=l.goal){
-      s.phase='win';this.stopSouris();
-      // Progression : le meilleur niveau atteint est mémorisé.
-      if(currentUser&&this.stats&&s.lvl>(this.stats.sourisBest||0)){
-        this.stats.sourisBest=s.lvl;saveStats(this.stats);
-      }
-      this.renderSouris();
+    this.stopSouris();
+    s.tier=this._sourisTier(l,s.score);
+    s.phase=s.tier?'win':'over';
+    if(s.tier&&currentUser&&this.stats){
+      if(s.lvl>(this.stats.sourisBest||0)){this.stats.sourisBest=s.lvl;}
+      this.stats.sourisTiers=this.stats.sourisTiers||{};
+      const rank={bronze:1,silver:2,gold:3};
+      if((rank[s.tier]||0)>(rank[this.stats.sourisTiers[s.lvl]]||0))this.stats.sourisTiers[s.lvl]=s.tier;
+      saveStats(this.stats);
     }
+    this.renderSouris();
   },
 
   _sourisSpawn(){
     const s=this.souris, c=this._sourisCaps(s.lvl);
     const rnd=(a,b)=>a+Math.random()*(b-a);
     if(c.drag){
-      const color=Math.random()<.5?'#1FA971':'#3B82F6';
-      const x=rnd(12,88), y=rnd(10,48);
-      s.targets.push({x,y,hx:x,hy:y,r:5,color,shape:Math.random()<.5?'circle':'square',born:Date.now()});
+      const palette=c.sort3?['#1FA971','#3B82F6','#E5722B']:['#1FA971','#3B82F6'];
+      const color=palette[Math.floor(Math.random()*palette.length)];
+      const x=rnd(12,88), y=rnd(8,42);
+      s.targets.push({x,y,hx:x,hy:y,r:4.6,color,shape:Math.random()<.5?'circle':'square',born:Date.now()});
       return;
     }
     if(c.pads){
-      // Cercle à atteindre au clavier : pas de clic, on entre dedans.
       s.targets.push({x:rnd(12,88),y:rnd(12,88),r:7,pad:true,born:Date.now(),life:6000,hover:0});
       return;
     }
-    const bad=!!c.traps&&Math.random()<.3;
+    if(c.bonus&&Math.random()<.14&&!(s.targets||[]).some(t=>t.bonus)){
+      const kinds=[
+        {bonus:'points',color:'#3B82F6',icon:'×2',life:2200},
+        {bonus:'time',color:'#A855F7',icon:'+2s',life:2400},
+        {bonus:'jackpot',color:'#FFD84D',icon:'★',life:1500},
+      ];
+      const k=kinds[Math.floor(Math.random()*kinds.length)];
+      s.targets.push({x:rnd(12,88),y:rnd(12,88),r:4.4,born:Date.now(),hover:0,...k});
+      return;
+    }
+    const bad=!!c.traps&&Math.random()<(c.fast?.34:.3);
+    const base=c.fast?rnd(2.6,4.0):rnd(3.4,5.4);
     s.targets.push({
       x:rnd(8,92), y:rnd(10,90),
-      r:c.hover?7:(c.fast?rnd(2.8,4.4):rnd(3.4,5.6)),
-      bad, born:Date.now(),
-      life:c.hover?4200:c.fast?2600:(c.move?4600:(c.traps?4000:3000)),
+      r:c.hover?7:base,
+      bad,
+      disguised:bad&&!!c.disguise&&Math.random()<.6,
+      born:Date.now(),
+      life:c.hover?4200:c.fast?1900:(c.move?4600:(c.traps?3600:3000)),
       hover:0,
     });
   },
@@ -4262,6 +4343,8 @@ const app={
     s.tick++;
     const c=this._sourisCaps(s.lvl);
     const now=Date.now();
+    s.tLeft-=50;
+    if(s.tLeft<=0){s.tLeft=0;return this._sourisTimeUp();}
 
     // Apparition
     const maxT=c.drag?3:c.pads?2:c.hover?2:3;
@@ -4283,6 +4366,12 @@ const app={
       }
     }
 
+    // Glisser-déposer : une pièce jamais déposée finit par disparaître (coûte une vie)
+    if(c.drag){
+      const gone=(s.targets||[]).filter(t=>now-t.born>8000&&t!==s.drag);
+      gone.forEach(()=>{s.miss++;this._sourisLoseLife();});
+      s.targets=(s.targets||[]).filter(t=>!(now-t.born>8000&&t!==s.drag));
+    }
     // Expiration : laisser filer une cible utile coûte une vie
     if(!c.drag){
       const gone=(s.targets||[]).filter(t=>now-t.born>t.life);
@@ -4364,16 +4453,17 @@ const app={
     const c=this._sourisCaps(s.lvl);
     const now=Date.now();
     let html='';
-
     if(c.drag){
-      html+=`<div style="position:absolute;left:0;right:50%;top:62%;bottom:0;background:rgba(31,169,113,.1);border:2px dashed rgba(31,169,113,.5);border-radius:14px;margin:6px;display:flex;align-items:center;justify-content:center;color:rgba(31,169,113,.85);font-weight:800;font-size:13px;letter-spacing:.05em">ZONE VERTE</div>`;
-      html+=`<div style="position:absolute;left:50%;right:0;top:62%;bottom:0;background:rgba(59,130,246,.1);border:2px dashed rgba(59,130,246,.5);border-radius:14px;margin:6px;display:flex;align-items:center;justify-content:center;color:rgba(59,130,246,.85);font-weight:800;font-size:13px;letter-spacing:.05em">ZONE BLEUE</div>`;
+      const zones=c.sort3
+        ?[['#1FA971','VERTE',0,33.3],['#3B82F6','BLEUE',33.3,66.6],['#E5722B','ORANGE',66.6,100]]
+        :[['#1FA971','VERTE',0,50],['#3B82F6','BLEUE',50,100]];
+      zones.forEach(([col,lbl,l,r])=>{
+        html+=`<div style="position:absolute;left:${l}%;right:${100-r}%;top:58%;bottom:0;background:${col}1a;border:2px dashed ${col}88;border-radius:12px;margin:5px;display:flex;align-items:center;justify-content:center;color:${col};font-weight:800;font-size:12px;letter-spacing:.05em">${lbl}</div>`;
+      });
     }
-
     (s.hazards||[]).forEach(h=>{
       html+=`<div style="position:absolute;left:${h.x}%;top:${h.y}%;width:${h.r*2}%;aspect-ratio:1;transform:translate(-50%,-50%);background:rgba(229,72,77,.22);border:2px solid rgba(229,72,77,.65);border-radius:50%"></div>`;
     });
-
     (s.targets||[]).forEach(t=>{
       const age=now-t.born;
       if(c.drag){
@@ -4386,20 +4476,28 @@ const app={
         html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${t.r*2}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #1FA971;background:rgba(31,169,113,${.12+fill*.5});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">${fill>0?Math.round(fill*100)+'%':''}</div>`;
         return;
       }
+      if(t.bonus){
+        const left=Math.max(0,1-age/t.life);
+        const pulse=0.85+0.15*Math.sin(now/90);
+        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${t.r*2}%;aspect-ratio:1;transform:translate(-50%,-50%) scale(${pulse});border-radius:50%;background:${t.color};box-shadow:0 0 22px ${t.color};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;border:2px solid #fff">${t.icon}</div>`;
+        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${t.r*2.6}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2px solid ${t.color};opacity:${left*.6};pointer-events:none"></div>`;
+        return;
+      }
       const left=Math.max(0,1-age/t.life);
       const sz=t.r*2*(c.hover?1:(.55+left*.45));
-      const col=t.bad?'#E5484D':'#1FA971';
+      const col=t.bad?(t.disguised?'#D98A3D':'#E5484D'):'#1FA971';
+      const mark=t.bad&&!t.disguised?'✕':'';
       const ring=c.hover&&t.hover>0?`<div style="position:absolute;inset:-6px;border-radius:50%;border:3px solid #fff;opacity:${t.hover/800}"></div>`:'';
-      // Cœur doré : visible seulement sur les cibles utiles des niveaux concernés
-      const core=(c.core&&!t.bad)?`<div style="position:absolute;left:50%;top:50%;width:${0.34*2*100}%;height:${0.34*2*100}%;transform:translate(-50%,-50%);border-radius:50%;background:#FFD84D;box-shadow:0 0 10px #FFD84D"></div>`:'';
-      html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${col};border-radius:50%;box-shadow:0 0 ${t.bad?'22':'18'}px ${col}88;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${t.bad?'✕':''}${core}${ring}</div>`;
+      const frac=c.smaller?0.26:0.30;
+      const core=(c.core&&!t.bad)?`<div style="position:absolute;left:50%;top:50%;width:${frac*2*100}%;height:${frac*2*100}%;transform:translate(-50%,-50%);border-radius:50%;background:#FFD84D;box-shadow:0 0 8px #FFD84D"></div>`:'';
+      html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${col};border-radius:50%;box-shadow:0 0 ${t.bad?'20':'16'}px ${col}88;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${mark}${core}${ring}</div>`;
     });
-
     if(c.move||c.pads){
       html+=`<div style="position:absolute;left:${s.player.x}%;top:${s.player.y}%;width:5%;aspect-ratio:1;transform:translate(-50%,-50%);background:#fff;border-radius:50%;box-shadow:0 0 14px rgba(255,255,255,.7);opacity:${s._inv?.4:1};display:flex;align-items:center;justify-content:center;font-size:12px">🙂</div>`;
     }
-
-    // Série de cœurs en cours : le joueur doit voir sa progression vers la vie
+    if(s.mult>1&&now<s.multUntil){
+      html+=`<div style="position:absolute;left:12px;top:10px;background:#3B82F6;color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:14px;font-family:JetBrains Mono,monospace">×${s.mult} ${Math.ceil((s.multUntil-now)/1000)}s</div>`;
+    }
     if(c.core&&(s.streak||0)>0){
       const dots=[0,1,2,3,4].map(i=>`<span style="width:7px;height:7px;border-radius:50%;background:${i<(s.streak%5||5)?'#FFD84D':'rgba(255,255,255,.2)'}"></span>`).join('');
       html+=`<div style="position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);padding:6px 12px;border-radius:20px">
