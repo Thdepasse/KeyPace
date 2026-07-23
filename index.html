@@ -3745,7 +3745,7 @@ const app={
       ${score}
       ${g.w?`<div style="max-width:520px;margin:0 auto;text-align:center">
         <div style="font-size:15px;font-weight:700;margin-bottom:6px">🏁 En attendant, défie tes amis</div>
-        <div style="font-size:13.5px;color:var(--muted);line-height:1.55;margin-bottom:14px">Envoie-leur ton score : ils devront le battre.</div>
+        <div style="font-size:13.5px;color:var(--muted);line-height:1.55;margin-bottom:14px">Envoie-leur ton score : le lien leur débloque un test pour te battre. S'ils te renvoient le leur, tu pourras rejouer aujourd'hui.</div>
         ${this._challengeForm(g.w,g.a)}
       </div>`:''}
     </div>`;
@@ -3771,7 +3771,7 @@ const app={
     try{
       if(navigator.share){await navigator.share({title:'Défi KeyPace',text:txt,url});return;}
       await navigator.clipboard.writeText(txt+' '+url);
-      if(msg){msg.style.display='block';msg.style.color='#1FA971';msg.textContent='✓ Lien du défi copié : envoie-le à tes amis !';}
+      if(msg){msg.style.display='block';msg.style.color='#1FA971';msg.textContent='✓ Lien copié ! Envoie-le à tes amis. Quand ils te renvoient le leur, tu peux rejouer.';}
     }catch{
       if(msg){msg.style.display='block';msg.style.color='var(--muted)';msg.textContent=url;}
     }
@@ -3831,7 +3831,7 @@ const app={
       chalResult=`<div style="margin-top:18px;border-top:1px solid var(--border);padding-top:18px">
         ${vs}
         <div style="font-size:15px;font-weight:800;margin-bottom:4px">🏁 Défie tes amis</div>
-        <div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">Envoie-leur ton score : ils devront le battre.</div>
+        <div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">Envoie-leur ton score : le lien leur débloque un test pour te battre. Pour continuer le duel, <b>demande-leur de te renvoyer leur score</b> — chaque lien reçu te redonne un test.</div>
         ${this._challengeForm(resWpm,resAcc)}
       </div>`;
     }
