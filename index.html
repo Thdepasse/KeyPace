@@ -1620,6 +1620,17 @@ async function handlePaymentReturn(){
 
 /* ── DATA ── */
 let _saveDebounce=null;
+// _statsDirty : true dès qu'une vraie modif locale (jeu, test, leçon…) a eu lieu.
+// On n'écrit JAMAIS au serveur tant que ce drapeau est faux -> impossible d'écraser
+// la progression serveur avec les valeurs par défaut vides du démarrage.
+let _statsDirty=false;
+async function flushStats(){
+  if(!currentUser||!currentToken||!app.stats||!_statsDirty)return;
+  try{
+    await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:app.stats})});
+    _statsDirty=false;
+  }catch{}
+}
 function mergeStats(remote){
   const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,simonBest:null,sourisBest:0,goals:{minWpm:20,maxErrors:8}};
   const s=Object.assign(def, remote||{});
@@ -1638,10 +1649,9 @@ function loadStats(){
 function saveStats(s){
   if(!currentUser)return;
   app.stats=s;
+  _statsDirty=true;
   clearTimeout(_saveDebounce);
-  _saveDebounce=setTimeout(async()=>{
-    try{await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:s})});}catch{}
-  },2000);
+  _saveDebounce=setTimeout(flushStats,2000);
 }
 
 /* ── CURRICULUM ── */
@@ -7975,7 +7985,15 @@ async function loadProgressFromServer(){
   try{
     const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
     const d=await r.json();
-    if(d&&d.data){app.stats=mergeStats(d.data);const _s=JSON.parse(localStorage.getItem('klak_session')||'{}');let _changed=false;if(d.id&&!currentUserId){currentUserId=d.id;_s.userId=d.id;_changed=true;}if(app.stats.role&&_s.role!==app.stats.role){_s.role=app.stats.role||null;_changed=true;}if(_changed)localStorage.setItem('klak_session',JSON.stringify(_s));updateNavUser();app.renderCurrent();if(isAdmin())app.loadAdmin();else if(isTeacher())app.loadEtab();}
+    if(d){
+      // Si l'utilisateur a déjà modifié ses stats localement pendant le chargement
+      // (ex. il a fini un jeu avant que le serveur réponde), on ne les écrase PAS :
+      // on garde la version locale et on la renvoie au serveur.
+      if(d.data&&!_statsDirty)app.stats=mergeStats(d.data);
+      const _s=JSON.parse(localStorage.getItem('klak_session')||'{}');let _changed=false;if(d.id&&!currentUserId){currentUserId=d.id;_s.userId=d.id;_changed=true;}if(app.stats&&app.stats.role&&_s.role!==app.stats.role){_s.role=app.stats.role||null;_changed=true;}if(_changed)localStorage.setItem('klak_session',JSON.stringify(_s));
+      updateNavUser();app.renderCurrent();if(isAdmin())app.loadAdmin();else if(isTeacher())app.loadEtab();
+      if(_statsDirty)flushStats(); // persister les modifs locales faites avant le chargement
+    }
   }catch{}
 }
 loadSession();
@@ -8002,7 +8020,9 @@ handleCertVerify();
 handleChallenge();
 // Sauvegarde immédiate de la progression à la fermeture / au changement d'onglet (la sauvegarde normale est différée)
 window.addEventListener('pagehide',()=>{
-  if(currentUser&&currentToken&&app.stats){
+  // Uniquement s'il y a de vraies modifs en attente : ne jamais envoyer les valeurs
+  // par défaut vides du démarrage (sinon un reload avant chargement efface la progression).
+  if(currentUser&&currentToken&&app.stats&&_statsDirty){
     try{navigator.sendBeacon('/api/save-progress',new Blob([JSON.stringify({token:currentToken,data:app.stats})],{type:'application/json'}));}catch{}
   }
 });
