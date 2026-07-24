@@ -1459,8 +1459,8 @@ function updateNavUser(){
   const logged=document.getElementById('nav-logged');
   if(!currentUser){
     guest.style.display='flex';logged.style.display='none';
-    // Restaurer la nav publique par défaut (notamment après déconnexion d'un compte prof).
-    ['nav-test','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='';});
+    // Restaurer la nav publique par défaut (notamment après déconnexion d'un compte prof/élève).
+    ['nav-home','nav-test','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='';});
     const cb=document.getElementById('nav-classes');if(cb)cb.style.display='none';
     const ap=document.getElementById('nav-apercu');if(ap)ap.style.display='none';
     const jb=document.getElementById('nav-join');if(jb)jb.style.display='none';
@@ -1481,6 +1481,8 @@ function updateNavUser(){
   upgradeBtn.style.display=(plan==='expert'||teacher)?'none':'inline-block';
   if(classesBtn)classesBtn.style.display=teacher?'inline-flex':'none';
   ['nav-test','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=teacher?'none':'';});
+  // Élève connecté : plus d'onglet Accueil (le prof garde le sien = son tableau de bord).
+  const homeBtn=document.getElementById('nav-home');if(homeBtn)homeBtn.style.display=teacher?'':'none';
   const apercu=document.getElementById('nav-apercu');if(apercu)apercu.style.display=teacher?'inline-flex':'none';
   const joinBtn=document.getElementById('nav-join');if(joinBtn)joinBtn.style.display=teacher?'none':'inline-flex';
   applyMobileNav();
@@ -3448,6 +3450,8 @@ const app={
   renderHome(){
     if(isAdmin()){this._renderHomeAdmin();return;}
     if(isTeacher()){this._renderHomeEtab();return;}
+    // Élève connecté : la landing n'a plus d'utilité -> on l'envoie sur ses progrès.
+    if(currentUser){this.renderView('stats');return;}
     const kbHtml=KB.map(row=>'<div class="hkb-row">'+row.map(k=>`<div class="hkb-key${k.home?' home':''}">${k.l.toLowerCase()}</div>`).join('')+'</div>').join('');
     const isGuest=!currentUser;
 
