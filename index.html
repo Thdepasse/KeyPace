@@ -6110,8 +6110,24 @@ const app={
     document.getElementById('gaze-modal-overlay')?.remove();
     const g=this._gaze;g.enabled=true;g.permError=null;
     this.renderCurrent();
-    this._gazeEnsureRunning();
+    // 1) D'ABORD la caméra : autorisation + MediaPipe + boucle de détection prêts.
+    //    (sinon le point de fixation ci-dessous ne mesurerait rien.)
+    this._gazeInitBanner(true);
+    const ok=await this._gazeEnsureRunning();
+    this._gazeInitBanner(false);
+    if(!ok){this.renderCurrent();return;} // autorisation refusée / erreur : on n'affiche pas la fixation
+    // 2) ENSUITE le point de fixation : la caméra tourne, il collecte une vraie baseline.
     await this._gazeFixationPrompt();
+  },
+  // Petit bandeau pendant l'initialisation de la caméra (chargement + autorisation).
+  _gazeInitBanner(show){
+    let el=document.getElementById('gaze-init');
+    if(!show){el&&el.remove();return;}
+    if(el)return;
+    el=document.createElement('div');el.id='gaze-init';
+    el.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:1200;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 18px;font-size:14px;font-weight:600;color:var(--txt);box-shadow:0 12px 32px rgba(0,0,0,.15);display:flex;align-items:center;gap:10px';
+    el.innerHTML='👁 Autorise la caméra pour activer le traqueur…';
+    document.body.appendChild(el);
   },
   _gazeFixationPrompt(){
     return new Promise(resolve=>{
