@@ -231,40 +231,35 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA}
-/* ── Immersion clavier : touches qui flottent en fond (variées par page) ── */
-#kp-amb{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
-#kp-amb .kc{position:absolute;will-change:transform;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-weight:700;transition:opacity .2s ease}
-#kp-amb .face{position:absolute;inset:0;border-radius:clamp(12px,2vw,22px);
-  background:linear-gradient(155deg,#ffffff,#E7DBBF);
-  box-shadow:0 30px 60px -26px rgba(70,48,20,.22), inset 0 3px 0 rgba(255,255,255,.6), inset 0 -6px 14px rgba(70,48,20,.05);
-  display:grid;place-items:center;color:#9C875F;
-  transition:transform .22s cubic-bezier(.2,.85,.3,1.5), box-shadow .25s ease, color .2s ease}
-#kp-amb .face::before{content:"";position:absolute;left:12%;top:12%;right:12%;height:42%;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0))}
-#kp-amb .kc.accent .face{color:color-mix(in srgb,var(--accent) 70%, #9C875F)}
-#kp-amb .kc.hit{opacity:1}
-#kp-amb .kc.hit .face{transform:scale(1.16);color:var(--accent);
-  box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 35%,transparent), 0 18px 44px -14px var(--accent), inset 0 3px 0 rgba(255,255,255,.7)}
-#kp-amb .kc.bonus .face{animation:kpPop .5s cubic-bezier(.2,.9,.3,1.5)}
-/* Positions : toutes SOUS le header et dans l'écran (le plus grand = le X de Jeux ≈ 11vw/124px) */
-#kp-amb .p1{width:min(11vw,124px);height:min(11vw,124px);left:3%;top:14%;font-size:min(4.8vw,54px);opacity:.5;filter:blur(.5px);animation:kpw1 42s ease-in-out infinite}
-#kp-amb .p2{width:min(11vw,124px);height:min(11vw,124px);right:3%;bottom:8%;font-size:min(4.8vw,54px);opacity:.46;filter:blur(.6px);animation:kpw2 54s ease-in-out infinite}
-#kp-amb .p3{width:min(7.5vw,84px);height:min(7.5vw,84px);right:5%;top:15%;font-size:min(3.4vw,38px);opacity:.6;filter:blur(0);animation:kpw3 34s ease-in-out infinite}
-#kp-amb .p4{width:min(9vw,104px);height:min(9vw,104px);left:5%;bottom:9%;font-size:min(4vw,46px);opacity:.48;filter:blur(.5px);animation:kpw4 46s ease-in-out infinite}
-#kp-amb .p5{width:min(6.5vw,74px);height:min(6.5vw,74px);right:4%;top:46%;font-size:min(3vw,33px);opacity:.54;filter:blur(.3px);animation:kpw5 30s ease-in-out infinite}
-#kp-amb .p6{width:min(8.5vw,96px);height:min(8.5vw,96px);left:24%;top:12%;font-size:min(3.7vw,42px);opacity:.44;filter:blur(.6px);animation:kpw6 50s ease-in-out infinite}
-#kp-amb .p7{width:min(9vw,102px);height:min(9vw,102px);left:3%;top:48%;font-size:min(3.9vw,44px);opacity:.5;filter:blur(.5px);animation:kpw3 44s ease-in-out infinite}
-#kp-amb .p8{width:min(7vw,80px);height:min(7vw,80px);left:44%;bottom:6%;font-size:min(3.2vw,35px);opacity:.46;filter:blur(.4px);animation:kpw2 38s ease-in-out infinite}
-#kp-amb .p9{width:min(10vw,116px);height:min(10vw,116px);right:16%;bottom:14%;font-size:min(4.4vw,50px);opacity:.48;filter:blur(.6px);animation:kpw1 48s ease-in-out infinite}
-@keyframes kpw1{0%,100%{transform:translate(0,0) rotate(-6deg)}25%{transform:translate(18px,12px) rotate(-3deg)}55%{transform:translate(10px,-20px) rotate(-8deg)}80%{transform:translate(-14px,8px) rotate(-5deg)}}
-@keyframes kpw2{0%,100%{transform:translate(0,0) rotate(6deg)}25%{transform:translate(-20px,-12px) rotate(3deg)}55%{transform:translate(-8px,16px) rotate(9deg)}80%{transform:translate(16px,-6px) rotate(5deg)}}
-@keyframes kpw3{0%,100%{transform:translate(0,0) rotate(5deg)}30%{transform:translate(-16px,14px) rotate(1deg)}60%{transform:translate(12px,18px) rotate(7deg)}82%{transform:translate(14px,-10px) rotate(3deg)}}
-@keyframes kpw4{0%,100%{transform:translate(0,0) rotate(-4deg)}28%{transform:translate(20px,-12px) rotate(-1deg)}52%{transform:translate(-10px,-18px) rotate(-6deg)}78%{transform:translate(-18px,10px) rotate(-2deg)}}
-@keyframes kpw5{0%,100%{transform:translate(0,0) rotate(8deg)}26%{transform:translate(-16px,16px) rotate(4deg)}58%{transform:translate(-20px,-8px) rotate(11deg)}84%{transform:translate(10px,-14px) rotate(6deg)}}
-@keyframes kpw6{0%,100%{transform:translate(0,0) rotate(-2deg)}24%{transform:translate(14px,18px) rotate(-5deg)}54%{transform:translate(20px,-8px) rotate(0deg)}80%{transform:translate(-12px,-16px) rotate(-4deg)}}
-@keyframes kpPop{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.18) rotate(4deg)}100%{transform:scale(1) rotate(0)}}
-@media (prefers-reduced-motion:reduce){#kp-amb .kc{animation:none!important}#kp-amb .kc.bonus .face{animation:none!important}}
-@media (max-width:768px){#kp-amb{display:none}}
 body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',Arial,sans-serif;color:var(--txt);min-height:100vh;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+/* ── Célébration de fin de leçon : clavier popup, les touches travaillées explosent ── */
+.cel-overlay{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(22,20,15,.5);backdrop-filter:blur(6px);animation:cel-fade .25s ease}
+@keyframes cel-fade{from{opacity:0}to{opacity:1}}
+.cel-card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:30px 30px 26px;max-width:560px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(22,20,15,.35);animation:cel-pop .4s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes cel-pop{from{transform:scale(.9) translateY(12px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.cel-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.cel-title{font-size:27px;font-weight:800;letter-spacing:-.02em;margin:6px 0 3px}
+.cel-sub{color:var(--muted);font-size:14.5px;margin:0}
+.cel-stats{display:flex;justify-content:center;gap:26px;margin:16px 0 18px}
+.cel-stat b{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--txt)}
+.cel-stat span{display:block;font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}
+.cel-kb{display:flex;flex-direction:column;gap:6px;align-items:center;margin:4px 0 22px}
+.cel-row{display:flex;gap:6px;justify-content:center}
+.cel-key{width:clamp(28px,7vw,36px);height:clamp(28px,7vw,36px);border-radius:9px;background:var(--light);border:1px solid var(--border);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;color:var(--muted);position:relative;transition:transform .2s}
+.cel-key.dim{opacity:.45}
+.cel-key.hot{background:linear-gradient(160deg,#FF7A5C,var(--accent));color:#fff;border-color:transparent;box-shadow:0 8px 20px -6px var(--accent)}
+.cel-key.boom{animation:cel-boom .6s cubic-bezier(.3,.9,.3,1.5)}
+@keyframes cel-boom{0%{transform:scale(1)}30%{transform:scale(1.55) rotate(-7deg)}60%{transform:scale(1.12) rotate(4deg)}100%{transform:scale(1)}}
+.cel-part{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:2px;pointer-events:none;will-change:transform,opacity;animation:cel-particle .72s ease-out forwards}
+@keyframes cel-particle{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.3);opacity:0}}
+.cel-btns{display:flex;gap:10px;justify-content:center}
+.cel-btn{font-family:inherit;font-weight:700;font-size:15px;padding:12px 22px;border-radius:12px;cursor:pointer;border:none;transition:transform .12s}
+.cel-btn:active{transform:scale(.97)}
+.cel-btn.primary{background:var(--accent);color:#fff;box-shadow:0 12px 26px -12px var(--accent)}
+.cel-btn.ghost{background:var(--card);border:1px solid var(--border);color:var(--txt)}
+.cel-confetti{position:fixed;top:-14px;width:9px;height:14px;border-radius:2px;z-index:2001;pointer-events:none;will-change:transform;animation:cel-fall linear forwards}
+@keyframes cel-fall{0%{transform:translateY(-14px) rotate(0);opacity:1}100%{transform:translateY(102vh) rotate(760deg);opacity:.85}}
+@media (prefers-reduced-motion:reduce){.cel-key.boom{animation:none!important}.cel-part,.cel-confetti{display:none!important}}
 @keyframes _pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 [id^="page-"]{contain:layout style;}
 ._pgAnim{animation:_pgIn .18s ease both}
@@ -948,9 +943,6 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 </style>
 </head>
 <body>
-
-<!-- Immersion clavier : touches en fond, variées par page (rempli par applyAmbience) -->
-<div id="kp-amb" aria-hidden="true"></div>
 
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="auth-modal">
@@ -1690,66 +1682,54 @@ function saveStats(s){
   _saveDebounce=setTimeout(flushStats,2000);
 }
 
-/* ── Immersion clavier : touches en fond, un jeu de lettres + un agencement différent par page ── */
-const KP_AMB={
-  home:         [['A','p1'],['P','p2'],['K','p3 accent'],['E','p4'],['R','p5']],
-  test:         [['T','p6'],['S','p2'],['E','p3 accent'],['N','p7'],['R','p8']],
-  lessons:      [['F','p1'],['J','p9 accent'],['D','p4'],['K','p5'],['L','p2']],
-  games:        [['W','p6'],['X','p2'],['C','p1 accent'],['V','p5'],['B','p8']],
-  stats:        [['M','p1'],['O','p9'],['P','p3 accent'],['U','p4'],['I','p7']],
-  classes:      [['C','p1'],['L','p2'],['A','p3 accent'],['S','p8'],['E','p5']],
-  etablissement:[['E','p6'],['T','p2'],['B','p3 accent'],['L','p7'],['S','p9']]
-};
-const KP_POS=['p1','p2','p3','p4','p5','p6','p7','p8','p9'];
-const KP_ALPHA='AZERTYUIOPQSDFGHJKLMWXCVBN'.split('');
-let _ambPressed=new Set(), _ambBonusUsed=false;
-function applyAmbience(v){
-  const el=document.getElementById('kp-amb');if(!el)return;
-  const set=KP_AMB[v]||KP_AMB.home;
-  el.innerHTML=set.map(k=>'<div class="kc '+k[1]+'"><div class="face">'+k[0]+'</div></div>').join('');
-  _ambPressed=new Set(); _ambBonusUsed=false; // easter egg réarmé à chaque page
+/* ── Célébration de fin de leçon : un clavier s'affiche et les touches travaillées explosent ── */
+function celebrateLesson(lesson,res){
+  lesson=lesson||{keys:'',title:'Leçon'};
+  const hot=new Set((lesson.keys||'').toUpperCase().split(/\s+/).filter(Boolean));
+  const ROWS=[['A','Z','E','R','T','Y','U','I','O','P'],['Q','S','D','F','G','H','J','K','L','M'],['W','X','C','V','B','N',',',';',':']];
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const kb=ROWS.map(r=>'<div class="cel-row">'+r.map(k=>'<div class="cel-key '+(hot.has(k)?'hot':'dim')+'" data-k="'+k+'">'+k+'</div>').join('')+'</div>').join('');
+  const ov=document.createElement('div');ov.className='cel-overlay';
+  ov.innerHTML='<div class="cel-card">'
+    +'<div class="cel-eyebrow">Leçon terminée</div>'
+    +'<div class="cel-title">Bravo ! 🎉</div>'
+    +'<div class="cel-sub">'+(lesson.title||'')+'</div>'
+    +'<div class="cel-stats"><div class="cel-stat"><b>'+(res?res.wpm:0)+'</b><span>mots/min</span></div><div class="cel-stat"><b>'+(res?res.acc:0)+'%</b><span>précision</span></div></div>'
+    +'<div class="cel-kb">'+kb+'</div>'
+    +'<div class="cel-btns"><button class="cel-btn primary" data-act="close">Continuer</button></div>'
+    +'</div>';
+  document.body.appendChild(ov);
+  const close=()=>{ov.remove();window.removeEventListener('keydown',onKey,true);};
+  const onKey=e=>{if(e.key==='Escape'||e.key==='Enter'){e.preventDefault();e.stopPropagation();close();}};
+  window.addEventListener('keydown',onKey,true);
+  ov.addEventListener('click',e=>{if(e.target===ov||e.target.closest('[data-act=close]'))close();});
+  // explosion échelonnée des touches travaillées
+  const hotEls=[...ov.querySelectorAll('.cel-key.hot')];
+  hotEls.forEach((el,i)=>setTimeout(()=>{el.classList.add('boom');if(!reduce)_celBurst(el);},350+i*170));
+  if(!reduce)setTimeout(_celConfetti,420);
 }
-function _ambCaps(){return [...document.querySelectorAll('#kp-amb .kc')];}
-function _ambLetters(){return _ambCaps().map(c=>c.querySelector('.face').textContent);}
-function ambHit(letter){
-  letter=letter.toUpperCase();
-  const cap=_ambCaps().find(c=>c.querySelector('.face').textContent===letter);
-  if(!cap)return;
-  cap.classList.add('hit');
-  clearTimeout(cap._ht); cap._ht=setTimeout(()=>cap.classList.remove('hit'),400);
-  _ambPressed.add(letter);
-  if(!_ambBonusUsed){
-    const letters=_ambLetters();
-    if(letters.length && letters.every(l=>_ambPressed.has(l))){ _ambBonusUsed=true; _ambSpawnBonus(); }
+function _celBurst(el){
+  const colors=['#FF4D2E','#FF8A4C','#E7A93A','#2FA8A0','#5B8DEF','#B98CE0'];
+  for(let i=0;i<10;i++){
+    const p=document.createElement('div');p.className='cel-part';
+    const ang=Math.random()*Math.PI*2, dist=28+Math.random()*46;
+    p.style.setProperty('--tx',(Math.cos(ang)*dist).toFixed(1)+'px');
+    p.style.setProperty('--ty',(Math.sin(ang)*dist).toFixed(1)+'px');
+    p.style.background=colors[i%colors.length];
+    el.appendChild(p);setTimeout(()=>p.remove(),760);
   }
 }
-function _ambSpawnBonus(){
-  const el=document.getElementById('kp-amb');if(!el)return;
-  const used=new Set();_ambCaps().forEach(c=>KP_POS.forEach(p=>{if(c.classList.contains(p))used.add(p);}));
-  const freePos=KP_POS.filter(p=>!used.has(p)); if(!freePos.length)return;
-  const pos=freePos[Math.floor(Math.random()*freePos.length)];
-  const shown=new Set(_ambLetters());
-  const cand=KP_ALPHA.filter(l=>!shown.has(l));
-  const letter=cand.length?cand[Math.floor(Math.random()*cand.length)]:'?';
-  const d=document.createElement('div');d.className='kc '+pos+' accent bonus';
-  d.innerHTML='<div class="face">'+letter+'</div>';
-  el.appendChild(d);
+function _celConfetti(){
+  const colors=['#FF4D2E','#FF8A4C','#E7A93A','#2FA8A0','#5B8DEF','#B98CE0'];
+  for(let i=0;i<36;i++){
+    const c=document.createElement('div');c.className='cel-confetti';
+    c.style.left=(Math.random()*100).toFixed(1)+'vw';
+    c.style.background=colors[i%colors.length];
+    c.style.animationDuration=(1.6+Math.random()*1.4).toFixed(2)+'s';
+    c.style.animationDelay=(Math.random()*0.3).toFixed(2)+'s';
+    document.body.appendChild(c);setTimeout(()=>c.remove(),3500);
+  }
 }
-(function(){
-  // illumination + agrandissement à la frappe (fonctionne partout, ne bloque pas la saisie)
-  window.addEventListener('keydown',e=>{
-    if(e.metaKey||e.ctrlKey||e.altKey)return;
-    if(e.key&&e.key.length===1&&/[a-zA-Z]/.test(e.key))ambHit(e.key);
-  });
-  // parallaxe murmurée : les touches suivent très légèrement la souris
-  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  const dpt=[12,16,9,13,10];
-  window.addEventListener('pointermove',e=>{
-    const el=document.getElementById('kp-amb');if(!el||!el.children.length)return;
-    const dx=e.clientX/window.innerWidth-0.5, dy=e.clientY/window.innerHeight-0.5;
-    for(let i=0;i<el.children.length;i++){el.children[i].style.marginLeft=(dx*dpt[i%dpt.length])+'px';el.children[i].style.marginTop=(dy*dpt[i%dpt.length])+'px';}
-  },{passive:true});
-})();
 
 /* ── CURRICULUM ── */
 const FINGERS={lp:'#B7AE9E',lr:'#79C56A',lm:'#E8C13B',li:'#EE6B5E',ri:'#A77BD6',rm:'#E8C13B',rr:'#79C56A',rp:'#B7AE9E',th:'#BCB3A2'};
@@ -3192,7 +3172,7 @@ const app={
       }
     }
     s.idx++;
-    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats(s);const res=this.computeResult(s);if(currentUser){const _pr=s.mode==='lesson'?this.lessonRec(s.lessonId).bestWpm||0:Math.max(0,...(this.stats?.tests||[]).map(t=>t.wpm));s._prevBestWpm=_pr;}this.recordResult(s.mode,res,s.lessonId,s._gazeStats);if(!currentUser&&s.mode==='test')this._markGuestTest(res.wpm,res.acc);this.renderCurrent();if(s.cert)this._finishCertExam(s,res);return;}
+    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats(s);const res=this.computeResult(s);if(currentUser){const _pr=s.mode==='lesson'?this.lessonRec(s.lessonId).bestWpm||0:Math.max(0,...(this.stats?.tests||[]).map(t=>t.wpm));s._prevBestWpm=_pr;}this.recordResult(s.mode,res,s.lessonId,s._gazeStats);if(!currentUser&&s.mode==='test')this._markGuestTest(res.wpm,res.acc);this.renderCurrent();if(s.mode==='lesson'&&!s.cert)celebrateLesson(this.lessonById(s.lessonId),res);if(s.cert)this._finishCertExam(s,res);return;}
     this._patchTypingBox();
   },
   computeResult(s){
@@ -3398,7 +3378,6 @@ const app={
       else if(MOBILE_BLOCKED_VIEWS.indexOf(v)>=0)v=isTeacher()?'home':'stats';
     }
     this.view=v;
-    applyAmbience(v);
     if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;}
     if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
     // Vider les pages avec #tb-scroll pour éviter les IDs dupliqués
