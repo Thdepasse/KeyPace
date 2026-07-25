@@ -239,15 +239,16 @@
   display:grid;place-items:center;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-weight:700;color:#9C875F;will-change:transform}
 #kp-amb .kc::before{content:"";position:absolute;left:12%;top:12%;right:12%;height:42%;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0))}
 #kp-amb .kc.accent{color:color-mix(in srgb,var(--accent) 70%, #9C875F)}
-#kp-amb .p1{width:min(26vw,300px);height:min(26vw,300px);left:-5%;top:6%;font-size:min(11vw,132px);opacity:.5;filter:blur(.6px);animation:kpw1 42s ease-in-out infinite}
-#kp-amb .p2{width:min(18vw,210px);height:min(18vw,210px);right:-3%;bottom:5%;font-size:min(8vw,96px);opacity:.46;filter:blur(1px);animation:kpw2 54s ease-in-out infinite}
-#kp-amb .p3{width:min(12vw,140px);height:min(12vw,140px);right:14%;top:12%;font-size:min(5.4vw,62px);opacity:.6;filter:blur(0);animation:kpw3 34s ease-in-out infinite}
-#kp-amb .p4{width:min(15vw,180px);height:min(15vw,180px);left:6%;bottom:8%;font-size:min(6.6vw,80px);opacity:.48;filter:blur(.8px);animation:kpw4 46s ease-in-out infinite}
-#kp-amb .p5{width:min(10vw,120px);height:min(10vw,120px);right:5%;top:44%;font-size:min(4.6vw,52px);opacity:.54;filter:blur(.4px);animation:kpw5 30s ease-in-out infinite}
-#kp-amb .p6{width:min(13vw,150px);height:min(13vw,150px);left:22%;top:-4%;font-size:min(5.6vw,64px);opacity:.44;filter:blur(1px);animation:kpw6 50s ease-in-out infinite}
-#kp-amb .p7{width:min(14vw,165px);height:min(14vw,165px);left:-3%;top:46%;font-size:min(6vw,72px);opacity:.5;filter:blur(.7px);animation:kpw3 44s ease-in-out infinite}
-#kp-amb .p8{width:min(11vw,130px);height:min(11vw,130px);left:40%;bottom:-4%;font-size:min(5vw,56px);opacity:.46;filter:blur(.6px);animation:kpw2 38s ease-in-out infinite}
-#kp-amb .p9{width:min(16vw,190px);height:min(16vw,190px);right:8%;top:-5%;font-size:min(7vw,84px);opacity:.48;filter:blur(.9px);animation:kpw1 48s ease-in-out infinite}
+/* Gabarit : le plus grand = le X de la page Jeux (p2 ≈ 11vw / 124px), tout le reste plus petit */
+#kp-amb .p1{width:min(11vw,124px);height:min(11vw,124px);left:-3%;top:7%;font-size:min(4.8vw,54px);opacity:.5;filter:blur(.5px);animation:kpw1 42s ease-in-out infinite}
+#kp-amb .p2{width:min(11vw,124px);height:min(11vw,124px);right:-2%;bottom:6%;font-size:min(4.8vw,54px);opacity:.46;filter:blur(.6px);animation:kpw2 54s ease-in-out infinite}
+#kp-amb .p3{width:min(7.5vw,84px);height:min(7.5vw,84px);right:14%;top:13%;font-size:min(3.4vw,38px);opacity:.6;filter:blur(0);animation:kpw3 34s ease-in-out infinite}
+#kp-amb .p4{width:min(9vw,104px);height:min(9vw,104px);left:6%;bottom:9%;font-size:min(4vw,46px);opacity:.48;filter:blur(.5px);animation:kpw4 46s ease-in-out infinite}
+#kp-amb .p5{width:min(6.5vw,74px);height:min(6.5vw,74px);right:5%;top:44%;font-size:min(3vw,33px);opacity:.54;filter:blur(.3px);animation:kpw5 30s ease-in-out infinite}
+#kp-amb .p6{width:min(8.5vw,96px);height:min(8.5vw,96px);left:22%;top:-3%;font-size:min(3.7vw,42px);opacity:.44;filter:blur(.6px);animation:kpw6 50s ease-in-out infinite}
+#kp-amb .p7{width:min(9vw,102px);height:min(9vw,102px);left:-2%;top:46%;font-size:min(3.9vw,44px);opacity:.5;filter:blur(.5px);animation:kpw3 44s ease-in-out infinite}
+#kp-amb .p8{width:min(7vw,80px);height:min(7vw,80px);left:40%;bottom:-3%;font-size:min(3.2vw,35px);opacity:.46;filter:blur(.4px);animation:kpw2 38s ease-in-out infinite}
+#kp-amb .p9{width:min(10vw,116px);height:min(10vw,116px);right:8%;top:-4%;font-size:min(4.4vw,50px);opacity:.48;filter:blur(.6px);animation:kpw1 48s ease-in-out infinite}
 @keyframes kpw1{0%,100%{transform:translate(0,0) rotate(-8deg)}22%{transform:translate(52px,34px) rotate(-4deg)}48%{transform:translate(26px,-46px) rotate(-11deg)}72%{transform:translate(-30px,14px) rotate(-6deg)}}
 @keyframes kpw2{0%,100%{transform:translate(0,0) rotate(9deg)}25%{transform:translate(-46px,-30px) rotate(5deg)}55%{transform:translate(-14px,26px) rotate(12deg)}80%{transform:translate(38px,-8px) rotate(7deg)}}
 @keyframes kpw3{0%,100%{transform:translate(0,0) rotate(6deg)}30%{transform:translate(-38px,28px) rotate(2deg)}60%{transform:translate(24px,40px) rotate(9deg)}82%{transform:translate(30px,-20px) rotate(4deg)}}
