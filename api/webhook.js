@@ -32,7 +32,7 @@ function readRawBody(req) {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  const stripe = new Stripe((process.env.STRIPE_SECRET_KEY || '').trim(), {
     httpClient: Stripe.createFetchHttpClient(),
     maxNetworkRetries: 2,
   });
@@ -53,7 +53,7 @@ module.exports = async function handler(req, res) {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(raw, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(raw, sig, (process.env.STRIPE_WEBHOOK_SECRET || '').trim());
   } catch (err) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }

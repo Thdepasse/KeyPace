@@ -52,11 +52,12 @@ module.exports = async function handler(req, res) {
 
   // httpClient fetch : le client HTTP par défaut (node https) échoue sur ce
   // runtime Vercel (StripeConnectionError) alors que fetch fonctionne (cf. Supabase).
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  const stripe = new Stripe((process.env.STRIPE_SECRET_KEY || '').trim(), {
     httpClient: Stripe.createFetchHttpClient(),
     maxNetworkRetries: 2,
   });
   const appUrl = (process.env.APP_URL || 'https://keypace.be').trim();
+  const priceId = (process.env.STRIPE_PRICE_ID || '').trim();
 
   try {
 
@@ -115,7 +116,7 @@ module.exports = async function handler(req, res) {
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
     payment_method_types: ['card'],
-    line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
+    line_items: [{ price: priceId, quantity: 1 }],
     mode: 'subscription',
     allow_promotion_codes: true,
     success_url: `${appUrl}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
