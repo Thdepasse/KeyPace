@@ -32,7 +32,10 @@ function readRawBody(req) {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    httpClient: Stripe.createFetchHttpClient(),
+    maxNetworkRetries: 2,
+  });
   const sig = req.headers['stripe-signature'];
 
   // Corps brut : le flux si bodyParser est bien désactivé, sinon repli sur req.body.

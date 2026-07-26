@@ -50,7 +50,12 @@ module.exports = async function handler(req, res) {
   const user = r.data && r.data[0];
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  // httpClient fetch : le client HTTP par défaut (node https) échoue sur ce
+  // runtime Vercel (StripeConnectionError) alors que fetch fonctionne (cf. Supabase).
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    httpClient: Stripe.createFetchHttpClient(),
+    maxNetworkRetries: 2,
+  });
   const appUrl = (process.env.APP_URL || 'https://keypace.be').trim();
 
   try {
