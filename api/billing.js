@@ -36,6 +36,14 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Action inconnue.' });
   }
 
+  // Gardes de configuration : message clair au lieu d'un crash 500 opaque.
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return res.status(500).json({ error: 'Paiement indisponible : STRIPE_SECRET_KEY absente côté serveur.' });
+  }
+  if (action === 'checkout' && !process.env.STRIPE_PRICE_ID) {
+    return res.status(500).json({ error: 'Paiement indisponible : STRIPE_PRICE_ID absente côté serveur.' });
+  }
+
   const r = await sb(
     `/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,email,stripe_customer_id`
   );
@@ -44,6 +52,8 @@ module.exports = async function handler(req, res) {
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const appUrl = (process.env.APP_URL || 'https://keypace.be').trim();
+
+  try {
 
   // ── Confirmation serveur d'un paiement (appelée au retour du checkout) ──
   // Ne dépend pas du webhook : on interroge Stripe directement.
@@ -108,4 +118,8 @@ module.exports = async function handler(req, res) {
   });
 
   res.json({ url: session.url });
+  } catch (e) {
+    // Toute erreur Stripe/serveur remonte en JSON clair (au lieu d'un crash 500 opaque).
+    return res.status(500).json({ error: 'Stripe : ' + (e && e.message ? e.message : 'erreur inconnue') });
+  }
 };
