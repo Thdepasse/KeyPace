@@ -260,6 +260,21 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .cel-confetti{position:fixed;top:-14px;width:9px;height:14px;border-radius:2px;z-index:2001;pointer-events:none;will-change:transform;animation:cel-fall linear forwards}
 @keyframes cel-fall{0%{transform:translateY(-14px) rotate(0);opacity:1}100%{transform:translateY(102vh) rotate(760deg);opacity:.85}}
 @media (prefers-reduced-motion:reduce){.cel-key.boom{animation:none!important}.cel-part,.cel-confetti{display:none!important}}
+/* ── Pop-ups de conversion (invité → compte, gratuit → Expert) ── */
+.conv-overlay{position:fixed;inset:0;z-index:2100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(22,20,15,.5);backdrop-filter:blur(6px);animation:cel-fade .25s ease}
+.conv-card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:30px 28px 24px;max-width:440px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(22,20,15,.35);animation:cel-pop .4s cubic-bezier(.2,.9,.3,1.4)}
+.conv-x{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:14px;cursor:pointer;line-height:1}
+.conv-icon{font-size:40px;line-height:1;margin-bottom:8px}
+.conv-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.conv-title{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:5px 0 8px}
+.conv-body{color:var(--muted);font-size:14.5px;line-height:1.55;margin:0 auto 16px;max-width:34ch}
+.conv-feats{list-style:none;margin:0 0 20px;padding:0;display:flex;flex-direction:column;gap:9px;text-align:left;max-width:270px;margin-left:auto;margin-right:auto}
+.conv-feats li{position:relative;padding-left:28px;font-size:14.5px;font-weight:600;color:var(--txt)}
+.conv-feats li::before{content:"✓";position:absolute;left:0;top:-1px;width:19px;height:19px;border-radius:50%;background:rgba(255,77,46,.14);color:var(--accent);font-size:12px;font-weight:800;display:grid;place-items:center}
+.conv-cta{width:100%;font-family:inherit;font-weight:700;font-size:16px;padding:14px;border-radius:13px;cursor:pointer;border:none;background:var(--accent);color:#fff;box-shadow:0 14px 30px -12px var(--accent);transition:transform .12s}
+.conv-cta:active{transform:scale(.98)}
+.conv-later{margin-top:10px;background:none;border:none;color:var(--muted);font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+.conv-later:hover{color:var(--txt)}
 @keyframes _pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 [id^="page-"]{contain:layout style;}
 ._pgAnim{animation:_pgIn .18s ease both}
@@ -1731,6 +1746,69 @@ function _celConfetti(){
   }
 }
 
+/* ── Pop-ups de conversion ────────────────────────────────────────────── */
+function _convToday(){try{return new Date().toISOString().slice(0,10);}catch{return '';}}
+function _convGet(k){try{return localStorage.getItem(k);}catch{return null;}}
+function _convSet(k,v){try{localStorage.setItem(k,v);}catch{}}
+function showConvertPopup(kind,res){
+  if(document.querySelector('.conv-overlay'))return; // jamais deux à la fois
+  const cfg = kind==='guest' ? {
+    icon:'🚀', eyebrow:'Ton essai est prometteur', title:'Crée ton compte gratuit',
+    body:(res?('Beau départ à '+res.wpm+' mots/min ! '):'')+'Débloque les 10 premières leçons et garde ta progression.',
+    feats:['10 leçons gratuites','Suivi de ta progression','Tes records sauvegardés'],
+    cta:'Créer mon compte gratuit',
+    act:()=>openAuth('register','Crée ton compte pour débloquer les 10 leçons gratuites.')
+  } : {
+    icon:'⚡', eyebrow:'Passe au niveau supérieur', title:'Débloque tout avec Expert',
+    body:'Les 65 leçons, tous les jeux et les défis pour progresser bien plus vite et exploser ton score.',
+    feats:['65 leçons complètes','Tous les jeux & défis','Certification de niveau'],
+    cta:'Passer à Expert',
+    act:()=>openModal('upgrade-modal')
+  };
+  const ov=document.createElement('div');ov.className='conv-overlay';
+  ov.innerHTML='<div class="conv-card">'
+    +'<button class="conv-x" data-act="close" aria-label="Fermer">✕</button>'
+    +'<div class="conv-icon">'+cfg.icon+'</div>'
+    +'<div class="conv-eyebrow">'+cfg.eyebrow+'</div>'
+    +'<div class="conv-title">'+cfg.title+'</div>'
+    +'<p class="conv-body">'+cfg.body+'</p>'
+    +'<ul class="conv-feats">'+cfg.feats.map(f=>'<li>'+f+'</li>').join('')+'</ul>'
+    +'<button class="conv-cta" data-act="go">'+cfg.cta+'</button>'
+    +'<button class="conv-later" data-act="close">Plus tard</button>'
+    +'</div>';
+  document.body.appendChild(ov);
+  const close=()=>ov.remove();
+  ov.addEventListener('click',e=>{
+    if(e.target.closest('[data-act=go]')){close();cfg.act();return;}
+    if(e.target===ov||e.target.closest('[data-act=close]'))close();
+  });
+}
+// Invité qui vient de faire le test : proposer la création de compte (1×/jour)
+function maybeConvGuest(res){
+  if(currentUser)return;
+  if(_convGet('kp-conv-guest')===_convToday())return;
+  _convSet('kp-conv-guest',_convToday());
+  setTimeout(()=>showConvertPopup('guest',res),1100);
+}
+// Utilisateur gratuit après un test : proposer Expert (1×/jour, pas au tout 1er test)
+function maybeConvUpsell(res){
+  if(!currentUser||getUserPlan()!=='free'||isTeacher()||isAdmin())return;
+  const nTests=(app.stats&&app.stats.tests)?app.stats.tests.length:0;
+  if(nTests<2)return;
+  if(_convGet('kp-conv-upsell')===_convToday())return;
+  _convSet('kp-conv-upsell',_convToday());
+  setTimeout(()=>showConvertPopup('upgrade',res),1100);
+}
+// Nudge occasionnel pour les comptes gratuits (1× tous les 3 jours, sur Cours/Jeux)
+function maybeConvNudge(v){
+  if(!currentUser||getUserPlan()!=='free'||isTeacher()||isAdmin())return;
+  if(v!=='lessons'&&v!=='games')return;
+  const last=+(_convGet('kp-conv-nudge')||0), now=Date.now();
+  if(now-last<3*86400000)return;
+  _convSet('kp-conv-nudge',String(now));
+  setTimeout(()=>showConvertPopup('upgrade'),1300);
+}
+
 /* ── CURRICULUM ── */
 const FINGERS={lp:'#B7AE9E',lr:'#79C56A',lm:'#E8C13B',li:'#EE6B5E',ri:'#A77BD6',rm:'#E8C13B',rr:'#79C56A',rp:'#B7AE9E',th:'#BCB3A2'};
 const FINGER_LABEL={p:'auriculaire',r:'annulaire',m:'majeur',i:'index'};
@@ -3172,7 +3250,7 @@ const app={
       }
     }
     s.idx++;
-    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats(s);const res=this.computeResult(s);if(currentUser){const _pr=s.mode==='lesson'?this.lessonRec(s.lessonId).bestWpm||0:Math.max(0,...(this.stats?.tests||[]).map(t=>t.wpm));s._prevBestWpm=_pr;}this.recordResult(s.mode,res,s.lessonId,s._gazeStats);if(!currentUser&&s.mode==='test')this._markGuestTest(res.wpm,res.acc);this.renderCurrent();if(s.mode==='lesson'&&!s.cert)celebrateLesson(this.lessonById(s.lessonId),res);if(s.cert)this._finishCertExam(s,res);return;}
+    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats(s);const res=this.computeResult(s);if(currentUser){const _pr=s.mode==='lesson'?this.lessonRec(s.lessonId).bestWpm||0:Math.max(0,...(this.stats?.tests||[]).map(t=>t.wpm));s._prevBestWpm=_pr;}this.recordResult(s.mode,res,s.lessonId,s._gazeStats);if(!currentUser&&s.mode==='test')this._markGuestTest(res.wpm,res.acc);this.renderCurrent();if(s.mode==='lesson'&&!s.cert)celebrateLesson(this.lessonById(s.lessonId),res);if(s.mode==='test'&&!s.cert){if(!currentUser)maybeConvGuest(res);else maybeConvUpsell(res);}if(s.cert)this._finishCertExam(s,res);return;}
     this._patchTypingBox();
   },
   computeResult(s){
@@ -3378,6 +3456,7 @@ const app={
       else if(MOBILE_BLOCKED_VIEWS.indexOf(v)>=0)v=isTeacher()?'home':'stats';
     }
     this.view=v;
+    maybeConvNudge(v);
     if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;}
     if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
     // Vider les pages avec #tb-scroll pour éviter les IDs dupliqués
