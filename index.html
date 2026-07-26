@@ -1641,13 +1641,22 @@ function handleVerificationReturn(){
 async function handlePaymentReturn(){
   const params=new URLSearchParams(location.search);
   if(params.get('payment')==='success'&&currentToken){
-    // Le webhook Stripe peut arriver après la redirection : on réessaie un peu
     let d={};
-    for(let i=0;i<4;i++){
-      const r=await fetch('/api/refresh-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
-      d=await r.json();
-      if(d.plan==='expert')break;
+    const sid=params.get('session_id');
+    // 1) Confirmation directe de la session (indépendante du webhook) : active tout de suite.
+    if(sid){
+      try{
+        const r=await fetch('/api/billing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',token:currentToken,session_id:sid})});
+        d=await r.json();
+      }catch{}
+    }
+    // 2) Repli : le webhook peut confirmer un peu après la redirection, on repolle.
+    for(let i=0;i<4&&d.plan!=='expert';i++){
       await new Promise(rs=>setTimeout(rs,1500));
+      try{
+        const r=await fetch('/api/refresh-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+        d=await r.json();
+      }catch{}
     }
     if(d.plan){
       currentPlan=d.plan;

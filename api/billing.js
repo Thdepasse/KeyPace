@@ -20,8 +20,9 @@ async function sb(path, opts = {}) {
 // Endpoint de facturation unifie.
 // Remplace create-checkout.js et customer-portal.js pour rester sous la
 // limite de 12 fonctions serverless du plan Hobby de Vercel.
-//   POST /api/billing  { action: 'checkout', token }  -> ouvre le paiement
-//   POST /api/billing  { action: 'portal',   token }  -> ouvre le portail client
+//   POST /api/billing  { action: 'checkout', token }              -> ouvre le paiement
+//   POST /api/billing  { action: 'portal',   token }              -> ouvre le portail client
+//   POST /api/billing  { action: 'verify',   token, session_id }  -> confirme le paiement (filet de sécurité, indépendant du webhook)
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -29,20 +30,47 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { action, token } = req.body || {};
+  const { action, token, session_id } = req.body || {};
   if (!token) return res.status(400).json({ error: 'Token manquant.' });
-  if (action !== 'checkout' && action !== 'portal') {
+  if (action !== 'checkout' && action !== 'portal' && action !== 'verify') {
     return res.status(400).json({ error: 'Action inconnue.' });
   }
 
   const r = await sb(
-    `/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,stripe_customer_id`
+    `/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,email,stripe_customer_id`
   );
   const user = r.data && r.data[0];
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const appUrl = (process.env.APP_URL || 'https://keypace.be').trim();
+
+  // ── Confirmation serveur d'un paiement (appelée au retour du checkout) ──
+  // Ne dépend pas du webhook : on interroge Stripe directement.
+  if (action === 'verify') {
+    if (!session_id) return res.status(400).json({ error: 'session_id manquant.' });
+    let cs;
+    try {
+      cs = await stripe.checkout.sessions.retrieve(session_id, { expand: ['subscription'] });
+    } catch (e) {
+      return res.status(400).json({ error: 'Session Stripe introuvable.' });
+    }
+    // Sécurité : la session doit appartenir au client Stripe de cet utilisateur.
+    if (!cs.customer || (user.stripe_customer_id && cs.customer !== user.stripe_customer_id)) {
+      return res.status(403).json({ error: 'Session non associée à ce compte.' });
+    }
+    const sub = cs.subscription;
+    const paid =
+      cs.payment_status === 'paid' ||
+      (sub && (sub.status === 'active' || sub.status === 'trialing'));
+    if (paid) {
+      const patch = { plan: 'expert' };
+      if (!user.stripe_customer_id) patch.stripe_customer_id = cs.customer;
+      await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+      return res.json({ plan: 'expert' });
+    }
+    return res.json({ plan: 'free', pending: true });
+  }
 
   if (action === 'portal') {
     if (!user.stripe_customer_id) {
@@ -55,9 +83,11 @@ module.exports = async function handler(req, res) {
     return res.json({ url: session.url });
   }
 
+  // action === 'checkout'
   let customerId = user.stripe_customer_id;
   if (!customerId) {
     const customer = await stripe.customers.create({
+      email: user.email || undefined,
       metadata: { username: user.username },
     });
     customerId = customer.id;

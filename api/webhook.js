@@ -17,16 +17,40 @@ async function sb(path, opts = {}) {
   return { ok: r.ok, status: r.status, data: text ? JSON.parse(text) : null };
 }
 
-// Vercel: disable body parser to get raw body for Stripe signature verification
+// Lit le corps brut de la requête (nécessaire pour vérifier la signature Stripe).
+// bodyParser désactivé (voir config en bas) => on consomme le flux nous-mêmes.
+function readRawBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', (c) => chunks.push(typeof c === 'string' ? Buffer.from(c) : c));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
+
+// Vercel: bodyParser désactivé pour obtenir le corps brut (signature Stripe)
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const sig = req.headers['stripe-signature'];
 
+  // Corps brut : le flux si bodyParser est bien désactivé, sinon repli sur req.body.
+  let raw;
+  try {
+    raw = await readRawBody(req);
+  } catch (e) {
+    return res.status(400).send('Webhook Error: body read failed');
+  }
+  if ((!raw || !raw.length) && req.body) {
+    raw = Buffer.isBuffer(req.body)
+      ? req.body
+      : Buffer.from(typeof req.body === 'string' ? req.body : JSON.stringify(req.body));
+  }
+
   let event;
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(raw, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
