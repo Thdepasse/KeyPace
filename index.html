@@ -3216,6 +3216,13 @@ const app={
 
   keyMatches(key,ch){if(ch==null)return false;const low=ch.toLowerCase();if(key.l.toLowerCase()===low)return true;if(key.s&&key.s===ch)return true;return false;},
   handleKey(e){
+    // Ne jamais capturer la frappe quand l'utilisateur écrit dans un champ
+    // (connexion/inscription, code promo, nom du certificat, recherche…) :
+    // sinon typeKey() fait preventDefault() et rien ne s'inscrit dans le champ.
+    const t=e.target;
+    if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable))return;
+    // Ni quand une fenêtre modale est ouverte (auth, upgrade, réglages, tuto…).
+    if([...document.querySelectorAll('.modal-overlay,.settings-overlay')].some(m=>m.classList.contains('open')))return;
     if(document.getElementById('lesson-tuto-modal').classList.contains('open'))return;
     // Centralised dead-key composition (^+u→û etc.) for all modes
     if(e.key==='Dead'){this._pendingDeadKey=CODE_TO_DEAD[e.code]||null;return;}
