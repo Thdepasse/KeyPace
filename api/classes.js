@@ -626,25 +626,13 @@ async function legacyJoin(req, res) {
   return res.json({ ok: true, className: cls.name });
 }
 
+// DÉSACTIVÉ (juil. 2026) — cette action de l'ancien modèle jsonb renvoyait les
+// stats de n'importe quel utilisateur par son username, SANS vérifier son
+// appartenance à la classe de l'appelant (fuite inter-établissement). Le suivi
+// élève passe désormais par `student-detail`, correctement autorisé
+// (loadClassForManage). L'action est neutralisée ; le client ne l'utilise plus.
 async function legacyStudentStats(req, res) {
-  const { token, username } = req.body || {};
-  if (!token || !username) return res.status(400).json({ error: 'Champs manquants.' });
-  const cR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,plan`);
-  const caller = cR.data && cR.data[0];
-  if (!caller) return res.status(401).json({ error: 'Non autorisé.' });
-  const cp = await sb(`/progress?user_id=eq.${caller.id}&select=data`);
-  const cData = cp.data && cp.data[0] && cp.data[0].data;
-  if (!cData || cData.role !== 'etablissement') return res.status(403).json({ error: 'Accès réservé aux comptes établissement.' });
-  const sR = await sb(`/users?username=eq.${encodeURIComponent(username)}&select=id`);
-  const student = sR.data && sR.data[0];
-  if (!student) return res.status(404).json({ error: 'Élève introuvable.' });
-  const pr = await sb(`/progress?user_id=eq.${student.id}&select=data`);
-  const data = pr.data && pr.data[0] && pr.data[0].data;
-  if (!data || !(data.tests || []).length) return res.json({ wpm: null, acc: null, tests: 0 });
-  const slice = data.tests.slice(-10);
-  const wpm = Math.round(slice.reduce((a, t) => a + (t.wpm || 0), 0) / slice.length);
-  const acc = Math.round(slice.reduce((a, t) => a + (t.acc || 0), 0) / slice.length);
-  return res.json({ wpm, acc, tests: data.tests.length });
+  return res.status(410).json({ error: 'Action dépréciée. Utilise le suivi de classe.' });
 }
 
 const AUDIO_BUCKET = 'dictation-audio';
@@ -653,7 +641,7 @@ const MAX_AUDIO_PER_TEACHER = 10;
 async function audioUpload(req, res) {
   const user = await userFromToken(req.body.token);
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
-  if (user.role !== 'teacher' && user.plan !== 'expert') {
+  if (!canActAsTeacher(user)) {
     return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
   }
   const { audioBase64, mimeType = 'audio/webm', prevPath } = req.body;
@@ -903,6 +891,7 @@ module.exports = async function handler(req, res) {
       default: return res.status(400).json({ error: 'Action inconnue.' });
     }
   } catch (e) {
+    console.error('classes handler error [action=' + action + ']:', e);
     return res.status(500).json({ error: 'Erreur serveur.' });
   }
 };

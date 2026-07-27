@@ -230,3 +230,18 @@ create table if not exists certificates (
 );
 create index if not exists certificates_code_idx on certificates(code);
 alter table certificates enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Sécurité & RGPD (juil. 2026)
+-- Anti-bruteforce : verrouillage temporaire du compte après trop d'échecs.
+-- Consentement / mineurs : trace du consentement, âge, email du responsable.
+-- Les mots de passe sont désormais stockés au format scrypt salé
+-- (password_hash reste text ; migration transparente au prochain login).
+-- ───────────────────────────────────────────────────────────────
+alter table users
+  add column if not exists failed_attempts integer default 0,
+  add column if not exists locked_until timestamptz,
+  add column if not exists consent_at timestamptz,
+  add column if not exists terms_version text,
+  add column if not exists birthdate date,
+  add column if not exists parent_email text;

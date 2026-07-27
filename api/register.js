@@ -1,4 +1,5 @@
 const { Resend } = require('resend');
+const { hashPassword, verifyPassword } = require('./_auth');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -160,8 +161,10 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { username, email, passwordHash, institutionId, institutionPasswordHash, profInviteToken } = req.body || {};
+  const { username, email, passwordHash, institutionId, institutionPasswordHash, profInviteToken, consent, birthdate, parentEmail } = req.body || {};
   if (!username || !passwordHash || !email) return res.status(400).json({ error: 'Champs manquants.' });
+  const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+  if (!emailRe.test(String(email))) return res.status(400).json({ error: 'Adresse email invalide.' });
 
   const check = await sb(`/users?username=eq.${encodeURIComponent(username)}&select=id`);
   if (check.data && check.data.length > 0) return res.status(409).json({ error: 'Ce nom est déjà pris.' });
@@ -200,7 +203,7 @@ module.exports = async function handler(req, res) {
     const instR = await sb(`/institutions?id=eq.${encodeURIComponent(institutionId)}&select=*`);
     institution = instR.data && instR.data[0];
     if (!institution) return res.status(404).json({ error: 'Établissement introuvable.' });
-    if (institution.password_hash !== institutionPasswordHash)
+    if (!verifyPassword(institutionPasswordHash, institution.password_hash).ok)
       return res.status(401).json({ error: 'Mot de passe établissement incorrect.' });
   }
 
@@ -213,6 +216,32 @@ module.exports = async function handler(req, res) {
       return res.status(403).json({ error: 'Plus de places disponibles pour cet établissement.' });
   }
 
+  // RGPD mineurs : pour une inscription INDIVIDUELLE, consentement obligatoire et
+  // vérification d'âge. Les élèves rattachés à un établissement relèvent de la
+  // base légale de l'école (couverte par l'accord de sous-traitance).
+  const consentAt = new Date().toISOString();
+  let birthdateVal = null;
+  let parentEmailVal = null;
+  if (!institution) {
+    if (consent !== true) {
+      return res.status(400).json({ error: 'Tu dois accepter les conditions et la politique de confidentialité pour créer un compte.' });
+    }
+    const bd = (birthdate || '').trim();
+    if (bd) {
+      const d = new Date(bd);
+      if (isNaN(d.getTime())) return res.status(400).json({ error: 'Date de naissance invalide.' });
+      birthdateVal = bd;
+      const age = Math.floor((Date.now() - d.getTime()) / 31557600000); // ~365,25 j
+      if (age < 13) {
+        const pe = (parentEmail || '').trim();
+        if (!emailRe.test(pe)) {
+          return res.status(400).json({ error: "En dessous de 13 ans, l'accord d'un responsable légal est requis : indique son adresse email." });
+        }
+        parentEmailVal = pe;
+      }
+    }
+  }
+
   const token = require('crypto').randomUUID();
   const verificationToken = require('crypto').randomBytes(32).toString('hex');
   const verificationExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
@@ -223,12 +252,16 @@ module.exports = async function handler(req, res) {
     body: JSON.stringify({
       username,
       email,
-      password_hash: passwordHash,
+      password_hash: hashPassword(passwordHash),
       plan,
       session_token: token,
       email_verified: false,
       verification_token: verificationToken,
       verification_expires_at: verificationExpiresAt,
+      consent_at: consentAt,
+      terms_version: 'v1',
+      ...(birthdateVal ? { birthdate: birthdateVal } : {}),
+      ...(parentEmailVal ? { parent_email: parentEmailVal } : {}),
       ...(institution ? { institution_id: institution.id } : {}),
       ...(isProf ? { role: 'prof' } : {}),
     }),

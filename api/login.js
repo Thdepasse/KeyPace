@@ -1,4 +1,5 @@
 const { Resend } = require('resend');
+const { hashPassword, verifyPassword } = require('./_auth');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -66,6 +67,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
+  try {
   const body = req.body || {};
 
   // — Demande de réinitialisation de mot de passe
@@ -115,10 +117,12 @@ module.exports = async function handler(req, res) {
     await sb(`/users?id=eq.${user.id}`, {
       method: 'PATCH',
       body: JSON.stringify({
-        password_hash: newPasswordHash,
+        password_hash: hashPassword(newPasswordHash),
         verification_token: null,
         verification_expires_at: null,
         session_token: newSession,
+        failed_attempts: 0,
+        locked_until: null,
       }),
     });
 
@@ -170,7 +174,7 @@ module.exports = async function handler(req, res) {
     const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,password_hash`);
     const user = uR.data && uR.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
-    if (user.password_hash !== passwordHash) return res.status(401).json({ error: 'Mot de passe incorrect.' });
+    if (!verifyPassword(passwordHash, user.password_hash).ok) return res.status(401).json({ error: 'Mot de passe incorrect.' });
     // Les FK on delete cascade nettoient progress, class_members, scores, etc.
     await sb(`/users?id=eq.${user.id}`, { method: 'DELETE' });
     return res.json({ ok: true });
@@ -206,17 +210,33 @@ module.exports = async function handler(req, res) {
   const r = await sb(`/users?username=eq.${encodeURIComponent(username)}&select=*`);
   const user = r.data && r.data[0];
   if (!user) return res.status(401).json({ error: 'Utilisateur introuvable.' });
-  if (user.password_hash !== passwordHash) return res.status(401).json({ error: 'Mot de passe incorrect.' });
+
+  // Anti-bruteforce : compte temporairement verrouillé après trop d'échecs.
+  if (user.locked_until && new Date(user.locked_until) > new Date()) {
+    return res.status(429).json({ error: 'Trop de tentatives. Réessaie dans quelques minutes.' });
+  }
+
+  const check = verifyPassword(passwordHash, user.password_hash);
+  if (!check.ok) {
+    const attempts = (user.failed_attempts || 0) + 1;
+    const patch = { failed_attempts: attempts };
+    if (attempts >= 5) { patch.locked_until = new Date(Date.now() + 15 * 60 * 1000).toISOString(); patch.failed_attempts = 0; }
+    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+    return res.status(401).json({ error: 'Mot de passe incorrect.' });
+  }
   if (user.verification_token) return res.status(403).json({ error: 'Confirme ton adresse email avant de te connecter. Vérifie ta boîte mail.', code: 'EMAIL_NOT_VERIFIED' });
 
   const token = require('crypto').randomUUID();
-  await sb(`/users?id=eq.${user.id}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ session_token: token }),
-  });
+  const patch = { session_token: token, failed_attempts: 0, locked_until: null };
+  if (check.upgrade) patch.password_hash = check.upgrade; // migration SHA-256 brut -> scrypt
+  await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
 
   const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
   const progress = pr.data && pr.data[0];
 
   res.json({ id: user.id, username: user.username, plan: user.plan, role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, token, data: progress?.data || {} });
+  } catch (e) {
+    console.error('login handler error:', e);
+    return res.status(500).json({ error: 'Erreur serveur.' });
+  }
 };
