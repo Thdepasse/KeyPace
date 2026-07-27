@@ -1538,7 +1538,14 @@ function isAdmin(){return (typeof app!=='undefined')&&app.stats&&app.stats.role=
    Taper au clavier n'a pas de sens sur téléphone : Test, Cours et Jeux sont
    retirés. Il reste : la landing (visiteur), les progrès (élève) et l'espace
    classes (élève : devoirs / prof et établissement : suivi). */
-function isMobileLayout(){return window.matchMedia('(max-width:768px)').matches;}
+// Version réduite (téléphone) réservée aux vrais écrans tactiles étroits SANS
+// pointeur précis. Les tablettes/iPad équipés d'un clavier ou d'un trackpad —
+// comme les ordinateurs — exposent un pointeur « fine » et gardent donc
+// l'expérience KeyPace complète (Test, Cours, Jeux…), même en portrait ≤768px.
+function isMobileLayout(){
+  return window.matchMedia('(max-width:768px)').matches
+      && !window.matchMedia('(any-pointer:fine)').matches;
+}
 const MOBILE_BLOCKED_VIEWS=['test','lessons','games'];
 function applyMobileNav(){
   if(!isMobileLayout())return;
