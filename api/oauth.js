@@ -174,6 +174,10 @@ async function findOrCreateUser(provider, profile) {
       email_verified: true,
       verification_token: null,
       oauth_provider: provider,
+      // Consentement tracé à la création (l'utilisateur passe par l'écran de
+      // consentement du fournisseur + accepte nos conditions liées au bouton SSO).
+      consent_at: new Date().toISOString(),
+      terms_version: 'v1',
       ...(institution ? { institution_id: institution.id } : {}),
     }),
   });

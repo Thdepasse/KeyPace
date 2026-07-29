@@ -1336,13 +1336,13 @@ async function authSubmit(){
       if(password!==confirm){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Les mots de passe ne correspondent pas.');}
       if(password.length<6){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Mot de passe trop court (6 caractères min).');}
       if(!email||!email.includes('@')){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Entre une adresse email valide.');}
-      // RGPD : consentement obligatoire + email d'un parent si moins de 13 ans.
+      // RGPD : consentement obligatoire côté client. La règle « email d'un parent
+      // si < 13 ans » est appliquée par le SERVEUR : il l'exige pour une inscription
+      // individuelle et l'ignore pour un élève d'établissement (base légale de l'école),
+      // ce que le client ne peut pas déterminer (il ne connaît pas les domaines scolaires).
       if(!document.getElementById('auth-consent').checked){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Tu dois accepter les conditions et la politique de confidentialité.');}
       const birth=document.getElementById('auth-birth').value||'';
       const parentEmail=(document.getElementById('auth-parent').value||'').trim().toLowerCase();
-      let under13=false;
-      if(birth){const bd=new Date(birth);if(!isNaN(bd.getTime())){under13=Math.floor((Date.now()-bd.getTime())/31557600000)<13;}}
-      if(under13&&(!parentEmail||!parentEmail.includes('@'))){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError("En dessous de 13 ans, indique l'email d'un responsable légal.");}
       // Le rattachement à un établissement se fait automatiquement via le domaine de l'email scolaire (côté serveur).
       const body={username,email,passwordHash,consent:true};
       if(birth)body.birthdate=birth;
