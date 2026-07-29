@@ -22,6 +22,17 @@ async function sb(path, opts = {}) {
   return { ok: r.ok, status: r.status, data: text ? JSON.parse(text) : null };
 }
 
+// Plan réellement accordé : un élève d'établissement dont la licence a expiré
+// repasse en 'free' (sans écrire en base : renouveler la licence le réactive).
+async function effectivePlan(user) {
+  if (user && user.institution_id && user.plan === 'expert') {
+    const li = await sb(`/institutions?id=eq.${user.institution_id}&select=license_expires_at`);
+    const inst = li.data && li.data[0];
+    if (inst && inst.license_expires_at && new Date(inst.license_expires_at) < new Date()) return 'free';
+  }
+  return user ? user.plan : 'free';
+}
+
 function resetEmail(username, resetUrl) {
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -200,7 +211,7 @@ module.exports = async function handler(req, res) {
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
     const progress = pr.data && pr.data[0];
-    return res.json({ id: user.id, username: user.username, plan: user.plan, role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, token, data: progress?.data || {} });
+    return res.json({ id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, token, data: progress?.data || {} });
   }
 
   // — Connexion normale
@@ -234,7 +245,7 @@ module.exports = async function handler(req, res) {
   const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
   const progress = pr.data && pr.data[0];
 
-  res.json({ id: user.id, username: user.username, plan: user.plan, role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, token, data: progress?.data || {} });
+  res.json({ id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, token, data: progress?.data || {} });
   } catch (e) {
     console.error('login handler error:', e);
     return res.status(500).json({ error: 'Erreur serveur.' });

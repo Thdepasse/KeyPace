@@ -161,6 +161,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
+  try {
   const { username, email, passwordHash, institutionId, institutionPasswordHash, profInviteToken, consent, birthdate, parentEmail } = req.body || {};
   if (!username || !passwordHash || !email) return res.status(400).json({ error: 'Champs manquants.' });
   const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -205,6 +206,11 @@ module.exports = async function handler(req, res) {
     if (!institution) return res.status(404).json({ error: 'Établissement introuvable.' });
     if (!verifyPassword(institutionPasswordHash, institution.password_hash).ok)
       return res.status(401).json({ error: 'Mot de passe établissement incorrect.' });
+  }
+
+  // Licence établissement expirée : plus aucune inscription rattachée possible.
+  if (institution && institution.license_expires_at && new Date(institution.license_expires_at) < new Date()) {
+    return res.status(403).json({ error: "La licence de cet établissement a expiré. Contacte ton établissement pour la renouveler." });
   }
 
   // Contrôle des places disponibles (élèves uniquement ; un prof invité ne
@@ -305,4 +311,8 @@ module.exports = async function handler(req, res) {
     data: {},
     emailPending: true,
   });
+  } catch (e) {
+    console.error('register handler error:', e);
+    return res.status(500).json({ error: 'Erreur serveur.' });
+  }
 };

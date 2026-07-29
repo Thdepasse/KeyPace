@@ -552,6 +552,8 @@ async function certExamPass(req, res) {
   if (gaze < CERT_MIN_GAZE) return res.status(400).json({ error: `Regard sur l'écran insuffisant (${gaze}% < ${CERT_MIN_GAZE}%). Refais l'examen en gardant les yeux sur l'écran.`, code: 'GAZE' });
   if (acc < CERT_MIN_ACC) return res.status(400).json({ error: `Précision insuffisante (${acc}% < ${CERT_MIN_ACC}%).`, code: 'ACC' });
   if (wpm < CERT_MIN_WPM) return res.status(400).json({ error: `Vitesse insuffisante (${wpm} < ${CERT_MIN_WPM} mpm).`, code: 'WPM' });
+  // Borne de plausibilité (anti-forge) : au-delà, la valeur est rejetée.
+  if (wpm > 250 || acc > 100 || gaze > 100) return res.status(400).json({ error: 'Valeurs de résultat invalides.', code: 'INVALID' });
 
   const exR = await sb(`/certificates?user_id=eq.${user.id}&select=*`);
   const ex = exR.data && exR.data[0];

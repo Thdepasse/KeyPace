@@ -245,3 +245,8 @@ alter table users
   add column if not exists terms_version text,
   add column if not exists birthdate date,
   add column if not exists parent_email text;
+
+-- Licence établissement : échéance de renouvellement. Null = pas d'expiration
+-- (compat licences existantes). À l'expiration, les élèves rattachés repassent
+-- en 'free' au prochain login et les nouvelles inscriptions sont bloquées.
+alter table institutions add column if not exists license_expires_at timestamptz;
