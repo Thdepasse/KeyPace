@@ -3,3 +3,6 @@
 .env.supabase
 node_modules/
 game-server/dist/
+
+# Workflows CI gérés via GitHub web (le token PAT n'a pas le scope workflow)
+.github/workflows/
