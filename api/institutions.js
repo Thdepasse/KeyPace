@@ -1,13 +1,23 @@
 // GET → liste des établissements
-// POST (x-admin-key header) → créer un établissement
+// POST (x-admin-key header) → créer un établissement (+ lien d'invitation admin optionnel)
 // POST (body.action=contact) → formulaire de contact licence
 const { Resend } = require('resend');
+const crypto = require('crypto');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 const ADMIN_KEY = process.env.ADMIN_KEY;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL || 'KeyPace <noreply@keypace.be>';
+const APP_URL = (process.env.APP_URL || 'https://keypace.be').trim();
+
+// Même format que genInviteCode() dans api/classes.js (12 caractères, alphabet sans ambiguïté).
+function genInviteToken() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let t = '';
+  for (let i = 0; i < 12; i++) t += chars[Math.floor(Math.random() * chars.length)];
+  return t;
+}
 
 async function sb(path, opts = {}) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
@@ -44,7 +54,7 @@ module.exports = async function handler(req, res) {
     if (!ADMIN_KEY || req.headers['x-admin-key'] !== ADMIN_KEY)
       return res.status(401).json({ error: 'Non autorisé.' });
 
-    const { name, slug, passwordHash, seatCount } = req.body || {};
+    const { name, slug, passwordHash, seatCount, adminEmail } = req.body || {};
     if (!name || !slug || !passwordHash || !seatCount)
       return res.status(400).json({ error: 'Champs manquants (name, slug, passwordHash, seatCount).' });
     if (typeof seatCount !== 'number' || seatCount < 1)
@@ -59,7 +69,26 @@ module.exports = async function handler(req, res) {
       body: JSON.stringify({ name, slug, password_hash: passwordHash, seat_count: seatCount }),
     });
     if (!create.ok) return res.status(500).json({ error: 'Erreur création établissement.' });
-    return res.status(201).json(create.data[0]);
+    const institution = create.data[0];
+
+    // Bootstrap du tout premier compte établissement (role='admin') : sans ça,
+    // il n'existe aucun chemin produit pour créer ce rôle (seul un admin déjà
+    // existant peut inviter via prof-invite-create, chicken-and-egg). Génère
+    // un lien d'invitation ?prof=TOKEN réutilisant le flux d'inscription
+    // standard (register.js), avec role='admin' porté par l'invitation.
+    let adminInvite = null;
+    if (adminEmail) {
+      for (let i = 0; i < 5; i++) {
+        const token = genInviteToken();
+        const r = await sb('/prof_invites', {
+          method: 'POST',
+          body: JSON.stringify({ institution_id: institution.id, email: adminEmail, token, role: 'admin' }),
+        });
+        if (r.ok && r.data && r.data[0]) { adminInvite = { token, url: `${APP_URL}/?prof=${token}` }; break; }
+      }
+    }
+
+    return res.status(201).json({ ...institution, adminInvite });
   }
 
   // POST action=contact → formulaire de contact licence
