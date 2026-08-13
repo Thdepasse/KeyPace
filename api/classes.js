@@ -2,8 +2,10 @@
 // Tout passe par la clé service (RLS deny-anon). Logique pure dans _class-logic.
 const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary,
   essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats } = require('./_class-logic');
+const { hashPassword } = require('./_auth');
 
 const crypto = require('crypto');
+function sha256hex(s) { return crypto.createHash('sha256').update(s, 'utf8').digest('hex'); }
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 // Secret de signature des certificats (réutilise le secret OAuth déjà en place).
@@ -164,6 +166,78 @@ async function classDetail(req, res) {
   const datas = members.map((m) => pmap[m.student_id] || {});
   const students = members.map((m, i) => ({ studentId: m.student_id, username: m.username, joinedAt: m.joined_at, ...studentSummary(datas[i], now) }));
   return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now) });
+}
+
+// Import CSV : jusqu'ici les élèves devaient s'inscrire un par un via lien
+// (limite documentée dans la FAQ établissement : "sur notre roadmap"). Crée
+// un compte par ligne + ajoute directement à la classe. Un mot de passe
+// temporaire est généré par élève et renvoyé UNE SEULE FOIS dans la réponse
+// (jamais stocké en clair, seul son hash scrypt l'est) — au prof de le
+// communiquer. Même contrôle de sièges licenciés qu'une inscription normale.
+async function bulkImportStudents(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const { cls, error, status } = await loadClassForManage(user, req.body.classId);
+  if (error) return res.status(status).json({ error });
+
+  const rows = Array.isArray(req.body.students) ? req.body.students.slice(0, 200) : [];
+  if (!rows.length) return res.status(400).json({ error: 'Aucun élève à importer.' });
+
+  let institution = null;
+  if (user.institution_id) {
+    const instR = await sb(`/institutions?id=eq.${user.institution_id}&select=*`);
+    institution = instR.data && instR.data[0];
+  }
+  let seatsUsed = 0;
+  if (institution) {
+    const seatsR = await sb(`/users?institution_id=eq.${user.institution_id}&role=eq.eleve&select=id`);
+    seatsUsed = seatsR.data ? seatsR.data.length : 0;
+  }
+
+  const results = [];
+  for (const row of rows) {
+    const username = String(row.username || '').trim().toLowerCase();
+    const email = String(row.email || '').trim().toLowerCase() || null;
+    if (!username) { results.push({ username: row.username || '(vide)', status: 'error', reason: "Nom d'utilisateur manquant." }); continue; }
+    if (institution && seatsUsed >= institution.seat_count) { results.push({ username, status: 'error', reason: 'Plus de places disponibles sur la licence.' }); continue; }
+
+    const dupU = await sb(`/users?username=eq.${encodeURIComponent(username)}&select=id`);
+    if (dupU.data && dupU.data.length) { results.push({ username, status: 'skipped', reason: "Nom d'utilisateur déjà pris." }); continue; }
+    if (email) {
+      const dupE = await sb(`/users?email=eq.${encodeURIComponent(email)}&select=id`);
+      if (dupE.data && dupE.data.length) { results.push({ username, status: 'skipped', reason: 'Email déjà utilisé.' }); continue; }
+    }
+
+    // 8 caractères lisibles (même alphabet que les codes d'invitation).
+    const tempPassword = genInviteCode().slice(0, 4) + genInviteCode().slice(0, 4);
+    // Reproduit exactement ce que fait le client normalement (sha256 du mot de
+    // passe) avant le re-hachage scrypt côté serveur — sinon le mot de passe
+    // temporaire ne fonctionnerait pas au premier login (formulaire standard).
+    const passwordHash = hashPassword(sha256hex(tempPassword));
+
+    const createR = await sb('/users', {
+      method: 'POST',
+      body: JSON.stringify({
+        username,
+        ...(email ? { email } : {}),
+        password_hash: passwordHash,
+        plan: institution ? 'expert' : 'free',
+        email_verified: true, // créé par l'enseignant, rien à confirmer (même base légale que le rattachement par domaine)
+        consent_at: new Date().toISOString(),
+        terms_version: 'v1',
+        ...(institution ? { institution_id: institution.id, role: 'eleve' } : {}),
+      }),
+    });
+    const newUser = createR.data && createR.data[0];
+    if (!newUser) { results.push({ username, status: 'error', reason: 'Erreur de création.' }); continue; }
+
+    await sb('/progress', { method: 'POST', body: JSON.stringify({ user_id: newUser.id, data: {} }) });
+    await sb('/class_members', { method: 'POST', body: JSON.stringify({ class_id: cls.id, student_id: newUser.id }) });
+    if (institution) seatsUsed++;
+    results.push({ username, status: 'created', tempPassword });
+  }
+
+  return res.json({ results });
 }
 
 /* ── Détail d'un élève (pour le prof qui gère la classe) ── */
@@ -414,8 +488,13 @@ async function adminOverview(req, res) {
   const { user, error, status } = await adminFromToken(req.body.token);
   if (error) return res.status(status).json({ error });
 
-  const instR = await sb(`/institutions?id=eq.${user.institution_id}&select=id,name,slug,seat_count`);
+  const instR = await sb(`/institutions?id=eq.${user.institution_id}&select=id,name,slug,seat_count,license_expires_at`);
   const institution = (instR.data && instR.data[0]) || null;
+
+  // Sièges consommés = élèves rattachés (même règle que le contrôle à
+  // l'inscription dans register.js) — invisible jusqu'ici dans le dashboard.
+  const seatsUsedR = await sb(`/users?institution_id=eq.${user.institution_id}&role=eq.eleve&archived=eq.false&select=id`);
+  const seatsUsed = Array.isArray(seatsUsedR.data) ? seatsUsedR.data.length : 0;
 
   const profsR = await sb(`/users?institution_id=eq.${user.institution_id}&role=eq.prof&archived=eq.false&select=id,username&order=username.asc`);
   const profs = Array.isArray(profsR.data) ? profsR.data : [];
@@ -439,6 +518,7 @@ async function adminOverview(req, res) {
 
   return res.json({
     institution,
+    seatsUsed,
     profs: institutionProfSummary(profEntries, now),
     global: aggregateClass(allData, now),
     series: dailySeries(allData, now),
@@ -861,6 +941,7 @@ module.exports = async function handler(req, res) {
       case 'class-rename': return await classRename(req, res);
       case 'class-archive': return await classArchive(req, res);
       case 'class-detail': return await classDetail(req, res);
+      case 'bulk-import-students': return await bulkImportStudents(req, res);
       case 'student-detail': return await studentDetail(req, res);
       case 'join-code': return await joinByCode(req, res);
       case 'my-classes': return await myClasses(req, res);

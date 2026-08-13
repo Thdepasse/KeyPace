@@ -40,6 +40,19 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,X-Admin-Key');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  // GET ?domain=xxx.be → l'inscription vérifie si l'email saisi correspond à un
+  // établissement partenaire, pour afficher un signal visible ("compte rattaché
+  // à ..."). Ne renvoie que le nom, jamais les sièges/licence/mot de passe.
+  const domainParam = req.method === 'GET'
+    ? ((req.query && req.query.domain) || new URL(req.url, `https://${req.headers.host}`).searchParams.get('domain'))
+    : null;
+  if (domainParam) {
+    const domain = String(domainParam).toLowerCase().trim();
+    const r = await sb(`/institutions?domains=cs.{"${domain}"}&select=name`);
+    const inst = r.data && r.data[0];
+    return res.json({ matched: !!inst, name: inst ? inst.name : null });
+  }
+
   // GET → liste
   if (req.method === 'GET') {
     const r = await sb('/institutions?select=id,name,slug&order=name.asc');
