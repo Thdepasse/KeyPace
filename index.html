@@ -1289,6 +1289,7 @@ const SOUND_FILES={
   hit:'/sounds/hit.mp3',
   miss:'/sounds/miss.mp3',
   record:'/sounds/record.mp3',
+  levelup:'/sounds/levelup.mp3',
   victory:'/sounds/victory.mp3',
   defeat:'/sounds/defeat.mp3',
   countdown:'/sounds/countdown.mp3',
@@ -3552,7 +3553,7 @@ const app={
       <div class="tb-speed">Vitesse : ${speeds[idx]||''}</div>
     </div>`;
     (arena||document.body).appendChild(el);
-    this._celebrateGame();
+    this._celebrateGame(null,'levelup');
     // Resume game loop after banner fades out
     setTimeout(()=>{
       el.style.transition='opacity .5s';el.style.opacity='0';
@@ -3743,8 +3744,9 @@ const app={
   // Confetti/particules déjà utilisés pour la fin de leçon (_celConfetti/_celBurst,
   // 100% génériques) — jamais réutilisés par les jeux jusqu'ici. selEl optionnel :
   // élément depuis lequel une salve de particules part en plus des confettis.
-  _celebrateGame(selEl){
-    playSound('record'); // le son n'est pas soumis à prefers-reduced-motion
+  // sound : 'record' (défaut, record perso) | 'levelup' (palier/niveau débloqué) | 'victory'.
+  _celebrateGame(selEl,sound){
+    playSound(sound||'record'); // le son n'est pas soumis à prefers-reduced-motion
     if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
     try{_celConfetti();}catch{}
     if(selEl){try{const el=document.querySelector(selEl);if(el)_celBurst(el);}catch{}}
@@ -4903,7 +4905,8 @@ const app={
       // Confettis : premier passage d'un niveau (débloque le suivant) ou
       // amélioration de médaille (bronze→argent→or) — un "palier franchi" à
       // chaque fois, jamais célébré jusqu'ici.
-      if(!wasUnlocked||newTierRank>prevTierRank)this._celebrateGame();
+      if(!wasUnlocked)this._celebrateGame(null,'levelup');
+      else if(newTierRank>prevTierRank)this._celebrateGame(null,'record');
     }
     this.renderSouris();
   },
@@ -6038,7 +6041,7 @@ const app={
       if(d.oppForfeit&&!d.oppFinished)d.winner=d.role;
       else d.winner=(d.myFinishMs<=d.oppFinishMs)?d.role:(d.role==='host'?'guest':'host');
       d.phase='result';this.stopDuelLoop();this.renderCurrent();
-      if(d.winner===d.role)this._celebrateGame();else if(d.winner!=='draw')playSound('defeat');
+      if(d.winner===d.role)this._celebrateGame(null,'victory');else if(d.winner!=='draw')playSound('defeat');
     }
   },
   duelLeave(){
