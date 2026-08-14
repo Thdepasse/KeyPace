@@ -48,7 +48,7 @@ module.exports = async function handler(req, res) {
     : null;
   if (domainParam) {
     const domain = String(domainParam).toLowerCase().trim();
-    const r = await sb(`/institutions?domains=cs.{"${domain}"}&select=name`);
+    const r = await sb(`/institutions?domains=cs.{"${encodeURIComponent(domain)}"}&select=name`);
     const inst = r.data && r.data[0];
     return res.json({ matched: !!inst, name: inst ? inst.name : null });
   }

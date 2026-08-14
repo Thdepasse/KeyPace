@@ -188,53 +188,85 @@ async function bulkImportStudents(req, res) {
     const instR = await sb(`/institutions?id=eq.${user.institution_id}&select=*`);
     institution = instR.data && instR.data[0];
   }
+  // Même garde que l'inscription normale (api/register.js) : une licence
+  // expirée bloque tout nouveau rattachement, y compris par import CSV.
+  if (institution && institution.license_expires_at && new Date(institution.license_expires_at) < new Date()) {
+    return res.status(403).json({ error: "La licence de cet établissement a expiré. Contacte ton établissement pour la renouveler." });
+  }
   let seatsUsed = 0;
   if (institution) {
-    const seatsR = await sb(`/users?institution_id=eq.${user.institution_id}&role=eq.eleve&select=id`);
+    // archived=eq.false : un élève archivé libère son siège (même filtre que
+    // le tableau de bord établissement, qui montre ce siège comme disponible).
+    const seatsR = await sb(`/users?institution_id=eq.${user.institution_id}&role=eq.eleve&archived=eq.false&select=id`);
     seatsUsed = seatsR.data ? seatsR.data.length : 0;
   }
 
+  // Normalise chaque ligne en mémoire, puis vérifie les doublons en un seul
+  // aller-retour par colonne (au lieu d'un aller-retour par ligne) : sur un
+  // import de 200 élèves, ça remplace ~800 requêtes séquentielles par 2.
+  const normalized = rows.map((row) => ({
+    rawUsername: row.username,
+    username: String(row.username || '').trim().toLowerCase(),
+    email: String(row.email || '').trim().toLowerCase() || null,
+  }));
+  const candidateUsernames = [...new Set(normalized.filter((n) => n.username).map((n) => n.username))];
+  const candidateEmails = [...new Set(normalized.filter((n) => n.email).map((n) => n.email))];
+  const [dupUR, dupER] = await Promise.all([
+    candidateUsernames.length
+      ? sb(`/users?username=in.(${candidateUsernames.map(encodeURIComponent).join(',')})&select=username`)
+      : Promise.resolve({ data: [] }),
+    candidateEmails.length
+      ? sb(`/users?email=in.(${candidateEmails.map(encodeURIComponent).join(',')})&select=email`)
+      : Promise.resolve({ data: [] }),
+  ]);
+  const takenUsernames = new Set((dupUR.data || []).map((u) => u.username));
+  const takenEmails = new Set((dupER.data || []).map((u) => u.email));
+
   const results = [];
-  for (const row of rows) {
-    const username = String(row.username || '').trim().toLowerCase();
-    const email = String(row.email || '').trim().toLowerCase() || null;
-    if (!username) { results.push({ username: row.username || '(vide)', status: 'error', reason: "Nom d'utilisateur manquant." }); continue; }
-    if (institution && seatsUsed >= institution.seat_count) { results.push({ username, status: 'error', reason: 'Plus de places disponibles sur la licence.' }); continue; }
+  const toCreate = [];
+  const seenUsernames = new Set(), seenEmails = new Set();
+  for (const n of normalized) {
+    const { username, email } = n;
+    if (!username) { results.push({ username: n.rawUsername || '(vide)', status: 'error', reason: "Nom d'utilisateur manquant." }); continue; }
+    if (institution && seatsUsed + toCreate.length >= institution.seat_count) { results.push({ username, status: 'error', reason: 'Plus de places disponibles sur la licence.' }); continue; }
+    if (takenUsernames.has(username) || seenUsernames.has(username)) { results.push({ username, status: 'skipped', reason: "Nom d'utilisateur déjà pris." }); continue; }
+    if (email && (takenEmails.has(email) || seenEmails.has(email))) { results.push({ username, status: 'skipped', reason: 'Email déjà utilisé.' }); continue; }
 
-    const dupU = await sb(`/users?username=eq.${encodeURIComponent(username)}&select=id`);
-    if (dupU.data && dupU.data.length) { results.push({ username, status: 'skipped', reason: "Nom d'utilisateur déjà pris." }); continue; }
-    if (email) {
-      const dupE = await sb(`/users?email=eq.${encodeURIComponent(email)}&select=id`);
-      if (dupE.data && dupE.data.length) { results.push({ username, status: 'skipped', reason: 'Email déjà utilisé.' }); continue; }
-    }
-
+    seenUsernames.add(username);
+    if (email) seenEmails.add(email);
     // 8 caractères lisibles (même alphabet que les codes d'invitation).
     const tempPassword = genInviteCode().slice(0, 4) + genInviteCode().slice(0, 4);
     // Reproduit exactement ce que fait le client normalement (sha256 du mot de
     // passe) avant le re-hachage scrypt côté serveur — sinon le mot de passe
     // temporaire ne fonctionnerait pas au premier login (formulaire standard).
     const passwordHash = hashPassword(sha256hex(tempPassword));
+    toCreate.push({ id: crypto.randomUUID(), username, email, tempPassword, passwordHash });
+  }
 
+  if (toCreate.length) {
     const createR = await sb('/users', {
       method: 'POST',
-      body: JSON.stringify({
-        username,
-        ...(email ? { email } : {}),
-        password_hash: passwordHash,
+      body: JSON.stringify(toCreate.map((u) => ({
+        id: u.id,
+        username: u.username,
+        ...(u.email ? { email: u.email } : {}),
+        password_hash: u.passwordHash,
         plan: institution ? 'expert' : 'free',
         email_verified: true, // créé par l'enseignant, rien à confirmer (même base légale que le rattachement par domaine)
         consent_at: new Date().toISOString(),
         terms_version: 'v1',
         ...(institution ? { institution_id: institution.id, role: 'eleve' } : {}),
-      }),
+      }))),
     });
-    const newUser = createR.data && createR.data[0];
-    if (!newUser) { results.push({ username, status: 'error', reason: 'Erreur de création.' }); continue; }
-
-    await sb('/progress', { method: 'POST', body: JSON.stringify({ user_id: newUser.id, data: {} }) });
-    await sb('/class_members', { method: 'POST', body: JSON.stringify({ class_id: cls.id, student_id: newUser.id }) });
-    if (institution) seatsUsed++;
-    results.push({ username, status: 'created', tempPassword });
+    if (!createR.ok) {
+      toCreate.forEach((u) => results.push({ username: u.username, status: 'error', reason: 'Erreur de création.' }));
+    } else {
+      await Promise.all([
+        sb('/progress', { method: 'POST', body: JSON.stringify(toCreate.map((u) => ({ user_id: u.id, data: {} }))) }),
+        sb('/class_members', { method: 'POST', body: JSON.stringify(toCreate.map((u) => ({ class_id: cls.id, student_id: u.id }))) }),
+      ]);
+      toCreate.forEach((u) => results.push({ username: u.username, status: 'created', tempPassword: u.tempPassword }));
+    }
   }
 
   return res.json({ results });

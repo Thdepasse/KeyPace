@@ -3650,6 +3650,10 @@ const app={
     this.view=v;
     maybeConvNudge(v);
     if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;}
+    // Sans ça, le poll 25s de viewClass() continuait après avoir quitté la vue
+    // "classes" par un onglet de nav (au lieu du bouton ← Retour), et renvoyait
+    // de force l'utilisateur vers la liste des classes à chaque tick.
+    if(v!=='classes'){clearInterval(this._classRefreshTimer);this._classesSub=null;this._classViewingId=null;}
     if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
     // Vider les pages avec #tb-scroll pour éviter les IDs dupliqués
     if(v!=='test')document.getElementById('page-test').innerHTML='';
@@ -3686,13 +3690,17 @@ const app={
   },
 
   /* ── COQUILLE PARTAGÉE DES JEUX ──
-     En-tête et écran de résultat communs aux 8 jeux : avant ce helper, chaque
-     jeu réécrivait son propre HTML d'en-tête et un des trois écrans de
-     résultat différents (overlay sombre, carte claire à grille de stats,
-     stage clair sans grille), avec trois vocabulaires de boutons distincts.
-     Un seul système désormais : bouton .res-btn.pri/.sec partout, résultat
-     toujours sous forme de grille de stats (la famille la plus alignée avec
-     le reste du produit). */
+     En-tête et écran de résultat communs à 6 des 8 jeux (Sprint, Frappe-mots,
+     Tireur, Course, Simon, Boss) : avant ce helper, chaque jeu réécrivait son
+     propre HTML d'en-tête et un des trois écrans de résultat différents
+     (overlay sombre, carte claire à grille de stats, stage clair sans
+     grille), avec trois vocabulaires de boutons distincts. Un seul système
+     désormais pour ces 6 : bouton .res-btn.pri/.sec, résultat en grille de
+     stats. Duel et Visée/Souris gardent volontairement leur propre écran de
+     résultat (vs-adversaire à 2 colonnes pour l'un, paliers médaille pour
+     l'autre — la forme {boxes,primaryLabel,secondaryLabel} ne les couvre pas
+     proprement) ; ne pas forcer leur migration dans ce helper sans d'abord
+     étendre sa forme pour ces deux besoins. */
   _gameHeader(title,emoji,tag){
     const tagHtml=tag==='expert'?'<span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span>'
       :tag==='free'?'<span class="game-sel-tag free" style="margin-left:4px">GRATUIT</span>':'';
@@ -3737,7 +3745,7 @@ const app={
   // chacun séparément. lanes: [{name,emoji,prog,you?}].
   _raceLanesHTML(lanes){
     return `<div class="race-track">${lanes.map(l=>`<div class="race-lane${l.you?' you':''}">
-      <div class="race-lane-name">${l.you?'Toi':l.emoji+' '+l.name}</div>
+      <div class="race-lane-name">${l.you?'Toi':(l.namePrefix===false?l.name:l.emoji+' '+l.name)}</div>
       <div class="race-strip"><div class="race-car" style="left:${Math.round((l.prog||0)*100)}%">${l.emoji}</div></div>
     </div>`).join('')}</div>`;
   },
@@ -5768,6 +5776,18 @@ const app={
     this.stats.bossBest={rank:lb.me.rank,score:lb.me.score,wpm:lb.me.wpm,isoWeek};
     saveStats(this.stats);
   },
+  // Même algorithme que isoWeek() côté serveur (api/_boss-shared.js) — sert
+  // uniquement à savoir si stats.bossBest date de la semaine en cours avant
+  // de l'afficher comme "cette semaine" sur la page Progrès.
+  _currentIsoWeek(){
+    const d=new Date();
+    const date=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));
+    const dayNum=(date.getUTCDay()+6)%7;
+    date.setUTCDate(date.getUTCDate()-dayNum+3);
+    const firstThursday=new Date(Date.UTC(date.getUTCFullYear(),0,4));
+    const week=1+Math.round(((date-firstThursday)/86400000-3+((firstThursday.getUTCDay()+6)%7))/7);
+    return `${date.getUTCFullYear()}-W${String(week).padStart(2,'0')}`;
+  },
   startBossAttempt(){
     const b=this.boss;if(!b||!b.challenge)return;
     this.boss={...b,phase:'playing',text:b.challenge.text,typed:[],correct:0,keystrokes:0,started:false,startTime:0,endTime:0,finished:false};
@@ -6062,7 +6082,8 @@ const app={
     const d=this.duel;if(!d||d.phase==='result')return;
     if(d.finished&&(d.oppFinished||d.oppForfeit)){
       if(d.oppForfeit&&!d.oppFinished)d.winner=d.role;
-      else d.winner=(d.myFinishMs<=d.oppFinishMs)?d.role:(d.role==='host'?'guest':'host');
+      else if(d.myFinishMs===d.oppFinishMs)d.winner='draw';
+      else d.winner=(d.myFinishMs<d.oppFinishMs)?d.role:(d.role==='host'?'guest':'host');
       d.phase='result';this.stopDuelLoop();this.renderCurrent();
       // Duel ne gardait aucune trace après une partie (le jeu le plus social
       // des 8, mais celui avec le moins de raison d'y revenir). Historique
@@ -6112,7 +6133,7 @@ const app={
     const oppName=(d.role==='host'?(d.oppLabel||'Adversaire'):(d.hostLabel||d.oppLabel||'Hôte'));
     return this._raceLanesHTML([
       {name:'Toi',emoji:'🏎️',prog:d.myProg||0,you:true},
-      {name:oppName,emoji:'🚗',prog:d.oppProg||0},
+      {name:oppName,emoji:'🚗',prog:d.oppProg||0,namePrefix:false},
     ]);
   },
   renderDuel(){
@@ -7178,7 +7199,7 @@ const app={
         <div class="spanel" style="margin-bottom:0"><h3>🏹 Tireur d'élite : précision record</h3>${this.stats.tireurBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.tireurBest.precision}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.tireurBest.wpm} mpm</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le Tireur d\'élite pour établir ton record de précision !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏎️ Course de dactylo : record</h3>${this.stats.courseBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.courseBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.courseBest.acc}% précision · ${this.stats.courseBest.rank===1?'1ʳᵉ place 🥇':this.stats.courseBest.rank+'ᵉ place'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour établir ton record !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🧠 Simon des mots : record</h3>${this.stats.simonBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.simonBest.score} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">séquence max : ${this.stats.simonBest.maxSeq} mots</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance Simon des mots pour établir ton record de mémoire !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3>🏆 Boss de la semaine</h3>${this.stats.bossBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">#${this.stats.bossBest.rank}</div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.bossBest.score} pts · ${this.stats.bossBest.wpm} mpm cette semaine</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Tente le défi pour apparaître au classement !</p>'}<button onclick="go('games');setTimeout(()=>app.selectGame('boss'),0)" style="background:none;border:none;padding:0;margin-top:8px;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;text-decoration:underline">Voir le classement →</button></div>
+        <div class="spanel" style="margin-bottom:0"><h3>🏆 Boss de la semaine</h3>${this.stats.bossBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">#${this.stats.bossBest.rank}</div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.bossBest.score} pts · ${this.stats.bossBest.wpm} mpm ${this.stats.bossBest.isoWeek===this._currentIsoWeek()?'cette semaine':'(semaine '+this.stats.bossBest.isoWeek.replace(/^\d+-W/,'')+')'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Tente le défi pour apparaître au classement !</p>'}<button onclick="go('games');setTimeout(()=>app.selectGame('boss'),0)" style="background:none;border:none;padding:0;margin-top:8px;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;text-decoration:underline">Voir le classement →</button></div>
         <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint : record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>⚔️ Duel 1v1</h3>${this.stats.duelRecord&&(this.stats.duelRecord.wins+this.stats.duelRecord.losses+this.stats.duelRecord.draws)>0?(()=>{const r=this.stats.duelRecord;const total=r.wins+r.losses+r.draws;const winRate=Math.round(100*r.wins/total);return`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${r.wins}<span style="font-size:16px;color:var(--muted);font-weight:500">V</span> · ${r.losses}<span style="font-size:16px;color:var(--muted);font-weight:500">D</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${winRate}% de victoires${r.draws?' · '+r.draws+' nul'+(r.draws>1?'s':''):''} sur ${total} duel${total>1?'s':''}</p>`;})():'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Défie un ami pour ton premier duel !</p>'}</div>
       </div>
@@ -7716,10 +7737,10 @@ const app={
       const list=created.map(x=>x.username+' / '+x.tempPassword).join('\n');
       resEl.innerHTML=`
         <div style="font-size:13px;font-weight:700;margin-bottom:8px">${created.length} compte${created.length!==1?'s':''} créé${created.length!==1?'s':''}${rest.length?(' · '+rest.length+' ignoré'+(rest.length!==1?'s':'')):''}</div>
-        ${created.length?`<div style="background:var(--light);border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;white-space:pre-wrap;max-height:160px;overflow-y:auto">${escHtml(list)}</div>
+        ${created.length?`<div style="background:var(--light);border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;white-space:pre-wrap;max-height:160px;overflow-y:auto">${this._esc(list)}</div>
         <button id="imp-copy-list" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:9px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer">Copier la liste (identifiant / mot de passe)</button>
         <p style="font-size:11.5px;color:var(--muted);margin:8px 0 0;line-height:1.5">Communique à chaque élève son identifiant et son mot de passe temporaire — il pourra le changer une fois connecté.</p>`:''}
-        ${rest.length?`<div style="margin-top:10px;font-size:12px;color:var(--muted)">${rest.map(x=>escHtml(x.username)+' — '+escHtml(x.reason)).join('<br>')}</div>`:''}
+        ${rest.length?`<div style="margin-top:10px;font-size:12px;color:var(--muted)">${rest.map(x=>this._esc(x.username)+' — '+this._esc(x.reason)).join('<br>')}</div>`:''}
       `;
       const copyBtn=document.getElementById('imp-copy-list');
       if(copyBtn)copyBtn.addEventListener('click',()=>{navigator.clipboard.writeText(list);copyBtn.textContent='✓ Copié !';setTimeout(()=>{copyBtn.textContent='Copier la liste (identifiant / mot de passe)';},2000);});
@@ -8458,7 +8479,6 @@ function promptModal({icon,title,placeholder,confirmText}){
 // via lien (cf. FAQ établissement). Un compte par ligne est créé et ajouté
 // directement à la classe ; le mot de passe temporaire de chacun n'est
 // affiché qu'une fois, au prof de le communiquer.
-function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function openImportModal(classId){
   const overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
