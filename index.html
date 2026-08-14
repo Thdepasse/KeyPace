@@ -5754,8 +5754,19 @@ const app={
       if(ch.error)throw new Error(ch.error);
       const lb=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-leaderboard',token:currentToken})}).then(r=>r.json());
       this.boss={phase:'lobby',challenge:ch,lb,secondsLeft:ch.secondsLeft};
+      this._cacheBossBest(lb,ch.isoWeek);
     }catch(e){this.boss={phase:'error',msg:'Impossible de charger le défi pour le moment. Réessaie plus tard.'};}
     if(this.activeGame==='boss')this.renderCurrent();
+  },
+  // Boss n'a pas de "meilleur score" local (tout vit côté serveur, classement
+  // hebdo) — jusqu'ici ça le rendait absent de la page Progrès malgré son
+  // classement en temps réel. On met simplement en cache le dernier rang/score
+  // connu à chaque chargement du classement, pour l'affichage seulement (la
+  // source de vérité reste le serveur).
+  _cacheBossBest(lb,isoWeek){
+    if(!currentUser||!this.stats||!lb||!lb.me)return;
+    this.stats.bossBest={rank:lb.me.rank,score:lb.me.score,wpm:lb.me.wpm,isoWeek};
+    saveStats(this.stats);
   },
   startBossAttempt(){
     const b=this.boss;if(!b||!b.challenge)return;
@@ -5797,6 +5808,7 @@ const app={
       try{track('game_completed',{game:'boss',wpm,acc,score:sub.score});}catch{}
       const lb=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-leaderboard',token:currentToken})}).then(r=>r.json());
       b.lb=lb;
+      this._cacheBossBest(lb,b.challenge&&b.challenge.isoWeek);
       b._isRecord=!!(lb&&lb.me&&lb.me.score>prevBestScore);
       if(b._isRecord)this._celebrateGame();
     }catch(e){b._submitErr='Erreur réseau, score peut-être non enregistré.';}
@@ -6052,6 +6064,14 @@ const app={
       if(d.oppForfeit&&!d.oppFinished)d.winner=d.role;
       else d.winner=(d.myFinishMs<=d.oppFinishMs)?d.role:(d.role==='host'?'guest':'host');
       d.phase='result';this.stopDuelLoop();this.renderCurrent();
+      // Duel ne gardait aucune trace après une partie (le jeu le plus social
+      // des 8, mais celui avec le moins de raison d'y revenir). Historique
+      // simple victoires/défaites/nuls, affiché sur la page Progrès.
+      if(currentUser&&this.stats){
+        const rec=this.stats.duelRecord||{wins:0,losses:0,draws:0};
+        if(d.winner==='draw')rec.draws++;else if(d.winner===d.role)rec.wins++;else rec.losses++;
+        this.stats.duelRecord=rec;saveStats(this.stats);
+      }
       if(d.winner===d.role)this._celebrateGame(null,'victory');else if(d.winner!=='draw')playSound('defeat');
     }
   },
@@ -7158,8 +7178,9 @@ const app={
         <div class="spanel" style="margin-bottom:0"><h3>🏹 Tireur d'élite : précision record</h3>${this.stats.tireurBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.tireurBest.precision}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.tireurBest.wpm} mpm</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le Tireur d\'élite pour établir ton record de précision !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏎️ Course de dactylo : record</h3>${this.stats.courseBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.courseBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.courseBest.acc}% précision · ${this.stats.courseBest.rank===1?'1ʳᵉ place 🥇':this.stats.courseBest.rank+'ᵉ place'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour établir ton record !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🧠 Simon des mots : record</h3>${this.stats.simonBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.simonBest.score} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">séquence max : ${this.stats.simonBest.maxSeq} mots</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance Simon des mots pour établir ton record de mémoire !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3>🏆 Boss de la semaine</h3><p style="color:var(--muted);font-size:14px;margin-top:8px">Défi hebdo commun à la communauté avec classement. <button onclick="go('games');setTimeout(()=>app.selectGame('boss'),0)" style="background:none;border:none;padding:0;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:14px;text-decoration:underline">Voir le défi →</button></p></div>
+        <div class="spanel" style="margin-bottom:0"><h3>🏆 Boss de la semaine</h3>${this.stats.bossBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">#${this.stats.bossBest.rank}</div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.bossBest.score} pts · ${this.stats.bossBest.wpm} mpm cette semaine</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Tente le défi pour apparaître au classement !</p>'}<button onclick="go('games');setTimeout(()=>app.selectGame('boss'),0)" style="background:none;border:none;padding:0;margin-top:8px;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;text-decoration:underline">Voir le classement →</button></div>
         <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint : record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3>⚔️ Duel 1v1</h3>${this.stats.duelRecord&&(this.stats.duelRecord.wins+this.stats.duelRecord.losses+this.stats.duelRecord.draws)>0?(()=>{const r=this.stats.duelRecord;const total=r.wins+r.losses+r.draws;const winRate=Math.round(100*r.wins/total);return`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${r.wins}<span style="font-size:16px;color:var(--muted);font-weight:500">V</span> · ${r.losses}<span style="font-size:16px;color:var(--muted);font-weight:500">D</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${winRate}% de victoires${r.draws?' · '+r.draws+' nul'+(r.draws>1?'s':''):''} sur ${total} duel${total>1?'s':''}</p>`;})():'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Défie un ami pour ton premier duel !</p>'}</div>
       </div>
       <div class="spanel" style="margin-bottom:22px"><h3>⌨️ Tes touches difficiles</h3><div style="font-size:13px;color:var(--muted);margin:4px 0 16px">Les touches en rouge sont celles où tu fais le plus de fautes. Concentre-toi dessus !</div>${this._keyHeatmap(this.stats.keyStats)}</div>
       ${this._gazeAnalysisPanel(tests)}
