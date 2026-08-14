@@ -3885,7 +3885,7 @@ const app={
           </div>
           <div class="sprint-progress"><div class="sprint-progress-fill" style="width:${progressPct}%"></div></div>
           <div class="sprint-text-box" tabindex="0">${s?textHTML:'<span style="color:var(--muted)">Prêt…</span>'}</div>
-          <div class="sprint-hint">${!s||!s.started?'Commence à taper : le chrono démarre automatiquement.':errors>0?`<span style="color:#E5484D">${errors} erreur${errors>1?'s':''}</span> · ${correct} corrects`:`${correct} caractères corrects`}</div>
+          <div class="sprint-hint">${!s||!s.started?'Commence à taper : le chrono démarre automatiquement.':errors>0?`<span style="color:var(--danger)">${errors} erreur${errors>1?'s':''}</span> · ${correct} corrects`:`${correct} caractères corrects`}</div>
           <div style="display:flex;gap:12px;justify-content:center">
             ${!s?`<button class="btn-primary" onclick="app.startSprint()">Lancer le Sprint ▸</button>`:`<button class="btn-sm btn-dark" onclick="app.startSprint()">↻ Recommencer</button>`}
           </div>
@@ -4103,7 +4103,7 @@ const app={
       return;
     }
 
-    const accColor=g.avgAcc!=null&&g.avgAcc>=90?'#1FA971':(g.avgAcc!=null&&g.avgAcc<75?'#E5484D':'var(--txt)');
+    const accColor=g.avgAcc!=null&&g.avgAcc>=90?'var(--success)':(g.avgAcc!=null&&g.avgAcc<75?'var(--danger)':'var(--txt)');
     const statCard=(label,val,unit,sub,valColor)=>`
       <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 24px">
         <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:10px">${label}</div>
@@ -4225,7 +4225,7 @@ const app={
     try{
       if(navigator.share){await navigator.share({title:'Défi KeyPace',text:txt,url});return;}
       await navigator.clipboard.writeText(txt+' '+url);
-      if(msg){msg.style.display='block';msg.style.color='#1FA971';msg.textContent='✓ Lien copié ! Envoie-le à tes amis. Quand ils te renvoient le leur, tu peux rejouer.';}
+      if(msg){msg.style.display='block';msg.style.color='var(--success)';msg.textContent='✓ Lien copié ! Envoie-le à tes amis. Quand ils te renvoient le leur, tu peux rejouer.';}
     }catch{
       if(msg){msg.style.display='block';msg.style.color='var(--muted)';msg.textContent=url;}
     }
@@ -4298,7 +4298,7 @@ const app={
     document.getElementById(pageId).innerHTML=`<div class="typing-section">
       <div class="typing-header">
         <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br>':custom?'<button onclick="go(\'classes\')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Mes devoirs</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
-        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')">💡 Explication</button>`:''}${vocal&&!finished?`<button class="btn-sm btn-outline" onclick="app.speakAssignment()">🔊 Réécouter</button>`:''}${!isLesson&&!custom&&!cert?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()">${this._gaze.enabled?'👁 Traqueur actif':'👁 Activer traqueur des yeux'}</button>${this._gaze.permError?`<span style="font-size:11px;color:#E5484D;max-width:220px;text-align:right">${this._gaze.permError}</span>`:''}</div></div>
+        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')">💡 Explication</button>`:''}${vocal&&!finished?`<button class="btn-sm btn-outline" onclick="app.speakAssignment()">🔊 Réécouter</button>`:''}${!isLesson&&!custom&&!cert?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()">${this._gaze.enabled?'👁 Traqueur actif':'👁 Activer traqueur des yeux'}</button>${this._gaze.permError?`<span style="font-size:11px;color:var(--danger);max-width:220px;text-align:right">${this._gaze.permError}</span>`:''}</div></div>
       </div>
       <div class="live-stats" style="${finished?'display:none':''}">
         <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val">${s&&s.started?liveWpm+'<span class="stat-unit"> mpm</span>':'·'}</div></div>
@@ -4310,7 +4310,7 @@ const app={
           const pb=isLesson?this.lessonRec(s?.lessonId).bestWpm||0:Math.max(0,...(this.stats.tests||[]).map(t=>t.wpm));
           if(!pb)return'';
           const beating=s&&s.started&&liveWpm>pb;
-          return`<div class="stat-box" style="border-left:1px solid var(--border)"><div class="stat-label" style="color:${beating?'#1FA971':'var(--muted)'}">Record</div><div class="stat-val" style="font-size:22px;color:${beating?'#1FA971':'var(--muted)'}">${pb}<span class="stat-unit"> mpm</span></div></div>`;
+          return`<div class="stat-box" style="border-left:1px solid var(--border)"><div class="stat-label" style="color:${beating?'var(--success)':'var(--muted)'}">Record</div><div class="stat-val" style="font-size:22px;color:${beating?'var(--success)':'var(--muted)'}">${pb}<span class="stat-unit"> mpm</span></div></div>`;
         })()}
       </div>
       <div class="prog-wrap"><div class="prog-fill" style="width:${progress}%"></div></div>
@@ -4371,8 +4371,8 @@ const app={
           <div class="gaze-bar-title">👁 Suivi du regard</div>
           <div class="gaze-timeline">${segs}</div>
           <div class="gaze-bar-stats">
-            <span><span class="gaze-dot" style="background:#1FA971;display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Écran <b>${stats.pct}%</b></span>
-            <span><span class="gaze-dot" style="background:#E5484D;display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Clavier <b>${100-stats.pct}%</b></span>
+            <span><span class="gaze-dot" style="background:var(--success);display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Écran <b>${stats.pct}%</b></span>
+            <span><span class="gaze-dot" style="background:var(--danger);display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Clavier <b>${100-stats.pct}%</b></span>
             <span style="margin-left:auto;color:var(--muted);font-size:12px">${msg}</span>
           </div>
         </div>`;
@@ -5421,7 +5421,7 @@ const app={
     }).join('');
     const fxHTML=(t&&t.fx?t.fx:[]).map(f=>{
       const op=f.t/6;const scale=f.type==='hit'?(1+(1-op)*0.9):1;
-      const sym=f.type==='hit'?'✓':'✕';const col=f.type==='hit'?'#1FA971':'#E5484D';
+      const sym=f.type==='hit'?'✓':'✕';const col=f.type==='hit'?'var(--success)':'var(--danger)';
       return`<div class="timpact" style="left:${f.x}%;top:${f.y}%;color:${col};opacity:${reduce?0.9:op};transform:translate(-50%,-50%) scale(${reduce?1:scale})">${sym}</div>`;
     }).join('');
     let overlay='';
@@ -5700,7 +5700,7 @@ const app={
         <div class="simon-words">${chips}</div>
         <div style="font-size:13px;color:var(--muted)">Espace ou Entrée pour valider chaque mot</div>`;
     } else if(s&&s.phase==='fail'){
-      stage=`<div class="simon-prompt" style="color:#E5484D;font-size:24px">Raté !</div>
+      stage=`<div class="simon-prompt" style="color:var(--danger);font-size:24px">Raté !</div>
         <div style="font-size:15px;color:var(--muted)">Il te reste ${s.lives} vie${s.lives>1?'s':''}. Nouvelle séquence…</div>`;
     }
     let overlay='';
@@ -6140,15 +6140,15 @@ const app={
           <div class="duel-code-copied">${d._codeCopied?'Code copié ✓':''}</div>
           <p style="color:var(--muted);font-size:12px;margin:4px 0 16px">ou partage le lien :</p>
           <div class="duel-link"><input readonly value="${link}" onclick="this.select()"><button onclick="app.duelCopyLink()">${d._copied?'Copié ✓':'Copier le lien'}</button></div>
-          <div class="duel-status">${d.oppPresent?`<div class="duel-opp-badge">✓ ${d.oppLabel||'Adversaire'} a rejoint</div>`:d.oppLeft?'<span style="color:#E5484D;font-weight:600">● Ton adversaire a quitté le lobby</span>':'<span class="duel-wait">● En attente de l\'adversaire…</span>'}</div>
+          <div class="duel-status">${d.oppPresent?`<div class="duel-opp-badge">✓ ${d.oppLabel||'Adversaire'} a rejoint</div>`:d.oppLeft?'<span style="color:var(--danger);font-weight:600">● Ton adversaire a quitté le lobby</span>':'<span class="duel-wait">● En attente de l\'adversaire…</span>'}</div>
           <button class="btn-primary" style="margin-top:12px;${d.oppPresent?'':'opacity:.5;cursor:default'}" ${d.oppPresent?'onclick="app.duelStart()"':'disabled'}>Lancer le duel ▸</button>
-          ${d.msg?`<p style="color:#E5484D;font-size:13px;margin-top:10px">${d.msg}</p>`:''}
+          ${d.msg?`<p style="color:var(--danger);font-size:13px;margin-top:10px">${d.msg}</p>`:''}
         </div>`;
       } else {
         body=`<div class="boss-card" style="text-align:center">
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px">Duel rejoint !</h2>
           <p style="color:var(--muted);font-size:15px;margin-bottom:18px">Tu affrontes <b style="color:var(--txt)">${d.hostLabel||'l\'hôte'}</b>.</p>
-          <div class="duel-status">${d.oppLeft?'<span style="color:#E5484D;font-weight:600">● Ton adversaire a quitté le lobby</span>':'<span class="duel-wait">● En attente du lancement par l\'hôte…</span>'}</div>
+          <div class="duel-status">${d.oppLeft?'<span style="color:var(--danger);font-weight:600">● Ton adversaire a quitté le lobby</span>':'<span class="duel-wait">● En attente du lancement par l\'hôte…</span>'}</div>
         </div>`;
       }
     } else if(d.phase==='countdown'){
@@ -6184,13 +6184,13 @@ const app={
       if(d._rematchLoading){
         rematchHTML=`<p style="color:var(--muted);font-size:14px;margin-top:12px">Nouvelle partie en cours…</p>`;
       } else if(d._rematchError){
-        rematchHTML=`<p style="color:#E5484D;font-size:13px;margin-top:10px">${d._rematchError}</p>`;
+        rematchHTML=`<p style="color:var(--danger);font-size:13px;margin-top:10px">${d._rematchError}</p>`;
       } else if(d._myRematch&&d._oppRematch){
-        rematchHTML=`<p style="color:#1FA971;font-size:14px;font-weight:600;margin-top:12px">Les deux joueurs sont prêts — lancement…</p>`;
+        rematchHTML=`<p style="color:var(--success);font-size:14px;font-weight:600;margin-top:12px">Les deux joueurs sont prêts — lancement…</p>`;
       } else if(d._myRematch){
         rematchHTML=`<p style="color:var(--muted);font-size:14px;margin-top:12px">En attente de ${oppName}…</p>`;
       } else if(d._oppRematch){
-        rematchHTML=`<p style="color:#1FA971;font-size:14px;font-weight:600;margin-top:12px">${oppName} veut rejouer !</p>`;
+        rematchHTML=`<p style="color:var(--success);font-size:14px;font-weight:600;margin-top:12px">${oppName} veut rejouer !</p>`;
       }
       body=`<div class="boss-card">
         <div class="sprint-result">
@@ -8130,7 +8130,7 @@ const app={
     const profs=ad.profs||[];const inst=ad.institution||{};
     const g=ad.global||{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null};
     const series=ad.series||[];
-    const accColor=g.avgAcc!=null&&g.avgAcc>=90?'#1FA971':(g.avgAcc!=null&&g.avgAcc<75?'#E5484D':'var(--txt)');
+    const accColor=g.avgAcc!=null&&g.avgAcc>=90?'var(--success)':(g.avgAcc!=null&&g.avgAcc<75?'var(--danger)':'var(--txt)');
     const statCard=(label,val,unit,sub,valColor)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 24px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:10px">${label}</div><div style="font-size:34px;font-weight:800;line-height:1;color:${valColor||'var(--txt)'}">${val}<span style="font-size:15px;font-weight:500;color:var(--muted)">${unit}</span></div><div style="font-size:12px;color:var(--muted);margin-top:6px">${sub}</div></div>`;
     const dayNames=['D','L','M','M','J','V','S'];const today=new Date();
     const labels=Array.from({length:series.length},(_,i)=>{const d=new Date(today);d.setDate(today.getDate()-(series.length-1-i));return dayNames[d.getDay()];});
