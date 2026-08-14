@@ -4142,7 +4142,7 @@ const app={
           <p style="font-size:15px;color:var(--muted);margin:0">L'activité de tes classes en un coup d'oeil.</p>
         </div>
 
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px">
           ${statCard('ÉLÈVES ACTIFS',g.activeThisWeek,'','cette semaine sur '+g.total)}
           ${statCard('SESSIONS',g.totalSessions,'','cumulées')}
           ${statCard('VITESSE MOY.',g.avgWpm!=null?g.avgWpm:'—',g.avgWpm!=null?' mpm':'',g.avgWpm!=null?'tous élèves confondus':'Pas encore de données')}
@@ -7632,7 +7632,7 @@ const app={
         </div>
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
-        ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+        ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ÉLÈVES</div><div style="font-size:28px;font-weight:800">${agg.total!=null?agg.total:students.length}</div></div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ACTIFS / SEM.</div><div style="font-size:28px;font-weight:800">${agg.activeThisWeek||0}</div></div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">VITESSE MOY.</div><div style="font-size:28px;font-weight:800">${agg.avgWpm!=null?agg.avgWpm:'—'}<span style="font-size:14px;color:var(--muted);font-weight:500"> mpm</span></div></div>
@@ -7659,6 +7659,8 @@ const app={
           </div>
         `:`
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+            <div style="overflow-x:auto">
+            <div style="min-width:600px">
             <div style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px 16px;padding:10px 20px;border-bottom:1px solid var(--border)">
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">ÉLÈVE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">VITESSE</div>
@@ -7668,8 +7670,8 @@ const app={
               <div></div>
             </div>
             ${students.map(st=>{
-              const wpmColor=st.avgWpm==null?'var(--muted)':st.avgWpm>=50?'#1FA971':st.avgWpm>=30?'var(--txt)':'#E5484D';
-              const accColor=st.avgAcc==null?'var(--muted)':st.avgAcc>=95?'#1FA971':st.avgAcc>=80?'var(--txt)':'#E5484D';
+              const wpmColor=st.avgWpm==null?'var(--muted)':st.avgWpm>=50?'var(--success)':st.avgWpm>=30?'var(--txt)':'var(--danger)';
+              const accColor=st.avgAcc==null?'var(--muted)':st.avgAcc>=95?'var(--success)':st.avgAcc>=80?'var(--txt)':'var(--danger)';
               const last=st.daysSinceActive==null?'jamais':st.daysSinceActive===0?"aujourd'hui":st.daysSinceActive===1?'hier':'il y a '+st.daysSinceActive+' j';
               const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'#E5722B':'var(--muted)';
               return`<div onclick="app.viewStudent('${d.id}','${st.studentId}')" style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px 16px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
@@ -7681,6 +7683,8 @@ const app={
                 <div style="text-align:right;color:var(--muted);font-size:14px">›</div>
               </div>`;
             }).join('')}
+            </div>
+            </div>
           </div>
         `}
       </div></div>`;
@@ -8074,7 +8078,7 @@ const app={
         ${isAdmin()?`<button onclick="app.adminDeleteStudent('${d.studentId}')" style="margin-top:12px;background:none;border:1px solid #E5484D;color:#E5484D;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Supprimer cet élève (RGPD)</button>`:''}
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px">
           ${card('SESSIONS',s.sessions||0,'')}
           ${card('VITESSE MOY.',s.avgWpm!=null?s.avgWpm:'—',s.avgWpm!=null?' mpm':'')}
           ${card('PRÉCISION MOY.',s.avgAcc!=null?s.avgAcc:'—',s.avgAcc!=null?' %':'',accColor)}
@@ -8186,7 +8190,7 @@ const app={
           <p style="font-size:15px;color:var(--muted);margin:0">Vue d'ensemble de tes professeurs et de leurs élèves.</p>
         </div>
         ${licenceBannerHtml}
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px">
           ${statCard('PROFESSEURS',profs.length,'','dans ton établissement')}
           ${statCard('ÉLÈVES ACTIFS',g.activeThisWeek,'','cette semaine sur '+g.total)}
           ${statCard('VITESSE MOY.',g.avgWpm!=null?g.avgWpm:'—',g.avgWpm!=null?' mpm':'','tous élèves confondus')}
