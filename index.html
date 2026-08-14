@@ -3725,6 +3725,29 @@ const app={
   // habillage visuel uniquement, appliqué à Frappe-mots et Tireur d'élite qui
   // n'avaient qu'une rangée de pastilles plates pour représenter leurs paliers.
   // items: [{label, sub, state:'done'|'current'|'locked'}]
+  // Longueur du préfixe correct — logique identique dans Course/Boss/Duel,
+  // chacun ne faisant que passer sa propre paire (typed,text).
+  _correctPrefix(typed,text){
+    let n=0;
+    for(let i=0;i<typed.length;i++){if(typed[i]===text[i])n++;else break;}
+    return n;
+  },
+  // Pistes de course (voiture + barre de progression) — même template pour
+  // Course (joueur + bots) et Duel (joueur + adversaire), qui le réécrivaient
+  // chacun séparément. lanes: [{name,emoji,prog,you?}].
+  _raceLanesHTML(lanes){
+    return `<div class="race-track">${lanes.map(l=>`<div class="race-lane${l.you?' you':''}">
+      <div class="race-lane-name">${l.you?'Toi':l.emoji+' '+l.name}</div>
+      <div class="race-strip"><div class="race-car" style="left:${Math.round((l.prog||0)*100)}%">${l.emoji}</div></div>
+    </div>`).join('')}</div>`;
+  },
+  // Compte à rebours 3-2-1-GO avant le départ — même template pour Course et
+  // Duel, qui le réécrivaient chacun séparément.
+  _raceCountdownHTML(startAt){
+    const cd=Math.max(0,Math.ceil((startAt-Date.now())/1000));
+    return `<div class="race-count">${cd>0?cd:'GO !'}</div><p>Prépare tes doigts…</p>`;
+  },
+
   _tierRoadmap(items){
     return `<div style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:340px;margin:8px auto 4px">
       ${items.map((it,i)=>{
@@ -5479,11 +5502,7 @@ const app={
     });
     this.renderCurrent();
   },
-  _courseCorrectPrefix(){
-    const c=this.course;let n=0;
-    for(let i=0;i<c.typed.length;i++){if(c.typed[i]===c.text[i])n++;else break;}
-    return n;
-  },
+  _courseCorrectPrefix(){return this._correctPrefix(this.course.typed,this.course.text);},
   courseKey(e){
     const c=this.course;if(!c||!c.on||!c.raceStarted||c.finished)return;
     const k=e._composedKey||e.key;
@@ -5527,10 +5546,7 @@ const app={
     const liveAcc=c&&c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     // pistes
     const lanes=c?[{name:'Toi',emoji:'🏎️',prog:playerProg,color:'var(--accent)',you:true},...c.bots]:[];
-    const lanesHTML=lanes.map(l=>`<div class="race-lane${l.you?' you':''}">
-      <div class="race-lane-name">${l.you?'Toi':l.emoji+' '+l.name}</div>
-      <div class="race-strip"><div class="race-car" style="left:${Math.round((l.prog||0)*100)}%">${l.emoji}</div></div>
-    </div>`).join('');
+    const lanesHTML=this._raceLanesHTML(lanes);
     // texte
     let textHTML='';
     if(c){
@@ -5547,8 +5563,7 @@ const app={
     if(IS_TOUCH_ONLY()&&idle){
       overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>La Course de dactylo se joue au clavier physique. Reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
     } else if(c&&!c.raceStarted){
-      const cd=Math.max(0,Math.ceil((c.startAt-Date.now())/1000));
-      overlay=`<div class="race-overlay"><div class="race-count">${cd>0?cd:'GO !'}</div><p>Prépare tes doigts…</p></div>`;
+      overlay=`<div class="race-overlay">${this._raceCountdownHTML(c.startAt)}</div>`;
     }
     const result=over?this._gameResult({
       icon:c.rank===1?'🥇':c.rank===2?'🥈':c.rank===3?'🥉':'🏁',
@@ -5571,7 +5586,7 @@ const app={
             <div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:var(--muted);font-weight:500"> mpm</span></div></div>
             <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">PRÉCISION</div><div class="sprint-score-val" style="color:var(--txt)">${liveAcc}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div></div>
           </div>
-          <div class="race-track">${lanesHTML}</div>
+          ${lanesHTML}
           ${over?'':`<div class="race-text-box">${textHTML}</div>`}
           ${over?'':`<div class="sprint-hint">${c.raceStarted?'Corrige tes fautes (retour arrière) pour continuer à avancer.':'La course démarre dans un instant…'}</div>`}
           ${result}
@@ -5747,11 +5762,7 @@ const app={
     this.boss={...b,phase:'playing',text:b.challenge.text,typed:[],correct:0,keystrokes:0,started:false,startTime:0,endTime:0,finished:false};
     this.renderCurrent();
   },
-  _bossCorrectPrefix(){
-    const b=this.boss;let n=0;
-    for(let i=0;i<b.typed.length;i++){if(b.typed[i]===b.text[i])n++;else break;}
-    return n;
-  },
+  _bossCorrectPrefix(){return this._correctPrefix(this.boss.typed,this.boss.text);},
   bossKey(e){
     const b=this.boss;if(!b||b.phase!=='playing'||b.finished)return;
     const k=e._composedKey||e.key;
@@ -5996,7 +6007,7 @@ const app={
     const done=()=>{if(this.duel){this.duel._copied=true;this.renderCurrent();setTimeout(()=>{if(this.duel)this.duel._copied=false;this.renderCurrent();},2000);}};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(done,done);else done();
   },
-  _duelCorrectPrefix(){const d=this.duel;let n=0;for(let i=0;i<d.typed.length;i++){if(d.typed[i]===d.text[i])n++;else break;}return n;},
+  _duelCorrectPrefix(){return this._correctPrefix(this.duel.typed,this.duel.text);},
   duelKey(e){
     const d=this.duel;if(!d||d.phase!=='racing'||d.finished)return;
     if(Date.now()<d.startAt)return;
@@ -6079,10 +6090,10 @@ const app={
   _duelLanesHTML(){
     const d=this.duel;
     const oppName=(d.role==='host'?(d.oppLabel||'Adversaire'):(d.hostLabel||d.oppLabel||'Hôte'));
-    return`<div class="race-track">
-      <div class="race-lane you"><div class="race-lane-name">Toi 🏎️</div><div class="race-strip"><div class="race-car" style="left:${Math.round((d.myProg||0)*100)}%">🏎️</div></div></div>
-      <div class="race-lane"><div class="race-lane-name">${oppName}</div><div class="race-strip"><div class="race-car" style="left:${Math.round((d.oppProg||0)*100)}%">🚗</div></div></div>
-    </div>`;
+    return this._raceLanesHTML([
+      {name:'Toi',emoji:'🏎️',prog:d.myProg||0,you:true},
+      {name:oppName,emoji:'🚗',prog:d.oppProg||0},
+    ]);
   },
   renderDuel(){
     const d=this.duel;
@@ -6141,10 +6152,9 @@ const app={
         </div>`;
       }
     } else if(d.phase==='countdown'){
-      const cd=Math.max(0,Math.ceil((d.startAt-Date.now())/1000));
       body=`<div class="boss-card" style="position:relative">
         ${this._duelLanesHTML()}
-        <div class="race-overlay" style="position:static;background:none;backdrop-filter:none;padding:20px 0"><div class="race-count">${cd>0?cd:'GO !'}</div><p>Prépare tes doigts…</p></div>
+        <div class="race-overlay" style="position:static;background:none;backdrop-filter:none;padding:20px 0">${this._raceCountdownHTML(d.startAt)}</div>
       </div>`;
     } else if(d.phase==='racing'){
       let textHTML='';
