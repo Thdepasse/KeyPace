@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/dashboard?action=sync-zimbra-cron", "schedule": "0 6 * * *" },
+    { "path": "/api/dashboard?action=sync-google-reviews-cron", "schedule": "0 5 * * *" }
+  ]
+}

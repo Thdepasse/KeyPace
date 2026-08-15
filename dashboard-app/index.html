@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard équipe | KeyPace</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA;--series-signups:#FF4D2E;--series-active:#2a78d6;
+    --shadow-sm:0 1px 2px rgba(22,20,15,.04),0 1px 3px rgba(22,20,15,.03);
+    --shadow-md:0 2px 6px rgba(22,20,15,.05),0 8px 20px -8px rgba(22,20,15,.08);
+    --shadow-lift:0 10px 24px -10px rgba(22,20,15,.16)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1;margin:0}
+  .mono{font-family:'JetBrains Mono',monospace}
+  ::selection{background:#FFDACE}
+  header{border-bottom:1px solid var(--border);background:rgba(250,249,245,.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:20}
+  .nav{max-width:1180px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;gap:12px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;color:var(--txt)}
+  .logo .k{width:27px;height:27px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-family:'JetBrains Mono',monospace;box-shadow:0 4px 10px rgba(255,77,46,.4)}
+  .nav .sp{flex:1}
+  .nav .title{font-size:14px;color:var(--muted);font-weight:600}
+  .logout{font-size:13px;color:var(--muted);cursor:pointer;border:1px solid var(--border);background:var(--card);padding:7px 12px;border-radius:9px;transition:color .15s,border-color .15s}
+  .logout:hover{color:var(--txt);border-color:#D8D0C0}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 64px}
+  section{margin:0 0 40px}
+  section h2{font-size:20px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+  .tabs{display:flex;gap:4px;margin-bottom:28px;border-bottom:1px solid var(--border)}
+  .tab-btn{background:none;border:none;padding:12px 6px;margin:0 14px -1px 0;font:inherit;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;display:flex;align-items:center;gap:7px}
+  .tab-btn:hover{color:var(--txt)}
+  .tab-btn.active{color:var(--accent);border-color:var(--accent)}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block;animation:fade-in .2s ease}
+  @media (max-width:640px){.tabs{overflow-x:auto}.tab-btn{flex:0 0 auto}}
+  section h2 .sec-ic{font-size:18px;filter:saturate(1.1)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-sm);transition:box-shadow .18s,transform .18s}
+  .card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+  .card .label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .card .num{font-size:28px;font-weight:700;margin-top:6px}
+  .card .sub{font-size:12px;color:var(--muted);margin-top:4px}
+  .kpi-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+  .kpi-group h3{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+  .callout{background:#FFF6F2;border:1px solid #FFD9CC;border-radius:14px;padding:14px 18px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+  .callout.empty{background:var(--light);border-color:var(--border);color:var(--muted)}
+  .callout h3{margin:0 0 8px;font-size:14px;font-weight:800;color:var(--txt)}
+  .followup-item{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px}
+  .followup-item .fname{font-weight:700;flex:1}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;cursor:pointer;transition:filter .15s}
+  .badge:hover{filter:brightness(.95)}
+  .status-select{font-size:12px;font-weight:700;padding:3px 6px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--txt)}
+  .badge-a_contacter{background:#EFEBE2;color:#6B6455}
+  .badge-envoye{background:#FFF0E0;color:#B4640A}
+  .badge-relance{background:#FFE9D6;color:#C2540A}
+  .badge-repondu{background:#E6F0FF;color:#1D5FD6}
+  .badge-en_negociation{background:#F1E6FF;color:#7A2FCC}
+  .badge-signe{background:#E3F7E9;color:#1C8A45}
+  .badge-perdu{background:#FBE7E5;color:#C23B2E}
+  .badge-pending{background:#FFF0E0;color:#B4640A}
+  .badge-published{background:#E3F7E9;color:#1C8A45}
+  .badge-rejected{background:#FBE7E5;color:#C23B2E}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  .table-wrap{overflow-x:auto;border-radius:16px;box-shadow:var(--shadow-sm)}
+  table.prospects{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;min-width:720px}
+  th,td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--light)}
+  tbody tr{transition:background .12s}
+  tbody tr:hover{background:#FCFAF6}
+  tr:last-child td{border-bottom:none}
+  .muted{color:var(--muted)}
+  .actions{display:flex;gap:6px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:5px;background:var(--accent);color:#fff;font-weight:700;font-size:13px;padding:9px 16px;border:none;border-radius:10px;cursor:pointer;transition:transform .12s,box-shadow .12s,opacity .12s;box-shadow:0 1px 2px rgba(255,77,46,.15)}
+  .btn:hover{opacity:.94;transform:translateY(-1px);box-shadow:0 6px 14px -6px rgba(255,77,46,.5)}
+  .btn:active{transform:translateY(0)}
+  .btn.ghost{background:var(--card);color:var(--txt);border:1px solid var(--border);box-shadow:none}
+  .btn.ghost:hover{box-shadow:var(--shadow-sm);border-color:#D8D0C0}
+  .btn.small{padding:5px 10px;font-size:12px;font-weight:600}
+  .btn.danger{background:#fff;color:#C23B2E;border:1px solid #F3C7C1;box-shadow:none}
+  .btn.danger:hover{background:#FFF5F4;box-shadow:none}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+  .panel h3{font-size:15px;font-weight:800;margin-bottom:12px}
+  .chart-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .chart-legend{display:flex;gap:16px;flex-wrap:wrap}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:600}
+  .legend-item .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .chart-svg{width:100%;height:auto;overflow:visible}
+  .chart-gridline{stroke:var(--border);stroke-width:1}
+  .chart-axis-label{fill:var(--muted);font-size:10px;font-family:'JetBrains Mono',monospace}
+  .chart-crosshair{stroke:var(--muted);stroke-width:1;stroke-dasharray:3,3;pointer-events:none}
+  .chart-tooltip{position:absolute;background:var(--txt);color:#fff;font-size:12px;padding:8px 10px;border-radius:9px;pointer-events:none;white-space:nowrap;transform:translate(-50%,-115%);z-index:5}
+  .chart-tooltip .tt-date{font-weight:700;margin-bottom:3px;font-family:'JetBrains Mono',monospace;font-size:11px}
+  .chart-tooltip .tt-row{display:flex;align-items:center;gap:6px}
+  .chart-tooltip .tt-row .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+  .chart-wrap{position:relative}
+  .traffic-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
+  .td-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+  .td-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px}
+  .td-row .td-label{flex:0 1 auto;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .td-row .td-bar-wrap{flex:1;background:var(--light);border-radius:4px;height:7px;overflow:hidden;min-width:24px}
+  .td-row .td-bar{height:100%;background:var(--accent);border-radius:4px}
+  .td-row .td-val{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);min-width:32px;text-align:right}
+  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+  input,select,textarea{font:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:#fff;color:var(--txt);width:100%;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,.12)}
+  textarea{resize:vertical;min-height:60px}
+  .form-actions{margin-top:12px;display:flex;gap:8px}
+  .cal-nav{display:flex;align-items:center;gap:12px}
+  .cal-nav button{background:var(--card);border:1px solid var(--border);border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:15px;transition:background .12s,border-color .12s}
+  .cal-nav button:hover{background:var(--light);border-color:#D8D0C0}
+  .cal-layout{display:grid;grid-template-columns:1fr 260px;gap:18px;align-items:start}
+  @media (max-width:860px){.cal-layout{grid-template-columns:1fr}}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .cal-dow{font-size:11px;text-transform:uppercase;color:var(--muted);text-align:center;padding-bottom:4px;font-weight:700}
+  .cal-day{background:var(--card);border:1px solid var(--border);border-radius:12px;min-height:96px;padding:6px;display:flex;flex-direction:column;gap:4px;transition:border-color .15s,background .15s}
+  .cal-day.empty{background:transparent;border:none}
+  .cal-day.dragover{border-color:var(--accent);background:#FFF6F2;box-shadow:var(--shadow-sm)}
+  .cal-day .dnum{font-size:11px;color:var(--muted);font-weight:700;padding:2px 4px}
+  .content-card{background:var(--light);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;cursor:grab;line-height:1.35;transition:box-shadow .15s,transform .15s}
+  .content-card:hover{box-shadow:var(--shadow-sm);transform:translateY(-1px)}
+  .content-card:active{cursor:grabbing}
+  .content-card .ctitle{font-weight:700;display:block}
+  .content-card .cmeta{color:var(--muted);font-size:11px}
+  .backlog{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:120px;box-shadow:var(--shadow-sm);transition:border-color .15s,background .15s}
+  .backlog.dragover{border-color:var(--accent);background:#FFF6F2}
+  .backlog h3{font-size:13px;font-weight:800;margin-bottom:2px}
+  .platform-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;background:var(--border);color:var(--txt);margin-right:4px}
+  #gate{position:fixed;inset:0;background:radial-gradient(circle at 50% 0%,#FFF3EE 0%,var(--bg) 55%);display:flex;align-items:center;justify-content:center;z-index:100}
+  #gate .box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:34px 32px;width:100%;max-width:340px;text-align:center;box-shadow:var(--shadow-lift)}
+  #gate .box .k{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:19px;margin:0 auto 14px;box-shadow:0 6px 16px rgba(255,77,46,.4)}
+  #gate h1{font-size:19px;margin-bottom:6px}
+  #gate p{color:var(--muted);font-size:14px;margin:0 0 16px}
+  #gate input{margin-bottom:10px}
+  #gate .err{color:#C23B2E;font-size:13px;min-height:18px;margin-top:8px}
+  #app{display:none;animation:fade-in .25s ease}
+  @keyframes fade-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .skeleton{background:linear-gradient(90deg,var(--light) 25%,#EFEBE0 37%,var(--light) 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;border-radius:8px;height:14px}
+  @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+  .empty-msg{color:var(--muted);font-size:13px;padding:10px 2px}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <div class="k">K</div>
+    <h1>Dashboard équipe</h1>
+    <p>Entrez la clé d'accès partagée pour continuer.</p>
+    <input id="gate-key" type="password" placeholder="Clé d'équipe" autocomplete="off">
+    <button class="btn" style="width:100%;justify-content:center" onclick="tryUnlock()">Entrer</button>
+    <div class="err" id="gate-err"></div>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="nav">
+      <span class="logo"><span class="k">K</span> KeyPace</span>
+      <span class="title">Dashboard équipe</span>
+      <span class="sp"></span>
+      <span class="logout" onclick="logout()">Se déconnecter</span>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <div class="tabs">
+      <button class="tab-btn" data-tab="kpi" onclick="switchTab('kpi')"><span class="sec-ic">📈</span>KPI</button>
+      <button class="tab-btn" data-tab="prospects" onclick="switchTab('prospects')"><span class="sec-ic">🏫</span>Prospection écoles</button>
+      <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')"><span class="sec-ic">🗓️</span>Calendrier marketing</button>
+      <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')"><span class="sec-ic">💬</span>Avis</button>
+    </div>
+
+    <section id="kpi-section" class="tab-panel">
+      <h2><span class="sec-ic">📈</span>KPI de croissance</h2>
+      <div class="kpi-groups">
+        <div class="kpi-group">
+          <h3>Acquisition &amp; conversion</h3>
+          <div class="cards" id="kpi-acquisition">
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+          </div>
+        </div>
+        <div class="kpi-group">
+          <h3>Trafic site</h3>
+          <div class="cards" id="kpi-traffic">
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+          </div>
+        </div>
+        <div class="kpi-group">
+          <h3>Ventes B2B écoles</h3>
+          <div class="cards" id="kpi-b2b">
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+          </div>
+        </div>
+        <div class="kpi-group">
+          <h3>Engagement produit</h3>
+          <div class="cards" id="kpi-engagement">
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:16px">
+        <div class="chart-head">
+          <h3 style="margin:0">Évolution sur 30 jours</h3>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot" style="background:var(--series-signups)"></span>Nouveaux inscrits</span>
+            <span class="legend-item"><span class="dot" style="background:var(--series-active)"></span>Dernière activité connue</span>
+          </div>
+        </div>
+        <div id="trend-chart"></div>
+        <p class="muted" style="font-size:12px;margin:6px 0 0">« Dernière activité » compte les utilisateurs dont la session la plus récente tombe ce jour-là — pas un vrai cumul d'actifs quotidiens (une seule date est stockée par utilisateur).</p>
+      </div>
+
+      <div class="panel" id="traffic-detail-panel" style="margin-top:16px;display:none">
+        <h3>Détail du trafic (30 jours)</h3>
+        <div class="traffic-detail-grid">
+          <div>
+            <div class="td-title">Pages les plus visitées</div>
+            <div id="traffic-pages"></div>
+          </div>
+          <div>
+            <div class="td-title">Appareils</div>
+            <div id="traffic-devices"></div>
+          </div>
+          <div>
+            <div class="td-title">Sources de trafic</div>
+            <div id="traffic-channels"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="prospects-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">🏫</span>Prospection écoles</h2>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="muted" id="last-sync" style="font-size:12px"></span>
+          <button class="btn ghost small" onclick="syncZimbra()" id="sync-btn">🔄 Sync emails</button>
+          <button class="btn ghost small" onclick="exportProspectsCSV()">⬇ Export CSV</button>
+          <button class="btn ghost small" onclick="document.getElementById('csv-file-input').click()">⬆ Import CSV</button>
+          <input type="file" id="csv-file-input" accept=".csv,text/csv" style="display:none" onchange="handleCSVImport(event)">
+          <button class="btn" onclick="openAddForm()">+ Ajouter une école</button>
+        </div>
+      </div>
+      <div id="sync-result"></div>
+      <div id="import-result"></div>
+
+      <div class="panel" id="prospect-form" style="display:none">
+        <h3 id="prospect-form-title">Nouvelle école</h3>
+        <div class="form-grid">
+          <input id="p-school" placeholder="Nom de l'école *">
+          <input id="p-contact" placeholder="Nom du contact">
+          <input id="p-email" type="email" placeholder="Email du contact">
+          <input id="p-phone" placeholder="Téléphone">
+          <input id="p-city" placeholder="Ville">
+        </div>
+        <textarea id="p-notes" placeholder="Notes" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" id="prospect-save-btn" onclick="saveProspect()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeProspectForm()">Annuler</button>
+        </div>
+      </div>
+
+      <div id="followup-callout"></div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px">
+        <input id="prospect-search" type="search" placeholder="🔎 Rechercher (école, ville, contact, email...)" oninput="renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
+        <select id="sort-select" onchange="renderProspects()" style="width:auto;font-size:13px;padding:7px 10px">
+          <option value="relance">Trier par relance (défaut)</option>
+          <option value="ville">Trier par ville</option>
+          <option value="ecole">Trier par école (A-Z)</option>
+          <option value="statut">Trier par statut</option>
+          <option value="recent">Trier par ajout (récent)</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="prospects">
+          <thead>
+            <tr>
+              <th>École</th><th>Ville</th><th>Contact</th><th>Statut</th><th>Dernier contact</th><th>Relance</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="prospects-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="calendar-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">🗓️</span>Calendrier marketing</h2>
+        <div class="cal-nav">
+          <button onclick="shiftMonth(-1)">‹</button>
+          <span class="mono" id="cal-label" style="font-weight:700;min-width:130px;text-align:center;display:inline-block"></span>
+          <button onclick="shiftMonth(1)">›</button>
+          <button class="btn small" style="width:auto" onclick="openAddEventForm()">+ Contenu</button>
+        </div>
+      </div>
+
+      <div class="panel" id="event-form" style="display:none">
+        <h3>Nouveau contenu</h3>
+        <div class="form-grid">
+          <input id="e-title" placeholder="Titre *">
+          <select id="e-type">
+            <option value="video">Vidéo</option>
+            <option value="post" selected>Post</option>
+            <option value="story">Story</option>
+            <option value="article">Article</option>
+            <option value="newsletter">Newsletter</option>
+            <option value="tache">Tâche</option>
+          </select>
+          <select id="e-platform">
+            <option value="">Plateforme…</option>
+            <option value="instagram">Instagram</option>
+            <option value="tiktok">TikTok</option>
+            <option value="youtube">YouTube</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="blog">Blog</option>
+            <option value="autre">Autre</option>
+          </select>
+          <input id="e-date" type="date">
+          <select id="e-account">
+            <option value="keypace">KeyPace (compte marque)</option>
+            <option value="fondateur_1">Fondateur 1 (perso)</option>
+            <option value="fondateur_2">Fondateur 2 (perso)</option>
+          </select>
+        </div>
+        <textarea id="e-caption" placeholder="Texte du post (ce qui sera publié)" style="margin-top:10px;min-height:90px"></textarea>
+        <textarea id="e-notes" placeholder="Notes internes (pas publiées)" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" onclick="saveEvent()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeEventForm()">Annuler</button>
+          <button class="btn danger" id="event-delete-btn" style="display:none;margin-left:auto" onclick="deleteEvent(editingEventId)">Supprimer</button>
+        </div>
+        <p class="muted" style="font-size:12px;margin:10px 0 0">Sans date : le contenu va dans « Idées à planifier » — glissez-le ensuite sur un jour.</p>
+      </div>
+
+      <div class="cal-layout">
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="backlog" id="backlog" ondragover="allowDrop(event)" ondrop="dropOnBacklog(event)">
+          <h3>Idées à planifier</h3>
+          <div id="backlog-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="reviews-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">💬</span>Avis</h2>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="muted" id="reviews-summary" style="font-size:12px"></span>
+          <button class="btn ghost small" onclick="syncGoogleReviews()" id="sync-google-btn">🔄 Sync avis Google</button>
+        </div>
+      </div>
+
+      <div class="panel" id="google-setup-panel" style="margin-bottom:16px">
+        <h3 style="margin:0 0 4px">Configuration Google (une seule fois)</h3>
+        <p class="muted" style="font-size:12.5px;margin:0 0 12px">Retrouve le <b>Place ID</b> de la fiche KeyPace pour configurer <code>GOOGLE_PLACE_ID</code> sur Vercel — sans jamais avoir à saisir la clé API ici. Si la recherche par nom renvoie des établissements sans rapport, cherche plutôt par <b>numéro de téléphone</b> (celui affiché sur la fiche Google), plus fiable.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="google-query" placeholder="ex. KeyPace Namur ou +32 471 40 18 59" style="flex:1;min-width:220px">
+          <button class="btn small" style="width:auto" onclick="findGooglePlace()">🔍 Chercher</button>
+        </div>
+        <div id="google-place-results" style="margin-top:12px"></div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="prospects">
+          <thead>
+            <tr>
+              <th>Auteur</th><th>Note</th><th>Commentaire</th><th>Statut</th><th>Déposé le</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reviews-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+const KEY_STORAGE = 'kp_dashboard_key';
+const STATUS_LABELS = { a_contacter:'À contacter', envoye:'Envoyé', relance:'Relancé', repondu:'Répondu', en_negociation:'Négociation', signe:'Signé', perdu:'Perdu' };
+const STATUS_FLOW = ['a_contacter','envoye','relance','repondu','en_negociation','signe','perdu'];
+let calMonth = new Date();
+
+function adminKey(){ return localStorage.getItem(KEY_STORAGE) || ''; }
+
+async function api(action, { method = 'GET', body, params } = {}) {
+  const qs = new URLSearchParams({ action, ...(params || {}) });
+  const url = method === 'GET' ? `/api/dashboard?${qs}` : '/api/dashboard';
+  const r = await fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey() },
+    body: method === 'GET' ? undefined : JSON.stringify({ action, ...(body || {}) }),
+  });
+  if (r.status === 401) { logout(); throw new Error('Non autorisé'); }
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || 'Erreur serveur');
+  return data;
+}
+
+async function tryUnlock(){
+  const key = document.getElementById('gate-key').value.trim();
+  const errEl = document.getElementById('gate-err');
+  if (!key) return;
+  localStorage.setItem(KEY_STORAGE, key);
+  try {
+    await api('kpis');
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    boot();
+  } catch (e) {
+    localStorage.removeItem(KEY_STORAGE);
+    errEl.textContent = 'Clé invalide.';
+  }
+}
+
+function logout(){
+  localStorage.removeItem(KEY_STORAGE);
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('gate').style.display = 'flex';
+}
+
+const TAB_SECTIONS = { kpi: 'kpi-section', prospects: 'prospects-section', calendar: 'calendar-section', reviews: 'reviews-section' };
+const REVIEW_STATUS_LABELS = { pending: 'En attente', published: 'Publié', rejected: 'Rejeté' };
+
+function switchTab(name){
+  if (!TAB_SECTIONS[name]) name = 'kpi';
+  Object.entries(TAB_SECTIONS).forEach(([key, id]) => {
+    document.getElementById(id).classList.toggle('active', key === name);
+  });
+  document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === name));
+  localStorage.setItem('kp_active_tab', name);
+}
+
+function boot(){
+  loadKpis();
+  loadTrafficDetail();
+  loadProspects();
+  renderCalendarHeader();
+  loadCalendar();
+  loadReviews();
+  switchTab(localStorage.getItem('kp_active_tab') || 'kpi');
+}
+
+// ─── KPI ──────────────────────────────────────────────
+function kpiCard(label, num, sub){
+  return `<div class="card"><div class="label">${label}</div><div class="num mono">${num}</div>${sub ? `<div class="sub">${sub}</div>` : ''}</div>`;
+}
+
+function trafficCardsHtml(traffic, conversionToSignup30d){
+  if (!traffic) return kpiCard('Trafic site', '—', 'Google Analytics non configuré');
+  if (traffic.error) return `<div class="card"><div class="label">Trafic site</div><div class="sub" style="color:#C23B2E">Erreur GA4 : ${traffic.error}</div></div>`;
+  return kpiCard('Visiteurs (7j)', traffic.visitors7d) +
+    kpiCard('Visiteurs (30j)', traffic.visitors30d) +
+    kpiCard('Pages vues (30j)', traffic.pageviews30d) +
+    kpiCard('Conversion visiteur→inscrit', conversionToSignup30d != null ? conversionToSignup30d + '%' : '—', 'sur 30 jours');
+}
+
+const DEVICE_LABELS = { desktop: 'Ordinateur', mobile: 'Mobile', tablet: 'Tablette' };
+const CHANNEL_LABELS = {
+  'Organic Search': 'Recherche organique', 'Direct': 'Direct', 'Referral': 'Référent',
+  'Organic Social': 'Réseaux sociaux', 'Paid Search': 'Recherche payante', 'Email': 'Email',
+  'Unassigned': 'Non attribué',
+};
+
+function trafficDetailRows(items, labelKey, valueKey, labelMap){
+  if (!items.length) return `<div class="empty-msg">Pas encore de données.</div>`;
+  const max = Math.max(...items.map((i) => i[valueKey]));
+  return items.map((i) => {
+    const raw = i[labelKey];
+    const label = labelMap ? (labelMap[raw] || raw) : raw;
+    return `<div class="td-row">
+      <span class="td-label" title="${raw}">${label}</span>
+      <span class="td-bar-wrap"><span class="td-bar" style="width:${max ? Math.round((i[valueKey] / max) * 100) : 0}%"></span></span>
+      <span class="td-val">${i[valueKey]}</span>
+    </div>`;
+  }).join('');
+}
+
+async function loadTrafficDetail(){
+  try {
+    const d = await api('traffic-detail');
+    const panel = document.getElementById('traffic-detail-panel');
+    if (!d.configured) { panel.style.display = 'none'; return; }
+    panel.style.display = 'block';
+    if (d.error) {
+      panel.querySelector('.traffic-detail-grid').innerHTML = `<div style="color:#C23B2E;font-size:13px">Erreur GA4 : ${d.error}</div>`;
+      return;
+    }
+    document.getElementById('traffic-pages').innerHTML = trafficDetailRows(d.topPages, 'path', 'views');
+    document.getElementById('traffic-devices').innerHTML = trafficDetailRows(d.devices, 'category', 'users', DEVICE_LABELS);
+    document.getElementById('traffic-channels').innerHTML = trafficDetailRows(d.channels, 'channel', 'sessions', CHANNEL_LABELS);
+  } catch (e) { console.error(e); }
+}
+
+async function loadKpis(){
+  try {
+    const { acquisition: a, b2b: b, engagement: e, trend } = await api('kpis');
+    document.getElementById('kpi-acquisition').innerHTML =
+      kpiCard('Inscrits (total)', a.totalUsers) +
+      kpiCard('Nouveaux (7j)', a.signups7d) +
+      kpiCard('Nouveaux (30j)', a.signups30d) +
+      kpiCard('Conversion free→expert', a.conversionRate + '%', a.expertUsers + ' expert / ' + a.freeUsers + ' free');
+    document.getElementById('kpi-traffic').innerHTML = trafficCardsHtml(a.traffic, a.conversionToSignup30d);
+    document.getElementById('kpi-b2b').innerHTML =
+      kpiCard('Écoles clientes', b.institutionsCount) +
+      kpiCard('Sièges vendus', b.totalSeats) +
+      kpiCard('À relancer', b.dueFollowups) +
+      kpiCard('Signées', b.prospectsByStatus.signe || 0);
+    document.getElementById('kpi-engagement').innerHTML =
+      kpiCard('Actifs (7j)', e.activeUsers7d) +
+      kpiCard('Actifs (30j)', e.activeUsers30d) +
+      kpiCard('Certificats émis', e.certificatesIssued) +
+      kpiCard('Participants défi hebdo', e.weeklyChallengeParticipants);
+    renderTrendChart(trend);
+  } catch (e) { console.error(e); }
+}
+
+function fmtDayLabel(iso){ const d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('fr-BE', { day:'2-digit', month:'2-digit' }); }
+
+function renderTrendChart(trend){
+  const el = document.getElementById('trend-chart');
+  const signups = trend.signups, active = trend.lastActive;
+  const n = signups.length;
+  const W = 680, H = 200, mL = 30, mR = 8, mT = 8, mB = 22;
+  const pw = W - mL - mR, ph = H - mT - mB;
+  const maxVal = Math.max(1, ...signups.map(d => d.count), ...active.map(d => d.count));
+  const x = i => mL + (n === 1 ? 0 : (i / (n - 1)) * pw);
+  const y = v => mT + ph - (v / maxVal) * ph;
+  const path = series => series.map((d, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(d.count).toFixed(1)}`).join(' ');
+
+  const gridSteps = 4;
+  let grid = '';
+  for (let s = 0; s <= gridSteps; s++) {
+    const v = Math.round((maxVal * s) / gridSteps);
+    const gy = y(v);
+    grid += `<line class="chart-gridline" x1="${mL}" x2="${W - mR}" y1="${gy.toFixed(1)}" y2="${gy.toFixed(1)}"/>`;
+    grid += `<text class="chart-axis-label" x="${mL - 6}" y="${(gy + 3).toFixed(1)}" text-anchor="end">${v}</text>`;
+  }
+  let xLabels = '';
+  const labelEvery = Math.ceil(n / 6);
+  for (let i = 0; i < n; i += labelEvery) {
+    xLabels += `<text class="chart-axis-label" x="${x(i).toFixed(1)}" y="${H - 4}" text-anchor="middle">${fmtDayLabel(signups[i].date)}</text>`;
+  }
+
+  el.innerHTML = `
+    <div class="chart-wrap">
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+        ${grid}
+        ${xLabels}
+        <path d="${path(signups)}" fill="none" stroke="var(--series-signups)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${path(active)}" fill="none" stroke="var(--series-active)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <line id="trend-crosshair" class="chart-crosshair" x1="0" x2="0" y1="${mT}" y2="${mT + ph}" style="display:none"/>
+        <rect id="trend-overlay" x="${mL}" y="${mT}" width="${pw}" height="${ph}" fill="transparent"/>
+      </svg>
+      <div id="trend-tooltip" class="chart-tooltip" style="display:none"></div>
+    </div>`;
+
+  const svg = el.querySelector('.chart-svg');
+  const overlay = el.querySelector('#trend-overlay');
+  const crosshair = el.querySelector('#trend-crosshair');
+  const tooltip = el.querySelector('#trend-tooltip');
+
+  overlay.addEventListener('mousemove', (ev) => {
+    const rect = svg.getBoundingClientRect();
+    const svgX = ((ev.clientX - rect.left) / rect.width) * W;
+    let i = Math.round(((svgX - mL) / pw) * (n - 1));
+    i = Math.max(0, Math.min(n - 1, i));
+    const cx = x(i);
+    crosshair.setAttribute('x1', cx); crosshair.setAttribute('x2', cx);
+    crosshair.style.display = 'block';
+    tooltip.style.display = 'block';
+    tooltip.style.left = ((ev.clientX - rect.left)) + 'px';
+    tooltip.style.top = (y(Math.max(signups[i].count, active[i].count)) / H * rect.height) + 'px';
+    tooltip.innerHTML = `<div class="tt-date">${fmtDayLabel(signups[i].date)}</div>
+      <div class="tt-row"><span class="dot" style="background:var(--series-signups)"></span>${signups[i].count} inscrit${signups[i].count > 1 ? 's' : ''}</div>
+      <div class="tt-row"><span class="dot" style="background:var(--series-active)"></span>${active[i].count} dernière activité</div>`;
+  });
+  overlay.addEventListener('mouseleave', () => {
+    crosshair.style.display = 'none';
+    tooltip.style.display = 'none';
+  });
+}
+
+// ─── Prospection écoles ──────────────────────────────
+function fmtDate(iso){ if (!iso) return '—'; return new Date(iso).toLocaleDateString('fr-BE', { day:'2-digit', month:'2-digit', year:'numeric' }); }
+
+function filterProspects(list){
+  const q = document.getElementById('prospect-search').value.trim().toLowerCase();
+  if (!q) return list;
+  return list.filter(p => [p.school_name, p.city, p.contact_name, p.contact_email, p.contact_phone, p.notes]
+    .some(field => (field || '').toLowerCase().includes(q)));
+}
+
+function sortProspects(list){
+  const mode = document.getElementById('sort-select').value;
+  const sorted = [...list];
+  if (mode === 'ville') sorted.sort((a, b) => (a.city || '').localeCompare(b.city || '', 'fr'));
+  else if (mode === 'ecole') sorted.sort((a, b) => (a.school_name || '').localeCompare(b.school_name || '', 'fr'));
+  else if (mode === 'statut') sorted.sort((a, b) => STATUS_FLOW.indexOf(a.status) - STATUS_FLOW.indexOf(b.status));
+  else if (mode === 'recent') sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  // 'relance' : on garde l'ordre déjà renvoyé par l'API (relances dues en premier)
+  return sorted;
+}
+
+async function loadProspects(){
+  try {
+    const { items: list, lastSyncAt } = await api('prospects');
+    window.__prospects = list;
+    document.getElementById('last-sync').textContent = lastSyncAt
+      ? `Dernière sync : ${fmtDate(lastSyncAt)}`
+      : 'Jamais synchronisé';
+    const now = Date.now();
+    const due = list.filter(p => p.next_followup_at && new Date(p.next_followup_at).getTime() <= now && p.status !== 'signe' && p.status !== 'perdu');
+
+    const calloutEl = document.getElementById('followup-callout');
+    calloutEl.innerHTML = due.length
+      ? `<div class="callout"><h3>À relancer aujourd'hui (${due.length})</h3>${due.map(p =>
+          `<div class="followup-item"><span class="fname">${p.school_name}</span><span class="badge badge-${p.status}">${STATUS_LABELS[p.status]}</span><span class="muted">depuis le ${fmtDate(p.last_contact_at)}</span></div>`
+        ).join('')}</div>`
+      : `<div class="callout empty">Aucune relance en attente 🎉</div>`;
+
+    renderProspects();
+  } catch (e) { console.error(e); }
+}
+
+function renderProspects(){
+  const list = window.__prospects || [];
+  const view = sortProspects(filterProspects(list));
+  try {
+    document.getElementById('prospects-body').innerHTML = view.length ? view.map(p => `
+      <tr>
+        <td><strong>${p.school_name}</strong>${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
+        <td>${p.city || '—'}</td>
+        <td>${p.contact_name || '—'}${p.contact_email ? `<div class="muted" style="font-size:12px">${p.contact_email}</div>` : ''}</td>
+        <td><span class="badge badge-${p.status}" title="Cliquer pour changer le statut" onclick="openStatusPicker(event,'${p.id}','${p.status}')">${STATUS_LABELS[p.status]}</span></td>
+        <td>${fmtDate(p.last_contact_at)}</td>
+        <td>${fmtDate(p.next_followup_at)}</td>
+        <td><div class="actions"><button class="btn small ghost" onclick="editProspect('${p.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
+      </tr>`).join('') : `<tr><td colspan="7" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
+  } catch (e) { console.error(e); }
+}
+
+// Remplace le badge de statut par un <select> natif au clic — plus simple et
+// plus accessible qu'un menu custom, le navigateur gère l'ouverture/fermeture.
+function openStatusPicker(ev, id, current){
+  const span = ev.currentTarget;
+  const select = document.createElement('select');
+  select.className = 'status-select';
+  STATUS_FLOW.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = STATUS_LABELS[s];
+    if (s === current) opt.selected = true;
+    select.appendChild(opt);
+  });
+  select.onchange = () => logContact(id, select.value);
+  select.onblur = () => loadProspects();
+  span.replaceWith(select);
+  select.focus();
+}
+
+// Dédoublonnage : même contact_email (ou même school_name si pas d'email),
+// on garde la fiche la plus récemment mise à jour.
+function dedupeProspects(list){
+  const byKey = new Map();
+  for (const p of list) {
+    const key = (p.contact_email || p.school_name || '').trim().toLowerCase();
+    if (!key) continue;
+    const existing = byKey.get(key);
+    if (!existing || new Date(p.updated_at) > new Date(existing.updated_at)) byKey.set(key, p);
+  }
+  return [...byKey.values()];
+}
+
+function csvCell(v){
+  const s = v == null ? '' : String(v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+const CSV_COLS = ['school_name','city','contact_name','contact_email','contact_phone','status','last_contact_at','next_followup_at','notes'];
+const CSV_LABELS = ['École','Ville','Contact','Email','Téléphone','Statut','Dernier contact','Relance prévue','Notes'];
+
+function exportProspectsCSV(){
+  const list = dedupeProspects(window.__prospects || []);
+  if (!list.length) return;
+  const rows = [CSV_LABELS.join(','), ...list.map(p => CSV_COLS.map(c => csvCell(c === 'status' ? STATUS_LABELS[p[c]] : p[c])).join(','))];
+  const blob = new Blob(['﻿' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `prospects-keypace-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── Ajout / édition (formulaire partagé) ─────────────
+let editingProspectId = null;
+
+function openAddForm(){
+  editingProspectId = null;
+  ['p-school','p-contact','p-email','p-phone','p-city','p-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('prospect-form-title').textContent = 'Nouvelle école';
+  document.getElementById('prospect-save-btn').textContent = 'Enregistrer';
+  document.getElementById('prospect-form').style.display = 'block';
+}
+
+function closeProspectForm(){
+  document.getElementById('prospect-form').style.display = 'none';
+}
+
+function editProspect(id){
+  const p = (window.__prospects || []).find(x => x.id === id);
+  if (!p) return;
+  editingProspectId = id;
+  document.getElementById('p-school').value = p.school_name || '';
+  document.getElementById('p-contact').value = p.contact_name || '';
+  document.getElementById('p-email').value = p.contact_email || '';
+  document.getElementById('p-phone').value = p.contact_phone || '';
+  document.getElementById('p-city').value = p.city || '';
+  document.getElementById('p-notes').value = p.notes || '';
+  document.getElementById('prospect-form-title').textContent = `Modifier « ${p.school_name} »`;
+  document.getElementById('prospect-save-btn').textContent = 'Enregistrer les modifications';
+  document.getElementById('prospect-form').style.display = 'block';
+}
+
+async function saveProspect(){
+  const school_name = document.getElementById('p-school').value.trim();
+  if (!school_name) return;
+  const body = {
+    school_name,
+    contact_name: document.getElementById('p-contact').value.trim(),
+    contact_email: document.getElementById('p-email').value.trim(),
+    contact_phone: document.getElementById('p-phone').value.trim(),
+    city: document.getElementById('p-city').value.trim(),
+    notes: document.getElementById('p-notes').value.trim(),
+  };
+  if (editingProspectId) await api('update-prospect', { method:'POST', body: { id: editingProspectId, ...body } });
+  else await api('create-prospect', { method:'POST', body });
+  closeProspectForm();
+  loadProspects();
+  loadKpis();
+}
+
+// ─── Import CSV ────────────────────────────────────────
+// Parseur CSV minimal mais correct (guillemets, virgules et retours à la
+// ligne dans un champ) — évite un simple split(',') qui casserait sur les
+// notes contenant une virgule.
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else inQuotes = false; }
+      else field += c;
+    } else if (c === '"') inQuotes = true;
+    else if (c === ',') { row.push(field); field = ''; }
+    else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      row.push(field); field = '';
+      if (row.length > 1 || row[0] !== '') rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+const CSV_HEADER_SYNONYMS = {
+  school_name: ['école', 'ecole', 'school_name', 'nom'],
+  city: ['ville', 'city'],
+  contact_name: ['contact', 'contact_name'],
+  contact_email: ['email', 'contact_email'],
+  contact_phone: ['téléphone', 'telephone', 'contact_phone'],
+  status: ['statut', 'status'],
+  notes: ['notes'],
+};
+const STATUS_LABEL_TO_KEY = Object.fromEntries(Object.entries(STATUS_LABELS).map(([k, v]) => [v.toLowerCase(), k]));
+
+function resolveStatus(raw){
+  const s = (raw || '').trim().toLowerCase();
+  if (!s) return undefined;
+  if (STATUS_LABEL_TO_KEY[s]) return STATUS_LABEL_TO_KEY[s];
+  if (STATUS_FLOW.includes(s)) return s;
+  return undefined;
+}
+
+async function handleCSVImport(ev){
+  const file = ev.target.files[0];
+  ev.target.value = ''; // permet de réimporter le même fichier ensuite
+  if (!file) return;
+  const text = await file.text();
+  const rows = parseCSV(text.replace(/^﻿/, ''));
+  if (rows.length < 2) return;
+
+  const header = rows[0].map(h => h.trim().toLowerCase());
+  const colIndex = {};
+  for (const [field, synonyms] of Object.entries(CSV_HEADER_SYNONYMS)) {
+    const idx = header.findIndex(h => synonyms.includes(h));
+    if (idx !== -1) colIndex[field] = idx;
+  }
+  if (colIndex.school_name == null) {
+    document.getElementById('import-result').innerHTML = `<div class="callout">Colonne "École" introuvable dans le CSV — import annulé.</div>`;
+    return;
+  }
+
+  const existingByEmail = new Map((window.__prospects || [])
+    .filter(p => p.contact_email)
+    .map(p => [p.contact_email.trim().toLowerCase(), p]));
+
+  let created = 0, updated = 0, skipped = 0;
+  for (const row of rows.slice(1)) {
+    const get = (field) => colIndex[field] != null ? (row[colIndex[field]] || '').trim() : '';
+    const school_name = get('school_name');
+    if (!school_name) { skipped++; continue; }
+    const email = get('contact_email');
+    const body = {
+      school_name,
+      city: get('city'),
+      contact_name: get('contact_name'),
+      contact_email: email,
+      contact_phone: get('contact_phone'),
+      notes: get('notes'),
+      status: resolveStatus(get('status')),
+    };
+    const existing = email ? existingByEmail.get(email.toLowerCase()) : null;
+    if (existing) { await api('update-prospect', { method:'POST', body: { id: existing.id, ...body } }); updated++; }
+    else { await api('create-prospect', { method:'POST', body }); created++; }
+  }
+
+  document.getElementById('import-result').innerHTML =
+    `<div class="callout">Import terminé : ${created} créée${created > 1 ? 's' : ''}, ${updated} mise${updated > 1 ? 's' : ''} à jour${skipped ? `, ${skipped} ligne${skipped > 1 ? 's' : ''} ignorée${skipped > 1 ? 's' : ''} (sans nom d'école)` : ''}.</div>`;
+  loadProspects();
+  loadKpis();
+}
+
+async function logContact(id, status){
+  await api('log-contact', { method:'POST', body: { id, status } });
+  loadProspects();
+  loadKpis();
+}
+
+async function deleteProspect(id){
+  if (!confirm('Supprimer cette école de la liste de prospection ?')) return;
+  await api('delete-prospect', { method:'POST', body: { id } });
+  loadProspects();
+  loadKpis();
+}
+
+async function syncZimbra(){
+  const btn = document.getElementById('sync-btn');
+  const resultEl = document.getElementById('sync-result');
+  btn.disabled = true;
+  btn.textContent = '⏳ Sync en cours…';
+  resultEl.innerHTML = '';
+  try {
+    const r = await api('sync-zimbra', { method: 'POST' });
+    resultEl.innerHTML = `<div class="callout empty" style="margin:10px 0">${r.checked} email(s) vérifié(s) — ${r.updated} statut(s) mis à jour, ${r.created} nouveau(x) prospect(s), ${r.skipped} déjà traité(s).</div>`;
+    loadProspects();
+    loadKpis();
+  } catch (e) {
+    resultEl.innerHTML = `<div class="callout" style="margin:10px 0;background:#FBE7E5;border-color:#F3C7C1">${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔄 Sync emails';
+  }
+}
+
+// ─── Calendrier marketing ─────────────────────────────
+function monthKey(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+function renderCalendarHeader(){
+  document.getElementById('cal-label').textContent = calMonth.toLocaleDateString('fr-BE', { month:'long', year:'numeric' });
+}
+function shiftMonth(delta){
+  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+delta, 1);
+  renderCalendarHeader();
+  loadCalendar();
+}
+
+const ACCOUNT_LABELS = { keypace: 'KeyPace', fondateur_1: 'Fondateur 1', fondateur_2: 'Fondateur 2' };
+
+function contentCardHtml(ev){
+  const isTask = ev.content_type === 'tache';
+  return `<div class="content-card" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')" style="${isTask ? 'background:#FFF6F2;border-color:#FFD9CC' : ''}">
+    <span class="ctitle">${isTask ? '✅ ' : ''}${ev.title}</span>
+    <span class="cmeta">${ev.platform ? `<span class="platform-tag">${ev.platform}</span>` : ''}<span class="platform-tag" style="background:#EAE6F5">${ACCOUNT_LABELS[ev.account] || 'KeyPace'}</span>${isTask ? 'tâche' : ev.content_type}</span>
+  </div>`;
+}
+
+async function loadCalendar(){
+  try {
+    const { scheduled, backlog } = await api('calendar', { params: { month: monthKey(calMonth) } });
+    window.__events = {}; [...scheduled, ...backlog].forEach(e => window.__events[e.id] = e);
+
+    const byDay = {};
+    scheduled.forEach(ev => { (byDay[ev.scheduled_date] = byDay[ev.scheduled_date] || []).push(ev); });
+
+    const year = calMonth.getFullYear(), month = calMonth.getMonth();
+    const firstDow = (new Date(year, month, 1).getDay() + 6) % 7; // lundi = 0
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const dows = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+
+    let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
+    for (let i=0;i<firstDow;i++) html += `<div class="cal-day empty"></div>`;
+    for (let day=1; day<=daysInMonth; day++){
+      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const items = (byDay[dateStr] || []).map(contentCardHtml).join('');
+      html += `<div class="cal-day" ondragover="allowDrop(event)" ondrop="dropOnDay(event,'${dateStr}')">
+        <div class="dnum">${day}</div>${items}
+      </div>`;
+    }
+    document.getElementById('cal-grid').innerHTML = html;
+    document.getElementById('backlog-list').innerHTML = backlog.length
+      ? backlog.map(contentCardHtml).join('')
+      : `<div class="empty-msg">Rien en attente.</div>`;
+  } catch (e) { console.error(e); }
+}
+
+function allowDrop(ev){ ev.preventDefault(); ev.currentTarget.classList.add('dragover'); ev.currentTarget.addEventListener('dragleave', () => ev.currentTarget.classList.remove('dragover'), { once:true }); }
+function dragStart(ev, id){ ev.dataTransfer.setData('text/plain', id); }
+
+async function dropOnDay(ev, dateStr){
+  ev.preventDefault(); ev.currentTarget.classList.remove('dragover');
+  const id = ev.dataTransfer.getData('text/plain');
+  if (!id) return;
+  await api('update-event', { method:'POST', body: { id, scheduled_date: dateStr } });
+  loadCalendar();
+}
+
+async function dropOnBacklog(ev){
+  ev.preventDefault(); ev.currentTarget.classList.remove('dragover');
+  const id = ev.dataTransfer.getData('text/plain');
+  if (!id) return;
+  await api('update-event', { method:'POST', body: { id, scheduled_date: null } });
+  loadCalendar();
+}
+
+let editingEventId = null;
+
+function openAddEventForm(){
+  editingEventId = null;
+  ['e-title','e-date','e-caption','e-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('e-type').value = 'post';
+  document.getElementById('e-platform').value = '';
+  document.getElementById('e-account').value = 'keypace';
+  document.querySelector('#event-form h3').textContent = 'Nouveau contenu';
+  document.getElementById('event-delete-btn').style.display = 'none';
+  document.getElementById('event-form').style.display = 'block';
+}
+
+function editEvent(id){
+  const ev = window.__events[id];
+  if (!ev) return;
+  editingEventId = id;
+  document.getElementById('e-title').value = ev.title || '';
+  document.getElementById('e-type').value = ev.content_type || 'post';
+  document.getElementById('e-platform').value = ev.platform || '';
+  document.getElementById('e-date').value = ev.scheduled_date || '';
+  document.getElementById('e-account').value = ev.account || 'keypace';
+  document.getElementById('e-caption').value = ev.caption || '';
+  document.getElementById('e-notes').value = ev.notes || '';
+  document.querySelector('#event-form h3').textContent = `Modifier « ${ev.title} »`;
+  document.getElementById('event-delete-btn').style.display = 'inline-flex';
+  document.getElementById('event-form').style.display = 'block';
+}
+
+async function deleteEvent(id){
+  if (!confirm('Supprimer ce contenu du calendrier ?')) return;
+  await api('delete-event', { method:'POST', body: { id } });
+  closeEventForm();
+  loadCalendar();
+}
+
+function closeEventForm(){
+  editingEventId = null;
+  document.getElementById('event-form').style.display = 'none';
+}
+
+async function saveEvent(){
+  const title = document.getElementById('e-title').value.trim();
+  if (!title) return;
+  const body = {
+    title,
+    content_type: document.getElementById('e-type').value,
+    platform: document.getElementById('e-platform').value,
+    account: document.getElementById('e-account').value,
+    scheduled_date: document.getElementById('e-date').value || null,
+    caption: document.getElementById('e-caption').value.trim(),
+    notes: document.getElementById('e-notes').value.trim(),
+  };
+  if (editingEventId) await api('update-event', { method:'POST', body: { id: editingEventId, ...body } });
+  else await api('create-event', { method:'POST', body });
+  closeEventForm();
+  loadCalendar();
+}
+
+// ─── Avis (modération) ─────────────────────────────────
+function escHtml(s){
+  return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
+async function loadReviews(){
+  const { items } = await api('reviews');
+  window.__reviews = items;
+  renderReviews();
+}
+
+function renderReviews(){
+  const items = window.__reviews || [];
+  const pending = items.filter(r => r.status === 'pending').length;
+  const published = items.filter(r => r.status === 'published').length;
+  document.getElementById('reviews-summary').textContent = `${pending} en attente · ${published} publié${published > 1 ? 's' : ''}`;
+  document.getElementById('reviews-body').innerHTML = items.length ? items.map(r => `
+    <tr>
+      <td>${escHtml(r.author_name)}</td>
+      <td>${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</td>
+      <td style="max-width:360px;white-space:normal">${escHtml(r.comment)}</td>
+      <td><span class="badge badge-${r.status}">${REVIEW_STATUS_LABELS[r.status] || r.status}</span></td>
+      <td>${fmtDate(r.created_at)}</td>
+      <td style="white-space:nowrap">
+        ${r.status !== 'published' ? `<button class="btn ghost small" onclick="setReviewStatus('${r.id}','published')">✓ Publier</button>` : ''}
+        ${r.status !== 'rejected' ? `<button class="btn ghost small" onclick="setReviewStatus('${r.id}','rejected')">✕ Rejeter</button>` : ''}
+      </td>
+    </tr>`).join('') : '<tr><td colspan="6" class="muted">Aucun avis pour le moment.</td></tr>';
+}
+
+async function setReviewStatus(id, status){
+  const action = status === 'published' ? 'publish-review' : 'reject-review';
+  await api(action, { method: 'POST', body: { id } });
+  await loadReviews();
+}
+
+async function findGooglePlace(){
+  const query = document.getElementById('google-query').value.trim();
+  const resultsEl = document.getElementById('google-place-results');
+  if (!query) return;
+  resultsEl.innerHTML = '<span class="muted">Recherche…</span>';
+  try {
+    const { candidates } = await api('find-place', { params: { query } });
+    resultsEl.innerHTML = candidates && candidates.length
+      ? candidates.map(c => `
+          <div style="padding:10px 0;border-top:1px solid var(--border)">
+            <div style="font-weight:700">${escHtml(c.name)}</div>
+            <div class="muted" style="font-size:12.5px;margin:2px 0 6px">${escHtml(c.formatted_address || '')}</div>
+            <div class="mono" style="font-size:12.5px;background:var(--light);border-radius:8px;padding:6px 10px;display:inline-block">${escHtml(c.place_id)}</div>
+          </div>`).join('')
+      : '<span class="muted">Aucun résultat — précise le nom et la ville.</span>';
+  } catch (e) {
+    resultsEl.innerHTML = `<span class="muted">${escHtml(e.message)}</span>`;
+  }
+}
+
+async function syncGoogleReviews(){
+  const btn = document.getElementById('sync-google-btn');
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = 'Synchro…';
+  try {
+    const r = await api('sync-google-reviews', { method: 'POST' });
+    await loadReviews();
+    alert(`${r.synced} avis Google synchronisé${r.synced > 1 ? 's' : ''}.`);
+  } catch (e) {
+    alert(e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = original;
+}
+
+// ─── Démarrage ─────────────────────────────────────────
+if (adminKey()) {
+  api('kpis').then(() => {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    boot();
+  }).catch(() => { localStorage.removeItem(KEY_STORAGE); });
+}
+document.getElementById('gate-key').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+</script>
+
+</body>
+</html>

@@ -250,3 +250,92 @@ alter table users
 -- (compat licences existantes). À l'expiration, les élèves rattachés repassent
 -- en 'free' au prochain login et les nouvelles inscriptions sont bloquées.
 alter table institutions add column if not exists license_expires_at timestamptz;
+
+-- ───────────────────────────────────────────────────────────────
+-- Dashboard interne équipe (KPI, prospection écoles, calendrier marketing).
+-- Accès uniquement via api/dashboard.js (clé ADMIN_KEY partagée, côté service).
+-- RLS sans policy => accès anonyme refusé.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists school_prospects (
+  id uuid default gen_random_uuid() primary key,
+  school_name text not null,
+  contact_name text,
+  contact_email text,
+  contact_phone text,
+  status text default 'a_contacter' check (status in
+    ('a_contacter','envoye','relance','repondu','en_negociation','signe','perdu')),
+  notes text,
+  last_contact_at timestamptz,
+  next_followup_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists school_prospects_status_idx on school_prospects(status);
+create index if not exists school_prospects_followup_idx on school_prospects(next_followup_at);
+alter table school_prospects enable row level security;
+
+-- Ville du prospect (formulaire, tri, import/export CSV du dashboard).
+alter table school_prospects add column if not exists city text;
+
+create table if not exists content_calendar (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  content_type text default 'post' check (content_type in
+    ('video','post','story','article','newsletter','tache')),
+  platform text,
+  account text default 'keypace',  -- 'keypace' | 'fondateur_1' | 'fondateur_2'
+  caption text,                    -- texte réel du post (distinct de `notes`, interne)
+  status text default 'idee' check (status in ('idee','a_faire','pret','publie')),
+  scheduled_date date,            -- null = dans le backlog, pas encore planifié
+  link text,
+  notes text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists content_calendar_date_idx on content_calendar(scheduled_date);
+alter table content_calendar enable row level security;
+
+-- Dédup de la synchro Zimbra (api/dashboard.js action=sync-zimbra) : un email
+-- déjà traité (par Message-ID) n'est jamais reclassé lors d'une sync suivante.
+create table if not exists zimbra_sync_log (
+  id uuid default gen_random_uuid() primary key,
+  message_id text unique not null,
+  prospect_id uuid references school_prospects(id) on delete set null,
+  direction text not null check (direction in ('in','out')),
+  processed_at timestamptz default now()
+);
+create index if not exists zimbra_sync_log_message_id_idx on zimbra_sync_log(message_id);
+alter table zimbra_sync_log enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Avis KeyPace, affichés sur la home après le bandeau licence établissement.
+-- Avis natifs déposés par un élève connecté depuis son dashboard (proposé
+-- après un certain nombre de leçons/certificat), modérés avant publication.
+-- Un seul avis natif par élève (uniques par user_id, resoumission = mise à
+-- jour). `source`='google' réservé à une future synchro Google Business
+-- Profile (source_url = lien vers l'avis d'origine).
+-- Accès via api/reviews.js (clé service) ; RLS sans policy => anon refusé.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists reviews (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references users(id) on delete set null,
+  source text not null default 'natif' check (source in ('natif','google')),
+  author_name text not null,
+  rating integer not null check (rating between 1 and 5),
+  comment text,
+  status text not null default 'pending' check (status in ('pending','published','rejected')),
+  source_url text,
+  published_at timestamptz,
+  created_at timestamptz default now()
+);
+create index if not exists reviews_status_idx on reviews(status, published_at desc);
+create unique index if not exists reviews_user_unique_idx on reviews(user_id) where user_id is not null;
+alter table reviews enable row level security;
+
+-- Synchro avis Google Business Profile (dashboard-app, cron quotidien) :
+-- l'API Google Places (legacy) ne renvoie pas d'ID stable par avis, donc on
+-- en construit un nous-mêmes (horodatage + auteur) pour pouvoir upserter sans
+-- doublon d'une synchro à l'autre sans jamais écraser un statut de
+-- modération déjà décidé (voir syncGoogleReviews, dashboard-app/api/dashboard.js).
+alter table reviews add column if not exists external_id text;
+create unique index if not exists reviews_source_external_idx on reviews(source, external_id);

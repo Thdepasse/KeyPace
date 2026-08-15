@@ -2,6 +2,15 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3FTPKKF679"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3FTPKKF679');
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KeyPace – Application de dactylographie AZERTY gratuite en français</title>
 <meta name="description" content="KeyPace : apprenez à taper vite sur clavier AZERTY avec 65 leçons progressives, test de vitesse et jeux de frappe. Gratuit, en français, sans installation.">
@@ -577,6 +586,22 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
   .school-banner p{margin-left:auto;margin-right:auto}
   .school-banner-feats{justify-content:center}
   .school-banner-actions{justify-content:center}
+}
+
+/* AVIS (home, après le bandeau licence établissement) */
+.reviews-section{max-width:1120px;margin:0 auto;padding:0 24px 70px}
+.reviews-section h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;text-align:center;margin-bottom:8px}
+.reviews-summary{text-align:center;color:#7A7365;font-size:16px;margin-bottom:32px}
+.reviews-summary .reviews-avg{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--txt);font-size:20px}
+.reviews-summary .reviews-stars{color:#F5A623;letter-spacing:1px}
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.review-card{border:1.5px solid var(--border);border-radius:18px;padding:22px;background:var(--card)}
+.review-card .review-stars{color:#F5A623;letter-spacing:1px;margin-bottom:10px}
+.review-card p{font-size:14.5px;color:var(--txt);line-height:1.55;margin-bottom:14px}
+.review-card .review-author{font-size:13px;color:var(--muted);font-weight:700}
+@media(max-width:768px){
+  .reviews-section{padding:0 16px 44px}
+  .reviews-section h2{font-size:26px}
 }
 
 /* TYPING */
@@ -3852,7 +3877,43 @@ const app={
           <div class="school-banner-visual" aria-hidden="true">🎓</div>
         </div>
       </div>
+
+      <div class="reviews-section" id="home-reviews" style="display:none">
+        <h2>Ce qu'ils en pensent</h2>
+        <div class="reviews-summary"></div>
+        <div class="reviews-grid"></div>
+      </div>
       `;
+    this.loadHomeReviews();
+  },
+
+  // Avis publiés (modérés), affichés après le bandeau licence établissement.
+  // Injecte aussi le schema.org AggregateRating/Review correspondant (rich
+  // snippets) — uniquement si des avis existent (jamais de note à 0 avis).
+  async loadHomeReviews(){
+    const el=document.getElementById('home-reviews');
+    if(!el)return;
+    try{
+      const r=await fetch('/api/reviews?action=list');
+      if(!r.ok)return;
+      const d=await r.json();
+      if(!d.count)return;
+      const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      const stars=n=>'★'.repeat(Math.round(n))+'☆'.repeat(5-Math.round(n));
+      el.querySelector('.reviews-summary').innerHTML=`<span class="reviews-avg">${d.average.toFixed(1)}</span> <span class="reviews-stars">${stars(d.average)}</span> sur ${d.count} avis`;
+      el.querySelector('.reviews-grid').innerHTML=d.items.slice(0,6).map(it=>`<div class="review-card"><div class="review-stars">${stars(it.rating)}</div><p>${esc(it.comment)}</p><div class="review-author">${esc(it.author_name)}</div></div>`).join('');
+      el.style.display='';
+      let ld=document.getElementById('reviews-jsonld');
+      if(!ld){ld=document.createElement('script');ld.type='application/ld+json';ld.id='reviews-jsonld';document.head.appendChild(ld);}
+      ld.textContent=JSON.stringify({
+        '@context':'https://schema.org',
+        '@type':'Course',
+        name:'Cours de dactylographie AZERTY',
+        provider:{'@type':'Organization',name:'KeyPace',url:'https://keypace.be'},
+        aggregateRating:{'@type':'AggregateRating',ratingValue:d.average,reviewCount:d.count},
+        review:d.items.slice(0,10).map(it=>({'@type':'Review',author:{'@type':'Person',name:it.author_name},reviewRating:{'@type':'Rating',ratingValue:it.rating,bestRating:5,worstRating:1},reviewBody:it.comment})),
+      });
+    }catch(e){}
   },
 
   _renderHomeEtab(){
@@ -6925,6 +6986,7 @@ const app={
         <div class="scard"><div class="scard-label">Cours validés</div><div class="scard-val">${clearedLessons} <span style="font-size:20px;color:var(--muted)">/ ${ALL_LESSONS.length}</span></div><div class="scard-unit">leçons terminées</div></div>
       </div>
       ${this._certPanel()}
+      ${this._reviewBanner(clearedLessons)}
       <div class="stats-grid">
         <div class="spanel"><h3>Vitesse récente</h3><div class="chart">${chartHTML}</div></div>
         <div class="spanel" style="margin-bottom:0"><h3>Derniers tests</h3><div class="recent-list">${recentHTML}</div></div>
@@ -6985,6 +7047,54 @@ const app={
       </div>
       ${isMobileLayout()?`<div style="margin-top:12px;background:var(--light);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);line-height:1.5">💻 Pour passer (ou repasser) un examen, connecte-toi sur ordinateur.</div>`:''}`);
   },
+
+  /* ── AVIS ── */
+  // Proposé une fois l'élève engagé (leçons validées ou certificat obtenu),
+  // sur le même principe que _certPanel : bandeau conditionnel dans le dashboard.
+  async loadMyReview(){
+    if(this._reviewLoading)return;
+    if(!currentToken){this._myReview=null;return;}
+    this._reviewLoading=true;
+    try{
+      const r=await fetch('/api/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+      this._myReview=r.ok?((await r.json()).review||null):null;
+    }catch{this._myReview=null;}
+    this._reviewLoading=false;
+    if(this.view==='stats')this.renderStats();
+  },
+  _reviewBanner(clearedLessons){
+    const eligible=clearedLessons>=10||(this._myCert&&this._myCert.level);
+    if(!eligible)return '';
+    if(this._myReview===undefined){this.loadMyReview();return '';}
+    const wrap=(inner)=>`<div class="spanel" style="margin-bottom:22px"><h3>💬 Ton avis compte</h3>${inner}</div>`;
+    if(this._myReview){
+      const msg=this._myReview.status==='published'?"Merci, ton avis est publié sur la page d'accueil ! 🎉":"Merci ! Ton avis est en cours de vérification avant publication.";
+      return wrap(`<div style="font-size:14px;color:var(--muted)">${msg}</div>`);
+    }
+    return wrap(`<div style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:14px">Tu progresses bien, ça nous ferait très plaisir d'avoir ton avis sur KeyPace 🙏</div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;font-size:26px">
+        ${[1,2,3,4,5].map(n=>`<span onclick="app.setReviewStar(${n})" style="cursor:pointer;opacity:.35" id="rstar-${n}">★</span>`).join('')}
+      </div>
+      <textarea id="review-comment" rows="3" maxlength="2000" placeholder="Qu'est-ce qui t'a aidé avec KeyPace ?" style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px;font-family:inherit;font-size:14px;resize:vertical"></textarea>
+      <div style="margin-top:10px"><button class="btn-primary" style="padding:9px 18px;font-size:14px" onclick="app.submitReview()">Envoyer mon avis</button></div>`);
+  },
+  setReviewStar(n){
+    this._reviewStar=n;
+    for(let i=1;i<=5;i++){const el=document.getElementById('rstar-'+i);if(el)el.style.opacity=i<=n?'1':'.35';}
+  },
+  async submitReview(){
+    const rating=this._reviewStar||0;
+    const comment=(document.getElementById('review-comment')||{}).value||'';
+    if(!rating){alert('Choisis une note de 1 à 5 étoiles.');return;}
+    if(!comment.trim()){alert('Ajoute un petit commentaire.');return;}
+    try{
+      const r=await fetch('/api/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,rating,comment:comment.trim()})});
+      if(!r.ok){const d=await r.json().catch(()=>({}));alert(d.error||"Erreur lors de l'envoi.");return;}
+    }catch{alert('Erreur réseau, réessaie.');return;}
+    this._myReview={rating,comment:comment.trim(),status:'pending'};
+    this.renderStats();
+  },
+
   startCertExam(mode){
     if(!currentUser){openAuth('login','Connecte-toi pour passer la certification.',()=>this.startCertExam(mode));return;}
     if(!localStorage.getItem('keypace-gaze-calib')){
