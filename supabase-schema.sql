@@ -301,6 +301,18 @@ create table if not exists content_calendar (
 create index if not exists content_calendar_date_idx on content_calendar(scheduled_date);
 alter table content_calendar enable row level security;
 
+-- Un contenu peut être posté sur plusieurs plateformes à la fois (remplace
+-- l'ancien `platform` unique). Migration : reprend la valeur existante avant
+-- de supprimer la colonne.
+alter table content_calendar add column if not exists platforms text[] default '{}';
+update content_calendar set platforms = array[platform] where platform is not null and platforms = '{}';
+alter table content_calendar drop column if exists platform;
+
+-- Clé stable de l'idée de la banque d'idées (voir CONTENT_IDEAS,
+-- dashboard-app/index.html) à l'origine de ce contenu, si créé depuis là.
+-- Sert à ne plus reproposer un sujet déjà traité (regroupé par `topic`).
+alter table content_calendar add column if not exists idea_key text;
+
 -- Dédup de la synchro Zimbra (api/dashboard.js action=sync-zimbra) : un email
 -- déjà traité (par Message-ID) n'est jamais reclassé lors d'une sync suivante.
 create table if not exists zimbra_sync_log (

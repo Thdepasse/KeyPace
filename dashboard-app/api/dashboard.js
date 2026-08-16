@@ -199,27 +199,38 @@ async function calendarList(req, res) {
 }
 
 async function eventCreate(req, res) {
-  const { title, content_type, platform, account, caption, status, scheduled_date, link, notes } = req.body || {};
+  const { title, content_type, platforms, account, caption, status, scheduled_date, link, notes, idea_key } = req.body || {};
   if (!title) return res.status(400).json({ error: 'Titre manquant.' });
   const r = await sb('/content_calendar', {
     method: 'POST',
     body: JSON.stringify({
       title,
       content_type: content_type || 'post',
-      platform: platform || null,
+      platforms: Array.isArray(platforms) ? platforms : [],
       account: account || 'keypace',
       caption: caption || null,
       status: status || 'idee',
       scheduled_date: scheduled_date || null,
       link: link || null,
       notes: notes || null,
+      idea_key: idea_key || null,
     }),
   });
   if (!r.ok) return res.status(500).json({ error: 'Erreur création contenu.' });
   return res.status(201).json(r.data[0]);
 }
 
-const EVENT_FIELDS = ['title', 'content_type', 'platform', 'account', 'caption', 'status', 'scheduled_date', 'link', 'notes'];
+const EVENT_FIELDS = ['title', 'content_type', 'platforms', 'account', 'caption', 'status', 'scheduled_date', 'link', 'notes', 'idea_key'];
+
+// Clés d'idées (banque d'idées) déjà utilisées pour créer un contenu — sert à
+// ne plus reproposer un sujet déjà traité, peu importe où il en est (idée,
+// planifié, publié...) et peu importe le mois affiché dans le calendrier.
+async function usedIdeaKeys(req, res) {
+  const r = await sb('/content_calendar?select=idea_key&idea_key=not.is.null');
+  if (!r.ok) return res.status(500).json({ error: 'Erreur récupération des idées utilisées.' });
+  const keys = [...new Set((r.data || []).map((c) => c.idea_key))];
+  return res.json({ keys });
+}
 
 // Sert aussi au glisser-déposer : { id, scheduled_date } déplace un contenu.
 async function eventUpdate(req, res) {
@@ -449,6 +460,7 @@ module.exports = async function handler(req, res) {
         case 'traffic-detail': return await trafficDetail(req, res);
         case 'prospects': return await prospectsList(req, res);
         case 'calendar': return await calendarList(req, res);
+        case 'used-idea-keys': return await usedIdeaKeys(req, res);
         case 'reviews': return await reviewsList(req, res);
         case 'find-place': return await googleFindPlace(req, res);
         default: return res.status(400).json({ error: 'Action inconnue.' });

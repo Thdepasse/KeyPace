@@ -138,6 +138,9 @@
   .backlog.dragover{border-color:var(--accent);background:#FFF6F2}
   .backlog h3{font-size:13px;font-weight:800;margin-bottom:2px}
   .platform-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;background:var(--border);color:var(--txt);margin-right:4px}
+  .platform-checks{display:flex;gap:6px;flex-wrap:wrap}
+  .platform-checks label{display:flex;align-items:center;gap:5px;font-size:12.5px;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;user-select:none}
+  .platform-checks input{margin:0}
   .idea-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
   .idea-card{background:var(--light);border:1px solid var(--border);border-radius:12px;padding:14px}
   .idea-card .ititle{font-weight:700;font-size:13.5px;margin-bottom:6px;line-height:1.35}
@@ -378,21 +381,23 @@
             <option value="newsletter">Newsletter</option>
             <option value="tache">Tâche</option>
           </select>
-          <select id="e-platform">
-            <option value="">Plateforme…</option>
-            <option value="instagram">Instagram</option>
-            <option value="tiktok">TikTok</option>
-            <option value="youtube">YouTube</option>
-            <option value="linkedin">LinkedIn</option>
-            <option value="blog">Blog</option>
-            <option value="autre">Autre</option>
-          </select>
           <input id="e-date" type="date">
           <select id="e-account">
             <option value="keypace">KeyPace (compte marque)</option>
             <option value="fondateur_1">Fondateur 1 (perso)</option>
             <option value="fondateur_2">Fondateur 2 (perso)</option>
           </select>
+        </div>
+        <div style="margin-top:10px">
+          <label style="font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:6px">Plateformes (posté sur plusieurs à la fois ? coche-les toutes)</label>
+          <div class="platform-checks" id="e-platforms">
+            <label><input type="checkbox" value="instagram"> Instagram</label>
+            <label><input type="checkbox" value="tiktok"> TikTok</label>
+            <label><input type="checkbox" value="youtube"> YouTube</label>
+            <label><input type="checkbox" value="linkedin"> LinkedIn</label>
+            <label><input type="checkbox" value="blog"> Blog</label>
+            <label><input type="checkbox" value="autre"> Autre</label>
+          </div>
         </div>
         <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
           <label style="font-size:12px;color:var(--muted);font-weight:700">Texte du post</label>
@@ -514,6 +519,7 @@ function boot(){
   loadProspects();
   renderCalendarHeader();
   loadCalendar();
+  loadUsedIdeaTopics();
   loadReviews();
   switchTab(localStorage.getItem('kp_active_tab') || 'kpi');
 }
@@ -1034,7 +1040,7 @@ function contentCardHtml(ev){
   const isTask = ev.content_type === 'tache';
   return `<div class="content-card" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')" style="${isTask ? 'background:#FFF6F2;border-color:#FFD9CC' : ''}">
     <span class="ctitle">${isTask ? '✅ ' : ''}${ev.title}</span>
-    <span class="cmeta">${ev.platform ? `<span class="platform-tag">${ev.platform}</span>` : ''}<span class="platform-tag" style="background:#EAE6F5">${ACCOUNT_LABELS[ev.account] || 'KeyPace'}</span>${isTask ? 'tâche' : ev.content_type}</span>
+    <span class="cmeta">${(ev.platforms || []).map(p => `<span class="platform-tag">${p}</span>`).join('')}<span class="platform-tag" style="background:#EAE6F5">${ACCOUNT_LABELS[ev.account] || 'KeyPace'}</span>${isTask ? 'tâche' : ev.content_type}</span>
   </div>`;
 }
 
@@ -1088,11 +1094,20 @@ async function dropOnBacklog(ev){
 
 let editingEventId = null;
 
+function setPlatformChecks(platforms){
+  const selected = new Set(platforms || []);
+  document.querySelectorAll('#e-platforms input').forEach(cb => cb.checked = selected.has(cb.value));
+}
+
+function getPlatformChecks(){
+  return [...document.querySelectorAll('#e-platforms input:checked')].map(cb => cb.value);
+}
+
 function openAddEventForm(){
   editingEventId = null;
   ['e-title','e-date','e-caption','e-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('e-type').value = 'post';
-  document.getElementById('e-platform').value = '';
+  setPlatformChecks([]);
   document.getElementById('e-account').value = 'keypace';
   document.querySelector('#event-form h3').textContent = 'Nouveau contenu';
   document.getElementById('event-delete-btn').style.display = 'none';
@@ -1105,7 +1120,7 @@ function editEvent(id){
   editingEventId = id;
   document.getElementById('e-title').value = ev.title || '';
   document.getElementById('e-type').value = ev.content_type || 'post';
-  document.getElementById('e-platform').value = ev.platform || '';
+  setPlatformChecks(ev.platforms);
   document.getElementById('e-date').value = ev.scheduled_date || '';
   document.getElementById('e-account').value = ev.account || 'keypace';
   document.getElementById('e-caption').value = ev.caption || '';
@@ -1130,45 +1145,65 @@ function closeEventForm(){
 // ─── Banque d'idées de contenu (templates, pas d'IA) ──────────────
 // Chaque idée est prête à devenir une carte "idée" dans le backlog : titre +
 // angle (le pourquoi/l'accroche) + format + plateforme suggérés.
+// `key` identifie l'idée de façon stable (persisté dans content_calendar.idea_key).
+// `topic` regroupe les idées qui couvrent le même sujet sous des angles
+// différents : utiliser l'une d'elles marque tout le groupe comme couvert,
+// pour ne plus reproposer bêtement ce sujet (voir loadUsedIdeaTopics).
 const CONTENT_IDEAS = [
-  { audience:'etudiants', title:"Avant/après : la même page de notes tapée à 20 mpm vs 60 mpm", angle:"Contraste visuel qui parle plus qu'un argument : montre concrètement le temps gagné.", format:'video', platform:'tiktok' },
-  { audience:'etudiants', title:"3 signes que tu perds un temps fou à cause d'une frappe lente en cours", angle:"Douleur reconnaissable en liste courte, facile à partager entre étudiants.", format:'post', platform:'instagram' },
-  { audience:'etudiants', title:"Le test : combien de mots tapes-tu en 1 minute ?", angle:"Interactif et facilement viral — invite à partager son score en story.", format:'story', platform:'instagram' },
-  { audience:'etudiants', title:"Pourquoi taper vite change vraiment tes notes de cours", angle:"Argumentaire sérieux et utile, bon pour le référencement.", format:'article', platform:'blog' },
-  { audience:'emploi', title:"Le test de frappe qu'on te demande en entretien admin : comment t'entraîner en 2 semaines", angle:"Contenu utilitaire très concret, excellent pour le SEO.", format:'article', platform:'blog' },
-  { audience:'emploi', title:"3 métiers où la vitesse de frappe est littéralement testée à l'embauche", angle:"Info utile et partageable dans un cadre professionnel.", format:'post', platform:'linkedin' },
-  { audience:'emploi', title:"Comment j'ai bossé ma frappe avant un entretien secrétariat", angle:"Témoignage narratif, preuve sociale incarnée.", format:'video', platform:'youtube' },
-  { audience:'emploi', title:"Checklist : es-tu prêt pour un test de frappe administratif ?", angle:"Lead magnet pratique, facile à consommer et à partager.", format:'article', platform:'blog' },
-  { audience:'parents', title:"L'âge idéal pour apprendre à taper au clavier à son enfant", angle:"Question que beaucoup de parents se posent — bon pour le SEO parental.", format:'article', platform:'blog' },
-  { audience:'parents', title:"5 minutes par jour : comment rendre la dactylo amusante pour un enfant", angle:"Storytelling parental concret, rassurant et actionnable.", format:'post', platform:'instagram' },
-  { audience:'general', title:"Le calcul qui fait mal : combien d'heures perdues par an à taper lentement", angle:"Chiffre choc qui capte l'attention en 2 secondes.", format:'post', platform:'instagram' },
-  { audience:'general', title:"Pourquoi taper vite est une des compétences les plus sous-estimées", angle:"Point de vue fort qui invite au débat en commentaires.", format:'article', platform:'linkedin' },
-  { audience:'general', title:"3 jeux pour progresser en tapant sans même t'en rendre compte", angle:"Angle fun et produit, montre la partie ludique de l'app.", format:'video', platform:'tiktok' },
-  { audience:'general', title:"La position des doigts que 90% des gens ratent", angle:"Astuce concrète et actionnable immédiatement, bon format tuto court.", format:'video', platform:'tiktok' },
-  { audience:'general', title:"Duel 1v1 : défie un ami en frappe, qui gagne ?", angle:"Mécanique de jeu sociale qui pousse au partage entre amis.", format:'post', platform:'instagram' },
-  { audience:'general', title:"« Je tape assez vite comme ça » — vrai ou faux ?", angle:"Format débunk qui invite à la discussion en commentaires.", format:'post', platform:'linkedin' },
-  { audience:'preuve_sociale', title:"On vient de recevoir cet avis, ça fait chaud au cœur", angle:"Partage direct d'un vrai avis client (capture d'écran) — authentique et rapide à produire.", format:'post', platform:'instagram' },
-  { audience:'preuve_sociale', title:"Ce que disent les premiers utilisateurs de KeyPace", angle:"Carrousel de plusieurs avis courts, format facile en story.", format:'story', platform:'instagram' },
-  { audience:'conversion', title:"10 leçons gratuites, sans carte bancaire : voici exactement ce que tu débloques", angle:"Clarifie l'offre freemium pour lever le doute avant l'inscription.", format:'post', platform:'instagram' },
-  { audience:'conversion', title:"Gratuit vs Expert : le comparatif en 30 secondes", angle:"Comparatif visuel rapide qui aide à la décision d'achat.", format:'video', platform:'tiktok' },
-  { audience:'conversion', title:"Pourquoi j'ai créé KeyPace", angle:"Storytelling fondateur, authenticité qui construit la confiance.", format:'article', platform:'linkedin' },
-  { audience:'conversion', title:"Les nouveautés du mois sur KeyPace", angle:"Contenu de rétention pour la liste email, garde le lien avec les inscrits.", format:'newsletter', platform:'autre' },
+  { key:'avant-apres-vitesse', topic:'avant-apres-vitesse', audience:'etudiants', title:"Avant/après : la même page de notes tapée à 20 mpm vs 60 mpm", angle:"Contraste visuel qui parle plus qu'un argument : montre concrètement le temps gagné.", format:'video', platforms:['tiktok','youtube'] },
+  { key:'signes-frappe-lente-cours', topic:'signes-frappe-lente-cours', audience:'etudiants', title:"3 signes que tu perds un temps fou à cause d'une frappe lente en cours", angle:"Douleur reconnaissable en liste courte, facile à partager entre étudiants.", format:'post', platforms:['instagram'] },
+  { key:'test-1-minute', topic:'test-1-minute', audience:'etudiants', title:"Le test : combien de mots tapes-tu en 1 minute ?", angle:"Interactif et facilement viral — invite à partager son score en story.", format:'story', platforms:['instagram'] },
+  { key:'pourquoi-vitesse-notes', topic:'pourquoi-vitesse-notes', audience:'etudiants', title:"Pourquoi taper vite change vraiment tes notes de cours", angle:"Argumentaire sérieux et utile, bon pour le référencement.", format:'article', platforms:['blog'] },
+  { key:'entrainement-test-admin', topic:'entrainement-test-admin', audience:'emploi', title:"Le test de frappe qu'on te demande en entretien admin : comment t'entraîner en 2 semaines", angle:"Contenu utilitaire très concret, excellent pour le SEO.", format:'article', platforms:['blog'] },
+  { key:'metiers-test-vitesse', topic:'metiers-test-vitesse', audience:'emploi', title:"3 métiers où la vitesse de frappe est littéralement testée à l'embauche", angle:"Info utile et partageable dans un cadre professionnel.", format:'post', platforms:['linkedin'] },
+  { key:'temoignage-entretien-secretariat', topic:'temoignage-entretien-secretariat', audience:'emploi', title:"Comment j'ai bossé ma frappe avant un entretien secrétariat", angle:"Témoignage narratif, preuve sociale incarnée.", format:'video', platforms:['youtube'] },
+  { key:'checklist-test-admin', topic:'checklist-test-admin', audience:'emploi', title:"Checklist : es-tu prêt pour un test de frappe administratif ?", angle:"Lead magnet pratique, facile à consommer et à partager.", format:'article', platforms:['blog'] },
+  { key:'age-ideal-enfant', topic:'age-ideal-enfant', audience:'parents', title:"L'âge idéal pour apprendre à taper au clavier à son enfant", angle:"Question que beaucoup de parents se posent — bon pour le SEO parental.", format:'article', platforms:['blog'] },
+  { key:'dactylo-amusante-enfant', topic:'dactylo-amusante-enfant', audience:'parents', title:"5 minutes par jour : comment rendre la dactylo amusante pour un enfant", angle:"Storytelling parental concret, rassurant et actionnable.", format:'post', platforms:['instagram'] },
+  { key:'calcul-heures-perdues', topic:'calcul-heures-perdues', audience:'general', title:"Le calcul qui fait mal : combien d'heures perdues par an à taper lentement", angle:"Chiffre choc qui capte l'attention en 2 secondes.", format:'post', platforms:['instagram'] },
+  { key:'competence-sous-estimee', topic:'competence-sous-estimee', audience:'general', title:"Pourquoi taper vite est une des compétences les plus sous-estimées", angle:"Point de vue fort qui invite au débat en commentaires.", format:'article', platforms:['linkedin'] },
+  { key:'jeux-progression-fun', topic:'jeux-progression-fun', audience:'general', title:"3 jeux pour progresser en tapant sans même t'en rendre compte", angle:"Angle fun et produit, montre la partie ludique de l'app.", format:'video', platforms:['tiktok'] },
+  { key:'position-doigts-erreur', topic:'position-doigts-erreur', audience:'general', title:"La position des doigts que 90% des gens ratent", angle:"Astuce concrète et actionnable immédiatement, bon format tuto court.", format:'video', platforms:['tiktok','youtube'] },
+  { key:'duel-1v1', topic:'duel-1v1', audience:'general', title:"Duel 1v1 : défie un ami en frappe, qui gagne ?", angle:"Mécanique de jeu sociale qui pousse au partage entre amis.", format:'post', platforms:['instagram','tiktok'] },
+  { key:'debunk-tape-assez-vite', topic:'debunk-tape-assez-vite', audience:'general', title:"« Je tape assez vite comme ça » — vrai ou faux ?", angle:"Format débunk qui invite à la discussion en commentaires.", format:'post', platforms:['linkedin'] },
+  { key:'partage-avis-recu', topic:'partage-avis-recu', audience:'preuve_sociale', title:"On vient de recevoir cet avis, ça fait chaud au cœur", angle:"Partage direct d'un vrai avis client (capture d'écran) — authentique et rapide à produire.", format:'post', platforms:['instagram'] },
+  { key:'carrousel-avis', topic:'carrousel-avis', audience:'preuve_sociale', title:"Ce que disent les premiers utilisateurs de KeyPace", angle:"Carrousel de plusieurs avis courts, format facile en story.", format:'story', platforms:['instagram'] },
+  { key:'offre-gratuite-explication', topic:'offre-gratuite-explication', audience:'conversion', title:"10 leçons gratuites, sans carte bancaire : voici exactement ce que tu débloques", angle:"Clarifie l'offre freemium pour lever le doute avant l'inscription.", format:'post', platforms:['instagram'] },
+  { key:'comparatif-gratuit-expert', topic:'comparatif-gratuit-expert', audience:'conversion', title:"Gratuit vs Expert : le comparatif en 30 secondes", angle:"Comparatif visuel rapide qui aide à la décision d'achat.", format:'video', platforms:['tiktok'] },
+  { key:'histoire-fondateur', topic:'histoire-fondateur', audience:'conversion', title:"Pourquoi j'ai créé KeyPace", angle:"Storytelling fondateur, authenticité qui construit la confiance.", format:'article', platforms:['linkedin'] },
+  { key:'newsletter-nouveautes', topic:'newsletter-nouveautes', audience:'conversion', title:"Les nouveautés du mois sur KeyPace", angle:"Contenu de rétention pour la liste email, garde le lien avec les inscrits.", format:'newsletter', platforms:['autre'] },
 ];
+
+// Sujets déjà traités (peu importe le mois affiché ou le statut du contenu) :
+// chargé une fois, puis mis à jour localement à chaque ajout, pour ne plus
+// reproposer inutilement un sujet déjà couvert sous un angle ou l'autre.
+window.__usedIdeaTopics = new Set();
+
+async function loadUsedIdeaTopics(){
+  try {
+    const { keys } = await api('used-idea-keys');
+    const usedKeys = new Set(keys || []);
+    window.__usedIdeaTopics = new Set(CONTENT_IDEAS.filter(i => usedKeys.has(i.key)).map(i => i.topic));
+  } catch (e) { console.error(e); }
+}
 
 function generateContentIdeas(){
   const audience = document.getElementById('idea-audience').value;
-  const pool = audience ? CONTENT_IDEAS.filter(i => i.audience === audience) : CONTENT_IDEAS;
+  let pool = CONTENT_IDEAS.filter(i => !window.__usedIdeaTopics.has(i.topic));
+  const excludedCount = CONTENT_IDEAS.length - pool.length;
+  if (audience) pool = pool.filter(i => i.audience === audience);
   const picks = [...pool].sort(() => Math.random() - 0.5).slice(0, 5);
   window.__currentIdeaPicks = picks;
   const el = document.getElementById('idea-bank-results');
-  el.innerHTML = picks.length ? `<div class="idea-grid">${picks.map((idea, i) => `
+  const note = excludedCount ? `<p class="muted" style="font-size:12px;margin:0 0 10px">🧠 ${excludedCount} sujet${excludedCount>1?'s':''} déjà traité${excludedCount>1?'s':''} n'${excludedCount>1?'ont':'a'} pas été reproposé${excludedCount>1?'s':''}.</p>` : '';
+  el.innerHTML = note + (picks.length ? `<div class="idea-grid">${picks.map((idea, i) => `
     <div class="idea-card" id="idea-card-${i}">
       <div class="ititle">${idea.title}</div>
       <div class="iangle">${idea.angle}</div>
-      <div class="cmeta" style="margin-bottom:10px"><span class="platform-tag">${idea.platform}</span>${idea.format}</div>
+      <div class="cmeta" style="margin-bottom:10px">${idea.platforms.map(p => `<span class="platform-tag">${p}</span>`).join('')}${idea.format}</div>
       <button class="btn ghost small" style="width:auto" onclick="addIdeaToBacklog(${i})">+ Ajouter au backlog</button>
     </div>`).join('')}</div>`
-    : `<div class="empty-msg">Aucune idée pour cette audience pour l'instant — essaie « Toutes les audiences ».</div>`;
+    : `<div class="empty-msg">${audience ? "Aucune idée neuve pour cette audience — essaie « Toutes les audiences »." : "Tous les sujets de la banque d'idées ont déjà été traités !"}</div>`);
 }
 
 async function addIdeaToBacklog(i){
@@ -1177,12 +1212,14 @@ async function addIdeaToBacklog(i){
   await api('create-event', { method:'POST', body: {
     title: idea.title,
     content_type: idea.format,
-    platform: idea.platform,
+    platforms: idea.platforms,
     account: 'keypace',
     scheduled_date: null,
     caption: '',
     notes: idea.angle,
+    idea_key: idea.key,
   }});
+  window.__usedIdeaTopics.add(idea.topic);
   const card = document.getElementById(`idea-card-${i}`);
   if (card) card.querySelector('button').outerHTML = `<span class="iadded">✓ Ajoutée au backlog</span>`;
   loadCalendar();
@@ -1217,7 +1254,7 @@ async function saveEvent(){
   const body = {
     title,
     content_type: document.getElementById('e-type').value,
-    platform: document.getElementById('e-platform').value,
+    platforms: getPlatformChecks(),
     account: document.getElementById('e-account').value,
     scheduled_date: document.getElementById('e-date').value || null,
     caption: document.getElementById('e-caption').value.trim(),
