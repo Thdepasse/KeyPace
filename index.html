@@ -1700,8 +1700,7 @@ function updateNavUser(){
   upgradeBtn.style.display=(plan==='expert'||teacher)?'none':'inline-block';
   if(classesBtn)classesBtn.style.display=teacher?'inline-flex':'none';
   ['nav-test','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=teacher?'none':'';});
-  // Élève connecté : plus d'onglet Accueil (le prof garde le sien = son tableau de bord).
-  const homeBtn=document.getElementById('nav-home');if(homeBtn)homeBtn.style.display=teacher?'':'none';
+  const homeBtn=document.getElementById('nav-home');if(homeBtn)homeBtn.style.display='';
   const apercu=document.getElementById('nav-apercu');if(apercu)apercu.style.display=teacher?'inline-flex':'none';
   const joinBtn=document.getElementById('nav-join');if(joinBtn)joinBtn.style.display=teacher?'none':'inline-flex';
   applyMobileNav();
