@@ -52,9 +52,12 @@ function redirect(res, url) {
 const b64url = (buf) => Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const b64urlDecode = (s) => Buffer.from(s.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
 
-// State signé : provider + nonce + horodatage, scellé par HMAC (anti-CSRF, stateless).
-function makeState(provider) {
-  const payload = b64url(JSON.stringify({ p: provider, n: crypto.randomBytes(8).toString('hex'), t: Date.now() }));
+// State signé : provider + nonce + horodatage (+ token d'invitation prof/admin
+// éventuel), scellé par HMAC (anti-CSRF, stateless). Le token doit transiter
+// par le state car ssoLogin() navigue immédiatement vers le provider — la
+// mémoire client (window._profInviteToken) ne survit pas à l'aller-retour.
+function makeState(provider, invite) {
+  const payload = b64url(JSON.stringify({ p: provider, n: crypto.randomBytes(8).toString('hex'), t: Date.now(), inv: invite || null }));
   const sig = b64url(crypto.createHmac('sha256', STATE_SECRET).update(payload).digest());
   return `${payload}.${sig}`;
 }
@@ -78,14 +81,14 @@ function decodeJwt(jwt) {
 
 const REDIRECT_URI = `${APP_URL}/api/oauth`;
 
-function buildAuthUrl(provider) {
+function buildAuthUrl(provider, invite) {
   const cfg = PROVIDERS[provider];
   const params = new URLSearchParams({
     client_id: cfg.clientId(),
     redirect_uri: REDIRECT_URI,
     response_type: 'code',
     scope: cfg.scope,
-    state: makeState(provider),
+    state: makeState(provider, invite),
     ...cfg.extraAuth,
   });
   return `${cfg.authUrl}?${params.toString()}`;
@@ -133,15 +136,36 @@ async function uniqueUsername(seed) {
   return `${base}${crypto.randomBytes(3).toString('hex')}`;
 }
 
-// find-or-create : lie un compte existant (par email) ou en crée un nouveau,
-// rattaché à l'établissement par domaine email (même logique que register.js).
-async function findOrCreateUser(provider, profile) {
+// Résout un token d'invitation prof/admin (même règles que register.js) :
+// non utilisé, non révoqué, établissement existant. Retourne null si absent,
+// ou { error:'invite' } si le token est fourni mais invalide/déjà utilisé.
+async function resolveInvite(inviteToken) {
+  if (!inviteToken) return null;
+  const invR = await sb(`/prof_invites?token=eq.${encodeURIComponent(inviteToken)}&used_by=is.null&revoked=eq.false&select=*`);
+  const invite = invR.data && invR.data[0];
+  if (!invite) return { error: 'invite' };
+  const instR = await sb(`/institutions?id=eq.${encodeURIComponent(invite.institution_id)}&select=*`);
+  const institution = instR.data && instR.data[0];
+  if (!institution) return { error: 'invite' };
+  return { invite, institution, role: invite.role || 'prof' };
+}
+
+// find-or-create : lie un compte existant (par email) ou en crée un nouveau.
+// Sans invitation, rattachement à l'établissement par domaine email (même
+// logique que register.js). Avec une invitation valide (inviteCtx), celle-ci
+// est prioritaire : rôle + établissement viennent du lien, pas du domaine, et
+// aucun siège licencié n'est consommé (même règle que register.js) — c'est ce
+// qui permet à un prof/admin invité de s'inscrire via Google/Microsoft sans
+// que l'invitation soit silencieusement ignorée.
+async function findOrCreateUser(provider, profile, inviteCtx) {
   const existR = await sb(`/users?email=eq.${encodeURIComponent(profile.email)}&select=*`);
   const existing = existR.data && existR.data[0];
   const session = crypto.randomUUID();
 
   if (existing) {
     // Liaison auto + nouvelle session ; on confirme l'email au passage.
+    // Note : une invitation présente ici n'est pas appliquée à un compte déjà
+    // existant (même périmètre que register.js, qui ne gère que la création).
     const patch = { session_token: session, email_verified: true };
     if (!existing.oauth_provider) patch.oauth_provider = provider;
     if (existing.verification_token) patch.verification_token = null;
@@ -149,17 +173,21 @@ async function findOrCreateUser(provider, profile) {
     return { token: session };
   }
 
-  // Rattachement établissement par domaine (clé d'appartenance licence).
-  const domain = (profile.email.split('@')[1] || '').toLowerCase();
   let institution = null;
-  if (domain) {
-    const byDomain = await sb(`/institutions?domains=cs.{"${domain}"}&select=*`);
-    institution = byDomain.data && byDomain.data[0];
-  }
-  if (institution) {
-    const seatsR = await sb(`/users?institution_id=eq.${encodeURIComponent(institution.id)}&role=eq.eleve&select=id`);
-    const used = seatsR.data ? seatsR.data.length : 0;
-    if (used >= institution.seat_count) return { error: 'seats' };
+  if (inviteCtx) {
+    institution = inviteCtx.institution;
+  } else {
+    // Rattachement établissement par domaine (clé d'appartenance licence).
+    const domain = (profile.email.split('@')[1] || '').toLowerCase();
+    if (domain) {
+      const byDomain = await sb(`/institutions?domains=cs.{"${domain}"}&select=*`);
+      institution = byDomain.data && byDomain.data[0];
+    }
+    if (institution) {
+      const seatsR = await sb(`/users?institution_id=eq.${encodeURIComponent(institution.id)}&role=eq.eleve&select=id`);
+      const used = seatsR.data ? seatsR.data.length : 0;
+      if (used >= institution.seat_count) return { error: 'seats' };
+    }
   }
 
   const username = await uniqueUsername(profile.name || profile.email.split('@')[0]);
@@ -179,11 +207,15 @@ async function findOrCreateUser(provider, profile) {
       consent_at: new Date().toISOString(),
       terms_version: 'v1',
       ...(institution ? { institution_id: institution.id } : {}),
+      ...(inviteCtx ? { role: inviteCtx.role } : {}),
     }),
   });
   const user = createR.data && createR.data[0];
   if (!user) return { error: 'create' };
   await sb('/progress', { method: 'POST', body: JSON.stringify({ user_id: user.id, data: {} }) });
+  if (inviteCtx) {
+    await sb(`/prof_invites?id=eq.${inviteCtx.invite.id}`, { method: 'PATCH', body: JSON.stringify({ used_by: user.id }) });
+  }
   return { token: session };
 }
 
@@ -202,17 +234,19 @@ module.exports = async function handler(req, res) {
       const claims = await exchangeCode(provider, code);
       const profile = profileFromClaims(claims);
       if (!profile) return redirect(res, `${APP_URL}?sso_error=profile`);
-      const result = await findOrCreateUser(provider, profile);
+      const inviteCtx = await resolveInvite(state.inv);
+      if (inviteCtx && inviteCtx.error) return redirect(res, `${APP_URL}?sso_error=invite`);
+      const result = await findOrCreateUser(provider, profile, inviteCtx);
       if (result.error === 'seats') return redirect(res, `${APP_URL}?sso_error=seats`);
       if (result.error || !result.token) return redirect(res, `${APP_URL}?sso_error=server`);
       return redirect(res, `${APP_URL}?sso=${result.token}`);
     }
 
-    // — Démarrage (?provider=…)
+    // — Démarrage (?provider=…&invite=TOKEN optionnel, cf. ssoLogin() côté client)
     const provider = q.get('provider');
     if (!provider || !PROVIDERS[provider]) return redirect(res, `${APP_URL}?sso_error=provider`);
     if (!PROVIDERS[provider].clientId()) return redirect(res, `${APP_URL}?sso_error=unconfigured`);
-    return redirect(res, buildAuthUrl(provider));
+    return redirect(res, buildAuthUrl(provider, q.get('invite')));
   } catch (e) {
     return redirect(res, `${APP_URL}?sso_error=server`);
   }

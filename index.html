@@ -15,7 +15,6 @@
 <title>KeyPace – Application de dactylographie AZERTY gratuite en français</title>
 <meta name="description" content="KeyPace : apprenez à taper vite sur clavier AZERTY avec 65 leçons progressives, test de vitesse et jeux de frappe. Gratuit, en français, sans installation.">
 <meta name="google-site-verification" content="wBYddgSlkFIdV9JdCfAXul6Etj9o8hYiFhZYDplfq2E" />
-<script defer src="https://cloud.umami.is/script.js" data-website-id="486b0095-614b-46b1-863b-ebf6d5ac2e7b"></script>
 <meta name="keywords" content="KeyPace, apprendre à taper, clavier AZERTY, dactylo, dactylographie, frappe rapide, cours de frappe, mots par minute, wpm, exercices clavier, touch typing, frappe 10 doigts">
 <meta name="author" content="KeyPace">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
@@ -278,7 +277,7 @@
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA}
+:root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA;--danger:#E5484D;--success:#1FA971}
 body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',Arial,sans-serif;color:var(--txt);min-height:100vh;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 /* ── Célébration de fin de leçon : clavier popup, les touches travaillées explosent ── */
 .cel-overlay{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(22,20,15,.5);backdrop-filter:blur(6px);animation:cel-fade .25s ease}
@@ -1038,7 +1037,11 @@ footer{border-top:1px solid var(--border);margin-top:10px}
     </div>
     <div id="auth-error" class="auth-error"></div>
     <div class="auth-field"><label>Nom d'utilisateur</label><input type="text" id="auth-username" placeholder="ex: jean42" autocomplete="username"></div>
-    <div class="auth-field" id="auth-email-wrap" style="display:none"><label>Adresse email</label><input type="email" id="auth-email" placeholder="ex: jean@email.com" autocomplete="email"></div>
+    <div class="auth-field" id="auth-email-wrap" style="display:none">
+      <label>Adresse email</label>
+      <input type="email" id="auth-email" placeholder="ex: jean@email.com" autocomplete="email" onblur="checkInstitutionDomain()">
+      <div id="auth-domain-hint" style="display:none;margin-top:6px;font-size:12.5px;font-weight:600;color:#1FA971"></div>
+    </div>
     <div class="auth-field"><label>Mot de passe</label><input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password"></div>
     <div class="auth-field" id="auth-confirm-wrap" style="display:none"><label>Confirmer le mot de passe</label><input type="password" id="auth-confirm" placeholder="••••••••" autocomplete="new-password"></div>
     <div class="auth-field" id="auth-birth-wrap" style="display:none"><label>Date de naissance <span style="color:var(--muted);font-weight:400">(facultatif)</span></label><input type="date" id="auth-birth" oninput="onBirthChange()"></div>
@@ -1287,6 +1290,50 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <script>
 'use strict';
 
+/* ── ANALYTICS MAISON (remplace Umami) : beacon fire-and-forget vers /api/track ── */
+function track(event, props){
+  try{
+    const payload=JSON.stringify({event,path:location.pathname,props:props||{}});
+    if(navigator.sendBeacon){
+      navigator.sendBeacon('/api/track', new Blob([payload],{type:'application/json'}));
+    } else {
+      fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},body:payload,keepalive:true}).catch(()=>{});
+    }
+  }catch{}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>track('pageview'));
+else track('pageview');
+
+/* ── SONS DE JEU ──
+   Infrastructure prête, fichiers pas encore fournis : tant qu'ils ne sont pas
+   déposés dans /sounds/, playSound() ne fait rien de visible (l'échec de
+   lecture est avalé en silence, jamais d'erreur ni de son cassé). Liste et
+   format attendus : voir /sounds/README.md (créé avec ce commit).
+   Activé par défaut ; préférence retenue dans localStorage (réglages). */
+const SOUND_FILES={
+  hit:'/sounds/hit.mp3',
+  miss:'/sounds/miss.mp3',
+  record:'/sounds/record.mp3',
+  levelup:'/sounds/levelup.mp3',
+  victory:'/sounds/victory.mp3',
+  defeat:'/sounds/defeat.mp3',
+  countdown:'/sounds/countdown.mp3',
+};
+const _soundCache={};
+function isSoundMuted(){try{return localStorage.getItem('kp_sound_muted')==='1';}catch{return false;}}
+function setSoundMuted(v){try{localStorage.setItem('kp_sound_muted',v?'1':'0');}catch{}}
+function playSound(name){
+  if(isSoundMuted())return;
+  const src=SOUND_FILES[name];if(!src)return;
+  try{
+    let base=_soundCache[name];
+    if(!base){base=new Audio(src);base.volume=0.45;base.preload='auto';_soundCache[name]=base;}
+    const inst=base.cloneNode(); // clone : deux hits rapprochés peuvent se chevaucher
+    inst.volume=base.volume;
+    inst.play().catch(()=>{}); // fichier absent (404) ou lecture bloquée par le navigateur : silencieux
+  }catch{}
+}
+
 /* ── PLAN CONFIG ── */
 const FREE_LESSON_IDS = ['r1','r2','r3','r4','r5','r6','h1','h2','h3','h4']; // 10 leçons gratuites
 
@@ -1322,7 +1369,7 @@ function loadSession(){
   }catch{}
 }
 
-function openModal(id){document.getElementById(id).classList.add('open');}
+function openModal(id,opts){if(id==='upgrade-modal'&&!(opts&&opts.silent)){try{track('upgrade_wall_shown');}catch{}}document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 function openAuth(tab, contextMsg, callback){
@@ -1349,6 +1396,7 @@ function switchTab(tab){
   document.getElementById('auth-submit').textContent=tab==='login'?'Se connecter':'Créer mon compte';
   document.getElementById('auth-forgot-wrap').style.display=tab==='login'?'block':'none';
   document.getElementById('auth-error').classList.remove('show');
+  const dh=document.getElementById('auth-domain-hint');if(dh)dh.style.display='none';
   if(tab==='register')loadInstitutions();
 }
 
@@ -1377,6 +1425,28 @@ function onInstitutionChange(){
 }
 
 function showAuthError(msg){const e=document.getElementById('auth-error');e.textContent=msg;e.classList.add('show');}
+
+// Signal visible du rattachement établissement : le domaine email d'un élève
+// est vérifié en silence côté serveur à l'inscription (aucune indication
+// avant ça). Ici on affiche juste "compte rattaché à [École]" si l'email
+// saisi correspond à un établissement partenaire — aucune donnée sensible
+// n'est exposée par /api/institutions (juste le nom, si trouvé).
+let _domainCheckSeq=0;
+async function checkInstitutionDomain(){
+  const hint=document.getElementById('auth-domain-hint');
+  if(!hint)return;
+  const email=document.getElementById('auth-email').value.trim().toLowerCase();
+  const domain=email.includes('@')?email.split('@')[1]:'';
+  if(!domain){hint.style.display='none';return;}
+  const seq=++_domainCheckSeq; // évite qu'une réponse tardive écrase un résultat plus récent
+  try{
+    const r=await fetch('/api/institutions?domain='+encodeURIComponent(domain));
+    const d=await r.json();
+    if(seq!==_domainCheckSeq)return;
+    if(d.matched){hint.textContent='✓ Compte rattaché à '+d.name+' — accès Expert offert';hint.style.display='block';}
+    else hint.style.display='none';
+  }catch{if(seq===_domainCheckSeq)hint.style.display='none';}
+}
 
 // Affiche le champ email du responsable légal si l'âge saisi est < 13 ans.
 function onBirthChange(){
@@ -1422,6 +1492,7 @@ async function authSubmit(){
       document.getElementById('auth-institution').value='';
       document.getElementById('auth-inst-pw-wrap').style.display='none';
       const wasProf=!!window._profInviteToken;window._profInviteToken=null;
+      try{track('signup',{type:wasProf?'teacher_invite':'student'});}catch{}
       switchTab('login');
       const ctx=document.getElementById('auth-context-msg');
       ctx.innerHTML='📧 <strong>Compte '+(wasProf?'enseignant ':'')+'créé !</strong> Un lien de confirmation a été envoyé à ton adresse email. Clique dessus, puis reviens te connecter ici.';
@@ -1434,6 +1505,7 @@ async function authSubmit(){
       const _mergedData=mergeStats(d.data);
       if(d.role)_mergedData.role=d.role;
       saveSession(d.username, d.plan, d.token, d.id, _mergedData.role||null);
+      try{track('login',{method:'password'});}catch{}
       app.stats=_mergedData;
       window._needsOnboarding = !d.onboarding_completed;
       if(!d.onboarding_completed)localStorage.removeItem('klak_ob');else localStorage.setItem('klak_ob','1');
@@ -1480,6 +1552,9 @@ function loginUser(username){
   const btn=document.getElementById('auth-submit');
   btn.disabled=false;btn.textContent=currentTab==='login'?'Se connecter':'Créer mon compte';
   updateNavUser();
+  // Prof/établissement : atterrir sur son tableau de bord, pas sur la vue Test
+  // par défaut (déjà fait pour mobile via MOBILE_BLOCKED_VIEWS, manquant sur desktop).
+  if(isTeacher())go('home');
   app.init();
   app.renderCurrent();
   if(_authCallback){const cb=_authCallback;_authCallback=null;cb();}
@@ -1487,18 +1562,30 @@ function loginUser(username){
 }
 
 // ── Onboarding tooltip walkthrough ─────────────────────────────
-const OB_STEPS=[
+// Deux parcours : élève (nav complète) vs prof/établissement (nav réduite à
+// Accueil/Gestion de classes/Compte, cf. updateNavUser()). Avant ce correctif,
+// le tour élève s'affichait pour tout le monde et ciblait des éléments masqués
+// pour prof/admin (#nav-lessons, #nav-test, #nav-games, #nav-stats), donc des
+// tooltips mal positionnés / pointant vers du vide au premier login.
+const OB_STEPS_ELEVE=[
   {sel:'#nav-lessons', label:'Par où commencer', title:'Cours',   desc:'65 leçons progressives. Commence par la Leçon 1 : elle t\'apprend la rangée de base, doigt par doigt.'},
   {sel:'#nav-test',    label:'Teste-toi',         title:'Test',    desc:'Mesure ta vitesse en mots par minute et ta précision sur un texte libre, à tout moment.'},
   {sel:'#nav-games',   label:'Pour progresser',   title:'Jeux',    desc:'Boss de la semaine, Duel 1v1 et Sprint chronométré. Pour te challenger et rendre la pratique addictive.'},
   {sel:'#nav-stats',   label:'Suis tes progrès',  title:'Progrès', desc:'Ton historique de vitesse et de précision au fil du temps. Tu verras tes progrès semaine après semaine.'},
   {sel:'#nav-avatar',  label:'Tes paramètres',    title:'Compte',  desc:'Accède à tes paramètres, réinitialise ton mot de passe ou retrouve ce guide via "Revoir le tutoriel".'},
 ];
+const OB_STEPS_PROF=[
+  {sel:'#nav-home',    label:'Ton tableau de bord', title:'Accueil',           desc:'Vue d\'ensemble : nombre d\'élèves, vitesse moyenne, activité récente sur tes classes.'},
+  {sel:'#nav-classes', label:'Gérer tes classes',   title:'Gestion de classes', desc:'Crée une classe, invite tes élèves par lien, assigne des devoirs et suis la progression de chacun.'},
+  {sel:'#nav-avatar',  label:'Tes paramètres',      title:'Compte',            desc:'Accède à tes paramètres, réinitialise ton mot de passe ou retrouve ce guide via "Revoir le tutoriel".'},
+];
 let _obStep=0;
 let _obPrevEl=null;
+let _obList=OB_STEPS_ELEVE;
 
 function obOpen(){
   _obStep=0;
+  _obList=isTeacher()?OB_STEPS_PROF:OB_STEPS_ELEVE;
   document.getElementById('ob-overlay').classList.add('active');
   obRender();
 }
@@ -1507,8 +1594,8 @@ function obRender(){
   // Retirer le highlight de l'étape précédente
   if(_obPrevEl){_obPrevEl.classList.remove('ob-highlight');_obPrevEl=null;}
 
-  const step=OB_STEPS[_obStep];
-  const total=OB_STEPS.length;
+  const step=_obList[_obStep];
+  const total=_obList.length;
   const el=document.querySelector(step.sel);
 
   // Textes
@@ -1541,7 +1628,7 @@ function obRender(){
 }
 
 function obNext(){
-  if(_obStep>=OB_STEPS.length-1){obClose(true);return;}
+  if(_obStep>=_obList.length-1){obClose(true);return;}
   const tt=document.getElementById('ob-tooltip');
   tt.classList.add('ob-fading');
   setTimeout(()=>{
@@ -1570,6 +1657,16 @@ function obReplay(){
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('ob-overlay').classList.contains('active'))obClose(false);});
 // ───────────────────────────────────────────────────────────────
+
+// Élève : un devoir fraîchement assigné par le prof n'apparaissait qu'après un
+// rechargement complet de la page (cache "Mes classes" invalidé seulement par
+// certaines actions locales). En revenant sur l'onglet, on rafraîchit en
+// silence si l'élève est justement sur "Mes classes".
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&currentUser&&!isTeacher()&&typeof app!=='undefined'&&app.view==='classes'){
+    app._myClasses=null;app.loadMyClasses();
+  }
+});
 
 function logout(){
   clearSession();
@@ -1680,7 +1777,7 @@ async function startCheckout(){
   try{
     const r=await fetch('/api/billing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'checkout',token:currentToken})});
     const d=await r.json();
-    if(d.url)window.location.href=d.url;
+    if(d.url){try{track('checkout_started');}catch{}window.location.href=d.url;}
     else{btn.disabled=false;btn.textContent='Passer à Expert : Payer →';alert('Erreur paiement : '+( d.error||'réessaie.'));}
   }catch{btn.disabled=false;btn.textContent='Passer à Expert : Payer →';alert('Erreur réseau.');}
 }
@@ -1757,7 +1854,7 @@ async function handlePaymentReturn(){
       s.plan=d.plan;localStorage.setItem('klak_session',JSON.stringify(s));
       updateNavUser();
       const msg=document.getElementById('upgrade-msg');
-      if(d.plan==='expert'){openModal('upgrade-modal');msg.textContent='✓ Paiement confirmé ! Compte Expert activé.';msg.style.color='#1FA971';msg.style.display='block';}
+      if(d.plan==='expert'){try{track('checkout_completed');}catch{}openModal('upgrade-modal',{silent:true});msg.textContent='✓ Paiement confirmé ! Compte Expert activé.';msg.style.color='#1FA971';msg.style.display='block';}
     }
     history.replaceState({},'',location.pathname);
   }
@@ -3359,7 +3456,7 @@ const app={
       }
     }
     s.idx++;
-    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats(s);const res=this.computeResult(s);if(currentUser){const _pr=s.mode==='lesson'?this.lessonRec(s.lessonId).bestWpm||0:Math.max(0,...(this.stats?.tests||[]).map(t=>t.wpm));s._prevBestWpm=_pr;}this.recordResult(s.mode,res,s.lessonId,s._gazeStats);if(!currentUser&&s.mode==='test')this._markGuestTest(res.wpm,res.acc);this.renderCurrent();if(s.mode==='lesson'&&!s.cert)celebrateLesson(this.lessonById(s.lessonId),res);if(s.mode==='test'&&!s.cert){if(!currentUser)maybeConvGuest(res);else maybeConvUpsell(res);}if(s.cert)this._finishCertExam(s,res);return;}
+    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats(s);const res=this.computeResult(s);if(currentUser){const _pr=s.mode==='lesson'?this.lessonRec(s.lessonId).bestWpm||0:Math.max(0,...(this.stats?.tests||[]).map(t=>t.wpm));s._prevBestWpm=_pr;}try{if(s.mode==='test'&&!s.cert)track('speed_test_completed',{wpm:res.wpm,acc:res.acc,loggedIn:!!currentUser});}catch{}this.recordResult(s.mode,res,s.lessonId,s._gazeStats);if(!currentUser&&s.mode==='test')this._markGuestTest(res.wpm,res.acc);this.renderCurrent();if(s.mode==='lesson'&&!s.cert)celebrateLesson(this.lessonById(s.lessonId),res);if(s.mode==='test'&&!s.cert){if(!currentUser)maybeConvGuest(res);else maybeConvUpsell(res);}if(s.cert)this._finishCertExam(s,res);return;}
     this._patchTypingBox();
   },
   computeResult(s){
@@ -3381,10 +3478,12 @@ const app={
     if(mode==='lesson'&&lessonId){
       const g=this.stats.goals;let rec=this.stats.lessons[lessonId];
       if(!rec||typeof rec==='number')rec={bestWpm:typeof rec==='number'?rec:0,bestErr:null,cleared:typeof rec==='number'};
+      const _wasCleared=!!rec.cleared;
       rec.bestWpm=Math.max(rec.bestWpm||0,res.wpm);
       rec.bestErr=rec.bestErr==null?res.errors:Math.min(rec.bestErr,res.errors);
       if(res.wpm>=g.minWpm&&res.errors<=g.maxErrors)rec.cleared=true;
       this.stats.lessons[lessonId]=rec;
+      try{if(rec.cleared&&!_wasCleared)track('lesson_completed',{lessonId,wpm:res.wpm});}catch{}
     }
     saveStats(this.stats);
     this._myClasses=null; // forcer le rechargement des devoirs (statut "terminé") au prochain affichage
@@ -3448,6 +3547,7 @@ const app={
     el.innerHTML=n>0
       ?`<span class="cd-n" style="animation:cdPop .85s ease forwards">${n}</span><div style="font-size:13px;color:rgba(255,255,255,.4);margin-top:10px">Prépare tes doigts…</div>`
       :`<span class="cd-go" style="animation:cdPop .5s ease forwards">GO !</span>`;
+    playSound('countdown');
     if(n>0){
       this._cdTimer=setTimeout(()=>this._startCountdown(n-1),1000);
     }else{
@@ -3478,6 +3578,7 @@ const app={
       <div class="tb-speed">Vitesse : ${speeds[idx]||''}</div>
     </div>`;
     (arena||document.body).appendChild(el);
+    this._celebrateGame(null,'levelup');
     // Resume game loop after banner fades out
     setTimeout(()=>{
       el.style.transition='opacity .5s';el.style.opacity='0';
@@ -3530,7 +3631,14 @@ const app={
     if(g.over&&!this._gameRec){this._gameRec=true;this.stopGame();this.afterGameOver(g.score);}
   },
   afterGameOver(score){
-    if(currentUser&&this.stats&&score>(this.stats.gameBest||0)){this.stats.gameBest=score;saveStats(this.stats);}
+    try{track('game_completed',{game:'frappe',score});}catch{}
+    // Flag posé AVANT d'écraser gameBest (même bug que Sprint à l'origine :
+    // comparé après mutation, "Nouveau record" ne s'affichait jamais).
+    if(this.game)this.game._isRecord=currentUser&&this.stats&&score>(this.stats.gameBest||0);
+    if(currentUser&&this.stats&&score>(this.stats.gameBest||0)){
+      this.stats.gameBest=score;saveStats(this.stats);
+      this._celebrateGame();
+    }
     this.renderCurrent();
   },
   gameKey(e){
@@ -3546,13 +3654,13 @@ const app={
       const cands=g.words.filter(w=>w.text[0]===char).sort((a,b)=>b.y-a.y);
       if(cands.length){
         const c=cands[0];c.typedLen=1;
-        if(c.typedLen>=c.text.length){g.score+=c.text.length;g.wordsTyped++;g.combo++;g.maxCombo=Math.max(g.maxCombo,g.combo);g.words=g.words.filter(w=>w!==c);}
-      }else{g.errorCount++;g.combo=0;}
+        if(c.typedLen>=c.text.length){g.score+=c.text.length;g.wordsTyped++;g.combo++;g.maxCombo=Math.max(g.maxCombo,g.combo);g.words=g.words.filter(w=>w!==c);playSound('hit');}
+      }else{g.errorCount++;g.combo=0;playSound('miss');}
     }else{
       if(active.text[active.typedLen]===char){
         active.typedLen++;
-        if(active.typedLen>=active.text.length){g.score+=active.text.length;g.wordsTyped++;g.combo++;g.maxCombo=Math.max(g.maxCombo,g.combo);g.words=g.words.filter(w=>w!==active);}
-      }else{g.errorCount++;active.typedLen=0;g.combo=0;}
+        if(active.typedLen>=active.text.length){g.score+=active.text.length;g.wordsTyped++;g.combo++;g.maxCombo=Math.max(g.maxCombo,g.combo);g.words=g.words.filter(w=>w!==active);playSound('hit');}
+      }else{g.errorCount++;active.typedLen=0;g.combo=0;playSound('miss');}
     }
     this.renderCurrent();
   },
@@ -3567,6 +3675,10 @@ const app={
     this.view=v;
     maybeConvNudge(v);
     if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;}
+    // Sans ça, le poll 25s de viewClass() continuait après avoir quitté la vue
+    // "classes" par un onglet de nav (au lieu du bouton ← Retour), et renvoyait
+    // de force l'utilisateur vers la liste des classes à chaque tick.
+    if(v!=='classes'){clearInterval(this._classRefreshTimer);this._classesSub=null;this._classViewingId=null;}
     if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
     // Vider les pages avec #tb-scroll pour éviter les IDs dupliqués
     if(v!=='test')document.getElementById('page-test').innerHTML='';
@@ -3602,6 +3714,100 @@ const app={
     }
   },
 
+  /* ── COQUILLE PARTAGÉE DES JEUX ──
+     En-tête et écran de résultat communs à 6 des 8 jeux (Sprint, Frappe-mots,
+     Tireur, Course, Simon, Boss) : avant ce helper, chaque jeu réécrivait son
+     propre HTML d'en-tête et un des trois écrans de résultat différents
+     (overlay sombre, carte claire à grille de stats, stage clair sans
+     grille), avec trois vocabulaires de boutons distincts. Un seul système
+     désormais pour ces 6 : bouton .res-btn.pri/.sec, résultat en grille de
+     stats. Duel et Visée/Souris gardent volontairement leur propre écran de
+     résultat (vs-adversaire à 2 colonnes pour l'un, paliers médaille pour
+     l'autre — la forme {boxes,primaryLabel,secondaryLabel} ne les couvre pas
+     proprement) ; ne pas forcer leur migration dans ce helper sans d'abord
+     étendre sa forme pour ces deux besoins. */
+  _gameHeader(title,emoji,tag){
+    const tagHtml=tag==='expert'?'<span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span>'
+      :tag==='free'?'<span class="game-sel-tag free" style="margin-left:4px">GRATUIT</span>':'';
+    return `<div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
+      <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
+      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">${title} ${emoji}</h2>
+      ${tagHtml}
+    </div>`;
+  },
+  // boxes: [{label, value, unit?, color?, accent?}] · record: texte du bandeau 🏆 si présent
+  _gameResult({icon,title,record,boxes,extra,bestLine,primaryLabel,primaryOnClick,secondaryLabel,secondaryOnClick}){
+    const boxesHtml=(boxes||[]).map(b=>`<div class="stat-box"><div class="stat-label">${b.label}</div><div class="stat-val${b.accent?' acc':''}" style="font-size:36px${b.color?';color:'+b.color:''}">${b.value}${b.unit?'<span class="stat-unit"> '+b.unit+'</span>':''}</div></div>`).join('');
+    // Fond clair auto-porté (au lieu de dépendre du fond du conteneur parent) :
+    // ce même composant doit rester lisible aussi bien sur l'arène claire
+    // (Sprint/Course/Simon/Boss/Duel) que sur l'arène sombre (Tireur/Frappe-mots).
+    return `<div class="sprint-result" style="background:var(--card);border-radius:20px;padding:28px 24px;box-shadow:0 20px 50px rgba(0,0,0,0.25)">
+      ${icon?`<div style="font-size:44px;line-height:1;margin-bottom:6px">${icon}</div>`:''}
+      <h2>${title}</h2>
+      ${record?`<div class="sprint-record show">🏆 ${record}</div>`:''}
+      <div class="sprint-result-grid">${boxesHtml}</div>
+      ${extra?`<div style="margin-bottom:20px">${extra}</div>`:''}
+      ${bestLine?`<p style="font-size:14px;color:var(--muted);margin-bottom:20px">${bestLine}</p>`:''}
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="${primaryOnClick}">${primaryLabel||'Rejouer'}</button>
+        <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="${secondaryOnClick||'app.exitActiveGame()'}">${secondaryLabel||'← Jeux'}</button>
+      </div>
+    </div>`;
+  },
+  // Feuille de route façon Visée (paliers avec icône/cadenas + progression) —
+  // habillage visuel uniquement, appliqué à Frappe-mots et Tireur d'élite qui
+  // n'avaient qu'une rangée de pastilles plates pour représenter leurs paliers.
+  // items: [{label, sub, state:'done'|'current'|'locked'}]
+  // Longueur du préfixe correct — logique identique dans Course/Boss/Duel,
+  // chacun ne faisant que passer sa propre paire (typed,text).
+  _correctPrefix(typed,text){
+    let n=0;
+    for(let i=0;i<typed.length;i++){if(typed[i]===text[i])n++;else break;}
+    return n;
+  },
+  // Pistes de course (voiture + barre de progression) — même template pour
+  // Course (joueur + bots) et Duel (joueur + adversaire), qui le réécrivaient
+  // chacun séparément. lanes: [{name,emoji,prog,you?}].
+  _raceLanesHTML(lanes){
+    return `<div class="race-track">${lanes.map(l=>`<div class="race-lane${l.you?' you':''}">
+      <div class="race-lane-name">${l.you?'Toi':(l.namePrefix===false?l.name:l.emoji+' '+l.name)}</div>
+      <div class="race-strip"><div class="race-car" style="left:${Math.round((l.prog||0)*100)}%">${l.emoji}</div></div>
+    </div>`).join('')}</div>`;
+  },
+  // Compte à rebours 3-2-1-GO avant le départ — même template pour Course et
+  // Duel, qui le réécrivaient chacun séparément.
+  _raceCountdownHTML(startAt){
+    const cd=Math.max(0,Math.ceil((startAt-Date.now())/1000));
+    return `<div class="race-count">${cd>0?cd:'GO !'}</div><p>Prépare tes doigts…</p>`;
+  },
+
+  _tierRoadmap(items){
+    return `<div style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:340px;margin:8px auto 4px">
+      ${items.map((it,i)=>{
+        const icon=it.state==='current'?'🔥':it.state==='done'?'✓':it.state==='upcoming'?(i+1):'🔒';
+        const bg=it.state==='current'?'rgba(255,77,46,.18)':it.state==='done'?'rgba(31,169,113,.10)':'rgba(255,255,255,.05)';
+        const bd=it.state==='current'?'1px solid var(--accent)':'1px solid transparent';
+        const col=it.state==='locked'?'rgba(255,255,255,.35)':'#fff';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:${bg};border:${bd}">
+          <span style="font-size:15px;width:20px;text-align:center;flex-shrink:0">${icon}</span>
+          <span style="flex:1;text-align:left;font-size:13px;font-weight:700;color:${col}">${it.label}</span>
+          <span style="font-size:11px;color:rgba(255,255,255,.4);flex-shrink:0">${it.sub||''}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  },
+
+  // Confetti/particules déjà utilisés pour la fin de leçon (_celConfetti/_celBurst,
+  // 100% génériques) — jamais réutilisés par les jeux jusqu'ici. selEl optionnel :
+  // élément depuis lequel une salve de particules part en plus des confettis.
+  // sound : 'record' (défaut, record perso) | 'levelup' (palier/niveau débloqué) | 'victory'.
+  _celebrateGame(selEl,sound){
+    playSound(sound||'record'); // le son n'est pas soumis à prefers-reduced-motion
+    if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+    try{_celConfetti();}catch{}
+    if(selEl){try{const el=document.querySelector(selEl);if(el)_celBurst(el);}catch{}}
+  },
+
   /* ── SPRINT ── */
   startSprint(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startSprint());return;}
@@ -3624,9 +3830,17 @@ const app={
     if(!currentUser||!this.stats)return;
     const s=this.sprint;
     const wpm=Math.round((s.correct/5)/0.5);
-    if(!this.stats.sprintBest||wpm>this.stats.sprintBest.wpm){
+    try{track('game_completed',{game:'sprint',wpm});}catch{}
+    // Le flag record doit être posé AVANT d'écraser sprintBest : calculé après
+    // (comme c'était le cas avant), wpm et best étaient déjà égaux au moment du
+    // rendu et le bandeau "Nouveau record" ne s'affichait quasiment jamais.
+    const prevBest=this.stats.sprintBest;
+    s._isRecord=!!prevBest&&wpm>prevBest.wpm;
+    s._isFirstRecord=!prevBest&&wpm>0;
+    if(!prevBest||wpm>prevBest.wpm){
       this.stats.sprintBest={wpm,correct:s.correct,errors:s.errors,date:Date.now()};
       saveStats(this.stats);
+      if(s._isRecord||s._isFirstRecord)this._celebrateGame();
     }
   },
   sprintKey(e){
@@ -3655,8 +3869,8 @@ const app={
     const errors=s?s.errors:0;
     const wpm=s&&s.started?Math.round((correct/5)/Math.max(0.05,(30-timeLeft)/60)):0;
     const best=currentUser&&this.stats&&this.stats.sprintBest?this.stats.sprintBest.wpm:0;
-    const isRecord=isOver&&wpm>best&&best>0;
-    const isFirstRecord=isOver&&wpm>0&&best===0;
+    const isRecord=isOver&&!!s._isRecord;
+    const isFirstRecord=isOver&&!!s._isFirstRecord;
 
     let textHTML='';
     if(s){
@@ -3677,27 +3891,20 @@ const app={
     const progressPct=s?Math.round(100*(30-timeLeft)/30):0;
 
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
-        <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Le Sprint 🏁</h2>
-        <span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span>
-      </div>
+      ${this._gameHeader('Le Sprint','🏁','expert')}
       <div class="sprint-arena">
         ${isOver?`
-          <div class="sprint-result">
-            <h2>${wpm>=50?'Impressionnant !':wpm>=35?'Excellent !':wpm>=20?'Bien joué !':'Continue !'}</h2>
-            ${(isRecord||isFirstRecord)?'<div class="sprint-record show">🏆 Nouveau record personnel !</div>':''}
-            <div class="sprint-result-grid">
-              <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val acc" style="font-size:36px">${wpm}<span class="stat-unit"> mpm</span></div></div>
-              <div class="stat-box"><div class="stat-label">Caractères corrects</div><div class="stat-val" style="font-size:36px">${correct}</div></div>
-              <div class="stat-box"><div class="stat-label">Erreurs</div><div class="stat-val" style="font-size:36px;color:${errors>0?'#E5484D':'#1FA971'}">${errors}</div></div>
-            </div>
-            ${best>0?`<p style="font-size:14px;color:var(--muted);margin-bottom:20px">Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best} mpm</b></p>`:''}
-            <div style="display:flex;gap:12px;justify-content:center">
-              <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="app.startSprint()">Rejouer</button>
-              <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="app.activeGame=null;app.sprint=null;app.renderGames()">← Jeux</button>
-            </div>
-          </div>
+          ${this._gameResult({
+            title:wpm>=50?'Impressionnant !':wpm>=35?'Excellent !':wpm>=20?'Bien joué !':'Continue !',
+            record:(isRecord||isFirstRecord)?'Nouveau record personnel !':null,
+            boxes:[
+              {label:'Vitesse',value:wpm,unit:'mpm',accent:true},
+              {label:'Caractères corrects',value:correct},
+              {label:'Erreurs',value:errors,color:errors>0?'var(--danger)':'var(--success)'},
+            ],
+            bestLine:best>0?`Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best} mpm</b>`:null,
+            primaryLabel:'Rejouer',primaryOnClick:'app.startSprint()',
+          })}
         `:`
           <div class="sprint-hud">
             <div>
@@ -3711,7 +3918,7 @@ const app={
           </div>
           <div class="sprint-progress"><div class="sprint-progress-fill" style="width:${progressPct}%"></div></div>
           <div class="sprint-text-box" tabindex="0">${s?textHTML:'<span style="color:var(--muted)">Prêt…</span>'}</div>
-          <div class="sprint-hint">${!s||!s.started?'Commence à taper : le chrono démarre automatiquement.':errors>0?`<span style="color:#E5484D">${errors} erreur${errors>1?'s':''}</span> · ${correct} corrects`:`${correct} caractères corrects`}</div>
+          <div class="sprint-hint">${!s||!s.started?'Commence à taper : le chrono démarre automatiquement.':errors>0?`<span style="color:var(--danger)">${errors} erreur${errors>1?'s':''}</span> · ${correct} corrects`:`${correct} caractères corrects`}</div>
           <div style="display:flex;gap:12px;justify-content:center">
             ${!s?`<button class="btn-primary" onclick="app.startSprint()">Lancer le Sprint ▸</button>`:`<button class="btn-sm btn-dark" onclick="app.startSprint()">↻ Recommencer</button>`}
           </div>
@@ -3965,7 +4172,7 @@ const app={
       return;
     }
 
-    const accColor=g.avgAcc!=null&&g.avgAcc>=90?'#1FA971':(g.avgAcc!=null&&g.avgAcc<75?'#E5484D':'var(--txt)');
+    const accColor=g.avgAcc!=null&&g.avgAcc>=90?'var(--success)':(g.avgAcc!=null&&g.avgAcc<75?'var(--danger)':'var(--txt)');
     const statCard=(label,val,unit,sub,valColor)=>`
       <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 24px">
         <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:10px">${label}</div>
@@ -4004,7 +4211,7 @@ const app={
           <p style="font-size:15px;color:var(--muted);margin:0">L'activité de tes classes en un coup d'oeil.</p>
         </div>
 
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px">
           ${statCard('ÉLÈVES ACTIFS',g.activeThisWeek,'','cette semaine sur '+g.total)}
           ${statCard('SESSIONS',g.totalSessions,'','cumulées')}
           ${statCard('VITESSE MOY.',g.avgWpm!=null?g.avgWpm:'—',g.avgWpm!=null?' mpm':'',g.avgWpm!=null?'tous élèves confondus':'Pas encore de données')}
@@ -4083,10 +4290,11 @@ const app={
     const url=`${location.origin}/?defi=${encodeURIComponent(name+'~'+wpm+'~'+acc)}`;
     const msg=document.getElementById('chal-msg');
     const txt=`Je viens de taper à ${wpm} mpm sur KeyPace. Tu peux faire mieux ?`;
+    try{track('challenge_shared',{wpm});}catch{}
     try{
       if(navigator.share){await navigator.share({title:'Défi KeyPace',text:txt,url});return;}
       await navigator.clipboard.writeText(txt+' '+url);
-      if(msg){msg.style.display='block';msg.style.color='#1FA971';msg.textContent='✓ Lien copié ! Envoie-le à tes amis. Quand ils te renvoient le leur, tu peux rejouer.';}
+      if(msg){msg.style.display='block';msg.style.color='var(--success)';msg.textContent='✓ Lien copié ! Envoie-le à tes amis. Quand ils te renvoient le leur, tu peux rejouer.';}
     }catch{
       if(msg){msg.style.display='block';msg.style.color='var(--muted)';msg.textContent=url;}
     }
@@ -4159,7 +4367,7 @@ const app={
     document.getElementById(pageId).innerHTML=`<div class="typing-section">
       <div class="typing-header">
         <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br>':custom?'<button onclick="go(\'classes\')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Mes devoirs</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
-        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')">💡 Explication</button>`:''}${vocal&&!finished?`<button class="btn-sm btn-outline" onclick="app.speakAssignment()">🔊 Réécouter</button>`:''}${!isLesson&&!custom&&!cert?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()">${this._gaze.enabled?'👁 Traqueur actif':'👁 Activer traqueur des yeux'}</button>${this._gaze.permError?`<span style="font-size:11px;color:#E5484D;max-width:220px;text-align:right">${this._gaze.permError}</span>`:''}</div></div>
+        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')">💡 Explication</button>`:''}${vocal&&!finished?`<button class="btn-sm btn-outline" onclick="app.speakAssignment()">🔊 Réécouter</button>`:''}${!isLesson&&!custom&&!cert?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()">${this._gaze.enabled?'👁 Traqueur actif':'👁 Activer traqueur des yeux'}</button>${this._gaze.permError?`<span style="font-size:11px;color:var(--danger);max-width:220px;text-align:right">${this._gaze.permError}</span>`:''}</div></div>
       </div>
       <div class="live-stats" style="${finished?'display:none':''}">
         <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val">${s&&s.started?liveWpm+'<span class="stat-unit"> mpm</span>':'·'}</div></div>
@@ -4171,7 +4379,7 @@ const app={
           const pb=isLesson?this.lessonRec(s?.lessonId).bestWpm||0:Math.max(0,...(this.stats.tests||[]).map(t=>t.wpm));
           if(!pb)return'';
           const beating=s&&s.started&&liveWpm>pb;
-          return`<div class="stat-box" style="border-left:1px solid var(--border)"><div class="stat-label" style="color:${beating?'#1FA971':'var(--muted)'}">Record</div><div class="stat-val" style="font-size:22px;color:${beating?'#1FA971':'var(--muted)'}">${pb}<span class="stat-unit"> mpm</span></div></div>`;
+          return`<div class="stat-box" style="border-left:1px solid var(--border)"><div class="stat-label" style="color:${beating?'var(--success)':'var(--muted)'}">Record</div><div class="stat-val" style="font-size:22px;color:${beating?'var(--success)':'var(--muted)'}">${pb}<span class="stat-unit"> mpm</span></div></div>`;
         })()}
       </div>
       <div class="prog-wrap"><div class="prog-fill" style="width:${progress}%"></div></div>
@@ -4232,8 +4440,8 @@ const app={
           <div class="gaze-bar-title">👁 Suivi du regard</div>
           <div class="gaze-timeline">${segs}</div>
           <div class="gaze-bar-stats">
-            <span><span class="gaze-dot" style="background:#1FA971;display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Écran <b>${stats.pct}%</b></span>
-            <span><span class="gaze-dot" style="background:#E5484D;display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Clavier <b>${100-stats.pct}%</b></span>
+            <span><span class="gaze-dot" style="background:var(--success);display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Écran <b>${stats.pct}%</b></span>
+            <span><span class="gaze-dot" style="background:var(--danger);display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Clavier <b>${100-stats.pct}%</b></span>
             <span style="margin-left:auto;color:var(--muted);font-size:12px">${msg}</span>
           </div>
         </div>`;
@@ -4314,6 +4522,8 @@ const app={
   /* ── LESSONS ── */
   // Bloc "crée un compte" imposant pour les visiteurs, adapté à chaque onglet.
   _guestGate(o){
+    if(!window._guestGateSeen)window._guestGateSeen=new Set();
+    if(!window._guestGateSeen.has(o.eyebrow)){window._guestGateSeen.add(o.eyebrow);try{track('guest_gate_shown',{context:o.eyebrow});}catch{}}
     return`<div class="guest-gate">
       <div class="guest-gate-icon">${o.icon}</div>
       <div class="guest-gate-eyebrow">${o.eyebrow}</div>
@@ -4518,7 +4728,7 @@ const app={
     const golds=Object.values(tiers).filter(t=>t==='gold').length;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:1120px;margin:0 auto;padding:0 24px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <button onclick="app.activeGame=null;app.souris=null;app.renderGames()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
         <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Visée — 12 niveaux</h2>
         <div style="font-size:13px;color:var(--muted);font-weight:600">${best}/12 franchis${golds?' · '+golds+' 🥇':''}</div>
       </div>
@@ -4547,8 +4757,8 @@ const app={
           <div style="background:rgba(255,77,46,.14);border:1px solid rgba(255,77,46,.3);border-radius:12px;padding:9px 16px;font-size:13px;font-weight:700;color:#FF9478">NOUVEAU : ${this._esc(l.newThing)}</div>
           <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">${l.brief}</p>
           <div style="display:flex;gap:26px;margin-top:4px">
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIF</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:#fff">${l.goal} pts</div></div>
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">${'♥'.repeat(l.lives)}</div></div>
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${l.bronze} · 🥈${l.silver} · 🥇${l.gold}</div></div>
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">${'♥'.repeat(s.lives||3)}</div></div>
           </div>
           <button class="game-play-btn" style="margin-top:8px" onclick="app.startSouris()">Commencer</button>
         </div>
@@ -4774,12 +4984,21 @@ const app={
     this.stopSouris();
     s.tier=this._sourisTier(l,s.score);
     s.phase=s.tier?'win':'over';
+    try{track('game_completed',{game:'souris',level:s.lvl,score:s.score,tier:s.tier||null});}catch{}
     if(s.tier&&currentUser&&this.stats){
+      const wasUnlocked=s.lvl<=(this.stats.sourisBest||0);
+      const prevTierRank={bronze:1,silver:2,gold:3}[(this.stats.sourisTiers||{})[s.lvl]]||0;
       if(s.lvl>(this.stats.sourisBest||0)){this.stats.sourisBest=s.lvl;}
       this.stats.sourisTiers=this.stats.sourisTiers||{};
       const rank={bronze:1,silver:2,gold:3};
-      if((rank[s.tier]||0)>(rank[this.stats.sourisTiers[s.lvl]]||0))this.stats.sourisTiers[s.lvl]=s.tier;
+      const newTierRank=rank[s.tier]||0;
+      if(newTierRank>prevTierRank)this.stats.sourisTiers[s.lvl]=s.tier;
       saveStats(this.stats);
+      // Confettis : premier passage d'un niveau (débloque le suivant) ou
+      // amélioration de médaille (bronze→argent→or) — un "palier franchi" à
+      // chaque fois, jamais célébré jusqu'ici.
+      if(!wasUnlocked)this._celebrateGame(null,'levelup');
+      else if(newTierRank>prevTierRank)this._celebrateGame(null,'record');
     }
     this.renderSouris();
   },
@@ -5121,32 +5340,35 @@ const app={
     const elapsed=g&&g.startTime?Math.round((Date.now()-g.startTime)/1000):0;
     const elapsedStr=elapsed>=60?`${Math.floor(elapsed/60)}m${elapsed%60}s`:`${elapsed}s`;
     const tierHistHTML=(g&&g.tierHistory&&g.tierHistory.length)?g.tierHistory.map(t=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:rgba(255,255,255,0.06);border-radius:8px;gap:16px"><span style="font-size:13px;font-weight:700;color:var(--accent)">${t.label}</span><span style="font-size:12px;color:rgba(255,255,255,0.4)">${t.score} pts</span></div>`).join(''):'';
-    const gameOverOverlay=`<div class="game-overlay" style="gap:8px;padding:28px 24px;overflow-y:auto;max-height:100%">
-      <h2 style="margin:0">${score>best?'Nouveau record !':'Fin de partie'}</h2>
-      <div class="game-final">${score} pts</div>
-      ${score>best?'<p style="color:var(--accent);font-weight:700;margin:0">Tu bats ton record !</p>':'<p style="color:rgba(255,255,255,0.5);margin:0">Meilleur : '+best+' pts</p>'}
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%;margin:8px 0">
-        <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px">MOTS</div><div style="font-size:22px;font-weight:700;color:#fff">${g?g.wordsTyped:0}</div></div>
-        <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px">PRÉCISION</div><div style="font-size:22px;font-weight:700;color:#fff">${accuracy}%</div></div>
-        <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px">DURÉE</div><div style="font-size:22px;font-weight:700;color:#fff">${elapsedStr}</div></div>
-      </div>
-      <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:10px;width:100%;text-align:center;margin-bottom:2px"><div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:2px">PALIER ATTEINT</div><div style="font-size:18px;font-weight:700;color:var(--accent)">${tier.label}</div></div>
-      ${tierHistHTML?`<div style="width:100%;display:flex;flex-direction:column;gap:4px"><div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Paliers franchis</div>${tierHistHTML}</div>`:''}
-      <button class="game-play-btn" onclick="app.startGame()" style="margin-top:8px">Rejouer ▸</button>
-    </div>`;
-    const tierPillsHTML=GAME_TIERS.map((t,i)=>`<div style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(255,255,255,${i===0?'.15':'.07'});color:rgba(255,255,255,${i===0?'.9':'.4'})">${t.label}<span style="font-size:10px;font-weight:400;margin-left:4px">${i===0?'départ':t.score+'pts'}</span></div>`).join('');
+    const tierExtra=`<div style="background:rgba(0,0,0,.04);border-radius:10px;padding:10px;text-align:center;margin-bottom:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:2px">PALIER ATTEINT</div><div style="font-size:18px;font-weight:700;color:var(--accent)">${tier.label}</div></div>`
+      +(tierHistHTML?`<div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Paliers franchis</div>${tierHistHTML.replace(/rgba\(255,255,255,0\.06\)/g,'var(--light)').replace(/rgba\(255,255,255,0\.4\)/g,'var(--muted)')}</div>`:'');
+    const isRecord=!!(g&&g._isRecord);
+    const gameOverOverlay=`<div class="game-overlay">${this._gameResult({
+      title:isRecord?'Nouveau record !':'Fin de partie',
+      record:isRecord?'Tu bats ton record !':null,
+      boxes:[
+        {label:'Score',value:score,unit:'pts',accent:true},
+        {label:'Mots tapés',value:g?g.wordsTyped:0},
+        {label:'Précision',value:accuracy,unit:'%'},
+      ],
+      extra:tierExtra,
+      bestLine:!isRecord?`Meilleur : <b style="color:var(--accent)">${best} pts</b>`:null,
+      primaryLabel:'Rejouer ▸',primaryOnClick:'app.startGame()',
+    })}</div>`;
+    const bestTierIdx=GAME_TIERS.indexOf(getGameTier(best));
+    const roadmapItems=GAME_TIERS.map((t,i)=>({
+      label:t.label,
+      sub:i===0?'départ':t.score+' pts',
+      state:i<bestTierIdx?'done':i===bestTierIdx?'current':'locked',
+    }));
     const idleOverlay=`<div class="game-overlay"><h2>Frappe-mots</h2><p style="margin-bottom:6px">Mots qui tombent, doigts qui dansent.<br>Meilleur : <b style="color:#fff">${best} pts</b></p>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:8px 0 4px">${tierPillsHTML}</div>
-      <button class="game-play-btn" onclick="app.startGame()" style="margin-top:12px">Jouer ▸</button></div>`;
+      ${this._tierRoadmap(roadmapItems)}
+      <button class="game-play-btn" onclick="app.startGame()" style="margin-top:4px">Jouer ▸</button></div>`;
     const guestOverlay=`<div class="game-overlay"><h2>Frappe-mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
     // Countdown/tierBanner are body-injected : no overlay needed here
     const overlay=!currentUser?guestOverlay:gameIdle?idleOverlay:gameOver?gameOverOverlay:'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
-        <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Frappe-mots 🎯</h2>
-        <span class="game-sel-tag free">GRATUIT</span>
-      </div>
+      ${this._gameHeader('Frappe-mots','🎯','free')}
       <div class="game-arena" style="max-width:1120px;margin:0 auto;margin-left:24px;margin-right:24px">
         <div class="game-hud"><div class="game-score-val">${score}<span> pts</span></div>${tierHTML}<div style="display:flex;gap:5px">${hearts}</div></div>
         ${wordsHTML}${overlay}
@@ -5239,12 +5461,14 @@ const app={
     const mins=t.started?Math.max((t.endTime-t.startTime)/60000,1/600):1/600;
     const wpm=Math.round((t.correctChars/5)/mins);
     t._precision=precision;t._wpm=wpm;t._isRecord=false;
+    try{track('game_completed',{game:'tireur',wpm,precision});}catch{}
     if(currentUser&&this.stats){
       const b=this.stats.tireurBest;
       if((!b||precision>b.precision||(precision===b.precision&&wpm>b.wpm))&&precision>0){
         t._isRecord=true;
         this.stats.tireurBest={precision,wpm,date:Date.now()};
         saveStats(this.stats);
+        this._celebrateGame();
       }
     }
     this.renderCurrent();
@@ -5266,7 +5490,7 @@ const app={
     }).join('');
     const fxHTML=(t&&t.fx?t.fx:[]).map(f=>{
       const op=f.t/6;const scale=f.type==='hit'?(1+(1-op)*0.9):1;
-      const sym=f.type==='hit'?'✓':'✕';const col=f.type==='hit'?'#1FA971':'#E5484D';
+      const sym=f.type==='hit'?'✓':'✕';const col=f.type==='hit'?'var(--success)':'var(--danger)';
       return`<div class="timpact" style="left:${f.x}%;top:${f.y}%;color:${col};opacity:${reduce?0.9:op};transform:translate(-50%,-50%) scale(${reduce?1:scale})">${sym}</div>`;
     }).join('');
     let overlay='';
@@ -5275,27 +5499,35 @@ const app={
     } else if(!currentUser){
       overlay=`<div class="game-overlay"><h2>Tireur d'élite</h2><p>Crée un compte gratuit pour jouer.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
     } else if(idle){
-      overlay=`<div class="game-overlay"><h2>Tireur d'élite</h2><p>Tape chaque mot sans la moindre faute.<br>Une erreur = cible ratée.${best?'<br>Record : <b style="color:#fff">'+best.precision+'% de précision</b>':''}</p><button class="game-play-btn" onclick="app.startTireur()">Jouer ▸</button></div>`;
+      const tireurRoadmap=this._tierRoadmap([
+        {label:'Mots courts',sub:'cibles 1-6',state:'upcoming'},
+        {label:'Mots moyens',sub:'cibles 7-13',state:'upcoming'},
+        {label:'Mots difficiles',sub:'cibles 14-20',state:'upcoming'},
+      ]);
+      overlay=`<div class="game-overlay"><h2>Tireur d'élite</h2><p style="margin-bottom:6px">Tape chaque mot sans la moindre faute.<br>Une erreur = cible ratée.${best?'<br>Record : <b style="color:#fff">'+best.precision+'% de précision</b>':''}</p>
+        ${tireurRoadmap}
+        <button class="game-play-btn" onclick="app.startTireur()" style="margin-top:4px">Jouer ▸</button></div>`;
     } else if(over){
       const prec=t._precision,wpm=t._wpm;
       const badge=prec>=90?"Tireur d'élite !":prec>=70?'Belle précision !':prec>=50?'Continue !':'Vise mieux !';
       const uniqMissed=[...new Set(t.missed)];
       const topKeys=Object.keys(t.errKeys).sort((a,b)=>t.errKeys[b]-t.errKeys[a]).slice(0,5);
-      overlay=`<div class="game-overlay">
-        <h2>${badge}</h2>
-        <div class="game-final">${prec}<span style="font-size:24px"> %</span></div>
-        <p>${wpm} mpm · ${hits}/${roundSize} cibles touchées${t._isRecord?'<br>🏆 Nouveau record de précision !':''}</p>
-        ${uniqMissed.length?`<div style="text-align:center"><div style="color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;margin-bottom:6px;letter-spacing:.04em">MOTS RATÉS</div><div class="tireur-chips">${uniqMissed.slice(0,12).map(w=>`<span class="tireur-chip">${w}</span>`).join('')}</div></div>`:'<p style="color:#1FA971;font-weight:700">Sans faute ! 🎉</p>'}
-        ${topKeys.length?`<div style="color:rgba(255,255,255,0.5);font-size:12px">Touches à surveiller : ${topKeys.map(k=>`<b style="color:#fff">${k===' '?'espace':k}</b>`).join(' · ')}</div>`:''}
-        <button class="game-play-btn" onclick="app.startTireur()">Rejouer ▸</button>
-      </div>`;
+      const extraHtml=(uniqMissed.length?`<div style="text-align:center;margin-bottom:12px"><div style="color:var(--muted);font-size:12px;font-weight:700;margin-bottom:6px;letter-spacing:.04em">MOTS RATÉS</div><div class="tireur-chips">${uniqMissed.slice(0,12).map(w=>`<span class="tireur-chip">${w}</span>`).join('')}</div></div>`:'<p style="color:var(--success);font-weight:700;text-align:center">Sans faute ! 🎉</p>')
+        +(topKeys.length?`<div style="color:var(--muted);font-size:12px;text-align:center">Touches à surveiller : ${topKeys.map(k=>`<b style="color:var(--txt)">${k===' '?'espace':k}</b>`).join(' · ')}</div>`:'');
+      overlay=`<div class="game-overlay">${this._gameResult({
+        title:badge,
+        record:t._isRecord?'Nouveau record de précision !':null,
+        boxes:[
+          {label:'Précision',value:prec,unit:'%',accent:true},
+          {label:'Vitesse',value:wpm,unit:'mpm'},
+          {label:'Cibles touchées',value:hits+'/'+roundSize},
+        ],
+        extra:extraHtml,
+        primaryLabel:'Rejouer ▸',primaryOnClick:'app.startTireur()',
+      })}</div>`;
     }
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
-        <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Tireur d'élite 🏹</h2>
-        <span class="game-sel-tag free">GRATUIT</span>
-      </div>
+      ${this._gameHeader("Tireur d'élite",'🏹','free')}
       <div class="game-arena" style="max-width:1120px;margin:0 auto;margin-left:24px;margin-right:24px">
         <div class="game-hud">
           <div style="display:flex;gap:22px;align-items:flex-end">
@@ -5339,11 +5571,7 @@ const app={
     });
     this.renderCurrent();
   },
-  _courseCorrectPrefix(){
-    const c=this.course;let n=0;
-    for(let i=0;i<c.typed.length;i++){if(c.typed[i]===c.text[i])n++;else break;}
-    return n;
-  },
+  _courseCorrectPrefix(){return this._correctPrefix(this.course.typed,this.course.text);},
   courseKey(e){
     const c=this.course;if(!c||!c.on||!c.raceStarted||c.finished)return;
     const k=e._composedKey||e.key;
@@ -5368,9 +5596,10 @@ const app={
     const wpm=Math.round((c.text.length/5)/mins);
     const acc=c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     c._wpm=wpm;c._acc=acc;c._isRecord=false;
+    try{track('game_completed',{game:'course',wpm,acc,rank:c.rank});}catch{}
     if(currentUser&&this.stats){
       const b=this.stats.courseBest;
-      if(!b||wpm>b.wpm){c._isRecord=true;this.stats.courseBest={wpm,acc,rank:c.rank,date:Date.now()};saveStats(this.stats);}
+      if(!b||wpm>b.wpm){c._isRecord=true;this.stats.courseBest={wpm,acc,rank:c.rank,date:Date.now()};saveStats(this.stats);this._celebrateGame();}
     }
     this.renderCurrent();
   },
@@ -5386,10 +5615,7 @@ const app={
     const liveAcc=c&&c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     // pistes
     const lanes=c?[{name:'Toi',emoji:'🏎️',prog:playerProg,color:'var(--accent)',you:true},...c.bots]:[];
-    const lanesHTML=lanes.map(l=>`<div class="race-lane${l.you?' you':''}">
-      <div class="race-lane-name">${l.you?'Toi':l.emoji+' '+l.name}</div>
-      <div class="race-strip"><div class="race-car" style="left:${Math.round((l.prog||0)*100)}%">${l.emoji}</div></div>
-    </div>`).join('');
+    const lanesHTML=this._raceLanesHTML(lanes);
     // texte
     let textHTML='';
     if(c){
@@ -5406,30 +5632,22 @@ const app={
     if(IS_TOUCH_ONLY()&&idle){
       overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>La Course de dactylo se joue au clavier physique. Reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
     } else if(c&&!c.raceStarted){
-      const cd=Math.max(0,Math.ceil((c.startAt-Date.now())/1000));
-      overlay=`<div class="race-overlay"><div class="race-count">${cd>0?cd:'GO !'}</div><p>Prépare tes doigts…</p></div>`;
+      overlay=`<div class="race-overlay">${this._raceCountdownHTML(c.startAt)}</div>`;
     }
-    const result=over?`<div class="sprint-result">
-      <div style="font-size:48px;line-height:1">${c.rank===1?'🥇':c.rank===2?'🥈':c.rank===3?'🥉':'🏁'}</div>
-      <h2>${c.rank===1?'1ʳᵉ place !':c.rank+'ᵉ place'}</h2>
-      ${c._isRecord?'<div class="sprint-record show">🏆 Nouveau record de vitesse !</div>':''}
-      <div class="sprint-result-grid">
-        <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val acc" style="font-size:36px">${c._wpm}<span class="stat-unit"> mpm</span></div></div>
-        <div class="stat-box"><div class="stat-label">Précision</div><div class="stat-val" style="font-size:36px">${c._acc}<span class="stat-unit"> %</span></div></div>
-        <div class="stat-box"><div class="stat-label">Classement</div><div class="stat-val" style="font-size:36px">${c.rank}<span class="stat-unit"> / ${c.bots.length+1}</span></div></div>
-      </div>
-      ${best?`<p style="font-size:14px;color:var(--muted);margin-bottom:20px">Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best.wpm} mpm</b></p>`:''}
-      <div style="display:flex;gap:12px;justify-content:center">
-        <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="app.startCourse()">Rejouer</button>
-        <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="app.exitActiveGame()">← Jeux</button>
-      </div>
-    </div>`:'';
+    const result=over?this._gameResult({
+      icon:c.rank===1?'🥇':c.rank===2?'🥈':c.rank===3?'🥉':'🏁',
+      title:c.rank===1?'1ʳᵉ place !':c.rank+'ᵉ place',
+      record:c._isRecord?'Nouveau record de vitesse !':null,
+      boxes:[
+        {label:'Vitesse',value:c._wpm,unit:'mpm',accent:true},
+        {label:'Précision',value:c._acc,unit:'%'},
+        {label:'Classement',value:c.rank+' / '+(c.bots.length+1)},
+      ],
+      bestLine:best?`Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best.wpm} mpm</b>`:null,
+      primaryLabel:'Rejouer',primaryOnClick:'app.startCourse()',
+    }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
-        <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Course de dactylo 🏎️</h2>
-        <span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span>
-      </div>
+      ${this._gameHeader('Course de dactylo','🏎️','expert')}
       <div class="sprint-arena" style="position:relative">
         ${idle&&!IS_TOUCH_ONLY()?`<div class="sprint-result"><h2 style="margin-bottom:12px">Prêt à courir ?</h2><p style="color:var(--muted);font-size:15px;margin-bottom:20px">Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary" onclick="app.startCourse()">Lancer la course ▸</button></div>`:''}
         ${c?`
@@ -5437,7 +5655,7 @@ const app={
             <div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:var(--muted);font-weight:500"> mpm</span></div></div>
             <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">PRÉCISION</div><div class="sprint-score-val" style="color:var(--txt)">${liveAcc}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div></div>
           </div>
-          <div class="race-track">${lanesHTML}</div>
+          ${lanesHTML}
           ${over?'':`<div class="race-text-box">${textHTML}</div>`}
           ${over?'':`<div class="sprint-hint">${c.raceStarted?'Corrige tes fautes (retour arrière) pour continuer à avancer.':'La course démarre dans un instant…'}</div>`}
           ${result}
@@ -5521,9 +5739,10 @@ const app={
   },
   afterSimon(){
     const s=this.simon;s._isRecord=false;
+    try{track('game_completed',{game:'simon',score:s.score,maxSeq:s.maxSeq});}catch{}
     if(currentUser&&this.stats){
       const b=this.stats.simonBest;
-      if((!b||s.score>b.score)&&s.score>0){s._isRecord=true;this.stats.simonBest={score:s.score,maxSeq:s.maxSeq,date:Date.now()};saveStats(this.stats);}
+      if((!b||s.score>b.score)&&s.score>0){s._isRecord=true;this.stats.simonBest={score:s.score,maxSeq:s.maxSeq,date:Date.now()};saveStats(this.stats);this._celebrateGame();}
     }
     this.renderCurrent();
   },
@@ -5550,7 +5769,7 @@ const app={
         <div class="simon-words">${chips}</div>
         <div style="font-size:13px;color:var(--muted)">Espace ou Entrée pour valider chaque mot</div>`;
     } else if(s&&s.phase==='fail'){
-      stage=`<div class="simon-prompt" style="color:#E5484D;font-size:24px">Raté !</div>
+      stage=`<div class="simon-prompt" style="color:var(--danger);font-size:24px">Raté !</div>
         <div style="font-size:15px;color:var(--muted)">Il te reste ${s.lives} vie${s.lives>1?'s':''}. Nouvelle séquence…</div>`;
     }
     let overlay='';
@@ -5562,22 +5781,19 @@ const app={
       overlay=`<div class="race-overlay"><h2>Simon des mots</h2><p>Mémorise une séquence de mots puis retape-la. Elle s'allonge à chaque réussite.${best?'<br>Record : <b style="color:var(--accent)">'+best.score+' pts</b> (séquence de '+best.maxSeq+')':''}</p><button class="btn-primary" onclick="app.startSimon()">Jouer ▸</button></div>`;
     } else if(over){
       const badge=s.maxSeq>=8?'Mémoire d\'éléphant !':s.maxSeq>=5?'Excellente mémoire !':s.maxSeq>=3?'Bien joué !':'Continue !';
-      overlay=`<div class="race-overlay">
-        <div style="font-size:46px;line-height:1">🧠</div>
-        <h2>${badge}</h2>
-        <p style="font-size:15px">Score : <b style="color:var(--accent);font-family:'JetBrains Mono',monospace">${s.score} pts</b><br>Séquence max : <b>${s.maxSeq} mots</b>${s._isRecord?'<br>🏆 Nouveau record !':''}</p>
-        <div style="display:flex;gap:12px;justify-content:center;margin-top:6px">
-          <button class="btn-primary" onclick="app.startSimon()">Rejouer ▸</button>
-          <button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button>
-        </div>
-      </div>`;
+      overlay=`<div class="race-overlay">${this._gameResult({
+        icon:'🧠',
+        title:badge,
+        record:s._isRecord?'Nouveau record !':null,
+        boxes:[
+          {label:'Score',value:s.score,unit:'pts',accent:true},
+          {label:'Séquence max',value:s.maxSeq,unit:'mots'},
+        ],
+        primaryLabel:'Rejouer ▸',primaryOnClick:'app.startSimon()',
+      })}</div>`;
     }
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
-        <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Simon des mots 🧠</h2>
-        <span class="game-sel-tag free">GRATUIT</span>
-      </div>
+      ${this._gameHeader('Simon des mots','🧠','free')}
       <div class="simon-arena">
         <div class="simon-hud">
           <div style="display:flex;gap:22px;align-items:flex-end">
@@ -5607,19 +5823,38 @@ const app={
       if(ch.error)throw new Error(ch.error);
       const lb=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-leaderboard',token:currentToken})}).then(r=>r.json());
       this.boss={phase:'lobby',challenge:ch,lb,secondsLeft:ch.secondsLeft};
+      this._cacheBossBest(lb,ch.isoWeek);
     }catch(e){this.boss={phase:'error',msg:'Impossible de charger le défi pour le moment. Réessaie plus tard.'};}
     if(this.activeGame==='boss')this.renderCurrent();
+  },
+  // Boss n'a pas de "meilleur score" local (tout vit côté serveur, classement
+  // hebdo) — jusqu'ici ça le rendait absent de la page Progrès malgré son
+  // classement en temps réel. On met simplement en cache le dernier rang/score
+  // connu à chaque chargement du classement, pour l'affichage seulement (la
+  // source de vérité reste le serveur).
+  _cacheBossBest(lb,isoWeek){
+    if(!currentUser||!this.stats||!lb||!lb.me)return;
+    this.stats.bossBest={rank:lb.me.rank,score:lb.me.score,wpm:lb.me.wpm,isoWeek};
+    saveStats(this.stats);
+  },
+  // Même algorithme que isoWeek() côté serveur (api/_boss-shared.js) — sert
+  // uniquement à savoir si stats.bossBest date de la semaine en cours avant
+  // de l'afficher comme "cette semaine" sur la page Progrès.
+  _currentIsoWeek(){
+    const d=new Date();
+    const date=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));
+    const dayNum=(date.getUTCDay()+6)%7;
+    date.setUTCDate(date.getUTCDate()-dayNum+3);
+    const firstThursday=new Date(Date.UTC(date.getUTCFullYear(),0,4));
+    const week=1+Math.round(((date-firstThursday)/86400000-3+((firstThursday.getUTCDay()+6)%7))/7);
+    return `${date.getUTCFullYear()}-W${String(week).padStart(2,'0')}`;
   },
   startBossAttempt(){
     const b=this.boss;if(!b||!b.challenge)return;
     this.boss={...b,phase:'playing',text:b.challenge.text,typed:[],correct:0,keystrokes:0,started:false,startTime:0,endTime:0,finished:false};
     this.renderCurrent();
   },
-  _bossCorrectPrefix(){
-    const b=this.boss;let n=0;
-    for(let i=0;i<b.typed.length;i++){if(b.typed[i]===b.text[i])n++;else break;}
-    return n;
-  },
+  _bossCorrectPrefix(){return this._correctPrefix(this.boss.typed,this.boss.text);},
   bossKey(e){
     const b=this.boss;if(!b||b.phase!=='playing'||b.finished)return;
     const k=e._composedKey||e.key;
@@ -5643,12 +5878,20 @@ const app={
     const wpm=Math.round((b.text.length/5)/mins);
     const acc=b.keystrokes?Math.round(100*b.correct/b.keystrokes):100;
     b._wpm=wpm;b._acc=acc;b._score=Math.round(wpm*Math.pow(acc/100,2)*10)/10;
+    // Meilleur score AVANT cette tentative (b.lb date du lobby, chargé avant de
+    // jouer) : capturé maintenant car b.lb va être écrasé par le classement
+    // post-soumission juste en dessous.
+    const prevBestScore=b.lb&&b.lb.me?b.lb.me.score:0;
     b.phase='submitting';this.renderCurrent();
     try{
       const sub=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-submit',token:currentToken,wpm,accuracy:acc})}).then(r=>r.json());
       b._submitErr=sub.error||null;b._serverScore=sub.score;
+      try{track('game_completed',{game:'boss',wpm,acc,score:sub.score});}catch{}
       const lb=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-leaderboard',token:currentToken})}).then(r=>r.json());
       b.lb=lb;
+      this._cacheBossBest(lb,b.challenge&&b.challenge.isoWeek);
+      b._isRecord=!!(lb&&lb.me&&lb.me.score>prevBestScore);
+      if(b._isRecord)this._celebrateGame();
     }catch(e){b._submitErr='Erreur réseau, score peut-être non enregistré.';}
     b.phase='result';if(this.activeGame==='boss')this.renderCurrent();
   },
@@ -5673,8 +5916,7 @@ const app={
   },
   renderBoss(){
     const b=this.boss;
-    const back=`<button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>`;
-    const head=`<div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">${back}<h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Boss de la semaine 🏆</h2><span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span></div>`;
+    const head=this._gameHeader('Boss de la semaine','🏆','expert');
     let body='';
     if(!b||b.phase==='loading'){
       body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Chargement du défi…</div></div>`;
@@ -5720,21 +5962,19 @@ const app={
       body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Envoi de ton score…</div></div>`;
     } else if(b.phase==='result'){
       body=`<div class="boss-card">
-        <div class="sprint-result" style="padding-bottom:8px">
-          <div style="font-size:46px;line-height:1">🏆</div>
-          <h2>Défi relevé !</h2>
-          ${b._submitErr?`<div class="auth-error show" style="display:block;margin:0 auto 16px;max-width:360px">${b._submitErr}</div>`:''}
-          <div class="sprint-result-grid">
-            <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val acc" style="font-size:32px">${b._wpm}<span class="stat-unit"> mpm</span></div></div>
-            <div class="stat-box"><div class="stat-label">Précision</div><div class="stat-val" style="font-size:32px">${b._acc}<span class="stat-unit"> %</span></div></div>
-            <div class="stat-box"><div class="stat-label">Score</div><div class="stat-val acc" style="font-size:32px">${b._score}</div></div>
-          </div>
-          ${b.lb&&b.lb.me?`<p style="font-size:15px;color:var(--muted);margin-bottom:18px">Ton rang cette semaine : <b style="color:var(--accent);font-size:20px">#${b.lb.me.rank}</b> · meilleur score <b>${b.lb.me.score} pts</b></p>`:''}
-          <div style="display:flex;gap:12px;justify-content:center;margin-bottom:24px">
-            <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="app.startBossAttempt()">Réessayer</button>
-            <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="app.boss.phase='lobby';app.renderCurrent()">Classement</button>
-          </div>
-        </div>
+        ${this._gameResult({
+          icon:'🏆',title:'Défi relevé !',
+          record:b._isRecord?'Nouveau record personnel cette semaine !':null,
+          extra:b._submitErr?`<div class="auth-error show" style="display:block;margin:0 auto;max-width:360px">${b._submitErr}</div>`:null,
+          boxes:[
+            {label:'Vitesse',value:b._wpm,unit:'mpm',accent:true},
+            {label:'Précision',value:b._acc,unit:'%'},
+            {label:'Score',value:b._score,accent:true},
+          ],
+          bestLine:b.lb&&b.lb.me?`Ton rang cette semaine : <b style="color:var(--accent);font-size:20px">#${b.lb.me.rank}</b> · meilleur score <b>${b.lb.me.score} pts</b>`:null,
+          primaryLabel:'Réessayer',primaryOnClick:'app.startBossAttempt()',
+          secondaryLabel:'Classement',secondaryOnClick:'app.boss.phase=\'lobby\';app.renderCurrent()',
+        })}
         <h3 class="boss-lb-title">Classement de la semaine</h3>
         <div class="lb-table">${this._bossLeaderboardHTML(b.lb,true)}</div>
       </div>`;
@@ -5860,7 +6100,7 @@ const app={
     const done=()=>{if(this.duel){this.duel._copied=true;this.renderCurrent();setTimeout(()=>{if(this.duel)this.duel._copied=false;this.renderCurrent();},2000);}};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(done,done);else done();
   },
-  _duelCorrectPrefix(){const d=this.duel;let n=0;for(let i=0;i<d.typed.length;i++){if(d.typed[i]===d.text[i])n++;else break;}return n;},
+  _duelCorrectPrefix(){return this._correctPrefix(this.duel.typed,this.duel.text);},
   duelKey(e){
     const d=this.duel;if(!d||d.phase!=='racing'||d.finished)return;
     if(Date.now()<d.startAt)return;
@@ -5884,6 +6124,7 @@ const app={
       const mins=Math.max(d.myFinishMs/60000,1/600);
       d.myWpm=Math.round((d.text.length/5)/mins);
       d.myAcc=d.keystrokes?Math.round(100*d.correct/d.keystrokes):100;
+      try{track('game_completed',{game:'duel',wpm:d.myWpm,acc:d.myAcc});}catch{}
       this._duelBroadcastProg(true);
       if(d._channel)d._channel.send({type:'broadcast',event:'done',payload:{role:d.role,wpm:d.myWpm,acc:d.myAcc,timeMs:d.myFinishMs}});
       fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-finish',token:currentToken,roomId:d.roomId,role:d.role,wpm:d.myWpm,accuracy:d.myAcc,timeMs:d.myFinishMs,finished:true})}).catch(()=>{});
@@ -5902,8 +6143,18 @@ const app={
     const d=this.duel;if(!d||d.phase==='result')return;
     if(d.finished&&(d.oppFinished||d.oppForfeit)){
       if(d.oppForfeit&&!d.oppFinished)d.winner=d.role;
-      else d.winner=(d.myFinishMs<=d.oppFinishMs)?d.role:(d.role==='host'?'guest':'host');
+      else if(d.myFinishMs===d.oppFinishMs)d.winner='draw';
+      else d.winner=(d.myFinishMs<d.oppFinishMs)?d.role:(d.role==='host'?'guest':'host');
       d.phase='result';this.stopDuelLoop();this.renderCurrent();
+      // Duel ne gardait aucune trace après une partie (le jeu le plus social
+      // des 8, mais celui avec le moins de raison d'y revenir). Historique
+      // simple victoires/défaites/nuls, affiché sur la page Progrès.
+      if(currentUser&&this.stats){
+        const rec=this.stats.duelRecord||{wins:0,losses:0,draws:0};
+        if(d.winner==='draw')rec.draws++;else if(d.winner===d.role)rec.wins++;else rec.losses++;
+        this.stats.duelRecord=rec;saveStats(this.stats);
+      }
+      if(d.winner===d.role)this._celebrateGame(null,'victory');else if(d.winner!=='draw')playSound('defeat');
     }
   },
   duelLeave(){
@@ -5941,15 +6192,14 @@ const app={
   _duelLanesHTML(){
     const d=this.duel;
     const oppName=(d.role==='host'?(d.oppLabel||'Adversaire'):(d.hostLabel||d.oppLabel||'Hôte'));
-    return`<div class="race-track">
-      <div class="race-lane you"><div class="race-lane-name">Toi 🏎️</div><div class="race-strip"><div class="race-car" style="left:${Math.round((d.myProg||0)*100)}%">🏎️</div></div></div>
-      <div class="race-lane"><div class="race-lane-name">${oppName}</div><div class="race-strip"><div class="race-car" style="left:${Math.round((d.oppProg||0)*100)}%">🚗</div></div></div>
-    </div>`;
+    return this._raceLanesHTML([
+      {name:'Toi',emoji:'🏎️',prog:d.myProg||0,you:true},
+      {name:oppName,emoji:'🚗',prog:d.oppProg||0,namePrefix:false},
+    ]);
   },
   renderDuel(){
     const d=this.duel;
-    const back=`<button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>`;
-    const head=`<div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">${back}<h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">Duel 1v1 ⚔️</h2><span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span></div>`;
+    const head=this._gameHeader('Duel 1v1','⚔️','expert');
     let body='';
     if(!d||d.phase==='menu'){
       const codeErr=d&&d._codeError?d._codeError:'';
@@ -5992,22 +6242,21 @@ const app={
           <div class="duel-code-copied">${d._codeCopied?'Code copié ✓':''}</div>
           <p style="color:var(--muted);font-size:12px;margin:4px 0 16px">ou partage le lien :</p>
           <div class="duel-link"><input readonly value="${link}" onclick="this.select()"><button onclick="app.duelCopyLink()">${d._copied?'Copié ✓':'Copier le lien'}</button></div>
-          <div class="duel-status">${d.oppPresent?`<div class="duel-opp-badge">✓ ${d.oppLabel||'Adversaire'} a rejoint</div>`:d.oppLeft?'<span style="color:#E5484D;font-weight:600">● Ton adversaire a quitté le lobby</span>':'<span class="duel-wait">● En attente de l\'adversaire…</span>'}</div>
+          <div class="duel-status">${d.oppPresent?`<div class="duel-opp-badge">✓ ${d.oppLabel||'Adversaire'} a rejoint</div>`:d.oppLeft?'<span style="color:var(--danger);font-weight:600">● Ton adversaire a quitté le lobby</span>':'<span class="duel-wait">● En attente de l\'adversaire…</span>'}</div>
           <button class="btn-primary" style="margin-top:12px;${d.oppPresent?'':'opacity:.5;cursor:default'}" ${d.oppPresent?'onclick="app.duelStart()"':'disabled'}>Lancer le duel ▸</button>
-          ${d.msg?`<p style="color:#E5484D;font-size:13px;margin-top:10px">${d.msg}</p>`:''}
+          ${d.msg?`<p style="color:var(--danger);font-size:13px;margin-top:10px">${d.msg}</p>`:''}
         </div>`;
       } else {
         body=`<div class="boss-card" style="text-align:center">
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px">Duel rejoint !</h2>
           <p style="color:var(--muted);font-size:15px;margin-bottom:18px">Tu affrontes <b style="color:var(--txt)">${d.hostLabel||'l\'hôte'}</b>.</p>
-          <div class="duel-status">${d.oppLeft?'<span style="color:#E5484D;font-weight:600">● Ton adversaire a quitté le lobby</span>':'<span class="duel-wait">● En attente du lancement par l\'hôte…</span>'}</div>
+          <div class="duel-status">${d.oppLeft?'<span style="color:var(--danger);font-weight:600">● Ton adversaire a quitté le lobby</span>':'<span class="duel-wait">● En attente du lancement par l\'hôte…</span>'}</div>
         </div>`;
       }
     } else if(d.phase==='countdown'){
-      const cd=Math.max(0,Math.ceil((d.startAt-Date.now())/1000));
       body=`<div class="boss-card" style="position:relative">
         ${this._duelLanesHTML()}
-        <div class="race-overlay" style="position:static;background:none;backdrop-filter:none;padding:20px 0"><div class="race-count">${cd>0?cd:'GO !'}</div><p>Prépare tes doigts…</p></div>
+        <div class="race-overlay" style="position:static;background:none;backdrop-filter:none;padding:20px 0">${this._raceCountdownHTML(d.startAt)}</div>
       </div>`;
     } else if(d.phase==='racing'){
       let textHTML='';
@@ -6037,13 +6286,13 @@ const app={
       if(d._rematchLoading){
         rematchHTML=`<p style="color:var(--muted);font-size:14px;margin-top:12px">Nouvelle partie en cours…</p>`;
       } else if(d._rematchError){
-        rematchHTML=`<p style="color:#E5484D;font-size:13px;margin-top:10px">${d._rematchError}</p>`;
+        rematchHTML=`<p style="color:var(--danger);font-size:13px;margin-top:10px">${d._rematchError}</p>`;
       } else if(d._myRematch&&d._oppRematch){
-        rematchHTML=`<p style="color:#1FA971;font-size:14px;font-weight:600;margin-top:12px">Les deux joueurs sont prêts — lancement…</p>`;
+        rematchHTML=`<p style="color:var(--success);font-size:14px;font-weight:600;margin-top:12px">Les deux joueurs sont prêts — lancement…</p>`;
       } else if(d._myRematch){
         rematchHTML=`<p style="color:var(--muted);font-size:14px;margin-top:12px">En attente de ${oppName}…</p>`;
       } else if(d._oppRematch){
-        rematchHTML=`<p style="color:#1FA971;font-size:14px;font-weight:600;margin-top:12px">${oppName} veut rejouer !</p>`;
+        rematchHTML=`<p style="color:var(--success);font-size:14px;font-weight:600;margin-top:12px">${oppName} veut rejouer !</p>`;
       }
       body=`<div class="boss-card">
         <div class="sprint-result">
@@ -6107,6 +6356,16 @@ const app={
         </div>
       </div>
       <div class="settings-section">
+        <div class="settings-section-title"><span>🔊</span> Sons</div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>Sons de jeu</strong>
+            <span>Réussite, record, victoire… désactivables à tout moment</span>
+          </div>
+          <button class="settings-btn" id="sound-toggle-btn" onclick="app.toggleSound()">${isSoundMuted()?'Activer':'Désactiver'}</button>
+        </div>
+      </div>
+      <div class="settings-section">
         <div class="settings-section-title"><span>🔐</span> Compte</div>
         <div class="settings-row">
           <div class="settings-row-info">
@@ -6159,6 +6418,12 @@ const app={
     if(section==='gaze'){setTimeout(()=>{const el=document.getElementById('settings-gaze-section');if(el)el.scrollIntoView({behavior:'smooth'});},100);}
   },
   closeSettings(){document.getElementById('settings-overlay')?.remove();},
+  toggleSound(){
+    setSoundMuted(!isSoundMuted());
+    const btn=document.getElementById('sound-toggle-btn');
+    if(btn)btn.textContent=isSoundMuted()?'Activer':'Désactiver';
+    if(!isSoundMuted())playSound('hit'); // aperçu immédiat au moment d'activer
+  },
   async openBillingPortal(btn){
     if(!currentToken)return;
     const old=btn.textContent;btn.disabled=true;btn.textContent='Ouverture…';
@@ -6996,8 +7261,9 @@ const app={
         <div class="spanel" style="margin-bottom:0"><h3>🏹 Tireur d'élite : précision record</h3>${this.stats.tireurBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.tireurBest.precision}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.tireurBest.wpm} mpm</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le Tireur d\'élite pour établir ton record de précision !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏎️ Course de dactylo : record</h3>${this.stats.courseBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.courseBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.courseBest.acc}% précision · ${this.stats.courseBest.rank===1?'1ʳᵉ place 🥇':this.stats.courseBest.rank+'ᵉ place'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour établir ton record !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🧠 Simon des mots : record</h3>${this.stats.simonBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.simonBest.score} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">séquence max : ${this.stats.simonBest.maxSeq} mots</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance Simon des mots pour établir ton record de mémoire !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3>🏆 Boss de la semaine</h3><p style="color:var(--muted);font-size:14px;margin-top:8px">Défi hebdo commun à la communauté avec classement. <button onclick="go('games');setTimeout(()=>app.selectGame('boss'),0)" style="background:none;border:none;padding:0;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:14px;text-decoration:underline">Voir le défi →</button></p></div>
+        <div class="spanel" style="margin-bottom:0"><h3>🏆 Boss de la semaine</h3>${this.stats.bossBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">#${this.stats.bossBest.rank}</div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.bossBest.score} pts · ${this.stats.bossBest.wpm} mpm ${this.stats.bossBest.isoWeek===this._currentIsoWeek()?'cette semaine':'(semaine '+this.stats.bossBest.isoWeek.replace(/^\d+-W/,'')+')'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Tente le défi pour apparaître au classement !</p>'}<button onclick="go('games');setTimeout(()=>app.selectGame('boss'),0)" style="background:none;border:none;padding:0;margin-top:8px;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;text-decoration:underline">Voir le classement →</button></div>
         <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint : record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3>⚔️ Duel 1v1</h3>${this.stats.duelRecord&&(this.stats.duelRecord.wins+this.stats.duelRecord.losses+this.stats.duelRecord.draws)>0?(()=>{const r=this.stats.duelRecord;const total=r.wins+r.losses+r.draws;const winRate=Math.round(100*r.wins/total);return`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${r.wins}<span style="font-size:16px;color:var(--muted);font-weight:500">V</span> · ${r.losses}<span style="font-size:16px;color:var(--muted);font-weight:500">D</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${winRate}% de victoires${r.draws?' · '+r.draws+' nul'+(r.draws>1?'s':''):''} sur ${total} duel${total>1?'s':''}</p>`;})():'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Défie un ami pour ton premier duel !</p>'}</div>
       </div>
       <div class="spanel" style="margin-bottom:22px"><h3>⌨️ Tes touches difficiles</h3><div style="font-size:13px;color:var(--muted);margin:4px 0 16px">Les touches en rouge sont celles où tu fais le plus de fautes. Concentre-toi dessus !</div>${this._keyHeatmap(this.stats.keyStats)}</div>
       ${this._gazeAnalysisPanel(tests)}
@@ -7366,6 +7632,7 @@ const app={
 
   renderClasses(){
     if(!isTeacher()){go('home');return;}
+    clearInterval(this._classRefreshTimer);
     const etab=this.etab;
     if(!etab||!etab.loaded){
       this.loadEtab();
@@ -7413,10 +7680,10 @@ const app={
   },
 
   async createClass(){
-    const name=prompt('Nom de la classe :');
-    if(!name||!name.trim())return;
+    const name=await promptModal({icon:'🏫',title:'Nom de la classe',placeholder:'ex: 5e Latin-Grec',confirmText:'Créer la classe'});
+    if(!name)return;
     try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-create',token:currentToken,name:name.trim()})});
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-create',token:currentToken,name})});
       const d=await r.json();
       if(!r.ok){alert(d.error||'Création impossible.');return;}
       await this.loadEtab(true);
@@ -7437,27 +7704,33 @@ const app={
 
   // Retour depuis une classe : prof -> ses classes ; établissement -> le prof (ou la liste).
   backFromClass(){
+    clearInterval(this._classRefreshTimer);
     if(isAdmin()){if(this._lastProfId)return this.viewProf(this._lastProfId);return this.renderInstitution();}
     return this.renderClasses();
   },
 
-  async viewClass(id){
+  async viewClass(id,opts={}){
     const pageId='page-classes';
     if(this.view!=='classes')go('classes');
     this._classesSub='class';
-    document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
+    this._classViewingId=id;
+    if(!opts.silent)document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
     let d;
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-detail',token:currentToken,classId:id})});
       d=await r.json();
-      if(!r.ok){document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">${d.error||'Erreur.'}<br><button onclick="app.backFromClass()" style="margin-top:14px;background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;cursor:pointer">← Retour</button></div></div>`;return;}
-    }catch{document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">Erreur réseau.</div></div>`;return;}
+      if(!r.ok){if(opts.silent)return;document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">${d.error||'Erreur.'}<br><button onclick="app.backFromClass()" style="margin-top:14px;background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;cursor:pointer">← Retour</button></div></div>`;return;}
+    }catch{if(opts.silent)return;document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">Erreur réseau.</div></div>`;return;}
+    // Re-vérifie qu'on regarde toujours cette classe : un rafraîchissement
+    // silencieux en fond ne doit jamais écraser une navigation entre-temps.
+    if(this._classesSub!=='class'||this._classViewingId!==id)return;
     const students=d.students||[];
     const agg=d.agg||{};
     this._classDetail=d;
     const link=`${location.origin}?classe=${d.inviteCode}`;
     let asg=[];
     try{const ar=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-list',token:currentToken,classId:id})});if(ar.ok)asg=(await ar.json()).assignments||[];}catch{}
+    if(this._classesSub!=='class'||this._classViewingId!==id)return;
     const asgHtml=`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)">
         <div style="font-size:15px;font-weight:700">Devoirs</div>
@@ -7490,7 +7763,7 @@ const app={
         </div>
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
-        ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+        ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ÉLÈVES</div><div style="font-size:28px;font-weight:800">${agg.total!=null?agg.total:students.length}</div></div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ACTIFS / SEM.</div><div style="font-size:28px;font-weight:800">${agg.activeThisWeek||0}</div></div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">VITESSE MOY.</div><div style="font-size:28px;font-weight:800">${agg.avgWpm!=null?agg.avgWpm:'—'}<span style="font-size:14px;color:var(--muted);font-weight:500"> mpm</span></div></div>
@@ -7504,6 +7777,7 @@ const app={
             <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:.12em;color:var(--accent)">${d.inviteCode}</div>
           </div>
           <button id="copy-code-btn" onclick="app.copyClassLink('${link}')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Copier le lien</button>
+          <button onclick="openImportModal('${d.id}')" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt);white-space:nowrap;flex-shrink:0">📋 Importer un CSV</button>
         </div>
 
         ${asgHtml}
@@ -7516,6 +7790,8 @@ const app={
           </div>
         `:`
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+            <div style="overflow-x:auto">
+            <div style="min-width:600px">
             <div style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px 16px;padding:10px 20px;border-bottom:1px solid var(--border)">
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">ÉLÈVE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">VITESSE</div>
@@ -7525,8 +7801,8 @@ const app={
               <div></div>
             </div>
             ${students.map(st=>{
-              const wpmColor=st.avgWpm==null?'var(--muted)':st.avgWpm>=50?'#1FA971':st.avgWpm>=30?'var(--txt)':'#E5484D';
-              const accColor=st.avgAcc==null?'var(--muted)':st.avgAcc>=95?'#1FA971':st.avgAcc>=80?'var(--txt)':'#E5484D';
+              const wpmColor=st.avgWpm==null?'var(--muted)':st.avgWpm>=50?'var(--success)':st.avgWpm>=30?'var(--txt)':'var(--danger)';
+              const accColor=st.avgAcc==null?'var(--muted)':st.avgAcc>=95?'var(--success)':st.avgAcc>=80?'var(--txt)':'var(--danger)';
               const last=st.daysSinceActive==null?'jamais':st.daysSinceActive===0?"aujourd'hui":st.daysSinceActive===1?'hier':'il y a '+st.daysSinceActive+' j';
               const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'#E5722B':'var(--muted)';
               return`<div onclick="app.viewStudent('${d.id}','${st.studentId}')" style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px 16px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
@@ -7538,9 +7814,53 @@ const app={
                 <div style="text-align:right;color:var(--muted);font-size:14px">›</div>
               </div>`;
             }).join('')}
+            </div>
+            </div>
           </div>
         `}
       </div></div>`;
+    // Rafraîchissement silencieux périodique (résultats d'élèves saisis en
+    // dehors du navigateur du prof) — remplace la dépendance totale au clic
+    // manuel sur "↻ Actualiser". S'arrête dès qu'on quitte cette classe.
+    clearInterval(this._classRefreshTimer);
+    this._classRefreshTimer=setInterval(()=>{
+      if(this._classesSub==='class'&&this._classViewingId===id&&document.visibilityState==='visible')this.viewClass(id,{silent:true});
+    },25000);
+  },
+
+  async submitImport(classId){
+    const ta=document.getElementById('imp-csv');
+    const errEl=document.getElementById('imp-error');
+    const btn=document.getElementById('imp-submit');
+    const resEl=document.getElementById('imp-results');
+    errEl.style.display='none';
+    const lines=ta.value.split('\n').map(l=>l.trim()).filter(Boolean);
+    if(!lines.length){errEl.textContent='Colle au moins une ligne.';errEl.style.display='block';return;}
+    const students=lines.map(l=>{const [username,email]=l.split(',').map(s=>(s||'').trim());return{username,email};});
+    btn.disabled=true;btn.textContent='Import en cours…';
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'bulk-import-students',token:currentToken,classId,students})});
+      const d=await r.json();
+      if(!r.ok){errEl.textContent=d.error||'Erreur.';errEl.style.display='block';btn.disabled=false;btn.textContent='Importer';return;}
+      const created=d.results.filter(x=>x.status==='created');
+      const rest=d.results.filter(x=>x.status!=='created');
+      const list=created.map(x=>x.username+' / '+x.tempPassword).join('\n');
+      resEl.innerHTML=`
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">${created.length} compte${created.length!==1?'s':''} créé${created.length!==1?'s':''}${rest.length?(' · '+rest.length+' ignoré'+(rest.length!==1?'s':'')):''}</div>
+        ${created.length?`<div style="background:var(--light);border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;white-space:pre-wrap;max-height:160px;overflow-y:auto">${this._esc(list)}</div>
+        <button id="imp-copy-list" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:9px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer">Copier la liste (identifiant / mot de passe)</button>
+        <p style="font-size:11.5px;color:var(--muted);margin:8px 0 0;line-height:1.5">Communique à chaque élève son identifiant et son mot de passe temporaire — il pourra le changer une fois connecté.</p>`:''}
+        ${rest.length?`<div style="margin-top:10px;font-size:12px;color:var(--muted)">${rest.map(x=>this._esc(x.username)+' — '+this._esc(x.reason)).join('<br>')}</div>`:''}
+      `;
+      const copyBtn=document.getElementById('imp-copy-list');
+      if(copyBtn)copyBtn.addEventListener('click',()=>{navigator.clipboard.writeText(list);copyBtn.textContent='✓ Copié !';setTimeout(()=>{copyBtn.textContent='Copier la liste (identifiant / mot de passe)';},2000);});
+      btn.style.display='none';
+      ta.style.display='none';
+      if(created.length){
+        await this.loadEtab(true);
+        if(this._classesSub==='class'&&this._classViewingId===classId)this.viewClass(classId,{silent:true});
+      }
+    }catch{errEl.textContent='Erreur réseau.';errEl.style.display='block';btn.disabled=false;btn.textContent='Importer';}
   },
 
   copyClassLink(link){
@@ -7889,7 +8209,7 @@ const app={
         ${isAdmin()?`<button onclick="app.adminDeleteStudent('${d.studentId}')" style="margin-top:12px;background:none;border:1px solid #E5484D;color:#E5484D;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Supprimer cet élève (RGPD)</button>`:''}
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px">
           ${card('SESSIONS',s.sessions||0,'')}
           ${card('VITESSE MOY.',s.avgWpm!=null?s.avgWpm:'—',s.avgWpm!=null?' mpm':'')}
           ${card('PRÉCISION MOY.',s.avgAcc!=null?s.avgAcc:'—',s.avgAcc!=null?' %':'',accColor)}
@@ -7966,13 +8286,33 @@ const app={
     const profs=ad.profs||[];const inst=ad.institution||{};
     const g=ad.global||{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null};
     const series=ad.series||[];
-    const accColor=g.avgAcc!=null&&g.avgAcc>=90?'#1FA971':(g.avgAcc!=null&&g.avgAcc<75?'#E5484D':'var(--txt)');
+    const accColor=g.avgAcc!=null&&g.avgAcc>=90?'var(--success)':(g.avgAcc!=null&&g.avgAcc<75?'var(--danger)':'var(--txt)');
     const statCard=(label,val,unit,sub,valColor)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 24px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:10px">${label}</div><div style="font-size:34px;font-weight:800;line-height:1;color:${valColor||'var(--txt)'}">${val}<span style="font-size:15px;font-weight:500;color:var(--muted)">${unit}</span></div><div style="font-size:12px;color:var(--muted);margin-top:6px">${sub}</div></div>`;
     const dayNames=['D','L','M','M','J','V','S'];const today=new Date();
     const labels=Array.from({length:series.length},(_,i)=>{const d=new Date(today);d.setDate(today.getDate()-(series.length-1-i));return dayNames[d.getDay()];});
     const maxS=Math.max(1,...series.map(p=>p.sessions));
     const bars=series.map((p,i)=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px" title="${p.sessions} session${p.sessions!==1?'s':''}${p.avgWpm!=null?' · '+p.avgWpm+' mpm':''}"><div style="width:62%;background:var(--accent);border-radius:5px 5px 0 0;height:${Math.max(3,Math.round(p.sessions/maxS*70))}px;opacity:${p.sessions?1:.2}"></div><div style="font-size:10px;color:var(--muted)">${labels[i]}</div></div>`).join('');
     const profsHtml=profs.length?profs.map(p=>this._profRow(p)).join(''):`<div style="padding:18px 4px;color:var(--muted);font-size:13px">Aucun professeur pour l'instant. <a onclick="app.inviteProf()" style="color:var(--accent);cursor:pointer;font-weight:600">Invite ton équipe enseignante.</a></div>`;
+    // Sièges + licence : donnée existante côté serveur mais jusqu'ici invisible
+    // pour l'établissement (il fallait contacter KeyPace pour savoir où on en est).
+    const seatsUsed=ad.seatsUsed||0;const seatCount=inst.seat_count||0;
+    const seatPct=seatCount?Math.round(100*seatsUsed/seatCount):0;
+    const seatColor=seatPct>=100?'#E5484D':(seatPct>=90?'#EDA100':'var(--accent)');
+    const expiresAt=inst.license_expires_at?new Date(inst.license_expires_at):null;
+    const daysLeft=expiresAt?Math.ceil((expiresAt-Date.now())/86400000):null;
+    const expiryWarn=daysLeft!=null&&daysLeft<=30;
+    const expiryText=!expiresAt?"Licence sans date d'expiration"
+      :(daysLeft>=0?'Licence valable jusqu\'au '+expiresAt.toLocaleDateString('fr-FR')+(expiryWarn?' ⚠️ ('+daysLeft+' j restants)':'')
+                   :'⚠️ Licence expirée le '+expiresAt.toLocaleDateString('fr-FR'));
+    const licenceBannerHtml=`
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="flex:1;min-width:220px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px"><span>SIÈGES UTILISÉS</span><span style="color:${seatColor}">${seatsUsed} / ${seatCount||'—'}</span></div>
+          <div style="height:8px;background:var(--light);border-radius:5px;overflow:hidden"><div style="height:100%;width:${Math.min(100,seatPct)}%;background:${seatColor};border-radius:5px"></div></div>
+        </div>
+        <div style="font-size:13px;color:${expiryWarn||(daysLeft!=null&&daysLeft<0)?'#E5484D':'var(--muted)'};font-weight:${expiryWarn?'700':'500'}">${expiryText}</div>
+        <a href="mailto:contact@keypace.be?subject=${encodeURIComponent('Renouvellement licence KeyPace — '+(inst.name||''))}" style="background:var(--light);border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--txt);text-decoration:none;white-space:nowrap">Renouveler / ajuster →</a>
+      </div>`;
     document.getElementById('page-home').innerHTML=`
       <div style="max-width:1100px;margin:0 auto;padding:44px 24px 80px">
         <div style="margin-bottom:32px">
@@ -7980,7 +8320,8 @@ const app={
           <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:36px;letter-spacing:-0.03em;margin:0 0 6px">${inst.name||currentUser}</h1>
           <p style="font-size:15px;color:var(--muted);margin:0">Vue d'ensemble de tes professeurs et de leurs élèves.</p>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+        ${licenceBannerHtml}
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px">
           ${statCard('PROFESSEURS',profs.length,'','dans ton établissement')}
           ${statCard('ÉLÈVES ACTIFS',g.activeThisWeek,'','cette semaine sur '+g.total)}
           ${statCard('VITESSE MOY.',g.avgWpm!=null?g.avgWpm:'—',g.avgWpm!=null?' mpm':'','tous élèves confondus')}
@@ -8004,6 +8345,7 @@ const app={
 
   async renderInstitution(){
     if(!isAdmin()){go('home');return;}
+    clearInterval(this._classRefreshTimer);
     this._classesSub='inst';
     const pageId='page-classes';
     if(!this.admin||!this.admin.loaded){document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;await this.loadAdmin(true);if(this._classesSub!=='inst')return;}
@@ -8212,6 +8554,59 @@ async function handleClassJoin(){
   }
 }
 
+// Petit modal de saisie stylé, remplace les prompt() natifs (créer/rejoindre
+// une classe) qui détonnaient visuellement avec le reste du produit.
+function promptModal({icon,title,placeholder,confirmText}){
+  return new Promise(resolve=>{
+    const overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
+    overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:100%;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">${icon}</div>
+      <h2 style="margin:0 0 16px;font-size:20px;font-family:'Bricolage Grotesque',sans-serif">${title}</h2>
+      <input id="pm-input" type="text" placeholder="${placeholder}" autocomplete="off" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--txt);outline:none;box-sizing:border-box;text-align:center;margin-bottom:8px">
+      <div id="pm-error" style="color:#E5484D;font-size:13px;margin-bottom:8px;display:none"></div>
+      <div style="display:flex;gap:10px;flex-direction:column;margin-top:8px">
+        <button id="pm-confirm" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;width:100%">${confirmText}</button>
+        <button id="pm-cancel" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px;cursor:pointer;width:100%">Annuler</button>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const input=overlay.querySelector('#pm-input');
+    const err=overlay.querySelector('#pm-error');
+    setTimeout(()=>input.focus(),50);
+    function close(val){overlay.remove();resolve(val);}
+    overlay.querySelector('#pm-cancel').onclick=()=>close(null);
+    overlay.querySelector('#pm-confirm').onclick=()=>{
+      const v=input.value.trim();
+      if(!v){err.textContent='Ce champ est requis.';err.style.display='block';return;}
+      close(v);
+    };
+    input.addEventListener('keydown',e=>{if(e.key==='Enter')overlay.querySelector('#pm-confirm').click();if(e.key==='Escape')close(null);});
+  });
+}
+
+// Import CSV d'élèves : jusqu'ici chaque élève devait s'inscrire un par un
+// via lien (cf. FAQ établissement). Un compte par ligne est créé et ajouté
+// directement à la classe ; le mot de passe temporaire de chacun n'est
+// affiché qu'une fois, au prof de le communiquer.
+function openImportModal(classId){
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:86vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <h2 style="margin:0;font-size:19px;font-family:'Bricolage Grotesque',sans-serif">📋 Importer des élèves</h2>
+      <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Un élève par ligne : <code>nom_utilisateur,email</code> (email optionnel). Un compte est créé pour chacun et ajouté directement à la classe.</p>
+    <textarea id="imp-csv" placeholder="marie.dupont,marie@ecole.be&#10;lucas92" style="width:100%;min-height:140px;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--txt);outline:none;box-sizing:border-box;resize:vertical"></textarea>
+    <div id="imp-error" style="color:#E5484D;font-size:13px;margin-top:8px;display:none"></div>
+    <button id="imp-submit" style="width:100%;margin-top:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer">Importer</button>
+    <div id="imp-results" style="margin-top:16px"></div>
+  </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('imp-submit').addEventListener('click',()=>app.submitImport(classId));
+}
+
 async function startClassJoin(code){
   if(!code)return;
   if(!currentUser){openAuth('login','Connecte-toi avec ton adresse scolaire pour rejoindre la classe.',()=>startClassJoin(code));return;}
@@ -8246,9 +8641,9 @@ async function startClassJoin(code){
   }catch{document.getElementById('cj-name').textContent='Erreur réseau.';}
 }
 
-function joinClassPrompt(){
-  const code=prompt('Entre le code de ta classe (donné par ton professeur, ex. ABC123) :');
-  if(code&&code.trim())startClassJoin(code.trim().toUpperCase());
+async function joinClassPrompt(){
+  const code=await promptModal({icon:'🔑',title:'Rejoindre une classe',placeholder:'Code donné par ton professeur, ex. ABC123',confirmText:'Continuer'});
+  if(code)startClassJoin(code.toUpperCase());
 }
 
 async function handleClassCodeJoin(){
@@ -8277,6 +8672,7 @@ function handleChallenge(){
   const name=(p[0]||'Un ami').slice(0,18);
   const wpm=parseInt(p[1],10);
   if(!wpm||wpm<1||wpm>400)return;
+  try{track('challenge_link_used',{wpm});}catch{}
   // Sur mobile, le test n'existe pas : on explique qu'il faut un ordinateur.
   if(isMobileLayout()){
     setTimeout(()=>app._certModal('🏁',`${name} te défie !`,
@@ -8290,8 +8686,16 @@ function handleChallenge(){
   go('test');
 }
 
-// SSO : lance la redirection OAuth vers le provider.
-function ssoLogin(provider){location.href='/api/oauth?provider='+encodeURIComponent(provider);}
+// SSO : lance la redirection OAuth vers le provider. Le token d'invitation
+// prof/admin (s'il y en a un) doit être transmis en query : ssoLogin() navigue
+// immédiatement hors de la page, donc window._profInviteToken ne survivrait
+// pas à l'aller-retour chez le provider. Sans ce transfert, un prof/admin
+// invité qui utilise Google/Microsoft devenait silencieusement un simple élève.
+function ssoLogin(provider){
+  try{track('oauth_started',{provider});}catch{}
+  const invite=window._profInviteToken?'&invite='+encodeURIComponent(window._profInviteToken):'';
+  location.href='/api/oauth?provider='+encodeURIComponent(provider)+invite;
+}
 
 // Vérification publique d'un certificat (?cert=CODE depuis le QR / lien).
 async function handleCertVerify(){
@@ -8309,7 +8713,7 @@ async function handleSSOReturn(){
   const err=params.get('sso_error');
   if(err){
     history.replaceState(null,'',location.pathname);
-    const msgs={state:'La connexion a expiré, réessaie.',profile:'Impossible de récupérer ton adresse email depuis le fournisseur.',seats:'Plus de places disponibles pour cet établissement.',unconfigured:'Ce mode de connexion n\'est pas encore activé.',provider:'Fournisseur inconnu.',server:'Erreur lors de la connexion. Réessaie.'};
+    const msgs={state:'La connexion a expiré, réessaie.',profile:'Impossible de récupérer ton adresse email depuis le fournisseur.',seats:'Plus de places disponibles pour cet établissement.',unconfigured:'Ce mode de connexion n\'est pas encore activé.',provider:'Fournisseur inconnu.',server:'Erreur lors de la connexion. Réessaie.',invite:'Ce lien d\'invitation est invalide ou a déjà été utilisé.'};
     openAuth('login');setTimeout(()=>showAuthError(msgs[err]||'La connexion via le fournisseur a échoué.'),120);
     return;
   }
@@ -8323,6 +8727,7 @@ async function handleSSOReturn(){
     const _mergedData=mergeStats(d.data);
     if(d.role)_mergedData.role=d.role;
     saveSession(d.username,d.plan,d.token,d.id,_mergedData.role||null);
+    try{track('login',{method:'oauth'});}catch{}
     app.stats=_mergedData;
     window._needsOnboarding = !d.onboarding_completed;
     if(!d.onboarding_completed)localStorage.removeItem('klak_ob');else localStorage.setItem('klak_ob','1');

@@ -117,6 +117,18 @@
   footer a{color:var(--muted)}
   .final-cta{background:linear-gradient(135deg,#FFEDE8,#FFF6F2);border:1px solid var(--border);border-radius:22px;padding:28px 24px;text-align:center;margin:20px 0}
   .final-cta h2{margin-top:0}
+  .lform{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:26px 24px;margin:18px 0;scroll-margin-top:80px}
+  .lform label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:5px}
+  .lform .f{margin-bottom:14px}
+  .lform input,.lform textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--txt);outline:none;box-sizing:border-box}
+  .lform input:focus,.lform textarea:focus{border-color:var(--accent)}
+  .lform textarea{resize:vertical;min-height:80px}
+  .lform button{width:100%;background:var(--accent);color:#fff;font-weight:700;font-size:15px;padding:13px;border:none;border-radius:12px;cursor:pointer;box-shadow:0 8px 20px -8px var(--accent);font-family:inherit}
+  .lform button:disabled{opacity:.6;cursor:default}
+  .lform .err{color:#E5484D;font-size:13px;font-weight:600;margin-bottom:12px;display:none}
+  .lform .ok{display:none;text-align:center;padding:8px 0}
+  .lform .ok .em{font-size:38px;margin-bottom:10px}
+  .lform .fallback{font-size:13px;color:var(--muted);text-align:center;margin-top:14px}
 </style>
 </head>
 <body>
@@ -138,7 +150,7 @@
     <h1>La dactylographie en classe, simplement</h1>
     <p class="lead">Donnez à vos élèves une compétence qui les suivra toute leur scolarité : taper vite et sans regarder le clavier. KeyPace propose des licences par classe et un suivi enseignant, sur la méthode AZERTY à dix doigts.</p>
     <div class="cta-row">
-      <a class="btn" href="mailto:contact@keypace.be?subject=KeyPace%20pour%20mon%20%C3%A9cole">Demander une licence</a>
+      <a class="btn" href="#licence-form">Demander une licence</a>
       <a class="btn ghost" href="/">Découvrir l'application</a>
     </div>
   </div>
@@ -164,8 +176,25 @@
 
   <section>
     <h2>Obtenir une licence pour votre établissement</h2>
-    <p>Les licences sont adaptées au nombre de classes et d'élèves. Pour un devis ou une démonstration, écrivez-nous à <a href="mailto:contact@keypace.be">contact@keypace.be</a> en précisant votre établissement et le nombre d'élèves concernés.</p>
+    <p>Les licences sont adaptées au nombre de classes et d'élèves. Remplissez le formulaire ci-dessous pour un devis ou une démonstration — nous revenons vers vous rapidement.</p>
     <p>Vous préférez tester d'abord ? <a href="/cours-dactylographie">Parcourez les cours</a> et essayez les premières leçons gratuitement.</p>
+
+    <form class="lform" id="licence-form" onsubmit="return submitLicenceForm(event)">
+      <div class="err" id="lf-error"></div>
+      <div id="lf-fields">
+        <div class="f"><label for="lf-name">Nom de l'établissement</label><input type="text" id="lf-name" required placeholder="ex: Athénée royal de..."></div>
+        <div class="f"><label for="lf-email">Votre email de contact</label><input type="email" id="lf-email" required placeholder="ex: direction@ecole.be"></div>
+        <div class="f"><label for="lf-count">Nombre d'élèves concernés</label><input type="number" id="lf-count" required min="1" placeholder="ex: 90"></div>
+        <div class="f"><label for="lf-message">Message <span style="font-weight:400">(optionnel)</span></label><textarea id="lf-message" placeholder="Contexte, questions, délai souhaité…"></textarea></div>
+        <button type="submit" id="lf-submit">Envoyer la demande →</button>
+      </div>
+      <div class="ok" id="lf-ok">
+        <div class="em">🎉</div>
+        <h3>Demande envoyée !</h3>
+        <p>Merci pour votre intérêt. Nous revenons vers vous dans les plus brefs délais.</p>
+      </div>
+      <p class="fallback">Vous préférez l'email ? Écrivez-nous directement à <a href="mailto:contact@keypace.be">contact@keypace.be</a>.</p>
+    </form>
   </section>
 
   <section class="faq">
@@ -187,7 +216,7 @@
   <div class="final-cta">
     <h2>Envie d'équiper votre classe ?</h2>
     <p style="color:var(--muted);max-width:46ch;margin:0 auto 18px">Écrivez-nous pour une licence adaptée à votre établissement.</p>
-    <a class="btn" href="mailto:contact@keypace.be?subject=KeyPace%20pour%20mon%20%C3%A9cole">Demander une licence →</a>
+    <a class="btn" href="#licence-form">Demander une licence →</a>
   </div>
 </div>
 
@@ -201,5 +230,30 @@
     <a href="/mentions-legales">Mentions légales</a>
   </div>
 </footer>
+<script>
+async function submitLicenceForm(e){
+  e.preventDefault();
+  const name=document.getElementById('lf-name').value.trim();
+  const email=document.getElementById('lf-email').value.trim();
+  const count=parseInt(document.getElementById('lf-count').value,10);
+  const message=document.getElementById('lf-message').value.trim();
+  const errEl=document.getElementById('lf-error');
+  const btn=document.getElementById('lf-submit');
+  errEl.style.display='none';
+  if(!name||!email||!count){errEl.textContent='Merci de remplir les champs requis.';errEl.style.display='block';return false;}
+  btn.disabled=true;btn.textContent='Envoi…';
+  try{
+    const r=await fetch('/api/institutions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,count,message})});
+    const d=await r.json();
+    if(!r.ok){errEl.textContent=d.error||'Erreur, réessaie.';errEl.style.display='block';btn.disabled=false;btn.textContent='Envoyer la demande →';return false;}
+    document.getElementById('lf-fields').style.display='none';
+    document.getElementById('lf-ok').style.display='block';
+  }catch(err){
+    errEl.textContent='Erreur réseau, réessaie.';errEl.style.display='block';
+    btn.disabled=false;btn.textContent='Envoyer la demande →';
+  }
+  return false;
+}
+</script>
 </body>
 </html>

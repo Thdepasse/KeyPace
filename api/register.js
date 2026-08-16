@@ -175,19 +175,21 @@ module.exports = async function handler(req, res) {
 
   // Rattachement à un établissement.
   let institution = null;
-  let isProf = false;
 
-  // 0) Invitation enseignant émise par un établissement (lien ?prof=TOKEN).
-  //    Prioritaire : crée un compte prof rattaché à l'établissement de l'invitation.
+  // 0) Invitation enseignant OU établissement (lien ?prof=TOKEN, rôle porté par
+  //    l'invitation : 'prof' par défaut, ou 'admin' pour le bootstrap du tout
+  //    premier compte d'un établissement — voir api/institutions.js).
+  //    Prioritaire : crée un compte staff rattaché à l'établissement de l'invitation.
   let profInvite = null;
+  let inviteRole = null;
   if (profInviteToken) {
     const invR = await sb(`/prof_invites?token=eq.${encodeURIComponent(profInviteToken)}&used_by=is.null&revoked=eq.false&select=*`);
     profInvite = invR.data && invR.data[0];
-    if (!profInvite) return res.status(400).json({ error: "Lien d'invitation enseignant invalide ou déjà utilisé." });
+    if (!profInvite) return res.status(400).json({ error: "Lien d'invitation invalide ou déjà utilisé." });
     const instR = await sb(`/institutions?id=eq.${encodeURIComponent(profInvite.institution_id)}&select=*`);
     institution = instR.data && instR.data[0];
     if (!institution) return res.status(404).json({ error: 'Établissement introuvable.' });
-    isProf = true;
+    inviteRole = profInvite.role || 'prof';
   }
 
   // 1) Par domaine de l'email institutionnel (clé d'appartenance, recommandé).
@@ -213,9 +215,9 @@ module.exports = async function handler(req, res) {
     return res.status(403).json({ error: "La licence de cet établissement a expiré. Contacte ton établissement pour la renouveler." });
   }
 
-  // Contrôle des places disponibles (élèves uniquement ; un prof invité ne
-  // consomme pas un siège licencié).
-  if (institution && !isProf) {
+  // Contrôle des places disponibles (élèves uniquement ; un prof/admin invité
+  // ne consomme pas un siège licencié).
+  if (institution && !profInvite) {
     const seatsR = await sb(`/users?institution_id=eq.${encodeURIComponent(institution.id)}&role=eq.eleve&select=id`);
     const usedSeats = seatsR.data ? seatsR.data.length : 0;
     if (usedSeats >= institution.seat_count)
@@ -269,14 +271,14 @@ module.exports = async function handler(req, res) {
       ...(birthdateVal ? { birthdate: birthdateVal } : {}),
       ...(parentEmailVal ? { parent_email: parentEmailVal } : {}),
       ...(institution ? { institution_id: institution.id } : {}),
-      ...(isProf ? { role: 'prof' } : {}),
+      ...(inviteRole ? { role: inviteRole } : {}),
     }),
   });
   if (!create.ok) return res.status(500).json({ error: 'Erreur création compte.' });
 
   const user = create.data[0];
 
-  // Marque l'invitation enseignant comme utilisée (lie le prof à l'invitation).
+  // Marque l'invitation (prof ou admin) comme utilisée.
   if (profInvite) {
     await sb(`/prof_invites?id=eq.${profInvite.id}`, { method: 'PATCH', body: JSON.stringify({ used_by: user.id }) });
   }

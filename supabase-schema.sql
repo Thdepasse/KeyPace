@@ -206,6 +206,12 @@ create index if not exists prof_invites_token_idx on prof_invites(token);
 create index if not exists prof_invites_institution_idx on prof_invites(institution_id);
 alter table prof_invites enable row level security;
 
+-- Rôle accordé par l'invitation : 'prof' (par défaut, via prof-invite-create)
+-- ou 'admin' (bootstrap du tout premier compte établissement, voir
+-- api/institutions.js — sans ça, aucun chemin produit ne crée jamais un
+-- compte admin, il fallait le faire à la main en base).
+alter table prof_invites add column if not exists role text default 'prof' check (role in ('prof','admin'));
+
 -- ───────────────────────────────────────────────────────────────
 -- Certificats de niveau (dactylographie). Émis par le serveur, signés (HMAC),
 -- vérifiables publiquement via un code court + QR (page ?cert=CODE).
@@ -339,3 +345,31 @@ alter table reviews enable row level security;
 -- modération déjà décidé (voir syncGoogleReviews, dashboard-app/api/dashboard.js).
 alter table reviews add column if not exists external_id text;
 create unique index if not exists reviews_source_external_idx on reviews(source, external_id);
+
+-- ───────────────────────────────────────────────────────────────
+-- Analytics maison (remplace Umami Cloud, août 2026).
+-- Un événement = une pageview ('event_name'='pageview') ou un événement
+-- produit custom (signup, lesson_completed, ...). session_id est un hash
+-- (IP + user-agent + jour + sel), recalculé chaque jour côté serveur
+-- (api/track.js) : pas de cookie, pas d'identifiant persistant côté client,
+-- donc pas de bannière de consentement nécessaire (même logique que le mode
+-- "cookieless" d'Umami/Plausible déjà retenu). Écriture via clé service
+-- uniquement (RLS sans policy => accès anon refusé).
+-- ───────────────────────────────────────────────────────────────
+create table if not exists analytics_events (
+  id uuid default gen_random_uuid() primary key,
+  session_id text not null,          -- hash journalier anonyme, non ré-identifiable
+  event_name text not null,
+  path text,                          -- chemin de la page (pageviews)
+  props jsonb default '{}',           -- payload custom (wpm, acc, game, ...)
+  referrer text,                      -- hostname du référent externe, null si direct/interne
+  country text,                       -- code pays ISO (en-tête géo Vercel, sans service tiers)
+  browser text,
+  os text,
+  device_type text check (device_type in ('mobile','tablet','desktop')),
+  created_at timestamptz default now()
+);
+create index if not exists analytics_events_name_idx on analytics_events(event_name, created_at);
+create index if not exists analytics_events_created_idx on analytics_events(created_at);
+create index if not exists analytics_events_session_idx on analytics_events(session_id);
+alter table analytics_events enable row level security;
