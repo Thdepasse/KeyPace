@@ -138,6 +138,22 @@
   .backlog.dragover{border-color:var(--accent);background:#FFF6F2}
   .backlog h3{font-size:13px;font-weight:800;margin-bottom:2px}
   .platform-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;background:var(--border);color:var(--txt);margin-right:4px}
+  .view-toggle{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+  .view-toggle-btn{font:inherit;font-size:12.5px;font-weight:700;padding:7px 12px;border:none;background:var(--card);color:var(--muted);cursor:pointer}
+  .view-toggle-btn.active{background:var(--accent);color:#fff}
+  .kanban-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
+  .kanban-col{background:var(--light);border-radius:14px;padding:10px;min-width:230px;max-width:230px;flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+  .kanban-col-head{font-size:12px;font-weight:800;color:var(--txt);display:flex;justify-content:space-between;align-items:center;padding:2px 4px 6px}
+  .kanban-col-count{color:var(--muted);font-weight:700}
+  .kanban-col-body{display:flex;flex-direction:column;gap:8px;min-height:60px;transition:background .15s}
+  .kanban-col-body.dragover{background:#FFF6F2;border-radius:10px}
+  .kanban-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 10px;font-size:12.5px;cursor:grab;box-shadow:var(--shadow-sm);transition:transform .15s}
+  .kanban-card:active{cursor:grabbing}
+  .kanban-card:hover{transform:translateY(-1px)}
+  .kanban-card .kc-title{font-weight:700;display:block;margin-bottom:3px}
+  .kanban-card .kc-meta{color:var(--muted);font-size:11px}
+  .kanban-card .kc-actions{display:flex;gap:6px;margin-top:6px}
+  .kanban-card .kc-actions button{font-size:11px;padding:3px 7px;border-radius:6px;border:1px solid var(--border);background:var(--card);cursor:pointer}
   .platform-checks{display:flex;gap:6px;flex-wrap:wrap}
   .platform-checks label{display:flex;align-items:center;gap:5px;font-size:12.5px;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;user-select:none}
   .platform-checks input{margin:0}
@@ -320,19 +336,25 @@
         </div>
       </div>
 
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
         <input id="prospect-search" type="search" placeholder="🔎 Rechercher (école, ville, contact, email...)" oninput="window.__duplicateGroupFilter=null;renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
-        <select id="sort-select" onchange="renderProspects()" style="width:auto;font-size:13px;padding:7px 10px">
-          <option value="relance">Trier par relance (défaut)</option>
-          <option value="ville">Trier par ville</option>
-          <option value="ecole">Trier par école (A-Z)</option>
-          <option value="statut">Trier par statut</option>
-          <option value="recent">Trier par ajout (récent)</option>
-        </select>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="view-toggle" id="prospects-view-toggle">
+            <button class="view-toggle-btn" id="prospects-view-btn-table" onclick="setProspectsView('table')">📋 Tableau</button>
+            <button class="view-toggle-btn" id="prospects-view-btn-kanban" onclick="setProspectsView('kanban')">📊 Kanban</button>
+          </div>
+          <select id="sort-select" onchange="renderProspects()" style="width:auto;font-size:13px;padding:7px 10px">
+            <option value="relance">Trier par relance (défaut)</option>
+            <option value="ville">Trier par ville</option>
+            <option value="ecole">Trier par école (A-Z)</option>
+            <option value="statut">Trier par statut</option>
+            <option value="recent">Trier par ajout (récent)</option>
+          </select>
+        </div>
       </div>
       <div id="duplicate-filter-note"></div>
 
-      <div class="table-wrap">
+      <div class="table-wrap" id="prospects-table-wrap">
         <table class="prospects">
           <thead>
             <tr>
@@ -342,12 +364,17 @@
           <tbody id="prospects-body"></tbody>
         </table>
       </div>
+      <div class="kanban-board" id="prospects-kanban" style="display:none"></div>
     </section>
 
     <section id="calendar-section" class="tab-panel">
       <div class="toolbar">
         <h2 style="margin:0"><span class="sec-ic">🗓️</span>Calendrier marketing</h2>
         <div class="cal-nav">
+          <div class="view-toggle" id="calendar-view-toggle">
+            <button class="view-toggle-btn" id="calendar-view-btn-grid" onclick="setCalendarView('grid')">🗓️ Calendrier</button>
+            <button class="view-toggle-btn" id="calendar-view-btn-kanban" onclick="setCalendarView('kanban')">📊 Kanban</button>
+          </div>
           <button onclick="shiftMonth(-1)">‹</button>
           <span class="mono" id="cal-label" style="font-weight:700;min-width:130px;text-align:center;display:inline-block"></span>
           <button onclick="shiftMonth(1)">›</button>
@@ -422,13 +449,14 @@
         <p class="muted" style="font-size:12px;margin:10px 0 0">Sans date : le contenu va dans « Idées à planifier » — glissez-le ensuite sur un jour.</p>
       </div>
 
-      <div class="cal-layout">
+      <div class="cal-layout" id="calendar-grid-layout">
         <div class="cal-grid" id="cal-grid"></div>
         <div class="backlog" id="backlog" ondragover="allowDrop(event)" ondrop="dropOnBacklog(event)">
           <h3>Idées à planifier</h3>
           <div id="backlog-list"></div>
         </div>
       </div>
+      <div class="kanban-board" id="calendar-kanban" style="display:none"></div>
     </section>
 
     <section id="reviews-section" class="tab-panel">
@@ -524,8 +552,10 @@ function switchTab(name){
 function boot(){
   loadKpis();
   loadTrafficDetail();
+  setProspectsView(prospectsView);
   loadProspects();
   renderCalendarHeader();
+  setCalendarView(calendarView);
   loadCalendar();
   loadUsedIdeaTopics();
   loadReviews();
@@ -805,6 +835,18 @@ function clearDuplicateGroupFilter(){
   renderProspects();
 }
 
+// ─── Bascule Tableau / Kanban ──────────────────────────────────────
+let prospectsView = localStorage.getItem('kp_prospects_view') || 'table';
+
+function setProspectsView(v){
+  prospectsView = v;
+  localStorage.setItem('kp_prospects_view', v);
+  document.getElementById('prospects-table-wrap').style.display = v === 'table' ? '' : 'none';
+  document.getElementById('prospects-kanban').style.display = v === 'kanban' ? 'flex' : 'none';
+  document.getElementById('prospects-view-btn-table').classList.toggle('active', v === 'table');
+  document.getElementById('prospects-view-btn-kanban').classList.toggle('active', v === 'kanban');
+}
+
 function renderProspects(){
   const list = window.__prospects || [];
   const view = sortProspects(filterProspects(list));
@@ -823,7 +865,39 @@ function renderProspects(){
         <td>${fmtDate(p.next_followup_at)}</td>
         <td><div class="actions"><button class="btn small ghost" onclick="openFollowupMessage('${p.id}')">✉️ Message</button><button class="btn small ghost" onclick="editProspect('${p.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
       </tr>`).join('') : `<tr><td colspan="7" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
+    renderProspectsKanban(view, dupIds);
   } catch (e) { console.error(e); }
+}
+
+// ─── Vue Kanban (pipeline de prospection) ──────────────────────────
+function renderProspectsKanban(view, dupIds){
+  const byStatus = Object.fromEntries(STATUS_FLOW.map(s => [s, []]));
+  for (const p of view) if (byStatus[p.status]) byStatus[p.status].push(p);
+  document.getElementById('prospects-kanban').innerHTML = STATUS_FLOW.map(status => `
+    <div class="kanban-col">
+      <div class="kanban-col-head"><span>${STATUS_LABELS[status]}</span><span class="kanban-col-count">${byStatus[status].length}</span></div>
+      <div class="kanban-col-body" ondragover="allowDrop(event)" ondrop="dropOnStatusColumn(event,'${status}')">
+        ${byStatus[status].map(p => `
+          <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${p.id}')" onclick="editProspect('${p.id}')">
+            <span class="kc-title">${escHtml(p.school_name)}${dupIds && dupIds.has(p.id) ? ' ⚠️' : ''}</span>
+            <span class="kc-meta">${escHtml(p.city || '')}${p.city && p.contact_name ? ' · ' : ''}${escHtml(p.contact_name || '')}</span>
+            ${p.meeting_at ? `<div class="kc-meta">📅 ${fmtDate(p.meeting_at)}</div>` : ''}
+            <div class="kc-actions" onclick="event.stopPropagation()">
+              <button onclick="openFollowupMessage('${p.id}')" title="Message">✉️</button>
+              <button onclick="deleteProspect('${p.id}')" title="Supprimer">🗑️</button>
+            </div>
+          </div>`).join('') || `<p class="muted" style="font-size:11.5px;margin:0;text-align:center">—</p>`}
+      </div>
+    </div>`).join('');
+}
+
+async function dropOnStatusColumn(ev, status){
+  ev.preventDefault(); ev.currentTarget.classList.remove('dragover');
+  const id = ev.dataTransfer.getData('text/plain');
+  if (!id) return;
+  const p = (window.__prospects || []).find(x => x.id === id);
+  if (!p || p.status === status) return;
+  await logContact(id, status);
 }
 
 // ─── Bibliothèque de templates d'emails (prospection/suivi/réponse) ───────
@@ -1181,6 +1255,7 @@ async function loadCalendar(){
     document.getElementById('backlog-list').innerHTML = backlog.length
       ? backlog.map(contentCardHtml).join('')
       : `<div class="empty-msg">Rien en attente.</div>`;
+    renderCalendarKanban([...scheduled, ...backlog]);
   } catch (e) { console.error(e); }
 }
 
@@ -1200,6 +1275,45 @@ async function dropOnBacklog(ev){
   const id = ev.dataTransfer.getData('text/plain');
   if (!id) return;
   await api('update-event', { method:'POST', body: { id, scheduled_date: null } });
+  loadCalendar();
+}
+
+// ─── Bascule Calendrier / Kanban (contenu marketing) ──────────────
+let calendarView = localStorage.getItem('kp_calendar_view') || 'grid';
+const CONTENT_STATUS_FLOW = ['idee', 'a_faire', 'pret', 'publie'];
+const CONTENT_STATUS_LABELS = { idee:'Idée', a_faire:'À faire', pret:'Prêt', publie:'Publié' };
+
+function setCalendarView(v){
+  calendarView = v;
+  localStorage.setItem('kp_calendar_view', v);
+  document.getElementById('calendar-grid-layout').style.display = v === 'grid' ? '' : 'none';
+  document.getElementById('calendar-kanban').style.display = v === 'kanban' ? 'flex' : 'none';
+  document.getElementById('calendar-view-btn-grid').classList.toggle('active', v === 'grid');
+  document.getElementById('calendar-view-btn-kanban').classList.toggle('active', v === 'kanban');
+}
+
+function renderCalendarKanban(events){
+  const byStatus = Object.fromEntries(CONTENT_STATUS_FLOW.map(s => [s, []]));
+  for (const ev of events) if (byStatus[ev.status]) byStatus[ev.status].push(ev);
+  document.getElementById('calendar-kanban').innerHTML = CONTENT_STATUS_FLOW.map(status => `
+    <div class="kanban-col">
+      <div class="kanban-col-head"><span>${CONTENT_STATUS_LABELS[status]}</span><span class="kanban-col-count">${byStatus[status].length}</span></div>
+      <div class="kanban-col-body" ondragover="allowDrop(event)" ondrop="dropOnContentStatusColumn(event,'${status}')">
+        ${byStatus[status].map(ev => `
+          <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')">
+            <span class="kc-title">${ev.content_type === 'tache' ? '✅ ' : ''}${escHtml(ev.title)}</span>
+            <span class="kc-meta">${(ev.platforms || []).map(p => `<span class="platform-tag">${p}</span>`).join('')}${ev.content_type}</span>
+            <div class="kc-meta">${ev.scheduled_date ? '📅 ' + fmtDate(ev.scheduled_date) : 'Backlog'}</div>
+          </div>`).join('') || `<p class="muted" style="font-size:11.5px;margin:0;text-align:center">—</p>`}
+      </div>
+    </div>`).join('');
+}
+
+async function dropOnContentStatusColumn(ev, status){
+  ev.preventDefault(); ev.currentTarget.classList.remove('dragover');
+  const id = ev.dataTransfer.getData('text/plain');
+  if (!id) return;
+  await api('update-event', { method:'POST', body: { id, status } });
   loadCalendar();
 }
 
