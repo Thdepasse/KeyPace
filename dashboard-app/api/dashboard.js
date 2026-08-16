@@ -454,7 +454,7 @@ async function addNote(req, res) {
 }
 
 const STATUS_LABELS_FR = { a_contacter: 'À contacter', envoye: 'Envoyé', relance: 'Relancé', repondu: 'Répondu', en_negociation: 'Négociation', signe: 'Signé', perdu: 'Perdu' };
-const PROSPECT_FIELD_LABELS = { school_name: 'École', contact_name: 'Contact', contact_email: 'Email', contact_phone: 'Téléphone', city: 'Ville', notes: 'Notes', meeting_at: 'Rendez-vous' };
+const PROSPECT_FIELD_LABELS = { school_name: 'École', contact_name: 'Contact', contact_email: 'Email', contact_phone: 'Téléphone', city: 'Ville', notes: 'Notes', meeting_at: 'Rendez-vous', estimated_students: 'Effectif estimé', estimated_students_source: 'Source effectif' };
 const EVENT_FIELD_LABELS = { title: 'Titre', content_type: 'Type', account: 'Compte', caption: 'Texte du post', scheduled_date: 'Date planifiée', link: 'Lien', notes: 'Notes' };
 const CONTENT_STATUS_LABELS_FR = { idee: 'Idée', a_faire: 'À faire', pret: 'Prêt', publie: 'Publié' };
 const DEV_FIELD_LABELS = { title: 'Titre', description: 'Description', item_type: 'Type', priority: 'Priorité' };
@@ -489,7 +489,7 @@ async function dismissDuplicate(req, res) {
 }
 
 async function prospectCreate(req, res) {
-  const { school_name, contact_name, contact_email, contact_phone, city, notes, status, meeting_at } = req.body || {};
+  const { school_name, contact_name, contact_email, contact_phone, city, notes, status, meeting_at, estimated_students, estimated_students_source } = req.body || {};
   if (!school_name) return res.status(400).json({ error: "Nom d'école manquant." });
   const r = await sb('/school_prospects', {
     method: 'POST',
@@ -502,6 +502,8 @@ async function prospectCreate(req, res) {
       notes: notes || null,
       status: status || undefined, // undefined => laisse la valeur par défaut de la table
       meeting_at: meeting_at || null,
+      estimated_students: estimated_students || null,
+      estimated_students_source: estimated_students_source || null,
     }),
   });
   if (!r.ok) return res.status(500).json({ error: 'Erreur création prospect.' });
@@ -509,7 +511,7 @@ async function prospectCreate(req, res) {
   return res.status(201).json(r.data[0]);
 }
 
-const PROSPECT_FIELDS = ['school_name', 'contact_name', 'contact_email', 'contact_phone', 'city', 'notes', 'status', 'meeting_at'];
+const PROSPECT_FIELDS = ['school_name', 'contact_name', 'contact_email', 'contact_phone', 'city', 'notes', 'status', 'meeting_at', 'estimated_students', 'estimated_students_source'];
 
 // Automatisation : une école qui signe mérite d'être annoncée. Crée une idée
 // de contenu prête à planifier dans le calendrier marketing, best-effort (un

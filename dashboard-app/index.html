@@ -338,6 +338,8 @@
             <label style="font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">Prochain rendez-vous</label>
             <input id="p-meeting" type="datetime-local">
           </div>
+          <input id="p-students" placeholder="Effectif estimé (ex. ~1000 élèves)">
+          <input id="p-students-source" placeholder="Source (ex. Wikipédia, site officiel, non trouvé)">
         </div>
         <textarea id="p-notes" placeholder="Notes" style="margin-top:10px"></textarea>
         <div class="form-actions">
@@ -1072,7 +1074,7 @@ function renderProspects(){
     document.getElementById('prospects-body').innerHTML = view.length ? view.map(p => `
       <tr${dupIds.has(p.id) ? ' style="background:#FFFBEF"' : ''}>
         <td><strong>${p.school_name}</strong>${dupIds.has(p.id) ? ' <span class="badge" style="background:#FFF3CD;color:#8A6D1D" title="Un autre dossier a un nom d\'école identique ou très proche">⚠️ doublon possible</span>' : ''}${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
-        <td>${p.city || '—'}</td>
+        <td>${p.city || '—'}${p.estimated_students ? `<div class="muted" style="font-size:12px" title="${escHtml(p.estimated_students_source || '')}">👥 ${escHtml(p.estimated_students)}</div>` : ''}</td>
         <td>${p.contact_name || '—'}${p.contact_email ? `<div class="muted" style="font-size:12px">${p.contact_email}</div>` : ''}</td>
         <td><span class="badge badge-${p.status}" title="Cliquer pour changer le statut" onclick="openStatusPicker(event,'${p.id}','${p.status}')">${STATUS_LABELS[p.status]}</span></td>
         <td>${fmtDate(p.last_contact_at)}</td>
@@ -1224,7 +1226,7 @@ function csvCell(v){
   return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 }
 
-const CSV_COLS = ['school_name','city','contact_name','contact_email','contact_phone','status','last_contact_at','next_followup_at','notes'];
+const CSV_COLS = ['school_name','city','contact_name','contact_email','contact_phone','status','last_contact_at','next_followup_at','estimated_students','estimated_students_source','notes'];
 const CSV_LABELS = ['École','Ville','Contact','Email','Téléphone','Statut','Dernier contact','Relance prévue','Notes'];
 
 function exportProspectsCSV(){
@@ -1684,7 +1686,7 @@ async function addContentNote(){
 
 function openAddForm(){
   editingProspectId = null;
-  ['p-school','p-contact','p-email','p-phone','p-city','p-notes','p-meeting'].forEach(id => document.getElementById(id).value = '');
+  ['p-school','p-contact','p-email','p-phone','p-city','p-notes','p-meeting','p-students','p-students-source'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('prospect-form-title').textContent = 'Nouvelle école';
   document.getElementById('prospect-save-btn').textContent = 'Enregistrer';
   document.getElementById('prospect-history').style.display = 'none';
@@ -1705,6 +1707,8 @@ function editProspect(id){
   document.getElementById('p-phone').value = p.contact_phone || '';
   document.getElementById('p-city').value = p.city || '';
   document.getElementById('p-meeting').value = toDatetimeLocalValue(p.meeting_at);
+  document.getElementById('p-students').value = p.estimated_students || '';
+  document.getElementById('p-students-source').value = p.estimated_students_source || '';
   document.getElementById('p-notes').value = p.notes || '';
   document.getElementById('prospect-form-title').textContent = `Modifier « ${p.school_name} »`;
   document.getElementById('prospect-save-btn').textContent = 'Enregistrer les modifications';
@@ -1724,6 +1728,8 @@ async function saveProspect(){
     contact_phone: document.getElementById('p-phone').value.trim(),
     city: document.getElementById('p-city').value.trim(),
     meeting_at: document.getElementById('p-meeting').value ? new Date(document.getElementById('p-meeting').value).toISOString() : null,
+    estimated_students: document.getElementById('p-students').value.trim(),
+    estimated_students_source: document.getElementById('p-students-source').value.trim(),
     notes: document.getElementById('p-notes').value.trim(),
   };
   if (editingProspectId) await api('update-prospect', { method:'POST', body: { id: editingProspectId, ...body } });

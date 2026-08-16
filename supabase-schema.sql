@@ -288,6 +288,13 @@ alter table school_prospects add column if not exists city text;
 alter table school_prospects add column if not exists meeting_at timestamptz;
 create index if not exists school_prospects_meeting_idx on school_prospects(meeting_at);
 
+-- Effectif élèves estimé (texte libre, ex. "~1000 élèves (secondaire)") +
+-- source/fiabilité de l'estimation (ex. "Wikipédia", "non trouvé"). Pas de
+-- champ € : la conversion en revenu projeté reste une décision manuelle
+-- (grille tarifaire non fixe), volontairement pas automatisée ici.
+alter table school_prospects add column if not exists estimated_students text;
+alter table school_prospects add column if not exists estimated_students_source text;
+
 create table if not exists content_calendar (
   id uuid default gen_random_uuid() primary key,
   title text not null,
