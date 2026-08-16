@@ -294,6 +294,10 @@
           <input id="p-email" type="email" placeholder="Email du contact">
           <input id="p-phone" placeholder="Téléphone">
           <input id="p-city" placeholder="Ville">
+          <div>
+            <label style="font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">Prochain rendez-vous</label>
+            <input id="p-meeting" type="datetime-local">
+          </div>
         </div>
         <textarea id="p-notes" placeholder="Notes" style="margin-top:10px"></textarea>
         <div class="form-actions">
@@ -303,9 +307,12 @@
       </div>
 
       <div id="followup-callout"></div>
+      <div id="duplicates-callout"></div>
+      <div id="meetings-panel"></div>
 
       <div class="panel" id="followup-msg-panel" style="display:none;margin-bottom:16px">
         <h3 id="followup-msg-title" style="margin:0 0 10px">Message de relance</h3>
+        <select id="followup-msg-template" onchange="switchFollowupTemplate()" style="margin-bottom:10px;font-size:13px;padding:7px 10px"></select>
         <textarea id="followup-msg-text" style="min-height:150px"></textarea>
         <div class="form-actions">
           <button class="btn" id="followup-msg-copy-btn" onclick="copyFollowupMessage()">📋 Copier</button>
@@ -314,7 +321,7 @@
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px">
-        <input id="prospect-search" type="search" placeholder="🔎 Rechercher (école, ville, contact, email...)" oninput="renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
+        <input id="prospect-search" type="search" placeholder="🔎 Rechercher (école, ville, contact, email...)" oninput="window.__duplicateGroupFilter=null;renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
         <select id="sort-select" onchange="renderProspects()" style="width:auto;font-size:13px;padding:7px 10px">
           <option value="relance">Trier par relance (défaut)</option>
           <option value="ville">Trier par ville</option>
@@ -323,6 +330,7 @@
           <option value="recent">Trier par ajout (récent)</option>
         </select>
       </div>
+      <div id="duplicate-filter-note"></div>
 
       <div class="table-wrap">
         <table class="prospects">
@@ -701,6 +709,7 @@ function renderTrendChart(trend){
 function fmtDate(iso){ if (!iso) return '—'; return new Date(iso).toLocaleDateString('fr-BE', { day:'2-digit', month:'2-digit', year:'numeric' }); }
 
 function filterProspects(list){
+  if (window.__duplicateGroupFilter) return list.filter(p => window.__duplicateGroupFilter.has(p.id));
   const q = document.getElementById('prospect-search').value.trim().toLowerCase();
   if (!q) return list;
   return list.filter(p => [p.school_name, p.city, p.contact_name, p.contact_email, p.contact_phone, p.notes]
@@ -720,7 +729,7 @@ function sortProspects(list){
 
 async function loadProspects(){
   try {
-    const { items: list, lastSyncAt } = await api('prospects');
+    const { items: list, lastSyncAt, duplicateGroups } = await api('prospects');
     window.__prospects = list;
     document.getElementById('last-sync').textContent = lastSyncAt
       ? `Dernière sync : ${fmtDate(lastSyncAt)}`
@@ -735,17 +744,78 @@ async function loadProspects(){
         ).join('')}</div>`
       : `<div class="callout empty">Aucune relance en attente 🎉</div>`;
 
+    renderDuplicatesCallout(list, duplicateGroups || []);
+    renderMeetingsPanel(list, now);
     renderProspects();
   } catch (e) { console.error(e); }
+}
+
+function fmtDateTime(iso){
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('fr-BE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+// ─── Calendrier des rendez-vous planifiés ─────────────────────────
+function renderMeetingsPanel(list, now){
+  const upcoming = list
+    .filter(p => p.meeting_at && new Date(p.meeting_at).getTime() >= now)
+    .sort((a, b) => new Date(a.meeting_at) - new Date(b.meeting_at));
+  const el = document.getElementById('meetings-panel');
+  if (!upcoming.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="callout" style="background:#EEF5FF;border-color:#C7DEFF">
+    <h3>📅 Prochains rendez-vous (${upcoming.length})</h3>
+    ${upcoming.map(p => `<div class="followup-item" style="cursor:pointer" onclick="editProspect('${p.id}')">
+      <span class="fname">${escHtml(p.school_name)}</span>
+      <span class="badge badge-${p.status}">${STATUS_LABELS[p.status]}</span>
+      <span class="muted">${fmtDateTime(p.meeting_at)}</span>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ─── Doublons d'écoles ─────────────────────────────────
+// duplicateGroups : tableaux d'ids de prospects (calculé côté serveur, voir
+// findDuplicateProspects dans _dashboard-logic.js) partageant le même nom
+// d'école une fois accents/casse/ponctuation ignorés.
+function renderDuplicatesCallout(list, duplicateGroups){
+  window.__duplicateIds = new Set(duplicateGroups.flat());
+  const byId = Object.fromEntries(list.map(p => [p.id, p]));
+  const calloutEl = document.getElementById('duplicates-callout');
+  if (!duplicateGroups.length) { calloutEl.innerHTML = ''; return; }
+  calloutEl.innerHTML = `<div class="callout" style="background:#FFF9E8;border-color:#F5E1A0">
+    <h3>⚠️ ${duplicateGroups.length} doublon${duplicateGroups.length>1?'s':''} potentiel${duplicateGroups.length>1?'s':''} détecté${duplicateGroups.length>1?'s':''}</h3>
+    ${duplicateGroups.map(ids => {
+      const group = ids.map(id => byId[id]).filter(Boolean);
+      if (!group.length) return '';
+      return `<div class="followup-item" style="cursor:pointer" onclick='showDuplicateGroup(${JSON.stringify(ids)})'>
+        <span class="fname">${group.map(p => escHtml(p.school_name)).join('  ↔  ')}</span>
+        <span class="muted">${group.length} dossiers</span>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function showDuplicateGroup(ids){
+  window.__duplicateGroupFilter = new Set(ids);
+  document.getElementById('prospect-search').value = '';
+  renderProspects();
+}
+
+function clearDuplicateGroupFilter(){
+  window.__duplicateGroupFilter = null;
+  renderProspects();
 }
 
 function renderProspects(){
   const list = window.__prospects || [];
   const view = sortProspects(filterProspects(list));
   try {
+    document.getElementById('duplicate-filter-note').innerHTML = window.__duplicateGroupFilter
+      ? `<p class="muted" style="font-size:12.5px;margin:0 0 8px">Affichage limité à ce doublon — <a href="#" onclick="clearDuplicateGroupFilter();return false">✕ voir tous les dossiers</a></p>`
+      : '';
+    const dupIds = window.__duplicateIds || new Set();
     document.getElementById('prospects-body').innerHTML = view.length ? view.map(p => `
-      <tr>
-        <td><strong>${p.school_name}</strong>${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
+      <tr${dupIds.has(p.id) ? ' style="background:#FFFBEF"' : ''}>
+        <td><strong>${p.school_name}</strong>${dupIds.has(p.id) ? ' <span class="badge" style="background:#FFF3CD;color:#8A6D1D" title="Un autre dossier a un nom d\'école identique ou très proche">⚠️ doublon possible</span>' : ''}${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
         <td>${p.city || '—'}</td>
         <td>${p.contact_name || '—'}${p.contact_email ? `<div class="muted" style="font-size:12px">${p.contact_email}</div>` : ''}</td>
         <td><span class="badge badge-${p.status}" title="Cliquer pour changer le statut" onclick="openStatusPicker(event,'${p.id}','${p.status}')">${STATUS_LABELS[p.status]}</span></td>
@@ -756,27 +826,59 @@ function renderProspects(){
   } catch (e) { console.error(e); }
 }
 
-// ─── Message de relance prêt à l'emploi ───────────────────────────
-// Un brouillon adapté au statut du dossier, pour ne jamais repartir de zéro
-// avant d'envoyer une relance.
-function followupMessageFor(p){
+// ─── Bibliothèque de templates d'emails (prospection/suivi/réponse) ───────
+// Chaque template sait se choisir par défaut selon le statut du dossier, mais
+// reste sélectionnable manuellement — jamais de page blanche avant d'écrire.
+const EMAIL_TEMPLATES = [
+  {
+    key: 'premier_contact', label: 'Premier contact', statuses: ['a_contacter'],
+    build: (greeting, school) => `${greeting},\n\nJe me permets de vous contacter au sujet de KeyPace, notre plateforme de dactylographie AZERTY pensée pour les établissements scolaires (65 leçons progressives, suivi de progression par élève, mise en place en quelques minutes).\n\nSeriez-vous disponible pour un bref échange cette semaine à propos d'une licence pour ${school} ?\n\nBien cordialement,\nThéo — KeyPace`,
+  },
+  {
+    key: 'relance', label: 'Relance (pas de réponse)', statuses: ['envoye', 'relance'],
+    build: (greeting, school) => `${greeting},\n\nJe me permets de revenir vers vous suite à mon précédent message concernant KeyPace pour ${school}. Restez-vous intéressé·e par une présentation rapide de la plateforme ?\n\nBien cordialement,\nThéo — KeyPace`,
+  },
+  {
+    key: 'reponse_objection', label: 'Réponse à une question / objection', statuses: ['repondu', 'en_negociation'],
+    build: (greeting, school) => `${greeting},\n\nJe reviens vers vous suite à notre échange au sujet de KeyPace pour ${school}. Avez-vous besoin d'informations complémentaires de mon côté pour avancer ?\n\nBien cordialement,\nThéo — KeyPace`,
+  },
+  {
+    key: 'apres_rdv', label: 'Suivi après un rendez-vous', statuses: [],
+    build: (greeting, school) => `${greeting},\n\nMerci pour votre temps lors de notre échange à propos de KeyPace pour ${school}. Comme convenu, je reste disponible pour toute question complémentaire, et je peux vous transmettre un accès test si c'est utile.\n\nBien cordialement,\nThéo — KeyPace`,
+  },
+  {
+    key: 'remerciement_signature', label: 'Remerciement après signature', statuses: ['signe'],
+    build: (greeting, school) => `${greeting},\n\nUn grand merci pour votre confiance ! La licence KeyPace pour ${school} est maintenant active — je reviens vers vous très vite avec les accès et les prochaines étapes pour la mise en place.\n\nBien cordialement,\nThéo — KeyPace`,
+  },
+];
+document.getElementById('followup-msg-template').innerHTML = EMAIL_TEMPLATES.map(t => `<option value="${t.key}">${t.label}</option>`).join('');
+
+function defaultTemplateKeyFor(status){
+  const match = EMAIL_TEMPLATES.find(t => t.statuses.includes(status));
+  return match ? match.key : 'relance';
+}
+
+function buildEmailFromTemplate(key, p){
+  const tpl = EMAIL_TEMPLATES.find(t => t.key === key) || EMAIL_TEMPLATES[0];
   const contact = (p.contact_name || '').trim().split(' ')[0];
   const greeting = contact ? `Bonjour ${contact}` : 'Bonjour';
-  const school = p.school_name;
-  if (p.status === 'a_contacter') {
-    return `${greeting},\n\nJe me permets de vous contacter au sujet de KeyPace, notre plateforme de dactylographie AZERTY pensée pour les établissements scolaires (65 leçons progressives, suivi de progression par élève, mise en place en quelques minutes).\n\nSeriez-vous disponible pour un bref échange cette semaine à propos d'une licence pour ${school} ?\n\nBien cordialement,\nThéo — KeyPace`;
-  }
-  if (p.status === 'repondu' || p.status === 'en_negociation') {
-    return `${greeting},\n\nJe reviens vers vous suite à notre échange au sujet de KeyPace pour ${school}. Avez-vous besoin d'informations complémentaires de mon côté pour avancer ?\n\nBien cordialement,\nThéo — KeyPace`;
-  }
-  return `${greeting},\n\nJe me permets de revenir vers vous suite à mon précédent message concernant KeyPace pour ${school}. Restez-vous intéressé·e par une présentation rapide de la plateforme ?\n\nBien cordialement,\nThéo — KeyPace`;
+  return tpl.build(greeting, p.school_name);
+}
+
+function switchFollowupTemplate(){
+  const p = (window.__prospects || []).find(x => x.id === window.__followupProspectId);
+  if (!p) return;
+  document.getElementById('followup-msg-text').value = buildEmailFromTemplate(document.getElementById('followup-msg-template').value, p);
 }
 
 function openFollowupMessage(id){
   const p = (window.__prospects || []).find(x => x.id === id);
   if (!p) return;
+  window.__followupProspectId = id;
   document.getElementById('followup-msg-title').textContent = `Message pour ${p.school_name}`;
-  document.getElementById('followup-msg-text').value = followupMessageFor(p);
+  const key = defaultTemplateKeyFor(p.status);
+  document.getElementById('followup-msg-template').value = key;
+  document.getElementById('followup-msg-text').value = buildEmailFromTemplate(key, p);
   document.getElementById('followup-msg-panel').style.display = 'block';
 }
 
@@ -853,9 +955,16 @@ function exportProspectsCSV(){
 // ─── Ajout / édition (formulaire partagé) ─────────────
 let editingProspectId = null;
 
+function toDatetimeLocalValue(iso){
+  if (!iso) return '';
+  const d = new Date(iso);
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 function openAddForm(){
   editingProspectId = null;
-  ['p-school','p-contact','p-email','p-phone','p-city','p-notes'].forEach(id => document.getElementById(id).value = '');
+  ['p-school','p-contact','p-email','p-phone','p-city','p-notes','p-meeting'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('prospect-form-title').textContent = 'Nouvelle école';
   document.getElementById('prospect-save-btn').textContent = 'Enregistrer';
   document.getElementById('prospect-form').style.display = 'block';
@@ -874,6 +983,7 @@ function editProspect(id){
   document.getElementById('p-email').value = p.contact_email || '';
   document.getElementById('p-phone').value = p.contact_phone || '';
   document.getElementById('p-city').value = p.city || '';
+  document.getElementById('p-meeting').value = toDatetimeLocalValue(p.meeting_at);
   document.getElementById('p-notes').value = p.notes || '';
   document.getElementById('prospect-form-title').textContent = `Modifier « ${p.school_name} »`;
   document.getElementById('prospect-save-btn').textContent = 'Enregistrer les modifications';
@@ -889,6 +999,7 @@ async function saveProspect(){
     contact_email: document.getElementById('p-email').value.trim(),
     contact_phone: document.getElementById('p-phone').value.trim(),
     city: document.getElementById('p-city').value.trim(),
+    meeting_at: document.getElementById('p-meeting').value ? new Date(document.getElementById('p-meeting').value).toISOString() : null,
     notes: document.getElementById('p-notes').value.trim(),
   };
   if (editingProspectId) await api('update-prospect', { method:'POST', body: { id: editingProspectId, ...body } });

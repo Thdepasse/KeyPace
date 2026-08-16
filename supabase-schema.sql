@@ -283,6 +283,11 @@ alter table school_prospects enable row level security;
 -- Ville du prospect (formulaire, tri, import/export CSV du dashboard).
 alter table school_prospects add column if not exists city text;
 
+-- Prochain rendez-vous planifié (appel/visio/rencontre), distinct de
+-- next_followup_at qui est une date de relance suggérée automatiquement.
+alter table school_prospects add column if not exists meeting_at timestamptz;
+create index if not exists school_prospects_meeting_idx on school_prospects(meeting_at);
+
 create table if not exists content_calendar (
   id uuid default gen_random_uuid() primary key,
   title text not null,

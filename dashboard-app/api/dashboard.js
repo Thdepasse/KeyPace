@@ -4,7 +4,7 @@
 // est attaché — l'isolation est structurelle, pas applicative).
 // Accès protégé par le header x-admin-key (secret ADMIN_KEY propre à ce
 // projet — pas de comptes individuels).
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, FOLLOWUP_DAYS } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, FOLLOWUP_DAYS } = require('./_dashboard-logic');
 const { classifyMessage } = require('./_zimbra-match');
 const { fetchRecentMessages } = require('./_zimbra-soap');
 const { fetchGA4Traffic, fetchGA4TrafficBreakdown } = require('./_ga4');
@@ -122,11 +122,12 @@ async function prospectsList(req, res) {
   ]);
   if (!r.ok) return res.status(500).json({ error: 'Erreur récupération prospects.' });
   const lastSyncAt = (lastSyncR.ok && lastSyncR.data && lastSyncR.data[0] && lastSyncR.data[0].processed_at) || null;
-  return res.json({ items: r.data || [], lastSyncAt });
+  const duplicateGroups = findDuplicateProspects(r.data || []).map((g) => g.prospects.map((p) => p.id));
+  return res.json({ items: r.data || [], lastSyncAt, duplicateGroups });
 }
 
 async function prospectCreate(req, res) {
-  const { school_name, contact_name, contact_email, contact_phone, city, notes, status } = req.body || {};
+  const { school_name, contact_name, contact_email, contact_phone, city, notes, status, meeting_at } = req.body || {};
   if (!school_name) return res.status(400).json({ error: "Nom d'école manquant." });
   const r = await sb('/school_prospects', {
     method: 'POST',
@@ -138,13 +139,14 @@ async function prospectCreate(req, res) {
       city: city || null,
       notes: notes || null,
       status: status || undefined, // undefined => laisse la valeur par défaut de la table
+      meeting_at: meeting_at || null,
     }),
   });
   if (!r.ok) return res.status(500).json({ error: 'Erreur création prospect.' });
   return res.status(201).json(r.data[0]);
 }
 
-const PROSPECT_FIELDS = ['school_name', 'contact_name', 'contact_email', 'contact_phone', 'city', 'notes', 'status'];
+const PROSPECT_FIELDS = ['school_name', 'contact_name', 'contact_email', 'contact_phone', 'city', 'notes', 'status', 'meeting_at'];
 
 async function prospectUpdate(req, res) {
   const { id, ...fields } = req.body || {};

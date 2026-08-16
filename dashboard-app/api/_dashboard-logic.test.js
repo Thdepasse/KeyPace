@@ -2,7 +2,7 @@
 // Lancer : node --test api/_dashboard-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects } = require('./_dashboard-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -125,4 +125,31 @@ test('contentGapsThisWeek : aucun trou si toute la semaine restante est planifi�
 
 test('thisWeekRange : bornes start/end pour filtrer la requête calendrier', () => {
   assert.deepEqual(thisWeekRange(NOW), { start: '2023-11-14', end: '2023-11-19' });
+});
+
+test('normalizeSchoolName : ignore accents, casse, ponctuation et espaces multiples', () => {
+  assert.equal(normalizeSchoolName('École du Centre !'), 'ecole du centre');
+  assert.equal(normalizeSchoolName('ecole   du  Centre'), 'ecole du centre');
+  assert.equal(normalizeSchoolName('  '), '');
+  assert.equal(normalizeSchoolName(null), '');
+});
+
+test('findDuplicateProspects : regroupe les noms qui ne diffèrent que par accents/casse/ponctuation', () => {
+  const groups = findDuplicateProspects([
+    { id: 1, school_name: 'École du Centre' },
+    { id: 2, school_name: 'ecole du centre' },
+    { id: 3, school_name: 'Institut Notre-Dame' },
+  ]);
+  assert.equal(groups.length, 1);
+  assert.deepEqual(groups[0].prospects.map((p) => p.id), [1, 2]);
+});
+
+test('findDuplicateProspects : aucun groupe si tous les noms sont distincts, ignore les noms vides', () => {
+  const groups = findDuplicateProspects([
+    { id: 1, school_name: 'Institut A' },
+    { id: 2, school_name: 'Institut B' },
+    { id: 3, school_name: '' },
+    { id: 4, school_name: null },
+  ]);
+  assert.deepEqual(groups, []);
 });

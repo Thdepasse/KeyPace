@@ -123,7 +123,35 @@ function thisWeekRange(now) {
   return { start: days[0], end: days[days.length - 1] };
 }
 
+// Normalise un nom d'école pour la comparaison (accents, casse, ponctuation,
+// espaces multiples) sans toucher au nom affiché ailleurs.
+function normalizeSchoolName(name) {
+  return String(name || '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '') // retire les accents (diacritiques combinants)
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ') // ponctuation -> espace
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Regroupe les prospects dont le nom d'école normalisé est identique (doublon
+// probable, ex. "École du Centre" / "école du centre" / "Ecole du Centre !").
+// Ne renvoie que les groupes d'au moins 2 dossiers ; ignore les noms vides.
+function findDuplicateProspects(prospects) {
+  const groups = new Map();
+  for (const p of prospects) {
+    const key = normalizeSchoolName(p.school_name);
+    if (!key) continue;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(p);
+  }
+  return [...groups.entries()]
+    .filter(([, group]) => group.length >= 2)
+    .map(([key, group]) => ({ key, prospects: group }));
+}
+
 module.exports = {
   FOLLOWUP_DAYS, computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement,
   dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange,
+  normalizeSchoolName, findDuplicateProspects,
 };
