@@ -5,7 +5,7 @@
 // Accès protégé par le header x-admin-key (secret ADMIN_KEY propre à ce
 // projet — pas de comptes individuels).
 const crypto = require('crypto');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, FOLLOWUP_DAYS } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, FOLLOWUP_DAYS } = require('./_dashboard-logic');
 const { classifyMessage } = require('./_zimbra-match');
 const { fetchRecentMessages } = require('./_zimbra-soap');
 const { fetchGA4Traffic, fetchGA4TrafficBreakdown } = require('./_ga4');
@@ -261,6 +261,70 @@ async function linkDelete(req, res) {
   const r = await sb(`/resource_links?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' });
   if (!r.ok) return res.status(500).json({ error: 'Erreur suppression du lien.' });
   return res.json({ ok: true });
+}
+
+// ─── Checklist sécurité périodique ──────────────────────────────────
+// Contenu curé manuellement à partir de standards connus (OWASP Top 10 /
+// ASVS, RGPD) et adapté à la stack réelle de KeyPace (Next.js/Vercel,
+// Supabase, Zimbra). Statique et versionné dans le code (pas de génération
+// IA en runtime) — seule la date de dernière vérification par item vit en
+// base (voir security_checklist_checks dans supabase-schema.sql).
+const SECURITY_CHECKLIST_ITEMS = [
+  // ── Authentification & accès ──
+  { key: 'auth-secret-rotation', category: 'Authentification & accès', label: "Aucun secret actif n'a jamais été partagé en clair (chat, email, capture d'écran)", why: "Un secret vu en clair une seule fois doit être considéré comme compromis, même si le canal semblait privé. Vérifier qu'ADMIN_KEY, les clés API et mots de passe n'ont pas fuité, et les tourner sinon.", frequencyDays: 90 },
+  { key: 'auth-access-review', category: 'Authentification & accès', label: "Revue des accès : qui possède l'ADMIN_KEY du dashboard, l'accès Supabase et l'accès Vercel", why: "Moins il y a de personnes avec un accès admin, plus la surface d'attaque humaine est petite. Révoquer les accès des personnes qui n'en ont plus l'usage.", frequencyDays: 180 },
+  { key: 'auth-password-hashing', category: 'Authentification & accès', label: "Les mots de passe utilisateurs sont hashés avec un algorithme robuste (bcrypt/argon2/scrypt), jamais en clair ni en simple SHA", why: "En cas de fuite de la base, un hash faible ou un mot de passe en clair expose directement les comptes utilisateurs.", frequencyDays: 365 },
+  { key: 'auth-brute-force', category: 'Authentification & accès', label: "Limitation du nombre de tentatives sur les endpoints de connexion et l'ADMIN_KEY (rate limiting)", why: "Sans limitation, un identifiant ou un mot de passe faible peut être deviné par essais successifs (brute force).", frequencyDays: 180 },
+  { key: 'auth-session-expiry', category: 'Authentification & accès', label: "Les sessions utilisateurs expirent dans un délai raisonnable et peuvent être révoquées", why: "Une session qui ne meurt jamais reste exploitable indéfiniment si un token fuite (appareil volé, poste partagé).", frequencyDays: 365 },
+  { key: 'auth-mfa', category: 'Authentification & accès', label: "Authentification à plusieurs facteurs (MFA) activée sur les comptes critiques (Vercel, Supabase, Zimbra/email, registrar du domaine)", why: "Recommandation explicite de la Commission européenne (Your Europe) : le MFA arrête la grande majorité des prises de contrôle de compte même si le mot de passe fuite.", frequencyDays: 180 },
+
+  // ── Données & RGPD ──
+  { key: 'data-privacy-policy', category: 'Données & RGPD', label: "La politique de confidentialité reflète exactement les données réellement collectées (y compris Analytics, cookies)", why: "Un décalage entre ce qui est déclaré et ce qui est fait est une non-conformité RGPD directe, et une perte de confiance si détecté par un utilisateur.", frequencyDays: 180 },
+  { key: 'data-cookie-consent', category: 'Données & RGPD', label: "La bannière de consentement cookies bloque bien tout traceur (Google Analytics...) tant qu'il n'y a pas d'accord", why: "Charger un traceur avant consentement est une infraction RGPD/ePrivacy, même si la bannière s'affiche visuellement.", frequencyDays: 90 },
+  { key: 'data-minors', category: 'Données & RGPD', label: "Les données collectées sur les élèves mineurs sont minimales, et la base légale (contrat école / consentement parental) est claire", why: "KeyPace a des utilisateurs mineurs via les écoles : le RGPD impose un cadre renforcé pour les données d'enfants (minimisation, finalité restreinte, pas de profilage publicitaire).", frequencyDays: 180 },
+  { key: 'data-deletion-process', category: 'Données & RGPD', label: "Il existe une procédure claire pour supprimer ou exporter les données d'un utilisateur qui en fait la demande", why: "Le droit à l'effacement et à la portabilité sont des obligations RGPD ; sans procédure documentée, une demande réelle risque d'être mal ou pas traitée dans les délais.", frequencyDays: 365 },
+  { key: 'data-subprocessors', category: 'Données & RGPD', label: "Les sous-traitants qui touchent des données personnelles (Supabase, Vercel, outil d'emailing...) ont un DPA/accord de traitement en règle", why: "En cas de contrôle ou d'incident chez un sous-traitant, l'absence d'accord de traitement engage directement la responsabilité de KeyPace.", frequencyDays: 365 },
+  { key: 'data-retention', category: 'Données & RGPD', label: "Les comptes et données inactifs depuis longtemps sont purgés ou archivés selon une politique de rétention définie", why: "Garder indéfiniment des données sans finalité active est une violation du principe de minimisation RGPD, et élargit inutilement la surface exposée en cas de fuite.", frequencyDays: 365 },
+
+  // ── Infrastructure & code ──
+  { key: 'infra-rls-policies', category: 'Infrastructure & code', label: "Chaque table Supabase exposée via la clé anonyme a des policies RLS explicites (pas juste RLS activé sans règle)", why: "Activer Row Level Security sans policy bloque tout par défaut pour la clé anonyme, ce qui est sûr — mais toute policy ajoutée ensuite doit être relue pour vérifier qu'elle ne réouvre pas plus large que prévu.", frequencyDays: 180 },
+  { key: 'infra-service-key-exposure', category: 'Infrastructure & code', label: "La clé service-role Supabase et les clés secrètes (Stripe...) ne sont jamais envoyées au navigateur", why: "Une clé service-role dans le bundle frontend donne un accès total à la base à quiconque lirait le code source côté client.", frequencyDays: 180 },
+  { key: 'infra-cors', category: 'Infrastructure & code', label: "CORS reste restreint à une liste d'origines connues, sans retour accidentel à un wildcard *", why: "Un CORS ouvert permet à n'importe quel site tiers d'appeler l'API du dashboard depuis le navigateur d'un utilisateur connecté.", frequencyDays: 180 },
+  { key: 'infra-security-headers', category: 'Infrastructure & code', label: "En-têtes de sécurité HTTP en place (CSP, X-Content-Type-Options, Strict-Transport-Security, X-Frame-Options)", why: "Ces en-têtes réduisent l'impact de failles XSS ou de clickjacking même si une injection passe malgré tout.", frequencyDays: 365 },
+  { key: 'infra-dependencies', category: 'Infrastructure & code', label: "Audit des dépendances npm (vulnérabilités connues) et mise à jour des paquets critiques", why: "La majorité des failles exploitées en pratique viennent de dépendances tierces obsolètes, pas de code applicatif.", frequencyDays: 90 },
+  { key: 'infra-no-secrets-in-code', category: 'Infrastructure & code', label: "Aucun secret en clair dans le code source ou l'historique git (uniquement en variables d'environnement)", why: "Un secret commité, même supprimé ensuite, reste récupérable dans l'historique git tant que le dépôt n'est pas nettoyé — et le secret doit être tourné, pas juste retiré.", frequencyDays: 180 },
+  { key: 'infra-security-testing', category: 'Infrastructure & code', label: "Test de sécurité périodique du site et des services (scan de vulnérabilités basique, ou test d'intrusion léger)", why: "Recommandation explicite de la Commission européenne (Your Europe) : un test régulier détecte des failles avant qu'un tiers malveillant ne les trouve.", frequencyDays: 365 },
+
+  // ── Supervision & continuité ──
+  { key: 'ops-backups', category: 'Supervision & continuité', label: "Sauvegardes régulières de la base Supabase, et test réel de restauration (pas juste vérifier qu'un fichier existe)", why: "Une sauvegarde jamais restaurée peut s'avérer corrompue ou incomplète le jour où elle est vraiment nécessaire.", frequencyDays: 180 },
+  { key: 'ops-incident-plan', category: 'Supervision & continuité', label: "Un plan simple existe en cas de fuite de données ou de compromission (qui prévenir, quoi couper en premier)", why: "Improviser une réponse à incident sous stress mène presque toujours à des décisions plus lentes ou plus dommageables qu'un plan préparé à froid.", frequencyDays: 365 },
+  { key: 'ops-https', category: 'Supervision & continuité', label: "Le site est servi en HTTPS partout, sans contenu mixte (ressources chargées en http:// sur une page https://)", why: "Le contenu mixte peut être intercepté ou modifié en clair, et certains navigateurs bloquent ou avertissent dessus.", frequencyDays: 365 },
+  { key: 'ops-email-auth', category: 'Supervision & continuité', label: "Enregistrements SPF/DKIM/DMARC corrects pour le domaine d'envoi (Zimbra) afin d'éviter le spoofing et le classement en spam", why: "Sans ces enregistrements, des emails peuvent être envoyés en usurpant le domaine KeyPace, et les emails légitimes atterrissent plus facilement en spam.", frequencyDays: 365 },
+];
+
+async function securityChecklistList(req, res) {
+  const r = await sb('/security_checklist_checks?select=*');
+  if (!r.ok) return res.status(500).json({ error: 'Erreur récupération de la checklist.' });
+  const checksByKey = Object.fromEntries((r.data || []).map((c) => [c.item_key, c]));
+  const now = Date.now();
+  const items = SECURITY_CHECKLIST_ITEMS.map((item) => {
+    const check = checksByKey[item.key];
+    const { overdue, daysSinceCheck } = checklistItemStatus(check ? check.checked_at : null, item.frequencyDays, now);
+    return { ...item, checkedAt: check ? check.checked_at : null, notes: check ? check.notes : null, overdue, daysSinceCheck };
+  });
+  return res.json({ items });
+}
+
+async function securityChecklistCheck(req, res) {
+  const { key, notes } = req.body || {};
+  if (!key || !SECURITY_CHECKLIST_ITEMS.some((i) => i.key === key)) return res.status(400).json({ error: 'Item de checklist inconnu.' });
+  const r = await sb('/security_checklist_checks?on_conflict=item_key', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+    body: JSON.stringify({ item_key: key, checked_at: new Date().toISOString(), notes: notes || null }),
+  });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur enregistrement de la vérification.' });
+  return res.json(r.data[0]);
 }
 
 // ─── Backlog de développement (bugs, features, dette technique) ───
@@ -936,6 +1000,7 @@ module.exports = async function handler(req, res) {
         case 'vault-list': return await vaultList(req, res);
         case 'vault-reveal': return await vaultReveal(req, res);
         case 'links-list': return await linksList(req, res);
+        case 'security-checklist': return await securityChecklistList(req, res);
         case 'dev-backlog': return await devBacklogList(req, res);
         case 'competitors-list': return await competitorsList(req, res);
         case 'competitor-suggestions-list': return await competitorSuggestionsList(req, res);
@@ -960,6 +1025,7 @@ module.exports = async function handler(req, res) {
         case 'vault-delete': return await vaultDelete(req, res);
         case 'link-create': return await linkCreate(req, res);
         case 'link-delete': return await linkDelete(req, res);
+        case 'security-checklist-check': return await securityChecklistCheck(req, res);
         case 'dev-issue-create': return await devIssueCreate(req, res);
         case 'dev-issue-update': return await devIssueUpdate(req, res);
         case 'dev-issue-delete': return await devIssueDelete(req, res);

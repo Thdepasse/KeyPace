@@ -198,9 +198,19 @@ function excludeDismissedDuplicates(groups, dismissedKeys) {
   return groups.filter((g) => !dismissed.has(g.key));
 }
 
+// État d'un item de la checklist sécurité : en retard si jamais vérifié, ou
+// si la dernière vérification date de plus de `frequencyDays`. `frequencyDays`
+// null/0 = pas de rappel automatique (item à vérifier au cas par cas).
+function checklistItemStatus(lastCheckedAt, frequencyDays, now) {
+  if (!lastCheckedAt) return { overdue: true, daysSinceCheck: null };
+  const daysSinceCheck = Math.floor((now - new Date(lastCheckedAt).getTime()) / DAY_MS);
+  const overdue = !!frequencyDays && daysSinceCheck > frequencyDays;
+  return { overdue, daysSinceCheck };
+}
+
 module.exports = {
   FOLLOWUP_DAYS, computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement,
   dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange,
   normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings,
-  excludeDismissedDuplicates,
+  excludeDismissedDuplicates, checklistItemStatus,
 };

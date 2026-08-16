@@ -418,6 +418,20 @@ create table if not exists dismissed_duplicates (
 alter table dismissed_duplicates enable row level security;
 
 -- ───────────────────────────────────────────────────────────────
+-- Checklist sécurité périodique (onglet Sécurité du dashboard).
+-- Les items eux-mêmes (libellé, catégorie, pourquoi, fréquence conseillée)
+-- sont définis en dur côté code (SECURITY_CHECKLIST_ITEMS dans dashboard.js)
+-- — cette table ne garde que l'état "dernière vérification" par item_key,
+-- pour savoir ce qui est en retard sans dépendre d'une IA en runtime.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists security_checklist_checks (
+  item_key text primary key,
+  checked_at timestamptz not null default now(),
+  notes text
+);
+alter table security_checklist_checks enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
 -- Coffre-fort de secrets (identifiants de services tiers, etc.).
 -- Chiffrement au repos (AES-256-GCM, voir vaultEncrypt/vaultDecrypt dans
 -- dashboard-app/api/dashboard.js) : la clé VAULT_ENCRYPTION_KEY vit

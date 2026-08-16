@@ -66,6 +66,17 @@
   .vault-item-main{display:flex;flex-direction:column;gap:2px;min-width:180px}
   .vault-item-secret{font-family:'JetBrains Mono',monospace;font-size:13px;flex:1;color:var(--muted);word-break:break-all}
   .links-item .fname{flex-shrink:0;min-width:160px}
+  .checklist-category{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin:20px 0 8px}
+  .checklist-category:first-child{margin-top:0}
+  .checklist-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+  .checklist-item.overdue{border-color:#FFD9CC;background:#FFFBF8}
+  .checklist-item-main{flex:1;min-width:0}
+  .checklist-item-label{font-size:13.5px;font-weight:700;color:var(--txt)}
+  .checklist-item-why{font-size:12.5px;color:var(--muted);margin-top:3px}
+  .checklist-item-meta{font-size:11.5px;color:var(--muted);margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .checklist-item-actions{flex-shrink:0}
+  .badge-overdue{background:#FBE7E5;color:#C23B2E}
+  .badge-ok{background:#E3F7E9;color:#1C8A45}
   .followup-item .fname{font-weight:700;flex:1}
   .brief-item{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:14px;cursor:pointer}
   .brief-item:hover{text-decoration:underline}
@@ -644,6 +655,12 @@
         </div>
       </div>
       <div id="links-list"></div>
+
+      <div class="toolbar" style="margin-top:28px">
+        <h3 style="margin:0">🛡️ Checklist sécurité périodique</h3>
+      </div>
+      <p class="muted" style="font-size:13px;margin:-6px 0 14px">À parcourir régulièrement — basée sur les standards OWASP, les recommandations RGPD et le guide "Your Europe" de la Commission européenne sur la sécurisation d'un site web. Le but : repérer les failles et limites potentielles, pas remplacer un vrai audit de sécurité.</p>
+      <div id="security-checklist"></div>
     </section>
 
     <section id="competitors-section" class="tab-panel">
@@ -765,6 +782,7 @@ function boot(){
   loadReviews();
   loadVault();
   loadLinks();
+  loadSecurityChecklist();
   setBacklogView(backlogView);
   loadDevBacklog();
   loadCompetitors();
@@ -1525,6 +1543,47 @@ function renderLinksList(items){
       <span class="muted" style="flex:1">${escHtml(l.category || '')}</span>
       <button class="btn small danger" style="width:auto" onclick="deleteResourceLink('${l.id}')">Suppr.</button>
     </div>`).join('') : `<div class="empty-msg">Aucun lien enregistré pour l'instant.</div>`;
+}
+
+// ─── Checklist sécurité périodique ──────────────────────────────────
+async function loadSecurityChecklist(){
+  try {
+    const { items } = await api('security-checklist');
+    renderSecurityChecklist(items);
+  } catch (e) { console.error(e); }
+}
+
+function renderSecurityChecklist(items){
+  const el = document.getElementById('security-checklist');
+  const byCategory = [];
+  for (const item of items) {
+    let group = byCategory.find(g => g.category === item.category);
+    if (!group) { group = { category: item.category, items: [] }; byCategory.push(group); }
+    group.items.push(item);
+  }
+  el.innerHTML = byCategory.map(g => `
+    <div class="checklist-category">${escHtml(g.category)}</div>
+    ${g.items.map(item => `
+      <div class="checklist-item${item.overdue ? ' overdue' : ''}">
+        <div class="checklist-item-main">
+          <div class="checklist-item-label">${escHtml(item.label)}</div>
+          <div class="checklist-item-why">${escHtml(item.why)}</div>
+          <div class="checklist-item-meta">
+            <span class="badge ${item.overdue ? 'badge-overdue' : 'badge-ok'}">${item.overdue ? '⚠️ À vérifier' : '✅ À jour'}</span>
+            <span>${item.checkedAt ? `Vérifié il y a ${item.daysSinceCheck} jour${item.daysSinceCheck > 1 ? 's' : ''} (${fmtDate(item.checkedAt)})` : 'Jamais vérifié'}</span>
+            ${item.frequencyDays ? `<span>· À revérifier tous les ${item.frequencyDays} jours</span>` : ''}
+          </div>
+        </div>
+        <div class="checklist-item-actions">
+          <button class="btn small ghost" style="width:auto" onclick="checkSecurityItem('${item.key}')">✔️ Marquer vérifié</button>
+        </div>
+      </div>`).join('')}
+  `).join('');
+}
+
+async function checkSecurityItem(key){
+  await api('security-checklist-check', { method:'POST', body: { key } });
+  loadSecurityChecklist();
 }
 
 function openLinkForm(){

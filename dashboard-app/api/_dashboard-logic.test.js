@@ -2,7 +2,7 @@
 // Lancer : node --test api/_dashboard-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus } = require('./_dashboard-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -212,4 +212,23 @@ test('excludeDismissedDuplicates : retire uniquement les groupes explicitement �
 test('excludeDismissedDuplicates : ne filtre rien si la liste des clés écartées est vide', () => {
   const groups = [{ key: 'a', prospects: [] }, { key: 'b', prospects: [] }];
   assert.deepEqual(excludeDismissedDuplicates(groups, []), groups);
+});
+
+test('checklistItemStatus : jamais vérifié => en retard, sans nombre de jours', () => {
+  assert.deepEqual(checklistItemStatus(null, 90, NOW), { overdue: true, daysSinceCheck: null });
+});
+
+test('checklistItemStatus : vérifié récemment, dans la fenêtre => pas en retard', () => {
+  const checkedAt = new Date(NOW - 10 * DAY).toISOString();
+  assert.deepEqual(checklistItemStatus(checkedAt, 90, NOW), { overdue: false, daysSinceCheck: 10 });
+});
+
+test('checklistItemStatus : vérifié il y a plus longtemps que la fréquence => en retard', () => {
+  const checkedAt = new Date(NOW - 100 * DAY).toISOString();
+  assert.deepEqual(checklistItemStatus(checkedAt, 90, NOW), { overdue: true, daysSinceCheck: 100 });
+});
+
+test('checklistItemStatus : sans fréquence définie, jamais en retard même vieux', () => {
+  const checkedAt = new Date(NOW - 500 * DAY).toISOString();
+  assert.deepEqual(checklistItemStatus(checkedAt, null, NOW), { overdue: false, daysSinceCheck: 500 });
 });
