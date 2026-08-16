@@ -56,6 +56,11 @@
   .dup-group{padding:6px 0;border-bottom:1px solid #F5E1A0}
   .dup-group:last-child{border-bottom:none}
   .dup-group-actions{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px}
+  .competitor-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+  .competitor-card-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .competitor-card-head .fname{font-size:15px;font-weight:800}
+  .competitor-card-body{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--txt);margin-bottom:10px}
+  .competitor-card-body strong{color:var(--muted);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.03em;margin-right:6px}
   .vault-item,.links-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px}
   .vault-item:last-child,.links-item:last-child{border-bottom:none}
   .vault-item-main{display:flex;flex-direction:column;gap:2px;min-width:180px}
@@ -224,6 +229,7 @@
       <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')"><span class="sec-ic">💬</span>Avis</button>
       <button class="tab-btn" data-tab="backlog" onclick="switchTab('backlog')"><span class="sec-ic">🛠️</span>Backlog dev</button>
       <button class="tab-btn" data-tab="security" onclick="switchTab('security')"><span class="sec-ic">🔒</span>Sécurité</button>
+      <button class="tab-btn" data-tab="competitors" onclick="switchTab('competitors')"><span class="sec-ic">🎯</span>Concurrents</button>
     </div>
 
     <section id="kpi-section" class="tab-panel">
@@ -456,6 +462,7 @@
             <label><input type="checkbox" value="tiktok"> TikTok</label>
             <label><input type="checkbox" value="youtube"> YouTube</label>
             <label><input type="checkbox" value="linkedin"> LinkedIn</label>
+            <label><input type="checkbox" value="facebook"> Facebook</label>
             <label><input type="checkbox" value="blog"> Blog</label>
             <label><input type="checkbox" value="autre"> Autre</label>
           </div>
@@ -637,6 +644,40 @@
       <div id="links-list"></div>
     </section>
 
+    <section id="competitors-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">🎯</span>Concurrents</h2>
+        <button class="btn" onclick="openCompetitorForm()">+ Ajouter un concurrent</button>
+      </div>
+
+      <div class="panel" id="competitor-form" style="display:none">
+        <h3 id="competitor-form-title">Nouveau concurrent</h3>
+        <div class="form-grid">
+          <input id="c-name" placeholder="Nom *">
+          <input id="c-url" type="url" placeholder="URL *">
+          <input id="c-revenue" placeholder="CA estimé (ex. 500k$/an, inconnu...)">
+        </div>
+        <textarea id="c-strengths" placeholder="Points forts" style="margin-top:10px"></textarea>
+        <textarea id="c-weaknesses" placeholder="Points faibles" style="margin-top:10px"></textarea>
+        <textarea id="c-notes" placeholder="Notes" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" onclick="saveCompetitor()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeCompetitorForm()">Annuler</button>
+          <button class="btn danger" id="competitor-delete-btn" style="display:none;margin-left:auto" onclick="deleteCompetitor(editingCompetitorId)">Supprimer</button>
+        </div>
+        <div id="competitor-history" class="history-section" style="display:none">
+          <h4>🕒 Historique</h4>
+          <div class="history-add">
+            <input id="competitor-note-input" placeholder="Ajouter une note...">
+            <button class="btn small ghost" style="width:auto" onclick="addCompetitorNote()">Ajouter</button>
+          </div>
+          <div id="competitor-history-list" class="history-list"></div>
+        </div>
+      </div>
+
+      <div id="competitors-list"></div>
+    </section>
+
   </div>
 </div>
 
@@ -684,7 +725,7 @@ function logout(){
   document.getElementById('gate').style.display = 'flex';
 }
 
-const TAB_SECTIONS = { kpi: 'kpi-section', prospects: 'prospects-section', calendar: 'calendar-section', reviews: 'reviews-section', backlog: 'backlog-section', security: 'security-section' };
+const TAB_SECTIONS = { kpi: 'kpi-section', prospects: 'prospects-section', calendar: 'calendar-section', reviews: 'reviews-section', backlog: 'backlog-section', security: 'security-section', competitors: 'competitors-section' };
 const REVIEW_STATUS_LABELS = { pending: 'En attente', published: 'Publié', rejected: 'Rejeté' };
 
 function switchTab(name){
@@ -710,6 +751,7 @@ function boot(){
   loadLinks();
   setBacklogView(backlogView);
   loadDevBacklog();
+  loadCompetitors();
   switchTab(localStorage.getItem('kp_active_tab') || 'kpi');
 }
 
@@ -1491,6 +1533,118 @@ async function deleteResourceLink(id){
   if (!confirm('Supprimer ce lien ?')) return;
   await api('link-delete', { method:'POST', body: { id } });
   loadLinks();
+}
+
+// ─── Veille concurrentielle ────────────────────────────────────────
+let editingCompetitorId = null;
+
+async function loadCompetitors(){
+  try {
+    const { items } = await api('competitors-list');
+    window.__competitors = items;
+    renderCompetitorsList(items);
+  } catch (e) { console.error(e); }
+}
+
+function renderCompetitorsList(items){
+  const el = document.getElementById('competitors-list');
+  el.innerHTML = items.length ? items.map(c => `
+    <div class="competitor-card">
+      <div class="competitor-card-head">
+        <a href="${escHtml(c.url)}" target="_blank" rel="noopener" class="fname">${escHtml(c.name)}</a>
+        ${c.content_changed ? '<span class="badge" style="background:#FFE9D6;color:#C2540A">⚠️ Changement détecté</span>' : ''}
+        <span class="muted" style="font-size:12px">${c.last_checked_at ? 'Vérifié le ' + fmtDateTime(c.last_checked_at) : 'Jamais vérifié'}</span>
+      </div>
+      <div class="competitor-card-body">
+        <div><strong>Forces</strong>${escHtml(c.strengths || '—')}</div>
+        <div><strong>Faiblesses</strong>${escHtml(c.weaknesses || '—')}</div>
+        <div><strong>CA estimé</strong>${escHtml(c.estimated_revenue || '—')}</div>
+      </div>
+      <div class="actions">
+        <button class="btn small ghost" id="competitor-check-btn-${c.id}" onclick="checkCompetitor('${c.id}')">🔍 Vérifier les changements</button>
+        <button class="btn small ghost" onclick="editCompetitor('${c.id}')">✏️ Éditer</button>
+      </div>
+    </div>`).join('') : `<div class="empty-msg">Aucun concurrent enregistré pour l'instant.</div>`;
+}
+
+async function checkCompetitor(id){
+  const btn = document.getElementById(`competitor-check-btn-${id}`);
+  const original = btn.textContent;
+  btn.textContent = '⏳ Vérification...';
+  btn.disabled = true;
+  try {
+    await api('competitor-check', { method:'POST', body: { id } });
+  } catch (e) {
+    alert("Erreur lors de la vérification : " + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = original;
+  loadCompetitors();
+}
+
+function openCompetitorForm(){
+  editingCompetitorId = null;
+  ['c-name','c-url','c-revenue','c-strengths','c-weaknesses','c-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('competitor-form-title').textContent = 'Nouveau concurrent';
+  document.getElementById('competitor-delete-btn').style.display = 'none';
+  document.getElementById('competitor-history').style.display = 'none';
+  document.getElementById('competitor-form').style.display = 'block';
+}
+
+function editCompetitor(id){
+  const c = (window.__competitors || []).find(x => x.id === id);
+  if (!c) return;
+  editingCompetitorId = id;
+  document.getElementById('c-name').value = c.name || '';
+  document.getElementById('c-url').value = c.url || '';
+  document.getElementById('c-revenue').value = c.estimated_revenue || '';
+  document.getElementById('c-strengths').value = c.strengths || '';
+  document.getElementById('c-weaknesses').value = c.weaknesses || '';
+  document.getElementById('c-notes').value = c.notes || '';
+  document.getElementById('competitor-form-title').textContent = `Modifier « ${c.name} »`;
+  document.getElementById('competitor-delete-btn').style.display = 'inline-flex';
+  document.getElementById('competitor-history').style.display = 'block';
+  document.getElementById('competitor-note-input').value = '';
+  renderActivityLog('competitor', id, 'competitor-history-list');
+  document.getElementById('competitor-form').style.display = 'block';
+}
+
+function closeCompetitorForm(){
+  editingCompetitorId = null;
+  document.getElementById('competitor-form').style.display = 'none';
+}
+
+async function saveCompetitor(){
+  const name = document.getElementById('c-name').value.trim();
+  const url = document.getElementById('c-url').value.trim();
+  if (!name || !url) return;
+  const body = {
+    name, url,
+    estimated_revenue: document.getElementById('c-revenue').value.trim(),
+    strengths: document.getElementById('c-strengths').value.trim(),
+    weaknesses: document.getElementById('c-weaknesses').value.trim(),
+    notes: document.getElementById('c-notes').value.trim(),
+  };
+  if (editingCompetitorId) await api('competitor-update', { method:'POST', body: { id: editingCompetitorId, ...body } });
+  else await api('competitor-create', { method:'POST', body });
+  closeCompetitorForm();
+  loadCompetitors();
+}
+
+async function deleteCompetitor(id){
+  if (!confirm('Supprimer ce concurrent du suivi ?')) return;
+  await api('competitor-delete', { method:'POST', body: { id } });
+  closeCompetitorForm();
+  loadCompetitors();
+}
+
+async function addCompetitorNote(){
+  const input = document.getElementById('competitor-note-input');
+  const note = input.value.trim();
+  if (!note || !editingCompetitorId) return;
+  await api('add-note', { method:'POST', body: { entity_type:'competitor', entity_id: editingCompetitorId, note } });
+  input.value = '';
+  renderActivityLog('competitor', editingCompetitorId, 'competitor-history-list');
 }
 
 // ─── Historique par élément (prospect ou contenu) ─────────────────

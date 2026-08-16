@@ -318,6 +318,103 @@ async function devIssueDelete(req, res) {
   return res.json({ ok: true });
 }
 
+// ─── Veille concurrentielle ─────────────────────────────────────────
+async function competitorsList(req, res) {
+  const r = await sb('/competitors?select=*&order=name.asc');
+  if (!r.ok) return res.status(500).json({ error: 'Erreur récupération des concurrents.' });
+  return res.json({ items: r.data || [] });
+}
+
+async function competitorCreate(req, res) {
+  const { name, url, strengths, weaknesses, estimated_revenue, notes } = req.body || {};
+  if (!name || !url) return res.status(400).json({ error: 'Nom ou URL manquant.' });
+  const r = await sb('/competitors', {
+    method: 'POST',
+    body: JSON.stringify({
+      name, url,
+      strengths: strengths || null,
+      weaknesses: weaknesses || null,
+      estimated_revenue: estimated_revenue || null,
+      notes: notes || null,
+    }),
+  });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur création du concurrent.' });
+  await logActivity('competitor', r.data[0].id, 'created', `Concurrent ajouté : ${name}.`);
+  return res.status(201).json(r.data[0]);
+}
+
+const COMPETITOR_FIELDS = ['name', 'url', 'strengths', 'weaknesses', 'estimated_revenue', 'notes'];
+
+async function competitorUpdate(req, res) {
+  const { id, ...fields } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const patch = {};
+  for (const k of COMPETITOR_FIELDS) if (k in fields) patch[k] = fields[k];
+  if (!Object.keys(patch).length) return res.status(400).json({ error: 'Aucun champ à mettre à jour.' });
+  const beforeR = await sb(`/competitors?id=eq.${encodeURIComponent(id)}&select=*`);
+  const before = beforeR.data && beforeR.data[0];
+  patch.updated_at = new Date().toISOString();
+  const r = await sb(`/competitors?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Erreur mise à jour du concurrent.' });
+  const summary = diffSummary(before, patch, COMPETITOR_FIELD_LABELS);
+  if (summary) await logActivity('competitor', id, 'updated', summary);
+  return res.json(r.data[0]);
+}
+
+async function competitorDelete(req, res) {
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const r = await sb(`/competitors?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur suppression du concurrent.' });
+  await deleteActivityLog('competitor', id);
+  return res.json({ ok: true });
+}
+
+// Hash du texte visible d'une page (scripts/styles/balises retirés, espaces
+// normalisés) — volontairement pas un hash du HTML brut, pour éviter les faux
+// positifs à chaque vérification (nonce, cache-busting, pub/analytics).
+function extractTextHash(html) {
+  const text = html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return crypto.createHash('sha256').update(text).digest('hex');
+}
+
+// Aucune IA ici : un simple hash comparé au précédent, cohérent avec le choix
+// déjà fait pour la banque d'idées (templates/règles, pas de dépendance IA).
+// Signale qu'un changement est détecté ; charge à l'utilisateur de vérifier
+// manuellement ce qui a changé et de mettre à jour forces/faiblesses/CA.
+async function competitorCheck(req, res) {
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const compR = await sb(`/competitors?id=eq.${encodeURIComponent(id)}&select=*`);
+  const competitor = compR.data && compR.data[0];
+  if (!competitor) return res.status(404).json({ error: 'Concurrent introuvable.' });
+  let html;
+  try {
+    const pageR = await fetch(competitor.url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; KeyPaceDashboardBot/1.0)' },
+      signal: AbortSignal.timeout(10000),
+    });
+    html = await pageR.text();
+  } catch (e) {
+    return res.status(502).json({ error: `Impossible de joindre ${competitor.url} : ${e.message}` });
+  }
+  const newHash = extractTextHash(html);
+  const changed = !!competitor.last_snapshot_hash && newHash !== competitor.last_snapshot_hash;
+  const now = new Date().toISOString();
+  const r = await sb(`/competitors?id=eq.${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ last_snapshot_hash: newHash, last_checked_at: now, content_changed: changed }),
+  });
+  if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Erreur mise à jour après vérification.' });
+  await logActivity('competitor', id, 'note', changed ? '🔎 Vérification : changement détecté sur le site.' : '🔎 Vérification : aucun changement détecté.');
+  return res.json(r.data[0]);
+}
+
 // ─── Historique par élément (activity_log) ─────────────────────────
 // Best-effort : un échec d'écriture du journal ne doit jamais faire échouer
 // l'action principale (création/modification d'un prospect ou d'un contenu).
@@ -362,6 +459,7 @@ const EVENT_FIELD_LABELS = { title: 'Titre', content_type: 'Type', account: 'Com
 const CONTENT_STATUS_LABELS_FR = { idee: 'Idée', a_faire: 'À faire', pret: 'Prêt', publie: 'Publié' };
 const DEV_FIELD_LABELS = { title: 'Titre', description: 'Description', item_type: 'Type', priority: 'Priorité' };
 const DEV_STATUS_LABELS_FR = { backlog: 'Backlog', a_faire: 'À faire', en_cours: 'En cours', fait: 'Fait' };
+const COMPETITOR_FIELD_LABELS = { name: 'Nom', url: 'URL', strengths: 'Forces', weaknesses: 'Faiblesses', estimated_revenue: 'CA estimé', notes: 'Notes' };
 
 // ─── Prospection écoles ───────────────────────────────────────────
 async function prospectsList(req, res) {
@@ -788,6 +886,7 @@ module.exports = async function handler(req, res) {
         case 'vault-reveal': return await vaultReveal(req, res);
         case 'links-list': return await linksList(req, res);
         case 'dev-backlog': return await devBacklogList(req, res);
+        case 'competitors-list': return await competitorsList(req, res);
         case 'reviews': return await reviewsList(req, res);
         case 'find-place': return await googleFindPlace(req, res);
         default: return res.status(400).json({ error: 'Action inconnue.' });
@@ -812,6 +911,10 @@ module.exports = async function handler(req, res) {
         case 'dev-issue-create': return await devIssueCreate(req, res);
         case 'dev-issue-update': return await devIssueUpdate(req, res);
         case 'dev-issue-delete': return await devIssueDelete(req, res);
+        case 'competitor-create': return await competitorCreate(req, res);
+        case 'competitor-update': return await competitorUpdate(req, res);
+        case 'competitor-delete': return await competitorDelete(req, res);
+        case 'competitor-check': return await competitorCheck(req, res);
         case 'sync-zimbra': return await syncZimbra(req, res);
         case 'publish-review': return await reviewSetStatus(req, res, 'published');
         case 'reject-review': return await reviewSetStatus(req, res, 'rejected');

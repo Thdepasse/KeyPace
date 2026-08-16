@@ -341,7 +341,7 @@ alter table activity_log enable row level security;
 -- exists" pour les check constraints : on la retire puis la recrée.
 alter table activity_log drop constraint if exists activity_log_entity_type_check;
 alter table activity_log add constraint activity_log_entity_type_check
-  check (entity_type in ('prospect', 'content', 'dev_issue'));
+  check (entity_type in ('prospect', 'content', 'dev_issue', 'competitor'));
 
 -- ───────────────────────────────────────────────────────────────
 -- Backlog de développement KeyPace (bugs, features, dette technique) —
@@ -360,6 +360,30 @@ create table if not exists dev_backlog (
 );
 create index if not exists dev_backlog_status_idx on dev_backlog(status);
 alter table dev_backlog enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Veille concurrentielle : liste de concurrents avec forces/faiblesses/CA
+-- estimé (renseignés manuellement), + détection de changement de contenu
+-- (hash du texte visible de leur page, voir competitorCheck dans
+-- dashboard-app/api/dashboard.js) — pas d'IA, juste un hash comparé au
+-- précédent, pour rester cohérent avec l'approche "templates/règles" déjà
+-- retenue pour la banque d'idées.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists competitors (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  url text not null,
+  strengths text,
+  weaknesses text,
+  estimated_revenue text,
+  notes text,
+  last_snapshot_hash text,
+  last_checked_at timestamptz,
+  content_changed boolean default false,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+alter table competitors enable row level security;
 
 -- Groupes de doublons potentiels (findDuplicateProspects, dedup_key = nom
 -- d'école normalisé) explicitement marqués "pas un doublon" par l'utilisateur
