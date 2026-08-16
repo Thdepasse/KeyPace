@@ -4057,6 +4057,7 @@ const app={
           <div class="school-banner-visual" aria-hidden="true">🎓</div>
         </div>
       </div>
+      `}
 
       <div class="reviews-section" id="home-reviews" style="display:none">
         <h2>Ce qu'ils en pensent</h2>
@@ -4070,7 +4071,6 @@ const app={
           ${homeFaqs.map(([q,a],i)=>`<details style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden" ${i===0?'open':''}><summary style="padding:16px 20px;font-weight:700;font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">${q}<span style="color:${A};font-size:18px;flex-shrink:0;margin-left:12px">+</span></summary><div style="padding:0 20px 18px;color:var(--muted);font-size:14px;line-height:1.65">${a}</div></details>`).join('')}
         </div>
       </div>
-      `}
       `;
     this.loadHomeReviews();
   },
