@@ -336,6 +336,31 @@ create table if not exists activity_log (
 create index if not exists activity_log_entity_idx on activity_log(entity_type, entity_id, created_at desc);
 alter table activity_log enable row level security;
 
+-- Élargit entity_type au backlog de développement (voir dev_backlog
+-- ci-dessous). alter table ... add constraint ne supporte pas "if not
+-- exists" pour les check constraints : on la retire puis la recrée.
+alter table activity_log drop constraint if exists activity_log_entity_type_check;
+alter table activity_log add constraint activity_log_entity_type_check
+  check (entity_type in ('prospect', 'content', 'dev_issue'));
+
+-- ───────────────────────────────────────────────────────────────
+-- Backlog de développement KeyPace (bugs, features, dette technique) —
+-- board interne façon Linear/GitHub Issues, historique via activity_log
+-- (entity_type='dev_issue').
+-- ───────────────────────────────────────────────────────────────
+create table if not exists dev_backlog (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  description text,
+  item_type text not null default 'feature' check (item_type in ('bug', 'feature', 'tech_debt', 'idee')),
+  priority text not null default 'moyenne' check (priority in ('basse', 'moyenne', 'haute', 'urgente')),
+  status text not null default 'backlog' check (status in ('backlog', 'a_faire', 'en_cours', 'fait')),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists dev_backlog_status_idx on dev_backlog(status);
+alter table dev_backlog enable row level security;
+
 -- Groupes de doublons potentiels (findDuplicateProspects, dedup_key = nom
 -- d'école normalisé) explicitement marqués "pas un doublon" par l'utilisateur
 -- — ne sont plus jamais reproposés dans la bannière d'alerte.
@@ -345,6 +370,40 @@ create table if not exists dismissed_duplicates (
   created_at timestamptz default now()
 );
 alter table dismissed_duplicates enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Coffre-fort de secrets (identifiants de services tiers, etc.).
+-- Chiffrement au repos (AES-256-GCM, voir vaultEncrypt/vaultDecrypt dans
+-- dashboard-app/api/dashboard.js) : la clé VAULT_ENCRYPTION_KEY vit
+-- uniquement en variable d'environnement Vercel, jamais en base — protège
+-- contre une fuite/dump direct de cette table. Ne protège PAS contre une
+-- fuite de l'ADMIN_KEY (accès complet via l'API normale du dashboard) :
+-- n'y stocke jamais la clé service Supabase ni la clé secrète Stripe, ce
+-- sont littéralement les clés qui donnent accès à l'endroit où ce coffre vit.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists vault_secrets (
+  id uuid default gen_random_uuid() primary key,
+  label text not null,
+  username text,
+  secret_ciphertext text not null,  -- base64 (chiffré || auth tag GCM)
+  secret_iv text not null,           -- base64, unique par entrée
+  notes text,
+  category text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+alter table vault_secrets enable row level security;
+
+-- Répertoire de liens (raccourcis vers consoles d'admin — Supabase, Vercel,
+-- Stripe...) : jamais de secret ici, uniquement des URL.
+create table if not exists resource_links (
+  id uuid default gen_random_uuid() primary key,
+  label text not null,
+  url text not null,
+  category text,
+  created_at timestamptz default now()
+);
+alter table resource_links enable row level security;
 
 -- Dédup de la synchro Zimbra (api/dashboard.js action=sync-zimbra) : un email
 -- déjà traité (par Message-ID) n'est jamais reclassé lors d'une sync suivante.

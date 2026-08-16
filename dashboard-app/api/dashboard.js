@@ -4,6 +4,7 @@
 // est attaché — l'isolation est structurelle, pas applicative).
 // Accès protégé par le header x-admin-key (secret ADMIN_KEY propre à ce
 // projet — pas de comptes individuels).
+const crypto = require('crypto');
 const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, FOLLOWUP_DAYS } = require('./_dashboard-logic');
 const { classifyMessage } = require('./_zimbra-match');
 const { fetchRecentMessages } = require('./_zimbra-soap');
@@ -16,6 +17,7 @@ const ADMIN_KEY = process.env.ADMIN_KEY;
 const CRON_SECRET = process.env.CRON_SECRET;
 const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 const GOOGLE_PLACE_ID = process.env.GOOGLE_PLACE_ID;
+const VAULT_ENCRYPTION_KEY = process.env.VAULT_ENCRYPTION_KEY; // hex 64 car. (32 octets), voir coffre-fort plus bas
 const ZIMBRA_SYNC_WINDOW_DAYS = 3; // fenêtre glissante ; zimbra_sync_log évite les doublons
 
 async function sb(path, opts = {}) {
@@ -40,6 +42,25 @@ function queryParam(req, name) {
   } catch (e) {
     return null;
   }
+}
+
+// Comparaison en temps constant (évite qu'une différence de timing sur la
+// comparaison naïve `!==` ne laisse fuiter des informations sur le secret).
+function safeEqual(a, b) {
+  const bufA = Buffer.from(String(a));
+  const bufB = Buffer.from(String(b));
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+// Aucun appelant légitime cross-origin n'existe pour cette API (le frontend
+// ne l'appelle qu'en same-origin) : seules les URLs du projet lui-même sont
+// autorisées, la variante preview ayant un préfixe aléatoire par déploiement.
+function isAllowedOrigin(origin) {
+  if (!origin) return false;
+  return origin === 'https://keypace-dashboard.vercel.app'
+    || origin === 'https://keypace-dashboard-neuraleon-companys-projects.vercel.app'
+    || /^https:\/\/keypace-dashboard-[a-z0-9]+-neuraleon-companys-projects\.vercel\.app$/.test(origin);
 }
 
 // ─── KPI ──────────────────────────────────────────────────────────
@@ -117,6 +138,186 @@ async function kpis(req, res) {
   });
 }
 
+// ─── Coffre-fort de secrets ─────────────────────────────────────────
+// Chiffrement au repos (AES-256-GCM) : protège contre une fuite/dump direct
+// de la table vault_secrets. Ne protège PAS contre une fuite de l'ADMIN_KEY
+// (accès complet à l'API normale, y compris révéler un secret) — voir la
+// note de sécurité dans supabase-schema.sql. N'y jamais stocker la clé
+// service Supabase ni la clé secrète Stripe (ce sont les clés qui donnent
+// accès à l'endroit où ce coffre vit ; les y stocker n'apporte aucune
+// protection réelle).
+function vaultEncrypt(plaintext) {
+  const key = Buffer.from(VAULT_ENCRYPTION_KEY, 'hex');
+  const iv = crypto.randomBytes(12); // 12 octets recommandés pour GCM
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+  const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+  const authTag = cipher.getAuthTag();
+  return { ciphertext: Buffer.concat([encrypted, authTag]).toString('base64'), iv: iv.toString('base64') };
+}
+
+function vaultDecrypt(ciphertextB64, ivB64) {
+  const key = Buffer.from(VAULT_ENCRYPTION_KEY, 'hex');
+  const iv = Buffer.from(ivB64, 'base64');
+  const data = Buffer.from(ciphertextB64, 'base64');
+  const authTag = data.subarray(data.length - 16);
+  const encrypted = data.subarray(0, data.length - 16);
+  const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+  decipher.setAuthTag(authTag);
+  return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8');
+}
+
+async function vaultList(req, res) {
+  if (!VAULT_ENCRYPTION_KEY) return res.status(500).json({ error: 'Coffre-fort indisponible : VAULT_ENCRYPTION_KEY absente côté serveur.' });
+  // Jamais le secret déchiffré dans la liste — uniquement les métadonnées.
+  const r = await sb('/vault_secrets?select=id,label,username,notes,category,created_at,updated_at&order=label.asc');
+  if (!r.ok) return res.status(500).json({ error: 'Erreur récupération du coffre-fort.' });
+  return res.json({ items: r.data || [] });
+}
+
+async function vaultReveal(req, res) {
+  if (!VAULT_ENCRYPTION_KEY) return res.status(500).json({ error: 'Coffre-fort indisponible : VAULT_ENCRYPTION_KEY absente côté serveur.' });
+  const id = queryParam(req, 'id');
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const r = await sb(`/vault_secrets?id=eq.${encodeURIComponent(id)}&select=secret_ciphertext,secret_iv`);
+  const row = r.data && r.data[0];
+  if (!r.ok || !row) return res.status(404).json({ error: 'Secret introuvable.' });
+  try {
+    return res.json({ secret: vaultDecrypt(row.secret_ciphertext, row.secret_iv) });
+  } catch (e) {
+    console.error('vaultReveal decrypt error:', e);
+    return res.status(500).json({ error: 'Erreur de déchiffrement.' });
+  }
+}
+
+async function vaultCreate(req, res) {
+  if (!VAULT_ENCRYPTION_KEY) return res.status(500).json({ error: 'Coffre-fort indisponible : VAULT_ENCRYPTION_KEY absente côté serveur.' });
+  const { label, username, secret, notes, category } = req.body || {};
+  if (!label || !secret) return res.status(400).json({ error: 'Libellé ou secret manquant.' });
+  const { ciphertext, iv } = vaultEncrypt(secret);
+  const r = await sb('/vault_secrets', {
+    method: 'POST',
+    body: JSON.stringify({
+      label,
+      username: username || null,
+      secret_ciphertext: ciphertext,
+      secret_iv: iv,
+      notes: notes || null,
+      category: category || null,
+    }),
+  });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur création du secret.' });
+  const { secret_ciphertext, secret_iv, ...safe } = r.data[0];
+  return res.status(201).json(safe);
+}
+
+async function vaultUpdate(req, res) {
+  if (!VAULT_ENCRYPTION_KEY) return res.status(500).json({ error: 'Coffre-fort indisponible : VAULT_ENCRYPTION_KEY absente côté serveur.' });
+  const { id, label, username, secret, notes, category } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const patch = { updated_at: new Date().toISOString() };
+  if (label !== undefined) patch.label = label;
+  if (username !== undefined) patch.username = username || null;
+  if (notes !== undefined) patch.notes = notes || null;
+  if (category !== undefined) patch.category = category || null;
+  if (secret) {
+    const { ciphertext, iv } = vaultEncrypt(secret);
+    patch.secret_ciphertext = ciphertext;
+    patch.secret_iv = iv;
+  }
+  const r = await sb(`/vault_secrets?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Erreur mise à jour du secret.' });
+  const { secret_ciphertext, secret_iv, ...safe } = r.data[0];
+  return res.json(safe);
+}
+
+async function vaultDelete(req, res) {
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const r = await sb(`/vault_secrets?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur suppression du secret.' });
+  return res.json({ ok: true });
+}
+
+// ─── Répertoire de liens ────────────────────────────────────────────
+// Raccourcis vers des consoles d'admin (Supabase, Vercel, Stripe...) —
+// jamais de secret ici, uniquement des URL.
+async function linksList(req, res) {
+  const r = await sb('/resource_links?select=*&order=category.asc,label.asc');
+  if (!r.ok) return res.status(500).json({ error: 'Erreur récupération des liens.' });
+  return res.json({ items: r.data || [] });
+}
+
+async function linkCreate(req, res) {
+  const { label, url, category } = req.body || {};
+  if (!label || !url) return res.status(400).json({ error: 'Libellé ou URL manquant.' });
+  const r = await sb('/resource_links', { method: 'POST', body: JSON.stringify({ label, url, category: category || null }) });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur création du lien.' });
+  return res.status(201).json(r.data[0]);
+}
+
+async function linkDelete(req, res) {
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const r = await sb(`/resource_links?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur suppression du lien.' });
+  return res.json({ ok: true });
+}
+
+// ─── Backlog de développement (bugs, features, dette technique) ───
+async function devBacklogList(req, res) {
+  const r = await sb('/dev_backlog?select=*&order=updated_at.desc');
+  if (!r.ok) return res.status(500).json({ error: 'Erreur récupération du backlog.' });
+  return res.json({ items: r.data || [] });
+}
+
+async function devIssueCreate(req, res) {
+  const { title, description, item_type, priority, status } = req.body || {};
+  if (!title) return res.status(400).json({ error: 'Titre manquant.' });
+  const r = await sb('/dev_backlog', {
+    method: 'POST',
+    body: JSON.stringify({
+      title,
+      description: description || null,
+      item_type: item_type || 'feature',
+      priority: priority || 'moyenne',
+      status: status || 'backlog',
+    }),
+  });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur création du ticket.' });
+  await logActivity('dev_issue', r.data[0].id, 'created', `Ticket créé : ${title}.`);
+  return res.status(201).json(r.data[0]);
+}
+
+const DEV_ISSUE_FIELDS = ['title', 'description', 'item_type', 'priority', 'status'];
+
+async function devIssueUpdate(req, res) {
+  const { id, ...fields } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const patch = {};
+  for (const k of DEV_ISSUE_FIELDS) if (k in fields) patch[k] = fields[k];
+  if (!Object.keys(patch).length) return res.status(400).json({ error: 'Aucun champ à mettre à jour.' });
+  const beforeR = await sb(`/dev_backlog?id=eq.${encodeURIComponent(id)}&select=*`);
+  const before = beforeR.data && beforeR.data[0];
+  patch.updated_at = new Date().toISOString();
+  const r = await sb(`/dev_backlog?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Erreur mise à jour du ticket.' });
+  const summary = diffSummary(before, patch, DEV_FIELD_LABELS);
+  if (summary) await logActivity('dev_issue', id, 'updated', summary);
+  if ('status' in patch && before && before.status !== patch.status) {
+    await logActivity('dev_issue', id, 'status_changed', `${DEV_STATUS_LABELS_FR[before.status] || before.status} → ${DEV_STATUS_LABELS_FR[patch.status] || patch.status}`);
+  }
+  return res.json(r.data[0]);
+}
+
+async function devIssueDelete(req, res) {
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const r = await sb(`/dev_backlog?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur suppression du ticket.' });
+  await deleteActivityLog('dev_issue', id);
+  return res.json({ ok: true });
+}
+
 // ─── Historique par élément (activity_log) ─────────────────────────
 // Best-effort : un échec d'écriture du journal ne doit jamais faire échouer
 // l'action principale (création/modification d'un prospect ou d'un contenu).
@@ -159,6 +360,8 @@ const STATUS_LABELS_FR = { a_contacter: 'À contacter', envoye: 'Envoyé', relan
 const PROSPECT_FIELD_LABELS = { school_name: 'École', contact_name: 'Contact', contact_email: 'Email', contact_phone: 'Téléphone', city: 'Ville', notes: 'Notes', meeting_at: 'Rendez-vous' };
 const EVENT_FIELD_LABELS = { title: 'Titre', content_type: 'Type', account: 'Compte', caption: 'Texte du post', scheduled_date: 'Date planifiée', link: 'Lien', notes: 'Notes' };
 const CONTENT_STATUS_LABELS_FR = { idee: 'Idée', a_faire: 'À faire', pret: 'Prêt', publie: 'Publié' };
+const DEV_FIELD_LABELS = { title: 'Titre', description: 'Description', item_type: 'Type', priority: 'Priorité' };
+const DEV_STATUS_LABELS_FR = { backlog: 'Backlog', a_faire: 'À faire', en_cours: 'En cours', fait: 'Fait' };
 
 // ─── Prospection écoles ───────────────────────────────────────────
 async function prospectsList(req, res) {
@@ -526,7 +729,11 @@ async function syncZimbra(req, res) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (isAllowedOrigin(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,X-Admin-Key');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -565,7 +772,7 @@ module.exports = async function handler(req, res) {
   // .trim() : tolère un espace ou un retour à la ligne collé par erreur en
   // copiant la valeur (fréquent depuis l'UI Vercel ou un gestionnaire de mots de passe).
   const providedKey = String(req.headers['x-admin-key'] || '').trim();
-  if (providedKey !== String(ADMIN_KEY).trim()) return res.status(401).json({ error: 'Non autorisé.' });
+  if (!safeEqual(providedKey, String(ADMIN_KEY).trim())) return res.status(401).json({ error: 'Non autorisé.' });
 
   const action = req.method === 'GET' ? queryParam(req, 'action') : (req.body || {}).action;
   try {
@@ -577,6 +784,10 @@ module.exports = async function handler(req, res) {
         case 'calendar': return await calendarList(req, res);
         case 'used-idea-keys': return await usedIdeaKeys(req, res);
         case 'activity-log': return await activityLogList(req, res);
+        case 'vault-list': return await vaultList(req, res);
+        case 'vault-reveal': return await vaultReveal(req, res);
+        case 'links-list': return await linksList(req, res);
+        case 'dev-backlog': return await devBacklogList(req, res);
         case 'reviews': return await reviewsList(req, res);
         case 'find-place': return await googleFindPlace(req, res);
         default: return res.status(400).json({ error: 'Action inconnue.' });
@@ -593,6 +804,14 @@ module.exports = async function handler(req, res) {
         case 'update-event': return await eventUpdate(req, res);
         case 'delete-event': return await eventDelete(req, res);
         case 'add-note': return await addNote(req, res);
+        case 'vault-create': return await vaultCreate(req, res);
+        case 'vault-update': return await vaultUpdate(req, res);
+        case 'vault-delete': return await vaultDelete(req, res);
+        case 'link-create': return await linkCreate(req, res);
+        case 'link-delete': return await linkDelete(req, res);
+        case 'dev-issue-create': return await devIssueCreate(req, res);
+        case 'dev-issue-update': return await devIssueUpdate(req, res);
+        case 'dev-issue-delete': return await devIssueDelete(req, res);
         case 'sync-zimbra': return await syncZimbra(req, res);
         case 'publish-review': return await reviewSetStatus(req, res, 'published');
         case 'reject-review': return await reviewSetStatus(req, res, 'rejected');

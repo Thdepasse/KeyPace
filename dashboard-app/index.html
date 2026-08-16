@@ -56,6 +56,11 @@
   .dup-group{padding:6px 0;border-bottom:1px solid #F5E1A0}
   .dup-group:last-child{border-bottom:none}
   .dup-group-actions{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px}
+  .vault-item,.links-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+  .vault-item:last-child,.links-item:last-child{border-bottom:none}
+  .vault-item-main{display:flex;flex-direction:column;gap:2px;min-width:180px}
+  .vault-item-secret{font-family:'JetBrains Mono',monospace;font-size:13px;flex:1;color:var(--muted);word-break:break-all}
+  .links-item .fname{flex-shrink:0;min-width:160px}
   .followup-item .fname{font-weight:700;flex:1}
   .brief-item{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:14px;cursor:pointer}
   .brief-item:hover{text-decoration:underline}
@@ -217,6 +222,8 @@
       <button class="tab-btn" data-tab="prospects" onclick="switchTab('prospects')"><span class="sec-ic">🏫</span>Prospection écoles</button>
       <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')"><span class="sec-ic">🗓️</span>Calendrier marketing</button>
       <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')"><span class="sec-ic">💬</span>Avis</button>
+      <button class="tab-btn" data-tab="backlog" onclick="switchTab('backlog')"><span class="sec-ic">🛠️</span>Backlog dev</button>
+      <button class="tab-btn" data-tab="security" onclick="switchTab('security')"><span class="sec-ic">🔒</span>Sécurité</button>
     </div>
 
     <section id="kpi-section" class="tab-panel">
@@ -517,6 +524,119 @@
       </div>
     </section>
 
+    <section id="backlog-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">🛠️</span>Backlog dev</h2>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="view-toggle" id="backlog-view-toggle">
+            <button class="view-toggle-btn" id="backlog-view-btn-table" onclick="setBacklogView('table')">📋 Tableau</button>
+            <button class="view-toggle-btn" id="backlog-view-btn-kanban" onclick="setBacklogView('kanban')">📊 Kanban</button>
+          </div>
+          <button class="btn" onclick="openDevIssueForm()">+ Nouveau ticket</button>
+        </div>
+      </div>
+
+      <div class="panel" id="dev-issue-form" style="display:none">
+        <h3 id="dev-issue-form-title">Nouveau ticket</h3>
+        <div class="form-grid">
+          <input id="d-title" placeholder="Titre *">
+          <select id="d-type">
+            <option value="bug">Bug</option>
+            <option value="feature" selected>Feature</option>
+            <option value="tech_debt">Dette technique</option>
+            <option value="idee">Idée</option>
+          </select>
+          <select id="d-priority">
+            <option value="basse">Basse</option>
+            <option value="moyenne" selected>Moyenne</option>
+            <option value="haute">Haute</option>
+            <option value="urgente">Urgente</option>
+          </select>
+          <select id="d-status">
+            <option value="backlog" selected>Backlog</option>
+            <option value="a_faire">À faire</option>
+            <option value="en_cours">En cours</option>
+            <option value="fait">Fait</option>
+          </select>
+        </div>
+        <textarea id="d-description" placeholder="Description" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" onclick="saveDevIssue()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeDevIssueForm()">Annuler</button>
+          <button class="btn danger" id="dev-issue-delete-btn" style="display:none;margin-left:auto" onclick="deleteDevIssue(editingDevIssueId)">Supprimer</button>
+        </div>
+        <div id="dev-issue-history" class="history-section" style="display:none">
+          <h4>🕒 Historique</h4>
+          <div class="history-add">
+            <input id="dev-issue-note-input" placeholder="Ajouter une note...">
+            <button class="btn small ghost" style="width:auto" onclick="addDevIssueNote()">Ajouter</button>
+          </div>
+          <div id="dev-issue-history-list" class="history-list"></div>
+        </div>
+      </div>
+
+      <div class="table-wrap" id="backlog-table-wrap">
+        <table class="prospects">
+          <thead>
+            <tr><th>Titre</th><th>Type</th><th>Priorité</th><th>Statut</th><th>Mis à jour</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="backlog-body"></tbody>
+        </table>
+      </div>
+      <div class="kanban-board" id="backlog-kanban" style="display:none"></div>
+    </section>
+
+    <section id="security-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">🔒</span>Sécurité</h2>
+      </div>
+
+      <div class="callout" style="background:#FFF6F2;border-color:#FFD9CC">
+        <h3>⚠️ À ne jamais stocker ici</h3>
+        <p style="margin:0;font-size:13px;color:var(--txt)">La clé service Supabase et la clé secrète Stripe (production) : ce sont les clés qui donnent accès à l'endroit où ce coffre vit — les y stocker n'apporte aucune protection réelle. Garde-les dans un vrai gestionnaire de mots de passe (1Password, Bitwarden). Ce coffre chiffre au repos (protège contre une fuite de la base), mais pas contre une fuite de l'ADMIN_KEY du dashboard.</p>
+      </div>
+
+      <div class="toolbar" style="margin-top:20px">
+        <h3 style="margin:0">🔑 Coffre-fort de secrets</h3>
+        <button class="btn small" style="width:auto" onclick="openVaultForm()">+ Ajouter un secret</button>
+      </div>
+
+      <div class="panel" id="vault-form" style="display:none;margin-bottom:16px">
+        <h3 id="vault-form-title">Nouveau secret</h3>
+        <div class="form-grid">
+          <input id="v-label" placeholder="Libellé * (ex. Compte Google Ads)">
+          <input id="v-username" placeholder="Identifiant / email">
+          <input id="v-category" placeholder="Catégorie (ex. Marketing, Hébergement)">
+        </div>
+        <input id="v-secret" type="password" placeholder="Mot de passe / secret *" style="margin-top:10px">
+        <textarea id="v-notes" placeholder="Notes" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" id="vault-save-btn" onclick="saveVaultSecret()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeVaultForm()">Annuler</button>
+          <button class="btn danger" id="vault-delete-btn" style="display:none;margin-left:auto" onclick="deleteVaultSecret(editingVaultId)">Supprimer</button>
+        </div>
+      </div>
+
+      <div id="vault-list"></div>
+
+      <div class="toolbar" style="margin-top:28px">
+        <h3 style="margin:0">🔗 Répertoire de liens</h3>
+        <button class="btn small" style="width:auto" onclick="openLinkForm()">+ Ajouter un lien</button>
+      </div>
+      <div class="panel" id="link-form" style="display:none;margin-bottom:16px">
+        <div class="form-grid">
+          <input id="l-label" placeholder="Libellé * (ex. Console Supabase)">
+          <input id="l-url" type="url" placeholder="URL *">
+          <input id="l-category" placeholder="Catégorie (optionnel)">
+        </div>
+        <div class="form-actions">
+          <button class="btn" onclick="saveResourceLink()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeLinkForm()">Annuler</button>
+        </div>
+      </div>
+      <div id="links-list"></div>
+    </section>
+
   </div>
 </div>
 
@@ -564,7 +684,7 @@ function logout(){
   document.getElementById('gate').style.display = 'flex';
 }
 
-const TAB_SECTIONS = { kpi: 'kpi-section', prospects: 'prospects-section', calendar: 'calendar-section', reviews: 'reviews-section' };
+const TAB_SECTIONS = { kpi: 'kpi-section', prospects: 'prospects-section', calendar: 'calendar-section', reviews: 'reviews-section', backlog: 'backlog-section', security: 'security-section' };
 const REVIEW_STATUS_LABELS = { pending: 'En attente', published: 'Publié', rejected: 'Rejeté' };
 
 function switchTab(name){
@@ -586,6 +706,10 @@ function boot(){
   loadCalendar();
   loadUsedIdeaTopics();
   loadReviews();
+  loadVault();
+  loadLinks();
+  setBacklogView(backlogView);
+  loadDevBacklog();
   switchTab(localStorage.getItem('kp_active_tab') || 'kpi');
 }
 
@@ -1082,6 +1206,291 @@ function toDatetimeLocalValue(iso){
   const d = new Date(iso);
   const pad = n => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+// ─── Backlog de développement ──────────────────────────────────────
+const DEV_TYPE_LABELS = { bug:'Bug', feature:'Feature', tech_debt:'Dette technique', idee:'Idée' };
+const DEV_PRIORITY_LABELS = { basse:'Basse', moyenne:'Moyenne', haute:'Haute', urgente:'Urgente' };
+const DEV_PRIORITY_COLORS = { basse:'#8A8275', moyenne:'#B4640A', haute:'#C2540A', urgente:'#B3261E' };
+const DEV_STATUS_LABELS = { backlog:'Backlog', a_faire:'À faire', en_cours:'En cours', fait:'Fait' };
+const DEV_STATUS_FLOW = ['backlog','a_faire','en_cours','fait'];
+
+let backlogView = localStorage.getItem('kp_backlog_view') || 'table';
+let editingDevIssueId = null;
+
+function setBacklogView(v){
+  backlogView = v;
+  localStorage.setItem('kp_backlog_view', v);
+  document.getElementById('backlog-table-wrap').style.display = v === 'table' ? '' : 'none';
+  document.getElementById('backlog-kanban').style.display = v === 'kanban' ? 'flex' : 'none';
+  document.getElementById('backlog-view-btn-table').classList.toggle('active', v === 'table');
+  document.getElementById('backlog-view-btn-kanban').classList.toggle('active', v === 'kanban');
+}
+
+async function loadDevBacklog(){
+  try {
+    const { items } = await api('dev-backlog');
+    window.__devIssues = items;
+    renderDevBacklogTable(items);
+    renderDevBacklogKanban(items);
+  } catch (e) { console.error(e); }
+}
+
+function renderDevBacklogTable(items){
+  document.getElementById('backlog-body').innerHTML = items.length ? items.map(d => `
+    <tr>
+      <td><strong>${escHtml(d.title)}</strong>${d.description ? `<div class="muted" style="font-size:12px">${escHtml(d.description)}</div>` : ''}</td>
+      <td>${DEV_TYPE_LABELS[d.item_type] || d.item_type}</td>
+      <td><span style="color:${DEV_PRIORITY_COLORS[d.priority] || 'inherit'};font-weight:700">${DEV_PRIORITY_LABELS[d.priority] || d.priority}</span></td>
+      <td>${DEV_STATUS_LABELS[d.status] || d.status}</td>
+      <td>${fmtDate(d.updated_at)}</td>
+      <td><div class="actions"><button class="btn small ghost" onclick="editDevIssue('${d.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteDevIssue('${d.id}')">Suppr.</button></div></td>
+    </tr>`).join('') : `<tr><td colspan="6" class="empty-msg">Aucun ticket pour l'instant.</td></tr>`;
+}
+
+function renderDevBacklogKanban(items){
+  const byStatus = Object.fromEntries(DEV_STATUS_FLOW.map(s => [s, []]));
+  for (const d of items) if (byStatus[d.status]) byStatus[d.status].push(d);
+  document.getElementById('backlog-kanban').innerHTML = DEV_STATUS_FLOW.map(status => `
+    <div class="kanban-col">
+      <div class="kanban-col-head"><span>${DEV_STATUS_LABELS[status]}</span><span class="kanban-col-count">${byStatus[status].length}</span></div>
+      <div class="kanban-col-body" ondragover="allowDrop(event)" ondrop="dropOnDevStatusColumn(event,'${status}')">
+        ${byStatus[status].map(d => `
+          <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${d.id}')" onclick="editDevIssue('${d.id}')">
+            <span class="kc-title">${escHtml(d.title)}</span>
+            <span class="kc-meta"><span style="color:${DEV_PRIORITY_COLORS[d.priority] || 'inherit'};font-weight:700">${DEV_PRIORITY_LABELS[d.priority] || d.priority}</span> · ${DEV_TYPE_LABELS[d.item_type] || d.item_type}</span>
+          </div>`).join('') || `<p class="muted" style="font-size:11.5px;margin:0;text-align:center">—</p>`}
+      </div>
+    </div>`).join('');
+}
+
+async function dropOnDevStatusColumn(ev, status){
+  ev.preventDefault(); ev.currentTarget.classList.remove('dragover');
+  const id = ev.dataTransfer.getData('text/plain');
+  if (!id) return;
+  await api('dev-issue-update', { method:'POST', body: { id, status } });
+  loadDevBacklog();
+}
+
+function openDevIssueForm(){
+  editingDevIssueId = null;
+  ['d-title','d-description'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('d-type').value = 'feature';
+  document.getElementById('d-priority').value = 'moyenne';
+  document.getElementById('d-status').value = 'backlog';
+  document.getElementById('dev-issue-form-title').textContent = 'Nouveau ticket';
+  document.getElementById('dev-issue-delete-btn').style.display = 'none';
+  document.getElementById('dev-issue-history').style.display = 'none';
+  document.getElementById('dev-issue-form').style.display = 'block';
+}
+
+function editDevIssue(id){
+  const d = (window.__devIssues || []).find(x => x.id === id);
+  if (!d) return;
+  editingDevIssueId = id;
+  document.getElementById('d-title').value = d.title || '';
+  document.getElementById('d-description').value = d.description || '';
+  document.getElementById('d-type').value = d.item_type || 'feature';
+  document.getElementById('d-priority').value = d.priority || 'moyenne';
+  document.getElementById('d-status').value = d.status || 'backlog';
+  document.getElementById('dev-issue-form-title').textContent = `Modifier « ${d.title} »`;
+  document.getElementById('dev-issue-delete-btn').style.display = 'inline-flex';
+  document.getElementById('dev-issue-history').style.display = 'block';
+  document.getElementById('dev-issue-note-input').value = '';
+  renderActivityLog('dev_issue', id, 'dev-issue-history-list');
+  document.getElementById('dev-issue-form').style.display = 'block';
+}
+
+function closeDevIssueForm(){
+  editingDevIssueId = null;
+  document.getElementById('dev-issue-form').style.display = 'none';
+}
+
+async function saveDevIssue(){
+  const title = document.getElementById('d-title').value.trim();
+  if (!title) return;
+  const body = {
+    title,
+    description: document.getElementById('d-description').value.trim(),
+    item_type: document.getElementById('d-type').value,
+    priority: document.getElementById('d-priority').value,
+    status: document.getElementById('d-status').value,
+  };
+  if (editingDevIssueId) await api('dev-issue-update', { method:'POST', body: { id: editingDevIssueId, ...body } });
+  else await api('dev-issue-create', { method:'POST', body });
+  closeDevIssueForm();
+  loadDevBacklog();
+}
+
+async function deleteDevIssue(id){
+  if (!confirm('Supprimer ce ticket du backlog ?')) return;
+  await api('dev-issue-delete', { method:'POST', body: { id } });
+  closeDevIssueForm();
+  loadDevBacklog();
+}
+
+async function addDevIssueNote(){
+  const input = document.getElementById('dev-issue-note-input');
+  const note = input.value.trim();
+  if (!note || !editingDevIssueId) return;
+  await api('add-note', { method:'POST', body: { entity_type:'dev_issue', entity_id: editingDevIssueId, note } });
+  input.value = '';
+  renderActivityLog('dev_issue', editingDevIssueId, 'dev-issue-history-list');
+}
+
+// ─── Coffre-fort de secrets ────────────────────────────────────────
+// Le secret déchiffré n'est jamais chargé au chargement de la liste — un
+// clic explicite sur "Révéler" ou "Copier" va le chercher à la demande.
+let editingVaultId = null;
+
+async function loadVault(){
+  try {
+    const { items } = await api('vault-list');
+    window.__vaultItems = items;
+    renderVaultList(items);
+  } catch (e) { console.error(e); }
+}
+
+function renderVaultList(items){
+  const el = document.getElementById('vault-list');
+  el.innerHTML = items.length ? items.map(v => `
+    <div class="vault-item">
+      <div class="vault-item-main">
+        <span class="fname">${escHtml(v.label)}</span>
+        <span class="muted">${escHtml(v.username || '—')}${v.category ? ' · ' + escHtml(v.category) : ''}</span>
+      </div>
+      <span class="vault-item-secret" id="vault-secret-${v.id}" data-revealed="false">••••••••</span>
+      <div class="actions">
+        <button class="btn small ghost" id="vault-toggle-${v.id}" onclick="toggleVaultSecret('${v.id}')">👁 Révéler</button>
+        <button class="btn small ghost" onclick="copyVaultSecret('${v.id}')" id="vault-copy-${v.id}">📋 Copier</button>
+        <button class="btn small ghost" onclick="editVaultSecret('${v.id}')">✏️ Éditer</button>
+      </div>
+    </div>`).join('') : `<div class="empty-msg">Aucun secret enregistré pour l'instant.</div>`;
+}
+
+async function toggleVaultSecret(id){
+  const span = document.getElementById(`vault-secret-${id}`);
+  const btn = document.getElementById(`vault-toggle-${id}`);
+  if (span.dataset.revealed === 'true') {
+    span.textContent = '••••••••';
+    span.dataset.revealed = 'false';
+    btn.textContent = '👁 Révéler';
+    return;
+  }
+  try {
+    const { secret } = await api('vault-reveal', { params: { id } });
+    span.textContent = secret;
+    span.dataset.revealed = 'true';
+    btn.textContent = '🙈 Masquer';
+  } catch (e) { console.error(e); }
+}
+
+async function copyVaultSecret(id){
+  const btn = document.getElementById(`vault-copy-${id}`);
+  try {
+    const { secret } = await api('vault-reveal', { params: { id } });
+    await navigator.clipboard.writeText(secret);
+    const original = btn.textContent;
+    btn.textContent = '✓ Copié';
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  } catch (e) { console.error(e); }
+}
+
+function openVaultForm(){
+  editingVaultId = null;
+  ['v-label','v-username','v-category','v-secret','v-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('v-secret').placeholder = 'Mot de passe / secret *';
+  document.getElementById('vault-form-title').textContent = 'Nouveau secret';
+  document.getElementById('vault-delete-btn').style.display = 'none';
+  document.getElementById('vault-form').style.display = 'block';
+}
+
+function editVaultSecret(id){
+  const v = (window.__vaultItems || []).find(x => x.id === id);
+  if (!v) return;
+  editingVaultId = id;
+  document.getElementById('v-label').value = v.label || '';
+  document.getElementById('v-username').value = v.username || '';
+  document.getElementById('v-category').value = v.category || '';
+  document.getElementById('v-notes').value = v.notes || '';
+  document.getElementById('v-secret').value = '';
+  document.getElementById('v-secret').placeholder = 'Laisser vide pour ne pas modifier le secret';
+  document.getElementById('vault-form-title').textContent = `Modifier « ${v.label} »`;
+  document.getElementById('vault-delete-btn').style.display = 'inline-flex';
+  document.getElementById('vault-form').style.display = 'block';
+}
+
+function closeVaultForm(){
+  editingVaultId = null;
+  document.getElementById('vault-form').style.display = 'none';
+}
+
+async function saveVaultSecret(){
+  const label = document.getElementById('v-label').value.trim();
+  const secret = document.getElementById('v-secret').value;
+  if (!label) return;
+  if (!editingVaultId && !secret) { alert('Le secret est obligatoire pour un nouvel enregistrement.'); return; }
+  const body = {
+    label,
+    username: document.getElementById('v-username').value.trim(),
+    category: document.getElementById('v-category').value.trim(),
+    notes: document.getElementById('v-notes').value.trim(),
+  };
+  if (secret) body.secret = secret;
+  if (editingVaultId) await api('vault-update', { method:'POST', body: { id: editingVaultId, ...body } });
+  else await api('vault-create', { method:'POST', body });
+  closeVaultForm();
+  loadVault();
+}
+
+async function deleteVaultSecret(id){
+  if (!confirm('Supprimer ce secret du coffre-fort ? Cette action est irréversible.')) return;
+  await api('vault-delete', { method:'POST', body: { id } });
+  closeVaultForm();
+  loadVault();
+}
+
+// ─── Répertoire de liens ────────────────────────────────────────────
+async function loadLinks(){
+  try {
+    const { items } = await api('links-list');
+    window.__linksItems = items;
+    renderLinksList(items);
+  } catch (e) { console.error(e); }
+}
+
+function renderLinksList(items){
+  const el = document.getElementById('links-list');
+  el.innerHTML = items.length ? items.map(l => `
+    <div class="links-item">
+      <a href="${escHtml(l.url)}" target="_blank" rel="noopener" class="fname">${escHtml(l.label)}</a>
+      <span class="muted" style="flex:1">${escHtml(l.category || '')}</span>
+      <button class="btn small danger" style="width:auto" onclick="deleteResourceLink('${l.id}')">Suppr.</button>
+    </div>`).join('') : `<div class="empty-msg">Aucun lien enregistré pour l'instant.</div>`;
+}
+
+function openLinkForm(){
+  ['l-label','l-url','l-category'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('link-form').style.display = 'block';
+}
+
+function closeLinkForm(){
+  document.getElementById('link-form').style.display = 'none';
+}
+
+async function saveResourceLink(){
+  const label = document.getElementById('l-label').value.trim();
+  const url = document.getElementById('l-url').value.trim();
+  if (!label || !url) return;
+  await api('link-create', { method:'POST', body: { label, url, category: document.getElementById('l-category').value.trim() } });
+  closeLinkForm();
+  loadLinks();
+}
+
+async function deleteResourceLink(id){
+  if (!confirm('Supprimer ce lien ?')) return;
+  await api('link-delete', { method:'POST', body: { id } });
+  loadLinks();
 }
 
 // ─── Historique par élément (prospect ou contenu) ─────────────────
