@@ -81,7 +81,6 @@ module.exports = async function handler(req, res) {
         const { token } = body;
         const user = await userFromToken(token);
         if (!user) return res.status(401).json({ error: 'Session invalide.' });
-        if (user.plan !== 'expert') return res.status(403).json({ error: 'Créer un duel est réservé aux comptes Expert.' });
         const text = DUEL_TEXTS[Math.floor(Math.random() * DUEL_TEXTS.length)];
         let room = null;
         for (let attempt = 0; attempt < 5; attempt++) {

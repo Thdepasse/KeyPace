@@ -5253,18 +5253,6 @@ const app={
           <div class="game-sel-desc">Tape chaque mot sans la moindre faute. Une seule erreur et la cible est ratée : la précision avant tout.</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
         </div>
-        <div class="game-sel-card expert-card" onclick="app.selectGame('course')">
-          <div class="game-sel-icon">🏎️</div>
-          <div class="game-sel-name">Course de dactylo</div>
-          <div class="game-sel-desc">Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !</div>
-          <span class="game-sel-tag expert">EXPERT</span>
-        </div>
-        <div class="game-sel-card expert-card" onclick="app.selectGame('sprint')">
-          <div class="game-sel-icon">🏁</div>
-          <div class="game-sel-name">Le Sprint</div>
-          <div class="game-sel-desc">30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace : chaque seconde compte.</div>
-          <span class="game-sel-tag expert">EXPERT</span>
-        </div>
         <div class="game-sel-card" onclick="app.selectGame('simon')">
           <div class="game-sel-icon">🧠</div>
           <div class="game-sel-name">Simon des mots</div>
@@ -5277,10 +5265,22 @@ const app={
           <div class="game-sel-desc">Maîtrise la souris en 5 niveaux : viser, cliquer, éviter les pièges, glisser-déposer, puis ZQSD et souris en même temps.</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
         </div>
-        <div class="game-sel-card expert-card" onclick="app.selectGame('duel')">
+        <div class="game-sel-card" onclick="app.selectGame('duel')">
           <div class="game-sel-icon">⚔️</div>
           <div class="game-sel-name">Duel 1v1</div>
           <div class="game-sel-desc">Défie un ami en temps réel sur le même texte. Partage un lien, comptez 3-2-1, et que le plus rapide gagne !</div>
+          <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
+        </div>
+        <div class="game-sel-card expert-card" onclick="app.selectGame('course')">
+          <div class="game-sel-icon">🏎️</div>
+          <div class="game-sel-name">Course de dactylo</div>
+          <div class="game-sel-desc">Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !</div>
+          <span class="game-sel-tag expert">EXPERT</span>
+        </div>
+        <div class="game-sel-card expert-card" onclick="app.selectGame('sprint')">
+          <div class="game-sel-icon">🏁</div>
+          <div class="game-sel-name">Le Sprint</div>
+          <div class="game-sel-desc">30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace : chaque seconde compte.</div>
           <span class="game-sel-tag expert">EXPERT</span>
         </div>
         <div class="game-sel-card expert-card" onclick="app.selectGame('boss')">
@@ -5313,7 +5313,6 @@ const app={
       this.activeGame='boss';this.boss=null;this.startBossLoop();this.bossLoad();
     } else if(which==='duel'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('duel'));return;}
-      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.duelLeave();this.activeGame='duel';this.duel={phase:'menu'};this.renderGames();
     } else if(which==='souris'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('souris'));return;}
@@ -6208,7 +6207,7 @@ const app={
   },
   renderDuel(){
     const d=this.duel;
-    const head=this._gameHeader('Duel 1v1','⚔️','expert');
+    const head=this._gameHeader('Duel 1v1','⚔️','free');
     let body='';
     if(!d||d.phase==='menu'){
       const codeErr=d&&d._codeError?d._codeError:'';
@@ -7272,7 +7271,7 @@ const app={
         <div class="spanel" style="margin-bottom:0"><h3>🧠 Simon des mots : record</h3>${this.stats.simonBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.simonBest.score} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">séquence max : ${this.stats.simonBest.maxSeq} mots</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance Simon des mots pour établir ton record de mémoire !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏆 Boss de la semaine</h3>${this.stats.bossBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">#${this.stats.bossBest.rank}</div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.bossBest.score} pts · ${this.stats.bossBest.wpm} mpm ${this.stats.bossBest.isoWeek===this._currentIsoWeek()?'cette semaine':'(semaine '+this.stats.bossBest.isoWeek.replace(/^\d+-W/,'')+')'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Tente le défi pour apparaître au classement !</p>'}<button onclick="go('games');setTimeout(()=>app.selectGame('boss'),0)" style="background:none;border:none;padding:0;margin-top:8px;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;text-decoration:underline">Voir le classement →</button></div>
         <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint : record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3>⚔️ Duel 1v1</h3>${this.stats.duelRecord&&(this.stats.duelRecord.wins+this.stats.duelRecord.losses+this.stats.duelRecord.draws)>0?(()=>{const r=this.stats.duelRecord;const total=r.wins+r.losses+r.draws;const winRate=Math.round(100*r.wins/total);return`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${r.wins}<span style="font-size:16px;color:var(--muted);font-weight:500">V</span> · ${r.losses}<span style="font-size:16px;color:var(--muted);font-weight:500">D</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${winRate}% de victoires${r.draws?' · '+r.draws+' nul'+(r.draws>1?'s':''):''} sur ${total} duel${total>1?'s':''}</p>`;})():'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Défie un ami pour ton premier duel !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3>⚔️ Duel 1v1</h3>${this.stats.duelRecord&&(this.stats.duelRecord.wins+this.stats.duelRecord.losses+this.stats.duelRecord.draws)>0?(()=>{const r=this.stats.duelRecord;const total=r.wins+r.losses+r.draws;const winRate=Math.round(100*r.wins/total);return`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${r.wins}<span style="font-size:16px;color:var(--muted);font-weight:500">V</span> · ${r.losses}<span style="font-size:16px;color:var(--muted);font-weight:500">D</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${winRate}% de victoires${r.draws?' · '+r.draws+' nul'+(r.draws>1?'s':''):''} sur ${total} duel${total>1?'s':''}</p>`;})():'<p style="color:var(--muted);font-size:14px;margin-top:8px">Défie un ami pour ton premier duel !</p>'}</div>
       </div>
       <div class="spanel" style="margin-bottom:22px"><h3>⌨️ Tes touches difficiles</h3><div style="font-size:13px;color:var(--muted);margin:4px 0 16px">Les touches en rouge sont celles où tu fais le plus de fautes. Concentre-toi dessus !</div>${this._keyHeatmap(this.stats.keyStats)}</div>
       ${this._gazeAnalysisPanel(tests)}
