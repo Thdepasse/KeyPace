@@ -169,8 +169,29 @@ function diffSummary(before, patch, labels) {
   return parts.join(' · ');
 }
 
+// Relances en retard de plus de `days` jours (par défaut 3) — un signal plus
+// fort que "due aujourd'hui" (dueFollowups) : ça glisse depuis un moment et
+// mérite une alerte distincte dans le Brief du jour.
+function severelyOverdueFollowups(prospects, now, days = 3) {
+  const threshold = now - days * DAY_MS;
+  return prospects.filter(
+    (p) => p.next_followup_at && new Date(p.next_followup_at).getTime() <= threshold && p.status !== 'signe' && p.status !== 'perdu'
+  );
+}
+
+// RDV planifiés dans les prochaines `hours` heures (par défaut 24) — à
+// préparer, distinct d'une relance en retard (action passée manquante).
+function upcomingMeetings(prospects, now, hours = 24) {
+  const limit = now + hours * 60 * 60 * 1000;
+  return prospects.filter((p) => {
+    if (!p.meeting_at) return false;
+    const t = new Date(p.meeting_at).getTime();
+    return t >= now && t <= limit;
+  });
+}
+
 module.exports = {
   FOLLOWUP_DAYS, computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement,
   dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange,
-  normalizeSchoolName, findDuplicateProspects, diffSummary,
+  normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings,
 };

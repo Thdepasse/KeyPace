@@ -56,6 +56,7 @@
   .followup-item .fname{font-weight:700;flex:1}
   .brief-item{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:14px;cursor:pointer}
   .brief-item:hover{text-decoration:underline}
+  .brief-item.urgent{color:#B3261E;font-weight:700}
   .brief-focus{font-weight:700;margin-top:4px}
   .wins-ticker{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
   .win-chip{background:#F0F9F1;border:1px solid #C9EBCC;border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:700;color:#1F7A32;display:flex;align-items:center;gap:6px}
@@ -640,6 +641,16 @@ async function loadTrafficDetail(){
 // jour (au lieu de simples compteurs à interpréter soi-même).
 function renderDailyBrief(b, brief){
   const items = [];
+  // Automatisations : signaux les plus urgents en premier (relance qui glisse
+  // depuis un moment, RDV imminent), avant les priorités routinières.
+  if (brief.overdueFollowups && brief.overdueFollowups.length) {
+    const n = brief.overdueFollowups.length;
+    items.push({ ic:'🚨', text:`${n} relance${n>1?'s':''} en retard de plus de 3 jours : ${brief.overdueFollowups.map(p=>escHtml(p.school_name)).join(', ')}`, tab:'prospects', urgent:true });
+  }
+  if (brief.upcomingMeetings && brief.upcomingMeetings.length) {
+    const n = brief.upcomingMeetings.length;
+    items.push({ ic:'📅', text:`RDV dans moins de 24h : ${brief.upcomingMeetings.map(p=>`${escHtml(p.school_name)} (${fmtDateTime(p.meeting_at)})`).join(', ')}`, tab:'prospects', urgent:true });
+  }
   if (b.dueFollowups > 0) items.push({ ic:'🏫', text:`${b.dueFollowups} école${b.dueFollowups>1?'s':''} à relancer`, tab:'prospects' });
   if (brief.reviewsPending > 0) items.push({ ic:'💬', text:`${brief.reviewsPending} avis en attente de modération`, tab:'reviews' });
   if (brief.gapDays.length > 0) items.push({ ic:'🗓️', text:`${brief.gapDays.length} jour${brief.gapDays.length>1?'s':''} cette semaine sans contenu planifié`, tab:'calendar' });
@@ -655,7 +666,7 @@ function renderDailyBrief(b, brief){
   briefEl.classList.remove('empty');
   document.getElementById('daily-brief-items').innerHTML =
     `<div class="brief-focus">👉 Priorité : ${items[0].text}</div>` +
-    items.map(it => `<div class="brief-item" onclick="switchTab('${it.tab}')"><span>${it.ic}</span><span>${it.text}</span></div>`).join('');
+    items.map(it => `<div class="brief-item${it.urgent?' urgent':''}" onclick="switchTab('${it.tab}')"><span>${it.ic}</span><span>${it.text}</span></div>`).join('');
 }
 
 function renderWinsTicker(a, e){

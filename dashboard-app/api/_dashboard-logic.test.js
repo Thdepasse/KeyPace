@@ -2,7 +2,7 @@
 // Lancer : node --test api/_dashboard-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects, diffSummary } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings } = require('./_dashboard-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -171,4 +171,31 @@ test('diffSummary : traite null/chaîne vide comme équivalents ("—")', () => 
 test('diffSummary : gère un champ nouvellement renseigné (avant vide)', () => {
   const patch = { city: 'Namur' };
   assert.equal(diffSummary(null, patch, PROSPECT_LABELS), 'Ville : — → Namur');
+});
+
+test('severelyOverdueFollowups : ne retient que les relances en retard de plus de 3 jours', () => {
+  const prospects = [
+    { id: 1, status: 'envoye', next_followup_at: new Date(NOW - 4 * DAY).toISOString() }, // en retard
+    { id: 2, status: 'envoye', next_followup_at: new Date(NOW - 1 * DAY).toISOString() }, // due mais pas "en retard"
+    { id: 3, status: 'signe', next_followup_at: new Date(NOW - 10 * DAY).toISOString() }, // clos, ignoré
+    { id: 4, status: 'envoye', next_followup_at: null },
+  ];
+  const overdue = severelyOverdueFollowups(prospects, NOW);
+  assert.deepEqual(overdue.map((p) => p.id), [1]);
+});
+
+test('severelyOverdueFollowups : seuil personnalisable', () => {
+  const prospects = [{ id: 1, status: 'envoye', next_followup_at: new Date(NOW - 2 * DAY).toISOString() }];
+  assert.equal(severelyOverdueFollowups(prospects, NOW, 3).length, 0);
+  assert.equal(severelyOverdueFollowups(prospects, NOW, 1).length, 1);
+});
+
+test('upcomingMeetings : RDV dans les prochaines 24h uniquement, pas le passé ni le lointain', () => {
+  const prospects = [
+    { id: 1, meeting_at: new Date(NOW + 3 * 60 * 60 * 1000).toISOString() }, // dans 3h : oui
+    { id: 2, meeting_at: new Date(NOW - 60 * 60 * 1000).toISOString() }, // il y a 1h : non (passé)
+    { id: 3, meeting_at: new Date(NOW + 2 * DAY).toISOString() }, // dans 2 jours : non (trop loin)
+    { id: 4, meeting_at: null },
+  ];
+  assert.deepEqual(upcomingMeetings(prospects, NOW).map((p) => p.id), [1]);
 });

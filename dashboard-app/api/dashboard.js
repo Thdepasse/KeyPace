@@ -4,7 +4,7 @@
 // est attaché — l'isolation est structurelle, pas applicative).
 // Accès protégé par le header x-admin-key (secret ADMIN_KEY propre à ce
 // projet — pas de comptes individuels).
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, FOLLOWUP_DAYS } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, FOLLOWUP_DAYS } = require('./_dashboard-logic');
 const { classifyMessage } = require('./_zimbra-match');
 const { fetchRecentMessages } = require('./_zimbra-soap');
 const { fetchGA4Traffic, fetchGA4TrafficBreakdown } = require('./_ga4');
@@ -82,7 +82,7 @@ async function kpis(req, res) {
   const [usersR, instR, prospR, progR, certR, wsR, reviewsPendingR, calendarWeekR, traffic] = await Promise.all([
     sb('/users?select=plan,created_at'),
     sb('/institutions?select=seat_count'),
-    sb('/school_prospects?select=status,next_followup_at'),
+    sb('/school_prospects?select=id,school_name,status,next_followup_at,meeting_at'),
     sb('/progress?select=updated_at'),
     sb('/certificates?select=id'),
     sb('/weekly_scores?select=id'),
@@ -95,13 +95,14 @@ async function kpis(req, res) {
   }
   const acquisition = summarizeAcquisition(usersR.data || [], now);
   const scheduledDates = (calendarWeekR.data || []).map((c) => c.scheduled_date);
+  const prospects = prospR.data || [];
   return res.json({
     acquisition: {
       ...acquisition,
       traffic,
       conversionToSignup30d: traffic && !traffic.error ? trafficConversionRate(acquisition.signups30d, traffic.visitors30d) : null,
     },
-    b2b: summarizeB2B(instR.data || [], prospR.data || [], now),
+    b2b: summarizeB2B(instR.data || [], prospects, now),
     engagement: summarizeEngagement(progR.data || [], certR.data || [], wsR.data || [], now),
     trend: {
       signups: dailySignups(usersR.data || [], now, 30),
@@ -110,6 +111,8 @@ async function kpis(req, res) {
     brief: {
       reviewsPending: (reviewsPendingR.data || []).length,
       ...contentGapsThisWeek(scheduledDates, now),
+      overdueFollowups: severelyOverdueFollowups(prospects, now).map((p) => ({ id: p.id, school_name: p.school_name, next_followup_at: p.next_followup_at })),
+      upcomingMeetings: upcomingMeetings(prospects, now).map((p) => ({ id: p.id, school_name: p.school_name, meeting_at: p.meeting_at })),
     },
   });
 }
@@ -192,6 +195,31 @@ async function prospectCreate(req, res) {
 
 const PROSPECT_FIELDS = ['school_name', 'contact_name', 'contact_email', 'contact_phone', 'city', 'notes', 'status', 'meeting_at'];
 
+// Automatisation : une école qui signe mérite d'être annoncée. Crée une idée
+// de contenu prête à planifier dans le calendrier marketing, best-effort (un
+// échec ici ne doit jamais faire échouer la mise à jour du statut).
+async function autoCreateSignedContentIdea(schoolName, prospectId) {
+  try {
+    const r = await sb('/content_calendar', {
+      method: 'POST',
+      body: JSON.stringify({
+        title: `Nouveau client : ${schoolName}`,
+        content_type: 'post',
+        platforms: [],
+        account: 'keypace',
+        status: 'idee',
+        notes: `Idée créée automatiquement suite à la signature de ${schoolName}. Partager la bonne nouvelle !`,
+      }),
+    });
+    if (r.ok && r.data && r.data[0]) {
+      await logActivity('content', r.data[0].id, 'created', `Idée créée automatiquement suite à la signature de ${schoolName}.`);
+      await logActivity('prospect', prospectId, 'note', `Idée de contenu "Nouveau client : ${schoolName}" créée automatiquement.`);
+    }
+  } catch (e) {
+    console.error('autoCreateSignedContentIdea error:', e);
+  }
+}
+
 async function prospectUpdate(req, res) {
   const { id, ...fields } = req.body || {};
   if (!id) return res.status(400).json({ error: 'id manquant.' });
@@ -207,6 +235,7 @@ async function prospectUpdate(req, res) {
   if (summary) await logActivity('prospect', id, 'updated', summary);
   if ('status' in patch && before && before.status !== patch.status) {
     await logActivity('prospect', id, 'status_changed', `${STATUS_LABELS_FR[before.status] || before.status} → ${STATUS_LABELS_FR[patch.status] || patch.status}`);
+    if (patch.status === 'signe') await autoCreateSignedContentIdea(r.data[0].school_name, id);
   }
   return res.json(r.data[0]);
 }
@@ -216,8 +245,9 @@ async function prospectLogContact(req, res) {
   const { id, status } = req.body || {};
   if (!id || !status) return res.status(400).json({ error: 'id ou status manquant.' });
   if (!(status in FOLLOWUP_DAYS)) return res.status(400).json({ error: 'Statut inconnu.' });
-  const beforeR = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}&select=status`);
-  const oldStatus = beforeR.data && beforeR.data[0] && beforeR.data[0].status;
+  const beforeR = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}&select=status,school_name`);
+  const beforeRow = beforeR.data && beforeR.data[0];
+  const oldStatus = beforeRow && beforeRow.status;
   const now = Date.now();
   const patch = {
     status,
@@ -229,6 +259,7 @@ async function prospectLogContact(req, res) {
   if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Erreur mise à jour du statut.' });
   if (oldStatus !== status) {
     await logActivity('prospect', id, 'status_changed', `${STATUS_LABELS_FR[oldStatus] || oldStatus || '—'} → ${STATUS_LABELS_FR[status] || status}`);
+    if (status === 'signe') await autoCreateSignedContentIdea(r.data[0].school_name, id);
   }
   return res.json(r.data[0]);
 }
