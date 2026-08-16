@@ -415,6 +415,55 @@ async function competitorCheck(req, res) {
   return res.json(r.data[0]);
 }
 
+// File d'attente de concurrents suggérés (pas de recherche IA en runtime —
+// alimentée manuellement au fil des sessions de veille, voir seed ponctuel).
+async function competitorSuggestionsList(req, res) {
+  const r = await sb('/competitor_suggestions?status=eq.pending&select=*&order=created_at.asc');
+  if (!r.ok) return res.status(500).json({ error: 'Erreur récupération des suggestions.' });
+  return res.json({ items: r.data || [] });
+}
+
+async function competitorSuggestionCreate(req, res) {
+  const { name, url, reason } = req.body || {};
+  if (!name || !url) return res.status(400).json({ error: 'Nom ou URL manquant.' });
+  const r = await sb('/competitor_suggestions', {
+    method: 'POST',
+    body: JSON.stringify({ name, url, reason: reason || null }),
+  });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur création de la suggestion.' });
+  return res.status(201).json(r.data[0]);
+}
+
+async function competitorSuggestionAdd(req, res) {
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const sugR = await sb(`/competitor_suggestions?id=eq.${encodeURIComponent(id)}&select=*`);
+  const suggestion = sugR.data && sugR.data[0];
+  if (!suggestion) return res.status(404).json({ error: 'Suggestion introuvable.' });
+  const r = await sb('/competitors', {
+    method: 'POST',
+    body: JSON.stringify({ name: suggestion.name, url: suggestion.url, notes: suggestion.reason || null }),
+  });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur création du concurrent.' });
+  await sb(`/competitor_suggestions?id=eq.${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: 'added' }),
+  });
+  await logActivity('competitor', r.data[0].id, 'created', `Concurrent ajouté depuis une suggestion : ${suggestion.name}.`);
+  return res.status(201).json(r.data[0]);
+}
+
+async function competitorSuggestionDismiss(req, res) {
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const r = await sb(`/competitor_suggestions?id=eq.${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: 'dismissed' }),
+  });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur mise à jour de la suggestion.' });
+  return res.json({ ok: true });
+}
+
 // ─── Historique par élément (activity_log) ─────────────────────────
 // Best-effort : un échec d'écriture du journal ne doit jamais faire échouer
 // l'action principale (création/modification d'un prospect ou d'un contenu).
@@ -889,6 +938,7 @@ module.exports = async function handler(req, res) {
         case 'links-list': return await linksList(req, res);
         case 'dev-backlog': return await devBacklogList(req, res);
         case 'competitors-list': return await competitorsList(req, res);
+        case 'competitor-suggestions-list': return await competitorSuggestionsList(req, res);
         case 'reviews': return await reviewsList(req, res);
         case 'find-place': return await googleFindPlace(req, res);
         default: return res.status(400).json({ error: 'Action inconnue.' });
@@ -917,6 +967,9 @@ module.exports = async function handler(req, res) {
         case 'competitor-update': return await competitorUpdate(req, res);
         case 'competitor-delete': return await competitorDelete(req, res);
         case 'competitor-check': return await competitorCheck(req, res);
+        case 'competitor-suggestion-create': return await competitorSuggestionCreate(req, res);
+        case 'competitor-suggestion-add': return await competitorSuggestionAdd(req, res);
+        case 'competitor-suggestion-dismiss': return await competitorSuggestionDismiss(req, res);
         case 'sync-zimbra': return await syncZimbra(req, res);
         case 'publish-review': return await reviewSetStatus(req, res, 'published');
         case 'reject-review': return await reviewSetStatus(req, res, 'rejected');

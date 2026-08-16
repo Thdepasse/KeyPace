@@ -392,6 +392,21 @@ create table if not exists competitors (
 );
 alter table competitors enable row level security;
 
+-- File d'attente de concurrents suggérés à vérifier (pré-alimentée via
+-- recherche ponctuelle, pas d'appel IA en runtime — cohérent avec le reste
+-- du dashboard). Un clic "Ajouter" crée la ligne dans `competitors` et
+-- marque la suggestion 'added' ; "Ignorer" la marque 'dismissed'.
+create table if not exists competitor_suggestions (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  url text not null,
+  reason text,
+  status text default 'pending' check (status in ('pending','added','dismissed')),
+  created_at timestamptz default now()
+);
+create index if not exists competitor_suggestions_status_idx on competitor_suggestions(status);
+alter table competitor_suggestions enable row level security;
+
 -- Groupes de doublons potentiels (findDuplicateProspects, dedup_key = nom
 -- d'école normalisé) explicitement marqués "pas un doublon" par l'utilisateur
 -- — ne sont plus jamais reproposés dans la bannière d'alerte.

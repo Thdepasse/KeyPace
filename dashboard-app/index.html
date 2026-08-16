@@ -649,7 +649,21 @@
     <section id="competitors-section" class="tab-panel">
       <div class="toolbar">
         <h2 style="margin:0"><span class="sec-ic">🎯</span>Concurrents</h2>
-        <button class="btn" onclick="openCompetitorForm()">+ Ajouter un concurrent</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="suggestCompetitor()">💡 Suggérer un concurrent</button>
+          <button class="btn" onclick="openCompetitorForm()">+ Ajouter un concurrent</button>
+        </div>
+      </div>
+
+      <div class="panel competitor-card" id="competitor-suggestion-panel" style="display:none">
+        <div class="competitor-card-head">
+          <strong style="text-transform:none;font-size:14px">💡 Suggestion : <a id="suggestion-name" href="#" target="_blank" rel="noopener" class="fname"></a></strong>
+        </div>
+        <p class="muted" id="suggestion-reason" style="margin:4px 0 12px"></p>
+        <div class="form-actions">
+          <button class="btn small" onclick="acceptCompetitorSuggestion()">✅ Ajouter aux concurrents</button>
+          <button class="btn small ghost" onclick="dismissCompetitorSuggestion()">✕ Ignorer</button>
+        </div>
       </div>
 
       <div class="panel" id="competitor-form" style="display:none">
@@ -1546,6 +1560,56 @@ async function loadCompetitors(){
     window.__competitors = items;
     renderCompetitorsList(items);
   } catch (e) { console.error(e); }
+}
+
+// ─── Suggestions de concurrents (file d'attente pré-alimentée) ─────
+let competitorSuggestions = [];
+
+async function suggestCompetitor(){
+  try {
+    if (!competitorSuggestions.length) {
+      const { items } = await api('competitor-suggestions-list');
+      competitorSuggestions = items;
+    }
+    renderCompetitorSuggestion();
+  } catch (e) { console.error(e); }
+}
+
+function renderCompetitorSuggestion(){
+  const panel = document.getElementById('competitor-suggestion-panel');
+  if (!competitorSuggestions.length) {
+    panel.style.display = 'block';
+    document.getElementById('suggestion-name').textContent = 'Aucune suggestion en attente pour le moment.';
+    document.getElementById('suggestion-name').removeAttribute('href');
+    document.getElementById('suggestion-reason').textContent = '';
+    return;
+  }
+  const s = competitorSuggestions[0];
+  panel.style.display = 'block';
+  panel.dataset.suggestionId = s.id;
+  const nameEl = document.getElementById('suggestion-name');
+  nameEl.textContent = s.name;
+  nameEl.href = s.url;
+  document.getElementById('suggestion-reason').textContent = s.reason || '';
+}
+
+async function acceptCompetitorSuggestion(){
+  const panel = document.getElementById('competitor-suggestion-panel');
+  const id = panel.dataset.suggestionId;
+  if (!id) return;
+  await api('competitor-suggestion-add', { method:'POST', body: { id } });
+  competitorSuggestions.shift();
+  renderCompetitorSuggestion();
+  loadCompetitors();
+}
+
+async function dismissCompetitorSuggestion(){
+  const panel = document.getElementById('competitor-suggestion-panel');
+  const id = panel.dataset.suggestionId;
+  if (!id) return;
+  await api('competitor-suggestion-dismiss', { method:'POST', body: { id } });
+  competitorSuggestions.shift();
+  renderCompetitorSuggestion();
 }
 
 function renderCompetitorsList(items){
