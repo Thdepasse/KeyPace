@@ -3925,38 +3925,8 @@ const app={
   renderHome(){
     if(isAdmin()){this._renderHomeAdmin();return;}
     if(isTeacher()){this._renderHomeEtab();return;}
-    // Élève connecté : la landing n'a plus d'utilité -> on l'envoie sur ses progrès.
-    if(currentUser){this.renderView('stats');return;}
     const kbHtml=KB.map(row=>'<div class="hkb-row">'+row.map(k=>`<div class="hkb-key${k.home?' home':''}">${k.l.toLowerCase()}</div>`).join('')+'</div>').join('');
     const isGuest=!currentUser;
-
-    // Stats for logged-in users (mobile resume block)
-    let resumeBlock='';
-    if(!isGuest&&this.stats){
-      const tests=this.stats.tests||[];
-      const bestWpm=tests.length?Math.max(...tests.map(t=>t.wpm)):0;
-      const clearedLessons=ALL_LESSONS.filter(l=>this.lessonRec(l.id).cleared).length;
-      const dset=new Set(tests.map(t=>{const d=new Date(t.t);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();}));
-      let streak=0;const cur=new Date();
-      for(let i=0;i<60;i++){const k=cur.getFullYear()+'-'+cur.getMonth()+'-'+cur.getDate();if(dset.has(k)){streak++;cur.setDate(cur.getDate()-1);}else if(i===0){cur.setDate(cur.getDate()-1);}else break;}
-      resumeBlock=`<div class="home-resume">
-        <div class="home-resume-label">REPRENDS TON ENTRAÎNEMENT</div>
-        <div class="home-resume-stats">
-          <div class="home-resume-stat" onclick="go('test')">
-            <div class="home-resume-val">${bestWpm||'—'}</div>
-            <div class="home-resume-unit">mpm record</div>
-          </div>
-          <div class="home-resume-stat" onclick="go('lessons')">
-            <div class="home-resume-val">${clearedLessons}</div>
-            <div class="home-resume-unit">leçons validées</div>
-          </div>
-          <div class="home-resume-stat" onclick="go('stats')">
-            <div class="home-resume-val">${streak}</div>
-            <div class="home-resume-unit">jours de suite</div>
-          </div>
-        </div>
-      </div>`;
-    }
 
     // Keyboard home row color preview (mobile)
     const homeRow=[{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li'},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri'},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}];
@@ -3977,15 +3947,15 @@ const app={
           <h1><span style="white-space:nowrap">Apprends à taper</span><br><span style="white-space:nowrap">en t'<span style="color:var(--accent)">amusant.</span></span></h1>
           <p>La bonne position et les bons réflexes appris en jouant. Tu taperas bientôt sans même y penser.</p>
           <div class="hero-btns">
-            <button class="btn-primary" onclick="${isGuest?"openAuth('register')":'go(\'lessons\')'}">Commencer gratuitement →</button>
-            <button class="btn-secondary home-hero-secondary" onclick="go('test')">Tester ma vitesse</button>
+            ${isGuest?`<button class="btn-primary" onclick="openAuth('register')">Commencer gratuitement →</button>
+            <button class="btn-secondary home-hero-secondary" onclick="go('test')">Tester ma vitesse</button>`
+            :`<button class="btn-primary" onclick="go('lessons')">Reprendre les cours →</button>`}
           </div>
         </div>
         <div class="hero-kb">${kbHtml}</div>
       </div>
 
-      ${resumeBlock}
-
+      ${!isGuest?'':`
       <div class="home-feat-grid">
         <div class="home-feat-cell" onclick="go('lessons')">
           <div class="home-feat-cell-icon" style="background:rgba(255,77,46,0.1)">⌨️</div>
@@ -4029,6 +3999,7 @@ const app={
         <div class="feature-card"><div class="icon">⚡</div><h3>Test de vitesse</h3><p>Mesure tes mots par minute et ta précision sur des textes variés.</p></div>
         <div class="feature-card"><div class="icon">🎮</div><h3>Jeu de mots</h3><p>Des mots tombent du ciel : tape-les avant qu'ils touchent le sol !</p></div>
       </div>
+      `}
       ${getUserPlan()!=='expert'?`<div class="pricing-section">
         <h2>Simple et transparent</h2>
         <p>Commence gratuitement, passe Expert quand tu veux.</p>
@@ -4067,6 +4038,7 @@ const app={
           </div>
         </div>
       </div>`:''}
+      ${!isGuest?'':`
       <div class="school-banner">
         <div class="school-banner-inner">
           <div class="school-banner-content">
@@ -4099,6 +4071,7 @@ const app={
           ${homeFaqs.map(([q,a],i)=>`<details style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden" ${i===0?'open':''}><summary style="padding:16px 20px;font-weight:700;font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">${q}<span style="color:${A};font-size:18px;flex-shrink:0;margin-left:12px">+</span></summary><div style="padding:0 20px 18px;color:var(--muted);font-size:14px;line-height:1.65">${a}</div></details>`).join('')}
         </div>
       </div>
+      `}
       `;
     this.loadHomeReviews();
   },
