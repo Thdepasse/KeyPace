@@ -190,8 +190,17 @@ function upcomingMeetings(prospects, now, hours = 24) {
   });
 }
 
+// Retire les groupes de doublons explicitement marqués "pas un doublon" par
+// l'utilisateur (voir dismiss-duplicate, dashboard-app/api/dashboard.js) —
+// ne sont plus jamais reproposés dans la bannière d'alerte.
+function excludeDismissedDuplicates(groups, dismissedKeys) {
+  const dismissed = new Set(dismissedKeys);
+  return groups.filter((g) => !dismissed.has(g.key));
+}
+
 module.exports = {
   FOLLOWUP_DAYS, computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement,
   dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange,
   normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings,
+  excludeDismissedDuplicates,
 };

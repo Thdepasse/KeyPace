@@ -336,6 +336,16 @@ create table if not exists activity_log (
 create index if not exists activity_log_entity_idx on activity_log(entity_type, entity_id, created_at desc);
 alter table activity_log enable row level security;
 
+-- Groupes de doublons potentiels (findDuplicateProspects, dedup_key = nom
+-- d'école normalisé) explicitement marqués "pas un doublon" par l'utilisateur
+-- — ne sont plus jamais reproposés dans la bannière d'alerte.
+create table if not exists dismissed_duplicates (
+  id uuid default gen_random_uuid() primary key,
+  dedup_key text not null unique,
+  created_at timestamptz default now()
+);
+alter table dismissed_duplicates enable row level security;
+
 -- Dédup de la synchro Zimbra (api/dashboard.js action=sync-zimbra) : un email
 -- déjà traité (par Message-ID) n'est jamais reclassé lors d'une sync suivante.
 create table if not exists zimbra_sync_log (

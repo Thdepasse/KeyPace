@@ -2,7 +2,7 @@
 // Lancer : node --test api/_dashboard-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates } = require('./_dashboard-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -198,4 +198,18 @@ test('upcomingMeetings : RDV dans les prochaines 24h uniquement, pas le passé n
     { id: 4, meeting_at: null },
   ];
   assert.deepEqual(upcomingMeetings(prospects, NOW).map((p) => p.id), [1]);
+});
+
+test('excludeDismissedDuplicates : retire uniquement les groupes explicitement écartés', () => {
+  const groups = [
+    { key: 'ecole du centre', prospects: [{ id: 1 }, { id: 2 }] },
+    { key: 'institut notre dame', prospects: [{ id: 3 }, { id: 4 }] },
+  ];
+  const kept = excludeDismissedDuplicates(groups, ['ecole du centre']);
+  assert.deepEqual(kept.map((g) => g.key), ['institut notre dame']);
+});
+
+test('excludeDismissedDuplicates : ne filtre rien si la liste des clés écartées est vide', () => {
+  const groups = [{ key: 'a', prospects: [] }, { key: 'b', prospects: [] }];
+  assert.deepEqual(excludeDismissedDuplicates(groups, []), groups);
 });

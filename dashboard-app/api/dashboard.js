@@ -4,7 +4,7 @@
 // est attaché — l'isolation est structurelle, pas applicative).
 // Accès protégé par le header x-admin-key (secret ADMIN_KEY propre à ce
 // projet — pas de comptes individuels).
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, FOLLOWUP_DAYS } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, FOLLOWUP_DAYS } = require('./_dashboard-logic');
 const { classifyMessage } = require('./_zimbra-match');
 const { fetchRecentMessages } = require('./_zimbra-soap');
 const { fetchGA4Traffic, fetchGA4TrafficBreakdown } = require('./_ga4');
@@ -162,14 +162,29 @@ const CONTENT_STATUS_LABELS_FR = { idee: 'Idée', a_faire: 'À faire', pret: 'Pr
 
 // ─── Prospection écoles ───────────────────────────────────────────
 async function prospectsList(req, res) {
-  const [r, lastSyncR] = await Promise.all([
+  const [r, lastSyncR, dismissedR] = await Promise.all([
     sb('/school_prospects?select=*&order=next_followup_at.asc.nullslast,created_at.desc'),
     sb('/zimbra_sync_log?select=processed_at&order=processed_at.desc&limit=1'),
+    sb('/dismissed_duplicates?select=dedup_key'),
   ]);
   if (!r.ok) return res.status(500).json({ error: 'Erreur récupération prospects.' });
   const lastSyncAt = (lastSyncR.ok && lastSyncR.data && lastSyncR.data[0] && lastSyncR.data[0].processed_at) || null;
-  const duplicateGroups = findDuplicateProspects(r.data || []).map((g) => g.prospects.map((p) => p.id));
+  const dismissedKeys = (dismissedR.data || []).map((d) => d.dedup_key);
+  const duplicateGroups = excludeDismissedDuplicates(findDuplicateProspects(r.data || []), dismissedKeys)
+    .map((g) => ({ key: g.key, ids: g.prospects.map((p) => p.id) }));
   return res.json({ items: r.data || [], lastSyncAt, duplicateGroups });
+}
+
+async function dismissDuplicate(req, res) {
+  const { key } = req.body || {};
+  if (!key) return res.status(400).json({ error: 'Clé manquante.' });
+  const r = await sb('/dismissed_duplicates?on_conflict=dedup_key', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=ignore-duplicates,return=minimal' },
+    body: JSON.stringify({ dedup_key: key }),
+  });
+  if (!r.ok) return res.status(500).json({ error: "Erreur d'enregistrement." });
+  return res.json({ ok: true });
 }
 
 async function prospectCreate(req, res) {
@@ -573,6 +588,7 @@ module.exports = async function handler(req, res) {
         case 'update-prospect': return await prospectUpdate(req, res);
         case 'log-contact': return await prospectLogContact(req, res);
         case 'delete-prospect': return await prospectDelete(req, res);
+        case 'dismiss-duplicate': return await dismissDuplicate(req, res);
         case 'create-event': return await eventCreate(req, res);
         case 'update-event': return await eventUpdate(req, res);
         case 'delete-event': return await eventDelete(req, res);

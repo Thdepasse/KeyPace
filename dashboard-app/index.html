@@ -53,6 +53,9 @@
   .callout.empty{background:var(--light);border-color:var(--border);color:var(--muted)}
   .callout h3{margin:0 0 8px;font-size:14px;font-weight:800;color:var(--txt)}
   .followup-item{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px}
+  .dup-group{padding:6px 0;border-bottom:1px solid #F5E1A0}
+  .dup-group:last-child{border-bottom:none}
+  .dup-group-actions{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px}
   .followup-item .fname{font-weight:700;flex:1}
   .brief-item{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:14px;cursor:pointer}
   .brief-item:hover{text-decoration:underline}
@@ -841,21 +844,32 @@ function renderMeetingsPanel(list, now){
 // findDuplicateProspects dans _dashboard-logic.js) partageant le même nom
 // d'école une fois accents/casse/ponctuation ignorés.
 function renderDuplicatesCallout(list, duplicateGroups){
-  window.__duplicateIds = new Set(duplicateGroups.flat());
+  window.__duplicateIds = new Set(duplicateGroups.flatMap(g => g.ids));
   const byId = Object.fromEntries(list.map(p => [p.id, p]));
   const calloutEl = document.getElementById('duplicates-callout');
   if (!duplicateGroups.length) { calloutEl.innerHTML = ''; return; }
   calloutEl.innerHTML = `<div class="callout" style="background:#FFF9E8;border-color:#F5E1A0">
     <h3>⚠️ ${duplicateGroups.length} doublon${duplicateGroups.length>1?'s':''} potentiel${duplicateGroups.length>1?'s':''} détecté${duplicateGroups.length>1?'s':''}</h3>
-    ${duplicateGroups.map(ids => {
-      const group = ids.map(id => byId[id]).filter(Boolean);
+    ${duplicateGroups.map(g => {
+      const group = g.ids.map(id => byId[id]).filter(Boolean);
       if (!group.length) return '';
-      return `<div class="followup-item" style="cursor:pointer" onclick='showDuplicateGroup(${JSON.stringify(ids)})'>
-        <span class="fname">${group.map(p => escHtml(p.school_name)).join('  ↔  ')}</span>
-        <span class="muted">${group.length} dossiers</span>
+      return `<div class="dup-group">
+        <div class="followup-item" style="cursor:pointer;margin-bottom:0" onclick='showDuplicateGroup(${JSON.stringify(g.ids)})'>
+          <span class="fname">${group.map(p => escHtml(p.school_name)).join('  ↔  ')}</span>
+          <span class="muted">${group.length} dossiers</span>
+        </div>
+        <div class="dup-group-actions">
+          <button class="btn ghost small" style="width:auto" onclick='dismissDuplicateGroup(${JSON.stringify(g.key)});event.stopPropagation()'>✓ Pas un doublon</button>
+          ${group.map(p => `<button class="btn small danger" style="width:auto" onclick="deleteProspect('${p.id}');event.stopPropagation()">🗑️ Suppr. ${escHtml(p.school_name)}</button>`).join('')}
+        </div>
       </div>`;
     }).join('')}
   </div>`;
+}
+
+async function dismissDuplicateGroup(key){
+  await api('dismiss-duplicate', { method:'POST', body: { key } });
+  loadProspects();
 }
 
 function showDuplicateGroup(ids){
