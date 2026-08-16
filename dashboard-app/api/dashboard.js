@@ -4,7 +4,7 @@
 // est attaché — l'isolation est structurelle, pas applicative).
 // Accès protégé par le header x-admin-key (secret ADMIN_KEY propre à ce
 // projet — pas de comptes individuels).
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, FOLLOWUP_DAYS } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, FOLLOWUP_DAYS } = require('./_dashboard-logic');
 const { classifyMessage } = require('./_zimbra-match');
 const { fetchRecentMessages } = require('./_zimbra-soap');
 const { fetchGA4Traffic, fetchGA4TrafficBreakdown } = require('./_ga4');
@@ -77,20 +77,24 @@ async function trafficDetail(req, res) {
 }
 
 async function kpis(req, res) {
-  const [usersR, instR, prospR, progR, certR, wsR, traffic] = await Promise.all([
+  const now = Date.now();
+  const week = thisWeekRange(now);
+  const [usersR, instR, prospR, progR, certR, wsR, reviewsPendingR, calendarWeekR, traffic] = await Promise.all([
     sb('/users?select=plan,created_at'),
     sb('/institutions?select=seat_count'),
     sb('/school_prospects?select=status,next_followup_at'),
     sb('/progress?select=updated_at'),
     sb('/certificates?select=id'),
     sb('/weekly_scores?select=id'),
+    sb('/reviews?select=id&status=eq.pending'),
+    sb(`/content_calendar?select=scheduled_date&scheduled_date=gte.${week.start}&scheduled_date=lte.${week.end}`),
     fetchTrafficSafe(),
   ]);
-  if (!usersR.ok || !instR.ok || !prospR.ok || !progR.ok || !certR.ok || !wsR.ok) {
+  if (!usersR.ok || !instR.ok || !prospR.ok || !progR.ok || !certR.ok || !wsR.ok || !reviewsPendingR.ok || !calendarWeekR.ok) {
     return res.status(500).json({ error: 'Erreur récupération KPI.' });
   }
-  const now = Date.now();
   const acquisition = summarizeAcquisition(usersR.data || [], now);
+  const scheduledDates = (calendarWeekR.data || []).map((c) => c.scheduled_date);
   return res.json({
     acquisition: {
       ...acquisition,
@@ -102,6 +106,10 @@ async function kpis(req, res) {
     trend: {
       signups: dailySignups(usersR.data || [], now, 30),
       lastActive: dailyLastActive(progR.data || [], now, 30),
+    },
+    brief: {
+      reviewsPending: (reviewsPendingR.data || []).length,
+      ...contentGapsThisWeek(scheduledDates, now),
     },
   });
 }

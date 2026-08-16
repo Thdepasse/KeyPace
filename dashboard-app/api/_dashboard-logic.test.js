@@ -2,7 +2,7 @@
 // Lancer : node --test api/_dashboard-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange } = require('./_dashboard-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -100,4 +100,29 @@ test('trafficConversionRate : taux arrondi, null sans trafic connu', () => {
   assert.equal(trafficConversionRate(5, 200), 2.5);
   assert.equal(trafficConversionRate(0, 0), null);
   assert.equal(trafficConversionRate(3, null), null);
+});
+
+test('remainingDaysThisWeek : aujourd\'hui (mardi) jusqu\'à dimanche inclus', () => {
+  const days = remainingDaysThisWeek(NOW); // NOW = mardi 2023-11-14 (UTC)
+  assert.deepEqual(days, ['2023-11-14', '2023-11-15', '2023-11-16', '2023-11-17', '2023-11-18', '2023-11-19']);
+});
+
+test('remainingDaysThisWeek : dimanche ne renvoie que le jour même', () => {
+  const sunday = NOW + 5 * DAY; // 2023-11-19, dimanche
+  assert.deepEqual(remainingDaysThisWeek(sunday), ['2023-11-19']);
+});
+
+test('contentGapsThisWeek : jours restants sans contenu déjà planifié', () => {
+  const g = contentGapsThisWeek(['2023-11-14', '2023-11-16'], NOW);
+  assert.equal(g.remainingDays, 6);
+  assert.deepEqual(g.gapDays, ['2023-11-15', '2023-11-17', '2023-11-18', '2023-11-19']);
+});
+
+test('contentGapsThisWeek : aucun trou si toute la semaine restante est planifiée', () => {
+  const g = contentGapsThisWeek(['2023-11-14', '2023-11-15', '2023-11-16', '2023-11-17', '2023-11-18', '2023-11-19'], NOW);
+  assert.deepEqual(g.gapDays, []);
+});
+
+test('thisWeekRange : bornes start/end pour filtrer la requête calendrier', () => {
+  assert.deepEqual(thisWeekRange(NOW), { start: '2023-11-14', end: '2023-11-19' });
 });

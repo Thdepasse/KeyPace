@@ -54,6 +54,11 @@
   .callout h3{margin:0 0 8px;font-size:14px;font-weight:800;color:var(--txt)}
   .followup-item{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px}
   .followup-item .fname{font-weight:700;flex:1}
+  .brief-item{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:14px;cursor:pointer}
+  .brief-item:hover{text-decoration:underline}
+  .brief-focus{font-weight:700;margin-top:4px}
+  .wins-ticker{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .win-chip{background:#F0F9F1;border:1px solid #C9EBCC;border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:700;color:#1F7A32;display:flex;align-items:center;gap:6px}
   .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;cursor:pointer;transition:filter .15s}
   .badge:hover{filter:brightness(.95)}
   .status-select{font-size:12px;font-weight:700;padding:3px 6px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--txt)}
@@ -133,6 +138,11 @@
   .backlog.dragover{border-color:var(--accent);background:#FFF6F2}
   .backlog h3{font-size:13px;font-weight:800;margin-bottom:2px}
   .platform-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;background:var(--border);color:var(--txt);margin-right:4px}
+  .idea-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+  .idea-card{background:var(--light);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .idea-card .ititle{font-weight:700;font-size:13.5px;margin-bottom:6px;line-height:1.35}
+  .idea-card .iangle{color:var(--muted);font-size:12px;line-height:1.5;margin-bottom:10px}
+  .idea-card .iadded{color:#1F7A32;font-size:12.5px;font-weight:700}
   #gate{position:fixed;inset:0;background:radial-gradient(circle at 50% 0%,#FFF3EE 0%,var(--bg) 55%);display:flex;align-items:center;justify-content:center;z-index:100}
   #gate .box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:34px 32px;width:100%;max-width:340px;text-align:center;box-shadow:var(--shadow-lift)}
   #gate .box .k{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:19px;margin:0 auto 14px;box-shadow:0 6px 16px rgba(255,77,46,.4)}
@@ -181,6 +191,13 @@
 
     <section id="kpi-section" class="tab-panel">
       <h2><span class="sec-ic">📈</span>KPI de croissance</h2>
+
+      <div class="callout" id="daily-brief" style="display:none">
+        <h3>🎯 Brief du jour</h3>
+        <div id="daily-brief-items"></div>
+      </div>
+      <div class="wins-ticker" id="wins-ticker"></div>
+
       <div class="kpi-groups">
         <div class="kpi-group">
           <h3>Acquisition &amp; conversion</h3>
@@ -284,6 +301,15 @@
 
       <div id="followup-callout"></div>
 
+      <div class="panel" id="followup-msg-panel" style="display:none;margin-bottom:16px">
+        <h3 id="followup-msg-title" style="margin:0 0 10px">Message de relance</h3>
+        <textarea id="followup-msg-text" style="min-height:150px"></textarea>
+        <div class="form-actions">
+          <button class="btn" id="followup-msg-copy-btn" onclick="copyFollowupMessage()">📋 Copier</button>
+          <button class="btn ghost" onclick="closeFollowupMessage()">Fermer</button>
+        </div>
+      </div>
+
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px">
         <input id="prospect-search" type="search" placeholder="🔎 Rechercher (école, ville, contact, email...)" oninput="renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
         <select id="sort-select" onchange="renderProspects()" style="width:auto;font-size:13px;padding:7px 10px">
@@ -318,6 +344,28 @@
         </div>
       </div>
 
+      <div class="panel" id="idea-bank" style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+          <div>
+            <h3 style="margin:0 0 2px">💡 Banque d'idées</h3>
+            <p class="muted" style="font-size:12.5px;margin:0">En panne d'inspiration ? Génère des idées prêtes à planifier.</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="idea-audience" style="font-size:13px;padding:7px 10px">
+              <option value="">Toutes les audiences</option>
+              <option value="etudiants">Étudiants</option>
+              <option value="emploi">Recherche d'emploi</option>
+              <option value="parents">Parents</option>
+              <option value="general">Grand public</option>
+              <option value="preuve_sociale">Preuve sociale</option>
+              <option value="conversion">Conversion</option>
+            </select>
+            <button class="btn small" style="width:auto" onclick="generateContentIdeas()">✨ Générer 5 idées</button>
+          </div>
+        </div>
+        <div id="idea-bank-results" style="margin-top:14px"></div>
+      </div>
+
       <div class="panel" id="event-form" style="display:none">
         <h3>Nouveau contenu</h3>
         <div class="form-grid">
@@ -346,7 +394,12 @@
             <option value="fondateur_2">Fondateur 2 (perso)</option>
           </select>
         </div>
-        <textarea id="e-caption" placeholder="Texte du post (ce qui sera publié)" style="margin-top:10px;min-height:90px"></textarea>
+        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+          <label style="font-size:12px;color:var(--muted);font-weight:700">Texte du post</label>
+          <button class="btn ghost small" type="button" style="width:auto;padding:4px 10px;font-size:12px" onclick="suggestHooks()">💡 Suggérer des accroches</button>
+        </div>
+        <div id="hook-suggestions" style="display:none;margin-top:6px;flex-direction:column;gap:5px"></div>
+        <textarea id="e-caption" placeholder="Texte du post (ce qui sera publié)" style="margin-top:6px;min-height:90px"></textarea>
         <textarea id="e-notes" placeholder="Notes internes (pas publiées)" style="margin-top:10px"></textarea>
         <div class="form-actions">
           <button class="btn" onclick="saveEvent()">Enregistrer</button>
@@ -516,9 +569,42 @@ async function loadTrafficDetail(){
   } catch (e) { console.error(e); }
 }
 
+// Brief marketing : transforme les KPI bruts en priorités actionnables du
+// jour (au lieu de simples compteurs à interpréter soi-même).
+function renderDailyBrief(b, brief){
+  const items = [];
+  if (b.dueFollowups > 0) items.push({ ic:'🏫', text:`${b.dueFollowups} école${b.dueFollowups>1?'s':''} à relancer`, tab:'prospects' });
+  if (brief.reviewsPending > 0) items.push({ ic:'💬', text:`${brief.reviewsPending} avis en attente de modération`, tab:'reviews' });
+  if (brief.gapDays.length > 0) items.push({ ic:'🗓️', text:`${brief.gapDays.length} jour${brief.gapDays.length>1?'s':''} cette semaine sans contenu planifié`, tab:'calendar' });
+
+  const briefEl = document.getElementById('daily-brief');
+  if (!items.length) {
+    briefEl.style.display = 'block';
+    briefEl.classList.add('empty');
+    document.getElementById('daily-brief-items').innerHTML = `<p style="margin:0;font-size:14px">Rien d'urgent aujourd'hui 🎉 Bon moment pour avancer sur du contenu ou de la prospection à froid.</p>`;
+    return;
+  }
+  briefEl.style.display = 'block';
+  briefEl.classList.remove('empty');
+  document.getElementById('daily-brief-items').innerHTML =
+    `<div class="brief-focus">👉 Priorité : ${items[0].text}</div>` +
+    items.map(it => `<div class="brief-item" onclick="switchTab('${it.tab}')"><span>${it.ic}</span><span>${it.text}</span></div>`).join('');
+}
+
+function renderWinsTicker(a, e){
+  const wins = [
+    { ic:'👋', label:`${a.signups7d} nouvel${a.signups7d>1?'les':'le'} inscription${a.signups7d>1?'s':''} (7j)` },
+    { ic:'⚡', label:`${e.activeUsers7d} actif${e.activeUsers7d>1?'s':''} (7j)` },
+    { ic:'🏆', label:`${e.weeklyChallengeParticipants} participant${e.weeklyChallengeParticipants>1?'s':''} au défi hebdo` },
+  ];
+  document.getElementById('wins-ticker').innerHTML = wins.map(w => `<div class="win-chip">${w.ic} ${w.label}</div>`).join('');
+}
+
 async function loadKpis(){
   try {
-    const { acquisition: a, b2b: b, engagement: e, trend } = await api('kpis');
+    const { acquisition: a, b2b: b, engagement: e, trend, brief } = await api('kpis');
+    renderDailyBrief(b, brief);
+    renderWinsTicker(a, e);
     document.getElementById('kpi-acquisition').innerHTML =
       kpiCard('Inscrits (total)', a.totalUsers) +
       kpiCard('Nouveaux (7j)', a.signups7d) +
@@ -659,9 +745,50 @@ function renderProspects(){
         <td><span class="badge badge-${p.status}" title="Cliquer pour changer le statut" onclick="openStatusPicker(event,'${p.id}','${p.status}')">${STATUS_LABELS[p.status]}</span></td>
         <td>${fmtDate(p.last_contact_at)}</td>
         <td>${fmtDate(p.next_followup_at)}</td>
-        <td><div class="actions"><button class="btn small ghost" onclick="editProspect('${p.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
+        <td><div class="actions"><button class="btn small ghost" onclick="openFollowupMessage('${p.id}')">✉️ Message</button><button class="btn small ghost" onclick="editProspect('${p.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
       </tr>`).join('') : `<tr><td colspan="7" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
   } catch (e) { console.error(e); }
+}
+
+// ─── Message de relance prêt à l'emploi ───────────────────────────
+// Un brouillon adapté au statut du dossier, pour ne jamais repartir de zéro
+// avant d'envoyer une relance.
+function followupMessageFor(p){
+  const contact = (p.contact_name || '').trim().split(' ')[0];
+  const greeting = contact ? `Bonjour ${contact}` : 'Bonjour';
+  const school = p.school_name;
+  if (p.status === 'a_contacter') {
+    return `${greeting},\n\nJe me permets de vous contacter au sujet de KeyPace, notre plateforme de dactylographie AZERTY pensée pour les établissements scolaires (65 leçons progressives, suivi de progression par élève, mise en place en quelques minutes).\n\nSeriez-vous disponible pour un bref échange cette semaine à propos d'une licence pour ${school} ?\n\nBien cordialement,\nThéo — KeyPace`;
+  }
+  if (p.status === 'repondu' || p.status === 'en_negociation') {
+    return `${greeting},\n\nJe reviens vers vous suite à notre échange au sujet de KeyPace pour ${school}. Avez-vous besoin d'informations complémentaires de mon côté pour avancer ?\n\nBien cordialement,\nThéo — KeyPace`;
+  }
+  return `${greeting},\n\nJe me permets de revenir vers vous suite à mon précédent message concernant KeyPace pour ${school}. Restez-vous intéressé·e par une présentation rapide de la plateforme ?\n\nBien cordialement,\nThéo — KeyPace`;
+}
+
+function openFollowupMessage(id){
+  const p = (window.__prospects || []).find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('followup-msg-title').textContent = `Message pour ${p.school_name}`;
+  document.getElementById('followup-msg-text').value = followupMessageFor(p);
+  document.getElementById('followup-msg-panel').style.display = 'block';
+}
+
+function closeFollowupMessage(){
+  document.getElementById('followup-msg-panel').style.display = 'none';
+}
+
+async function copyFollowupMessage(){
+  const text = document.getElementById('followup-msg-text').value;
+  const btn = document.getElementById('followup-msg-copy-btn');
+  try {
+    await navigator.clipboard.writeText(text);
+    const original = btn.textContent;
+    btn.textContent = '✓ Copié';
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  } catch (e) {
+    document.getElementById('followup-msg-text').select();
+  }
 }
 
 // Remplace le badge de statut par un <select> natif au clic — plus simple et
@@ -998,6 +1125,90 @@ async function deleteEvent(id){
 function closeEventForm(){
   editingEventId = null;
   document.getElementById('event-form').style.display = 'none';
+}
+
+// ─── Banque d'idées de contenu (templates, pas d'IA) ──────────────
+// Chaque idée est prête à devenir une carte "idée" dans le backlog : titre +
+// angle (le pourquoi/l'accroche) + format + plateforme suggérés.
+const CONTENT_IDEAS = [
+  { audience:'etudiants', title:"Avant/après : la même page de notes tapée à 20 mpm vs 60 mpm", angle:"Contraste visuel qui parle plus qu'un argument : montre concrètement le temps gagné.", format:'video', platform:'tiktok' },
+  { audience:'etudiants', title:"3 signes que tu perds un temps fou à cause d'une frappe lente en cours", angle:"Douleur reconnaissable en liste courte, facile à partager entre étudiants.", format:'post', platform:'instagram' },
+  { audience:'etudiants', title:"Le test : combien de mots tapes-tu en 1 minute ?", angle:"Interactif et facilement viral — invite à partager son score en story.", format:'story', platform:'instagram' },
+  { audience:'etudiants', title:"Pourquoi taper vite change vraiment tes notes de cours", angle:"Argumentaire sérieux et utile, bon pour le référencement.", format:'article', platform:'blog' },
+  { audience:'emploi', title:"Le test de frappe qu'on te demande en entretien admin : comment t'entraîner en 2 semaines", angle:"Contenu utilitaire très concret, excellent pour le SEO.", format:'article', platform:'blog' },
+  { audience:'emploi', title:"3 métiers où la vitesse de frappe est littéralement testée à l'embauche", angle:"Info utile et partageable dans un cadre professionnel.", format:'post', platform:'linkedin' },
+  { audience:'emploi', title:"Comment j'ai bossé ma frappe avant un entretien secrétariat", angle:"Témoignage narratif, preuve sociale incarnée.", format:'video', platform:'youtube' },
+  { audience:'emploi', title:"Checklist : es-tu prêt pour un test de frappe administratif ?", angle:"Lead magnet pratique, facile à consommer et à partager.", format:'article', platform:'blog' },
+  { audience:'parents', title:"L'âge idéal pour apprendre à taper au clavier à son enfant", angle:"Question que beaucoup de parents se posent — bon pour le SEO parental.", format:'article', platform:'blog' },
+  { audience:'parents', title:"5 minutes par jour : comment rendre la dactylo amusante pour un enfant", angle:"Storytelling parental concret, rassurant et actionnable.", format:'post', platform:'instagram' },
+  { audience:'general', title:"Le calcul qui fait mal : combien d'heures perdues par an à taper lentement", angle:"Chiffre choc qui capte l'attention en 2 secondes.", format:'post', platform:'instagram' },
+  { audience:'general', title:"Pourquoi taper vite est une des compétences les plus sous-estimées", angle:"Point de vue fort qui invite au débat en commentaires.", format:'article', platform:'linkedin' },
+  { audience:'general', title:"3 jeux pour progresser en tapant sans même t'en rendre compte", angle:"Angle fun et produit, montre la partie ludique de l'app.", format:'video', platform:'tiktok' },
+  { audience:'general', title:"La position des doigts que 90% des gens ratent", angle:"Astuce concrète et actionnable immédiatement, bon format tuto court.", format:'video', platform:'tiktok' },
+  { audience:'general', title:"Duel 1v1 : défie un ami en frappe, qui gagne ?", angle:"Mécanique de jeu sociale qui pousse au partage entre amis.", format:'post', platform:'instagram' },
+  { audience:'general', title:"« Je tape assez vite comme ça » — vrai ou faux ?", angle:"Format débunk qui invite à la discussion en commentaires.", format:'post', platform:'linkedin' },
+  { audience:'preuve_sociale', title:"On vient de recevoir cet avis, ça fait chaud au cœur", angle:"Partage direct d'un vrai avis client (capture d'écran) — authentique et rapide à produire.", format:'post', platform:'instagram' },
+  { audience:'preuve_sociale', title:"Ce que disent les premiers utilisateurs de KeyPace", angle:"Carrousel de plusieurs avis courts, format facile en story.", format:'story', platform:'instagram' },
+  { audience:'conversion', title:"10 leçons gratuites, sans carte bancaire : voici exactement ce que tu débloques", angle:"Clarifie l'offre freemium pour lever le doute avant l'inscription.", format:'post', platform:'instagram' },
+  { audience:'conversion', title:"Gratuit vs Expert : le comparatif en 30 secondes", angle:"Comparatif visuel rapide qui aide à la décision d'achat.", format:'video', platform:'tiktok' },
+  { audience:'conversion', title:"Pourquoi j'ai créé KeyPace", angle:"Storytelling fondateur, authenticité qui construit la confiance.", format:'article', platform:'linkedin' },
+  { audience:'conversion', title:"Les nouveautés du mois sur KeyPace", angle:"Contenu de rétention pour la liste email, garde le lien avec les inscrits.", format:'newsletter', platform:'autre' },
+];
+
+function generateContentIdeas(){
+  const audience = document.getElementById('idea-audience').value;
+  const pool = audience ? CONTENT_IDEAS.filter(i => i.audience === audience) : CONTENT_IDEAS;
+  const picks = [...pool].sort(() => Math.random() - 0.5).slice(0, 5);
+  window.__currentIdeaPicks = picks;
+  const el = document.getElementById('idea-bank-results');
+  el.innerHTML = picks.length ? `<div class="idea-grid">${picks.map((idea, i) => `
+    <div class="idea-card" id="idea-card-${i}">
+      <div class="ititle">${idea.title}</div>
+      <div class="iangle">${idea.angle}</div>
+      <div class="cmeta" style="margin-bottom:10px"><span class="platform-tag">${idea.platform}</span>${idea.format}</div>
+      <button class="btn ghost small" style="width:auto" onclick="addIdeaToBacklog(${i})">+ Ajouter au backlog</button>
+    </div>`).join('')}</div>`
+    : `<div class="empty-msg">Aucune idée pour cette audience pour l'instant — essaie « Toutes les audiences ».</div>`;
+}
+
+async function addIdeaToBacklog(i){
+  const idea = window.__currentIdeaPicks[i];
+  if (!idea) return;
+  await api('create-event', { method:'POST', body: {
+    title: idea.title,
+    content_type: idea.format,
+    platform: idea.platform,
+    account: 'keypace',
+    scheduled_date: null,
+    caption: '',
+    notes: idea.angle,
+  }});
+  const card = document.getElementById(`idea-card-${i}`);
+  if (card) card.querySelector('button').outerHTML = `<span class="iadded">✓ Ajoutée au backlog</span>`;
+  loadCalendar();
+}
+
+// ─── Suggestions d'accroches (templates) ──────────────────────────
+// Basées sur le titre déjà saisi : jamais de page blanche pour démarrer un post.
+function suggestHooks(){
+  const title = document.getElementById('e-title').value.trim();
+  if (!title) { alert("Renseigne d'abord un titre pour générer des accroches."); return; }
+  const hooks = [
+    `👀 ${title}\n\nOn t'explique tout dans ce post.`,
+    `${title}. Voici comment, concrètement.`,
+    `${title} — et toi, tu en es où ?`,
+  ];
+  const el = document.getElementById('hook-suggestions');
+  el.style.display = 'flex';
+  el.innerHTML = hooks.map((h, i) => `<button class="btn ghost small" type="button" style="width:100%;text-align:left;white-space:pre-line;height:auto;padding:8px 12px" onclick="applyHook(${i})">${escHtml(h)}</button>`).join('');
+  window.__currentHooks = hooks;
+}
+
+function applyHook(i){
+  const hook = window.__currentHooks[i];
+  if (hook == null) return;
+  document.getElementById('e-caption').value = hook;
+  document.getElementById('hook-suggestions').style.display = 'none';
 }
 
 async function saveEvent(){

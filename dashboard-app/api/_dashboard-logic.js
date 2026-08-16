@@ -98,7 +98,32 @@ function trafficConversionRate(signups, visitors) {
   return Math.round((signups / visitors) * 1000) / 10;
 }
 
+// Jours ISO (YYYY-MM-DD, UTC) d'aujourd'hui jusqu'à dimanche inclus (semaine lundi-dimanche).
+function remainingDaysThisWeek(now) {
+  const dow = new Date(now).getUTCDay(); // 0=dimanche..6=samedi
+  const daysUntilSunday = dow === 0 ? 0 : 7 - dow;
+  const out = [];
+  for (let i = 0; i <= daysUntilSunday; i++) out.push(new Date(now + i * DAY_MS).toISOString().slice(0, 10));
+  return out;
+}
+
+// Brief marketing : parmi les jours restants de la semaine (aujourd'hui -> dimanche),
+// combien n'ont aucun contenu déjà planifié dans le calendrier (content_calendar.scheduled_date).
+function contentGapsThisWeek(scheduledDates, now) {
+  const remaining = remainingDaysThisWeek(now);
+  const scheduledSet = new Set(scheduledDates);
+  const gapDays = remaining.filter((d) => !scheduledSet.has(d));
+  return { remainingDays: remaining.length, gapDays };
+}
+
+// { start, end } = aujourd'hui et dimanche (YYYY-MM-DD), pour filtrer la requête
+// content_calendar côté serveur (évite de rapatrier tout l'historique planifié).
+function thisWeekRange(now) {
+  const days = remainingDaysThisWeek(now);
+  return { start: days[0], end: days[days.length - 1] };
+}
+
 module.exports = {
   FOLLOWUP_DAYS, computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement,
-  dailySignups, dailyLastActive, trafficConversionRate,
+  dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange,
 };
