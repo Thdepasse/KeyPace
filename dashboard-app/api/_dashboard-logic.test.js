@@ -2,7 +2,7 @@
 // Lancer : node --test api/_dashboard-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects, diffSummary } = require('./_dashboard-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -152,4 +152,23 @@ test('findDuplicateProspects : aucun groupe si tous les noms sont distincts, ign
     { id: 4, school_name: null },
   ]);
   assert.deepEqual(groups, []);
+});
+
+const PROSPECT_LABELS = { city: 'Ville', status: 'Statut', notes: 'Notes' };
+
+test('diffSummary : liste les champs qui ont réellement changé, avant -> après', () => {
+  const before = { city: 'Namur', status: 'envoye', notes: 'RAS' };
+  const patch = { city: 'Liège', status: 'envoye', updated_at: '2026-01-01T00:00:00Z' };
+  assert.equal(diffSummary(before, patch, PROSPECT_LABELS), 'Ville : Namur → Liège');
+});
+
+test('diffSummary : traite null/chaîne vide comme équivalents ("—")', () => {
+  const before = { city: null };
+  const patch = { city: '' };
+  assert.equal(diffSummary(before, patch, PROSPECT_LABELS), '');
+});
+
+test('diffSummary : gère un champ nouvellement renseigné (avant vide)', () => {
+  const patch = { city: 'Namur' };
+  assert.equal(diffSummary(null, patch, PROSPECT_LABELS), 'Ville : — → Namur');
 });

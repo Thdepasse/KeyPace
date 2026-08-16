@@ -138,6 +138,13 @@
   .backlog.dragover{border-color:var(--accent);background:#FFF6F2}
   .backlog h3{font-size:13px;font-weight:800;margin-bottom:2px}
   .platform-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;background:var(--border);color:var(--txt);margin-right:4px}
+  .history-section{border-top:1px solid var(--border);margin-top:16px;padding-top:14px}
+  .history-section h4{margin:0 0 10px;font-size:13px;font-weight:800}
+  .history-add{display:flex;gap:8px;margin-bottom:10px}
+  .history-add input{flex:1;font-size:13px}
+  .history-list{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+  .history-item{padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px;line-height:1.5}
+  .history-item .h-time{color:var(--muted);font-size:11px;margin-right:6px}
   .view-toggle{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden}
   .view-toggle-btn{font:inherit;font-size:12.5px;font-weight:700;padding:7px 12px;border:none;background:var(--card);color:var(--muted);cursor:pointer}
   .view-toggle-btn.active{background:var(--accent);color:#fff}
@@ -320,6 +327,14 @@
           <button class="btn" id="prospect-save-btn" onclick="saveProspect()">Enregistrer</button>
           <button class="btn ghost" onclick="closeProspectForm()">Annuler</button>
         </div>
+        <div id="prospect-history" class="history-section" style="display:none">
+          <h4>🕒 Historique</h4>
+          <div class="history-add">
+            <input id="prospect-note-input" placeholder="Ajouter une note...">
+            <button class="btn small ghost" style="width:auto" onclick="addProspectNote()">Ajouter</button>
+          </div>
+          <div id="prospect-history-list" class="history-list"></div>
+        </div>
       </div>
 
       <div id="followup-callout"></div>
@@ -447,6 +462,14 @@
           <button class="btn danger" id="event-delete-btn" style="display:none;margin-left:auto" onclick="deleteEvent(editingEventId)">Supprimer</button>
         </div>
         <p class="muted" style="font-size:12px;margin:10px 0 0">Sans date : le contenu va dans « Idées à planifier » — glissez-le ensuite sur un jour.</p>
+        <div id="content-history" class="history-section" style="display:none">
+          <h4>🕒 Historique</h4>
+          <div class="history-add">
+            <input id="content-note-input" placeholder="Ajouter une note...">
+            <button class="btn small ghost" style="width:auto" onclick="addContentNote()">Ajouter</button>
+          </div>
+          <div id="content-history-list" class="history-list"></div>
+        </div>
       </div>
 
       <div class="cal-layout" id="calendar-grid-layout">
@@ -1036,11 +1059,47 @@ function toDatetimeLocalValue(iso){
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+// ─── Historique par élément (prospect ou contenu) ─────────────────
+// Générique : réutilisé par le formulaire prospect et le formulaire contenu.
+const ACTIVITY_ICONS = { created: '✨', updated: '✏️', status_changed: '🔄', note: '💬' };
+
+async function renderActivityLog(entityType, entityId, listElId){
+  const el = document.getElementById(listElId);
+  el.innerHTML = `<p class="muted" style="font-size:12px;margin:0">Chargement…</p>`;
+  try {
+    const { items } = await api('activity-log', { params: { entity_type: entityType, entity_id: entityId } });
+    el.innerHTML = items.length
+      ? items.map(it => `<div class="history-item"><span class="h-time">${fmtDateTime(it.created_at)}</span>${ACTIVITY_ICONS[it.action] || ''} ${escHtml(it.detail || '')}</div>`).join('')
+      : `<p class="muted" style="font-size:12px;margin:0">Aucun historique pour l'instant.</p>`;
+  } catch (e) {
+    el.innerHTML = `<p class="muted" style="font-size:12px;margin:0">Erreur de chargement de l'historique.</p>`;
+  }
+}
+
+async function addProspectNote(){
+  const input = document.getElementById('prospect-note-input');
+  const note = input.value.trim();
+  if (!note || !editingProspectId) return;
+  await api('add-note', { method:'POST', body: { entity_type:'prospect', entity_id: editingProspectId, note } });
+  input.value = '';
+  renderActivityLog('prospect', editingProspectId, 'prospect-history-list');
+}
+
+async function addContentNote(){
+  const input = document.getElementById('content-note-input');
+  const note = input.value.trim();
+  if (!note || !editingEventId) return;
+  await api('add-note', { method:'POST', body: { entity_type:'content', entity_id: editingEventId, note } });
+  input.value = '';
+  renderActivityLog('content', editingEventId, 'content-history-list');
+}
+
 function openAddForm(){
   editingProspectId = null;
   ['p-school','p-contact','p-email','p-phone','p-city','p-notes','p-meeting'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('prospect-form-title').textContent = 'Nouvelle école';
   document.getElementById('prospect-save-btn').textContent = 'Enregistrer';
+  document.getElementById('prospect-history').style.display = 'none';
   document.getElementById('prospect-form').style.display = 'block';
 }
 
@@ -1061,6 +1120,9 @@ function editProspect(id){
   document.getElementById('p-notes').value = p.notes || '';
   document.getElementById('prospect-form-title').textContent = `Modifier « ${p.school_name} »`;
   document.getElementById('prospect-save-btn').textContent = 'Enregistrer les modifications';
+  document.getElementById('prospect-history').style.display = 'block';
+  document.getElementById('prospect-note-input').value = '';
+  renderActivityLog('prospect', id, 'prospect-history-list');
   document.getElementById('prospect-form').style.display = 'block';
 }
 
@@ -1336,6 +1398,7 @@ function openAddEventForm(){
   document.getElementById('e-account').value = 'keypace';
   document.querySelector('#event-form h3').textContent = 'Nouveau contenu';
   document.getElementById('event-delete-btn').style.display = 'none';
+  document.getElementById('content-history').style.display = 'none';
   document.getElementById('event-form').style.display = 'block';
 }
 
@@ -1352,6 +1415,9 @@ function editEvent(id){
   document.getElementById('e-notes').value = ev.notes || '';
   document.querySelector('#event-form h3').textContent = `Modifier « ${ev.title} »`;
   document.getElementById('event-delete-btn').style.display = 'inline-flex';
+  document.getElementById('content-history').style.display = 'block';
+  document.getElementById('content-note-input').value = '';
+  renderActivityLog('content', id, 'content-history-list');
   document.getElementById('event-form').style.display = 'block';
 }
 

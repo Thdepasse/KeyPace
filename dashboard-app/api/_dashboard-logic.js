@@ -150,8 +150,27 @@ function findDuplicateProspects(prospects) {
     .map(([key, group]) => ({ key, prospects: group }));
 }
 
+// Résumé lisible des champs modifiés entre l'état avant (`before`, ligne
+// complète) et le patch appliqué (`patch`, seulement les champs touchés) —
+// pour l'historique par élément (voir logActivity dans dashboard.js).
+// `labels` : { champ: "Libellé affiché" } ; les champs absents sont ignorés
+// (ex. updated_at, qui change toujours mais n'intéresse personne).
+function diffSummary(before, patch, labels) {
+  const parts = [];
+  for (const key of Object.keys(patch)) {
+    if (!(key in labels)) continue;
+    const oldVal = before ? before[key] : undefined;
+    const newVal = patch[key];
+    const oldStr = oldVal == null || oldVal === '' ? '—' : String(oldVal);
+    const newStr = newVal == null || newVal === '' ? '—' : String(newVal);
+    if (oldStr === newStr) continue;
+    parts.push(`${labels[key]} : ${oldStr} → ${newStr}`);
+  }
+  return parts.join(' · ');
+}
+
 module.exports = {
   FOLLOWUP_DAYS, computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement,
   dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange,
-  normalizeSchoolName, findDuplicateProspects,
+  normalizeSchoolName, findDuplicateProspects, diffSummary,
 };

@@ -4,7 +4,7 @@
 // est attaché — l'isolation est structurelle, pas applicative).
 // Accès protégé par le header x-admin-key (secret ADMIN_KEY propre à ce
 // projet — pas de comptes individuels).
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, FOLLOWUP_DAYS } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, FOLLOWUP_DAYS } = require('./_dashboard-logic');
 const { classifyMessage } = require('./_zimbra-match');
 const { fetchRecentMessages } = require('./_zimbra-soap');
 const { fetchGA4Traffic, fetchGA4TrafficBreakdown } = require('./_ga4');
@@ -114,6 +114,49 @@ async function kpis(req, res) {
   });
 }
 
+// ─── Historique par élément (activity_log) ─────────────────────────
+// Best-effort : un échec d'écriture du journal ne doit jamais faire échouer
+// l'action principale (création/modification d'un prospect ou d'un contenu).
+async function logActivity(entityType, entityId, action, detail) {
+  try {
+    await sb('/activity_log', {
+      method: 'POST',
+      body: JSON.stringify({ entity_type: entityType, entity_id: entityId, action, detail: detail || null }),
+    });
+  } catch (e) {
+    console.error('logActivity error:', e);
+  }
+}
+
+async function deleteActivityLog(entityType, entityId) {
+  try {
+    await sb(`/activity_log?entity_type=eq.${entityType}&entity_id=eq.${encodeURIComponent(entityId)}`, { method: 'DELETE' });
+  } catch (e) {
+    console.error('deleteActivityLog error:', e);
+  }
+}
+
+async function activityLogList(req, res) {
+  const entityType = queryParam(req, 'entity_type');
+  const entityId = queryParam(req, 'entity_id');
+  if (!entityType || !entityId) return res.status(400).json({ error: 'Paramètres manquants.' });
+  const r = await sb(`/activity_log?entity_type=eq.${encodeURIComponent(entityType)}&entity_id=eq.${encodeURIComponent(entityId)}&order=created_at.desc&limit=50`);
+  if (!r.ok) return res.status(500).json({ error: "Erreur récupération de l'historique." });
+  return res.json({ items: r.data || [] });
+}
+
+async function addNote(req, res) {
+  const { entity_type, entity_id, note } = req.body || {};
+  if (!entity_type || !entity_id || !note) return res.status(400).json({ error: 'Champs manquants.' });
+  await logActivity(entity_type, entity_id, 'note', String(note).trim().slice(0, 2000));
+  return res.json({ ok: true });
+}
+
+const STATUS_LABELS_FR = { a_contacter: 'À contacter', envoye: 'Envoyé', relance: 'Relancé', repondu: 'Répondu', en_negociation: 'Négociation', signe: 'Signé', perdu: 'Perdu' };
+const PROSPECT_FIELD_LABELS = { school_name: 'École', contact_name: 'Contact', contact_email: 'Email', contact_phone: 'Téléphone', city: 'Ville', notes: 'Notes', meeting_at: 'Rendez-vous' };
+const EVENT_FIELD_LABELS = { title: 'Titre', content_type: 'Type', account: 'Compte', caption: 'Texte du post', scheduled_date: 'Date planifiée', link: 'Lien', notes: 'Notes' };
+const CONTENT_STATUS_LABELS_FR = { idee: 'Idée', a_faire: 'À faire', pret: 'Prêt', publie: 'Publié' };
+
 // ─── Prospection écoles ───────────────────────────────────────────
 async function prospectsList(req, res) {
   const [r, lastSyncR] = await Promise.all([
@@ -143,6 +186,7 @@ async function prospectCreate(req, res) {
     }),
   });
   if (!r.ok) return res.status(500).json({ error: 'Erreur création prospect.' });
+  await logActivity('prospect', r.data[0].id, 'created', `Dossier créé pour ${school_name}.`);
   return res.status(201).json(r.data[0]);
 }
 
@@ -154,9 +198,16 @@ async function prospectUpdate(req, res) {
   const patch = {};
   for (const k of PROSPECT_FIELDS) if (k in fields) patch[k] = fields[k];
   if (!Object.keys(patch).length) return res.status(400).json({ error: 'Aucun champ à mettre à jour.' });
+  const beforeR = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}&select=*`);
+  const before = beforeR.data && beforeR.data[0];
   patch.updated_at = new Date().toISOString();
   const r = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) });
   if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Erreur mise à jour prospect.' });
+  const summary = diffSummary(before, patch, PROSPECT_FIELD_LABELS);
+  if (summary) await logActivity('prospect', id, 'updated', summary);
+  if ('status' in patch && before && before.status !== patch.status) {
+    await logActivity('prospect', id, 'status_changed', `${STATUS_LABELS_FR[before.status] || before.status} → ${STATUS_LABELS_FR[patch.status] || patch.status}`);
+  }
   return res.json(r.data[0]);
 }
 
@@ -165,6 +216,8 @@ async function prospectLogContact(req, res) {
   const { id, status } = req.body || {};
   if (!id || !status) return res.status(400).json({ error: 'id ou status manquant.' });
   if (!(status in FOLLOWUP_DAYS)) return res.status(400).json({ error: 'Statut inconnu.' });
+  const beforeR = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}&select=status`);
+  const oldStatus = beforeR.data && beforeR.data[0] && beforeR.data[0].status;
   const now = Date.now();
   const patch = {
     status,
@@ -174,6 +227,9 @@ async function prospectLogContact(req, res) {
   };
   const r = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) });
   if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Erreur mise à jour du statut.' });
+  if (oldStatus !== status) {
+    await logActivity('prospect', id, 'status_changed', `${STATUS_LABELS_FR[oldStatus] || oldStatus || '—'} → ${STATUS_LABELS_FR[status] || status}`);
+  }
   return res.json(r.data[0]);
 }
 
@@ -182,6 +238,7 @@ async function prospectDelete(req, res) {
   if (!id) return res.status(400).json({ error: 'id manquant.' });
   const r = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' });
   if (!r.ok) return res.status(500).json({ error: 'Erreur suppression prospect.' });
+  await deleteActivityLog('prospect', id);
   return res.json({ ok: true });
 }
 
@@ -219,6 +276,7 @@ async function eventCreate(req, res) {
     }),
   });
   if (!r.ok) return res.status(500).json({ error: 'Erreur création contenu.' });
+  await logActivity('content', r.data[0].id, 'created', `Contenu créé : ${title}.`);
   return res.status(201).json(r.data[0]);
 }
 
@@ -234,16 +292,24 @@ async function usedIdeaKeys(req, res) {
   return res.json({ keys });
 }
 
-// Sert aussi au glisser-déposer : { id, scheduled_date } déplace un contenu.
+// Sert aussi au glisser-déposer : { id, scheduled_date } déplace un contenu,
+// { id, status } le fait changer de colonne kanban.
 async function eventUpdate(req, res) {
   const { id, ...fields } = req.body || {};
   if (!id) return res.status(400).json({ error: 'id manquant.' });
   const patch = {};
   for (const k of EVENT_FIELDS) if (k in fields) patch[k] = fields[k];
   if (!Object.keys(patch).length) return res.status(400).json({ error: 'Aucun champ à mettre à jour.' });
+  const beforeR = await sb(`/content_calendar?id=eq.${encodeURIComponent(id)}&select=*`);
+  const before = beforeR.data && beforeR.data[0];
   patch.updated_at = new Date().toISOString();
   const r = await sb(`/content_calendar?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) });
   if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Erreur mise à jour contenu.' });
+  const summary = diffSummary(before, patch, EVENT_FIELD_LABELS);
+  if (summary) await logActivity('content', id, 'updated', summary);
+  if ('status' in patch && before && before.status !== patch.status) {
+    await logActivity('content', id, 'status_changed', `${CONTENT_STATUS_LABELS_FR[before.status] || before.status} → ${CONTENT_STATUS_LABELS_FR[patch.status] || patch.status}`);
+  }
   return res.json(r.data[0]);
 }
 
@@ -252,6 +318,7 @@ async function eventDelete(req, res) {
   if (!id) return res.status(400).json({ error: 'id manquant.' });
   const r = await sb(`/content_calendar?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' });
   if (!r.ok) return res.status(500).json({ error: 'Erreur suppression contenu.' });
+  await deleteActivityLog('content', id);
   return res.json({ ok: true });
 }
 
@@ -463,6 +530,7 @@ module.exports = async function handler(req, res) {
         case 'prospects': return await prospectsList(req, res);
         case 'calendar': return await calendarList(req, res);
         case 'used-idea-keys': return await usedIdeaKeys(req, res);
+        case 'activity-log': return await activityLogList(req, res);
         case 'reviews': return await reviewsList(req, res);
         case 'find-place': return await googleFindPlace(req, res);
         default: return res.status(400).json({ error: 'Action inconnue.' });
@@ -477,6 +545,7 @@ module.exports = async function handler(req, res) {
         case 'create-event': return await eventCreate(req, res);
         case 'update-event': return await eventUpdate(req, res);
         case 'delete-event': return await eventDelete(req, res);
+        case 'add-note': return await addNote(req, res);
         case 'sync-zimbra': return await syncZimbra(req, res);
         case 'publish-review': return await reviewSetStatus(req, res, 'published');
         case 'reject-review': return await reviewSetStatus(req, res, 'rejected');

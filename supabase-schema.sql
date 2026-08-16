@@ -318,6 +318,24 @@ alter table content_calendar drop column if exists platform;
 -- Sert à ne plus reproposer un sujet déjà traité (regroupé par `topic`).
 alter table content_calendar add column if not exists idea_key text;
 
+-- ───────────────────────────────────────────────────────────────
+-- Historique par élément (prospect ou contenu) : qui a changé quoi et quand,
+-- + notes manuelles. entity_id référence school_prospects.id ou
+-- content_calendar.id selon entity_type (pas de FK stricte car polymorphe ;
+-- les lignes sont supprimées manuellement quand l'élément l'est, voir
+-- prospectDelete/eventDelete dans dashboard-app/api/dashboard.js).
+-- ───────────────────────────────────────────────────────────────
+create table if not exists activity_log (
+  id uuid default gen_random_uuid() primary key,
+  entity_type text not null check (entity_type in ('prospect', 'content')),
+  entity_id uuid not null,
+  action text not null check (action in ('created', 'updated', 'status_changed', 'note')),
+  detail text,
+  created_at timestamptz default now()
+);
+create index if not exists activity_log_entity_idx on activity_log(entity_type, entity_id, created_at desc);
+alter table activity_log enable row level security;
+
 -- Dédup de la synchro Zimbra (api/dashboard.js action=sync-zimbra) : un email
 -- déjà traité (par Message-ID) n'est jamais reclassé lors d'une sync suivante.
 create table if not exists zimbra_sync_log (
