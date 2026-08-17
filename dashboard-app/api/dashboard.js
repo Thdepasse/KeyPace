@@ -335,7 +335,7 @@ async function devBacklogList(req, res) {
 }
 
 async function devIssueCreate(req, res) {
-  const { title, description, item_type, priority, status } = req.body || {};
+  const { title, description, item_type, priority, status, dev_owner } = req.body || {};
   if (!title) return res.status(400).json({ error: 'Titre manquant.' });
   const r = await sb('/dev_backlog', {
     method: 'POST',
@@ -345,6 +345,7 @@ async function devIssueCreate(req, res) {
       item_type: item_type || 'feature',
       priority: priority || 'moyenne',
       status: status || 'backlog',
+      dev_owner: dev_owner || null,
     }),
   });
   if (!r.ok) return res.status(500).json({ error: 'Erreur création du ticket.' });
@@ -352,7 +353,7 @@ async function devIssueCreate(req, res) {
   return res.status(201).json(r.data[0]);
 }
 
-const DEV_ISSUE_FIELDS = ['title', 'description', 'item_type', 'priority', 'status'];
+const DEV_ISSUE_FIELDS = ['title', 'description', 'item_type', 'priority', 'status', 'dev_owner'];
 
 async function devIssueUpdate(req, res) {
   const { id, ...fields } = req.body || {};
@@ -570,7 +571,7 @@ const STATUS_LABELS_FR = { a_contacter: 'À contacter', envoye: 'Envoyé', relan
 const PROSPECT_FIELD_LABELS = { school_name: 'École', contact_name: 'Contact', contact_email: 'Email', contact_phone: 'Téléphone', city: 'Ville', notes: 'Notes', meeting_at: 'Rendez-vous', estimated_students: 'Effectif estimé', estimated_students_source: 'Source effectif' };
 const EVENT_FIELD_LABELS = { title: 'Titre', content_type: 'Type', account: 'Compte', caption: 'Texte du post', scheduled_date: 'Date planifiée', link: 'Lien', notes: 'Notes' };
 const CONTENT_STATUS_LABELS_FR = { idee: 'Idée', a_faire: 'À faire', pret: 'Prêt', publie: 'Publié' };
-const DEV_FIELD_LABELS = { title: 'Titre', description: 'Description', item_type: 'Type', priority: 'Priorité' };
+const DEV_FIELD_LABELS = { title: 'Titre', description: 'Description', item_type: 'Type', priority: 'Priorité', dev_owner: 'Développeur' };
 const DEV_STATUS_LABELS_FR = { backlog: 'Backlog', a_faire: 'À faire', en_cours: 'En cours', fait: 'Fait' };
 const COMPETITOR_FIELD_LABELS = { name: 'Nom', url: 'URL', strengths: 'Forces', weaknesses: 'Faiblesses', estimated_revenue: 'CA estimé', notes: 'Notes' };
 

@@ -464,8 +464,8 @@
           <input id="e-date" type="date">
           <select id="e-account">
             <option value="keypace">KeyPace (compte marque)</option>
-            <option value="fondateur_1">Fondateur 1 (perso)</option>
-            <option value="fondateur_2">Fondateur 2 (perso)</option>
+            <option value="fondateur_1">Théo (perso)</option>
+            <option value="fondateur_2">Vincent (perso)</option>
           </select>
         </div>
         <div style="margin-top:10px">
@@ -578,6 +578,11 @@
             <option value="en_cours">En cours</option>
             <option value="fait">Fait</option>
           </select>
+          <select id="d-owner">
+            <option value="">Développeur —</option>
+            <option value="theo">Théo</option>
+            <option value="vincent">Vincent</option>
+          </select>
         </div>
         <textarea id="d-description" placeholder="Description" style="margin-top:10px"></textarea>
         <div class="form-actions">
@@ -598,7 +603,7 @@
       <div class="table-wrap" id="backlog-table-wrap">
         <table class="prospects">
           <thead>
-            <tr><th>Titre</th><th>Type</th><th>Priorité</th><th>Statut</th><th>Mis à jour</th><th>Actions</th></tr>
+            <tr><th>Titre</th><th>Type</th><th>Priorité</th><th>Statut</th><th>Développeur</th><th>Mis à jour</th><th>Actions</th></tr>
           </thead>
           <tbody id="backlog-body"></tbody>
         </table>
@@ -1290,6 +1295,7 @@ const DEV_PRIORITY_LABELS = { basse:'Basse', moyenne:'Moyenne', haute:'Haute', u
 const DEV_PRIORITY_COLORS = { basse:'#8A8275', moyenne:'#B4640A', haute:'#C2540A', urgente:'#B3261E' };
 const DEV_STATUS_LABELS = { backlog:'Backlog', a_faire:'À faire', en_cours:'En cours', fait:'Fait' };
 const DEV_STATUS_FLOW = ['backlog','a_faire','en_cours','fait'];
+const DEV_OWNER_LABELS = { theo:'Théo', vincent:'Vincent' };
 
 let backlogView = localStorage.getItem('kp_backlog_view') || 'table';
 let editingDevIssueId = null;
@@ -1319,9 +1325,10 @@ function renderDevBacklogTable(items){
       <td>${DEV_TYPE_LABELS[d.item_type] || d.item_type}</td>
       <td><span style="color:${DEV_PRIORITY_COLORS[d.priority] || 'inherit'};font-weight:700">${DEV_PRIORITY_LABELS[d.priority] || d.priority}</span></td>
       <td>${DEV_STATUS_LABELS[d.status] || d.status}</td>
+      <td>${DEV_OWNER_LABELS[d.dev_owner] || '—'}</td>
       <td>${fmtDate(d.updated_at)}</td>
       <td><div class="actions"><button class="btn small ghost" onclick="editDevIssue('${d.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteDevIssue('${d.id}')">Suppr.</button></div></td>
-    </tr>`).join('') : `<tr><td colspan="6" class="empty-msg">Aucun ticket pour l'instant.</td></tr>`;
+    </tr>`).join('') : `<tr><td colspan="7" class="empty-msg">Aucun ticket pour l'instant.</td></tr>`;
 }
 
 function renderDevBacklogKanban(items){
@@ -1334,7 +1341,7 @@ function renderDevBacklogKanban(items){
         ${byStatus[status].map(d => `
           <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${d.id}')" onclick="editDevIssue('${d.id}')">
             <span class="kc-title">${escHtml(d.title)}</span>
-            <span class="kc-meta"><span style="color:${DEV_PRIORITY_COLORS[d.priority] || 'inherit'};font-weight:700">${DEV_PRIORITY_LABELS[d.priority] || d.priority}</span> · ${DEV_TYPE_LABELS[d.item_type] || d.item_type}</span>
+            <span class="kc-meta"><span style="color:${DEV_PRIORITY_COLORS[d.priority] || 'inherit'};font-weight:700">${DEV_PRIORITY_LABELS[d.priority] || d.priority}</span> · ${DEV_TYPE_LABELS[d.item_type] || d.item_type}${d.dev_owner ? ' · ' + DEV_OWNER_LABELS[d.dev_owner] : ''}</span>
           </div>`).join('') || `<p class="muted" style="font-size:11.5px;margin:0;text-align:center">—</p>`}
       </div>
     </div>`).join('');
@@ -1354,6 +1361,7 @@ function openDevIssueForm(){
   document.getElementById('d-type').value = 'feature';
   document.getElementById('d-priority').value = 'moyenne';
   document.getElementById('d-status').value = 'backlog';
+  document.getElementById('d-owner').value = '';
   document.getElementById('dev-issue-form-title').textContent = 'Nouveau ticket';
   document.getElementById('dev-issue-delete-btn').style.display = 'none';
   document.getElementById('dev-issue-history').style.display = 'none';
@@ -1369,6 +1377,7 @@ function editDevIssue(id){
   document.getElementById('d-type').value = d.item_type || 'feature';
   document.getElementById('d-priority').value = d.priority || 'moyenne';
   document.getElementById('d-status').value = d.status || 'backlog';
+  document.getElementById('d-owner').value = d.dev_owner || '';
   document.getElementById('dev-issue-form-title').textContent = `Modifier « ${d.title} »`;
   document.getElementById('dev-issue-delete-btn').style.display = 'inline-flex';
   document.getElementById('dev-issue-history').style.display = 'block';
@@ -1391,6 +1400,7 @@ async function saveDevIssue(){
     item_type: document.getElementById('d-type').value,
     priority: document.getElementById('d-priority').value,
     status: document.getElementById('d-status').value,
+    dev_owner: document.getElementById('d-owner').value || null,
   };
   if (editingDevIssueId) await api('dev-issue-update', { method:'POST', body: { id: editingDevIssueId, ...body } });
   else await api('dev-issue-create', { method:'POST', body });
@@ -1998,7 +2008,7 @@ function shiftMonth(delta){
   loadCalendar();
 }
 
-const ACCOUNT_LABELS = { keypace: 'KeyPace', fondateur_1: 'Fondateur 1', fondateur_2: 'Fondateur 2' };
+const ACCOUNT_LABELS = { keypace: 'KeyPace', fondateur_1: 'Théo', fondateur_2: 'Vincent' };
 
 function contentCardHtml(ev){
   const isTask = ev.content_type === 'tache';
