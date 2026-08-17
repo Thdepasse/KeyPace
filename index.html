@@ -3668,7 +3668,12 @@ const app={
     // "classes" par un onglet de nav (au lieu du bouton ← Retour), et renvoyait
     // de force l'utilisateur vers la liste des classes à chaque tick.
     if(v!=='classes'){clearInterval(this._classRefreshTimer);this._classesSub=null;this._classViewingId=null;}
-    if(v==='test'){if(!this.sess)this.sess=this.makeSession('test');}
+    // this.sess.mode!=='test' couvre le cas où on arrive sur "Test" avec une
+    // session de leçon encore en mémoire (ex : clic sur l'onglet Test juste
+    // après avoir terminé une leçon, sans repasser par "← Tous les cours") —
+    // sans ce contrôle, l'écran de résultat de la leçon s'affichait à la
+    // place d'un nouveau test.
+    if(v==='test'){if(!this.sess||this.sess.mode!=='test')this.sess=this.makeSession('test');}
     // Vider les pages avec #tb-scroll pour éviter les IDs dupliqués
     if(v!=='test')document.getElementById('page-test').innerHTML='';
     if(v!=='lessons')document.getElementById('page-lessons').innerHTML='';
