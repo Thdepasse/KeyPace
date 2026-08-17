@@ -258,6 +258,259 @@ alter table users
 alter table institutions add column if not exists license_expires_at timestamptz;
 
 -- ───────────────────────────────────────────────────────────────
+-- Dashboard interne équipe (KPI, prospection écoles, calendrier marketing).
+-- Accès uniquement via api/dashboard.js (clé ADMIN_KEY partagée, côté service).
+-- RLS sans policy => accès anonyme refusé.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists school_prospects (
+  id uuid default gen_random_uuid() primary key,
+  school_name text not null,
+  contact_name text,
+  contact_email text,
+  contact_phone text,
+  status text default 'a_contacter' check (status in
+    ('a_contacter','envoye','relance','repondu','en_negociation','signe','perdu')),
+  notes text,
+  last_contact_at timestamptz,
+  next_followup_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists school_prospects_status_idx on school_prospects(status);
+create index if not exists school_prospects_followup_idx on school_prospects(next_followup_at);
+alter table school_prospects enable row level security;
+
+-- Ville du prospect (formulaire, tri, import/export CSV du dashboard).
+alter table school_prospects add column if not exists city text;
+
+-- Prochain rendez-vous planifié (appel/visio/rencontre), distinct de
+-- next_followup_at qui est une date de relance suggérée automatiquement.
+alter table school_prospects add column if not exists meeting_at timestamptz;
+create index if not exists school_prospects_meeting_idx on school_prospects(meeting_at);
+
+-- Effectif élèves estimé (texte libre, ex. "~1000 élèves (secondaire)") +
+-- source/fiabilité de l'estimation (ex. "Wikipédia", "non trouvé"). Pas de
+-- champ € : la conversion en revenu projeté reste une décision manuelle
+-- (grille tarifaire non fixe), volontairement pas automatisée ici.
+alter table school_prospects add column if not exists estimated_students text;
+alter table school_prospects add column if not exists estimated_students_source text;
+
+create table if not exists content_calendar (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  content_type text default 'post' check (content_type in
+    ('video','post','story','article','newsletter','tache')),
+  platform text,
+  account text default 'keypace',  -- 'keypace' | 'fondateur_1' | 'fondateur_2'
+  caption text,                    -- texte réel du post (distinct de `notes`, interne)
+  status text default 'idee' check (status in ('idee','a_faire','pret','publie')),
+  scheduled_date date,            -- null = dans le backlog, pas encore planifié
+  link text,
+  notes text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists content_calendar_date_idx on content_calendar(scheduled_date);
+alter table content_calendar enable row level security;
+
+-- Un contenu peut être posté sur plusieurs plateformes à la fois (remplace
+-- l'ancien `platform` unique). Migration : reprend la valeur existante avant
+-- de supprimer la colonne.
+alter table content_calendar add column if not exists platforms text[] default '{}';
+update content_calendar set platforms = array[platform] where platform is not null and platforms = '{}';
+alter table content_calendar drop column if exists platform;
+
+-- Clé stable de l'idée de la banque d'idées (voir CONTENT_IDEAS,
+-- dashboard-app/index.html) à l'origine de ce contenu, si créé depuis là.
+-- Sert à ne plus reproposer un sujet déjà traité (regroupé par `topic`).
+alter table content_calendar add column if not exists idea_key text;
+
+-- ───────────────────────────────────────────────────────────────
+-- Historique par élément (prospect ou contenu) : qui a changé quoi et quand,
+-- + notes manuelles. entity_id référence school_prospects.id ou
+-- content_calendar.id selon entity_type (pas de FK stricte car polymorphe ;
+-- les lignes sont supprimées manuellement quand l'élément l'est, voir
+-- prospectDelete/eventDelete dans dashboard-app/api/dashboard.js).
+-- ───────────────────────────────────────────────────────────────
+create table if not exists activity_log (
+  id uuid default gen_random_uuid() primary key,
+  entity_type text not null check (entity_type in ('prospect', 'content')),
+  entity_id uuid not null,
+  action text not null check (action in ('created', 'updated', 'status_changed', 'note')),
+  detail text,
+  created_at timestamptz default now()
+);
+create index if not exists activity_log_entity_idx on activity_log(entity_type, entity_id, created_at desc);
+alter table activity_log enable row level security;
+
+-- Élargit entity_type au backlog de développement (voir dev_backlog
+-- ci-dessous). alter table ... add constraint ne supporte pas "if not
+-- exists" pour les check constraints : on la retire puis la recrée.
+alter table activity_log drop constraint if exists activity_log_entity_type_check;
+alter table activity_log add constraint activity_log_entity_type_check
+  check (entity_type in ('prospect', 'content', 'dev_issue', 'competitor'));
+
+-- ───────────────────────────────────────────────────────────────
+-- Backlog de développement KeyPace (bugs, features, dette technique) —
+-- board interne façon Linear/GitHub Issues, historique via activity_log
+-- (entity_type='dev_issue').
+-- ───────────────────────────────────────────────────────────────
+create table if not exists dev_backlog (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  description text,
+  item_type text not null default 'feature' check (item_type in ('bug', 'feature', 'tech_debt', 'idee')),
+  priority text not null default 'moyenne' check (priority in ('basse', 'moyenne', 'haute', 'urgente')),
+  status text not null default 'backlog' check (status in ('backlog', 'a_faire', 'en_cours', 'fait')),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists dev_backlog_status_idx on dev_backlog(status);
+alter table dev_backlog enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Veille concurrentielle : liste de concurrents avec forces/faiblesses/CA
+-- estimé (renseignés manuellement), + détection de changement de contenu
+-- (hash du texte visible de leur page, voir competitorCheck dans
+-- dashboard-app/api/dashboard.js) — pas d'IA, juste un hash comparé au
+-- précédent, pour rester cohérent avec l'approche "templates/règles" déjà
+-- retenue pour la banque d'idées.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists competitors (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  url text not null,
+  strengths text,
+  weaknesses text,
+  estimated_revenue text,
+  notes text,
+  last_snapshot_hash text,
+  last_checked_at timestamptz,
+  content_changed boolean default false,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+alter table competitors enable row level security;
+
+-- File d'attente de concurrents suggérés à vérifier (pré-alimentée via
+-- recherche ponctuelle, pas d'appel IA en runtime — cohérent avec le reste
+-- du dashboard). Un clic "Ajouter" crée la ligne dans `competitors` et
+-- marque la suggestion 'added' ; "Ignorer" la marque 'dismissed'.
+create table if not exists competitor_suggestions (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  url text not null,
+  reason text,
+  status text default 'pending' check (status in ('pending','added','dismissed')),
+  created_at timestamptz default now()
+);
+create index if not exists competitor_suggestions_status_idx on competitor_suggestions(status);
+alter table competitor_suggestions enable row level security;
+
+-- Groupes de doublons potentiels (findDuplicateProspects, dedup_key = nom
+-- d'école normalisé) explicitement marqués "pas un doublon" par l'utilisateur
+-- — ne sont plus jamais reproposés dans la bannière d'alerte.
+create table if not exists dismissed_duplicates (
+  id uuid default gen_random_uuid() primary key,
+  dedup_key text not null unique,
+  created_at timestamptz default now()
+);
+alter table dismissed_duplicates enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Checklist sécurité périodique (onglet Sécurité du dashboard).
+-- Les items eux-mêmes (libellé, catégorie, pourquoi, fréquence conseillée)
+-- sont définis en dur côté code (SECURITY_CHECKLIST_ITEMS dans dashboard.js)
+-- — cette table ne garde que l'état "dernière vérification" par item_key,
+-- pour savoir ce qui est en retard sans dépendre d'une IA en runtime.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists security_checklist_checks (
+  item_key text primary key,
+  checked_at timestamptz not null default now(),
+  notes text
+);
+alter table security_checklist_checks enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Coffre-fort de secrets (identifiants de services tiers, etc.).
+-- Chiffrement au repos (AES-256-GCM, voir vaultEncrypt/vaultDecrypt dans
+-- dashboard-app/api/dashboard.js) : la clé VAULT_ENCRYPTION_KEY vit
+-- uniquement en variable d'environnement Vercel, jamais en base — protège
+-- contre une fuite/dump direct de cette table. Ne protège PAS contre une
+-- fuite de l'ADMIN_KEY (accès complet via l'API normale du dashboard) :
+-- n'y stocke jamais la clé service Supabase ni la clé secrète Stripe, ce
+-- sont littéralement les clés qui donnent accès à l'endroit où ce coffre vit.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists vault_secrets (
+  id uuid default gen_random_uuid() primary key,
+  label text not null,
+  username text,
+  secret_ciphertext text not null,  -- base64 (chiffré || auth tag GCM)
+  secret_iv text not null,           -- base64, unique par entrée
+  notes text,
+  category text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+alter table vault_secrets enable row level security;
+
+-- Répertoire de liens (raccourcis vers consoles d'admin — Supabase, Vercel,
+-- Stripe...) : jamais de secret ici, uniquement des URL.
+create table if not exists resource_links (
+  id uuid default gen_random_uuid() primary key,
+  label text not null,
+  url text not null,
+  category text,
+  created_at timestamptz default now()
+);
+alter table resource_links enable row level security;
+
+-- Dédup de la synchro Zimbra (api/dashboard.js action=sync-zimbra) : un email
+-- déjà traité (par Message-ID) n'est jamais reclassé lors d'une sync suivante.
+create table if not exists zimbra_sync_log (
+  id uuid default gen_random_uuid() primary key,
+  message_id text unique not null,
+  prospect_id uuid references school_prospects(id) on delete set null,
+  direction text not null check (direction in ('in','out')),
+  processed_at timestamptz default now()
+);
+create index if not exists zimbra_sync_log_message_id_idx on zimbra_sync_log(message_id);
+alter table zimbra_sync_log enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Avis KeyPace, affichés sur la home après le bandeau licence établissement.
+-- Avis natifs déposés par un élève connecté depuis son dashboard (proposé
+-- après un certain nombre de leçons/certificat), modérés avant publication.
+-- Un seul avis natif par élève (uniques par user_id, resoumission = mise à
+-- jour). `source`='google' réservé à une future synchro Google Business
+-- Profile (source_url = lien vers l'avis d'origine).
+-- Accès via api/reviews.js (clé service) ; RLS sans policy => anon refusé.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists reviews (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references users(id) on delete set null,
+  source text not null default 'natif' check (source in ('natif','google')),
+  author_name text not null,
+  rating integer not null check (rating between 1 and 5),
+  comment text,
+  status text not null default 'pending' check (status in ('pending','published','rejected')),
+  source_url text,
+  published_at timestamptz,
+  created_at timestamptz default now()
+);
+create index if not exists reviews_status_idx on reviews(status, published_at desc);
+create unique index if not exists reviews_user_unique_idx on reviews(user_id) where user_id is not null;
+alter table reviews enable row level security;
+
+-- Synchro avis Google Business Profile (dashboard-app, cron quotidien) :
+-- l'API Google Places (legacy) ne renvoie pas d'ID stable par avis, donc on
+-- en construit un nous-mêmes (horodatage + auteur) pour pouvoir upserter sans
+-- doublon d'une synchro à l'autre sans jamais écraser un statut de
+-- modération déjà décidé (voir syncGoogleReviews, dashboard-app/api/dashboard.js).
+alter table reviews add column if not exists external_id text;
+create unique index if not exists reviews_source_external_idx on reviews(source, external_id);
+
+-- ───────────────────────────────────────────────────────────────
 -- Analytics maison (remplace Umami Cloud, août 2026).
 -- Un événement = une pageview ('event_name'='pageview') ou un événement
 -- produit custom (signup, lesson_completed, ...). session_id est un hash

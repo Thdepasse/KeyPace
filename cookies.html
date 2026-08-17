@@ -2,6 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+<!-- Consentement cookies + Google Analytics (chargé seulement après accord, voir /cookies) -->
+<script src="/cookie-consent.js" defer></script>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="index, follow">
   <title>Politique de cookies — KeyPace</title>
@@ -55,6 +57,9 @@
     .footer-links a { color: var(--muted); text-decoration: none; }
     .footer-links a:hover { color: var(--txt); }
   </style>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
 <body>
 
@@ -69,7 +74,7 @@
 <div class="page">
   <div class="page-label">Légal</div>
   <h1>Politique de cookies</h1>
-  <p class="updated">Dernière mise à jour : 24 juin 2026</p>
+  <p class="updated">Dernière mise à jour : 16 août 2026</p>
 
   <p>Cette page explique comment KeyPace (keypace.be) utilise les cookies et technologies de stockage similaires, conformément à la législation belge (loi du 13 juin 2005 sur les communications électroniques) et à la directive « ePrivacy ».</p>
 
@@ -92,12 +97,19 @@
   </table>
   <div class="note"><p><em>Stripe peut déposer des cookies strictement nécessaires uniquement au moment du paiement, pour la sécurité de la transaction. Voir : <a href="https://stripe.com/cookies-policy/legal" target="_blank" rel="noopener">https://stripe.com/cookies-policy/legal</a></em></p></div>
 
-  <h3>Cookies de mesure d'audience / marketing</h3>
-  <p><strong>Aucun</strong> à ce jour.</p>
-  <div class="note"><p><em>Si tu ajoutes plus tard un outil d'analytics (ex. Google Analytics, Plausible, Matomo) ou un pixel marketing, cette section devra être mise à jour et — pour tout cookie non strictement nécessaire — un <strong>bandeau de consentement</strong> (opt-in préalable) devra être affiché. Plausible et Matomo (configuré sans cookies) peuvent être exemptés de consentement, contrairement à Google Analytics.</em></p></div>
+  <h3>Cookies de mesure d'audience / marketing (soumis à ton consentement)</h3>
+  <p>Nous utilisons <strong>Google Analytics</strong> pour comprendre comment KeyPace est utilisé (pages visitées, provenance du trafic) et améliorer le service. Ces cookies ne sont déposés <strong>qu'après ton accord explicite</strong>, via le bandeau affiché lors de ta première visite.</p>
+  <table>
+    <thead><tr><th>Nom / type</th><th>Finalité</th><th>Durée</th></tr></thead>
+    <tbody>
+      <tr><td><code>_ga</code>, <code>_ga_*</code> (Google Analytics)</td><td>Mesure d'audience anonymisée (pages vues, provenance)</td><td>Jusqu'à 13 mois</td></tr>
+      <tr><td><code>keypace_cookie_consent</code> (<code>localStorage</code>)</td><td>Mémoriser ton choix (accepté / refusé) pour ne pas raffiner le bandeau à chaque visite</td><td>Persistant jusqu'à effacement</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><p><em>Tu peux accepter ou refuser ces cookies à tout moment via le bouton 🍪 en bas à gauche de l'écran. Si tu refuses, Google Analytics n'est jamais chargé.</em></p></div>
 
   <h2>Gérer les cookies</h2>
-  <p>Tu peux à tout moment supprimer ou bloquer les cookies et vider le stockage local via les réglages de ton navigateur. Le blocage des éléments strictement nécessaires peut toutefois empêcher la connexion à ton compte.</p>
+  <p>Tu peux revenir sur ton choix de mesure d'audience à tout moment via le bouton 🍪 en bas à gauche de n'importe quelle page. Tu peux aussi supprimer ou bloquer les cookies et vider le stockage local via les réglages de ton navigateur — le blocage des éléments strictement nécessaires peut toutefois empêcher la connexion à ton compte.</p>
   <p>Liens utiles : <a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener">Chrome</a> · <a href="https://support.mozilla.org/fr/kb/cookies-informations-sites-enregistrent" target="_blank" rel="noopener">Firefox</a> · <a href="https://support.apple.com/fr-be/guide/safari/sfri11471/mac" target="_blank" rel="noopener">Safari</a> · <a href="https://support.microsoft.com/fr-fr/microsoft-edge" target="_blank" rel="noopener">Edge</a>.</p>
 
   <h2>Modifications</h2>

@@ -154,7 +154,45 @@ function confirmationEmail(username, verifyUrl) {
 </html>`;
 }
 
+// Redirection robuste : ne dépend pas du helper res.redirect (absent selon le
+// runtime, ce qui faisait planter la fonction en FUNCTION_INVOCATION_FAILED).
+function redirect(res, url) {
+  res.statusCode = 302;
+  res.setHeader('Location', String(url).replace(/[\r\n]+/g, '')); // garde-fou en-tête valide
+  res.end();
+}
+
+// Confirmation du lien reçu par email (GET /api/verify-email?token=... — voir
+// vercel.json, rewrite vers /api/register pour rester sous la limite Vercel
+// de 12 fonctions sans casser les liens déjà envoyés).
+async function verifyEmail(req, res) {
+  try {
+    const token = (req.query && req.query.token) || (new URL(req.url, `https://${req.headers.host}`).searchParams.get('token'));
+    if (!token) return redirect(res, `${APP_URL}?verified=invalid`);
+
+    const r = await sb(`/users?verification_token=eq.${encodeURIComponent(token)}&select=id,email_verified,verification_expires_at`);
+    const user = r.data && r.data[0];
+
+    if (!user) return redirect(res, `${APP_URL}?verified=invalid`);
+    if (user.email_verified) return redirect(res, `${APP_URL}?verified=already`);
+    // N'expire que si une date est réellement fixée (null => on n'expire pas).
+    if (user.verification_expires_at && new Date(user.verification_expires_at) < new Date())
+      return redirect(res, `${APP_URL}?verified=expired`);
+
+    await sb(`/users?id=eq.${user.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ email_verified: true, verification_token: null, verification_expires_at: null }),
+    });
+
+    return redirect(res, `${APP_URL}?verified=success`);
+  } catch (e) {
+    return redirect(res, `${APP_URL}?verified=error`);
+  }
+}
+
 module.exports = async function handler(req, res) {
+  if (req.method === 'GET') return verifyEmail(req, res);
+
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

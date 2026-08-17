@@ -1,0 +1,2361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard équipe | KeyPace</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA;--series-signups:#FF4D2E;--series-active:#2a78d6;
+    --shadow-sm:0 1px 2px rgba(22,20,15,.04),0 1px 3px rgba(22,20,15,.03);
+    --shadow-md:0 2px 6px rgba(22,20,15,.05),0 8px 20px -8px rgba(22,20,15,.08);
+    --shadow-lift:0 10px 24px -10px rgba(22,20,15,.16)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1;margin:0}
+  .mono{font-family:'JetBrains Mono',monospace}
+  ::selection{background:#FFDACE}
+  header{border-bottom:1px solid var(--border);background:rgba(250,249,245,.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:20}
+  .nav{max-width:1180px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;gap:12px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;color:var(--txt)}
+  .logo .k{width:27px;height:27px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-family:'JetBrains Mono',monospace;box-shadow:0 4px 10px rgba(255,77,46,.4)}
+  .nav .sp{flex:1}
+  .nav .title{font-size:14px;color:var(--muted);font-weight:600}
+  .logout{font-size:13px;color:var(--muted);cursor:pointer;border:1px solid var(--border);background:var(--card);padding:7px 12px;border-radius:9px;transition:color .15s,border-color .15s}
+  .logout:hover{color:var(--txt);border-color:#D8D0C0}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 64px}
+  section{margin:0 0 40px}
+  section h2{font-size:20px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+  .tabs{display:flex;gap:4px;margin-bottom:28px;border-bottom:1px solid var(--border)}
+  .tab-btn{background:none;border:none;padding:12px 6px;margin:0 14px -1px 0;font:inherit;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;display:flex;align-items:center;gap:7px}
+  .tab-btn:hover{color:var(--txt)}
+  .tab-btn.active{color:var(--accent);border-color:var(--accent)}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block;animation:fade-in .2s ease}
+  @media (max-width:640px){.tabs{overflow-x:auto}.tab-btn{flex:0 0 auto}}
+  section h2 .sec-ic{font-size:18px;filter:saturate(1.1)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-sm);transition:box-shadow .18s,transform .18s}
+  .card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+  .card .label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .card .num{font-size:28px;font-weight:700;margin-top:6px}
+  .card .sub{font-size:12px;color:var(--muted);margin-top:4px}
+  .kpi-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+  .kpi-group h3{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+  .callout{background:#FFF6F2;border:1px solid #FFD9CC;border-radius:14px;padding:14px 18px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+  .callout.empty{background:var(--light);border-color:var(--border);color:var(--muted)}
+  .callout h3{margin:0 0 8px;font-size:14px;font-weight:800;color:var(--txt)}
+  .followup-item{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px}
+  .dup-group{padding:6px 0;border-bottom:1px solid #F5E1A0}
+  .dup-group:last-child{border-bottom:none}
+  .dup-group-actions{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px}
+  .competitor-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+  .competitor-card-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .competitor-card-head .fname{font-size:15px;font-weight:800}
+  .competitor-card-body{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--txt);margin-bottom:10px}
+  .competitor-card-body strong{color:var(--muted);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.03em;margin-right:6px}
+  .vault-item,.links-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+  .vault-item:last-child,.links-item:last-child{border-bottom:none}
+  .vault-item-main{display:flex;flex-direction:column;gap:2px;min-width:180px}
+  .vault-item-secret{font-family:'JetBrains Mono',monospace;font-size:13px;flex:1;color:var(--muted);word-break:break-all}
+  .links-item .fname{flex-shrink:0;min-width:160px}
+  .checklist-category{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin:20px 0 8px}
+  .checklist-category:first-child{margin-top:0}
+  .checklist-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+  .checklist-item.overdue{border-color:#FFD9CC;background:#FFFBF8}
+  .checklist-item-main{flex:1;min-width:0}
+  .checklist-item-label{font-size:13.5px;font-weight:700;color:var(--txt)}
+  .checklist-item-why{font-size:12.5px;color:var(--muted);margin-top:3px}
+  .checklist-item-meta{font-size:11.5px;color:var(--muted);margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .checklist-item-actions{flex-shrink:0}
+  .badge-overdue{background:#FBE7E5;color:#C23B2E}
+  .badge-ok{background:#E3F7E9;color:#1C8A45}
+  .followup-item .fname{font-weight:700;flex:1}
+  .brief-item{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:14px;cursor:pointer}
+  .brief-item:hover{text-decoration:underline}
+  .brief-item.urgent{color:#B3261E;font-weight:700}
+  .brief-focus{font-weight:700;margin-top:4px}
+  .wins-ticker{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .win-chip{background:#F0F9F1;border:1px solid #C9EBCC;border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:700;color:#1F7A32;display:flex;align-items:center;gap:6px}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;cursor:pointer;transition:filter .15s}
+  .badge:hover{filter:brightness(.95)}
+  .status-select{font-size:12px;font-weight:700;padding:3px 6px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--txt)}
+  .badge-a_contacter{background:#EFEBE2;color:#6B6455}
+  .badge-envoye{background:#FFF0E0;color:#B4640A}
+  .badge-relance{background:#FFE9D6;color:#C2540A}
+  .badge-repondu{background:#E6F0FF;color:#1D5FD6}
+  .badge-en_negociation{background:#F1E6FF;color:#7A2FCC}
+  .badge-signe{background:#E3F7E9;color:#1C8A45}
+  .badge-perdu{background:#FBE7E5;color:#C23B2E}
+  .badge-pending{background:#FFF0E0;color:#B4640A}
+  .badge-published{background:#E3F7E9;color:#1C8A45}
+  .badge-rejected{background:#FBE7E5;color:#C23B2E}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  .table-wrap{overflow-x:auto;border-radius:16px;box-shadow:var(--shadow-sm)}
+  table.prospects{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;min-width:720px}
+  th,td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--light)}
+  tbody tr{transition:background .12s}
+  tbody tr:hover{background:#FCFAF6}
+  tr:last-child td{border-bottom:none}
+  .muted{color:var(--muted)}
+  .actions{display:flex;gap:6px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:5px;background:var(--accent);color:#fff;font-weight:700;font-size:13px;padding:9px 16px;border:none;border-radius:10px;cursor:pointer;transition:transform .12s,box-shadow .12s,opacity .12s;box-shadow:0 1px 2px rgba(255,77,46,.15)}
+  .btn:hover{opacity:.94;transform:translateY(-1px);box-shadow:0 6px 14px -6px rgba(255,77,46,.5)}
+  .btn:active{transform:translateY(0)}
+  .btn.ghost{background:var(--card);color:var(--txt);border:1px solid var(--border);box-shadow:none}
+  .btn.ghost:hover{box-shadow:var(--shadow-sm);border-color:#D8D0C0}
+  .btn.small{padding:5px 10px;font-size:12px;font-weight:600}
+  .btn.danger{background:#fff;color:#C23B2E;border:1px solid #F3C7C1;box-shadow:none}
+  .btn.danger:hover{background:#FFF5F4;box-shadow:none}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+  .panel h3{font-size:15px;font-weight:800;margin-bottom:12px}
+  .chart-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .chart-legend{display:flex;gap:16px;flex-wrap:wrap}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:600}
+  .legend-item .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .chart-svg{width:100%;height:auto;overflow:visible}
+  .chart-gridline{stroke:var(--border);stroke-width:1}
+  .chart-axis-label{fill:var(--muted);font-size:10px;font-family:'JetBrains Mono',monospace}
+  .chart-crosshair{stroke:var(--muted);stroke-width:1;stroke-dasharray:3,3;pointer-events:none}
+  .chart-tooltip{position:absolute;background:var(--txt);color:#fff;font-size:12px;padding:8px 10px;border-radius:9px;pointer-events:none;white-space:nowrap;transform:translate(-50%,-115%);z-index:5}
+  .chart-tooltip .tt-date{font-weight:700;margin-bottom:3px;font-family:'JetBrains Mono',monospace;font-size:11px}
+  .chart-tooltip .tt-row{display:flex;align-items:center;gap:6px}
+  .chart-tooltip .tt-row .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+  .chart-wrap{position:relative}
+  .traffic-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
+  .td-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+  .td-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px}
+  .td-row .td-label{flex:0 1 auto;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .td-row .td-bar-wrap{flex:1;background:var(--light);border-radius:4px;height:7px;overflow:hidden;min-width:24px}
+  .td-row .td-bar{height:100%;background:var(--accent);border-radius:4px}
+  .td-row .td-val{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);min-width:32px;text-align:right}
+  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+  input,select,textarea{font:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:#fff;color:var(--txt);width:100%;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,.12)}
+  textarea{resize:vertical;min-height:60px}
+  .form-actions{margin-top:12px;display:flex;gap:8px}
+  .cal-nav{display:flex;align-items:center;gap:12px}
+  .cal-nav-arrow{background:var(--card);border:1px solid var(--border);border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:15px;transition:background .12s,border-color .12s}
+  .cal-nav-arrow:hover{background:var(--light);border-color:#D8D0C0}
+  .cal-layout{display:grid;grid-template-columns:1fr 260px;gap:18px;align-items:start}
+  @media (max-width:860px){.cal-layout{grid-template-columns:1fr}}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .cal-dow{font-size:11px;text-transform:uppercase;color:var(--muted);text-align:center;padding-bottom:4px;font-weight:700}
+  .cal-day{background:var(--card);border:1px solid var(--border);border-radius:12px;min-height:96px;padding:6px;display:flex;flex-direction:column;gap:4px;transition:border-color .15s,background .15s}
+  .cal-day.empty{background:transparent;border:none}
+  .cal-day.dragover{border-color:var(--accent);background:#FFF6F2;box-shadow:var(--shadow-sm)}
+  .cal-day .dnum{font-size:11px;color:var(--muted);font-weight:700;padding:2px 4px}
+  .content-card{background:var(--light);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;cursor:grab;line-height:1.35;transition:box-shadow .15s,transform .15s}
+  .content-card:hover{box-shadow:var(--shadow-sm);transform:translateY(-1px)}
+  .content-card:active{cursor:grabbing}
+  .content-card .ctitle{font-weight:700;display:block}
+  .content-card .cmeta{color:var(--muted);font-size:11px}
+  .backlog{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:120px;box-shadow:var(--shadow-sm);transition:border-color .15s,background .15s}
+  .backlog.dragover{border-color:var(--accent);background:#FFF6F2}
+  .backlog h3{font-size:13px;font-weight:800;margin-bottom:2px}
+  .platform-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;background:var(--border);color:var(--txt);margin-right:4px}
+  .history-section{border-top:1px solid var(--border);margin-top:16px;padding-top:14px}
+  .history-section h4{margin:0 0 10px;font-size:13px;font-weight:800}
+  .history-add{display:flex;gap:8px;margin-bottom:10px}
+  .history-add input{flex:1;font-size:13px}
+  .history-list{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+  .history-item{padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px;line-height:1.5}
+  .history-item .h-time{color:var(--muted);font-size:11px;margin-right:6px}
+  .view-toggle{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;flex-shrink:0}
+  .view-toggle-btn{font:inherit;font-size:12.5px;font-weight:700;padding:7px 12px;border:none;background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0}
+  .view-toggle-btn.active{background:var(--accent);color:#fff}
+  .kanban-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
+  .kanban-col{background:var(--light);border-radius:14px;padding:10px;min-width:230px;max-width:230px;flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+  .kanban-col-head{font-size:12px;font-weight:800;color:var(--txt);display:flex;justify-content:space-between;align-items:center;padding:2px 4px 6px}
+  .kanban-col-count{color:var(--muted);font-weight:700}
+  .kanban-col-body{display:flex;flex-direction:column;gap:8px;min-height:60px;transition:background .15s}
+  .kanban-col-body.dragover{background:#FFF6F2;border-radius:10px}
+  .kanban-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 10px;font-size:12.5px;cursor:grab;box-shadow:var(--shadow-sm);transition:transform .15s}
+  .kanban-card:active{cursor:grabbing}
+  .kanban-card:hover{transform:translateY(-1px)}
+  .kanban-card .kc-title{font-weight:700;display:block;margin-bottom:3px}
+  .kanban-card .kc-meta{color:var(--muted);font-size:11px}
+  .kanban-card .kc-actions{display:flex;gap:6px;margin-top:6px}
+  .kanban-card .kc-actions button{font-size:11px;padding:3px 7px;border-radius:6px;border:1px solid var(--border);background:var(--card);cursor:pointer}
+  .platform-checks{display:flex;gap:6px;flex-wrap:wrap}
+  .platform-checks label{display:flex;align-items:center;gap:5px;font-size:12.5px;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;user-select:none;white-space:nowrap;flex-shrink:0}
+  .platform-checks input{margin:0;width:14px;height:14px;flex-shrink:0}
+  .idea-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+  .idea-card{background:var(--light);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .idea-card .ititle{font-weight:700;font-size:13.5px;margin-bottom:6px;line-height:1.35}
+  .idea-card .iangle{color:var(--muted);font-size:12px;line-height:1.5;margin-bottom:10px}
+  .idea-card .iadded{color:#1F7A32;font-size:12.5px;font-weight:700}
+  #gate{position:fixed;inset:0;background:radial-gradient(circle at 50% 0%,#FFF3EE 0%,var(--bg) 55%);display:flex;align-items:center;justify-content:center;z-index:100}
+  #gate .box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:34px 32px;width:100%;max-width:340px;text-align:center;box-shadow:var(--shadow-lift)}
+  #gate .box .k{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:19px;margin:0 auto 14px;box-shadow:0 6px 16px rgba(255,77,46,.4)}
+  #gate h1{font-size:19px;margin-bottom:6px}
+  #gate p{color:var(--muted);font-size:14px;margin:0 0 16px}
+  #gate input{margin-bottom:10px}
+  #gate .err{color:#C23B2E;font-size:13px;min-height:18px;margin-top:8px}
+  #app{display:none;animation:fade-in .25s ease}
+  @keyframes fade-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .skeleton{background:linear-gradient(90deg,var(--light) 25%,#EFEBE0 37%,var(--light) 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;border-radius:8px;height:14px}
+  @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+  .empty-msg{color:var(--muted);font-size:13px;padding:10px 2px}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <div class="k">K</div>
+    <h1>Dashboard équipe</h1>
+    <p>Entrez la clé d'accès partagée pour continuer.</p>
+    <input id="gate-key" type="password" placeholder="Clé d'équipe" autocomplete="off">
+    <button class="btn" style="width:100%;justify-content:center" onclick="tryUnlock()">Entrer</button>
+    <div class="err" id="gate-err"></div>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="nav">
+      <span class="logo"><span class="k">K</span> KeyPace</span>
+      <span class="title">Dashboard équipe</span>
+      <span class="sp"></span>
+      <span class="logout" onclick="logout()">Se déconnecter</span>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <div class="tabs">
+      <button class="tab-btn" data-tab="kpi" onclick="switchTab('kpi')"><span class="sec-ic">📈</span>KPI</button>
+      <button class="tab-btn" data-tab="prospects" onclick="switchTab('prospects')"><span class="sec-ic">🏫</span>Prospection écoles</button>
+      <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')"><span class="sec-ic">🗓️</span>Calendrier marketing</button>
+      <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')"><span class="sec-ic">💬</span>Avis</button>
+      <button class="tab-btn" data-tab="backlog" onclick="switchTab('backlog')"><span class="sec-ic">🛠️</span>Backlog dev</button>
+      <button class="tab-btn" data-tab="security" onclick="switchTab('security')"><span class="sec-ic">🔒</span>Sécurité</button>
+      <button class="tab-btn" data-tab="competitors" onclick="switchTab('competitors')"><span class="sec-ic">🎯</span>Concurrents</button>
+    </div>
+
+    <section id="kpi-section" class="tab-panel">
+      <h2><span class="sec-ic">📈</span>KPI de croissance</h2>
+
+      <div class="callout" id="daily-brief" style="display:none">
+        <h3>🎯 Brief du jour</h3>
+        <div id="daily-brief-items"></div>
+      </div>
+      <div class="wins-ticker" id="wins-ticker"></div>
+
+      <div class="kpi-groups">
+        <div class="kpi-group">
+          <h3>Acquisition &amp; conversion</h3>
+          <div class="cards" id="kpi-acquisition">
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+          </div>
+        </div>
+        <div class="kpi-group">
+          <h3>Trafic site</h3>
+          <div class="cards" id="kpi-traffic">
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+          </div>
+        </div>
+        <div class="kpi-group">
+          <h3>Ventes B2B écoles</h3>
+          <div class="cards" id="kpi-b2b">
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+          </div>
+        </div>
+        <div class="kpi-group">
+          <h3>Engagement produit</h3>
+          <div class="cards" id="kpi-engagement">
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+            <div class="card"><div class="skeleton" style="width:65%;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:22px"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:16px">
+        <div class="chart-head">
+          <h3 style="margin:0">Évolution sur 30 jours</h3>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot" style="background:var(--series-signups)"></span>Nouveaux inscrits</span>
+            <span class="legend-item"><span class="dot" style="background:var(--series-active)"></span>Dernière activité connue</span>
+          </div>
+        </div>
+        <div id="trend-chart"></div>
+        <p class="muted" style="font-size:12px;margin:6px 0 0">« Dernière activité » compte les utilisateurs dont la session la plus récente tombe ce jour-là — pas un vrai cumul d'actifs quotidiens (une seule date est stockée par utilisateur).</p>
+      </div>
+
+      <div class="panel" id="traffic-detail-panel" style="margin-top:16px;display:none">
+        <h3>Détail du trafic (30 jours)</h3>
+        <div class="traffic-detail-grid">
+          <div>
+            <div class="td-title">Pages les plus visitées</div>
+            <div id="traffic-pages"></div>
+          </div>
+          <div>
+            <div class="td-title">Appareils</div>
+            <div id="traffic-devices"></div>
+          </div>
+          <div>
+            <div class="td-title">Sources de trafic</div>
+            <div id="traffic-channels"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="prospects-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">🏫</span>Prospection écoles</h2>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="muted" id="last-sync" style="font-size:12px"></span>
+          <button class="btn ghost small" onclick="syncZimbra()" id="sync-btn">🔄 Sync emails</button>
+          <button class="btn ghost small" onclick="exportProspectsCSV()">⬇ Export CSV</button>
+          <button class="btn ghost small" onclick="document.getElementById('csv-file-input').click()">⬆ Import CSV</button>
+          <input type="file" id="csv-file-input" accept=".csv,text/csv" style="display:none" onchange="handleCSVImport(event)">
+          <button class="btn" onclick="openAddForm()">+ Ajouter une école</button>
+        </div>
+      </div>
+      <div id="sync-result"></div>
+      <div id="import-result"></div>
+
+      <div class="panel" id="prospect-form" style="display:none">
+        <h3 id="prospect-form-title">Nouvelle école</h3>
+        <div class="form-grid">
+          <input id="p-school" placeholder="Nom de l'école *">
+          <input id="p-contact" placeholder="Nom du contact">
+          <input id="p-email" type="email" placeholder="Email du contact">
+          <input id="p-phone" placeholder="Téléphone">
+          <input id="p-city" placeholder="Ville">
+          <div>
+            <label style="font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">Prochain rendez-vous</label>
+            <input id="p-meeting" type="datetime-local">
+          </div>
+          <input id="p-students" placeholder="Effectif estimé (ex. ~1000 élèves)">
+          <input id="p-students-source" placeholder="Source (ex. Wikipédia, site officiel, non trouvé)">
+        </div>
+        <textarea id="p-notes" placeholder="Notes" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" id="prospect-save-btn" onclick="saveProspect()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeProspectForm()">Annuler</button>
+        </div>
+        <div id="prospect-history" class="history-section" style="display:none">
+          <h4>🕒 Historique</h4>
+          <div class="history-add">
+            <input id="prospect-note-input" placeholder="Ajouter une note...">
+            <button class="btn small ghost" style="width:auto" onclick="addProspectNote()">Ajouter</button>
+          </div>
+          <div id="prospect-history-list" class="history-list"></div>
+        </div>
+      </div>
+
+      <div id="followup-callout"></div>
+      <div id="duplicates-callout"></div>
+      <div id="meetings-panel"></div>
+
+      <div class="panel" id="followup-msg-panel" style="display:none;margin-bottom:16px">
+        <h3 id="followup-msg-title" style="margin:0 0 10px">Message de relance</h3>
+        <select id="followup-msg-template" onchange="switchFollowupTemplate()" style="margin-bottom:10px;font-size:13px;padding:7px 10px"></select>
+        <textarea id="followup-msg-text" style="min-height:150px"></textarea>
+        <div class="form-actions">
+          <button class="btn" id="followup-msg-copy-btn" onclick="copyFollowupMessage()">📋 Copier</button>
+          <button class="btn ghost" onclick="closeFollowupMessage()">Fermer</button>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+        <input id="prospect-search" type="search" placeholder="🔎 Rechercher (école, ville, contact, email...)" oninput="window.__duplicateGroupFilter=null;renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="view-toggle" id="prospects-view-toggle">
+            <button class="view-toggle-btn" id="prospects-view-btn-table" onclick="setProspectsView('table')">📋 Tableau</button>
+            <button class="view-toggle-btn" id="prospects-view-btn-kanban" onclick="setProspectsView('kanban')">📊 Kanban</button>
+          </div>
+          <select id="sort-select" onchange="renderProspects()" style="width:auto;font-size:13px;padding:7px 10px">
+            <option value="relance">Trier par relance (défaut)</option>
+            <option value="ville">Trier par ville</option>
+            <option value="ecole">Trier par école (A-Z)</option>
+            <option value="statut">Trier par statut</option>
+            <option value="recent">Trier par ajout (récent)</option>
+          </select>
+        </div>
+      </div>
+      <div id="duplicate-filter-note"></div>
+
+      <div class="table-wrap" id="prospects-table-wrap">
+        <table class="prospects">
+          <thead>
+            <tr>
+              <th>École</th><th>Ville</th><th>Contact</th><th>Statut</th><th>Dernier contact</th><th>Relance</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="prospects-body"></tbody>
+        </table>
+      </div>
+      <div class="kanban-board" id="prospects-kanban" style="display:none"></div>
+    </section>
+
+    <section id="calendar-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">🗓️</span>Calendrier marketing</h2>
+        <div class="cal-nav">
+          <div class="view-toggle" id="calendar-view-toggle">
+            <button class="view-toggle-btn" id="calendar-view-btn-grid" onclick="setCalendarView('grid')">🗓️ Calendrier</button>
+            <button class="view-toggle-btn" id="calendar-view-btn-kanban" onclick="setCalendarView('kanban')">📊 Kanban</button>
+          </div>
+          <button class="cal-nav-arrow" onclick="shiftMonth(-1)">‹</button>
+          <span class="mono" id="cal-label" style="font-weight:700;min-width:130px;text-align:center;display:inline-block"></span>
+          <button class="cal-nav-arrow" onclick="shiftMonth(1)">›</button>
+          <button class="btn small" style="width:auto" onclick="openAddEventForm()">+ Contenu</button>
+        </div>
+      </div>
+
+      <div class="panel" id="idea-bank" style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+          <div>
+            <h3 style="margin:0 0 2px">💡 Banque d'idées</h3>
+            <p class="muted" style="font-size:12.5px;margin:0">En panne d'inspiration ? Génère des idées prêtes à planifier.</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="idea-audience" style="font-size:13px;padding:7px 10px">
+              <option value="">Toutes les audiences</option>
+              <option value="etudiants">Étudiants</option>
+              <option value="emploi">Recherche d'emploi</option>
+              <option value="parents">Parents</option>
+              <option value="general">Grand public</option>
+              <option value="preuve_sociale">Preuve sociale</option>
+              <option value="conversion">Conversion</option>
+            </select>
+            <button class="btn small" style="width:auto" onclick="generateContentIdeas()">✨ Générer 5 idées</button>
+          </div>
+        </div>
+        <div id="idea-bank-results" style="margin-top:14px"></div>
+      </div>
+
+      <div class="panel" id="event-form" style="display:none">
+        <h3>Nouveau contenu</h3>
+        <div class="form-grid">
+          <input id="e-title" placeholder="Titre *">
+          <select id="e-type">
+            <option value="video">Vidéo</option>
+            <option value="post" selected>Post</option>
+            <option value="story">Story</option>
+            <option value="article">Article</option>
+            <option value="newsletter">Newsletter</option>
+            <option value="tache">Tâche</option>
+          </select>
+          <input id="e-date" type="date">
+          <select id="e-account">
+            <option value="keypace">KeyPace (compte marque)</option>
+            <option value="fondateur_1">Fondateur 1 (perso)</option>
+            <option value="fondateur_2">Fondateur 2 (perso)</option>
+          </select>
+        </div>
+        <div style="margin-top:10px">
+          <label style="font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:6px">Plateformes (posté sur plusieurs à la fois ? coche-les toutes)</label>
+          <div class="platform-checks" id="e-platforms">
+            <label><input type="checkbox" value="instagram"> Instagram</label>
+            <label><input type="checkbox" value="tiktok"> TikTok</label>
+            <label><input type="checkbox" value="youtube"> YouTube</label>
+            <label><input type="checkbox" value="linkedin"> LinkedIn</label>
+            <label><input type="checkbox" value="facebook"> Facebook</label>
+            <label><input type="checkbox" value="blog"> Blog</label>
+            <label><input type="checkbox" value="autre"> Autre</label>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+          <label style="font-size:12px;color:var(--muted);font-weight:700">Texte du post</label>
+          <button class="btn ghost small" type="button" style="width:auto;padding:4px 10px;font-size:12px" onclick="suggestHooks()">💡 Suggérer des accroches</button>
+        </div>
+        <div id="hook-suggestions" style="display:none;margin-top:6px;flex-direction:column;gap:5px"></div>
+        <textarea id="e-caption" placeholder="Texte du post (ce qui sera publié)" style="margin-top:6px;min-height:90px"></textarea>
+        <textarea id="e-notes" placeholder="Notes internes (pas publiées)" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" onclick="saveEvent()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeEventForm()">Annuler</button>
+          <button class="btn danger" id="event-delete-btn" style="display:none;margin-left:auto" onclick="deleteEvent(editingEventId)">Supprimer</button>
+        </div>
+        <p class="muted" style="font-size:12px;margin:10px 0 0">Sans date : le contenu va dans « Idées à planifier » — glissez-le ensuite sur un jour.</p>
+        <div id="content-history" class="history-section" style="display:none">
+          <h4>🕒 Historique</h4>
+          <div class="history-add">
+            <input id="content-note-input" placeholder="Ajouter une note...">
+            <button class="btn small ghost" style="width:auto" onclick="addContentNote()">Ajouter</button>
+          </div>
+          <div id="content-history-list" class="history-list"></div>
+        </div>
+      </div>
+
+      <div class="cal-layout" id="calendar-grid-layout">
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="backlog" id="backlog" ondragover="allowDrop(event)" ondrop="dropOnBacklog(event)">
+          <h3>Idées à planifier</h3>
+          <div id="backlog-list"></div>
+        </div>
+      </div>
+      <div class="kanban-board" id="calendar-kanban" style="display:none"></div>
+    </section>
+
+    <section id="reviews-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">💬</span>Avis</h2>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="muted" id="reviews-summary" style="font-size:12px"></span>
+          <button class="btn ghost small" onclick="syncGoogleReviews()" id="sync-google-btn">🔄 Sync avis Google</button>
+        </div>
+      </div>
+
+      <div class="panel" id="google-setup-panel" style="margin-bottom:16px">
+        <h3 style="margin:0 0 4px">Configuration Google (une seule fois)</h3>
+        <p class="muted" style="font-size:12.5px;margin:0 0 12px">Retrouve le <b>Place ID</b> de la fiche KeyPace pour configurer <code>GOOGLE_PLACE_ID</code> sur Vercel — sans jamais avoir à saisir la clé API ici. Si la recherche par nom renvoie des établissements sans rapport, cherche plutôt par <b>numéro de téléphone</b> (celui affiché sur la fiche Google), plus fiable.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="google-query" placeholder="ex. KeyPace Namur ou +32 471 40 18 59" style="flex:1;min-width:220px">
+          <button class="btn small" style="width:auto" onclick="findGooglePlace()">🔍 Chercher</button>
+        </div>
+        <div id="google-place-results" style="margin-top:12px"></div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="prospects">
+          <thead>
+            <tr>
+              <th>Auteur</th><th>Note</th><th>Commentaire</th><th>Statut</th><th>Déposé le</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reviews-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="backlog-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">🛠️</span>Backlog dev</h2>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="view-toggle" id="backlog-view-toggle">
+            <button class="view-toggle-btn" id="backlog-view-btn-table" onclick="setBacklogView('table')">📋 Tableau</button>
+            <button class="view-toggle-btn" id="backlog-view-btn-kanban" onclick="setBacklogView('kanban')">📊 Kanban</button>
+          </div>
+          <button class="btn" onclick="openDevIssueForm()">+ Nouveau ticket</button>
+        </div>
+      </div>
+
+      <div class="panel" id="dev-issue-form" style="display:none">
+        <h3 id="dev-issue-form-title">Nouveau ticket</h3>
+        <div class="form-grid">
+          <input id="d-title" placeholder="Titre *">
+          <select id="d-type">
+            <option value="bug">Bug</option>
+            <option value="feature" selected>Feature</option>
+            <option value="tech_debt">Dette technique</option>
+            <option value="idee">Idée</option>
+          </select>
+          <select id="d-priority">
+            <option value="basse">Basse</option>
+            <option value="moyenne" selected>Moyenne</option>
+            <option value="haute">Haute</option>
+            <option value="urgente">Urgente</option>
+          </select>
+          <select id="d-status">
+            <option value="backlog" selected>Backlog</option>
+            <option value="a_faire">À faire</option>
+            <option value="en_cours">En cours</option>
+            <option value="fait">Fait</option>
+          </select>
+        </div>
+        <textarea id="d-description" placeholder="Description" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" onclick="saveDevIssue()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeDevIssueForm()">Annuler</button>
+          <button class="btn danger" id="dev-issue-delete-btn" style="display:none;margin-left:auto" onclick="deleteDevIssue(editingDevIssueId)">Supprimer</button>
+        </div>
+        <div id="dev-issue-history" class="history-section" style="display:none">
+          <h4>🕒 Historique</h4>
+          <div class="history-add">
+            <input id="dev-issue-note-input" placeholder="Ajouter une note...">
+            <button class="btn small ghost" style="width:auto" onclick="addDevIssueNote()">Ajouter</button>
+          </div>
+          <div id="dev-issue-history-list" class="history-list"></div>
+        </div>
+      </div>
+
+      <div class="table-wrap" id="backlog-table-wrap">
+        <table class="prospects">
+          <thead>
+            <tr><th>Titre</th><th>Type</th><th>Priorité</th><th>Statut</th><th>Mis à jour</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="backlog-body"></tbody>
+        </table>
+      </div>
+      <div class="kanban-board" id="backlog-kanban" style="display:none"></div>
+    </section>
+
+    <section id="security-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">🔒</span>Sécurité</h2>
+      </div>
+
+      <div class="callout" style="background:#FFF6F2;border-color:#FFD9CC">
+        <h3>⚠️ À ne jamais stocker ici</h3>
+        <p style="margin:0;font-size:13px;color:var(--txt)">La clé service Supabase et la clé secrète Stripe (production) : ce sont les clés qui donnent accès à l'endroit où ce coffre vit — les y stocker n'apporte aucune protection réelle. Garde-les dans un vrai gestionnaire de mots de passe (1Password, Bitwarden). Ce coffre chiffre au repos (protège contre une fuite de la base), mais pas contre une fuite de l'ADMIN_KEY du dashboard.</p>
+      </div>
+
+      <div class="toolbar" style="margin-top:20px">
+        <h3 style="margin:0">🔑 Coffre-fort de secrets</h3>
+        <button class="btn small" style="width:auto" onclick="openVaultForm()">+ Ajouter un secret</button>
+      </div>
+
+      <div class="panel" id="vault-form" style="display:none;margin-bottom:16px">
+        <h3 id="vault-form-title">Nouveau secret</h3>
+        <div class="form-grid">
+          <input id="v-label" placeholder="Libellé * (ex. Compte Google Ads)">
+          <input id="v-username" placeholder="Identifiant / email">
+          <input id="v-category" placeholder="Catégorie (ex. Marketing, Hébergement)">
+        </div>
+        <input id="v-secret" type="password" placeholder="Mot de passe / secret *" style="margin-top:10px">
+        <textarea id="v-notes" placeholder="Notes" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" id="vault-save-btn" onclick="saveVaultSecret()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeVaultForm()">Annuler</button>
+          <button class="btn danger" id="vault-delete-btn" style="display:none;margin-left:auto" onclick="deleteVaultSecret(editingVaultId)">Supprimer</button>
+        </div>
+      </div>
+
+      <div id="vault-list"></div>
+
+      <div class="toolbar" style="margin-top:28px">
+        <h3 style="margin:0">🔗 Répertoire de liens</h3>
+        <button class="btn small" style="width:auto" onclick="openLinkForm()">+ Ajouter un lien</button>
+      </div>
+      <div class="panel" id="link-form" style="display:none;margin-bottom:16px">
+        <div class="form-grid">
+          <input id="l-label" placeholder="Libellé * (ex. Console Supabase)">
+          <input id="l-url" type="url" placeholder="URL *">
+          <input id="l-category" placeholder="Catégorie (optionnel)">
+        </div>
+        <div class="form-actions">
+          <button class="btn" onclick="saveResourceLink()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeLinkForm()">Annuler</button>
+        </div>
+      </div>
+      <div id="links-list"></div>
+
+      <div class="toolbar" style="margin-top:28px">
+        <h3 style="margin:0">🛡️ Checklist sécurité périodique</h3>
+      </div>
+      <p class="muted" style="font-size:13px;margin:-6px 0 14px">À parcourir régulièrement — basée sur les standards OWASP, les recommandations RGPD et le guide "Your Europe" de la Commission européenne sur la sécurisation d'un site web. Le but : repérer les failles et limites potentielles, pas remplacer un vrai audit de sécurité.</p>
+      <div id="security-checklist"></div>
+    </section>
+
+    <section id="competitors-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">🎯</span>Concurrents</h2>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="suggestCompetitor()">💡 Suggérer un concurrent</button>
+          <button class="btn" onclick="openCompetitorForm()">+ Ajouter un concurrent</button>
+        </div>
+      </div>
+
+      <div class="panel competitor-card" id="competitor-suggestion-panel" style="display:none">
+        <div class="competitor-card-head">
+          <strong style="text-transform:none;font-size:14px">💡 Suggestion : <a id="suggestion-name" href="#" target="_blank" rel="noopener" class="fname"></a></strong>
+        </div>
+        <p class="muted" id="suggestion-reason" style="margin:4px 0 12px"></p>
+        <div class="form-actions">
+          <button class="btn small" onclick="acceptCompetitorSuggestion()">✅ Ajouter aux concurrents</button>
+          <button class="btn small ghost" onclick="dismissCompetitorSuggestion()">✕ Ignorer</button>
+        </div>
+      </div>
+
+      <div class="panel" id="competitor-form" style="display:none">
+        <h3 id="competitor-form-title">Nouveau concurrent</h3>
+        <div class="form-grid">
+          <input id="c-name" placeholder="Nom *">
+          <input id="c-url" type="url" placeholder="URL *">
+          <input id="c-revenue" placeholder="CA estimé (ex. 500k$/an, inconnu...)">
+        </div>
+        <textarea id="c-strengths" placeholder="Points forts" style="margin-top:10px"></textarea>
+        <textarea id="c-weaknesses" placeholder="Points faibles" style="margin-top:10px"></textarea>
+        <textarea id="c-notes" placeholder="Notes" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" onclick="saveCompetitor()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeCompetitorForm()">Annuler</button>
+          <button class="btn danger" id="competitor-delete-btn" style="display:none;margin-left:auto" onclick="deleteCompetitor(editingCompetitorId)">Supprimer</button>
+        </div>
+        <div id="competitor-history" class="history-section" style="display:none">
+          <h4>🕒 Historique</h4>
+          <div class="history-add">
+            <input id="competitor-note-input" placeholder="Ajouter une note...">
+            <button class="btn small ghost" style="width:auto" onclick="addCompetitorNote()">Ajouter</button>
+          </div>
+          <div id="competitor-history-list" class="history-list"></div>
+        </div>
+      </div>
+
+      <div id="competitors-list"></div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+const KEY_STORAGE = 'kp_dashboard_key';
+const STATUS_LABELS = { a_contacter:'À contacter', envoye:'Envoyé', relance:'Relancé', repondu:'Répondu', en_negociation:'Négociation', signe:'Signé', perdu:'Perdu' };
+const STATUS_FLOW = ['a_contacter','envoye','relance','repondu','en_negociation','signe','perdu'];
+let calMonth = new Date();
+
+function adminKey(){ return localStorage.getItem(KEY_STORAGE) || ''; }
+
+async function api(action, { method = 'GET', body, params } = {}) {
+  const qs = new URLSearchParams({ action, ...(params || {}) });
+  const url = method === 'GET' ? `/api/dashboard?${qs}` : '/api/dashboard';
+  const r = await fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey() },
+    body: method === 'GET' ? undefined : JSON.stringify({ action, ...(body || {}) }),
+  });
+  if (r.status === 401) { logout(); throw new Error('Non autorisé'); }
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || 'Erreur serveur');
+  return data;
+}
+
+async function tryUnlock(){
+  const key = document.getElementById('gate-key').value.trim();
+  const errEl = document.getElementById('gate-err');
+  if (!key) return;
+  localStorage.setItem(KEY_STORAGE, key);
+  try {
+    await api('kpis');
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    boot();
+  } catch (e) {
+    localStorage.removeItem(KEY_STORAGE);
+    errEl.textContent = 'Clé invalide.';
+  }
+}
+
+function logout(){
+  localStorage.removeItem(KEY_STORAGE);
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('gate').style.display = 'flex';
+}
+
+const TAB_SECTIONS = { kpi: 'kpi-section', prospects: 'prospects-section', calendar: 'calendar-section', reviews: 'reviews-section', backlog: 'backlog-section', security: 'security-section', competitors: 'competitors-section' };
+const REVIEW_STATUS_LABELS = { pending: 'En attente', published: 'Publié', rejected: 'Rejeté' };
+
+function switchTab(name){
+  if (!TAB_SECTIONS[name]) name = 'kpi';
+  Object.entries(TAB_SECTIONS).forEach(([key, id]) => {
+    document.getElementById(id).classList.toggle('active', key === name);
+  });
+  document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === name));
+  localStorage.setItem('kp_active_tab', name);
+}
+
+function boot(){
+  loadKpis();
+  loadTrafficDetail();
+  setProspectsView(prospectsView);
+  loadProspects();
+  renderCalendarHeader();
+  setCalendarView(calendarView);
+  loadCalendar();
+  loadUsedIdeaTopics();
+  loadReviews();
+  loadVault();
+  loadLinks();
+  loadSecurityChecklist();
+  setBacklogView(backlogView);
+  loadDevBacklog();
+  loadCompetitors();
+  switchTab(localStorage.getItem('kp_active_tab') || 'kpi');
+}
+
+// ─── KPI ──────────────────────────────────────────────
+function kpiCard(label, num, sub){
+  return `<div class="card"><div class="label">${label}</div><div class="num mono">${num}</div>${sub ? `<div class="sub">${sub}</div>` : ''}</div>`;
+}
+
+function trafficCardsHtml(traffic, conversionToSignup30d){
+  if (!traffic) return kpiCard('Trafic site', '—', 'Google Analytics non configuré');
+  if (traffic.error) return `<div class="card"><div class="label">Trafic site</div><div class="sub" style="color:#C23B2E">Erreur GA4 : ${traffic.error}</div></div>`;
+  return kpiCard('Visiteurs (7j)', traffic.visitors7d) +
+    kpiCard('Visiteurs (30j)', traffic.visitors30d) +
+    kpiCard('Pages vues (30j)', traffic.pageviews30d) +
+    kpiCard('Conversion visiteur→inscrit', conversionToSignup30d != null ? conversionToSignup30d + '%' : '—', 'sur 30 jours');
+}
+
+const DEVICE_LABELS = { desktop: 'Ordinateur', mobile: 'Mobile', tablet: 'Tablette' };
+const CHANNEL_LABELS = {
+  'Organic Search': 'Recherche organique', 'Direct': 'Direct', 'Referral': 'Référent',
+  'Organic Social': 'Réseaux sociaux', 'Paid Search': 'Recherche payante', 'Email': 'Email',
+  'Unassigned': 'Non attribué',
+};
+
+function trafficDetailRows(items, labelKey, valueKey, labelMap){
+  if (!items.length) return `<div class="empty-msg">Pas encore de données.</div>`;
+  const max = Math.max(...items.map((i) => i[valueKey]));
+  return items.map((i) => {
+    const raw = i[labelKey];
+    const label = labelMap ? (labelMap[raw] || raw) : raw;
+    return `<div class="td-row">
+      <span class="td-label" title="${raw}">${label}</span>
+      <span class="td-bar-wrap"><span class="td-bar" style="width:${max ? Math.round((i[valueKey] / max) * 100) : 0}%"></span></span>
+      <span class="td-val">${i[valueKey]}</span>
+    </div>`;
+  }).join('');
+}
+
+async function loadTrafficDetail(){
+  try {
+    const d = await api('traffic-detail');
+    const panel = document.getElementById('traffic-detail-panel');
+    if (!d.configured) { panel.style.display = 'none'; return; }
+    panel.style.display = 'block';
+    if (d.error) {
+      panel.querySelector('.traffic-detail-grid').innerHTML = `<div style="color:#C23B2E;font-size:13px">Erreur GA4 : ${d.error}</div>`;
+      return;
+    }
+    document.getElementById('traffic-pages').innerHTML = trafficDetailRows(d.topPages, 'path', 'views');
+    document.getElementById('traffic-devices').innerHTML = trafficDetailRows(d.devices, 'category', 'users', DEVICE_LABELS);
+    document.getElementById('traffic-channels').innerHTML = trafficDetailRows(d.channels, 'channel', 'sessions', CHANNEL_LABELS);
+  } catch (e) { console.error(e); }
+}
+
+// Brief marketing : transforme les KPI bruts en priorités actionnables du
+// jour (au lieu de simples compteurs à interpréter soi-même).
+function renderDailyBrief(b, brief){
+  const items = [];
+  // Automatisations : signaux les plus urgents en premier (relance qui glisse
+  // depuis un moment, RDV imminent), avant les priorités routinières.
+  if (brief.overdueFollowups && brief.overdueFollowups.length) {
+    const n = brief.overdueFollowups.length;
+    items.push({ ic:'🚨', text:`${n} relance${n>1?'s':''} en retard de plus de 3 jours : ${brief.overdueFollowups.map(p=>escHtml(p.school_name)).join(', ')}`, tab:'prospects', urgent:true });
+  }
+  if (brief.upcomingMeetings && brief.upcomingMeetings.length) {
+    const n = brief.upcomingMeetings.length;
+    items.push({ ic:'📅', text:`RDV dans moins de 24h : ${brief.upcomingMeetings.map(p=>`${escHtml(p.school_name)} (${fmtDateTime(p.meeting_at)})`).join(', ')}`, tab:'prospects', urgent:true });
+  }
+  if (b.dueFollowups > 0) items.push({ ic:'🏫', text:`${b.dueFollowups} école${b.dueFollowups>1?'s':''} à relancer`, tab:'prospects' });
+  if (brief.reviewsPending > 0) items.push({ ic:'💬', text:`${brief.reviewsPending} avis en attente de modération`, tab:'reviews' });
+  if (brief.gapDays.length > 0) items.push({ ic:'🗓️', text:`${brief.gapDays.length} jour${brief.gapDays.length>1?'s':''} cette semaine sans contenu planifié`, tab:'calendar' });
+
+  const briefEl = document.getElementById('daily-brief');
+  if (!items.length) {
+    briefEl.style.display = 'block';
+    briefEl.classList.add('empty');
+    document.getElementById('daily-brief-items').innerHTML = `<p style="margin:0;font-size:14px">Rien d'urgent aujourd'hui 🎉 Bon moment pour avancer sur du contenu ou de la prospection à froid.</p>`;
+    return;
+  }
+  briefEl.style.display = 'block';
+  briefEl.classList.remove('empty');
+  document.getElementById('daily-brief-items').innerHTML =
+    `<div class="brief-focus">👉 Priorité : ${items[0].text}</div>` +
+    items.map(it => `<div class="brief-item${it.urgent?' urgent':''}" onclick="switchTab('${it.tab}')"><span>${it.ic}</span><span>${it.text}</span></div>`).join('');
+}
+
+function renderWinsTicker(a, e){
+  const wins = [
+    { ic:'👋', label:`${a.signups7d} nouvel${a.signups7d>1?'les':'le'} inscription${a.signups7d>1?'s':''} (7j)` },
+    { ic:'⚡', label:`${e.activeUsers7d} actif${e.activeUsers7d>1?'s':''} (7j)` },
+    { ic:'🏆', label:`${e.weeklyChallengeParticipants} participant${e.weeklyChallengeParticipants>1?'s':''} au défi hebdo` },
+  ];
+  document.getElementById('wins-ticker').innerHTML = wins.map(w => `<div class="win-chip">${w.ic} ${w.label}</div>`).join('');
+}
+
+async function loadKpis(){
+  try {
+    const { acquisition: a, b2b: b, engagement: e, trend, brief } = await api('kpis');
+    renderDailyBrief(b, brief);
+    renderWinsTicker(a, e);
+    document.getElementById('kpi-acquisition').innerHTML =
+      kpiCard('Inscrits (total)', a.totalUsers) +
+      kpiCard('Nouveaux (7j)', a.signups7d) +
+      kpiCard('Nouveaux (30j)', a.signups30d) +
+      kpiCard('Conversion free→expert', a.conversionRate + '%', a.expertUsers + ' expert / ' + a.freeUsers + ' free');
+    document.getElementById('kpi-traffic').innerHTML = trafficCardsHtml(a.traffic, a.conversionToSignup30d);
+    document.getElementById('kpi-b2b').innerHTML =
+      kpiCard('Écoles clientes', b.institutionsCount) +
+      kpiCard('Sièges vendus', b.totalSeats) +
+      kpiCard('À relancer', b.dueFollowups) +
+      kpiCard('Signées', b.prospectsByStatus.signe || 0);
+    document.getElementById('kpi-engagement').innerHTML =
+      kpiCard('Actifs (7j)', e.activeUsers7d) +
+      kpiCard('Actifs (30j)', e.activeUsers30d) +
+      kpiCard('Certificats émis', e.certificatesIssued) +
+      kpiCard('Participants défi hebdo', e.weeklyChallengeParticipants);
+    renderTrendChart(trend);
+  } catch (e) { console.error(e); }
+}
+
+function fmtDayLabel(iso){ const d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('fr-BE', { day:'2-digit', month:'2-digit' }); }
+
+function renderTrendChart(trend){
+  const el = document.getElementById('trend-chart');
+  const signups = trend.signups, active = trend.lastActive;
+  const n = signups.length;
+  const W = 680, H = 200, mL = 30, mR = 8, mT = 8, mB = 22;
+  const pw = W - mL - mR, ph = H - mT - mB;
+  const maxVal = Math.max(1, ...signups.map(d => d.count), ...active.map(d => d.count));
+  const x = i => mL + (n === 1 ? 0 : (i / (n - 1)) * pw);
+  const y = v => mT + ph - (v / maxVal) * ph;
+  const path = series => series.map((d, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(d.count).toFixed(1)}`).join(' ');
+
+  const gridSteps = 4;
+  let grid = '';
+  for (let s = 0; s <= gridSteps; s++) {
+    const v = Math.round((maxVal * s) / gridSteps);
+    const gy = y(v);
+    grid += `<line class="chart-gridline" x1="${mL}" x2="${W - mR}" y1="${gy.toFixed(1)}" y2="${gy.toFixed(1)}"/>`;
+    grid += `<text class="chart-axis-label" x="${mL - 6}" y="${(gy + 3).toFixed(1)}" text-anchor="end">${v}</text>`;
+  }
+  let xLabels = '';
+  const labelEvery = Math.ceil(n / 6);
+  for (let i = 0; i < n; i += labelEvery) {
+    xLabels += `<text class="chart-axis-label" x="${x(i).toFixed(1)}" y="${H - 4}" text-anchor="middle">${fmtDayLabel(signups[i].date)}</text>`;
+  }
+
+  el.innerHTML = `
+    <div class="chart-wrap">
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+        ${grid}
+        ${xLabels}
+        <path d="${path(signups)}" fill="none" stroke="var(--series-signups)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${path(active)}" fill="none" stroke="var(--series-active)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <line id="trend-crosshair" class="chart-crosshair" x1="0" x2="0" y1="${mT}" y2="${mT + ph}" style="display:none"/>
+        <rect id="trend-overlay" x="${mL}" y="${mT}" width="${pw}" height="${ph}" fill="transparent"/>
+      </svg>
+      <div id="trend-tooltip" class="chart-tooltip" style="display:none"></div>
+    </div>`;
+
+  const svg = el.querySelector('.chart-svg');
+  const overlay = el.querySelector('#trend-overlay');
+  const crosshair = el.querySelector('#trend-crosshair');
+  const tooltip = el.querySelector('#trend-tooltip');
+
+  overlay.addEventListener('mousemove', (ev) => {
+    const rect = svg.getBoundingClientRect();
+    const svgX = ((ev.clientX - rect.left) / rect.width) * W;
+    let i = Math.round(((svgX - mL) / pw) * (n - 1));
+    i = Math.max(0, Math.min(n - 1, i));
+    const cx = x(i);
+    crosshair.setAttribute('x1', cx); crosshair.setAttribute('x2', cx);
+    crosshair.style.display = 'block';
+    tooltip.style.display = 'block';
+    tooltip.style.left = ((ev.clientX - rect.left)) + 'px';
+    tooltip.style.top = (y(Math.max(signups[i].count, active[i].count)) / H * rect.height) + 'px';
+    tooltip.innerHTML = `<div class="tt-date">${fmtDayLabel(signups[i].date)}</div>
+      <div class="tt-row"><span class="dot" style="background:var(--series-signups)"></span>${signups[i].count} inscrit${signups[i].count > 1 ? 's' : ''}</div>
+      <div class="tt-row"><span class="dot" style="background:var(--series-active)"></span>${active[i].count} dernière activité</div>`;
+  });
+  overlay.addEventListener('mouseleave', () => {
+    crosshair.style.display = 'none';
+    tooltip.style.display = 'none';
+  });
+}
+
+// ─── Prospection écoles ──────────────────────────────
+function fmtDate(iso){ if (!iso) return '—'; return new Date(iso).toLocaleDateString('fr-BE', { day:'2-digit', month:'2-digit', year:'numeric' }); }
+
+function filterProspects(list){
+  if (window.__duplicateGroupFilter) return list.filter(p => window.__duplicateGroupFilter.has(p.id));
+  const q = document.getElementById('prospect-search').value.trim().toLowerCase();
+  if (!q) return list;
+  return list.filter(p => [p.school_name, p.city, p.contact_name, p.contact_email, p.contact_phone, p.notes]
+    .some(field => (field || '').toLowerCase().includes(q)));
+}
+
+function sortProspects(list){
+  const mode = document.getElementById('sort-select').value;
+  const sorted = [...list];
+  if (mode === 'ville') sorted.sort((a, b) => (a.city || '').localeCompare(b.city || '', 'fr'));
+  else if (mode === 'ecole') sorted.sort((a, b) => (a.school_name || '').localeCompare(b.school_name || '', 'fr'));
+  else if (mode === 'statut') sorted.sort((a, b) => STATUS_FLOW.indexOf(a.status) - STATUS_FLOW.indexOf(b.status));
+  else if (mode === 'recent') sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  // 'relance' : on garde l'ordre déjà renvoyé par l'API (relances dues en premier)
+  return sorted;
+}
+
+async function loadProspects(){
+  try {
+    const { items: list, lastSyncAt, duplicateGroups } = await api('prospects');
+    window.__prospects = list;
+    document.getElementById('last-sync').textContent = lastSyncAt
+      ? `Dernière sync : ${fmtDate(lastSyncAt)}`
+      : 'Jamais synchronisé';
+    const now = Date.now();
+    const due = list.filter(p => p.next_followup_at && new Date(p.next_followup_at).getTime() <= now && p.status !== 'signe' && p.status !== 'perdu');
+
+    const calloutEl = document.getElementById('followup-callout');
+    calloutEl.innerHTML = due.length
+      ? `<div class="callout"><h3>À relancer aujourd'hui (${due.length})</h3>${due.map(p =>
+          `<div class="followup-item"><span class="fname">${p.school_name}</span><span class="badge badge-${p.status}">${STATUS_LABELS[p.status]}</span><span class="muted">depuis le ${fmtDate(p.last_contact_at)}</span></div>`
+        ).join('')}</div>`
+      : `<div class="callout empty">Aucune relance en attente 🎉</div>`;
+
+    renderDuplicatesCallout(list, duplicateGroups || []);
+    renderMeetingsPanel(list, now);
+    renderProspects();
+  } catch (e) { console.error(e); }
+}
+
+function fmtDateTime(iso){
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('fr-BE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+// ─── Calendrier des rendez-vous planifiés ─────────────────────────
+function renderMeetingsPanel(list, now){
+  const upcoming = list
+    .filter(p => p.meeting_at && new Date(p.meeting_at).getTime() >= now)
+    .sort((a, b) => new Date(a.meeting_at) - new Date(b.meeting_at));
+  const el = document.getElementById('meetings-panel');
+  if (!upcoming.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="callout" style="background:#EEF5FF;border-color:#C7DEFF">
+    <h3>📅 Prochains rendez-vous (${upcoming.length})</h3>
+    ${upcoming.map(p => `<div class="followup-item" style="cursor:pointer" onclick="editProspect('${p.id}')">
+      <span class="fname">${escHtml(p.school_name)}</span>
+      <span class="badge badge-${p.status}">${STATUS_LABELS[p.status]}</span>
+      <span class="muted">${fmtDateTime(p.meeting_at)}</span>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ─── Doublons d'écoles ─────────────────────────────────
+// duplicateGroups : tableaux d'ids de prospects (calculé côté serveur, voir
+// findDuplicateProspects dans _dashboard-logic.js) partageant le même nom
+// d'école une fois accents/casse/ponctuation ignorés.
+function renderDuplicatesCallout(list, duplicateGroups){
+  window.__duplicateIds = new Set(duplicateGroups.flatMap(g => g.ids));
+  const byId = Object.fromEntries(list.map(p => [p.id, p]));
+  const calloutEl = document.getElementById('duplicates-callout');
+  if (!duplicateGroups.length) { calloutEl.innerHTML = ''; return; }
+  calloutEl.innerHTML = `<div class="callout" style="background:#FFF9E8;border-color:#F5E1A0">
+    <h3>⚠️ ${duplicateGroups.length} doublon${duplicateGroups.length>1?'s':''} potentiel${duplicateGroups.length>1?'s':''} détecté${duplicateGroups.length>1?'s':''}</h3>
+    ${duplicateGroups.map(g => {
+      const group = g.ids.map(id => byId[id]).filter(Boolean);
+      if (!group.length) return '';
+      return `<div class="dup-group">
+        <div class="followup-item" style="cursor:pointer;margin-bottom:0" onclick='showDuplicateGroup(${JSON.stringify(g.ids)})'>
+          <span class="fname">${group.map(p => escHtml(p.school_name)).join('  ↔  ')}</span>
+          <span class="muted">${group.length} dossiers</span>
+        </div>
+        <div class="dup-group-actions">
+          <button class="btn ghost small" style="width:auto" onclick='dismissDuplicateGroup(${JSON.stringify(g.key)});event.stopPropagation()'>✓ Pas un doublon</button>
+          ${group.map(p => `<button class="btn small danger" style="width:auto" onclick="deleteProspect('${p.id}');event.stopPropagation()">🗑️ Suppr. ${escHtml(p.school_name)}</button>`).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+async function dismissDuplicateGroup(key){
+  await api('dismiss-duplicate', { method:'POST', body: { key } });
+  loadProspects();
+}
+
+function showDuplicateGroup(ids){
+  window.__duplicateGroupFilter = new Set(ids);
+  document.getElementById('prospect-search').value = '';
+  renderProspects();
+}
+
+function clearDuplicateGroupFilter(){
+  window.__duplicateGroupFilter = null;
+  renderProspects();
+}
+
+// ─── Bascule Tableau / Kanban ──────────────────────────────────────
+let prospectsView = localStorage.getItem('kp_prospects_view') || 'table';
+
+function setProspectsView(v){
+  prospectsView = v;
+  localStorage.setItem('kp_prospects_view', v);
+  document.getElementById('prospects-table-wrap').style.display = v === 'table' ? '' : 'none';
+  document.getElementById('prospects-kanban').style.display = v === 'kanban' ? 'flex' : 'none';
+  document.getElementById('prospects-view-btn-table').classList.toggle('active', v === 'table');
+  document.getElementById('prospects-view-btn-kanban').classList.toggle('active', v === 'kanban');
+}
+
+function renderProspects(){
+  const list = window.__prospects || [];
+  const view = sortProspects(filterProspects(list));
+  try {
+    document.getElementById('duplicate-filter-note').innerHTML = window.__duplicateGroupFilter
+      ? `<p class="muted" style="font-size:12.5px;margin:0 0 8px">Affichage limité à ce doublon — <a href="#" onclick="clearDuplicateGroupFilter();return false">✕ voir tous les dossiers</a></p>`
+      : '';
+    const dupIds = window.__duplicateIds || new Set();
+    document.getElementById('prospects-body').innerHTML = view.length ? view.map(p => `
+      <tr${dupIds.has(p.id) ? ' style="background:#FFFBEF"' : ''}>
+        <td><strong>${p.school_name}</strong>${dupIds.has(p.id) ? ' <span class="badge" style="background:#FFF3CD;color:#8A6D1D" title="Un autre dossier a un nom d\'école identique ou très proche">⚠️ doublon possible</span>' : ''}${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
+        <td>${p.city || '—'}${p.estimated_students ? `<div class="muted" style="font-size:12px" title="${escHtml(p.estimated_students_source || '')}">👥 ${escHtml(p.estimated_students)}</div>` : ''}</td>
+        <td>${p.contact_name || '—'}${p.contact_email ? `<div class="muted" style="font-size:12px">${p.contact_email}</div>` : ''}</td>
+        <td><span class="badge badge-${p.status}" title="Cliquer pour changer le statut" onclick="openStatusPicker(event,'${p.id}','${p.status}')">${STATUS_LABELS[p.status]}</span></td>
+        <td>${fmtDate(p.last_contact_at)}</td>
+        <td>${fmtDate(p.next_followup_at)}</td>
+        <td><div class="actions"><button class="btn small ghost" onclick="openFollowupMessage('${p.id}')">✉️ Message</button><button class="btn small ghost" onclick="editProspect('${p.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
+      </tr>`).join('') : `<tr><td colspan="7" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
+    renderProspectsKanban(view, dupIds);
+  } catch (e) { console.error(e); }
+}
+
+// ─── Vue Kanban (pipeline de prospection) ──────────────────────────
+function renderProspectsKanban(view, dupIds){
+  const byStatus = Object.fromEntries(STATUS_FLOW.map(s => [s, []]));
+  for (const p of view) if (byStatus[p.status]) byStatus[p.status].push(p);
+  document.getElementById('prospects-kanban').innerHTML = STATUS_FLOW.map(status => `
+    <div class="kanban-col">
+      <div class="kanban-col-head"><span>${STATUS_LABELS[status]}</span><span class="kanban-col-count">${byStatus[status].length}</span></div>
+      <div class="kanban-col-body" ondragover="allowDrop(event)" ondrop="dropOnStatusColumn(event,'${status}')">
+        ${byStatus[status].map(p => `
+          <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${p.id}')" onclick="editProspect('${p.id}')">
+            <span class="kc-title">${escHtml(p.school_name)}${dupIds && dupIds.has(p.id) ? ' ⚠️' : ''}</span>
+            <span class="kc-meta">${escHtml(p.city || '')}${p.city && p.contact_name ? ' · ' : ''}${escHtml(p.contact_name || '')}</span>
+            ${p.meeting_at ? `<div class="kc-meta">📅 ${fmtDate(p.meeting_at)}</div>` : ''}
+            <div class="kc-actions" onclick="event.stopPropagation()">
+              <button onclick="openFollowupMessage('${p.id}')" title="Message">✉️</button>
+              <button onclick="deleteProspect('${p.id}')" title="Supprimer">🗑️</button>
+            </div>
+          </div>`).join('') || `<p class="muted" style="font-size:11.5px;margin:0;text-align:center">—</p>`}
+      </div>
+    </div>`).join('');
+}
+
+async function dropOnStatusColumn(ev, status){
+  ev.preventDefault(); ev.currentTarget.classList.remove('dragover');
+  const id = ev.dataTransfer.getData('text/plain');
+  if (!id) return;
+  const p = (window.__prospects || []).find(x => x.id === id);
+  if (!p || p.status === status) return;
+  await logContact(id, status);
+}
+
+// ─── Bibliothèque de templates d'emails (prospection/suivi/réponse) ───────
+// Chaque template sait se choisir par défaut selon le statut du dossier, mais
+// reste sélectionnable manuellement — jamais de page blanche avant d'écrire.
+const EMAIL_TEMPLATES = [
+  {
+    key: 'premier_contact', label: 'Premier contact', statuses: ['a_contacter'],
+    build: (greeting, school) => `${greeting},\n\nJe me permets de vous contacter au sujet de KeyPace, notre plateforme de dactylographie AZERTY pensée pour les établissements scolaires (65 leçons progressives, suivi de progression par élève, mise en place en quelques minutes).\n\nSeriez-vous disponible pour un bref échange cette semaine à propos d'une licence pour ${school} ?\n\nBien cordialement,\nThéo — KeyPace`,
+  },
+  {
+    key: 'relance', label: 'Relance (pas de réponse)', statuses: ['envoye', 'relance'],
+    build: (greeting, school) => `${greeting},\n\nJe me permets de revenir vers vous suite à mon précédent message concernant KeyPace pour ${school}. Restez-vous intéressé·e par une présentation rapide de la plateforme ?\n\nBien cordialement,\nThéo — KeyPace`,
+  },
+  {
+    key: 'reponse_objection', label: 'Réponse à une question / objection', statuses: ['repondu', 'en_negociation'],
+    build: (greeting, school) => `${greeting},\n\nJe reviens vers vous suite à notre échange au sujet de KeyPace pour ${school}. Avez-vous besoin d'informations complémentaires de mon côté pour avancer ?\n\nBien cordialement,\nThéo — KeyPace`,
+  },
+  {
+    key: 'apres_rdv', label: 'Suivi après un rendez-vous', statuses: [],
+    build: (greeting, school) => `${greeting},\n\nMerci pour votre temps lors de notre échange à propos de KeyPace pour ${school}. Comme convenu, je reste disponible pour toute question complémentaire, et je peux vous transmettre un accès test si c'est utile.\n\nBien cordialement,\nThéo — KeyPace`,
+  },
+  {
+    key: 'remerciement_signature', label: 'Remerciement après signature', statuses: ['signe'],
+    build: (greeting, school) => `${greeting},\n\nUn grand merci pour votre confiance ! La licence KeyPace pour ${school} est maintenant active — je reviens vers vous très vite avec les accès et les prochaines étapes pour la mise en place.\n\nBien cordialement,\nThéo — KeyPace`,
+  },
+];
+document.getElementById('followup-msg-template').innerHTML = EMAIL_TEMPLATES.map(t => `<option value="${t.key}">${t.label}</option>`).join('');
+
+function defaultTemplateKeyFor(status){
+  const match = EMAIL_TEMPLATES.find(t => t.statuses.includes(status));
+  return match ? match.key : 'relance';
+}
+
+function buildEmailFromTemplate(key, p){
+  const tpl = EMAIL_TEMPLATES.find(t => t.key === key) || EMAIL_TEMPLATES[0];
+  const contact = (p.contact_name || '').trim().split(' ')[0];
+  const greeting = contact ? `Bonjour ${contact}` : 'Bonjour';
+  return tpl.build(greeting, p.school_name);
+}
+
+function switchFollowupTemplate(){
+  const p = (window.__prospects || []).find(x => x.id === window.__followupProspectId);
+  if (!p) return;
+  document.getElementById('followup-msg-text').value = buildEmailFromTemplate(document.getElementById('followup-msg-template').value, p);
+}
+
+function openFollowupMessage(id){
+  const p = (window.__prospects || []).find(x => x.id === id);
+  if (!p) return;
+  window.__followupProspectId = id;
+  document.getElementById('followup-msg-title').textContent = `Message pour ${p.school_name}`;
+  const key = defaultTemplateKeyFor(p.status);
+  document.getElementById('followup-msg-template').value = key;
+  document.getElementById('followup-msg-text').value = buildEmailFromTemplate(key, p);
+  document.getElementById('followup-msg-panel').style.display = 'block';
+}
+
+function closeFollowupMessage(){
+  document.getElementById('followup-msg-panel').style.display = 'none';
+}
+
+async function copyFollowupMessage(){
+  const text = document.getElementById('followup-msg-text').value;
+  const btn = document.getElementById('followup-msg-copy-btn');
+  try {
+    await navigator.clipboard.writeText(text);
+    const original = btn.textContent;
+    btn.textContent = '✓ Copié';
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  } catch (e) {
+    document.getElementById('followup-msg-text').select();
+  }
+}
+
+// Remplace le badge de statut par un <select> natif au clic — plus simple et
+// plus accessible qu'un menu custom, le navigateur gère l'ouverture/fermeture.
+function openStatusPicker(ev, id, current){
+  const span = ev.currentTarget;
+  const select = document.createElement('select');
+  select.className = 'status-select';
+  STATUS_FLOW.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = STATUS_LABELS[s];
+    if (s === current) opt.selected = true;
+    select.appendChild(opt);
+  });
+  select.onchange = () => logContact(id, select.value);
+  select.onblur = () => loadProspects();
+  span.replaceWith(select);
+  select.focus();
+}
+
+// Dédoublonnage : même contact_email (ou même school_name si pas d'email),
+// on garde la fiche la plus récemment mise à jour.
+function dedupeProspects(list){
+  const byKey = new Map();
+  for (const p of list) {
+    const key = (p.contact_email || p.school_name || '').trim().toLowerCase();
+    if (!key) continue;
+    const existing = byKey.get(key);
+    if (!existing || new Date(p.updated_at) > new Date(existing.updated_at)) byKey.set(key, p);
+  }
+  return [...byKey.values()];
+}
+
+function csvCell(v){
+  const s = v == null ? '' : String(v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+const CSV_COLS = ['school_name','city','contact_name','contact_email','contact_phone','status','last_contact_at','next_followup_at','estimated_students','estimated_students_source','notes'];
+const CSV_LABELS = ['École','Ville','Contact','Email','Téléphone','Statut','Dernier contact','Relance prévue','Notes'];
+
+function exportProspectsCSV(){
+  const list = dedupeProspects(window.__prospects || []);
+  if (!list.length) return;
+  const rows = [CSV_LABELS.join(','), ...list.map(p => CSV_COLS.map(c => csvCell(c === 'status' ? STATUS_LABELS[p[c]] : p[c])).join(','))];
+  const blob = new Blob(['﻿' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `prospects-keypace-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── Ajout / édition (formulaire partagé) ─────────────
+let editingProspectId = null;
+
+function toDatetimeLocalValue(iso){
+  if (!iso) return '';
+  const d = new Date(iso);
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+// ─── Backlog de développement ──────────────────────────────────────
+const DEV_TYPE_LABELS = { bug:'Bug', feature:'Feature', tech_debt:'Dette technique', idee:'Idée' };
+const DEV_PRIORITY_LABELS = { basse:'Basse', moyenne:'Moyenne', haute:'Haute', urgente:'Urgente' };
+const DEV_PRIORITY_COLORS = { basse:'#8A8275', moyenne:'#B4640A', haute:'#C2540A', urgente:'#B3261E' };
+const DEV_STATUS_LABELS = { backlog:'Backlog', a_faire:'À faire', en_cours:'En cours', fait:'Fait' };
+const DEV_STATUS_FLOW = ['backlog','a_faire','en_cours','fait'];
+
+let backlogView = localStorage.getItem('kp_backlog_view') || 'table';
+let editingDevIssueId = null;
+
+function setBacklogView(v){
+  backlogView = v;
+  localStorage.setItem('kp_backlog_view', v);
+  document.getElementById('backlog-table-wrap').style.display = v === 'table' ? '' : 'none';
+  document.getElementById('backlog-kanban').style.display = v === 'kanban' ? 'flex' : 'none';
+  document.getElementById('backlog-view-btn-table').classList.toggle('active', v === 'table');
+  document.getElementById('backlog-view-btn-kanban').classList.toggle('active', v === 'kanban');
+}
+
+async function loadDevBacklog(){
+  try {
+    const { items } = await api('dev-backlog');
+    window.__devIssues = items;
+    renderDevBacklogTable(items);
+    renderDevBacklogKanban(items);
+  } catch (e) { console.error(e); }
+}
+
+function renderDevBacklogTable(items){
+  document.getElementById('backlog-body').innerHTML = items.length ? items.map(d => `
+    <tr>
+      <td><strong>${escHtml(d.title)}</strong>${d.description ? `<div class="muted" style="font-size:12px">${escHtml(d.description)}</div>` : ''}</td>
+      <td>${DEV_TYPE_LABELS[d.item_type] || d.item_type}</td>
+      <td><span style="color:${DEV_PRIORITY_COLORS[d.priority] || 'inherit'};font-weight:700">${DEV_PRIORITY_LABELS[d.priority] || d.priority}</span></td>
+      <td>${DEV_STATUS_LABELS[d.status] || d.status}</td>
+      <td>${fmtDate(d.updated_at)}</td>
+      <td><div class="actions"><button class="btn small ghost" onclick="editDevIssue('${d.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteDevIssue('${d.id}')">Suppr.</button></div></td>
+    </tr>`).join('') : `<tr><td colspan="6" class="empty-msg">Aucun ticket pour l'instant.</td></tr>`;
+}
+
+function renderDevBacklogKanban(items){
+  const byStatus = Object.fromEntries(DEV_STATUS_FLOW.map(s => [s, []]));
+  for (const d of items) if (byStatus[d.status]) byStatus[d.status].push(d);
+  document.getElementById('backlog-kanban').innerHTML = DEV_STATUS_FLOW.map(status => `
+    <div class="kanban-col">
+      <div class="kanban-col-head"><span>${DEV_STATUS_LABELS[status]}</span><span class="kanban-col-count">${byStatus[status].length}</span></div>
+      <div class="kanban-col-body" ondragover="allowDrop(event)" ondrop="dropOnDevStatusColumn(event,'${status}')">
+        ${byStatus[status].map(d => `
+          <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${d.id}')" onclick="editDevIssue('${d.id}')">
+            <span class="kc-title">${escHtml(d.title)}</span>
+            <span class="kc-meta"><span style="color:${DEV_PRIORITY_COLORS[d.priority] || 'inherit'};font-weight:700">${DEV_PRIORITY_LABELS[d.priority] || d.priority}</span> · ${DEV_TYPE_LABELS[d.item_type] || d.item_type}</span>
+          </div>`).join('') || `<p class="muted" style="font-size:11.5px;margin:0;text-align:center">—</p>`}
+      </div>
+    </div>`).join('');
+}
+
+async function dropOnDevStatusColumn(ev, status){
+  ev.preventDefault(); ev.currentTarget.classList.remove('dragover');
+  const id = ev.dataTransfer.getData('text/plain');
+  if (!id) return;
+  await api('dev-issue-update', { method:'POST', body: { id, status } });
+  loadDevBacklog();
+}
+
+function openDevIssueForm(){
+  editingDevIssueId = null;
+  ['d-title','d-description'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('d-type').value = 'feature';
+  document.getElementById('d-priority').value = 'moyenne';
+  document.getElementById('d-status').value = 'backlog';
+  document.getElementById('dev-issue-form-title').textContent = 'Nouveau ticket';
+  document.getElementById('dev-issue-delete-btn').style.display = 'none';
+  document.getElementById('dev-issue-history').style.display = 'none';
+  document.getElementById('dev-issue-form').style.display = 'block';
+}
+
+function editDevIssue(id){
+  const d = (window.__devIssues || []).find(x => x.id === id);
+  if (!d) return;
+  editingDevIssueId = id;
+  document.getElementById('d-title').value = d.title || '';
+  document.getElementById('d-description').value = d.description || '';
+  document.getElementById('d-type').value = d.item_type || 'feature';
+  document.getElementById('d-priority').value = d.priority || 'moyenne';
+  document.getElementById('d-status').value = d.status || 'backlog';
+  document.getElementById('dev-issue-form-title').textContent = `Modifier « ${d.title} »`;
+  document.getElementById('dev-issue-delete-btn').style.display = 'inline-flex';
+  document.getElementById('dev-issue-history').style.display = 'block';
+  document.getElementById('dev-issue-note-input').value = '';
+  renderActivityLog('dev_issue', id, 'dev-issue-history-list');
+  document.getElementById('dev-issue-form').style.display = 'block';
+}
+
+function closeDevIssueForm(){
+  editingDevIssueId = null;
+  document.getElementById('dev-issue-form').style.display = 'none';
+}
+
+async function saveDevIssue(){
+  const title = document.getElementById('d-title').value.trim();
+  if (!title) return;
+  const body = {
+    title,
+    description: document.getElementById('d-description').value.trim(),
+    item_type: document.getElementById('d-type').value,
+    priority: document.getElementById('d-priority').value,
+    status: document.getElementById('d-status').value,
+  };
+  if (editingDevIssueId) await api('dev-issue-update', { method:'POST', body: { id: editingDevIssueId, ...body } });
+  else await api('dev-issue-create', { method:'POST', body });
+  closeDevIssueForm();
+  loadDevBacklog();
+}
+
+async function deleteDevIssue(id){
+  if (!confirm('Supprimer ce ticket du backlog ?')) return;
+  await api('dev-issue-delete', { method:'POST', body: { id } });
+  closeDevIssueForm();
+  loadDevBacklog();
+}
+
+async function addDevIssueNote(){
+  const input = document.getElementById('dev-issue-note-input');
+  const note = input.value.trim();
+  if (!note || !editingDevIssueId) return;
+  await api('add-note', { method:'POST', body: { entity_type:'dev_issue', entity_id: editingDevIssueId, note } });
+  input.value = '';
+  renderActivityLog('dev_issue', editingDevIssueId, 'dev-issue-history-list');
+}
+
+// ─── Coffre-fort de secrets ────────────────────────────────────────
+// Le secret déchiffré n'est jamais chargé au chargement de la liste — un
+// clic explicite sur "Révéler" ou "Copier" va le chercher à la demande.
+let editingVaultId = null;
+
+async function loadVault(){
+  try {
+    const { items } = await api('vault-list');
+    window.__vaultItems = items;
+    renderVaultList(items);
+  } catch (e) { console.error(e); }
+}
+
+function renderVaultList(items){
+  const el = document.getElementById('vault-list');
+  el.innerHTML = items.length ? items.map(v => `
+    <div class="vault-item">
+      <div class="vault-item-main">
+        <span class="fname">${escHtml(v.label)}</span>
+        <span class="muted">${escHtml(v.username || '—')}${v.category ? ' · ' + escHtml(v.category) : ''}</span>
+      </div>
+      <span class="vault-item-secret" id="vault-secret-${v.id}" data-revealed="false">••••••••</span>
+      <div class="actions">
+        <button class="btn small ghost" id="vault-toggle-${v.id}" onclick="toggleVaultSecret('${v.id}')">👁 Révéler</button>
+        <button class="btn small ghost" onclick="copyVaultSecret('${v.id}')" id="vault-copy-${v.id}">📋 Copier</button>
+        <button class="btn small ghost" onclick="editVaultSecret('${v.id}')">✏️ Éditer</button>
+      </div>
+    </div>`).join('') : `<div class="empty-msg">Aucun secret enregistré pour l'instant.</div>`;
+}
+
+async function toggleVaultSecret(id){
+  const span = document.getElementById(`vault-secret-${id}`);
+  const btn = document.getElementById(`vault-toggle-${id}`);
+  if (span.dataset.revealed === 'true') {
+    span.textContent = '••••••••';
+    span.dataset.revealed = 'false';
+    btn.textContent = '👁 Révéler';
+    return;
+  }
+  try {
+    const { secret } = await api('vault-reveal', { params: { id } });
+    span.textContent = secret;
+    span.dataset.revealed = 'true';
+    btn.textContent = '🙈 Masquer';
+  } catch (e) { console.error(e); }
+}
+
+async function copyVaultSecret(id){
+  const btn = document.getElementById(`vault-copy-${id}`);
+  try {
+    const { secret } = await api('vault-reveal', { params: { id } });
+    await navigator.clipboard.writeText(secret);
+    const original = btn.textContent;
+    btn.textContent = '✓ Copié';
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  } catch (e) { console.error(e); }
+}
+
+function openVaultForm(){
+  editingVaultId = null;
+  ['v-label','v-username','v-category','v-secret','v-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('v-secret').placeholder = 'Mot de passe / secret *';
+  document.getElementById('vault-form-title').textContent = 'Nouveau secret';
+  document.getElementById('vault-delete-btn').style.display = 'none';
+  document.getElementById('vault-form').style.display = 'block';
+}
+
+function editVaultSecret(id){
+  const v = (window.__vaultItems || []).find(x => x.id === id);
+  if (!v) return;
+  editingVaultId = id;
+  document.getElementById('v-label').value = v.label || '';
+  document.getElementById('v-username').value = v.username || '';
+  document.getElementById('v-category').value = v.category || '';
+  document.getElementById('v-notes').value = v.notes || '';
+  document.getElementById('v-secret').value = '';
+  document.getElementById('v-secret').placeholder = 'Laisser vide pour ne pas modifier le secret';
+  document.getElementById('vault-form-title').textContent = `Modifier « ${v.label} »`;
+  document.getElementById('vault-delete-btn').style.display = 'inline-flex';
+  document.getElementById('vault-form').style.display = 'block';
+}
+
+function closeVaultForm(){
+  editingVaultId = null;
+  document.getElementById('vault-form').style.display = 'none';
+}
+
+async function saveVaultSecret(){
+  const label = document.getElementById('v-label').value.trim();
+  const secret = document.getElementById('v-secret').value;
+  if (!label) return;
+  if (!editingVaultId && !secret) { alert('Le secret est obligatoire pour un nouvel enregistrement.'); return; }
+  const body = {
+    label,
+    username: document.getElementById('v-username').value.trim(),
+    category: document.getElementById('v-category').value.trim(),
+    notes: document.getElementById('v-notes').value.trim(),
+  };
+  if (secret) body.secret = secret;
+  if (editingVaultId) await api('vault-update', { method:'POST', body: { id: editingVaultId, ...body } });
+  else await api('vault-create', { method:'POST', body });
+  closeVaultForm();
+  loadVault();
+}
+
+async function deleteVaultSecret(id){
+  if (!confirm('Supprimer ce secret du coffre-fort ? Cette action est irréversible.')) return;
+  await api('vault-delete', { method:'POST', body: { id } });
+  closeVaultForm();
+  loadVault();
+}
+
+// ─── Répertoire de liens ────────────────────────────────────────────
+async function loadLinks(){
+  try {
+    const { items } = await api('links-list');
+    window.__linksItems = items;
+    renderLinksList(items);
+  } catch (e) { console.error(e); }
+}
+
+function renderLinksList(items){
+  const el = document.getElementById('links-list');
+  el.innerHTML = items.length ? items.map(l => `
+    <div class="links-item">
+      <a href="${escHtml(l.url)}" target="_blank" rel="noopener" class="fname">${escHtml(l.label)}</a>
+      <span class="muted" style="flex:1">${escHtml(l.category || '')}</span>
+      <button class="btn small danger" style="width:auto" onclick="deleteResourceLink('${l.id}')">Suppr.</button>
+    </div>`).join('') : `<div class="empty-msg">Aucun lien enregistré pour l'instant.</div>`;
+}
+
+// ─── Checklist sécurité périodique ──────────────────────────────────
+async function loadSecurityChecklist(){
+  try {
+    const { items } = await api('security-checklist');
+    renderSecurityChecklist(items);
+  } catch (e) { console.error(e); }
+}
+
+function renderSecurityChecklist(items){
+  const el = document.getElementById('security-checklist');
+  const byCategory = [];
+  for (const item of items) {
+    let group = byCategory.find(g => g.category === item.category);
+    if (!group) { group = { category: item.category, items: [] }; byCategory.push(group); }
+    group.items.push(item);
+  }
+  el.innerHTML = byCategory.map(g => `
+    <div class="checklist-category">${escHtml(g.category)}</div>
+    ${g.items.map(item => `
+      <div class="checklist-item${item.overdue ? ' overdue' : ''}">
+        <div class="checklist-item-main">
+          <div class="checklist-item-label">${escHtml(item.label)}</div>
+          <div class="checklist-item-why">${escHtml(item.why)}</div>
+          <div class="checklist-item-meta">
+            <span class="badge ${item.overdue ? 'badge-overdue' : 'badge-ok'}">${item.overdue ? '⚠️ À vérifier' : '✅ À jour'}</span>
+            <span>${item.checkedAt ? `Vérifié il y a ${item.daysSinceCheck} jour${item.daysSinceCheck > 1 ? 's' : ''} (${fmtDate(item.checkedAt)})` : 'Jamais vérifié'}</span>
+            ${item.frequencyDays ? `<span>· À revérifier tous les ${item.frequencyDays} jours</span>` : ''}
+          </div>
+        </div>
+        <div class="checklist-item-actions">
+          <button class="btn small ghost" style="width:auto" onclick="checkSecurityItem('${item.key}')">✔️ Marquer vérifié</button>
+        </div>
+      </div>`).join('')}
+  `).join('');
+}
+
+async function checkSecurityItem(key){
+  await api('security-checklist-check', { method:'POST', body: { key } });
+  loadSecurityChecklist();
+}
+
+function openLinkForm(){
+  ['l-label','l-url','l-category'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('link-form').style.display = 'block';
+}
+
+function closeLinkForm(){
+  document.getElementById('link-form').style.display = 'none';
+}
+
+async function saveResourceLink(){
+  const label = document.getElementById('l-label').value.trim();
+  const url = document.getElementById('l-url').value.trim();
+  if (!label || !url) return;
+  await api('link-create', { method:'POST', body: { label, url, category: document.getElementById('l-category').value.trim() } });
+  closeLinkForm();
+  loadLinks();
+}
+
+async function deleteResourceLink(id){
+  if (!confirm('Supprimer ce lien ?')) return;
+  await api('link-delete', { method:'POST', body: { id } });
+  loadLinks();
+}
+
+// ─── Veille concurrentielle ────────────────────────────────────────
+let editingCompetitorId = null;
+
+async function loadCompetitors(){
+  try {
+    const { items } = await api('competitors-list');
+    window.__competitors = items;
+    renderCompetitorsList(items);
+  } catch (e) { console.error(e); }
+}
+
+// ─── Suggestions de concurrents (file d'attente pré-alimentée) ─────
+let competitorSuggestions = [];
+
+async function suggestCompetitor(){
+  try {
+    if (!competitorSuggestions.length) {
+      const { items } = await api('competitor-suggestions-list');
+      competitorSuggestions = items;
+    }
+    renderCompetitorSuggestion();
+  } catch (e) { console.error(e); }
+}
+
+function renderCompetitorSuggestion(){
+  const panel = document.getElementById('competitor-suggestion-panel');
+  if (!competitorSuggestions.length) {
+    panel.style.display = 'block';
+    document.getElementById('suggestion-name').textContent = 'Aucune suggestion en attente pour le moment.';
+    document.getElementById('suggestion-name').removeAttribute('href');
+    document.getElementById('suggestion-reason').textContent = '';
+    return;
+  }
+  const s = competitorSuggestions[0];
+  panel.style.display = 'block';
+  panel.dataset.suggestionId = s.id;
+  const nameEl = document.getElementById('suggestion-name');
+  nameEl.textContent = s.name;
+  nameEl.href = s.url;
+  document.getElementById('suggestion-reason').textContent = s.reason || '';
+}
+
+async function acceptCompetitorSuggestion(){
+  const panel = document.getElementById('competitor-suggestion-panel');
+  const id = panel.dataset.suggestionId;
+  if (!id) return;
+  await api('competitor-suggestion-add', { method:'POST', body: { id } });
+  competitorSuggestions.shift();
+  renderCompetitorSuggestion();
+  loadCompetitors();
+}
+
+async function dismissCompetitorSuggestion(){
+  const panel = document.getElementById('competitor-suggestion-panel');
+  const id = panel.dataset.suggestionId;
+  if (!id) return;
+  await api('competitor-suggestion-dismiss', { method:'POST', body: { id } });
+  competitorSuggestions.shift();
+  renderCompetitorSuggestion();
+}
+
+function renderCompetitorsList(items){
+  const el = document.getElementById('competitors-list');
+  el.innerHTML = items.length ? items.map(c => `
+    <div class="competitor-card">
+      <div class="competitor-card-head">
+        <a href="${escHtml(c.url)}" target="_blank" rel="noopener" class="fname">${escHtml(c.name)}</a>
+        ${c.content_changed ? '<span class="badge" style="background:#FFE9D6;color:#C2540A">⚠️ Changement détecté</span>' : ''}
+        <span class="muted" style="font-size:12px">${c.last_checked_at ? 'Vérifié le ' + fmtDateTime(c.last_checked_at) : 'Jamais vérifié'}</span>
+      </div>
+      <div class="competitor-card-body">
+        <div><strong>Forces</strong>${escHtml(c.strengths || '—')}</div>
+        <div><strong>Faiblesses</strong>${escHtml(c.weaknesses || '—')}</div>
+        <div><strong>CA estimé</strong>${escHtml(c.estimated_revenue || '—')}</div>
+      </div>
+      <div class="actions">
+        <button class="btn small ghost" id="competitor-check-btn-${c.id}" onclick="checkCompetitor('${c.id}')">🔍 Vérifier les changements</button>
+        <button class="btn small ghost" onclick="editCompetitor('${c.id}')">✏️ Éditer</button>
+      </div>
+    </div>`).join('') : `<div class="empty-msg">Aucun concurrent enregistré pour l'instant.</div>`;
+}
+
+async function checkCompetitor(id){
+  const btn = document.getElementById(`competitor-check-btn-${id}`);
+  const original = btn.textContent;
+  btn.textContent = '⏳ Vérification...';
+  btn.disabled = true;
+  try {
+    await api('competitor-check', { method:'POST', body: { id } });
+  } catch (e) {
+    alert("Erreur lors de la vérification : " + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = original;
+  loadCompetitors();
+}
+
+function openCompetitorForm(){
+  editingCompetitorId = null;
+  ['c-name','c-url','c-revenue','c-strengths','c-weaknesses','c-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('competitor-form-title').textContent = 'Nouveau concurrent';
+  document.getElementById('competitor-delete-btn').style.display = 'none';
+  document.getElementById('competitor-history').style.display = 'none';
+  document.getElementById('competitor-form').style.display = 'block';
+}
+
+function editCompetitor(id){
+  const c = (window.__competitors || []).find(x => x.id === id);
+  if (!c) return;
+  editingCompetitorId = id;
+  document.getElementById('c-name').value = c.name || '';
+  document.getElementById('c-url').value = c.url || '';
+  document.getElementById('c-revenue').value = c.estimated_revenue || '';
+  document.getElementById('c-strengths').value = c.strengths || '';
+  document.getElementById('c-weaknesses').value = c.weaknesses || '';
+  document.getElementById('c-notes').value = c.notes || '';
+  document.getElementById('competitor-form-title').textContent = `Modifier « ${c.name} »`;
+  document.getElementById('competitor-delete-btn').style.display = 'inline-flex';
+  document.getElementById('competitor-history').style.display = 'block';
+  document.getElementById('competitor-note-input').value = '';
+  renderActivityLog('competitor', id, 'competitor-history-list');
+  document.getElementById('competitor-form').style.display = 'block';
+}
+
+function closeCompetitorForm(){
+  editingCompetitorId = null;
+  document.getElementById('competitor-form').style.display = 'none';
+}
+
+async function saveCompetitor(){
+  const name = document.getElementById('c-name').value.trim();
+  const url = document.getElementById('c-url').value.trim();
+  if (!name || !url) return;
+  const body = {
+    name, url,
+    estimated_revenue: document.getElementById('c-revenue').value.trim(),
+    strengths: document.getElementById('c-strengths').value.trim(),
+    weaknesses: document.getElementById('c-weaknesses').value.trim(),
+    notes: document.getElementById('c-notes').value.trim(),
+  };
+  if (editingCompetitorId) await api('competitor-update', { method:'POST', body: { id: editingCompetitorId, ...body } });
+  else await api('competitor-create', { method:'POST', body });
+  closeCompetitorForm();
+  loadCompetitors();
+}
+
+async function deleteCompetitor(id){
+  if (!confirm('Supprimer ce concurrent du suivi ?')) return;
+  await api('competitor-delete', { method:'POST', body: { id } });
+  closeCompetitorForm();
+  loadCompetitors();
+}
+
+async function addCompetitorNote(){
+  const input = document.getElementById('competitor-note-input');
+  const note = input.value.trim();
+  if (!note || !editingCompetitorId) return;
+  await api('add-note', { method:'POST', body: { entity_type:'competitor', entity_id: editingCompetitorId, note } });
+  input.value = '';
+  renderActivityLog('competitor', editingCompetitorId, 'competitor-history-list');
+}
+
+// ─── Historique par élément (prospect ou contenu) ─────────────────
+// Générique : réutilisé par le formulaire prospect et le formulaire contenu.
+const ACTIVITY_ICONS = { created: '✨', updated: '✏️', status_changed: '🔄', note: '💬' };
+
+async function renderActivityLog(entityType, entityId, listElId){
+  const el = document.getElementById(listElId);
+  el.innerHTML = `<p class="muted" style="font-size:12px;margin:0">Chargement…</p>`;
+  try {
+    const { items } = await api('activity-log', { params: { entity_type: entityType, entity_id: entityId } });
+    el.innerHTML = items.length
+      ? items.map(it => `<div class="history-item"><span class="h-time">${fmtDateTime(it.created_at)}</span>${ACTIVITY_ICONS[it.action] || ''} ${escHtml(it.detail || '')}</div>`).join('')
+      : `<p class="muted" style="font-size:12px;margin:0">Aucun historique pour l'instant.</p>`;
+  } catch (e) {
+    el.innerHTML = `<p class="muted" style="font-size:12px;margin:0">Erreur de chargement de l'historique.</p>`;
+  }
+}
+
+async function addProspectNote(){
+  const input = document.getElementById('prospect-note-input');
+  const note = input.value.trim();
+  if (!note || !editingProspectId) return;
+  await api('add-note', { method:'POST', body: { entity_type:'prospect', entity_id: editingProspectId, note } });
+  input.value = '';
+  renderActivityLog('prospect', editingProspectId, 'prospect-history-list');
+}
+
+async function addContentNote(){
+  const input = document.getElementById('content-note-input');
+  const note = input.value.trim();
+  if (!note || !editingEventId) return;
+  await api('add-note', { method:'POST', body: { entity_type:'content', entity_id: editingEventId, note } });
+  input.value = '';
+  renderActivityLog('content', editingEventId, 'content-history-list');
+}
+
+function openAddForm(){
+  editingProspectId = null;
+  ['p-school','p-contact','p-email','p-phone','p-city','p-notes','p-meeting','p-students','p-students-source'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('prospect-form-title').textContent = 'Nouvelle école';
+  document.getElementById('prospect-save-btn').textContent = 'Enregistrer';
+  document.getElementById('prospect-history').style.display = 'none';
+  document.getElementById('prospect-form').style.display = 'block';
+}
+
+function closeProspectForm(){
+  document.getElementById('prospect-form').style.display = 'none';
+}
+
+function editProspect(id){
+  const p = (window.__prospects || []).find(x => x.id === id);
+  if (!p) return;
+  editingProspectId = id;
+  document.getElementById('p-school').value = p.school_name || '';
+  document.getElementById('p-contact').value = p.contact_name || '';
+  document.getElementById('p-email').value = p.contact_email || '';
+  document.getElementById('p-phone').value = p.contact_phone || '';
+  document.getElementById('p-city').value = p.city || '';
+  document.getElementById('p-meeting').value = toDatetimeLocalValue(p.meeting_at);
+  document.getElementById('p-students').value = p.estimated_students || '';
+  document.getElementById('p-students-source').value = p.estimated_students_source || '';
+  document.getElementById('p-notes').value = p.notes || '';
+  document.getElementById('prospect-form-title').textContent = `Modifier « ${p.school_name} »`;
+  document.getElementById('prospect-save-btn').textContent = 'Enregistrer les modifications';
+  document.getElementById('prospect-history').style.display = 'block';
+  document.getElementById('prospect-note-input').value = '';
+  renderActivityLog('prospect', id, 'prospect-history-list');
+  document.getElementById('prospect-form').style.display = 'block';
+}
+
+async function saveProspect(){
+  const school_name = document.getElementById('p-school').value.trim();
+  if (!school_name) return;
+  const body = {
+    school_name,
+    contact_name: document.getElementById('p-contact').value.trim(),
+    contact_email: document.getElementById('p-email').value.trim(),
+    contact_phone: document.getElementById('p-phone').value.trim(),
+    city: document.getElementById('p-city').value.trim(),
+    meeting_at: document.getElementById('p-meeting').value ? new Date(document.getElementById('p-meeting').value).toISOString() : null,
+    estimated_students: document.getElementById('p-students').value.trim(),
+    estimated_students_source: document.getElementById('p-students-source').value.trim(),
+    notes: document.getElementById('p-notes').value.trim(),
+  };
+  if (editingProspectId) await api('update-prospect', { method:'POST', body: { id: editingProspectId, ...body } });
+  else await api('create-prospect', { method:'POST', body });
+  closeProspectForm();
+  loadProspects();
+  loadKpis();
+}
+
+// ─── Import CSV ────────────────────────────────────────
+// Parseur CSV minimal mais correct (guillemets, virgules et retours à la
+// ligne dans un champ) — évite un simple split(',') qui casserait sur les
+// notes contenant une virgule.
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else inQuotes = false; }
+      else field += c;
+    } else if (c === '"') inQuotes = true;
+    else if (c === ',') { row.push(field); field = ''; }
+    else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      row.push(field); field = '';
+      if (row.length > 1 || row[0] !== '') rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+const CSV_HEADER_SYNONYMS = {
+  school_name: ['école', 'ecole', 'school_name', 'nom'],
+  city: ['ville', 'city'],
+  contact_name: ['contact', 'contact_name'],
+  contact_email: ['email', 'contact_email'],
+  contact_phone: ['téléphone', 'telephone', 'contact_phone'],
+  status: ['statut', 'status'],
+  notes: ['notes'],
+};
+const STATUS_LABEL_TO_KEY = Object.fromEntries(Object.entries(STATUS_LABELS).map(([k, v]) => [v.toLowerCase(), k]));
+
+function resolveStatus(raw){
+  const s = (raw || '').trim().toLowerCase();
+  if (!s) return undefined;
+  if (STATUS_LABEL_TO_KEY[s]) return STATUS_LABEL_TO_KEY[s];
+  if (STATUS_FLOW.includes(s)) return s;
+  return undefined;
+}
+
+async function handleCSVImport(ev){
+  const file = ev.target.files[0];
+  ev.target.value = ''; // permet de réimporter le même fichier ensuite
+  if (!file) return;
+  const text = await file.text();
+  const rows = parseCSV(text.replace(/^﻿/, ''));
+  if (rows.length < 2) return;
+
+  const header = rows[0].map(h => h.trim().toLowerCase());
+  const colIndex = {};
+  for (const [field, synonyms] of Object.entries(CSV_HEADER_SYNONYMS)) {
+    const idx = header.findIndex(h => synonyms.includes(h));
+    if (idx !== -1) colIndex[field] = idx;
+  }
+  if (colIndex.school_name == null) {
+    document.getElementById('import-result').innerHTML = `<div class="callout">Colonne "École" introuvable dans le CSV — import annulé.</div>`;
+    return;
+  }
+
+  const existingByEmail = new Map((window.__prospects || [])
+    .filter(p => p.contact_email)
+    .map(p => [p.contact_email.trim().toLowerCase(), p]));
+
+  let created = 0, updated = 0, skipped = 0;
+  for (const row of rows.slice(1)) {
+    const get = (field) => colIndex[field] != null ? (row[colIndex[field]] || '').trim() : '';
+    const school_name = get('school_name');
+    if (!school_name) { skipped++; continue; }
+    const email = get('contact_email');
+    const body = {
+      school_name,
+      city: get('city'),
+      contact_name: get('contact_name'),
+      contact_email: email,
+      contact_phone: get('contact_phone'),
+      notes: get('notes'),
+      status: resolveStatus(get('status')),
+    };
+    const existing = email ? existingByEmail.get(email.toLowerCase()) : null;
+    if (existing) { await api('update-prospect', { method:'POST', body: { id: existing.id, ...body } }); updated++; }
+    else { await api('create-prospect', { method:'POST', body }); created++; }
+  }
+
+  document.getElementById('import-result').innerHTML =
+    `<div class="callout">Import terminé : ${created} créée${created > 1 ? 's' : ''}, ${updated} mise${updated > 1 ? 's' : ''} à jour${skipped ? `, ${skipped} ligne${skipped > 1 ? 's' : ''} ignorée${skipped > 1 ? 's' : ''} (sans nom d'école)` : ''}.</div>`;
+  loadProspects();
+  loadKpis();
+}
+
+async function logContact(id, status){
+  await api('log-contact', { method:'POST', body: { id, status } });
+  loadProspects();
+  loadKpis();
+}
+
+async function deleteProspect(id){
+  if (!confirm('Supprimer cette école de la liste de prospection ?')) return;
+  await api('delete-prospect', { method:'POST', body: { id } });
+  loadProspects();
+  loadKpis();
+}
+
+async function syncZimbra(){
+  const btn = document.getElementById('sync-btn');
+  const resultEl = document.getElementById('sync-result');
+  btn.disabled = true;
+  btn.textContent = '⏳ Sync en cours…';
+  resultEl.innerHTML = '';
+  try {
+    const r = await api('sync-zimbra', { method: 'POST' });
+    resultEl.innerHTML = `<div class="callout empty" style="margin:10px 0">${r.checked} email(s) vérifié(s) — ${r.updated} statut(s) mis à jour, ${r.created} nouveau(x) prospect(s), ${r.skipped} déjà traité(s).</div>`;
+    loadProspects();
+    loadKpis();
+  } catch (e) {
+    resultEl.innerHTML = `<div class="callout" style="margin:10px 0;background:#FBE7E5;border-color:#F3C7C1">${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔄 Sync emails';
+  }
+}
+
+// ─── Calendrier marketing ─────────────────────────────
+function monthKey(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+function renderCalendarHeader(){
+  document.getElementById('cal-label').textContent = calMonth.toLocaleDateString('fr-BE', { month:'long', year:'numeric' });
+}
+function shiftMonth(delta){
+  calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+delta, 1);
+  renderCalendarHeader();
+  loadCalendar();
+}
+
+const ACCOUNT_LABELS = { keypace: 'KeyPace', fondateur_1: 'Fondateur 1', fondateur_2: 'Fondateur 2' };
+
+function contentCardHtml(ev){
+  const isTask = ev.content_type === 'tache';
+  return `<div class="content-card" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')" style="${isTask ? 'background:#FFF6F2;border-color:#FFD9CC' : ''}">
+    <span class="ctitle">${isTask ? '✅ ' : ''}${ev.title}</span>
+    <span class="cmeta">${(ev.platforms || []).map(p => `<span class="platform-tag">${p}</span>`).join('')}<span class="platform-tag" style="background:#EAE6F5">${ACCOUNT_LABELS[ev.account] || 'KeyPace'}</span>${isTask ? 'tâche' : ev.content_type}</span>
+  </div>`;
+}
+
+async function loadCalendar(){
+  try {
+    const { scheduled, backlog } = await api('calendar', { params: { month: monthKey(calMonth) } });
+    window.__events = {}; [...scheduled, ...backlog].forEach(e => window.__events[e.id] = e);
+
+    const byDay = {};
+    scheduled.forEach(ev => { (byDay[ev.scheduled_date] = byDay[ev.scheduled_date] || []).push(ev); });
+
+    const year = calMonth.getFullYear(), month = calMonth.getMonth();
+    const firstDow = (new Date(year, month, 1).getDay() + 6) % 7; // lundi = 0
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const dows = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+
+    let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
+    for (let i=0;i<firstDow;i++) html += `<div class="cal-day empty"></div>`;
+    for (let day=1; day<=daysInMonth; day++){
+      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const items = (byDay[dateStr] || []).map(contentCardHtml).join('');
+      html += `<div class="cal-day" ondragover="allowDrop(event)" ondrop="dropOnDay(event,'${dateStr}')">
+        <div class="dnum">${day}</div>${items}
+      </div>`;
+    }
+    document.getElementById('cal-grid').innerHTML = html;
+    document.getElementById('backlog-list').innerHTML = backlog.length
+      ? backlog.map(contentCardHtml).join('')
+      : `<div class="empty-msg">Rien en attente.</div>`;
+    renderCalendarKanban([...scheduled, ...backlog]);
+  } catch (e) { console.error(e); }
+}
+
+function allowDrop(ev){ ev.preventDefault(); ev.currentTarget.classList.add('dragover'); ev.currentTarget.addEventListener('dragleave', () => ev.currentTarget.classList.remove('dragover'), { once:true }); }
+function dragStart(ev, id){ ev.dataTransfer.setData('text/plain', id); }
+
+async function dropOnDay(ev, dateStr){
+  ev.preventDefault(); ev.currentTarget.classList.remove('dragover');
+  const id = ev.dataTransfer.getData('text/plain');
+  if (!id) return;
+  await api('update-event', { method:'POST', body: { id, scheduled_date: dateStr } });
+  loadCalendar();
+}
+
+async function dropOnBacklog(ev){
+  ev.preventDefault(); ev.currentTarget.classList.remove('dragover');
+  const id = ev.dataTransfer.getData('text/plain');
+  if (!id) return;
+  await api('update-event', { method:'POST', body: { id, scheduled_date: null } });
+  loadCalendar();
+}
+
+// ─── Bascule Calendrier / Kanban (contenu marketing) ──────────────
+let calendarView = localStorage.getItem('kp_calendar_view') || 'grid';
+const CONTENT_STATUS_FLOW = ['idee', 'a_faire', 'pret', 'publie'];
+const CONTENT_STATUS_LABELS = { idee:'Idée', a_faire:'À faire', pret:'Prêt', publie:'Publié' };
+
+function setCalendarView(v){
+  calendarView = v;
+  localStorage.setItem('kp_calendar_view', v);
+  document.getElementById('calendar-grid-layout').style.display = v === 'grid' ? '' : 'none';
+  document.getElementById('calendar-kanban').style.display = v === 'kanban' ? 'flex' : 'none';
+  document.getElementById('calendar-view-btn-grid').classList.toggle('active', v === 'grid');
+  document.getElementById('calendar-view-btn-kanban').classList.toggle('active', v === 'kanban');
+}
+
+function renderCalendarKanban(events){
+  const byStatus = Object.fromEntries(CONTENT_STATUS_FLOW.map(s => [s, []]));
+  for (const ev of events) if (byStatus[ev.status]) byStatus[ev.status].push(ev);
+  document.getElementById('calendar-kanban').innerHTML = CONTENT_STATUS_FLOW.map(status => `
+    <div class="kanban-col">
+      <div class="kanban-col-head"><span>${CONTENT_STATUS_LABELS[status]}</span><span class="kanban-col-count">${byStatus[status].length}</span></div>
+      <div class="kanban-col-body" ondragover="allowDrop(event)" ondrop="dropOnContentStatusColumn(event,'${status}')">
+        ${byStatus[status].map(ev => `
+          <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')">
+            <span class="kc-title">${ev.content_type === 'tache' ? '✅ ' : ''}${escHtml(ev.title)}</span>
+            <span class="kc-meta">${(ev.platforms || []).map(p => `<span class="platform-tag">${p}</span>`).join('')}${ev.content_type}</span>
+            <div class="kc-meta">${ev.scheduled_date ? '📅 ' + fmtDate(ev.scheduled_date) : 'Backlog'}</div>
+          </div>`).join('') || `<p class="muted" style="font-size:11.5px;margin:0;text-align:center">—</p>`}
+      </div>
+    </div>`).join('');
+}
+
+async function dropOnContentStatusColumn(ev, status){
+  ev.preventDefault(); ev.currentTarget.classList.remove('dragover');
+  const id = ev.dataTransfer.getData('text/plain');
+  if (!id) return;
+  await api('update-event', { method:'POST', body: { id, status } });
+  loadCalendar();
+}
+
+let editingEventId = null;
+
+function setPlatformChecks(platforms){
+  const selected = new Set(platforms || []);
+  document.querySelectorAll('#e-platforms input').forEach(cb => cb.checked = selected.has(cb.value));
+}
+
+function getPlatformChecks(){
+  return [...document.querySelectorAll('#e-platforms input:checked')].map(cb => cb.value);
+}
+
+function openAddEventForm(){
+  editingEventId = null;
+  ['e-title','e-date','e-caption','e-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('e-type').value = 'post';
+  setPlatformChecks([]);
+  document.getElementById('e-account').value = 'keypace';
+  document.querySelector('#event-form h3').textContent = 'Nouveau contenu';
+  document.getElementById('event-delete-btn').style.display = 'none';
+  document.getElementById('content-history').style.display = 'none';
+  document.getElementById('event-form').style.display = 'block';
+}
+
+function editEvent(id){
+  const ev = window.__events[id];
+  if (!ev) return;
+  editingEventId = id;
+  document.getElementById('e-title').value = ev.title || '';
+  document.getElementById('e-type').value = ev.content_type || 'post';
+  setPlatformChecks(ev.platforms);
+  document.getElementById('e-date').value = ev.scheduled_date || '';
+  document.getElementById('e-account').value = ev.account || 'keypace';
+  document.getElementById('e-caption').value = ev.caption || '';
+  document.getElementById('e-notes').value = ev.notes || '';
+  document.querySelector('#event-form h3').textContent = `Modifier « ${ev.title} »`;
+  document.getElementById('event-delete-btn').style.display = 'inline-flex';
+  document.getElementById('content-history').style.display = 'block';
+  document.getElementById('content-note-input').value = '';
+  renderActivityLog('content', id, 'content-history-list');
+  document.getElementById('event-form').style.display = 'block';
+}
+
+async function deleteEvent(id){
+  if (!confirm('Supprimer ce contenu du calendrier ?')) return;
+  await api('delete-event', { method:'POST', body: { id } });
+  closeEventForm();
+  loadCalendar();
+}
+
+function closeEventForm(){
+  editingEventId = null;
+  document.getElementById('event-form').style.display = 'none';
+}
+
+// ─── Banque d'idées de contenu (templates, pas d'IA) ──────────────
+// Chaque idée est prête à devenir une carte "idée" dans le backlog : titre +
+// angle (le pourquoi/l'accroche) + format + plateforme suggérés.
+// `key` identifie l'idée de façon stable (persisté dans content_calendar.idea_key).
+// `topic` regroupe les idées qui couvrent le même sujet sous des angles
+// différents : utiliser l'une d'elles marque tout le groupe comme couvert,
+// pour ne plus reproposer bêtement ce sujet (voir loadUsedIdeaTopics).
+const CONTENT_IDEAS = [
+  { key:'avant-apres-vitesse', topic:'avant-apres-vitesse', audience:'etudiants', title:"Avant/après : la même page de notes tapée à 20 mpm vs 60 mpm", angle:"Contraste visuel qui parle plus qu'un argument : montre concrètement le temps gagné.", format:'video', platforms:['tiktok','youtube'] },
+  { key:'signes-frappe-lente-cours', topic:'signes-frappe-lente-cours', audience:'etudiants', title:"3 signes que tu perds un temps fou à cause d'une frappe lente en cours", angle:"Douleur reconnaissable en liste courte, facile à partager entre étudiants.", format:'post', platforms:['instagram'] },
+  { key:'test-1-minute', topic:'test-1-minute', audience:'etudiants', title:"Le test : combien de mots tapes-tu en 1 minute ?", angle:"Interactif et facilement viral — invite à partager son score en story.", format:'story', platforms:['instagram'] },
+  { key:'pourquoi-vitesse-notes', topic:'pourquoi-vitesse-notes', audience:'etudiants', title:"Pourquoi taper vite change vraiment tes notes de cours", angle:"Argumentaire sérieux et utile, bon pour le référencement.", format:'article', platforms:['blog'] },
+  { key:'entrainement-test-admin', topic:'entrainement-test-admin', audience:'emploi', title:"Le test de frappe qu'on te demande en entretien admin : comment t'entraîner en 2 semaines", angle:"Contenu utilitaire très concret, excellent pour le SEO.", format:'article', platforms:['blog'] },
+  { key:'metiers-test-vitesse', topic:'metiers-test-vitesse', audience:'emploi', title:"3 métiers où la vitesse de frappe est littéralement testée à l'embauche", angle:"Info utile et partageable dans un cadre professionnel.", format:'post', platforms:['linkedin'] },
+  { key:'temoignage-entretien-secretariat', topic:'temoignage-entretien-secretariat', audience:'emploi', title:"Comment j'ai bossé ma frappe avant un entretien secrétariat", angle:"Témoignage narratif, preuve sociale incarnée.", format:'video', platforms:['youtube'] },
+  { key:'checklist-test-admin', topic:'checklist-test-admin', audience:'emploi', title:"Checklist : es-tu prêt pour un test de frappe administratif ?", angle:"Lead magnet pratique, facile à consommer et à partager.", format:'article', platforms:['blog'] },
+  { key:'age-ideal-enfant', topic:'age-ideal-enfant', audience:'parents', title:"L'âge idéal pour apprendre à taper au clavier à son enfant", angle:"Question que beaucoup de parents se posent — bon pour le SEO parental.", format:'article', platforms:['blog'] },
+  { key:'dactylo-amusante-enfant', topic:'dactylo-amusante-enfant', audience:'parents', title:"5 minutes par jour : comment rendre la dactylo amusante pour un enfant", angle:"Storytelling parental concret, rassurant et actionnable.", format:'post', platforms:['instagram'] },
+  { key:'calcul-heures-perdues', topic:'calcul-heures-perdues', audience:'general', title:"Le calcul qui fait mal : combien d'heures perdues par an à taper lentement", angle:"Chiffre choc qui capte l'attention en 2 secondes.", format:'post', platforms:['instagram'] },
+  { key:'competence-sous-estimee', topic:'competence-sous-estimee', audience:'general', title:"Pourquoi taper vite est une des compétences les plus sous-estimées", angle:"Point de vue fort qui invite au débat en commentaires.", format:'article', platforms:['linkedin'] },
+  { key:'jeux-progression-fun', topic:'jeux-progression-fun', audience:'general', title:"3 jeux pour progresser en tapant sans même t'en rendre compte", angle:"Angle fun et produit, montre la partie ludique de l'app.", format:'video', platforms:['tiktok'] },
+  { key:'position-doigts-erreur', topic:'position-doigts-erreur', audience:'general', title:"La position des doigts que 90% des gens ratent", angle:"Astuce concrète et actionnable immédiatement, bon format tuto court.", format:'video', platforms:['tiktok','youtube'] },
+  { key:'duel-1v1', topic:'duel-1v1', audience:'general', title:"Duel 1v1 : défie un ami en frappe, qui gagne ?", angle:"Mécanique de jeu sociale qui pousse au partage entre amis.", format:'post', platforms:['instagram','tiktok'] },
+  { key:'debunk-tape-assez-vite', topic:'debunk-tape-assez-vite', audience:'general', title:"« Je tape assez vite comme ça » — vrai ou faux ?", angle:"Format débunk qui invite à la discussion en commentaires.", format:'post', platforms:['linkedin'] },
+  { key:'partage-avis-recu', topic:'partage-avis-recu', audience:'preuve_sociale', title:"On vient de recevoir cet avis, ça fait chaud au cœur", angle:"Partage direct d'un vrai avis client (capture d'écran) — authentique et rapide à produire.", format:'post', platforms:['instagram'] },
+  { key:'carrousel-avis', topic:'carrousel-avis', audience:'preuve_sociale', title:"Ce que disent les premiers utilisateurs de KeyPace", angle:"Carrousel de plusieurs avis courts, format facile en story.", format:'story', platforms:['instagram'] },
+  { key:'offre-gratuite-explication', topic:'offre-gratuite-explication', audience:'conversion', title:"10 leçons gratuites, sans carte bancaire : voici exactement ce que tu débloques", angle:"Clarifie l'offre freemium pour lever le doute avant l'inscription.", format:'post', platforms:['instagram'] },
+  { key:'comparatif-gratuit-expert', topic:'comparatif-gratuit-expert', audience:'conversion', title:"Gratuit vs Expert : le comparatif en 30 secondes", angle:"Comparatif visuel rapide qui aide à la décision d'achat.", format:'video', platforms:['tiktok'] },
+  { key:'histoire-fondateur', topic:'histoire-fondateur', audience:'conversion', title:"Pourquoi j'ai créé KeyPace", angle:"Storytelling fondateur, authenticité qui construit la confiance.", format:'article', platforms:['linkedin'] },
+  { key:'newsletter-nouveautes', topic:'newsletter-nouveautes', audience:'conversion', title:"Les nouveautés du mois sur KeyPace", angle:"Contenu de rétention pour la liste email, garde le lien avec les inscrits.", format:'newsletter', platforms:['autre'] },
+];
+
+// Sujets déjà traités (peu importe le mois affiché ou le statut du contenu) :
+// chargé une fois, puis mis à jour localement à chaque ajout, pour ne plus
+// reproposer inutilement un sujet déjà couvert sous un angle ou l'autre.
+window.__usedIdeaTopics = new Set();
+
+async function loadUsedIdeaTopics(){
+  try {
+    const { keys } = await api('used-idea-keys');
+    const usedKeys = new Set(keys || []);
+    window.__usedIdeaTopics = new Set(CONTENT_IDEAS.filter(i => usedKeys.has(i.key)).map(i => i.topic));
+  } catch (e) { console.error(e); }
+}
+
+function generateContentIdeas(){
+  const audience = document.getElementById('idea-audience').value;
+  let pool = CONTENT_IDEAS.filter(i => !window.__usedIdeaTopics.has(i.topic));
+  const excludedCount = CONTENT_IDEAS.length - pool.length;
+  if (audience) pool = pool.filter(i => i.audience === audience);
+  const picks = [...pool].sort(() => Math.random() - 0.5).slice(0, 5);
+  window.__currentIdeaPicks = picks;
+  const el = document.getElementById('idea-bank-results');
+  const note = excludedCount ? `<p class="muted" style="font-size:12px;margin:0 0 10px">🧠 ${excludedCount} sujet${excludedCount>1?'s':''} déjà traité${excludedCount>1?'s':''} n'${excludedCount>1?'ont':'a'} pas été reproposé${excludedCount>1?'s':''}.</p>` : '';
+  el.innerHTML = note + (picks.length ? `<div class="idea-grid">${picks.map((idea, i) => `
+    <div class="idea-card" id="idea-card-${i}">
+      <div class="ititle">${idea.title}</div>
+      <div class="iangle">${idea.angle}</div>
+      <div class="cmeta" style="margin-bottom:10px">${idea.platforms.map(p => `<span class="platform-tag">${p}</span>`).join('')}${idea.format}</div>
+      <button class="btn ghost small" style="width:auto" onclick="addIdeaToBacklog(${i})">+ Ajouter au backlog</button>
+    </div>`).join('')}</div>`
+    : `<div class="empty-msg">${audience ? "Aucune idée neuve pour cette audience — essaie « Toutes les audiences »." : "Tous les sujets de la banque d'idées ont déjà été traités !"}</div>`);
+}
+
+async function addIdeaToBacklog(i){
+  const idea = window.__currentIdeaPicks[i];
+  if (!idea) return;
+  await api('create-event', { method:'POST', body: {
+    title: idea.title,
+    content_type: idea.format,
+    platforms: idea.platforms,
+    account: 'keypace',
+    scheduled_date: null,
+    caption: '',
+    notes: idea.angle,
+    idea_key: idea.key,
+  }});
+  window.__usedIdeaTopics.add(idea.topic);
+  const card = document.getElementById(`idea-card-${i}`);
+  if (card) card.querySelector('button').outerHTML = `<span class="iadded">✓ Ajoutée au backlog</span>`;
+  loadCalendar();
+}
+
+// ─── Suggestions d'accroches (templates) ──────────────────────────
+// Basées sur le titre déjà saisi : jamais de page blanche pour démarrer un post.
+function suggestHooks(){
+  const title = document.getElementById('e-title').value.trim();
+  if (!title) { alert("Renseigne d'abord un titre pour générer des accroches."); return; }
+  const hooks = [
+    `👀 ${title}\n\nOn t'explique tout dans ce post.`,
+    `${title}. Voici comment, concrètement.`,
+    `${title} — et toi, tu en es où ?`,
+  ];
+  const el = document.getElementById('hook-suggestions');
+  el.style.display = 'flex';
+  el.innerHTML = hooks.map((h, i) => `<button class="btn ghost small" type="button" style="width:100%;text-align:left;white-space:pre-line;height:auto;padding:8px 12px" onclick="applyHook(${i})">${escHtml(h)}</button>`).join('');
+  window.__currentHooks = hooks;
+}
+
+function applyHook(i){
+  const hook = window.__currentHooks[i];
+  if (hook == null) return;
+  document.getElementById('e-caption').value = hook;
+  document.getElementById('hook-suggestions').style.display = 'none';
+}
+
+async function saveEvent(){
+  const title = document.getElementById('e-title').value.trim();
+  if (!title) return;
+  const body = {
+    title,
+    content_type: document.getElementById('e-type').value,
+    platforms: getPlatformChecks(),
+    account: document.getElementById('e-account').value,
+    scheduled_date: document.getElementById('e-date').value || null,
+    caption: document.getElementById('e-caption').value.trim(),
+    notes: document.getElementById('e-notes').value.trim(),
+  };
+  if (editingEventId) await api('update-event', { method:'POST', body: { id: editingEventId, ...body } });
+  else await api('create-event', { method:'POST', body });
+  closeEventForm();
+  loadCalendar();
+}
+
+// ─── Avis (modération) ─────────────────────────────────
+function escHtml(s){
+  return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
+async function loadReviews(){
+  const { items } = await api('reviews');
+  window.__reviews = items;
+  renderReviews();
+}
+
+function renderReviews(){
+  const items = window.__reviews || [];
+  const pending = items.filter(r => r.status === 'pending').length;
+  const published = items.filter(r => r.status === 'published').length;
+  document.getElementById('reviews-summary').textContent = `${pending} en attente · ${published} publié${published > 1 ? 's' : ''}`;
+  document.getElementById('reviews-body').innerHTML = items.length ? items.map(r => `
+    <tr>
+      <td>${escHtml(r.author_name)}</td>
+      <td>${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</td>
+      <td style="max-width:360px;white-space:normal">${escHtml(r.comment)}</td>
+      <td><span class="badge badge-${r.status}">${REVIEW_STATUS_LABELS[r.status] || r.status}</span></td>
+      <td>${fmtDate(r.created_at)}</td>
+      <td style="white-space:nowrap">
+        ${r.status !== 'published' ? `<button class="btn ghost small" onclick="setReviewStatus('${r.id}','published')">✓ Publier</button>` : ''}
+        ${r.status !== 'rejected' ? `<button class="btn ghost small" onclick="setReviewStatus('${r.id}','rejected')">✕ Rejeter</button>` : ''}
+      </td>
+    </tr>`).join('') : '<tr><td colspan="6" class="muted">Aucun avis pour le moment.</td></tr>';
+}
+
+async function setReviewStatus(id, status){
+  const action = status === 'published' ? 'publish-review' : 'reject-review';
+  await api(action, { method: 'POST', body: { id } });
+  await loadReviews();
+}
+
+async function findGooglePlace(){
+  const query = document.getElementById('google-query').value.trim();
+  const resultsEl = document.getElementById('google-place-results');
+  if (!query) return;
+  resultsEl.innerHTML = '<span class="muted">Recherche…</span>';
+  try {
+    const { candidates } = await api('find-place', { params: { query } });
+    resultsEl.innerHTML = candidates && candidates.length
+      ? candidates.map(c => `
+          <div style="padding:10px 0;border-top:1px solid var(--border)">
+            <div style="font-weight:700">${escHtml(c.name)}</div>
+            <div class="muted" style="font-size:12.5px;margin:2px 0 6px">${escHtml(c.formatted_address || '')}</div>
+            <div class="mono" style="font-size:12.5px;background:var(--light);border-radius:8px;padding:6px 10px;display:inline-block">${escHtml(c.place_id)}</div>
+          </div>`).join('')
+      : '<span class="muted">Aucun résultat — précise le nom et la ville.</span>';
+  } catch (e) {
+    resultsEl.innerHTML = `<span class="muted">${escHtml(e.message)}</span>`;
+  }
+}
+
+async function syncGoogleReviews(){
+  const btn = document.getElementById('sync-google-btn');
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = 'Synchro…';
+  try {
+    const r = await api('sync-google-reviews', { method: 'POST' });
+    await loadReviews();
+    alert(`${r.synced} avis Google synchronisé${r.synced > 1 ? 's' : ''}.`);
+  } catch (e) {
+    alert(e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = original;
+}
+
+// ─── Démarrage ─────────────────────────────────────────
+if (adminKey()) {
+  api('kpis').then(() => {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    boot();
+  }).catch(() => { localStorage.removeItem(KEY_STORAGE); });
+}
+document.getElementById('gate-key').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+</script>
+
+</body>
+</html>
