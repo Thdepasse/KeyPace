@@ -576,3 +576,28 @@ alter table users
   add column if not exists must_change_password boolean default false,
   add column if not exists class_join_failed_attempts integer default 0,
   add column if not exists class_join_locked_until timestamptz;
+
+-- ───────────────────────────────────────────────────────────────
+-- Audit sécurité authentification (août 2026)
+-- session_expires_at : un session_token était valide indéfiniment une fois
+--   émis (aucune expiration, aucune révocation réelle à la déconnexion).
+--   NULL = session émise avant cette colonne, traitée comme valide (voir
+--   sessionFilter()/sessionOkFilter() côté serveur) pour ne pas déconnecter
+--   tout le monde d'un coup au déploiement — l'expiration s'applique de
+--   façon croissante, à chaque nouvelle émission de session_token (login,
+--   reset de mot de passe, changement de mot de passe, SSO).
+-- admin_key_attempts : anti-bruteforce sur ADMIN_KEY (bootstrap établissement,
+--   api/institutions.js) — suivi par IP puisque cette clé ne correspond à
+--   aucun compte utilisateur. Avant ça, la clé était essayable en boucle
+--   sans aucun frein applicatif.
+-- ───────────────────────────────────────────────────────────────
+alter table users
+  add column if not exists session_expires_at timestamptz;
+
+create table if not exists admin_key_attempts (
+  id uuid default gen_random_uuid() primary key,
+  ip text unique not null,
+  failed_attempts integer default 0,
+  locked_until timestamptz
+);
+alter table admin_key_attempts enable row level security;

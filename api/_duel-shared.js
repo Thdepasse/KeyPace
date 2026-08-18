@@ -56,9 +56,13 @@ const DUEL_TEXTS = [
   "la patience est la clé de tout apprentissage : aucun champion ne l'est devenu du jour au lendemain.",
 ];
 
+// session_expires_at IS NULL reste valide (sessions émises avant l'ajout de
+// cette colonne) — évite de déconnecter tout le monde d'un coup au déploiement.
+function sessionOkFilter() { return `or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})`; }
+
 async function userFromToken(token) {
   if (!token) return null;
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,display_name,plan`);
+  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&${sessionOkFilter()}&select=id,username,display_name,plan`);
   return (r.data && r.data[0]) || null;
 }
 

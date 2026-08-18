@@ -125,6 +125,10 @@ function randomHash() {
   return crypto.randomBytes(32).toString('hex'); // password_hash non-null, inutilisable
 }
 
+// Même durée de vie de session que api/login.js (30 jours) — un session_token
+// restait valide indéfiniment jusqu'ici.
+function sessionExpiresAt() { return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); }
+
 // Génère un username unique à partir de l'email/nom.
 async function uniqueUsername(seed) {
   let base = (seed || 'user').toLowerCase().replace(/[^a-z0-9._-]/g, '').replace(/^[._-]+|[._-]+$/g, '').slice(0, 24) || 'user';
@@ -166,7 +170,7 @@ async function findOrCreateUser(provider, profile, inviteCtx) {
     // Liaison auto + nouvelle session ; on confirme l'email au passage.
     // Note : une invitation présente ici n'est pas appliquée à un compte déjà
     // existant (même périmètre que register.js, qui ne gère que la création).
-    const patch = { session_token: session, email_verified: true };
+    const patch = { session_token: session, session_expires_at: sessionExpiresAt(), email_verified: true };
     if (!existing.oauth_provider) patch.oauth_provider = provider;
     if (existing.verification_token) patch.verification_token = null;
     await sb(`/users?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
@@ -199,6 +203,7 @@ async function findOrCreateUser(provider, profile, inviteCtx) {
       password_hash: randomHash(),
       plan: institution ? 'expert' : 'free',
       session_token: session,
+      session_expires_at: sessionExpiresAt(),
       email_verified: true,
       verification_token: null,
       oauth_provider: provider,

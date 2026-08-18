@@ -7,6 +7,17 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const APP_URL = (process.env.APP_URL || 'https://keypace.be').trim();
 const FROM_EMAIL = process.env.FROM_EMAIL || 'KeyPace <noreply@keypace.be>';
 
+// Durée de vie d'une session — auparavant un session_token restait valide
+// indéfiniment une fois émis. session_expires_at IS NULL est traité comme
+// valide (sessions émises avant l'ajout de cette colonne) : ça évite de
+// déconnecter tout le monde d'un coup au déploiement — l'expiration réelle
+// s'applique progressivement, à chaque nouvelle émission de token.
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 jours
+function sessionExpiresAt() { return new Date(Date.now() + SESSION_TTL_MS).toISOString(); }
+function sessionFilter(token) {
+  return `session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})`;
+}
+
 async function sb(path, opts = {}) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
     ...opts,
@@ -143,7 +154,7 @@ module.exports = async function handler(req, res) {
     const { token } = body;
     if (!token) return res.status(400).json({ error: 'Token de session manquant.' });
 
-    const sessionR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,email`);
+    const sessionR = await sb(`/users?${sessionFilter(token)}&select=id,username,email`);
     const user = sessionR.data && sessionR.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
@@ -189,6 +200,7 @@ module.exports = async function handler(req, res) {
         verification_token: null,
         verification_expires_at: null,
         session_token: newSession,
+        session_expires_at: sessionExpiresAt(),
         failed_attempts: 0,
         locked_until: null,
         must_change_password: false, // ce reset auto-choisi compte comme le changement exigé, s'il l'était
@@ -208,7 +220,7 @@ module.exports = async function handler(req, res) {
   if (body.action === 'export-me') {
     const { token } = body;
     if (!token) return res.status(400).json({ error: 'Token de session manquant.' });
-    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,email,role,plan,email_verified,created_at,institution_id`);
+    const uR = await sb(`/users?${sessionFilter(token)}&select=id,username,email,role,plan,email_verified,created_at,institution_id`);
     const user = uR.data && uR.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
@@ -240,7 +252,7 @@ module.exports = async function handler(req, res) {
   if (body.action === 'delete-me') {
     const { token, passwordHash } = body;
     if (!token || !passwordHash) return res.status(400).json({ error: 'Mot de passe requis.' });
-    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,password_hash`);
+    const uR = await sb(`/users?${sessionFilter(token)}&select=id,password_hash`);
     const user = uR.data && uR.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     if (!verifyPassword(passwordHash, user.password_hash).ok) return res.status(401).json({ error: 'Mot de passe incorrect.' });
@@ -260,7 +272,7 @@ module.exports = async function handler(req, res) {
     if (newUsername.length < 3 || newUsername.length > 24) return res.status(400).json({ error: "Le nom d'utilisateur doit faire entre 3 et 24 caractères." });
     if (!/^[a-zA-Z0-9._-]+$/.test(newUsername)) return res.status(400).json({ error: 'Caractères autorisés : lettres, chiffres, points, tirets, underscores.' });
 
-    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,role,institution_id`);
+    const uR = await sb(`/users?${sessionFilter(token)}&select=id,username,role,institution_id`);
     const user = uR.data && uR.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     if (user.role === 'eleve' && user.institution_id) {
@@ -284,7 +296,7 @@ module.exports = async function handler(req, res) {
     if (!token) return res.status(400).json({ error: 'Session manquante.' });
     const name = String(displayName || '').trim().slice(0, 24) || null;
     if (name && !/^[\p{L}\p{N}\s._-]+$/u.test(name)) return res.status(400).json({ error: 'Caractères non autorisés dans le nom affiché.' });
-    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id`);
+    const uR = await sb(`/users?${sessionFilter(token)}&select=id`);
     const user = uR.data && uR.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ display_name: name }) });
@@ -296,11 +308,27 @@ module.exports = async function handler(req, res) {
   if (body.action === 'change-password') {
     const { token, oldPasswordHash, newPasswordHash } = body;
     if (!token || !oldPasswordHash || !newPasswordHash) return res.status(400).json({ error: 'Champs manquants.' });
-    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,password_hash`);
+    const uR = await sb(`/users?${sessionFilter(token)}&select=id,password_hash`);
     const user = uR.data && uR.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     if (!verifyPassword(oldPasswordHash, user.password_hash).ok) return res.status(401).json({ error: 'Mot de passe actuel incorrect.' });
-    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ password_hash: hashPassword(newPasswordHash), must_change_password: false }) });
+    // Régénère aussi le session_token : sans ça, une session déjà volée avant
+    // ce changement de mot de passe restait valable après (le mot de passe
+    // change, mais pas le jeton qui donne accès sans lui).
+    const newToken = require('crypto').randomUUID();
+    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ password_hash: hashPassword(newPasswordHash), must_change_password: false, session_token: newToken, session_expires_at: sessionExpiresAt() }) });
+    return res.json({ ok: true, token: newToken });
+  }
+
+  // — Déconnexion explicite : invalide le session_token côté serveur (avant
+  // ça, "Déconnexion" ne faisait qu'effacer le localStorage du navigateur —
+  // un jeton intercepté avant la déconnexion restait utilisable indéfiniment).
+  if (body.action === 'logout') {
+    const { token } = body;
+    if (!token) return res.json({ ok: true });
+    const uR = await sb(`/users?${sessionFilter(token)}&select=id`);
+    const user = uR.data && uR.data[0];
+    if (user) await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ session_token: null, session_expires_at: null }) });
     return res.json({ ok: true });
   }
 
@@ -314,7 +342,7 @@ module.exports = async function handler(req, res) {
     const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
     if (!emailRe.test(String(newEmail))) return res.status(400).json({ error: 'Adresse email invalide.' });
 
-    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,email,password_hash`);
+    const uR = await sb(`/users?${sessionFilter(token)}&select=id,username,email,password_hash`);
     const user = uR.data && uR.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     if (!verifyPassword(currentPasswordHash, user.password_hash).ok) return res.status(401).json({ error: 'Mot de passe incorrect.' });
@@ -352,7 +380,7 @@ module.exports = async function handler(req, res) {
   if (body.action === 'onboarding-done') {
     const { token } = body;
     if (!token) return res.status(400).json({ error: 'Token manquant.' });
-    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id`);
+    const uR = await sb(`/users?${sessionFilter(token)}&select=id`);
     const user = uR.data && uR.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ onboarding_completed: true }) });
@@ -363,7 +391,7 @@ module.exports = async function handler(req, res) {
   if (body.action === 'session-login') {
     const { token } = body;
     if (!token) return res.status(400).json({ error: 'Token de session manquant.' });
-    const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=*`);
+    const r = await sb(`/users?${sessionFilter(token)}&select=*`);
     const user = r.data && r.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
@@ -395,7 +423,7 @@ module.exports = async function handler(req, res) {
   if (user.verification_token) return res.status(403).json({ error: 'Confirme ton adresse email avant de te connecter. Vérifie ta boîte mail.', code: 'EMAIL_NOT_VERIFIED' });
 
   const token = require('crypto').randomUUID();
-  const patch = { session_token: token, failed_attempts: 0, locked_until: null };
+  const patch = { session_token: token, session_expires_at: sessionExpiresAt(), failed_attempts: 0, locked_until: null };
   if (check.upgrade) patch.password_hash = check.upgrade; // migration SHA-256 brut -> scrypt
   await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
 

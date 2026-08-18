@@ -304,6 +304,7 @@ module.exports = async function handler(req, res) {
       password_hash: hashPassword(passwordHash),
       plan,
       session_token: token,
+      session_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       email_verified: false,
       verification_token: verificationToken,
       verification_expires_at: verificationExpiresAt,

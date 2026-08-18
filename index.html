@@ -1556,6 +1556,7 @@ function showForcedPasswordChangeModal(d,oldPasswordHash){
       const dd=await r.json();
       if(!r.ok)throw new Error(dd.error||'Erreur.');
       overlay.remove();
+      if(dd.token)d.token=dd.token; // le serveur régénère le jeton au changement de mot de passe
       completeLogin(d);
     }catch(e){btn.disabled=false;btn.textContent='Continuer';showErr(e.message||'Erreur réseau.');}
   });
@@ -1685,6 +1686,13 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 function logout(){
+  // Invalide le jeton côté serveur (best-effort, pas attendu) — avant, la
+  // déconnexion n'effaçait que le localStorage : un jeton intercepté avant
+  // le clic restait utilisable indéfiniment malgré la "déconnexion".
+  const tokenToRevoke=currentToken;
+  if(tokenToRevoke){
+    fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logout',token:tokenToRevoke})}).catch(()=>{});
+  }
   clearSession();
   app.stats=null;
   app.etab=null;
@@ -6823,6 +6831,13 @@ const app={
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'change-password',token:currentToken,oldPasswordHash,newPasswordHash})});
       const d=await r.json();
       if(!r.ok)throw new Error(d.error||'Erreur.');
+      // Le serveur régénère le jeton de session au changement de mot de passe
+      // (ancienne session potentiellement compromise invalidée) — on le
+      // reprend pour ne pas se retrouver déconnecté à la prochaine action.
+      if(d.token){
+        currentToken=d.token;
+        const s=JSON.parse(localStorage.getItem('klak_session')||'{}');s.token=d.token;localStorage.setItem('klak_session',JSON.stringify(s));
+      }
       showMsg('Mot de passe mis à jour !',true);
       oldInput.value='';newInput.value='';
     }catch(e){showMsg(e.message,false);}

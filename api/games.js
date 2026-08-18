@@ -34,7 +34,7 @@ module.exports = async function handler(req, res) {
       case 'boss-submit': {
         const { token, wpm, accuracy } = body;
         if (!token) return res.status(400).json({ error: 'Token manquant.' });
-        const ur = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,display_name,plan`);
+        const ur = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username,display_name,plan`);
         const user = ur.data && ur.data[0];
         if (!user) return res.status(401).json({ error: 'Session invalide.' });
         if (user.plan !== 'expert') return res.status(403).json({ error: 'Réservé aux comptes Expert.' });
@@ -63,7 +63,7 @@ module.exports = async function handler(req, res) {
         const rows = (top.data || []).map((r, i) => ({ rank: i + 1, ...r }));
         let me = null;
         if (token) {
-          const ur = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username`);
+          const ur = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username`);
           const user = ur.data && ur.data[0];
           if (user) {
             const mine = await sb(`/weekly_scores?challenge_id=eq.${ch.id}&user_id=eq.${user.id}&select=username,score,wpm,accuracy`);

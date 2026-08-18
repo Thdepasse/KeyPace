@@ -48,7 +48,7 @@ async function sb(path, opts = {}) {
 
 async function userFromToken(token) {
   if (!token) return null;
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,plan,role,institution_id,class_join_failed_attempts,class_join_locked_until`);
+  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username,plan,role,institution_id,class_join_failed_attempts,class_join_locked_until`);
   return (r.data && r.data[0]) || null;
 }
 
