@@ -33,6 +33,25 @@
   .nav .title{font-size:14px;color:var(--muted);font-weight:600}
   .logout{font-size:13px;color:var(--muted);cursor:pointer;border:1px solid var(--border);background:var(--card);padding:7px 12px;border-radius:9px;transition:color .15s,border-color .15s}
   .logout:hover{color:var(--txt);border-color:#D8D0C0}
+  .global-search{position:relative;width:260px}
+  .global-search input{width:100%;font-size:13px;padding:8px 12px;background:var(--card)}
+  .global-search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md,0 12px 28px rgba(0,0,0,.12));max-height:360px;overflow-y:auto;z-index:30;display:none}
+  .global-search-results.open{display:block}
+  .gsr-group-label{font-size:10.5px;text-transform:uppercase;font-weight:800;color:var(--muted);padding:8px 12px 4px}
+  .gsr-item{display:block;width:100%;text-align:left;padding:8px 12px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--txt)}
+  .gsr-item:hover,.gsr-item.active{background:var(--light)}
+  .gsr-item .gsr-meta{color:var(--muted);font-size:11.5px}
+  .gsr-empty{padding:14px 12px;font-size:12.5px;color:var(--muted)}
+  @media (max-width:860px){.global-search{width:180px}}
+  .tab-badge{background:#C23B2E;color:#fff;font-size:10px;font-weight:800;line-height:1;padding:3px 6px;border-radius:20px;margin-left:2px}
+  .toast-container{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:8px;z-index:100}
+  .toast{background:var(--txt);color:#fff;font-size:13px;font-weight:600;padding:10px 16px;border-radius:10px;box-shadow:0 12px 28px rgba(0,0,0,.22);animation:toast-in .18s ease}
+  .toast.error{background:#B3261E}
+  .toast.leaving{animation:toast-out .18s ease forwards}
+  @keyframes toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes toast-out{to{opacity:0;transform:translateY(8px)}}
+  .cal-day.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .cal-day.today .dnum{color:var(--accent)}
   .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 64px}
   section{margin:0 0 40px}
   section h2{font-size:20px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:9px}
@@ -158,11 +177,15 @@
   .cal-day.empty{background:transparent;border:none}
   .cal-day.dragover{border-color:var(--accent);background:#FFF6F2;box-shadow:var(--shadow-sm)}
   .cal-day .dnum{font-size:11px;color:var(--muted);font-weight:700;padding:2px 4px}
-  .content-card{background:var(--light);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;cursor:grab;line-height:1.35;transition:box-shadow .15s,transform .15s}
+  .content-card{background:var(--light);border:1px solid var(--border);border-left-width:3px;border-radius:8px;padding:6px 8px;font-size:12px;cursor:grab;line-height:1.35;transition:box-shadow .15s,transform .15s}
   .content-card:hover{box-shadow:var(--shadow-sm);transform:translateY(-1px)}
   .content-card:active{cursor:grabbing}
   .content-card .ctitle{font-weight:700;display:block}
   .content-card .cmeta{color:var(--muted);font-size:11px}
+  .content-card.cs-idee{border-left-color:var(--muted)}
+  .content-card.cs-a_faire{border-left-color:#C2540A}
+  .content-card.cs-pret{border-left-color:#6C5CE7}
+  .content-card.cs-publie{border-left-color:#1C8A45}
   .backlog{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:120px;box-shadow:var(--shadow-sm);transition:border-color .15s,background .15s}
   .backlog.dragover{border-color:var(--accent);background:#FFF6F2}
   .backlog h3{font-size:13px;font-weight:800;margin-bottom:2px}
@@ -231,6 +254,10 @@
       <span class="logo"><span class="k">K</span> KeyPace</span>
       <span class="title">Dashboard équipe</span>
       <span class="sp"></span>
+      <div class="global-search">
+        <input id="global-search-input" type="search" placeholder="Rechercher une école, un ticket..." oninput="onGlobalSearch()" onkeydown="onGlobalSearchKeydown(event)" onblur="closeGlobalSearchSoon()" onfocus="onGlobalSearch()">
+        <div class="global-search-results" id="global-search-results"></div>
+      </div>
       <span class="logout" onclick="logout()">Se déconnecter</span>
     </div>
   </header>
@@ -239,11 +266,11 @@
 
     <div class="tabs">
       <button class="tab-btn" data-tab="kpi" onclick="switchTab('kpi')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,17 9,11 13,15 21,6"/><polyline points="14,6 21,6 21,13"/></svg></span>KPI</button>
-      <button class="tab-btn" data-tab="prospects" onclick="switchTab('prospects')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/></svg></span>Prospection écoles</button>
-      <button class="tab-btn" data-tab="clients" onclick="switchTab('clients')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5 21 2"/><path d="M16 7l3 3"/></svg></span>Écoles clientes</button>
+      <button class="tab-btn" data-tab="prospects" onclick="switchTab('prospects')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/></svg></span>Prospection écoles<span class="tab-badge" id="tab-badge-prospects" style="display:none"></span></button>
+      <button class="tab-btn" data-tab="clients" onclick="switchTab('clients')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5 21 2"/><path d="M16 7l3 3"/></svg></span>Écoles clientes<span class="tab-badge" id="tab-badge-clients" style="display:none"></span></button>
       <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg></span>Calendrier marketing</button>
-      <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg></span>Avis</button>
-      <button class="tab-btn" data-tab="backlog" onclick="switchTab('backlog')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 1 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2z"/></svg></span>Backlog dev</button>
+      <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg></span>Avis<span class="tab-badge" id="tab-badge-reviews" style="display:none"></span></button>
+      <button class="tab-btn" data-tab="backlog" onclick="switchTab('backlog')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 1 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2z"/></svg></span>Backlog dev<span class="tab-badge" id="tab-badge-backlog" style="display:none"></span></button>
       <button class="tab-btn" data-tab="security" onclick="switchTab('security')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>Sécurité</button>
       <button class="tab-btn" data-tab="competitors" onclick="switchTab('competitors')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="#FF4D2E"/></svg></span>Concurrents</button>
     </div>
@@ -487,6 +514,7 @@
           <button class="cal-nav-arrow" onclick="shiftMonth(-1)">‹</button>
           <span class="mono" id="cal-label" style="font-weight:700;min-width:130px;text-align:center;display:inline-block"></span>
           <button class="cal-nav-arrow" onclick="shiftMonth(1)">›</button>
+          <button class="btn ghost small" style="width:auto" onclick="goToToday()">Aujourd'hui</button>
           <button class="btn small" style="width:auto" onclick="openAddEventForm()">+ Contenu</button>
         </div>
       </div>
@@ -784,6 +812,8 @@
   </div>
 </div>
 
+<div class="toast-container" id="toast-container"></div>
+
 <script>
 const KEY_STORAGE = 'kp_dashboard_key';
 const STATUS_LABELS = { a_contacter:'À contacter', envoye:'Envoyé', relance:'Relancé', repondu:'Répondu', en_negociation:'Négociation', signe:'Signé', perdu:'Perdu' };
@@ -826,6 +856,76 @@ function logout(){
   localStorage.removeItem(KEY_STORAGE);
   document.getElementById('app').style.display = 'none';
   document.getElementById('gate').style.display = 'flex';
+}
+
+// ─── Confirmations visuelles (toasts) ──────────────────────────────
+function showToast(message, type){
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast${type === 'error' ? ' error' : ''}`;
+  el.textContent = message;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('leaving');
+    setTimeout(() => el.remove(), 200);
+  }, 2200);
+}
+
+// ─── Badges de notification sur les onglets ────────────────────────
+function setTabBadge(tab, count){
+  const el = document.getElementById(`tab-badge-${tab}`);
+  if (!el) return;
+  el.textContent = count > 99 ? '99+' : String(count);
+  el.style.display = count > 0 ? '' : 'none';
+}
+
+// ─── Recherche globale (écoles, tickets, contenus) ─────────────────
+function globalSearchIndex(){
+  const items = [];
+  (window.__prospects || []).forEach(p => items.push({ group:'Prospection', tab:'prospects', label:p.school_name, meta:p.city || '', go:() => editProspect(p.id) }));
+  (window.__clients || []).forEach(c => items.push({ group:'Écoles clientes', tab:'clients', label:c.school_name, meta:c.city || '', go:() => editClient(c.id) }));
+  (window.__devIssues || []).forEach(d => items.push({ group:'Backlog dev', tab:'backlog', label:d.title, meta:DEV_TYPE_LABELS[d.item_type] || '', go:() => editDevIssue(d.id) }));
+  Object.values(window.__events || {}).forEach(e => items.push({ group:'Calendrier marketing', tab:'calendar', label:e.title, meta:e.content_type || '', go:() => editEvent(e.id) }));
+  return items;
+}
+
+function onGlobalSearch(){
+  const query = document.getElementById('global-search-input').value.trim().toLowerCase();
+  const resultsEl = document.getElementById('global-search-results');
+  if (query.length < 2) { resultsEl.classList.remove('open'); resultsEl.innerHTML = ''; return; }
+  const matches = globalSearchIndex().filter(it => it.label && it.label.toLowerCase().includes(query)).slice(0, 8);
+  if (!matches.length) {
+    resultsEl.innerHTML = `<div class="gsr-empty">Aucun résultat pour « ${escHtml(query)} ».</div>`;
+    resultsEl.classList.add('open');
+    return;
+  }
+  let lastGroup = null;
+  resultsEl.innerHTML = matches.map((it, i) => {
+    const groupLabel = it.group !== lastGroup ? `<div class="gsr-group-label">${it.group}</div>` : '';
+    lastGroup = it.group;
+    return `${groupLabel}<button type="button" class="gsr-item" data-idx="${i}" onmousedown="event.preventDefault();goToGlobalResult(${i})">${escHtml(it.label)}${it.meta ? ` <span class="gsr-meta">· ${escHtml(it.meta)}</span>` : ''}</button>`;
+  }).join('');
+  window.__globalSearchMatches = matches;
+  resultsEl.classList.add('open');
+}
+
+function goToGlobalResult(i){
+  const it = (window.__globalSearchMatches || [])[i];
+  if (!it) return;
+  document.getElementById('global-search-input').value = '';
+  document.getElementById('global-search-results').classList.remove('open');
+  switchTab(it.tab);
+  it.go();
+}
+
+function onGlobalSearchKeydown(ev){
+  if (ev.key === 'Escape') { ev.target.blur(); document.getElementById('global-search-results').classList.remove('open'); }
+  if (ev.key === 'Enter' && (window.__globalSearchMatches || []).length) goToGlobalResult(0);
+}
+
+// Laisse le temps à onmousedown de traiter le clic avant que blur ne ferme le menu.
+function closeGlobalSearchSoon(){
+  setTimeout(() => document.getElementById('global-search-results').classList.remove('open'), 150);
 }
 
 const TAB_SECTIONS = { kpi: 'kpi-section', prospects: 'prospects-section', clients: 'clients-section', calendar: 'calendar-section', reviews: 'reviews-section', backlog: 'backlog-section', security: 'security-section', competitors: 'competitors-section' };
@@ -1078,6 +1178,7 @@ async function loadProspects(){
       : 'Jamais synchronisé';
     const now = Date.now();
     const due = list.filter(p => p.next_followup_at && new Date(p.next_followup_at).getTime() <= now && p.status !== 'signe' && p.status !== 'perdu');
+    setTabBadge('prospects', due.length);
 
     const calloutEl = document.getElementById('followup-callout');
     calloutEl.innerHTML = due.length
@@ -1401,6 +1502,7 @@ async function loadClients(){
           `<div class="followup-item"><span class="fname">${escHtml(c.school_name)}</span>${renewalBadgeHtml(c)}</div>`
         ).join('')}</div>`
       : '';
+    setTabBadge('clients', dueSoon.length);
   } catch (e) { console.error(e); }
 }
 
@@ -1488,6 +1590,7 @@ async function saveClient(){
   if (!editingClientId) body.prospect_id = document.getElementById('c-prospect-id').value || null;
   if (editingClientId) await api('client-update', { method:'POST', body: { id: editingClientId, ...body } });
   else await api('client-create', { method:'POST', body });
+  showToast('École cliente enregistrée');
   closeClientForm();
   loadClients();
 }
@@ -1495,6 +1598,7 @@ async function saveClient(){
 async function deleteClient(id){
   if (!confirm('Supprimer cette école cliente ?')) return;
   await api('client-delete', { method:'POST', body: { id } });
+  showToast('École cliente supprimée');
   closeClientForm();
   loadClients();
 }
@@ -1534,6 +1638,7 @@ async function loadDevBacklog(){
     window.__devIssues = items;
     renderDevBacklogTable(items);
     renderDevBacklogKanban(items);
+    setTabBadge('backlog', items.filter(d => d.priority === 'urgente' && d.status !== 'fait').length);
   } catch (e) { console.error(e); }
 }
 
@@ -1623,6 +1728,7 @@ async function saveDevIssue(){
   };
   if (editingDevIssueId) await api('dev-issue-update', { method:'POST', body: { id: editingDevIssueId, ...body } });
   else await api('dev-issue-create', { method:'POST', body });
+  showToast('Ticket enregistré');
   closeDevIssueForm();
   loadDevBacklog();
 }
@@ -1630,6 +1736,7 @@ async function saveDevIssue(){
 async function deleteDevIssue(id){
   if (!confirm('Supprimer ce ticket du backlog ?')) return;
   await api('dev-issue-delete', { method:'POST', body: { id } });
+  showToast('Ticket supprimé');
   closeDevIssueForm();
   loadDevBacklog();
 }
@@ -1744,6 +1851,7 @@ async function saveVaultSecret(){
   if (secret) body.secret = secret;
   if (editingVaultId) await api('vault-update', { method:'POST', body: { id: editingVaultId, ...body } });
   else await api('vault-create', { method:'POST', body });
+  showToast('Secret enregistré');
   closeVaultForm();
   loadVault();
 }
@@ -1751,6 +1859,7 @@ async function saveVaultSecret(){
 async function deleteVaultSecret(id){
   if (!confirm('Supprimer ce secret du coffre-fort ? Cette action est irréversible.')) return;
   await api('vault-delete', { method:'POST', body: { id } });
+  showToast('Secret supprimé');
   closeVaultForm();
   loadVault();
 }
@@ -1812,6 +1921,7 @@ function renderSecurityChecklist(items){
 
 async function checkSecurityItem(key){
   await api('security-checklist-check', { method:'POST', body: { key } });
+  showToast('Vérification enregistrée');
   loadSecurityChecklist();
 }
 
@@ -1829,6 +1939,7 @@ async function saveResourceLink(){
   const url = document.getElementById('l-url').value.trim();
   if (!label || !url) return;
   await api('link-create', { method:'POST', body: { label, url, category: document.getElementById('l-category').value.trim() } });
+  showToast('Lien enregistré');
   closeLinkForm();
   loadLinks();
 }
@@ -1836,6 +1947,7 @@ async function saveResourceLink(){
 async function deleteResourceLink(id){
   if (!confirm('Supprimer ce lien ?')) return;
   await api('link-delete', { method:'POST', body: { id } });
+  showToast('Lien supprimé');
   loadLinks();
 }
 
@@ -1981,6 +2093,7 @@ async function saveCompetitor(){
   };
   if (editingCompetitorId) await api('competitor-update', { method:'POST', body: { id: editingCompetitorId, ...body } });
   else await api('competitor-create', { method:'POST', body });
+  showToast('Concurrent enregistré');
   closeCompetitorForm();
   loadCompetitors();
 }
@@ -1988,6 +2101,7 @@ async function saveCompetitor(){
 async function deleteCompetitor(id){
   if (!confirm('Supprimer ce concurrent du suivi ?')) return;
   await api('competitor-delete', { method:'POST', body: { id } });
+  showToast('Concurrent supprimé');
   closeCompetitorForm();
   loadCompetitors();
 }
@@ -2086,6 +2200,7 @@ async function saveProspect(){
   };
   if (editingProspectId) await api('update-prospect', { method:'POST', body: { id: editingProspectId, ...body } });
   else await api('create-prospect', { method:'POST', body });
+  showToast('École enregistrée');
   closeProspectForm();
   loadProspects();
   loadKpis();
@@ -2193,6 +2308,7 @@ async function logContact(id, status){
 async function deleteProspect(id){
   if (!confirm('Supprimer cette école de la liste de prospection ?')) return;
   await api('delete-prospect', { method:'POST', body: { id } });
+  showToast('École supprimée');
   loadProspects();
   loadKpis();
 }
@@ -2226,12 +2342,17 @@ function shiftMonth(delta){
   renderCalendarHeader();
   loadCalendar();
 }
+function goToToday(){
+  calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  renderCalendarHeader();
+  loadCalendar();
+}
 
 const ACCOUNT_LABELS = { keypace: 'KeyPace', fondateur_1: 'Théo', fondateur_2: 'Vincent' };
 
 function contentCardHtml(ev){
   const isTask = ev.content_type === 'tache';
-  return `<div class="content-card" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')" style="${isTask ? 'background:#FFF6F2;border-color:#FFD9CC' : ''}">
+  return `<div class="content-card cs-${ev.status || 'idee'}" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')" title="${CONTENT_STATUS_LABELS[ev.status] || ''}" style="${isTask ? 'background:#FFF6F2' : ''}">
     <span class="ctitle">${isTask ? '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8,12 11,15 16,9"/></svg> ' : ''}${ev.title}</span>
     <span class="cmeta">${(ev.platforms || []).map(p => `<span class="platform-tag">${p}</span>`).join('')}<span class="platform-tag" style="background:#EAE6F5">${ACCOUNT_LABELS[ev.account] || 'KeyPace'}</span>${isTask ? 'tâche' : ev.content_type}</span>
   </div>`;
@@ -2250,12 +2371,13 @@ async function loadCalendar(){
     const daysInMonth = new Date(year, month+1, 0).getDate();
     const dows = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 
+    const todayStr = monthKey(new Date()) === monthKey(calMonth) ? String(new Date().getDate()) : null;
     let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
     for (let i=0;i<firstDow;i++) html += `<div class="cal-day empty"></div>`;
     for (let day=1; day<=daysInMonth; day++){
       const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
       const items = (byDay[dateStr] || []).map(contentCardHtml).join('');
-      html += `<div class="cal-day" ondragover="allowDrop(event)" ondrop="dropOnDay(event,'${dateStr}')">
+      html += `<div class="cal-day${todayStr === String(day) ? ' today' : ''}" ondragover="allowDrop(event)" ondrop="dropOnDay(event,'${dateStr}')">
         <div class="dnum">${day}</div>${items}
       </div>`;
     }
@@ -2370,6 +2492,7 @@ function editEvent(id){
 async function deleteEvent(id){
   if (!confirm('Supprimer ce contenu du calendrier ?')) return;
   await api('delete-event', { method:'POST', body: { id } });
+  showToast('Contenu supprimé');
   closeEventForm();
   loadCalendar();
 }
@@ -2499,6 +2622,7 @@ async function saveEvent(){
   };
   if (editingEventId) await api('update-event', { method:'POST', body: { id: editingEventId, ...body } });
   else await api('create-event', { method:'POST', body });
+  showToast('Contenu enregistré');
   closeEventForm();
   loadCalendar();
 }
@@ -2519,6 +2643,7 @@ function renderReviews(){
   const pending = items.filter(r => r.status === 'pending').length;
   const published = items.filter(r => r.status === 'published').length;
   document.getElementById('reviews-summary').textContent = `${pending} en attente · ${published} publié${published > 1 ? 's' : ''}`;
+  setTabBadge('reviews', pending);
   document.getElementById('reviews-body').innerHTML = items.length ? items.map(r => `
     <tr>
       <td>${escHtml(r.author_name)}</td>
@@ -2536,6 +2661,7 @@ function renderReviews(){
 async function setReviewStatus(id, status){
   const action = status === 'published' ? 'publish-review' : 'reject-review';
   await api(action, { method: 'POST', body: { id } });
+  showToast(status === 'published' ? 'Avis publié' : 'Avis rejeté');
   await loadReviews();
 }
 
