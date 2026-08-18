@@ -44,6 +44,7 @@
   .tab-panel.active{display:block;animation:fade-in .2s ease}
   @media (max-width:640px){.tabs{overflow-x:auto}.tab-btn{flex:0 0 auto}}
   section h2 .sec-ic{font-size:18px;filter:saturate(1.1)}
+  .ic{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
   .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-sm);transition:box-shadow .18s,transform .18s}
   .card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
@@ -237,21 +238,21 @@
   <div class="wrap">
 
     <div class="tabs">
-      <button class="tab-btn" data-tab="kpi" onclick="switchTab('kpi')"><span class="sec-ic">📈</span>KPI</button>
-      <button class="tab-btn" data-tab="prospects" onclick="switchTab('prospects')"><span class="sec-ic">🏫</span>Prospection écoles</button>
-      <button class="tab-btn" data-tab="clients" onclick="switchTab('clients')"><span class="sec-ic">🔑</span>Écoles clientes</button>
-      <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')"><span class="sec-ic">🗓️</span>Calendrier marketing</button>
-      <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')"><span class="sec-ic">💬</span>Avis</button>
-      <button class="tab-btn" data-tab="backlog" onclick="switchTab('backlog')"><span class="sec-ic">🛠️</span>Backlog dev</button>
-      <button class="tab-btn" data-tab="security" onclick="switchTab('security')"><span class="sec-ic">🔒</span>Sécurité</button>
-      <button class="tab-btn" data-tab="competitors" onclick="switchTab('competitors')"><span class="sec-ic">🎯</span>Concurrents</button>
+      <button class="tab-btn" data-tab="kpi" onclick="switchTab('kpi')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,17 9,11 13,15 21,6"/><polyline points="14,6 21,6 21,13"/></svg></span>KPI</button>
+      <button class="tab-btn" data-tab="prospects" onclick="switchTab('prospects')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/></svg></span>Prospection écoles</button>
+      <button class="tab-btn" data-tab="clients" onclick="switchTab('clients')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5 21 2"/><path d="M16 7l3 3"/></svg></span>Écoles clientes</button>
+      <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg></span>Calendrier marketing</button>
+      <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg></span>Avis</button>
+      <button class="tab-btn" data-tab="backlog" onclick="switchTab('backlog')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 1 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2z"/></svg></span>Backlog dev</button>
+      <button class="tab-btn" data-tab="security" onclick="switchTab('security')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>Sécurité</button>
+      <button class="tab-btn" data-tab="competitors" onclick="switchTab('competitors')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="#FF4D2E"/></svg></span>Concurrents</button>
     </div>
 
     <section id="kpi-section" class="tab-panel">
-      <h2><span class="sec-ic">📈</span>KPI de croissance</h2>
+      <h2><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,17 9,11 13,15 21,6"/><polyline points="14,6 21,6 21,13"/></svg></span>KPI de croissance</h2>
 
       <div class="callout" id="daily-brief" style="display:none">
-        <h3>🎯 Brief du jour</h3>
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="#FF4D2E"/></svg> Brief du jour</h3>
         <div id="daily-brief-items"></div>
       </div>
       <div class="wins-ticker" id="wins-ticker"></div>
@@ -328,12 +329,12 @@
 
     <section id="prospects-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">🏫</span>Prospection écoles</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/></svg></span>Prospection écoles</h2>
         <div style="display:flex;align-items:center;gap:10px">
           <span class="muted" id="last-sync" style="font-size:12px"></span>
-          <button class="btn ghost small" onclick="syncZimbra()" id="sync-btn">🔄 Sync emails</button>
-          <button class="btn ghost small" onclick="exportProspectsCSV()">⬇ Export CSV</button>
-          <button class="btn ghost small" onclick="document.getElementById('csv-file-input').click()">⬆ Import CSV</button>
+          <button class="btn ghost small" onclick="syncZimbra()" id="sync-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg> Sync emails</button>
+          <button class="btn ghost small" onclick="exportProspectsCSV()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7,11 12,16 17,11"/><path d="M4 20h16"/></svg> Export CSV</button>
+          <button class="btn ghost small" onclick="document.getElementById('csv-file-input').click()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21h16"/><path d="M12 17V4"/><polyline points="7,9 12,4 17,9"/></svg> Import CSV</button>
           <input type="file" id="csv-file-input" accept=".csv,text/csv" style="display:none" onchange="handleCSVImport(event)">
           <button class="btn" onclick="openAddForm()">+ Ajouter une école</button>
         </div>
@@ -362,7 +363,7 @@
           <button class="btn ghost" onclick="closeProspectForm()">Annuler</button>
         </div>
         <div id="prospect-history" class="history-section" style="display:none">
-          <h4>🕒 Historique</h4>
+          <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
           <div class="history-add">
             <input id="prospect-note-input" placeholder="Ajouter une note...">
             <button class="btn small ghost" style="width:auto" onclick="addProspectNote()">Ajouter</button>
@@ -380,17 +381,17 @@
         <select id="followup-msg-template" onchange="switchFollowupTemplate()" style="margin-bottom:10px;font-size:13px;padding:7px 10px"></select>
         <textarea id="followup-msg-text" style="min-height:150px"></textarea>
         <div class="form-actions">
-          <button class="btn" id="followup-msg-copy-btn" onclick="copyFollowupMessage()">📋 Copier</button>
+          <button class="btn" id="followup-msg-copy-btn" onclick="copyFollowupMessage()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg> Copier</button>
           <button class="btn ghost" onclick="closeFollowupMessage()">Fermer</button>
         </div>
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
-        <input id="prospect-search" type="search" placeholder="🔎 Rechercher (école, ville, contact, email...)" oninput="window.__duplicateGroupFilter=null;renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
+        <input id="prospect-search" type="search" placeholder="Rechercher (école, ville, contact, email...)" oninput="window.__duplicateGroupFilter=null;renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
         <div style="display:flex;align-items:center;gap:10px">
           <div class="view-toggle" id="prospects-view-toggle">
-            <button class="view-toggle-btn" id="prospects-view-btn-table" onclick="setProspectsView('table')">📋 Tableau</button>
-            <button class="view-toggle-btn" id="prospects-view-btn-kanban" onclick="setProspectsView('kanban')">📊 Kanban</button>
+            <button class="view-toggle-btn" id="prospects-view-btn-table" onclick="setProspectsView('table')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg> Tableau</button>
+            <button class="view-toggle-btn" id="prospects-view-btn-kanban" onclick="setProspectsView('kanban')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="4" height="16" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg> Kanban</button>
           </div>
           <select id="sort-select" onchange="renderProspects()" style="width:auto;font-size:13px;padding:7px 10px">
             <option value="relance">Trier par relance (défaut)</option>
@@ -418,7 +419,7 @@
 
     <section id="clients-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">🔑</span>Écoles clientes</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5 21 2"/><path d="M16 7l3 3"/></svg></span>Écoles clientes</h2>
         <button class="btn" onclick="openClientForm()">+ Nouvelle école cliente</button>
       </div>
 
@@ -456,7 +457,7 @@
           <button class="btn danger" id="client-delete-btn" style="display:none;margin-left:auto" onclick="deleteClient(editingClientId)">Supprimer</button>
         </div>
         <div id="client-history" class="history-section" style="display:none">
-          <h4>🕒 Historique</h4>
+          <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
           <div class="history-add">
             <input id="client-note-input" placeholder="Ajouter une note...">
             <button class="btn small ghost" style="width:auto" onclick="addClientNote()">Ajouter</button>
@@ -477,11 +478,11 @@
 
     <section id="calendar-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">🗓️</span>Calendrier marketing</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg></span>Calendrier marketing</h2>
         <div class="cal-nav">
           <div class="view-toggle" id="calendar-view-toggle">
-            <button class="view-toggle-btn" id="calendar-view-btn-grid" onclick="setCalendarView('grid')">🗓️ Calendrier</button>
-            <button class="view-toggle-btn" id="calendar-view-btn-kanban" onclick="setCalendarView('kanban')">📊 Kanban</button>
+            <button class="view-toggle-btn" id="calendar-view-btn-grid" onclick="setCalendarView('grid')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg> Calendrier</button>
+            <button class="view-toggle-btn" id="calendar-view-btn-kanban" onclick="setCalendarView('kanban')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="4" height="16" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg> Kanban</button>
           </div>
           <button class="cal-nav-arrow" onclick="shiftMonth(-1)">‹</button>
           <span class="mono" id="cal-label" style="font-weight:700;min-width:130px;text-align:center;display:inline-block"></span>
@@ -493,7 +494,7 @@
       <div class="panel" id="idea-bank" style="margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
           <div>
-            <h3 style="margin:0 0 2px">💡 Banque d'idées</h3>
+            <h3 style="margin:0 0 2px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg> Banque d'idées</h3>
             <p class="muted" style="font-size:12.5px;margin:0">En panne d'inspiration ? Génère des idées prêtes à planifier.</p>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
@@ -506,7 +507,7 @@
               <option value="preuve_sociale">Preuve sociale</option>
               <option value="conversion">Conversion</option>
             </select>
-            <button class="btn small" style="width:auto" onclick="generateContentIdeas()">✨ Générer 5 idées</button>
+            <button class="btn small" style="width:auto" onclick="generateContentIdeas()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg> Générer 5 idées</button>
           </div>
         </div>
         <div id="idea-bank-results" style="margin-top:14px"></div>
@@ -546,7 +547,7 @@
         </div>
         <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
           <label style="font-size:12px;color:var(--muted);font-weight:700">Texte du post</label>
-          <button class="btn ghost small" type="button" style="width:auto;padding:4px 10px;font-size:12px" onclick="suggestHooks()">💡 Suggérer des accroches</button>
+          <button class="btn ghost small" type="button" style="width:auto;padding:4px 10px;font-size:12px" onclick="suggestHooks()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg> Suggérer des accroches</button>
         </div>
         <div id="hook-suggestions" style="display:none;margin-top:6px;flex-direction:column;gap:5px"></div>
         <textarea id="e-caption" placeholder="Texte du post (ce qui sera publié)" style="margin-top:6px;min-height:90px"></textarea>
@@ -558,7 +559,7 @@
         </div>
         <p class="muted" style="font-size:12px;margin:10px 0 0">Sans date : le contenu va dans « Idées à planifier » — glissez-le ensuite sur un jour.</p>
         <div id="content-history" class="history-section" style="display:none">
-          <h4>🕒 Historique</h4>
+          <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
           <div class="history-add">
             <input id="content-note-input" placeholder="Ajouter une note...">
             <button class="btn small ghost" style="width:auto" onclick="addContentNote()">Ajouter</button>
@@ -579,10 +580,10 @@
 
     <section id="reviews-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">💬</span>Avis</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg></span>Avis</h2>
         <div style="display:flex;align-items:center;gap:10px">
           <span class="muted" id="reviews-summary" style="font-size:12px"></span>
-          <button class="btn ghost small" onclick="syncGoogleReviews()" id="sync-google-btn">🔄 Sync avis Google</button>
+          <button class="btn ghost small" onclick="syncGoogleReviews()" id="sync-google-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg> Sync avis Google</button>
         </div>
       </div>
 
@@ -591,7 +592,7 @@
         <p class="muted" style="font-size:12.5px;margin:0 0 12px">Retrouve le <b>Place ID</b> de la fiche KeyPace pour configurer <code>GOOGLE_PLACE_ID</code> sur Vercel — sans jamais avoir à saisir la clé API ici. Si la recherche par nom renvoie des établissements sans rapport, cherche plutôt par <b>numéro de téléphone</b> (celui affiché sur la fiche Google), plus fiable.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <input id="google-query" placeholder="ex. KeyPace Namur ou +32 471 40 18 59" style="flex:1;min-width:220px">
-          <button class="btn small" style="width:auto" onclick="findGooglePlace()">🔍 Chercher</button>
+          <button class="btn small" style="width:auto" onclick="findGooglePlace()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Chercher</button>
         </div>
         <div id="google-place-results" style="margin-top:12px"></div>
       </div>
@@ -610,11 +611,11 @@
 
     <section id="backlog-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">🛠️</span>Backlog dev</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 1 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2z"/></svg></span>Backlog dev</h2>
         <div style="display:flex;align-items:center;gap:10px">
           <div class="view-toggle" id="backlog-view-toggle">
-            <button class="view-toggle-btn" id="backlog-view-btn-table" onclick="setBacklogView('table')">📋 Tableau</button>
-            <button class="view-toggle-btn" id="backlog-view-btn-kanban" onclick="setBacklogView('kanban')">📊 Kanban</button>
+            <button class="view-toggle-btn" id="backlog-view-btn-table" onclick="setBacklogView('table')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg> Tableau</button>
+            <button class="view-toggle-btn" id="backlog-view-btn-kanban" onclick="setBacklogView('kanban')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="4" height="16" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg> Kanban</button>
           </div>
           <button class="btn" onclick="openDevIssueForm()">+ Nouveau ticket</button>
         </div>
@@ -655,7 +656,7 @@
           <button class="btn danger" id="dev-issue-delete-btn" style="display:none;margin-left:auto" onclick="deleteDevIssue(editingDevIssueId)">Supprimer</button>
         </div>
         <div id="dev-issue-history" class="history-section" style="display:none">
-          <h4>🕒 Historique</h4>
+          <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
           <div class="history-add">
             <input id="dev-issue-note-input" placeholder="Ajouter une note...">
             <button class="btn small ghost" style="width:auto" onclick="addDevIssueNote()">Ajouter</button>
@@ -677,16 +678,16 @@
 
     <section id="security-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">🔒</span>Sécurité</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>Sécurité</h2>
       </div>
 
       <div class="callout" style="background:#FFF6F2;border-color:#FFD9CC">
-        <h3>⚠️ À ne jamais stocker ici</h3>
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> À ne jamais stocker ici</h3>
         <p style="margin:0;font-size:13px;color:var(--txt)">La clé service Supabase et la clé secrète Stripe (production) : ce sont les clés qui donnent accès à l'endroit où ce coffre vit — les y stocker n'apporte aucune protection réelle. Garde-les dans un vrai gestionnaire de mots de passe (1Password, Bitwarden). Ce coffre chiffre au repos (protège contre une fuite de la base), mais pas contre une fuite de l'ADMIN_KEY du dashboard.</p>
       </div>
 
       <div class="toolbar" style="margin-top:20px">
-        <h3 style="margin:0">🔑 Coffre-fort de secrets</h3>
+        <h3 style="margin:0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5 21 2"/><path d="M16 7l3 3"/></svg> Coffre-fort de secrets</h3>
         <button class="btn small" style="width:auto" onclick="openVaultForm()">+ Ajouter un secret</button>
       </div>
 
@@ -709,7 +710,7 @@
       <div id="vault-list"></div>
 
       <div class="toolbar" style="margin-top:28px">
-        <h3 style="margin:0">🔗 Répertoire de liens</h3>
+        <h3 style="margin:0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M13 4l1.5-1.5a4 4 0 0 1 5.5 5.8L18 10"/><path d="M11 20l-1.5 1.5a4 4 0 0 1-5.5-5.8L6 14"/></svg> Répertoire de liens</h3>
         <button class="btn small" style="width:auto" onclick="openLinkForm()">+ Ajouter un lien</button>
       </div>
       <div class="panel" id="link-form" style="display:none;margin-bottom:16px">
@@ -726,7 +727,7 @@
       <div id="links-list"></div>
 
       <div class="toolbar" style="margin-top:28px">
-        <h3 style="margin:0">🛡️ Checklist sécurité périodique</h3>
+        <h3 style="margin:0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6l7-3z"/></svg> Checklist sécurité périodique</h3>
       </div>
       <p class="muted" style="font-size:13px;margin:-6px 0 14px">À parcourir régulièrement — basée sur les standards OWASP, les recommandations RGPD et le guide "Your Europe" de la Commission européenne sur la sécurisation d'un site web. Le but : repérer les failles et limites potentielles, pas remplacer un vrai audit de sécurité.</p>
       <div id="security-checklist"></div>
@@ -734,20 +735,20 @@
 
     <section id="competitors-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">🎯</span>Concurrents</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="#FF4D2E"/></svg></span>Concurrents</h2>
         <div style="display:flex;gap:8px">
-          <button class="btn ghost" onclick="suggestCompetitor()">💡 Suggérer un concurrent</button>
+          <button class="btn ghost" onclick="suggestCompetitor()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg> Suggérer un concurrent</button>
           <button class="btn" onclick="openCompetitorForm()">+ Ajouter un concurrent</button>
         </div>
       </div>
 
       <div class="panel competitor-card" id="competitor-suggestion-panel" style="display:none">
         <div class="competitor-card-head">
-          <strong style="text-transform:none;font-size:14px">💡 Suggestion : <a id="suggestion-name" href="#" target="_blank" rel="noopener" class="fname"></a></strong>
+          <strong style="text-transform:none;font-size:14px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg> Suggestion : <a id="suggestion-name" href="#" target="_blank" rel="noopener" class="fname"></a></strong>
         </div>
         <p class="muted" id="suggestion-reason" style="margin:4px 0 12px"></p>
         <div class="form-actions">
-          <button class="btn small" onclick="acceptCompetitorSuggestion()">✅ Ajouter aux concurrents</button>
+          <button class="btn small" onclick="acceptCompetitorSuggestion()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8,12 11,15 16,9"/></svg> Ajouter aux concurrents</button>
           <button class="btn small ghost" onclick="dismissCompetitorSuggestion()">✕ Ignorer</button>
         </div>
       </div>
@@ -768,7 +769,7 @@
           <button class="btn danger" id="competitor-delete-btn" style="display:none;margin-left:auto" onclick="deleteCompetitor(editingCompetitorId)">Supprimer</button>
         </div>
         <div id="competitor-history" class="history-section" style="display:none">
-          <h4>🕒 Historique</h4>
+          <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
           <div class="history-add">
             <input id="competitor-note-input" placeholder="Ajouter une note...">
             <button class="btn small ghost" style="width:auto" onclick="addCompetitorNote()">Ajouter</button>
@@ -918,39 +919,39 @@ function renderDailyBrief(b, brief){
   // depuis un moment, RDV imminent), avant les priorités routinières.
   if (brief.overdueFollowups && brief.overdueFollowups.length) {
     const n = brief.overdueFollowups.length;
-    items.push({ ic:'🚨', text:`${n} relance${n>1?'s':''} en retard de plus de 3 jours : ${brief.overdueFollowups.map(p=>escHtml(p.school_name)).join(', ')}`, tab:'prospects', urgent:true });
+    items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>', text:`${n} relance${n>1?'s':''} en retard de plus de 3 jours : ${brief.overdueFollowups.map(p=>escHtml(p.school_name)).join(', ')}`, tab:'prospects', urgent:true });
   }
   if (brief.upcomingMeetings && brief.upcomingMeetings.length) {
     const n = brief.upcomingMeetings.length;
-    items.push({ ic:'📅', text:`RDV dans moins de 24h : ${brief.upcomingMeetings.map(p=>`${escHtml(p.school_name)} (${fmtDateTime(p.meeting_at)})`).join(', ')}`, tab:'prospects', urgent:true });
+    items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>', text:`RDV dans moins de 24h : ${brief.upcomingMeetings.map(p=>`${escHtml(p.school_name)} (${fmtDateTime(p.meeting_at)})`).join(', ')}`, tab:'prospects', urgent:true });
   }
-  if (b.dueFollowups > 0) items.push({ ic:'🏫', text:`${b.dueFollowups} école${b.dueFollowups>1?'s':''} à relancer`, tab:'prospects' });
+  if (b.dueFollowups > 0) items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/></svg>', text:`${b.dueFollowups} école${b.dueFollowups>1?'s':''} à relancer`, tab:'prospects' });
   if (brief.upcomingRenewals && brief.upcomingRenewals.length) {
     const n = brief.upcomingRenewals.length;
-    items.push({ ic:'🔑', text:`${n} renouvellement${n>1?'s':''} à traiter (30j) : ${brief.upcomingRenewals.map(c=>escHtml(c.school_name)).join(', ')}`, tab:'clients' });
+    items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5 21 2"/><path d="M16 7l3 3"/></svg>', text:`${n} renouvellement${n>1?'s':''} à traiter (30j) : ${brief.upcomingRenewals.map(c=>escHtml(c.school_name)).join(', ')}`, tab:'clients' });
   }
-  if (brief.reviewsPending > 0) items.push({ ic:'💬', text:`${brief.reviewsPending} avis en attente de modération`, tab:'reviews' });
-  if (brief.gapDays.length > 0) items.push({ ic:'🗓️', text:`${brief.gapDays.length} jour${brief.gapDays.length>1?'s':''} cette semaine sans contenu planifié`, tab:'calendar' });
+  if (brief.reviewsPending > 0) items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg>', text:`${brief.reviewsPending} avis en attente de modération`, tab:'reviews' });
+  if (brief.gapDays.length > 0) items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>', text:`${brief.gapDays.length} jour${brief.gapDays.length>1?'s':''} cette semaine sans contenu planifié`, tab:'calendar' });
 
   const briefEl = document.getElementById('daily-brief');
   if (!items.length) {
     briefEl.style.display = 'block';
     briefEl.classList.add('empty');
-    document.getElementById('daily-brief-items').innerHTML = `<p style="margin:0;font-size:14px">Rien d'urgent aujourd'hui 🎉 Bon moment pour avancer sur du contenu ou de la prospection à froid.</p>`;
+    document.getElementById('daily-brief-items').innerHTML = `<p style="margin:0;font-size:14px">Rien d'urgent aujourd'hui <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg> Bon moment pour avancer sur du contenu ou de la prospection à froid.</p>`;
     return;
   }
   briefEl.style.display = 'block';
   briefEl.classList.remove('empty');
   document.getElementById('daily-brief-items').innerHTML =
-    `<div class="brief-focus">👉 Priorité : ${items[0].text}</div>` +
+    `<div class="brief-focus"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><polyline points="14,6 20,12 14,18"/></svg> Priorité : ${items[0].text}</div>` +
     items.map(it => `<div class="brief-item${it.urgent?' urgent':''}" onclick="switchTab('${it.tab}')"><span>${it.ic}</span><span>${it.text}</span></div>`).join('');
 }
 
 function renderWinsTicker(a, e){
   const wins = [
-    { ic:'👋', label:`${a.signups7d} nouvel${a.signups7d>1?'les':'le'} inscription${a.signups7d>1?'s':''} (7j)` },
-    { ic:'⚡', label:`${e.activeUsers7d} actif${e.activeUsers7d>1?'s':''} (7j)` },
-    { ic:'🏆', label:`${e.weeklyChallengeParticipants} participant${e.weeklyChallengeParticipants>1?'s':''} au défi hebdo` },
+    { ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a5 5 0 0 1 5-5h4"/><path d="M18 8v6"/><path d="M15 11h6"/></svg>', label:`${a.signups7d} nouvel${a.signups7d>1?'les':'le'} inscription${a.signups7d>1?'s':''} (7j)` },
+    { ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 10,22 20,10 13,10"/></svg>', label:`${e.activeUsers7d} actif${e.activeUsers7d>1?'s':''} (7j)` },
+    { ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8 14.5 6.5 22l5.5-3 5.5 3-1.5-7.5"/></svg>', label:`${e.weeklyChallengeParticipants} participant${e.weeklyChallengeParticipants>1?'s':''} au défi hebdo` },
   ];
   document.getElementById('wins-ticker').innerHTML = wins.map(w => `<div class="win-chip">${w.ic} ${w.label}</div>`).join('');
 }
@@ -1083,7 +1084,7 @@ async function loadProspects(){
       ? `<div class="callout"><h3>À relancer aujourd'hui (${due.length})</h3>${due.map(p =>
           `<div class="followup-item"><span class="fname">${p.school_name}</span><span class="badge badge-${p.status}">${STATUS_LABELS[p.status]}</span><span class="muted">depuis le ${fmtDate(p.last_contact_at)}</span></div>`
         ).join('')}</div>`
-      : `<div class="callout empty">Aucune relance en attente 🎉</div>`;
+      : `<div class="callout empty">Aucune relance en attente <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg></div>`;
 
     renderDuplicatesCallout(list, duplicateGroups || []);
     renderMeetingsPanel(list, now);
@@ -1104,7 +1105,7 @@ function renderMeetingsPanel(list, now){
   const el = document.getElementById('meetings-panel');
   if (!upcoming.length) { el.innerHTML = ''; return; }
   el.innerHTML = `<div class="callout" style="background:#EEF5FF;border-color:#C7DEFF">
-    <h3>📅 Prochains rendez-vous (${upcoming.length})</h3>
+    <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg> Prochains rendez-vous (${upcoming.length})</h3>
     ${upcoming.map(p => `<div class="followup-item" style="cursor:pointer" onclick="editProspect('${p.id}')">
       <span class="fname">${escHtml(p.school_name)}</span>
       <span class="badge badge-${p.status}">${STATUS_LABELS[p.status]}</span>
@@ -1123,7 +1124,7 @@ function renderDuplicatesCallout(list, duplicateGroups){
   const calloutEl = document.getElementById('duplicates-callout');
   if (!duplicateGroups.length) { calloutEl.innerHTML = ''; return; }
   calloutEl.innerHTML = `<div class="callout" style="background:#FFF9E8;border-color:#F5E1A0">
-    <h3>⚠️ ${duplicateGroups.length} doublon${duplicateGroups.length>1?'s':''} potentiel${duplicateGroups.length>1?'s':''} détecté${duplicateGroups.length>1?'s':''}</h3>
+    <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> ${duplicateGroups.length} doublon${duplicateGroups.length>1?'s':''} potentiel${duplicateGroups.length>1?'s':''} détecté${duplicateGroups.length>1?'s':''}</h3>
     ${duplicateGroups.map(g => {
       const group = g.ids.map(id => byId[id]).filter(Boolean);
       if (!group.length) return '';
@@ -1134,7 +1135,7 @@ function renderDuplicatesCallout(list, duplicateGroups){
         </div>
         <div class="dup-group-actions">
           <button class="btn ghost small" style="width:auto" onclick='dismissDuplicateGroup(${JSON.stringify(g.key)});event.stopPropagation()'>✓ Pas un doublon</button>
-          ${group.map(p => `<button class="btn small danger" style="width:auto" onclick="deleteProspect('${p.id}');event.stopPropagation()">🗑️ Suppr. ${escHtml(p.school_name)}</button>`).join('')}
+          ${group.map(p => `<button class="btn small danger" style="width:auto" onclick="deleteProspect('${p.id}');event.stopPropagation()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg> Suppr. ${escHtml(p.school_name)}</button>`).join('')}
         </div>
       </div>`;
     }).join('')}
@@ -1179,13 +1180,13 @@ function renderProspects(){
     const dupIds = window.__duplicateIds || new Set();
     document.getElementById('prospects-body').innerHTML = view.length ? view.map(p => `
       <tr${dupIds.has(p.id) ? ' style="background:#FFFBEF"' : ''}>
-        <td><strong>${p.school_name}</strong>${dupIds.has(p.id) ? ' <span class="badge" style="background:#FFF3CD;color:#8A6D1D" title="Un autre dossier a un nom d\'école identique ou très proche">⚠️ doublon possible</span>' : ''}${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
-        <td>${p.city || '—'}${p.estimated_students ? `<div class="muted" style="font-size:12px" title="${escHtml(p.estimated_students_source || '')}">👥 ${escHtml(p.estimated_students)}</div>` : ''}</td>
+        <td><strong>${p.school_name}</strong>${dupIds.has(p.id) ? ' <span class="badge" style="background:#FFF3CD;color:#8A6D1D" title="Un autre dossier a un nom d\'école identique ou très proche"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> doublon possible</span>' : ''}${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
+        <td>${p.city || '—'}${p.estimated_students ? `<div class="muted" style="font-size:12px" title="${escHtml(p.estimated_students_source || '')}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5A4.5 4.5 0 0 1 7 14h4a4.5 4.5 0 0 1 4.5 4.5V20"/><circle cx="17" cy="8" r="3"/><path d="M17.5 14.3a4.5 4.5 0 0 1 3.9 4.5V20"/></svg> ${escHtml(p.estimated_students)}</div>` : ''}</td>
         <td>${p.contact_name || '—'}${p.contact_email ? `<div class="muted" style="font-size:12px">${p.contact_email}</div>` : ''}</td>
         <td><span class="badge badge-${p.status}" title="Cliquer pour changer le statut" onclick="openStatusPicker(event,'${p.id}','${p.status}')">${STATUS_LABELS[p.status]}</span></td>
         <td>${fmtDate(p.last_contact_at)}</td>
         <td>${fmtDate(p.next_followup_at)}</td>
-        <td><div class="actions"><button class="btn small ghost" onclick="openFollowupMessage('${p.id}')">✉️ Message</button><button class="btn small ghost" onclick="editProspect('${p.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
+        <td><div class="actions"><button class="btn small ghost" onclick="openFollowupMessage('${p.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> Message</button><button class="btn small ghost" onclick="editProspect('${p.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
       </tr>`).join('') : `<tr><td colspan="7" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
     renderProspectsKanban(view, dupIds);
   } catch (e) { console.error(e); }
@@ -1201,12 +1202,12 @@ function renderProspectsKanban(view, dupIds){
       <div class="kanban-col-body" ondragover="allowDrop(event)" ondrop="dropOnStatusColumn(event,'${status}')">
         ${byStatus[status].map(p => `
           <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${p.id}')" onclick="editProspect('${p.id}')">
-            <span class="kc-title">${escHtml(p.school_name)}${dupIds && dupIds.has(p.id) ? ' ⚠️' : ''}</span>
+            <span class="kc-title">${escHtml(p.school_name)}${dupIds && dupIds.has(p.id) ? ' <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>' : ''}</span>
             <span class="kc-meta">${escHtml(p.city || '')}${p.city && p.contact_name ? ' · ' : ''}${escHtml(p.contact_name || '')}</span>
-            ${p.meeting_at ? `<div class="kc-meta">📅 ${fmtDate(p.meeting_at)}</div>` : ''}
+            ${p.meeting_at ? `<div class="kc-meta"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg> ${fmtDate(p.meeting_at)}</div>` : ''}
             <div class="kc-actions" onclick="event.stopPropagation()">
-              <button onclick="openFollowupMessage('${p.id}')" title="Message">✉️</button>
-              <button onclick="deleteProspect('${p.id}')" title="Supprimer">🗑️</button>
+              <button onclick="openFollowupMessage('${p.id}')" title="Message"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></button>
+              <button onclick="deleteProspect('${p.id}')" title="Supprimer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></button>
             </div>
           </div>`).join('') || `<p class="muted" style="font-size:11.5px;margin:0;text-align:center">—</p>`}
       </div>
@@ -1373,8 +1374,8 @@ function renewalBadgeHtml(c){
   if (c.status === 'annule') return `<span class="badge" style="background:var(--border);color:var(--muted)">Annulée</span>`;
   if (!c.renewal_date) return `<span class="muted">—</span>`;
   const d = daysUntil(c.renewal_date);
-  if (d < 0) return `<span class="badge badge-perdu">⚠️ En retard de ${-d}j (${fmtDate(c.renewal_date)})</span>`;
-  if (d <= 30) return `<span class="badge badge-relance">🔔 Dans ${d}j (${fmtDate(c.renewal_date)})</span>`;
+  if (d < 0) return `<span class="badge badge-perdu"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> En retard de ${-d}j (${fmtDate(c.renewal_date)})</span>`;
+  if (d <= 30) return `<span class="badge badge-relance"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg> Dans ${d}j (${fmtDate(c.renewal_date)})</span>`;
   return `<span class="badge badge-signe">${fmtDate(c.renewal_date)}</span>`;
 }
 
@@ -1411,7 +1412,7 @@ function renderClientsTable(items){
       <td>${c.annual_price != null ? Number(c.annual_price).toLocaleString('fr-BE') + ' €' : '—'}</td>
       <td>${renewalBadgeHtml(c)}</td>
       <td>${CLIENT_STATUS_LABELS[c.status] || c.status}</td>
-      <td><div class="actions"><button class="btn small ghost" onclick="editClient('${c.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteClient('${c.id}')">Suppr.</button></div></td>
+      <td><div class="actions"><button class="btn small ghost" onclick="editClient('${c.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button><button class="btn small danger" onclick="deleteClient('${c.id}')">Suppr.</button></div></td>
     </tr>`).join('') : `<tr><td colspan="6" class="empty-msg">Aucune école cliente pour l'instant.</td></tr>`;
 }
 
@@ -1545,7 +1546,7 @@ function renderDevBacklogTable(items){
       <td>${DEV_STATUS_LABELS[d.status] || d.status}</td>
       <td>${DEV_OWNER_LABELS[d.dev_owner] || '—'}</td>
       <td>${fmtDate(d.updated_at)}</td>
-      <td><div class="actions"><button class="btn small ghost" onclick="editDevIssue('${d.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteDevIssue('${d.id}')">Suppr.</button></div></td>
+      <td><div class="actions"><button class="btn small ghost" onclick="editDevIssue('${d.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button><button class="btn small danger" onclick="deleteDevIssue('${d.id}')">Suppr.</button></div></td>
     </tr>`).join('') : `<tr><td colspan="7" class="empty-msg">Aucun ticket pour l'instant.</td></tr>`;
 }
 
@@ -1665,9 +1666,9 @@ function renderVaultList(items){
       </div>
       <span class="vault-item-secret" id="vault-secret-${v.id}" data-revealed="false">••••••••</span>
       <div class="actions">
-        <button class="btn small ghost" id="vault-toggle-${v.id}" onclick="toggleVaultSecret('${v.id}')">👁 Révéler</button>
-        <button class="btn small ghost" onclick="copyVaultSecret('${v.id}')" id="vault-copy-${v.id}">📋 Copier</button>
-        <button class="btn small ghost" onclick="editVaultSecret('${v.id}')">✏️ Éditer</button>
+        <button class="btn small ghost" id="vault-toggle-${v.id}" onclick="toggleVaultSecret('${v.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> Révéler</button>
+        <button class="btn small ghost" onclick="copyVaultSecret('${v.id}')" id="vault-copy-${v.id}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg> Copier</button>
+        <button class="btn small ghost" onclick="editVaultSecret('${v.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button>
       </div>
     </div>`).join('') : `<div class="empty-msg">Aucun secret enregistré pour l'instant.</div>`;
 }
@@ -1678,14 +1679,14 @@ async function toggleVaultSecret(id){
   if (span.dataset.revealed === 'true') {
     span.textContent = '••••••••';
     span.dataset.revealed = 'false';
-    btn.textContent = '👁 Révéler';
+    btn.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> Révéler';
     return;
   }
   try {
     const { secret } = await api('vault-reveal', { params: { id } });
     span.textContent = secret;
     span.dataset.revealed = 'true';
-    btn.textContent = '🙈 Masquer';
+    btn.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.2A10.6 10.6 0 0 1 12 5c6 0 10 7 10 7a17.6 17.6 0 0 1-3.4 4.2M6.5 6.5C4 8.2 2 12 2 12s4 7 10 7c1.4 0 2.7-.3 3.8-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg> Masquer';
   } catch (e) { console.error(e); }
 }
 
@@ -1797,13 +1798,13 @@ function renderSecurityChecklist(items){
           <div class="checklist-item-label">${escHtml(item.label)}</div>
           <div class="checklist-item-why">${escHtml(item.why)}</div>
           <div class="checklist-item-meta">
-            <span class="badge ${item.overdue ? 'badge-overdue' : 'badge-ok'}">${item.overdue ? '⚠️ À vérifier' : '✅ À jour'}</span>
+            <span class="badge ${item.overdue ? 'badge-overdue' : 'badge-ok'}">${item.overdue ? '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> À vérifier' : '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8,12 11,15 16,9"/></svg> À jour'}</span>
             <span>${item.checkedAt ? `Vérifié il y a ${item.daysSinceCheck} jour${item.daysSinceCheck > 1 ? 's' : ''} (${fmtDate(item.checkedAt)})` : 'Jamais vérifié'}</span>
             ${item.frequencyDays ? `<span>· À revérifier tous les ${item.frequencyDays} jours</span>` : ''}
           </div>
         </div>
         <div class="checklist-item-actions">
-          <button class="btn small ghost" style="width:auto" onclick="checkSecurityItem('${item.key}')">✔️ Marquer vérifié</button>
+          <button class="btn small ghost" style="width:auto" onclick="checkSecurityItem('${item.key}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,12 9,17 20,6"/></svg> Marquer vérifié</button>
         </div>
       </div>`).join('')}
   `).join('');
@@ -1905,7 +1906,7 @@ function renderCompetitorsList(items){
     <div class="competitor-card">
       <div class="competitor-card-head">
         <a href="${escHtml(c.url)}" target="_blank" rel="noopener" class="fname">${escHtml(c.name)}</a>
-        ${c.content_changed ? '<span class="badge" style="background:#FFE9D6;color:#C2540A">⚠️ Changement détecté</span>' : ''}
+        ${c.content_changed ? '<span class="badge" style="background:#FFE9D6;color:#C2540A"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> Changement détecté</span>' : ''}
         <span class="muted" style="font-size:12px">${c.last_checked_at ? 'Vérifié le ' + fmtDateTime(c.last_checked_at) : 'Jamais vérifié'}</span>
       </div>
       <div class="competitor-card-body">
@@ -1914,8 +1915,8 @@ function renderCompetitorsList(items){
         <div><strong>CA estimé</strong>${escHtml(c.estimated_revenue || '—')}</div>
       </div>
       <div class="actions">
-        <button class="btn small ghost" id="competitor-check-btn-${c.id}" onclick="checkCompetitor('${c.id}')">🔍 Vérifier les changements</button>
-        <button class="btn small ghost" onclick="editCompetitor('${c.id}')">✏️ Éditer</button>
+        <button class="btn small ghost" id="competitor-check-btn-${c.id}" onclick="checkCompetitor('${c.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Vérifier les changements</button>
+        <button class="btn small ghost" onclick="editCompetitor('${c.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button>
       </div>
     </div>`).join('') : `<div class="empty-msg">Aucun concurrent enregistré pour l'instant.</div>`;
 }
@@ -2002,7 +2003,7 @@ async function addCompetitorNote(){
 
 // ─── Historique par élément (prospect ou contenu) ─────────────────
 // Générique : réutilisé par le formulaire prospect et le formulaire contenu.
-const ACTIVITY_ICONS = { created: '✨', updated: '✏️', status_changed: '🔄', note: '💬' };
+const ACTIVITY_ICONS = { created: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg>', updated: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>', status_changed: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg>', note: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg>' };
 
 async function renderActivityLog(entityType, entityId, listElId){
   const el = document.getElementById(listElId);
@@ -2211,7 +2212,7 @@ async function syncZimbra(){
     resultEl.innerHTML = `<div class="callout" style="margin:10px 0;background:#FBE7E5;border-color:#F3C7C1">${e.message}</div>`;
   } finally {
     btn.disabled = false;
-    btn.textContent = '🔄 Sync emails';
+    btn.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg> Sync emails';
   }
 }
 
@@ -2231,7 +2232,7 @@ const ACCOUNT_LABELS = { keypace: 'KeyPace', fondateur_1: 'Théo', fondateur_2: 
 function contentCardHtml(ev){
   const isTask = ev.content_type === 'tache';
   return `<div class="content-card" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')" style="${isTask ? 'background:#FFF6F2;border-color:#FFD9CC' : ''}">
-    <span class="ctitle">${isTask ? '✅ ' : ''}${ev.title}</span>
+    <span class="ctitle">${isTask ? '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8,12 11,15 16,9"/></svg> ' : ''}${ev.title}</span>
     <span class="cmeta">${(ev.platforms || []).map(p => `<span class="platform-tag">${p}</span>`).join('')}<span class="platform-tag" style="background:#EAE6F5">${ACCOUNT_LABELS[ev.account] || 'KeyPace'}</span>${isTask ? 'tâche' : ev.content_type}</span>
   </div>`;
 }
@@ -2308,9 +2309,9 @@ function renderCalendarKanban(events){
       <div class="kanban-col-body" ondragover="allowDrop(event)" ondrop="dropOnContentStatusColumn(event,'${status}')">
         ${byStatus[status].map(ev => `
           <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')">
-            <span class="kc-title">${ev.content_type === 'tache' ? '✅ ' : ''}${escHtml(ev.title)}</span>
+            <span class="kc-title">${ev.content_type === 'tache' ? '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8,12 11,15 16,9"/></svg> ' : ''}${escHtml(ev.title)}</span>
             <span class="kc-meta">${(ev.platforms || []).map(p => `<span class="platform-tag">${p}</span>`).join('')}${ev.content_type}</span>
-            <div class="kc-meta">${ev.scheduled_date ? '📅 ' + fmtDate(ev.scheduled_date) : 'Backlog'}</div>
+            <div class="kc-meta">${ev.scheduled_date ? '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg> ' + fmtDate(ev.scheduled_date) : 'Backlog'}</div>
           </div>`).join('') || `<p class="muted" style="font-size:11.5px;margin:0;text-align:center">—</p>`}
       </div>
     </div>`).join('');
@@ -2431,7 +2432,7 @@ function generateContentIdeas(){
   const picks = [...pool].sort(() => Math.random() - 0.5).slice(0, 5);
   window.__currentIdeaPicks = picks;
   const el = document.getElementById('idea-bank-results');
-  const note = excludedCount ? `<p class="muted" style="font-size:12px;margin:0 0 10px">🧠 ${excludedCount} sujet${excludedCount>1?'s':''} déjà traité${excludedCount>1?'s':''} n'${excludedCount>1?'ont':'a'} pas été reproposé${excludedCount>1?'s':''}.</p>` : '';
+  const note = excludedCount ? `<p class="muted" style="font-size:12px;margin:0 0 10px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg> ${excludedCount} sujet${excludedCount>1?'s':''} déjà traité${excludedCount>1?'s':''} n'${excludedCount>1?'ont':'a'} pas été reproposé${excludedCount>1?'s':''}.</p>` : '';
   el.innerHTML = note + (picks.length ? `<div class="idea-grid">${picks.map((idea, i) => `
     <div class="idea-card" id="idea-card-${i}">
       <div class="ititle">${idea.title}</div>
