@@ -239,6 +239,7 @@
     <div class="tabs">
       <button class="tab-btn" data-tab="kpi" onclick="switchTab('kpi')"><span class="sec-ic">📈</span>KPI</button>
       <button class="tab-btn" data-tab="prospects" onclick="switchTab('prospects')"><span class="sec-ic">🏫</span>Prospection écoles</button>
+      <button class="tab-btn" data-tab="clients" onclick="switchTab('clients')"><span class="sec-ic">🔑</span>Écoles clientes</button>
       <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')"><span class="sec-ic">🗓️</span>Calendrier marketing</button>
       <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')"><span class="sec-ic">💬</span>Avis</button>
       <button class="tab-btn" data-tab="backlog" onclick="switchTab('backlog')"><span class="sec-ic">🛠️</span>Backlog dev</button>
@@ -413,6 +414,65 @@
         </table>
       </div>
       <div class="kanban-board" id="prospects-kanban" style="display:none"></div>
+    </section>
+
+    <section id="clients-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic">🔑</span>Écoles clientes</h2>
+        <button class="btn" onclick="openClientForm()">+ Nouvelle école cliente</button>
+      </div>
+
+      <div id="clients-convert-callout"></div>
+      <div id="clients-renewal-callout"></div>
+
+      <div class="panel" id="client-form" style="display:none">
+        <h3 id="client-form-title">Nouvelle école cliente</h3>
+        <input type="hidden" id="c-prospect-id">
+        <div class="form-grid">
+          <input id="c-school" placeholder="Nom de l'école *">
+          <input id="c-contact" placeholder="Nom du contact">
+          <input id="c-email" type="email" placeholder="Email du contact">
+          <input id="c-phone" placeholder="Téléphone">
+          <input id="c-city" placeholder="Ville">
+          <input id="c-seats" type="number" min="0" placeholder="Sièges / licences">
+          <input id="c-price" type="number" min="0" step="0.01" placeholder="Montant annuel (€)">
+          <div>
+            <label style="font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">Début du contrat</label>
+            <input id="c-start" type="date">
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">Date de renouvellement</label>
+            <input id="c-renewal" type="date">
+          </div>
+          <select id="c-status">
+            <option value="active" selected>Active</option>
+            <option value="annule">Annulée / non renouvelée</option>
+          </select>
+        </div>
+        <textarea id="c-notes" placeholder="Notes" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" onclick="saveClient()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeClientForm()">Annuler</button>
+          <button class="btn danger" id="client-delete-btn" style="display:none;margin-left:auto" onclick="deleteClient(editingClientId)">Supprimer</button>
+        </div>
+        <div id="client-history" class="history-section" style="display:none">
+          <h4>🕒 Historique</h4>
+          <div class="history-add">
+            <input id="client-note-input" placeholder="Ajouter une note...">
+            <button class="btn small ghost" style="width:auto" onclick="addClientNote()">Ajouter</button>
+          </div>
+          <div id="client-history-list" class="history-list"></div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="prospects">
+          <thead>
+            <tr><th>École</th><th>Sièges</th><th>Montant annuel</th><th>Renouvellement</th><th>Statut</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="clients-body"></tbody>
+        </table>
+      </div>
     </section>
 
     <section id="calendar-section" class="tab-panel">
@@ -767,7 +827,7 @@ function logout(){
   document.getElementById('gate').style.display = 'flex';
 }
 
-const TAB_SECTIONS = { kpi: 'kpi-section', prospects: 'prospects-section', calendar: 'calendar-section', reviews: 'reviews-section', backlog: 'backlog-section', security: 'security-section', competitors: 'competitors-section' };
+const TAB_SECTIONS = { kpi: 'kpi-section', prospects: 'prospects-section', clients: 'clients-section', calendar: 'calendar-section', reviews: 'reviews-section', backlog: 'backlog-section', security: 'security-section', competitors: 'competitors-section' };
 const REVIEW_STATUS_LABELS = { pending: 'En attente', published: 'Publié', rejected: 'Rejeté' };
 
 function switchTab(name){
@@ -784,6 +844,7 @@ function boot(){
   loadTrafficDetail();
   setProspectsView(prospectsView);
   loadProspects();
+  loadClients();
   renderCalendarHeader();
   setCalendarView(calendarView);
   loadCalendar();
@@ -864,6 +925,10 @@ function renderDailyBrief(b, brief){
     items.push({ ic:'📅', text:`RDV dans moins de 24h : ${brief.upcomingMeetings.map(p=>`${escHtml(p.school_name)} (${fmtDateTime(p.meeting_at)})`).join(', ')}`, tab:'prospects', urgent:true });
   }
   if (b.dueFollowups > 0) items.push({ ic:'🏫', text:`${b.dueFollowups} école${b.dueFollowups>1?'s':''} à relancer`, tab:'prospects' });
+  if (brief.upcomingRenewals && brief.upcomingRenewals.length) {
+    const n = brief.upcomingRenewals.length;
+    items.push({ ic:'🔑', text:`${n} renouvellement${n>1?'s':''} à traiter (30j) : ${brief.upcomingRenewals.map(c=>escHtml(c.school_name)).join(', ')}`, tab:'clients' });
+  }
   if (brief.reviewsPending > 0) items.push({ ic:'💬', text:`${brief.reviewsPending} avis en attente de modération`, tab:'reviews' });
   if (brief.gapDays.length > 0) items.push({ ic:'🗓️', text:`${brief.gapDays.length} jour${brief.gapDays.length>1?'s':''} cette semaine sans contenu planifié`, tab:'calendar' });
 
@@ -1291,6 +1356,155 @@ function toDatetimeLocalValue(iso){
   const d = new Date(iso);
   const pad = n => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+// ─── Écoles clientes (post-vente) ──────────────────────────────────
+const CLIENT_STATUS_LABELS = { active: 'Active', annule: 'Annulée' };
+let editingClientId = null;
+
+function daysUntil(dateStr){
+  if (!dateStr) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(dateStr + 'T00:00:00');
+  return Math.round((target - today) / 86400000);
+}
+
+function renewalBadgeHtml(c){
+  if (c.status === 'annule') return `<span class="badge" style="background:var(--border);color:var(--muted)">Annulée</span>`;
+  if (!c.renewal_date) return `<span class="muted">—</span>`;
+  const d = daysUntil(c.renewal_date);
+  if (d < 0) return `<span class="badge badge-perdu">⚠️ En retard de ${-d}j (${fmtDate(c.renewal_date)})</span>`;
+  if (d <= 30) return `<span class="badge badge-relance">🔔 Dans ${d}j (${fmtDate(c.renewal_date)})</span>`;
+  return `<span class="badge badge-signe">${fmtDate(c.renewal_date)}</span>`;
+}
+
+async function loadClients(){
+  try {
+    const [{ items: clients }, { items: prospects }] = await Promise.all([api('clients-list'), api('prospects')]);
+    window.__clients = clients;
+    renderClientsTable(clients);
+
+    const convertedProspectIds = new Set(clients.map(c => c.prospect_id).filter(Boolean));
+    const toConvert = prospects.filter(p => p.status === 'signe' && !convertedProspectIds.has(p.id));
+    const convertEl = document.getElementById('clients-convert-callout');
+    convertEl.innerHTML = toConvert.length
+      ? `<div class="callout"><h3>Écoles signées pas encore ajoutées ici (${toConvert.length})</h3>${toConvert.map(p =>
+          `<div class="followup-item"><span class="fname">${escHtml(p.school_name)}</span><button class="btn small ghost" style="width:auto" onclick="convertProspectToClient('${p.id}')">+ Ajouter comme cliente</button></div>`
+        ).join('')}</div>`
+      : '';
+
+    const dueSoon = clients.filter(c => c.status === 'active' && c.renewal_date && daysUntil(c.renewal_date) <= 30);
+    const renewalEl = document.getElementById('clients-renewal-callout');
+    renewalEl.innerHTML = dueSoon.length
+      ? `<div class="callout"><h3>Renouvellements à traiter (${dueSoon.length})</h3>${dueSoon.map(c =>
+          `<div class="followup-item"><span class="fname">${escHtml(c.school_name)}</span>${renewalBadgeHtml(c)}</div>`
+        ).join('')}</div>`
+      : '';
+  } catch (e) { console.error(e); }
+}
+
+function renderClientsTable(items){
+  document.getElementById('clients-body').innerHTML = items.length ? items.map(c => `
+    <tr>
+      <td><strong>${escHtml(c.school_name)}</strong>${c.city ? `<div class="muted" style="font-size:12px">${escHtml(c.city)}</div>` : ''}</td>
+      <td>${c.seats ?? '—'}</td>
+      <td>${c.annual_price != null ? Number(c.annual_price).toLocaleString('fr-BE') + ' €' : '—'}</td>
+      <td>${renewalBadgeHtml(c)}</td>
+      <td>${CLIENT_STATUS_LABELS[c.status] || c.status}</td>
+      <td><div class="actions"><button class="btn small ghost" onclick="editClient('${c.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteClient('${c.id}')">Suppr.</button></div></td>
+    </tr>`).join('') : `<tr><td colspan="6" class="empty-msg">Aucune école cliente pour l'instant.</td></tr>`;
+}
+
+function openClientForm(prefill){
+  editingClientId = null;
+  ['c-school','c-contact','c-email','c-phone','c-city','c-seats','c-price','c-start','c-renewal','c-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('c-prospect-id').value = '';
+  document.getElementById('c-status').value = 'active';
+  if (prefill) {
+    document.getElementById('c-school').value = prefill.school_name || '';
+    document.getElementById('c-contact').value = prefill.contact_name || '';
+    document.getElementById('c-email').value = prefill.contact_email || '';
+    document.getElementById('c-phone').value = prefill.contact_phone || '';
+    document.getElementById('c-city').value = prefill.city || '';
+    document.getElementById('c-prospect-id').value = prefill.id || '';
+  }
+  document.getElementById('client-form-title').textContent = 'Nouvelle école cliente';
+  document.getElementById('client-delete-btn').style.display = 'none';
+  document.getElementById('client-history').style.display = 'none';
+  document.getElementById('client-form').style.display = 'block';
+}
+
+function convertProspectToClient(prospectId){
+  const p = (window.__prospects || []).find(x => x.id === prospectId);
+  if (!p) return;
+  openClientForm(p);
+}
+
+function editClient(id){
+  const c = (window.__clients || []).find(x => x.id === id);
+  if (!c) return;
+  editingClientId = id;
+  document.getElementById('c-school').value = c.school_name || '';
+  document.getElementById('c-contact').value = c.contact_name || '';
+  document.getElementById('c-email').value = c.contact_email || '';
+  document.getElementById('c-phone').value = c.contact_phone || '';
+  document.getElementById('c-city').value = c.city || '';
+  document.getElementById('c-seats').value = c.seats ?? '';
+  document.getElementById('c-price').value = c.annual_price ?? '';
+  document.getElementById('c-start').value = c.contract_start_date || '';
+  document.getElementById('c-renewal').value = c.renewal_date || '';
+  document.getElementById('c-status').value = c.status || 'active';
+  document.getElementById('c-prospect-id').value = c.prospect_id || '';
+  document.getElementById('client-form-title').textContent = `Modifier « ${c.school_name} »`;
+  document.getElementById('client-delete-btn').style.display = 'inline-flex';
+  document.getElementById('client-history').style.display = 'block';
+  document.getElementById('client-note-input').value = '';
+  renderActivityLog('client_school', id, 'client-history-list');
+  document.getElementById('client-form').style.display = 'block';
+}
+
+function closeClientForm(){
+  editingClientId = null;
+  document.getElementById('client-form').style.display = 'none';
+}
+
+async function saveClient(){
+  const school_name = document.getElementById('c-school').value.trim();
+  if (!school_name) return;
+  const body = {
+    school_name,
+    contact_name: document.getElementById('c-contact').value.trim(),
+    contact_email: document.getElementById('c-email').value.trim(),
+    contact_phone: document.getElementById('c-phone').value.trim(),
+    city: document.getElementById('c-city').value.trim(),
+    seats: document.getElementById('c-seats').value ? Number(document.getElementById('c-seats').value) : null,
+    annual_price: document.getElementById('c-price').value ? Number(document.getElementById('c-price').value) : null,
+    contract_start_date: document.getElementById('c-start').value || null,
+    renewal_date: document.getElementById('c-renewal').value || null,
+    status: document.getElementById('c-status').value,
+    notes: document.getElementById('c-notes').value.trim(),
+  };
+  if (!editingClientId) body.prospect_id = document.getElementById('c-prospect-id').value || null;
+  if (editingClientId) await api('client-update', { method:'POST', body: { id: editingClientId, ...body } });
+  else await api('client-create', { method:'POST', body });
+  closeClientForm();
+  loadClients();
+}
+
+async function deleteClient(id){
+  if (!confirm('Supprimer cette école cliente ?')) return;
+  await api('client-delete', { method:'POST', body: { id } });
+  closeClientForm();
+  loadClients();
+}
+
+async function addClientNote(){
+  const input = document.getElementById('client-note-input');
+  const note = input.value.trim();
+  if (!note || !editingClientId) return;
+  await api('add-note', { method:'POST', body: { entity_type:'client_school', entity_id: editingClientId, note } });
+  input.value = '';
+  renderActivityLog('client_school', editingClientId, 'client-history-list');
 }
 
 // ─── Backlog de développement ──────────────────────────────────────

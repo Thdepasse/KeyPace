@@ -376,6 +376,36 @@ alter table dev_backlog add constraint dev_backlog_dev_owner_check
   check (dev_owner is null or dev_owner in ('theo', 'vincent'));
 
 -- ───────────────────────────────────────────────────────────────
+-- Écoles clientes (post-vente) : une fois un prospect signé, son suivi
+-- continue ici (sièges vendus, montant du contrat, date de renouvellement)
+-- au lieu de se perdre dans `school_prospects` qui reste le funnel
+-- pré-vente. `prospect_id` est un lien optionnel vers la fiche d'origine.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists client_schools (
+  id uuid default gen_random_uuid() primary key,
+  prospect_id uuid references school_prospects(id) on delete set null,
+  school_name text not null,
+  contact_name text,
+  contact_email text,
+  contact_phone text,
+  city text,
+  seats integer,
+  annual_price numeric,
+  contract_start_date date,
+  renewal_date date,
+  status text not null default 'active' check (status in ('active', 'annule')),
+  notes text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists client_schools_renewal_idx on client_schools(renewal_date);
+alter table client_schools enable row level security;
+
+alter table activity_log drop constraint if exists activity_log_entity_type_check;
+alter table activity_log add constraint activity_log_entity_type_check
+  check (entity_type in ('prospect', 'content', 'dev_issue', 'competitor', 'client_school'));
+
+-- ───────────────────────────────────────────────────────────────
 -- Veille concurrentielle : liste de concurrents avec forces/faiblesses/CA
 -- estimé (renseignés manuellement), + détection de changement de contenu
 -- (hash du texte visible de leur page, voir competitorCheck dans
