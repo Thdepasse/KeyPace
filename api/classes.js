@@ -48,7 +48,7 @@ async function sb(path, opts = {}) {
 
 async function userFromToken(token) {
   if (!token) return null;
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,plan,role,institution_id`);
+  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,plan,role,institution_id,class_join_failed_attempts,class_join_locked_until`);
   return (r.data && r.data[0]) || null;
 }
 
@@ -253,6 +253,9 @@ async function bulkImportStudents(req, res) {
         password_hash: u.passwordHash,
         plan: institution ? 'expert' : 'free',
         email_verified: true, // créé par l'enseignant, rien à confirmer (même base légale que le rattachement par domaine)
+        // Mot de passe temporaire connu du prof qui l'a communiqué : on force
+        // l'élève à en choisir un à lui dès sa première connexion.
+        must_change_password: true,
         consent_at: new Date().toISOString(),
         terms_version: 'v1',
         ...(institution ? { institution_id: institution.id, role: 'eleve' } : {}),
@@ -300,11 +303,34 @@ async function studentDetail(req, res) {
 async function joinByCode(req, res) {
   const user = await userFromToken(req.body.token);
   if (!user) return res.status(401).json({ error: 'Connecte-toi pour rejoindre une classe.' });
+  // Anti-bruteforce sur le code (même mécanique que le login : 5 échecs →
+  // verrou temporaire) — un code fait 6 caractères sur un alphabet de 32,
+  // ça reste devinable en boucle par un script sans cette limite.
+  if (user.class_join_locked_until && new Date(user.class_join_locked_until) > new Date()) {
+    return res.status(429).json({ error: 'Trop de tentatives de code invalide. Réessaie dans quelques minutes.' });
+  }
   const code = (req.body.code || '').toUpperCase().trim();
   if (!code) return res.status(400).json({ error: 'Code requis.' });
-  const r = await sb(`/classes?invite_code=eq.${encodeURIComponent(code)}&archived=eq.false&select=id,name`);
+  const r = await sb(`/classes?invite_code=eq.${encodeURIComponent(code)}&archived=eq.false&select=id,name,institution_id`);
   const cls = r.data && r.data[0];
-  if (!cls) return res.status(404).json({ error: 'Code de classe invalide.' });
+  // Rejoindre une classe par code est réservé aux élèves rattachés à un
+  // établissement, et uniquement pour une classe de CE même établissement —
+  // sinon le code seul suffirait à faire entrer n'importe quel compte
+  // KeyPace (même sans lien avec l'école) dans la classe et lui donner accès
+  // aux devoirs. Les classes de profs indépendants (institution_id null) ne
+  // sont donc plus rejoignables par code du tout — un prof indépendant qui
+  // veut des élèves passe par l'import CSV, qui crée directement leur compte.
+  const joinable = cls && cls.institution_id && cls.institution_id === user.institution_id;
+  if (!joinable) {
+    const attempts = (user.class_join_failed_attempts || 0) + 1;
+    const patch = { class_join_failed_attempts: attempts };
+    if (attempts >= 5) { patch.class_join_locked_until = new Date(Date.now() + 15 * 60 * 1000).toISOString(); patch.class_join_failed_attempts = 0; }
+    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+    if (cls && !cls.institution_id) return res.status(403).json({ error: 'Cette classe ne fait pas partie d\'un établissement — elle ne peut pas être rejointe par code.' });
+    if (cls) return res.status(403).json({ error: "Ce code appartient à une classe d'un autre établissement que le tien." });
+    return res.status(404).json({ error: 'Code de classe invalide.' });
+  }
+  if (user.class_join_failed_attempts) await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ class_join_failed_attempts: 0 }) });
   if (req.body.preview) return res.json({ className: cls.name });
 
   const exists = await sb(`/class_members?class_id=eq.${cls.id}&student_id=eq.${user.id}&select=id`);
@@ -520,7 +546,7 @@ async function adminOverview(req, res) {
   const { user, error, status } = await adminFromToken(req.body.token);
   if (error) return res.status(status).json({ error });
 
-  const instR = await sb(`/institutions?id=eq.${user.institution_id}&select=id,name,slug,seat_count,license_expires_at`);
+  const instR = await sb(`/institutions?id=eq.${user.institution_id}&select=id,name,slug,seat_count,license_expires_at,created_at`);
   const institution = (instR.data && instR.data[0]) || null;
 
   // Sièges consommés = élèves rattachés (même règle que le contrôle à
@@ -531,22 +557,39 @@ async function adminOverview(req, res) {
   const profsR = await sb(`/users?institution_id=eq.${user.institution_id}&role=eq.prof&archived=eq.false&select=id,username&order=username.asc`);
   const profs = Array.isArray(profsR.data) ? profsR.data : [];
 
-  const clsR = await sb(`/classes?institution_id=eq.${user.institution_id}&archived=eq.false&select=id,teacher_id`);
+  const clsR = await sb(`/classes?institution_id=eq.${user.institution_id}&archived=eq.false&select=id,name,teacher_id`);
   const classes = Array.isArray(clsR.data) ? clsR.data : [];
 
   const now = Date.now();
   const allData = [];
   const profEntries = [];
+  // Vue "directeur" : contrairement à profs[] (agrégé par enseignant), ceci
+  // détaille chaque classe individuellement pour repérer le décrochage
+  // classe par classe, et remonte les alertes (détectAlerts, déjà utilisé
+  // pour le dashboard d'un prof seul) à l'échelle de toute l'école, taguées
+  // par classe + prof pour rester actionnables.
+  const classBreakdown = [];
+  const allAlerts = [];
   for (const p of profs) {
     const profClasses = classes.filter((c) => c.teacher_id === p.id);
     const studentsData = [];
     for (const c of profClasses) {
       const members = await membersOf(c.id);
       const pmap = await fetchProgressMap(members.map((m) => m.student_id));
-      members.forEach((m) => { const d = pmap[m.student_id] || {}; studentsData.push(d); allData.push(d); });
+      const classStudents = members.map((m) => ({ username: m.username, data: pmap[m.student_id] || {} }));
+      classStudents.forEach((s) => { studentsData.push(s.data); allData.push(s.data); });
+      const agg = aggregateClass(classStudents.map((s) => s.data), now);
+      classBreakdown.push({ classId: c.id, className: c.name, profUsername: p.username, ...agg });
+      const { inactive, stuck } = detectAlerts(classStudents, now);
+      inactive.forEach((a) => allAlerts.push({ type: 'inactive', username: a.username, days: a.days, severity: a.days, className: c.name, profUsername: p.username }));
+      stuck.forEach((a) => allAlerts.push({ type: 'stuck', username: a.username, sessions: a.sessions, severity: a.sessions, className: c.name, profUsername: p.username }));
     }
     profEntries.push({ profId: p.id, username: p.username, classCount: profClasses.length, studentsData });
   }
+  // Classes les moins actives d'abord (les plus utiles à repérer), alertes
+  // les plus sévères d'abord, plafonnées pour rester lisibles sur un dashboard.
+  classBreakdown.sort((a, b) => a.activeThisWeek - b.activeThisWeek);
+  allAlerts.sort((a, b) => b.severity - a.severity);
 
   return res.json({
     institution,
@@ -554,6 +597,9 @@ async function adminOverview(req, res) {
     profs: institutionProfSummary(profEntries, now),
     global: aggregateClass(allData, now),
     series: dailySeries(allData, now),
+    classes: classBreakdown,
+    alerts: allAlerts.slice(0, 8),
+    alertsTotal: allAlerts.length,
   });
 }
 
@@ -714,30 +760,15 @@ async function certVerify(req, res) {
   return res.json({ valid: true, certificate: certPublic(c) });
 }
 
-/* ── Legacy (ancien modèle jsonb) — conservé tant que le front Phase 1 n'est pas livré ── */
+// DÉSACTIVÉ (août 2026) — ancien lien d'invitation par classe (?join=teacherUserId_classIdx_inviteToken),
+// modèle jsonb indexé par position dans un tableau, remplacé par le système
+// de code de classe (`join-code`, invite_code en base). Plus aucun code du
+// front ne génère ce type de lien ; l'action restait routable et exécutable
+// par n'importe qui la connaissant, sans bénéfice — neutralisée comme
+// legacyStudentStats ci-dessous plutôt que supprimée, au cas où un lien très
+// ancien traînerait encore quelque part.
 async function legacyJoin(req, res) {
-  const { studentToken, teacherUserId, classIdx, inviteToken, preview } = req.body || {};
-  if (!studentToken || !teacherUserId || classIdx == null || !inviteToken) return res.status(400).json({ error: 'Paramètres manquants.' });
-  const sR = await sb(`/users?session_token=eq.${encodeURIComponent(studentToken)}&select=id,username`);
-  const student = sR.data && sR.data[0];
-  if (!student) return res.status(401).json({ error: 'Non connecté.' });
-  const tp = await sb(`/progress?user_id=eq.${encodeURIComponent(teacherUserId)}&select=data`);
-  const tProg = tp.data && tp.data[0];
-  if (!tProg) return res.status(404).json({ error: 'Établissement introuvable.' });
-  const data = tProg.data || {};
-  const classes = data.classes || [];
-  const cls = classes[classIdx];
-  if (!cls) return res.status(404).json({ error: 'Classe introuvable.' });
-  if (cls.inviteToken !== inviteToken) return res.status(403).json({ error: "Lien d'invitation invalide ou expiré." });
-  if (preview) return res.json({ className: cls.name });
-  const students = cls.students || [];
-  if (students.find((s) => s.username === student.username)) return res.status(409).json({ error: 'Tu es déjà dans cette classe.' });
-  students.push({ username: student.username, addedAt: Date.now(), wpm: null, acc: null, tests: null });
-  classes[classIdx] = { ...cls, students };
-  data.classes = classes;
-  const upd = await sb(`/progress?user_id=eq.${encodeURIComponent(teacherUserId)}`, { method: 'PATCH', body: JSON.stringify({ data }) });
-  if (!upd.ok) return res.status(500).json({ error: "Erreur lors de l'inscription." });
-  return res.json({ ok: true, className: cls.name });
+  return res.status(410).json({ error: "Ce type de lien d'invitation n'est plus valide. Demande un nouveau code à ton professeur." });
 }
 
 // DÉSACTIVÉ (juil. 2026) — cette action de l'ancien modèle jsonb renvoyait les

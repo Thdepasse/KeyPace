@@ -537,3 +537,35 @@ create index if not exists analytics_events_name_idx on analytics_events(event_n
 create index if not exists analytics_events_created_idx on analytics_events(created_at);
 create index if not exists analytics_events_session_idx on analytics_events(session_id);
 alter table analytics_events enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Réglages de compte (août 2026)
+-- display_name : pseudo librement modifiable par tout le monde (visible en
+--   Duel 1v1 et au classement du Boss de la semaine) — séparé du username
+--   (identifiant de connexion) pour qu'un élève rattaché à un établissement
+--   ne puisse pas se cacher derrière un pseudo : l'enseignant continue de
+--   voir son vrai username dans la liste de classe, seul le nom affiché
+--   dans les jeux peut changer.
+-- pending_email : nouvelle adresse en attente de confirmation lors d'un
+--   changement d'email — appliquée à `email` une fois le lien cliqué (même
+--   mécanisme de token que la confirmation d'inscription, voir verifyEmail()
+--   dans api/register.js).
+-- ───────────────────────────────────────────────────────────────
+alter table users
+  add column if not exists display_name text,
+  add column if not exists pending_email text;
+
+-- ───────────────────────────────────────────────────────────────
+-- Sécurité du flux d'invitation élève (août 2026)
+-- must_change_password : compte créé par import CSV établissement, mot de
+--   passe temporaire connu du prof qui l'a communiqué à l'élève — force un
+--   changement à la première connexion. Remis à false par tout changement
+--   de mot de passe explicite (change-password, reset-confirm).
+-- class_join_failed_attempts / class_join_locked_until : anti-bruteforce sur
+--   le code de classe (join-code), même mécanique que le login normal —
+--   un code de 6 caractères reste devinable en boucle par un script sans ça.
+-- ───────────────────────────────────────────────────────────────
+alter table users
+  add column if not exists must_change_password boolean default false,
+  add column if not exists class_join_failed_attempts integer default 0,
+  add column if not exists class_join_locked_until timestamptz;

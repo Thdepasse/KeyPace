@@ -24,6 +24,25 @@ async function sb(path, opts = {}) {
 
 // Plan réellement accordé : un élève d'établissement dont la licence a expiré
 // repasse en 'free' (sans écrire en base : renouveler la licence le réactive).
+// Nom de l'établissement pour un message d'accueil contextualisé côté élève
+// (page "Mes classes") — évite un aller-retour supplémentaire côté client.
+async function institutionNameFor(institutionId) {
+  if (!institutionId) return null;
+  const r = await sb(`/institutions?id=eq.${institutionId}&select=name`);
+  const inst = r.data && r.data[0];
+  return inst ? inst.name : null;
+}
+
+// L'onglet "Classe" ne doit s'afficher que pour un élève rattaché à un
+// établissement OU déjà membre d'au moins une classe (cas d'un import CSV
+// par un prof indépendant, qui n'a pas d'institution_id mais a bien une
+// classe) — un simple hasInstitution ne suffit pas, sinon ces élèves-là
+// perdraient l'accès à leurs propres devoirs.
+async function hasAnyClass(userId) {
+  const r = await sb(`/class_members?student_id=eq.${userId}&select=id&limit=1`);
+  return !!(r.data && r.data[0]);
+}
+
 async function effectivePlan(user) {
   if (user && user.institution_id && user.plan === 'expert') {
     const li = await sb(`/institutions?id=eq.${user.institution_id}&select=license_expires_at`);
@@ -62,6 +81,44 @@ function resetEmail(username, resetUrl) {
             </td></tr>
             <tr><td bgcolor="#F8F5F0" style="background-color:#F8F5F0;border-top:1px solid #E7E1D5;padding:16px 36px;text-align:center">
               <p style="margin:0;font-size:12px;color:#8A8275;line-height:1.6">Lien : <a href="${resetUrl}" style="color:#FF6B2B;word-break:break-all;font-size:11px">${resetUrl}</a></p>
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
+function emailChangeConfirmEmail(username, verifyUrl) {
+  return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>:root{color-scheme:light only}body{background-color:#faf9f5!important}</style>
+</head>
+<body style="margin:0;padding:0;background-color:#faf9f5!important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#16140F">
+  <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#faf9f5" style="background-color:#faf9f5!important;padding:36px 16px">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px">
+        <tr><td align="center" style="padding-bottom:20px">
+          <table cellpadding="0" cellspacing="0"><tr>
+            <td bgcolor="#FF6B2B" style="background-color:#FF6B2B;border-radius:11px;width:36px;height:36px;text-align:center;vertical-align:middle">
+              <span style="font-family:'Courier New',monospace;font-size:18px;font-weight:700;color:#fff">K</span>
+            </td>
+            <td style="padding-left:9px;font-size:19px;font-weight:800;color:#16140F;letter-spacing:-0.02em">KeyPace</td>
+          </tr></table>
+        </td></tr>
+        <tr><td bgcolor="#ffffff" style="background-color:#fff;border:1px solid #E7E1D5;border-radius:22px;overflow:hidden">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td bgcolor="#FF6B2B" style="background-color:#FF6B2B;padding:28px 36px 24px;text-align:center">
+              <p style="margin:0 0 8px;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.02em">Confirme ta nouvelle adresse</p>
+              <p style="margin:0;font-size:14px;color:rgba(255,255,255,.88)">Bonjour ${username}, tu as demandé à changer l'email de ton compte KeyPace.</p>
+            </td></tr>
+            <tr><td style="padding:32px 36px 24px;text-align:center">
+              <p style="margin:0 0 20px;font-size:14px;color:#7A7365;line-height:1.6">Ce lien est valable <strong style="color:#16140F">24 heures</strong>. Si tu n'es pas à l'origine de cette demande, ignore cet email — ton adresse actuelle reste inchangée.</p>
+              <a href="${verifyUrl}" style="display:inline-block;background-color:#FF6B2B;color:#fff;text-decoration:none;font-size:15px;font-weight:700;padding:14px 36px;border-radius:13px">Confirmer cette adresse</a>
+            </td></tr>
+            <tr><td bgcolor="#F8F5F0" style="background-color:#F8F5F0;border-top:1px solid #E7E1D5;padding:16px 36px;text-align:center">
+              <p style="margin:0;font-size:12px;color:#8A8275;line-height:1.6">Lien : <a href="${verifyUrl}" style="color:#FF6B2B;word-break:break-all;font-size:11px">${verifyUrl}</a></p>
             </td></tr>
           </table>
         </td></tr>
@@ -134,16 +191,17 @@ module.exports = async function handler(req, res) {
         session_token: newSession,
         failed_attempts: 0,
         locked_until: null,
+        must_change_password: false, // ce reset auto-choisi compte comme le changement exigé, s'il l'était
       }),
     });
 
     // Récupérer les infos pour reconnecter l'utilisateur
-    const userR = await sb(`/users?id=eq.${user.id}&select=id,username,plan,onboarding_completed`);
+    const userR = await sb(`/users?id=eq.${user.id}&select=id,username,plan,onboarding_completed,email,display_name,institution_id`);
     const updated = userR.data && userR.data[0];
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
     const progress = pr.data && pr.data[0];
 
-    return res.json({ ok: true, id: updated.id, username: updated.username, plan: updated.plan, token: newSession, onboarding_completed: updated.onboarding_completed || false, data: progress?.data || {} });
+    return res.json({ ok: true, id: updated.id, username: updated.username, plan: updated.plan, token: newSession, onboarding_completed: updated.onboarding_completed || false, email: updated.email || null, displayName: updated.display_name || null, mustChangePassword: false, institutionName: await institutionNameFor(updated.institution_id), hasClass: await hasAnyClass(updated.id), data: progress?.data || {} });
   }
 
   // — RGPD : export des données personnelles (droit d'accès)
@@ -191,6 +249,105 @@ module.exports = async function handler(req, res) {
     return res.json({ ok: true });
   }
 
+  // — Modifier le nom d'utilisateur (identifiant de connexion). Un élève
+  // rattaché à un établissement ne peut pas le changer : l'enseignant doit
+  // pouvoir l'identifier de façon fiable dans sa classe (voir le "nom
+  // affiché" ci-dessous pour un pseudo librement modifiable à la place).
+  if (body.action === 'update-username') {
+    const { token, username } = body;
+    if (!token || !username) return res.status(400).json({ error: 'Champs manquants.' });
+    const newUsername = String(username).trim();
+    if (newUsername.length < 3 || newUsername.length > 24) return res.status(400).json({ error: "Le nom d'utilisateur doit faire entre 3 et 24 caractères." });
+    if (!/^[a-zA-Z0-9._-]+$/.test(newUsername)) return res.status(400).json({ error: 'Caractères autorisés : lettres, chiffres, points, tirets, underscores.' });
+
+    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,role,institution_id`);
+    const user = uR.data && uR.data[0];
+    if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    if (user.role === 'eleve' && user.institution_id) {
+      return res.status(403).json({ error: "Ton identifiant est géré par ton établissement. Utilise le nom affiché ci-dessous pour changer ce que voient les autres joueurs." });
+    }
+    if (newUsername.toLowerCase() === user.username.toLowerCase()) return res.json({ ok: true, username: user.username });
+
+    const dup = await sb(`/users?username=eq.${encodeURIComponent(newUsername)}&select=id`);
+    if (dup.data && dup.data.length) return res.status(409).json({ error: 'Ce nom est déjà pris.' });
+
+    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ username: newUsername }) });
+    return res.json({ ok: true, username: newUsername });
+  }
+
+  // — Modifier le nom affiché (pseudo visible par les autres joueurs en
+  // Duel 1v1 et au classement du Boss de la semaine). Disponible pour tout
+  // le monde, y compris les élèves rattachés à un établissement — c'est le
+  // seul des deux noms qu'ils peuvent changer librement.
+  if (body.action === 'update-display-name') {
+    const { token, displayName } = body;
+    if (!token) return res.status(400).json({ error: 'Session manquante.' });
+    const name = String(displayName || '').trim().slice(0, 24) || null;
+    if (name && !/^[\p{L}\p{N}\s._-]+$/u.test(name)) return res.status(400).json({ error: 'Caractères non autorisés dans le nom affiché.' });
+    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id`);
+    const user = uR.data && uR.data[0];
+    if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ display_name: name }) });
+    return res.json({ ok: true, displayName: name });
+  }
+
+  // — Changer le mot de passe directement dans les réglages (sans passer
+  // par le lien de réinitialisation par email), en reconfirmant l'ancien.
+  if (body.action === 'change-password') {
+    const { token, oldPasswordHash, newPasswordHash } = body;
+    if (!token || !oldPasswordHash || !newPasswordHash) return res.status(400).json({ error: 'Champs manquants.' });
+    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,password_hash`);
+    const user = uR.data && uR.data[0];
+    if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    if (!verifyPassword(oldPasswordHash, user.password_hash).ok) return res.status(401).json({ error: 'Mot de passe actuel incorrect.' });
+    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ password_hash: hashPassword(newPasswordHash), must_change_password: false }) });
+    return res.json({ ok: true });
+  }
+
+  // — Demande de changement d'email : envoie un lien de confirmation à la
+  // NOUVELLE adresse. Le changement n'est appliqué qu'au clic sur ce lien
+  // (voir verifyEmail() dans register.js, même mécanisme de token que la
+  // confirmation d'inscription — distingué par la présence de pending_email).
+  if (body.action === 'update-email-request') {
+    const { token, newEmail, currentPasswordHash } = body;
+    if (!token || !newEmail || !currentPasswordHash) return res.status(400).json({ error: 'Champs manquants.' });
+    const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    if (!emailRe.test(String(newEmail))) return res.status(400).json({ error: 'Adresse email invalide.' });
+
+    const uR = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,email,password_hash`);
+    const user = uR.data && uR.data[0];
+    if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    if (!verifyPassword(currentPasswordHash, user.password_hash).ok) return res.status(401).json({ error: 'Mot de passe incorrect.' });
+    if (String(newEmail).toLowerCase() === (user.email || '').toLowerCase()) return res.status(400).json({ error: "C'est déjà ton adresse actuelle." });
+
+    const dup = await sb(`/users?email=eq.${encodeURIComponent(newEmail)}&select=id`);
+    if (dup.data && dup.data.length) return res.status(409).json({ error: 'Cet email est déjà utilisé par un autre compte.' });
+
+    const verificationToken = require('crypto').randomBytes(32).toString('hex');
+    const verificationExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    await sb(`/users?id=eq.${user.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ pending_email: newEmail, verification_token: verificationToken, verification_expires_at: verificationExpiresAt }),
+    });
+
+    if (RESEND_API_KEY) {
+      try {
+        const resend = new Resend(RESEND_API_KEY);
+        const verifyUrl = `${APP_URL}/api/verify-email?token=${verificationToken}`;
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: newEmail,
+          subject: 'Confirme ta nouvelle adresse email — KeyPace',
+          html: emailChangeConfirmEmail(user.username, verifyUrl),
+        });
+      } catch (e) {
+        console.error('Email send error:', e.message);
+        return res.status(500).json({ error: "Impossible d'envoyer l'email de confirmation. Réessaie." });
+      }
+    }
+    return res.json({ ok: true });
+  }
+
   // — Marquer l'onboarding comme terminé
   if (body.action === 'onboarding-done') {
     const { token } = body;
@@ -211,7 +368,7 @@ module.exports = async function handler(req, res) {
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
     const progress = pr.data && pr.data[0];
-    return res.json({ id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, token, data: progress?.data || {} });
+    return res.json({ id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, email: user.email || null, displayName: user.display_name || null, mustChangePassword: !!user.must_change_password, institutionName: await institutionNameFor(user.institution_id), hasClass: await hasAnyClass(user.id), token, data: progress?.data || {} });
   }
 
   // — Connexion normale
@@ -245,7 +402,7 @@ module.exports = async function handler(req, res) {
   const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
   const progress = pr.data && pr.data[0];
 
-  res.json({ id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, token, data: progress?.data || {} });
+  res.json({ id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, email: user.email || null, displayName: user.display_name || null, mustChangePassword: !!user.must_change_password, institutionName: await institutionNameFor(user.institution_id), hasClass: await hasAnyClass(user.id), token, data: progress?.data || {} });
   } catch (e) {
     console.error('login handler error:', e);
     return res.status(500).json({ error: 'Erreur serveur.' });

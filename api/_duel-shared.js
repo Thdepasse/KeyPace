@@ -58,7 +58,7 @@ const DUEL_TEXTS = [
 
 async function userFromToken(token) {
   if (!token) return null;
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,plan`);
+  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,display_name,plan`);
   return (r.data && r.data[0]) || null;
 }
 

@@ -1,5 +1,5 @@
 const { Resend } = require('resend');
-const { hashPassword, verifyPassword } = require('./_auth');
+const { hashPassword } = require('./_auth');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -170,10 +170,24 @@ async function verifyEmail(req, res) {
     const token = (req.query && req.query.token) || (new URL(req.url, `https://${req.headers.host}`).searchParams.get('token'));
     if (!token) return redirect(res, `${APP_URL}?verified=invalid`);
 
-    const r = await sb(`/users?verification_token=eq.${encodeURIComponent(token)}&select=id,email_verified,verification_expires_at`);
+    const r = await sb(`/users?verification_token=eq.${encodeURIComponent(token)}&select=id,email_verified,verification_expires_at,pending_email`);
     const user = r.data && r.data[0];
 
     if (!user) return redirect(res, `${APP_URL}?verified=invalid`);
+
+    // Confirmation d'un changement d'email (compte déjà vérifié, en attente
+    // sur pending_email) — même token/expiration que la vérif d'inscription,
+    // distinguée par la présence de pending_email. Prioritaire ci-dessous.
+    if (user.pending_email) {
+      if (user.verification_expires_at && new Date(user.verification_expires_at) < new Date())
+        return redirect(res, `${APP_URL}?verified=expired`);
+      await sb(`/users?id=eq.${user.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ email: user.pending_email, pending_email: null, verification_token: null, verification_expires_at: null }),
+      });
+      return redirect(res, `${APP_URL}?verified=email-changed`);
+    }
+
     if (user.email_verified) return redirect(res, `${APP_URL}?verified=already`);
     // N'expire que si une date est réellement fixée (null => on n'expire pas).
     if (user.verification_expires_at && new Date(user.verification_expires_at) < new Date())
@@ -200,7 +214,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   try {
-  const { username, email, passwordHash, institutionId, institutionPasswordHash, profInviteToken, consent, birthdate, parentEmail } = req.body || {};
+  const { username, email, passwordHash, profInviteToken, consent, birthdate, parentEmail } = req.body || {};
   if (!username || !passwordHash || !email) return res.status(400).json({ error: 'Champs manquants.' });
   const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
   if (!emailRe.test(String(email))) return res.status(400).json({ error: 'Adresse email invalide.' });
@@ -235,17 +249,6 @@ module.exports = async function handler(req, res) {
   if (!institution && emailDomain) {
     const byDomain = await sb(`/institutions?domains=cs.{"${emailDomain}"}&select=*`);
     institution = byDomain.data && byDomain.data[0];
-  }
-
-  // 2) Sinon, ancien flux par mot de passe d'établissement (compat).
-  if (!institution && institutionId) {
-    if (!institutionPasswordHash)
-      return res.status(400).json({ error: 'Mot de passe établissement manquant.' });
-    const instR = await sb(`/institutions?id=eq.${encodeURIComponent(institutionId)}&select=*`);
-    institution = instR.data && instR.data[0];
-    if (!institution) return res.status(404).json({ error: 'Établissement introuvable.' });
-    if (!verifyPassword(institutionPasswordHash, institution.password_hash).ok)
-      return res.status(401).json({ error: 'Mot de passe établissement incorrect.' });
   }
 
   // Licence établissement expirée : plus aucune inscription rattachée possible.
@@ -347,6 +350,9 @@ module.exports = async function handler(req, res) {
     id: user.id,
     username: user.username,
     plan: user.plan,
+    email: user.email,
+    displayName: null,
+    institutionName: institution ? institution.name : null,
     token,
     data: {},
     emailPending: true,

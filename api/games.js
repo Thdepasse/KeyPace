@@ -34,10 +34,11 @@ module.exports = async function handler(req, res) {
       case 'boss-submit': {
         const { token, wpm, accuracy } = body;
         if (!token) return res.status(400).json({ error: 'Token manquant.' });
-        const ur = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,plan`);
+        const ur = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username,display_name,plan`);
         const user = ur.data && ur.data[0];
         if (!user) return res.status(401).json({ error: 'Session invalide.' });
         if (user.plan !== 'expert') return res.status(403).json({ error: 'Réservé aux comptes Expert.' });
+        const displayName = user.display_name || user.username;
         const ch = await getCurrentChallenge();
         if (!ch) return res.status(500).json({ error: 'Défi indisponible.' });
         const score = computeScore(wpm, accuracy);
@@ -47,10 +48,10 @@ module.exports = async function handler(req, res) {
         const prev = ex.data && ex.data[0];
         if (prev) {
           if (score > Number(prev.score)) {
-            await sb(`/weekly_scores?id=eq.${prev.id}`, { method: 'PATCH', body: JSON.stringify({ score, wpm: w, accuracy: a, username: user.username, created_at: new Date().toISOString() }) });
+            await sb(`/weekly_scores?id=eq.${prev.id}`, { method: 'PATCH', body: JSON.stringify({ score, wpm: w, accuracy: a, username: displayName, created_at: new Date().toISOString() }) });
           }
         } else {
-          await sb(`/weekly_scores`, { method: 'POST', body: JSON.stringify({ challenge_id: ch.id, user_id: user.id, username: user.username, score, wpm: w, accuracy: a }) });
+          await sb(`/weekly_scores`, { method: 'POST', body: JSON.stringify({ challenge_id: ch.id, user_id: user.id, username: displayName, score, wpm: w, accuracy: a }) });
         }
         return res.json({ ok: true, score, best: prev ? Math.max(score, Number(prev.score)) : score });
       }
@@ -89,7 +90,7 @@ module.exports = async function handler(req, res) {
           if (r.ok && r.data && r.data[0]) { room = r.data[0]; break; }
         }
         if (!room) return res.status(500).json({ error: 'Création du duel impossible.' });
-        return res.json({ roomId: room.id, roomCode: room.room_code, text: room.text, role: 'host', hostLabel: user.username });
+        return res.json({ roomId: room.id, roomCode: room.room_code, text: room.text, role: 'host', hostLabel: user.display_name || user.username });
       }
       case 'duel-join-code': {
         const { token, code } = body;
@@ -102,11 +103,11 @@ module.exports = async function handler(req, res) {
         const isHost = room.host_user_id === user.id;
         let hostLabel = null;
         if (room.host_user_id) {
-          const hu = await sb(`/users?id=eq.${room.host_user_id}&select=username`);
-          hostLabel = hu.data && hu.data[0] ? hu.data[0].username : 'Hôte';
+          const hu = await sb(`/users?id=eq.${room.host_user_id}&select=username,display_name`);
+          hostLabel = hu.data && hu.data[0] ? (hu.data[0].display_name || hu.data[0].username) : 'Hôte';
         }
         if (!isHost) {
-          await sb(`/duel_rooms?id=eq.${encodeURIComponent(room.id)}`, { method: 'PATCH', body: JSON.stringify({ guest_user_id: user.id, guest_label: user.username }) });
+          await sb(`/duel_rooms?id=eq.${encodeURIComponent(room.id)}`, { method: 'PATCH', body: JSON.stringify({ guest_user_id: user.id, guest_label: user.display_name || user.username }) });
         }
         return res.json({ roomId: room.id, roomCode: room.room_code, text: room.text, role: isHost ? 'host' : 'guest', status: room.status, startAt: room.start_at, hostLabel });
       }
@@ -122,11 +123,11 @@ module.exports = async function handler(req, res) {
         const isHost = room.host_user_id === user.id;
         let hostLabel = null;
         if (room.host_user_id) {
-          const hu = await sb(`/users?id=eq.${room.host_user_id}&select=username`);
-          hostLabel = hu.data && hu.data[0] ? hu.data[0].username : 'Hôte';
+          const hu = await sb(`/users?id=eq.${room.host_user_id}&select=username,display_name`);
+          hostLabel = hu.data && hu.data[0] ? (hu.data[0].display_name || hu.data[0].username) : 'Hôte';
         }
         if (!isHost) {
-          await sb(`/duel_rooms?id=eq.${encodeURIComponent(roomId)}`, { method: 'PATCH', body: JSON.stringify({ guest_user_id: user.id, guest_label: user.username }) });
+          await sb(`/duel_rooms?id=eq.${encodeURIComponent(roomId)}`, { method: 'PATCH', body: JSON.stringify({ guest_user_id: user.id, guest_label: user.display_name || user.username }) });
         }
         return res.json({ roomId: room.id, roomCode: room.room_code, text: room.text, role: isHost ? 'host' : 'guest', status: room.status, startAt: room.start_at, hostLabel });
       }
