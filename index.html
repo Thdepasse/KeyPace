@@ -418,9 +418,6 @@ ul,ol{list-style-position:inside}
 .auth-btn:hover{box-shadow:0 12px 28px rgba(255,77,46,0.4);transform:translateY(-1px)}
 .auth-error{color:#E5484D;font-size:13px;font-weight:600;margin-bottom:10px;padding:9px 13px;background:rgba(229,72,77,0.08);border-radius:9px;display:none}
 .auth-error.show{display:block}
-.auth-field select{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:11px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--txt);outline:none;transition:.15s;appearance:none;cursor:pointer}
-.auth-field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,0.12)}
-.auth-inst-hint{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4}
 
 /* upgrade modal */
 .upgrade-hero{text-align:center;padding:8px 0 20px}
@@ -1043,17 +1040,6 @@ footer{border-top:1px solid var(--border);margin-top:10px}
     <div class="auth-field" id="auth-birth-wrap" style="display:none"><label>Date de naissance <span style="color:var(--muted);font-weight:400">(facultatif)</span></label><input type="date" id="auth-birth" oninput="onBirthChange()"></div>
     <div class="auth-field" id="auth-parent-wrap" style="display:none"><label>Email d'un responsable légal</label><input type="email" id="auth-parent" placeholder="parent@email.com" autocomplete="email"></div>
     <label id="auth-consent-wrap" style="display:none;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--muted);line-height:1.5;margin:2px 0 14px;cursor:pointer"><input type="checkbox" id="auth-consent" style="margin-top:2px;flex-shrink:0"><span>J'accepte les <a href="/conditions" target="_blank" style="color:var(--accent)">conditions d'utilisation</a> et la <a href="/confidentialite" target="_blank" style="color:var(--accent)">politique de confidentialité</a>.</span></label>
-    <div class="auth-field" id="auth-institution-wrap" style="display:none">
-      <label>Établissement scolaire <span style="color:var(--muted);font-weight:400">(optionnel)</span></label>
-      <select id="auth-institution" onchange="onInstitutionChange()">
-        <option value="">Aucun établissement</option>
-      </select>
-      <div class="auth-inst-hint">Tu es étudiant·e dans une école partenaire ? Sélectionne-la pour activer ton accès Expert.</div>
-    </div>
-    <div class="auth-field" id="auth-inst-pw-wrap" style="display:none">
-      <label>Mot de passe de l'établissement</label>
-      <input type="password" id="auth-inst-password" placeholder="Fourni par ton école" autocomplete="off">
-    </div>
     <div id="auth-forgot-wrap" style="text-align:right;margin-top:-4px;margin-bottom:8px">
       <a href="mailto:contact@keypace.be?subject=Mot de passe oublié" style="font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:2px">Mot de passe oublié ?</a>
     </div>
@@ -1338,6 +1324,10 @@ let currentUser = null;
 let currentPlan = null;
 let currentToken = null;
 let currentUserId = null;
+let currentEmail = null;
+let currentDisplayName = null;
+let currentInstitutionName = null;
+let currentHasClass = false;
 let currentTab = 'login';
 let _authCallback = null;
 
@@ -1346,12 +1336,15 @@ async function hashPw(pw){
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-function saveSession(username, plan, token, userId, role){
+function saveSession(username, plan, token, userId, role, email, displayName, institutionName, hasClass){
   currentUser=username; currentPlan=plan; currentToken=token; currentUserId=userId||null;
-  localStorage.setItem('klak_session', JSON.stringify({username, plan, token, userId, role:role||null}));
+  currentEmail=email||null; currentDisplayName=displayName||null; currentInstitutionName=institutionName||null;
+  currentHasClass=!!hasClass;
+  localStorage.setItem('klak_session', JSON.stringify({username, plan, token, userId, role:role||null, email:email||null, displayName:displayName||null, institutionName:institutionName||null, hasClass:!!hasClass}));
 }
 function clearSession(){
   currentUser=null; currentPlan=null; currentToken=null; currentUserId=null;
+  currentEmail=null; currentDisplayName=null; currentInstitutionName=null; currentHasClass=false;
   localStorage.removeItem('klak_session');
 }
 function loadSession(){
@@ -1359,6 +1352,7 @@ function loadSession(){
     const s=JSON.parse(localStorage.getItem('klak_session'));
     if(s&&s.username){
       currentUser=s.username;currentPlan=s.plan||'free';currentToken=s.token;currentUserId=s.userId||null;
+      currentEmail=s.email||null;currentDisplayName=s.displayName||null;currentInstitutionName=s.institutionName||null;currentHasClass=!!s.hasClass;
       // Pré-charger le rôle pour éviter le flash EXPERT → ÉTABLISSEMENT
       if(s.role&&!app.stats)app.stats={role:s.role};
     }
@@ -1387,37 +1381,10 @@ function switchTab(tab){
   document.getElementById('auth-birth-wrap').style.display=tab==='register'?'block':'none';
   document.getElementById('auth-consent-wrap').style.display=tab==='register'?'flex':'none';
   document.getElementById('auth-parent-wrap').style.display='none';
-  document.getElementById('auth-institution-wrap').style.display='none';
-  document.getElementById('auth-inst-pw-wrap').style.display='none';
   document.getElementById('auth-submit').textContent=tab==='login'?'Se connecter':'Créer mon compte';
   document.getElementById('auth-forgot-wrap').style.display=tab==='login'?'block':'none';
   document.getElementById('auth-error').classList.remove('show');
   const dh=document.getElementById('auth-domain-hint');if(dh)dh.style.display='none';
-  if(tab==='register')loadInstitutions();
-}
-
-let _institutionsLoaded=false;
-async function loadInstitutions(){
-  if(_institutionsLoaded)return;
-  _institutionsLoaded=true;
-  try{
-    const r=await fetch('/api/institutions');
-    if(!r.ok)return;
-    const list=await r.json();
-    const sel=document.getElementById('auth-institution');
-    if(!sel)return;
-    list.forEach(inst=>{
-      const opt=document.createElement('option');
-      opt.value=inst.id;
-      opt.textContent=inst.name;
-      sel.appendChild(opt);
-    });
-  }catch{}
-}
-
-function onInstitutionChange(){
-  const val=document.getElementById('auth-institution').value;
-  document.getElementById('auth-inst-pw-wrap').style.display=val?'block':'none';
 }
 
 function showAuthError(msg){const e=document.getElementById('auth-error');e.textContent=msg;e.classList.add('show');}
@@ -1485,28 +1452,22 @@ async function authSubmit(){
       btn.disabled=false;btn.textContent='Créer mon compte';
       document.getElementById('auth-password').value='';
       document.getElementById('auth-confirm').value='';
-      document.getElementById('auth-institution').value='';
-      document.getElementById('auth-inst-pw-wrap').style.display='none';
       const wasProf=!!window._profInviteToken;window._profInviteToken=null;
       try{track('signup',{type:wasProf?'teacher_invite':'student'});}catch{}
       switchTab('login');
       const ctx=document.getElementById('auth-context-msg');
-      ctx.innerHTML='📧 <strong>Compte '+(wasProf?'enseignant ':'')+'créé !</strong> Un lien de confirmation a été envoyé à ton adresse email. Clique dessus, puis reviens te connecter ici.';
+      const instLine=d.institutionName?` Ton compte a été rattaché à <strong>${app._esc(d.institutionName)}</strong> — il ne te reste plus qu'à rejoindre ta classe avec le code donné par ton professeur.`:'';
+      ctx.innerHTML='📧 <strong>Compte '+(wasProf?'enseignant ':'')+'créé !</strong> Un lien de confirmation a été envoyé à ton adresse email. Clique dessus, puis reviens te connecter ici.'+instLine;
       ctx.style.cssText='background:rgba(31,169,113,0.1);border:1px solid rgba(31,169,113,0.25);border-radius:10px;padding:10px 13px;font-size:13px;color:#15784f;margin-bottom:16px;display:block';
       return;
     } else {
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,passwordHash})});
       const d=await r.json();
       if(!r.ok){btn.disabled=false;btn.textContent='Se connecter';return showAuthError(d.error||'Erreur.');}
-      const _mergedData=mergeStats(d.data);
-      if(d.role)_mergedData.role=d.role;
-      saveSession(d.username, d.plan, d.token, d.id, _mergedData.role||null);
-      try{track('login',{method:'password'});}catch{}
-      app.stats=_mergedData;
-      window._needsOnboarding = !d.onboarding_completed;
-      if(!d.onboarding_completed)localStorage.removeItem('klak_ob');else localStorage.setItem('klak_ob','1');
-      loginUser(d.username);
-      if(isAdmin())app.loadAdmin(true);else if(isTeacher())app.loadEtab(true);
+      // Compte importé par CSV : mot de passe temporaire connu du prof, on
+      // bloque sur un changement obligatoire avant de terminer la connexion.
+      if(d.mustChangePassword){btn.disabled=false;btn.textContent='Se connecter';showForcedPasswordChangeModal(d,passwordHash);return;}
+      completeLogin(d);
     }
   }catch(e){btn.disabled=false;btn.textContent=currentTab==='login'?'Se connecter':'Créer mon compte';showAuthError('Erreur réseau, réessaie.');}
 }
@@ -1540,6 +1501,66 @@ document.addEventListener('pointerdown',e=>{
   const q=e.target.closest&&e.target.closest('.btn-quit');
   if(q&&app&&app.activeGame){e.preventDefault();app.exitActiveGame();}
 });
+
+// Termine la connexion après un login réussi (extrait pour être réutilisable
+// après un changement de mot de passe obligatoire — voir showForcedPasswordChangeModal).
+function completeLogin(d){
+  const _mergedData=mergeStats(d.data);
+  if(d.role)_mergedData.role=d.role;
+  saveSession(d.username, d.plan, d.token, d.id, _mergedData.role||null, d.email, d.displayName, d.institutionName, d.hasClass);
+  try{track('login',{method:'password'});}catch{}
+  app.stats=_mergedData;
+  window._needsOnboarding = !d.onboarding_completed;
+  if(!d.onboarding_completed)localStorage.removeItem('klak_ob');else localStorage.setItem('klak_ob','1');
+  loginUser(d.username);
+  if(isAdmin())app.loadAdmin(true);else if(isTeacher())app.loadEtab(true);
+}
+
+// Compte créé par import CSV établissement : mot de passe temporaire connu
+// du prof qui l'a communiqué à l'élève — on force un changement avant de
+// laisser entrer, pour que ce mot de passe ne reste jamais valable durablement
+// et connu d'une tierce personne. `d` est la réponse de login (déjà valide,
+// token inclus) ; `oldPasswordHash` est le hash du mot de passe qui vient de
+// servir à se connecter (donc déjà connu de l'appelant, pas besoin de le
+// redemander).
+function showForcedPasswordChangeModal(d,oldPasswordHash){
+  const overlay=document.createElement('div');
+  overlay.className='settings-overlay';overlay.id='forced-pw-overlay';overlay.style.zIndex='1300';
+  overlay.innerHTML=`<div class="settings-modal" style="max-width:420px">
+    <div class="settings-modal-head">
+      <div class="settings-modal-avatar">🔑</div>
+      <div class="settings-modal-head-info"><strong>Choisis ton mot de passe</strong><span style="color:var(--muted);font-size:12px">Ton professeur a créé ce compte — à toi de définir un mot de passe que toi seul connais</span></div>
+    </div>
+    <div class="settings-section">
+      <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">NOUVEAU MOT DE PASSE</label>
+      <input type="password" id="fpw-new" placeholder="Au moins 6 caractères" autocomplete="new-password" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box;margin-bottom:10px">
+      <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">CONFIRME-LE</label>
+      <input type="password" id="fpw-confirm" placeholder="Retape le même mot de passe" autocomplete="new-password" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+      <div id="fpw-msg" style="display:none;font-size:13px;margin-top:10px;padding:10px 12px;border-radius:10px"></div>
+      <button id="fpw-submit" style="width:100%;margin-top:14px;background:var(--accent);color:#fff;border:none;border-radius:11px;padding:11px;font:inherit;font-size:14px;font-weight:700;cursor:pointer">Continuer</button>
+    </div>
+  </div>`;
+  // Pas de clic-dehors pour fermer, pas de bouton ✕ : le changement est obligatoire.
+  document.body.appendChild(overlay);
+  document.getElementById('fpw-submit').addEventListener('click',async()=>{
+    const pw=document.getElementById('fpw-new').value||'';
+    const pw2=document.getElementById('fpw-confirm').value||'';
+    const msg=document.getElementById('fpw-msg');
+    const showErr=(t)=>{msg.style.display='block';msg.style.background='rgba(229,72,77,0.1)';msg.style.color='var(--danger)';msg.textContent=t;};
+    if(pw.length<6)return showErr('Le mot de passe doit faire au moins 6 caractères.');
+    if(pw!==pw2)return showErr('Les mots de passe ne correspondent pas.');
+    const btn=document.getElementById('fpw-submit');btn.disabled=true;btn.textContent='Enregistrement…';
+    try{
+      const newPasswordHash=await hashPw(pw);
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'change-password',token:d.token,oldPasswordHash,newPasswordHash})});
+      const dd=await r.json();
+      if(!r.ok)throw new Error(dd.error||'Erreur.');
+      overlay.remove();
+      if(dd.token)d.token=dd.token; // le serveur régénère le jeton au changement de mot de passe
+      completeLogin(d);
+    }catch(e){btn.disabled=false;btn.textContent='Continuer';showErr(e.message||'Erreur réseau.');}
+  });
+}
 
 function loginUser(username){
   closeModal('auth-modal');
@@ -1665,6 +1686,13 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 function logout(){
+  // Invalide le jeton côté serveur (best-effort, pas attendu) — avant, la
+  // déconnexion n'effaçait que le localStorage : un jeton intercepté avant
+  // le clic restait utilisable indéfiniment malgré la "déconnexion".
+  const tokenToRevoke=currentToken;
+  if(tokenToRevoke){
+    fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logout',token:tokenToRevoke})}).catch(()=>{});
+  }
   clearSession();
   app.stats=null;
   app.etab=null;
@@ -1705,7 +1733,12 @@ function updateNavUser(){
   ['nav-test','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=teacher?'none':'';});
   const homeBtn=document.getElementById('nav-home');if(homeBtn)homeBtn.style.display='';
   const apercu=document.getElementById('nav-apercu');if(apercu)apercu.style.display=teacher?'inline-flex':'none';
-  const joinBtn=document.getElementById('nav-join');if(joinBtn)joinBtn.style.display=teacher?'none':'inline-flex';
+  // "Classe" n'a de sens que pour un élève rattaché à un établissement, ou
+  // déjà membre d'une classe (import CSV par un prof indépendant — pas
+  // d'établissement, mais bien une classe à voir). Un élève complètement
+  // indépendant n'a jamais aucun moyen d'en rejoindre une : lui montrer cet
+  // onglet ne serait que du bruit.
+  const joinBtn=document.getElementById('nav-join');if(joinBtn)joinBtn.style.display=(!teacher&&(currentInstitutionName||currentHasClass))?'inline-flex':'none';
   applyMobileNav();
 }
 
@@ -1804,6 +1837,7 @@ function handleVerificationReturn(){
   const messages={
     success:{icon:'✅',title:'Email confirmé !',body:'Ton compte est actif. Connecte-toi pour commencer.',cta:'Se connecter',action:"openAuth('login')"},
     already:{icon:'✅',title:'Déjà confirmé',body:'Ton adresse email est déjà vérifiée. Connecte-toi.',cta:'Se connecter',action:"openAuth('login')"},
+    'email-changed':{icon:'✅',title:'Nouvelle adresse confirmée !',body:'Ton adresse email a bien été mise à jour.',cta:'',action:''},
     expired:{icon:'⏱️',title:'Lien expiré',body:'Le lien a expiré (24h). Crée un nouveau compte ou contacte le support.',cta:'Créer un compte',action:"openAuth('register')"},
     invalid:{icon:'❌',title:'Lien invalide',body:'Ce lien de confirmation n\'est pas valide.',cta:'Retour à l\'accueil',action:''},
     error:{icon:'⚠️',title:'Erreur temporaire',body:'La confirmation a échoué côté serveur. Réessaie en recliquant sur le lien dans quelques instants.',cta:'Retour à l\'accueil',action:''},
@@ -1869,7 +1903,7 @@ async function flushStats(){
   }catch{}
 }
 function mergeStats(remote){
-  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,simonBest:null,sourisBest:0,goals:{minWpm:20,maxErrors:8}};
+  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,simonBest:null,sourisBest:0,ghostBest:null,goals:{minWpm:20,maxErrors:8}};
   const s=Object.assign(def, remote||{});
   s.tests=s.tests||[];s.lessons=s.lessons||{};s.goals=s.goals||{};
   if(typeof s.goals.minWpm!=='number')s.goals.minWpm=20;
@@ -2861,6 +2895,12 @@ const COURSE_BOTS=[
   {name:'Lièvre',emoji:'🐇',wpm:50,color:'#6E8BE8'},
   {name:'Guépard',emoji:'🐆',wpm:72,color:'#E8729A'}];
 
+// Contre ton fantôme : texte fixe et permanent (contrairement à RACE_TEXTS,
+// tiré au hasard) — le fantôme est un enregistrement (temps, position dans
+// le texte) de ta propre meilleure course passée, rejoué sur EXACTEMENT le
+// même texte à chaque fois. Un texte qui changerait invaliderait le replay.
+const GHOST_TEXT="le silence du matin enveloppe la maison encore endormie, seul le bruit léger des touches trouble doucement ce calme paisible.";
+
 /* Helpers transverses jeux : accessibilité + détection clavier */
 const PREFERS_REDUCED_MOTION=()=>!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 const IS_TOUCH_ONLY=()=>!!(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches&&!window.matchMedia('(pointer:fine)').matches);
@@ -2890,9 +2930,9 @@ const app={
     window.addEventListener('keydown',this._onKey);
   },
   stopAll(){
-    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();
+    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();
     if(this._onKey){window.removeEventListener('keydown',this._onKey);this._onKey=null;}
-    this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.course=null;this.simon=null;this.boss=null;this.activeGame=null;
+    this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.activeGame=null;
   },
 
   lessonRec(id){const v=(this.stats&&this.stats.lessons||{})[id];if(!v)return{bestWpm:0,bestErr:null,cleared:false};if(typeof v==='number')return{bestWpm:v,bestErr:null,cleared:true};return v;},
@@ -3415,15 +3455,16 @@ const app={
     if(this.view==='games'&&this.activeGame==='frappe'&&this.game&&this.game.on){this.gameKey(e);return;}
     if(this.view==='games'&&this.activeGame==='tireur'&&this.tireur&&this.tireur.on){this.tireurKey(e);return;}
     if(this.view==='games'&&this.activeGame==='course'&&this.course&&this.course.on){this.courseKey(e);return;}
+    if(this.view==='games'&&this.activeGame==='ghost'&&this.ghost&&this.ghost.on){this.ghostKey(e);return;}
     if(this.view==='games'&&this.activeGame==='simon'&&this.simon&&this.simon.on){this.simonKey(e);return;}
     if(this.view==='games'&&this.activeGame==='boss'&&this.boss&&this.boss.phase==='playing'){this.bossKey(e);return;}
     if(this.view==='games'&&this.activeGame==='duel'&&this.duel&&this.duel.phase==='racing'){this.duelKey(e);return;}
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   exitActiveGame(){
-    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();this.stopBoss();
+    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();
     if(this.duel)this.duelLeave();
-    this.activeGame=null;this.game=null;this.sprint=null;this.tireur=null;this.course=null;this.simon=null;this.boss=null;
+    this.activeGame=null;this.game=null;this.sprint=null;this.tireur=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;
     this.renderGames();
   },
   typeKey(e){
@@ -3664,9 +3705,15 @@ const app={
       if(!currentUser)v='home';
       else if(MOBILE_BLOCKED_VIEWS.indexOf(v)>=0)v=isTeacher()?'home':'stats';
     }
+    // La vue "classes" n'a de sens que pour un élève rattaché à un
+    // établissement ou déjà membre d'une classe (import CSV par un prof
+    // indépendant) — un élève complètement indépendant n'a aucun moyen d'en
+    // rejoindre une (voir joinByCode), inutile de lui laisser un accès direct
+    // par URL à une page qui ne peut plus rien lui offrir.
+    if(v==='classes'&&currentUser&&!isTeacher()&&!currentInstitutionName&&!currentHasClass)v='stats';
     this.view=v;
     maybeConvNudge(v);
-    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;}
+    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;}
     // Sans ça, le poll 25s de viewClass() continuait après avoir quitté la vue
     // "classes" par un onglet de nav (au lieu du bouton ← Retour), et renvoyait
     // de force l'utilisateur vers la liste des classes à chaque tick.
@@ -5201,6 +5248,7 @@ const app={
     if(this.activeGame==='frappe'){this.renderFrappe();return;}
     if(this.activeGame==='tireur'){this.renderTireur();return;}
     if(this.activeGame==='course'){this.renderCourse();return;}
+    if(this.activeGame==='ghost'){this.renderGhost();return;}
     if(this.activeGame==='simon'){this.renderSimon();return;}
     if(this.activeGame==='boss'){this.renderBoss();return;}
     if(this.activeGame==='duel'){this.renderDuel();return;}
@@ -5266,6 +5314,12 @@ const app={
           <div class="game-sel-desc">Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !</div>
           <span class="game-sel-tag expert">EXPERT</span>
         </div>
+        <div class="game-sel-card expert-card" onclick="app.selectGame('ghost')">
+          <div class="game-sel-icon">👻</div>
+          <div class="game-sel-name">Contre ton fantôme</div>
+          <div class="game-sel-desc">Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !</div>
+          <span class="game-sel-tag expert">EXPERT</span>
+        </div>
       </div>
     </div>`;
   },
@@ -5281,6 +5335,10 @@ const app={
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('course'));return;}
       if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='course';this.course=null;this.renderGames();
+    } else if(which==='ghost'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('ghost'));return;}
+      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
+      this.activeGame='ghost';this.ghost=null;this.renderGames();
     } else if(which==='simon'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('simon'));return;}
       this.activeGame='simon';this.simon=null;this.renderGames();
@@ -5651,10 +5709,156 @@ const app={
     </div>`;
   },
 
+  /* ── CONTRE TON FANTÔME ──
+     Même piste de course que "Course de dactylo" (_raceLanesHTML/
+     _raceCountdownHTML), mais l'unique adversaire est un enregistrement
+     (temps écoulé, position dans le texte) de ta propre meilleure course
+     passée sur GHOST_TEXT — un texte fixe, contrairement à Course qui en
+     tire un au hasard à chaque partie : le fantôme n'a de sens que rejoué
+     sur exactement le même texte. */
+  startGhost(){
+    if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startGhost());return;}
+    if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
+    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();
+    this.activeGame='ghost';
+    this.ghost={on:true,over:false,text:GHOST_TEXT,typed:[],correct:0,keystrokes:0,
+      raceStarted:false,startAt:Date.now()+3000,startTime:0,endTime:0,finished:false,
+      recording:[],ghostFinished:false,won:false};
+    this.renderCurrent();
+    this._ghostLoop=setInterval(()=>this.ghostTick(),100);
+  },
+  stopGhost(){if(this._ghostLoop){clearInterval(this._ghostLoop);this._ghostLoop=null;}},
+  _ghostProgAt(timeline,elapsedMs){
+    if(!timeline||!timeline.length)return 0;
+    if(elapsedMs<=timeline[0][0])return timeline[0][1]/GHOST_TEXT.length;
+    const last=timeline[timeline.length-1];
+    if(elapsedMs>=last[0])return 1;
+    for(let i=1;i<timeline.length;i++){
+      const t1=timeline[i][0],c1=timeline[i][1];
+      if(elapsedMs<=t1){
+        const t0=timeline[i-1][0],c0=timeline[i-1][1];
+        const frac=t1===t0?1:(elapsedMs-t0)/(t1-t0);
+        return (c0+(c1-c0)*frac)/GHOST_TEXT.length;
+      }
+    }
+    return 1;
+  },
+  ghostTick(){
+    const c=this.ghost;if(!c||!c.on)return;
+    const now=Date.now();
+    if(!c.raceStarted){
+      if(now>=c.startAt){c.raceStarted=true;c.startTime=now;}
+      this.renderCurrent();return;
+    }
+    const best=currentUser&&this.stats&&this.stats.ghostBest?this.stats.ghostBest:null;
+    if(best&&!c.ghostFinished&&(now-c.startTime)>=best.timeline[best.timeline.length-1][0])c.ghostFinished=true;
+    this.renderCurrent();
+  },
+  _ghostCorrectPrefix(){return this._correctPrefix(this.ghost.typed,this.ghost.text);},
+  ghostKey(e){
+    const c=this.ghost;if(!c||!c.on||!c.raceStarted||c.finished)return;
+    const k=e._composedKey||e.key;
+    if(k==='Backspace'){e.preventDefault();if(c.typed.length>0){c.typed.pop();this.renderCurrent();}return;}
+    if(k.length!==1)return;
+    e.preventDefault();
+    const i=c.typed.length;
+    if(i>=c.text.length)return;
+    c.keystrokes++;
+    if(k===c.text[i])c.correct++;
+    c.typed.push(k);
+    c.recording.push([Date.now()-c.startTime,this._ghostCorrectPrefix()]);
+    if(c.typed.length===c.text.length&&this._ghostCorrectPrefix()===c.text.length){
+      c.finished=true;c.endTime=Date.now();c.on=false;c.over=true;
+      const best=currentUser&&this.stats&&this.stats.ghostBest?this.stats.ghostBest:null;
+      const finishMs=c.endTime-c.startTime;
+      c.won=!best||finishMs<best.timeline[best.timeline.length-1][0];
+      this.stopGhost();this.afterGhost();
+    }
+    this.renderCurrent();
+  },
+  afterGhost(){
+    const c=this.ghost;
+    const mins=Math.max((c.endTime-c.startTime)/60000,1/600);
+    const wpm=Math.round((c.text.length/5)/mins);
+    const acc=c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
+    c._wpm=wpm;c._acc=acc;c._isRecord=false;c._isFirst=false;
+    try{track('game_completed',{game:'ghost',wpm,acc,won:c.won});}catch{}
+    if(currentUser&&this.stats){
+      const b=this.stats.ghostBest;
+      c._isFirst=!b;
+      if(!b||wpm>b.wpm){c._isRecord=!!b;this.stats.ghostBest={timeline:c.recording,wpm,acc,date:Date.now()};saveStats(this.stats);if(b)this._celebrateGame();}
+    }
+    this.renderCurrent();
+  },
+  renderGhost(){
+    const c=this.ghost;
+    const over=!!(c&&c.over),idle=!c||(!c.on&&!c.over);
+    const best=currentUser&&this.stats&&this.stats.ghostBest?this.stats.ghostBest:null;
+    const len=c?c.text.length:1;
+    const prefix=c?this._ghostCorrectPrefix():0;
+    const playerProg=c?prefix/len:0;
+    const elapsedMin=c&&c.raceStarted?Math.max((Date.now()-c.startTime)/60000,1/600):1/600;
+    const liveWpm=c&&c.raceStarted?Math.round((prefix/5)/elapsedMin):0;
+    const liveAcc=c&&c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
+    const ghostElapsed=c&&c.raceStarted?Date.now()-c.startTime:0;
+    const ghostProg=c&&best?(c.ghostFinished?1:this._ghostProgAt(best.timeline,ghostElapsed)):0;
+    const lanes=c?[
+      {name:'Toi',emoji:'🏎️',prog:playerProg,you:true},
+      ...(best?[{name:'Ton fantôme',emoji:'👻',prog:ghostProg,namePrefix:false}]:[]),
+    ]:[];
+    const lanesHTML=this._raceLanesHTML(lanes);
+    let textHTML='';
+    if(c){
+      let word=[];const flushWord=()=>{if(word.length){textHTML+='<span class="race-word">'+word.join('')+'</span>';word=[];}};
+      c.text.split('').forEach((ch,i)=>{
+        let cls='sprint-todo';
+        if(i<c.typed.length)cls=c.typed[i]===ch?'sprint-ok':'sprint-wrong';
+        else if(i===c.typed.length)cls='sprint-cur';
+        if(ch===' '){flushWord();textHTML+=`<span class="${cls} race-space"> </span>`;}
+        else word.push(`<span class="${cls}">${ch}</span>`);
+      });flushWord();
+    }
+    let overlay='';
+    if(IS_TOUCH_ONLY()&&idle){
+      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>Contre ton fantôme se joue au clavier physique. Reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+    } else if(c&&!c.raceStarted){
+      overlay=`<div class="race-overlay">${this._raceCountdownHTML(c.startAt)}</div>`;
+    }
+    const result=over?this._gameResult({
+      icon:c._isFirst?'👻':c.won?'🏆':'👻',
+      title:c._isFirst?'Fantôme enregistré !':c.won?'Tu as battu ton fantôme !':'Ton fantôme t\'a battu',
+      record:c._isRecord?'Nouveau record de vitesse !':null,
+      boxes:[
+        {label:'Vitesse',value:c._wpm,unit:'mpm',accent:true},
+        {label:'Précision',value:c._acc,unit:'%'},
+      ],
+      bestLine:best&&!c._isFirst?`Fantôme : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best.wpm} mpm</b>`:null,
+      primaryLabel:'Rejouer',primaryOnClick:'app.startGhost()',
+    }):'';
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      ${this._gameHeader('Contre ton fantôme','👻','expert')}
+      <div class="sprint-arena" style="position:relative">
+        ${idle&&!IS_TOUCH_ONLY()?`<div class="sprint-result"><h2 style="margin-bottom:12px">Prêt à courir ?</h2><p style="color:var(--muted);font-size:15px;margin-bottom:20px">${best?'Bats ton meilleur temps sur ce texte : ton fantôme court à ton propre rythme précédent.':'Ta toute première course sur ce texte : elle enregistrera ton fantôme pour la prochaine fois.'}${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary" onclick="app.startGhost()">Lancer la course ▸</button></div>`:''}
+        ${c?`
+          <div class="sprint-hud">
+            <div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:var(--muted);font-weight:500"> mpm</span></div></div>
+            <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">PRÉCISION</div><div class="sprint-score-val" style="color:var(--txt)">${liveAcc}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div></div>
+          </div>
+          ${lanesHTML}
+          ${over?'':`<div class="race-text-box">${textHTML}</div>`}
+          ${over?'':`<div class="sprint-hint">${c.raceStarted?'Corrige tes fautes (retour arrière) pour continuer à avancer.':'La course démarre dans un instant…'}</div>`}
+          ${result}
+          ${overlay}
+        `:''}
+        <div aria-live="polite" class="sr-live">${over&&c?(c._isFirst?'Course terminée, fantôme enregistré, '+c._wpm+' mots par minute.':'Course terminée, '+(c.won?'tu as battu ton fantôme':'ton fantôme a gagné')+', '+c._wpm+' mots par minute.'):''}</div>
+      </div>
+    </div>`;
+  },
+
   /* ── SIMON DES MOTS ── */
   startSimon(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startSimon());return;}
-    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopSimon();this.stopSouris();
+    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();
     this.activeGame='simon';
     this.simon={on:true,over:false,phase:'show',level:1,lives:3,score:0,maxSeq:0,
       words:[],currentWord:'',wordIdx:0,showUntil:0,failUntil:0,inputStart:0,_showTotal:0,_lastBonus:0};
@@ -6301,8 +6505,24 @@ const app={
   },
 
   /* ── SETTINGS ── */
-  openSettings(section){
+  async openSettings(section){
     if(document.getElementById('settings-overlay'))return;
+    // Sessions ouvertes avant l'ajout de l'email/nom affiché n'ont pas encore
+    // ces champs en cache local — on les rafraîchit à l'ouverture (même route
+    // que la reconnexion SSO), pour que la modale affiche toujours l'état réel.
+    if(currentToken){
+      try{
+        const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'session-login',token:currentToken})});
+        if(r.ok){
+          const d=await r.json();
+          currentUser=d.username;currentEmail=d.email||null;currentDisplayName=d.displayName||null;
+          const s=JSON.parse(localStorage.getItem('klak_session')||'{}');
+          s.username=d.username;s.email=currentEmail;s.displayName=currentDisplayName;
+          localStorage.setItem('klak_session',JSON.stringify(s));
+        }
+      }catch{}
+    }
+    if(document.getElementById('settings-overlay'))return; // fermée entre-temps
     const user=currentUser||'';
     const plan=getUserPlan()||'free'; // même source que le badge nav (évite l'incohérence Gratuit/Expert)
     const role=this.stats&&this.stats.role;
@@ -6351,6 +6571,46 @@ const app={
         </div>
       </div>
       <div class="settings-section">
+        <div class="settings-section-title"><span>👤</span> Profil</div>
+        <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px">
+          <div class="settings-row-info" style="width:100%">
+            <strong>Nom d'utilisateur</strong>
+            <span>Ton identifiant de connexion. Les élèves rattachés à un établissement ne peuvent pas le modifier — utilise le nom affiché ci-dessous à la place.</span>
+          </div>
+          <div style="display:flex;gap:8px;width:100%">
+            <input id="settings-username-input" value="${user.replace(/"/g,'&quot;')}" maxlength="24" style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+            <button class="settings-btn" id="settings-username-btn" onclick="app.updateUsername()">Enregistrer</button>
+          </div>
+          <div id="settings-username-msg" style="display:none;font-size:13px;padding:8px 10px;border-radius:9px;width:100%;box-sizing:border-box"></div>
+        </div>
+        <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px;margin-top:14px">
+          <div class="settings-row-info" style="width:100%">
+            <strong>Nom affiché (pseudo)</strong>
+            <span>Visible par les autres joueurs en Duel 1v1 et au classement du Boss de la semaine. Laisse vide pour utiliser ton nom d'utilisateur.</span>
+          </div>
+          <div style="display:flex;gap:8px;width:100%">
+            <input id="settings-displayname-input" value="${(currentDisplayName||'').replace(/"/g,'&quot;')}" maxlength="24" placeholder="${user.replace(/"/g,'&quot;')}" style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+            <button class="settings-btn" id="settings-displayname-btn" onclick="app.updateDisplayName()">Enregistrer</button>
+          </div>
+          <div id="settings-displayname-msg" style="display:none;font-size:13px;padding:8px 10px;border-radius:9px;width:100%;box-sizing:border-box"></div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title"><span>✉️</span> Email</div>
+        <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px">
+          <div class="settings-row-info" style="width:100%">
+            <strong>Adresse actuelle</strong>
+            <span>${currentEmail?this._esc(currentEmail):'Non renseignée'}</span>
+          </div>
+          <div style="display:flex;gap:8px;width:100%;flex-wrap:wrap">
+            <input type="email" id="settings-email-input" placeholder="nouvelle-adresse@exemple.com" style="flex:1;min-width:180px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+            <input type="password" id="settings-email-pw" placeholder="Mot de passe actuel" autocomplete="current-password" style="flex:1;min-width:150px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+            <button class="settings-btn" id="settings-email-btn" onclick="app.requestEmailChange()">Changer</button>
+          </div>
+          <div id="settings-email-msg" style="display:none;font-size:13px;padding:8px 10px;border-radius:9px;width:100%;box-sizing:border-box"></div>
+        </div>
+      </div>
+      <div class="settings-section">
         <div class="settings-section-title"><span>🔐</span> Compte</div>
         <div class="settings-row">
           <div class="settings-row-info">
@@ -6359,12 +6619,17 @@ const app={
           </div>
           <button class="settings-btn" onclick="obReplay()">Revoir</button>
         </div>
-        <div class="settings-row" style="margin-top:10px">
-          <div class="settings-row-info">
+        <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px;margin-top:10px">
+          <div class="settings-row-info" style="width:100%">
             <strong>Mot de passe</strong>
-            <span>Recevoir un lien de réinitialisation par email</span>
+            <span>Modifie-le directement, ou <a href="#" onclick="app.requestPasswordReset(this);return false" style="color:var(--accent);font-weight:600">reçois un lien par email</a> si tu l'as oublié.</span>
           </div>
-          <button class="settings-btn" id="reset-pw-btn" onclick="app.requestPasswordReset(this)">Réinitialiser</button>
+          <div style="display:flex;gap:8px;width:100%;flex-wrap:wrap">
+            <input type="password" id="settings-pw-old" placeholder="Mot de passe actuel" autocomplete="current-password" style="flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+            <input type="password" id="settings-pw-new" placeholder="Nouveau mot de passe" autocomplete="new-password" style="flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+            <button class="settings-btn" id="settings-pw-btn" onclick="app.changePasswordInline()">Enregistrer</button>
+          </div>
+          <div id="settings-pw-msg" style="display:none;font-size:13px;padding:8px 10px;border-radius:9px;width:100%;box-sizing:border-box"></div>
         </div>
         <div id="reset-pw-msg" style="display:none;font-size:13px;margin-top:6px;padding:10px 12px;border-radius:10px"></div>
         ${currentPlan==='expert'?`<div class="settings-row" style="margin-top:10px">
@@ -6494,6 +6759,90 @@ const app={
       btn.disabled=false;btn.textContent='Réinitialiser';
     }
   },
+  async updateUsername(){
+    const input=document.getElementById('settings-username-input');
+    const btn=document.getElementById('settings-username-btn');
+    const msg=document.getElementById('settings-username-msg');
+    const showMsg=(text,ok)=>{msg.style.display='block';msg.style.background=ok?'rgba(31,169,113,0.1)':'rgba(229,72,77,0.1)';msg.style.color=ok?'var(--success)':'var(--danger)';msg.textContent=text;};
+    const val=(input.value||'').trim();
+    if(!val)return showMsg("Nom d'utilisateur requis.",false);
+    const old=btn.textContent;btn.disabled=true;btn.textContent='Enregistrement…';
+    try{
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update-username',token:currentToken,username:val})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur.');
+      currentUser=d.username;input.value=d.username;
+      const s=JSON.parse(localStorage.getItem('klak_session')||'{}');s.username=d.username;localStorage.setItem('klak_session',JSON.stringify(s));
+      updateNavUser();
+      showMsg("Nom d'utilisateur mis à jour !",true);
+    }catch(e){showMsg(e.message,false);}
+    finally{btn.disabled=false;btn.textContent=old;}
+  },
+  async updateDisplayName(){
+    const input=document.getElementById('settings-displayname-input');
+    const btn=document.getElementById('settings-displayname-btn');
+    const msg=document.getElementById('settings-displayname-msg');
+    const showMsg=(text,ok)=>{msg.style.display='block';msg.style.background=ok?'rgba(31,169,113,0.1)':'rgba(229,72,77,0.1)';msg.style.color=ok?'var(--success)':'var(--danger)';msg.textContent=text;};
+    const val=(input.value||'').trim();
+    const old=btn.textContent;btn.disabled=true;btn.textContent='Enregistrement…';
+    try{
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update-display-name',token:currentToken,displayName:val})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur.');
+      currentDisplayName=d.displayName||null;
+      const s=JSON.parse(localStorage.getItem('klak_session')||'{}');s.displayName=currentDisplayName;localStorage.setItem('klak_session',JSON.stringify(s));
+      showMsg(currentDisplayName?'Nom affiché mis à jour !':"Nom affiché réinitialisé — ton nom d'utilisateur sera utilisé.",true);
+    }catch(e){showMsg(e.message,false);}
+    finally{btn.disabled=false;btn.textContent=old;}
+  },
+  async requestEmailChange(){
+    const emailInput=document.getElementById('settings-email-input');
+    const pwInput=document.getElementById('settings-email-pw');
+    const btn=document.getElementById('settings-email-btn');
+    const msg=document.getElementById('settings-email-msg');
+    const showMsg=(text,ok)=>{msg.style.display='block';msg.style.background=ok?'rgba(31,169,113,0.1)':'rgba(229,72,77,0.1)';msg.style.color=ok?'var(--success)':'var(--danger)';msg.textContent=text;};
+    const newEmail=(emailInput.value||'').trim();
+    const pw=pwInput.value||'';
+    if(!newEmail)return showMsg('Nouvelle adresse requise.',false);
+    if(!pw)return showMsg('Mot de passe requis.',false);
+    const old=btn.textContent;btn.disabled=true;btn.textContent='Envoi…';
+    try{
+      const currentPasswordHash=await hashPw(pw);
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update-email-request',token:currentToken,newEmail,currentPasswordHash})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur.');
+      showMsg('Email de confirmation envoyé à '+newEmail+' ! Clique sur le lien reçu pour valider le changement.',true);
+      emailInput.value='';pwInput.value='';
+    }catch(e){showMsg(e.message,false);}
+    finally{btn.disabled=false;btn.textContent=old;}
+  },
+  async changePasswordInline(){
+    const oldInput=document.getElementById('settings-pw-old');
+    const newInput=document.getElementById('settings-pw-new');
+    const btn=document.getElementById('settings-pw-btn');
+    const msg=document.getElementById('settings-pw-msg');
+    const showMsg=(text,ok)=>{msg.style.display='block';msg.style.background=ok?'rgba(31,169,113,0.1)':'rgba(229,72,77,0.1)';msg.style.color=ok?'var(--success)':'var(--danger)';msg.textContent=text;};
+    const oldPw=oldInput.value||'',newPw=newInput.value||'';
+    if(!oldPw||!newPw)return showMsg('Renseigne les deux champs.',false);
+    if(newPw.length<6)return showMsg('Le nouveau mot de passe doit faire au moins 6 caractères.',false);
+    const old=btn.textContent;btn.disabled=true;btn.textContent='Enregistrement…';
+    try{
+      const [oldPasswordHash,newPasswordHash]=await Promise.all([hashPw(oldPw),hashPw(newPw)]);
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'change-password',token:currentToken,oldPasswordHash,newPasswordHash})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur.');
+      // Le serveur régénère le jeton de session au changement de mot de passe
+      // (ancienne session potentiellement compromise invalidée) — on le
+      // reprend pour ne pas se retrouver déconnecté à la prochaine action.
+      if(d.token){
+        currentToken=d.token;
+        const s=JSON.parse(localStorage.getItem('klak_session')||'{}');s.token=d.token;localStorage.setItem('klak_session',JSON.stringify(s));
+      }
+      showMsg('Mot de passe mis à jour !',true);
+      oldInput.value='';newInput.value='';
+    }catch(e){showMsg(e.message,false);}
+    finally{btn.disabled=false;btn.textContent=old;}
+  },
   showResetPasswordModal(resetToken){
     const overlay=document.createElement('div');
     overlay.className='settings-overlay';overlay.id='reset-pw-overlay';
@@ -6540,7 +6889,7 @@ const app={
       if(!r.ok)throw new Error(d.error||'Erreur');
       showMsg('Mot de passe mis à jour ! Connexion en cours…',true);
       const role=d.data&&d.data.role;
-      saveSession(d.username,d.plan,d.token,d.id,role||null);
+      saveSession(d.username,d.plan,d.token,d.id,role||null,d.email,d.displayName,d.institutionName,d.hasClass);
       const _preRole=role;
       app.stats=mergeStats(_preRole?{role:_preRole}:d.data);
       setTimeout(()=>{document.getElementById('reset-pw-overlay')?.remove();updateNavUser();app.renderCurrent();},1200);
@@ -7245,6 +7594,7 @@ const app={
         <div class="spanel" style="margin-bottom:0"><h3>🎯 Frappe-mots : meilleur score</h3><div class="scard-val acc" style="font-size:36px;margin-top:8px">${gameBest} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div>${gameBest===0?'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le jeu pour établir un score !</p>':''}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏹 Tireur d'élite : précision record</h3>${this.stats.tireurBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.tireurBest.precision}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.tireurBest.wpm} mpm</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le Tireur d\'élite pour établir ton record de précision !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏎️ Course de dactylo : record</h3>${this.stats.courseBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.courseBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.courseBest.acc}% précision · ${this.stats.courseBest.rank===1?'1ʳᵉ place 🥇':this.stats.courseBest.rank+'ᵉ place'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour établir ton record !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3>👻 Contre ton fantôme : record</h3>${this.stats.ghostBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.ghostBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.ghostBest.acc}% précision</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour enregistrer ton premier fantôme !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🧠 Simon des mots : record</h3>${this.stats.simonBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.simonBest.score} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">séquence max : ${this.stats.simonBest.maxSeq} mots</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance Simon des mots pour établir ton record de mémoire !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>🏆 Boss de la semaine</h3>${this.stats.bossBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">#${this.stats.bossBest.rank}</div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.bossBest.score} pts · ${this.stats.bossBest.wpm} mpm ${this.stats.bossBest.isoWeek===this._currentIsoWeek()?'cette semaine':'(semaine '+this.stats.bossBest.isoWeek.replace(/^\d+-W/,'')+')'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Tente le défi pour apparaître au classement !</p>'}<button onclick="go('games');setTimeout(()=>app.selectGame('boss'),0)" style="background:none;border:none;padding:0;margin-top:8px;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;text-decoration:underline">Voir le classement →</button></div>
         <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint : record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
@@ -7558,7 +7908,7 @@ const app={
           <div style="text-align:center;padding:72px 20px;color:var(--muted)">
             <div style="font-size:48px;margin-bottom:16px">🎓</div>
             <div style="font-size:17px;font-weight:700;color:var(--txt);margin-bottom:8px">Tu n'as rejoint aucune classe</div>
-            <div style="font-size:14px;max-width:360px;margin:0 auto 22px;line-height:1.6">Demande son code à ton professeur, puis clique sur « Rejoindre une classe » et saisis-le.</div>
+            <div style="font-size:14px;max-width:360px;margin:0 auto 22px;line-height:1.6">${currentInstitutionName?`Ton compte est rattaché à <b style="color:var(--txt)">${this._esc(currentInstitutionName)}</b>, mais il te manque encore une classe.<br>`:''}Demande son code à ton professeur, puis clique sur « Rejoindre une classe » et saisis-le.</div>
             <button class="btn-primary" style="padding:10px 22px;font-size:14px" onclick="joinClassPrompt()">+ Rejoindre une classe</button>
           </div>
         `:`<div style="display:flex;flex-direction:column;gap:10px">
@@ -8278,6 +8628,26 @@ const app={
     const maxS=Math.max(1,...series.map(p=>p.sessions));
     const bars=series.map((p,i)=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px" title="${p.sessions} session${p.sessions!==1?'s':''}${p.avgWpm!=null?' · '+p.avgWpm+' mpm':''}"><div style="width:62%;background:var(--accent);border-radius:5px 5px 0 0;height:${Math.max(3,Math.round(p.sessions/maxS*70))}px;opacity:${p.sessions?1:.2}"></div><div style="font-size:10px;color:var(--muted)">${labels[i]}</div></div>`).join('');
     const profsHtml=profs.length?profs.map(p=>this._profRow(p)).join(''):`<div style="padding:18px 4px;color:var(--muted);font-size:13px">Aucun professeur pour l'instant. <a onclick="app.inviteProf()" style="color:var(--accent);cursor:pointer;font-weight:600">Invite ton équipe enseignante.</a></div>`;
+    // Vue "directeur" : décrochage classe par classe (pas juste par prof) et
+    // alertes remontées à l'échelle de toute l'école (mêmes détections que
+    // le dashboard d'un prof seul, voir _renderHomeEtab, mais agrégées).
+    const classesBreak=ad.classes||[];
+    const classBreakRow=(c)=>`<div onclick="app.viewClass('${c.classId}')" style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:12px;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
+        <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;flex-shrink:0">${(c.className||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--txt)">${c.className}</div><div style="font-size:12px;color:var(--muted);margin-top:1px">${c.profUsername} · ${c.activeThisWeek}/${c.total} actif${c.total!==1?'s':''} cette semaine</div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:800;color:var(--txt)">${c.avgWpm!=null?c.avgWpm:'—'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div></div>
+        <div style="color:var(--muted);font-size:14px">›</div>
+      </div>`;
+    const classesBreakHtml=classesBreak.length?classesBreak.map(classBreakRow).join(''):`<div style="padding:18px 4px;color:var(--muted);font-size:13px">Aucune classe pour l'instant.</div>`;
+    const alertRow=(txt,sub)=>`<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)"><div style="color:#E5722B;font-size:14px;line-height:1.3">●</div><div><div style="font-size:13px;font-weight:600;color:var(--txt)">${txt}</div><div style="font-size:12px;color:var(--muted)">${sub}</div></div></div>`;
+    const adAlerts=ad.alerts||[];
+    const alertsHtml=adAlerts.length
+      ? adAlerts.map(a=>alertRow(
+          a.username+(a.type==='inactive'?' inactif depuis '+a.days+' j':' semble bloqué'),
+          a.className+' · '+a.profUsername+(a.type==='stuck'?' · '+a.sessions+' sessions, aucune leçon validée':'')
+        )).join('')+((ad.alertsTotal||0)>adAlerts.length?`<div style="padding-top:10px;font-size:12px;color:var(--muted)">+ ${ad.alertsTotal-adAlerts.length} autre${ad.alertsTotal-adAlerts.length>1?'s':''} alerte${ad.alertsTotal-adAlerts.length>1?'s':''}</div>`:'')
+      : `<div style="padding:18px 0;color:var(--muted);font-size:13px">Aucune alerte. Tout roule dans l'établissement.</div>`;
+    const clientSinceTxt=inst.created_at?('Client depuis '+new Date(inst.created_at).toLocaleDateString('fr-FR',{month:'long',year:'numeric'})):'';
     // Sièges + licence : donnée existante côté serveur mais jusqu'ici invisible
     // pour l'établissement (il fallait contacter KeyPace pour savoir où on en est).
     const seatsUsed=ad.seatsUsed||0;const seatCount=inst.seat_count||0;
@@ -8303,7 +8673,7 @@ const app={
         <div style="margin-bottom:32px">
           <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">Établissement</div>
           <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:36px;letter-spacing:-0.03em;margin:0 0 6px">${inst.name||currentUser}</h1>
-          <p style="font-size:15px;color:var(--muted);margin:0">Vue d'ensemble de tes professeurs et de leurs élèves.</p>
+          <p style="font-size:15px;color:var(--muted);margin:0">Vue d'ensemble de tes professeurs et de leurs élèves.${clientSinceTxt?' · '+clientSinceTxt:''}</p>
         </div>
         ${licenceBannerHtml}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px">
@@ -8312,7 +8682,7 @@ const app={
           ${statCard('VITESSE MOY.',g.avgWpm!=null?g.avgWpm:'—',g.avgWpm!=null?' mpm':'','tous élèves confondus')}
           ${statCard('PRÉCISION MOY.',g.avgAcc!=null?g.avgAcc:'—',g.avgAcc!=null?'%':'','sur les derniers tests',accColor)}
         </div>
-        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start">
+        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start;margin-bottom:16px">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px 24px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
               <div style="font-size:15px;font-weight:700">Professeurs</div>
@@ -8323,6 +8693,16 @@ const app={
           <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px 24px">
             <div style="font-size:15px;font-weight:700;margin-bottom:14px">Activité (7 jours)</div>
             <div style="display:flex;align-items:flex-end;gap:5px;height:90px">${bars}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px 24px">
+            <div style="font-size:15px;font-weight:700;margin-bottom:14px">Classes de l'établissement</div>
+            ${classesBreakHtml}
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px 24px">
+            <div style="font-size:15px;font-weight:700;margin-bottom:6px">Alertes actionnables</div>
+            ${alertsHtml}
           </div>
         </div>
       </div>`;
@@ -8711,7 +9091,7 @@ async function handleSSOReturn(){
     if(!r.ok)throw new Error(d.error||'Erreur');
     const _mergedData=mergeStats(d.data);
     if(d.role)_mergedData.role=d.role;
-    saveSession(d.username,d.plan,d.token,d.id,_mergedData.role||null);
+    saveSession(d.username,d.plan,d.token,d.id,_mergedData.role||null,d.email,d.displayName,d.institutionName,d.hasClass);
     try{track('login',{method:'oauth'});}catch{}
     app.stats=_mergedData;
     window._needsOnboarding = !d.onboarding_completed;

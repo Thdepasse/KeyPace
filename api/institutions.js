@@ -34,6 +34,31 @@ async function sb(path, opts = {}) {
   return { ok: r.ok, status: r.status, data: text ? JSON.parse(text) : null };
 }
 
+function clientIp(req) {
+  const xff = req.headers['x-forwarded-for'];
+  if (xff) return String(xff).split(',')[0].trim();
+  return (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+
+// Anti-bruteforce sur ADMIN_KEY — cette clé n'est liée à aucun compte
+// utilisateur (elle protège un endpoint de bootstrap, pas une session), donc
+// le verrou est suivi par IP plutôt que par utilisateur. Sans ça, la clé
+// pouvait être essayée en boucle sans aucun frein applicatif.
+async function adminKeyLockState(ip) {
+  const r = await sb(`/admin_key_attempts?ip=eq.${encodeURIComponent(ip)}&select=id,failed_attempts,locked_until`);
+  return (r.data && r.data[0]) || null;
+}
+async function recordAdminKeyFailure(existing, ip) {
+  const attempts = (existing ? existing.failed_attempts : 0) + 1;
+  const patch = { ip, failed_attempts: attempts };
+  if (attempts >= 5) { patch.locked_until = new Date(Date.now() + 30 * 60 * 1000).toISOString(); patch.failed_attempts = 0; }
+  if (existing) await sb(`/admin_key_attempts?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  else await sb('/admin_key_attempts', { method: 'POST', body: JSON.stringify(patch) });
+}
+async function clearAdminKeyFailures(existing) {
+  if (existing && existing.failed_attempts) await sb(`/admin_key_attempts?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify({ failed_attempts: 0 }) });
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -64,8 +89,16 @@ module.exports = async function handler(req, res) {
 
   // POST avec x-admin-key → créer un établissement
   if (req.headers['x-admin-key']) {
-    if (!ADMIN_KEY || req.headers['x-admin-key'] !== ADMIN_KEY)
+    const ip = clientIp(req);
+    const lockState = await adminKeyLockState(ip);
+    if (lockState && lockState.locked_until && new Date(lockState.locked_until) > new Date()) {
+      return res.status(429).json({ error: 'Trop de tentatives. Réessaie plus tard.' });
+    }
+    if (!ADMIN_KEY || req.headers['x-admin-key'] !== ADMIN_KEY) {
+      await recordAdminKeyFailure(lockState, ip);
       return res.status(401).json({ error: 'Non autorisé.' });
+    }
+    await clearAdminKeyFailures(lockState);
 
     const { name, slug, passwordHash, seatCount, adminEmail } = req.body || {};
     if (!name || !slug || !passwordHash || !seatCount)

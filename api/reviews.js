@@ -43,7 +43,7 @@ async function myReview(req, res) {
   const { token, rating, comment } = req.body || {};
   if (!token) return res.status(400).json({ error: 'Token manquant.' });
 
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&select=id,username`);
+  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username`);
   const user = r.data && r.data[0];
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
