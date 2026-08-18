@@ -368,6 +368,13 @@ create table if not exists dev_backlog (
 create index if not exists dev_backlog_status_idx on dev_backlog(status);
 alter table dev_backlog enable row level security;
 
+-- Qui a pris en charge le développement (Théo ou Vincent). Nullable : un
+-- ticket pas encore commencé n'a pas encore de propriétaire.
+alter table dev_backlog add column if not exists dev_owner text;
+alter table dev_backlog drop constraint if exists dev_backlog_dev_owner_check;
+alter table dev_backlog add constraint dev_backlog_dev_owner_check
+  check (dev_owner is null or dev_owner in ('theo', 'vincent'));
+
 -- ───────────────────────────────────────────────────────────────
 -- Veille concurrentielle : liste de concurrents avec forces/faiblesses/CA
 -- estimé (renseignés manuellement), + détection de changement de contenu
