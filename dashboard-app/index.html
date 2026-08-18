@@ -50,6 +50,8 @@
   .toast.leaving{animation:toast-out .18s ease forwards}
   @keyframes toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   @keyframes toast-out{to{opacity:0;transform:translateY(8px)}}
+  .ic.spin{animation:ic-spin .8s linear infinite}
+  @keyframes ic-spin{to{transform:rotate(360deg)}}
   .cal-day.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
   .cal-day.today .dnum{color:var(--accent)}
   .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 64px}
@@ -70,7 +72,10 @@
   .card .label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
   .card .num{font-size:28px;font-weight:700;margin-top:6px}
   .card .sub{font-size:12px;color:var(--muted);margin-top:4px}
-  .kpi-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+  .kpi-groups{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .kpi-group .cards{grid-template-columns:1fr}
+  @media (max-width:1000px){.kpi-groups{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:560px){.kpi-groups{grid-template-columns:1fr}}
   .kpi-group h3{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--border)}
   .callout{background:#FFF6F2;border:1px solid #FFD9CC;border-radius:14px;padding:14px 18px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
   .callout.empty{background:var(--light);border-color:var(--border);color:var(--muted)}
@@ -138,6 +143,7 @@
   .btn.small{padding:5px 10px;font-size:12px;font-weight:600}
   .btn.danger{background:#fff;color:#C23B2E;border:1px solid #F3C7C1;box-shadow:none}
   .btn.danger:hover{background:#FFF5F4;box-shadow:none}
+  .btn:not(.ghost):not(.danger) .ic,.view-toggle-btn.active .ic{stroke:#fff}
   .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
   .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
   .panel h3{font-size:15px;font-weight:800;margin-bottom:12px}
@@ -803,6 +809,20 @@
             <button class="btn small ghost" style="width:auto" onclick="addCompetitorNote()">Ajouter</button>
           </div>
           <div id="competitor-history-list" class="history-list"></div>
+        </div>
+      </div>
+
+      <div class="cards" id="competitors-overview" style="margin-bottom:20px"></div>
+
+      <div class="panel" style="margin-bottom:20px">
+        <h3 style="margin:0 0 12px">Vue d'ensemble</h3>
+        <div class="table-wrap">
+          <table class="prospects">
+            <thead>
+              <tr><th>Concurrent</th><th>CA estimé</th><th>Forces</th><th>Faiblesses</th><th>Dernière vérif.</th></tr>
+            </thead>
+            <tbody id="competitors-overview-body"></tbody>
+          </table>
         </div>
       </div>
 
@@ -1958,9 +1978,39 @@ async function loadCompetitors(){
   try {
     const { items } = await api('competitors-list');
     window.__competitors = items;
+    renderCompetitorsOverview(items);
     renderCompetitorsList(items);
   } catch (e) { console.error(e); }
 }
+
+// Tendances de marché : uniquement à partir de champs fiables (dates de
+// vérification réelles, changements détectés par hash) — jamais un
+// classement par CA, ce champ est un texte libre non structuré
+// ("500k$/an", "non trouvé"...) qu'on ne peut pas comparer honnêtement.
+function renderCompetitorsOverview(items){
+  const overviewEl = document.getElementById('competitors-overview');
+  if (!items.length) { overviewEl.innerHTML = ''; document.getElementById('competitors-overview-body').innerHTML = ''; return; }
+  const changed = items.filter(c => c.content_changed).length;
+  const neverChecked = items.filter(c => !c.last_checked_at).length;
+  const stale = items.filter(c => c.last_checked_at && daysUntil(c.last_checked_at.slice(0,10)) < -30).length;
+  overviewEl.innerHTML =
+    kpiCard('Concurrents suivis', items.length) +
+    kpiCard('Changements à revoir', changed, changed ? 'Détectés depuis la dernière vérification' : undefined) +
+    kpiCard('Jamais vérifiés', neverChecked) +
+    kpiCard('Vérif. en retard (30j+)', stale);
+
+  const rows = [...items].sort((a, b) => (b.content_changed === a.content_changed ? 0 : b.content_changed ? 1 : -1));
+  document.getElementById('competitors-overview-body').innerHTML = rows.map(c => `
+    <tr>
+      <td><a href="${escHtml(c.url)}" target="_blank" rel="noopener" class="fname">${escHtml(c.name)}</a>${c.content_changed ? ' <span class="badge" style="background:#FFE9D6;color:#C2540A">Changé</span>' : ''}</td>
+      <td>${escHtml(c.estimated_revenue || '—')}</td>
+      <td style="max-width:220px;white-space:normal;font-size:12.5px">${escHtml(truncate(c.strengths, 90))}</td>
+      <td style="max-width:220px;white-space:normal;font-size:12.5px">${escHtml(truncate(c.weaknesses, 90))}</td>
+      <td>${c.last_checked_at ? fmtDate(c.last_checked_at) : `<span class="muted">Jamais</span>`}</td>
+    </tr>`).join('');
+}
+
+function truncate(s, n){ s = s || '—'; return s.length > n ? s.slice(0, n - 1) + '…' : s; }
 
 // ─── Suggestions de concurrents (file d'attente pré-alimentée) ─────
 let competitorSuggestions = [];
@@ -2035,8 +2085,8 @@ function renderCompetitorsList(items){
 
 async function checkCompetitor(id){
   const btn = document.getElementById(`competitor-check-btn-${id}`);
-  const original = btn.textContent;
-  btn.textContent = '⏳ Vérification...';
+  const original = btn.innerHTML;
+  btn.innerHTML = '<svg class="ic spin" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-opacity="0.25"/><path d="M21 12a9 9 0 0 0-9-9"/></svg> Vérification...';
   btn.disabled = true;
   try {
     await api('competitor-check', { method:'POST', body: { id } });
@@ -2044,7 +2094,7 @@ async function checkCompetitor(id){
     alert("Erreur lors de la vérification : " + e.message);
   }
   btn.disabled = false;
-  btn.textContent = original;
+  btn.innerHTML = original;
   loadCompetitors();
 }
 
@@ -2317,7 +2367,7 @@ async function syncZimbra(){
   const btn = document.getElementById('sync-btn');
   const resultEl = document.getElementById('sync-result');
   btn.disabled = true;
-  btn.textContent = '⏳ Sync en cours…';
+  btn.innerHTML = '<svg class="ic spin" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-opacity="0.25"/><path d="M21 12a9 9 0 0 0-9-9"/></svg> Sync en cours…';
   resultEl.innerHTML = '';
   try {
     const r = await api('sync-zimbra', { method: 'POST' });
