@@ -1745,17 +1745,34 @@ function updateNavUser(){
 function isTeacher(){const r=(typeof app!=='undefined')&&app.stats&&app.stats.role;return r==='prof'||r==='admin';}
 function isAdmin(){return (typeof app!=='undefined')&&app.stats&&app.stats.role==='admin';}
 
+/* ── Détection réelle d'un clavier ──
+   `pointer:fine` ne détecte qu'un pointeur précis (souris/trackpad), pas un
+   clavier : une tablette équipée d'un clavier Bluetooth/case SANS trackpad
+   reste "pointer:coarse" et était donc à tort traitée comme un écran tactile
+   sans clavier (nav Jeux masquée, jeux bloqués par l'écran "Clavier requis").
+   On corrige ça avec un vrai signal : dès qu'un événement keydown arrive pour
+   de vrai, on sait qu'un clavier physique est bel et bien utilisable — quel
+   que soit le type de pointeur — et on ré-affiche tout de suite l'écran. */
+let _kbDetected=false;
+window.addEventListener('keydown',()=>{
+  if(_kbDetected)return;
+  _kbDetected=true;
+  if(typeof updateNavUser==='function')updateNavUser();
+  if(typeof app!=='undefined'&&app.renderView)app.renderView(app.view||'home');
+},true);
+
 /* ── Mode mobile (≤768px) ──
    Taper au clavier n'a pas de sens sur téléphone : Test, Cours et Jeux sont
    retirés. Il reste : la landing (visiteur), les progrès (élève) et l'espace
    classes (élève : devoirs / prof et établissement : suivi). */
 // Version réduite (téléphone) réservée aux vrais écrans tactiles étroits SANS
-// pointeur précis. Les tablettes/iPad équipés d'un clavier ou d'un trackpad —
-// comme les ordinateurs — exposent un pointeur « fine » et gardent donc
-// l'expérience KeyPace complète (Test, Cours, Jeux…), même en portrait ≤768px.
+// pointeur précis ni clavier détecté. Les tablettes/iPad équipés d'un clavier
+// ou d'un trackpad — comme les ordinateurs — gardent donc l'expérience
+// KeyPace complète (Test, Cours, Jeux…), même en portrait ≤768px.
 function isMobileLayout(){
   return window.matchMedia('(max-width:768px)').matches
-      && !window.matchMedia('(any-pointer:fine)').matches;
+      && !window.matchMedia('(any-pointer:fine)').matches
+      && !_kbDetected;
 }
 const MOBILE_BLOCKED_VIEWS=['test','lessons','games'];
 function applyMobileNav(){
@@ -2903,7 +2920,7 @@ const GHOST_TEXT="le silence du matin enveloppe la maison encore endormie, seul 
 
 /* Helpers transverses jeux : accessibilité + détection clavier */
 const PREFERS_REDUCED_MOTION=()=>!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-const IS_TOUCH_ONLY=()=>!!(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches&&!window.matchMedia('(pointer:fine)').matches);
+const IS_TOUCH_ONLY=()=>!_kbDetected&&!!(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches&&!window.matchMedia('(pointer:fine)').matches);
 
 function genSprintText(){
   const pool=[...SPRINT_WORDS,...WORDS];
@@ -5538,7 +5555,7 @@ const app={
     }).join('');
     let overlay='';
     if(IS_TOUCH_ONLY()&&idle){
-      overlay=`<div class="game-overlay"><h2>⌨️ Clavier requis</h2><p>Le Tireur d'élite se joue au clavier physique. Reviens sur ordinateur pour cette épreuve.</p><button class="game-play-btn" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+      overlay=`<div class="game-overlay"><h2>⌨️ Clavier requis</h2><p>Le Tireur d'élite se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p><button class="game-play-btn" onclick="app.exitActiveGame()">← Jeux</button></div>`;
     } else if(!currentUser){
       overlay=`<div class="game-overlay"><h2>Tireur d'élite</h2><p>Crée un compte gratuit pour jouer.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
     } else if(idle){
@@ -5673,7 +5690,7 @@ const app={
     }
     let overlay='';
     if(IS_TOUCH_ONLY()&&idle){
-      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>La Course de dactylo se joue au clavier physique. Reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>La Course de dactylo se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
     } else if(c&&!c.raceStarted){
       overlay=`<div class="race-overlay">${this._raceCountdownHTML(c.startAt)}</div>`;
     }
@@ -5820,7 +5837,7 @@ const app={
     }
     let overlay='';
     if(IS_TOUCH_ONLY()&&idle){
-      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>Contre ton fantôme se joue au clavier physique. Reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>Contre ton fantôme se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
     } else if(c&&!c.raceStarted){
       overlay=`<div class="race-overlay">${this._raceCountdownHTML(c.startAt)}</div>`;
     }
@@ -5963,7 +5980,7 @@ const app={
     }
     let overlay='';
     if(IS_TOUCH_ONLY()&&idle){
-      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>Simon des mots se joue au clavier physique. Reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>Simon des mots se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
     } else if(!currentUser){
       overlay=`<div class="race-overlay"><h2>Simon des mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="btn-primary" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
     } else if(idle){
