@@ -5,7 +5,7 @@
 // Accès protégé par le header x-admin-key (secret ADMIN_KEY propre à ce
 // projet — pas de comptes individuels).
 const crypto = require('crypto');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, FOLLOWUP_DAYS } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals, FOLLOWUP_DAYS } = require('./_dashboard-logic');
 const { classifyMessage } = require('./_zimbra-match');
 const { fetchRecentMessages } = require('./_zimbra-soap');
 const { fetchGA4Traffic, fetchGA4TrafficBreakdown } = require('./_ga4');
@@ -100,7 +100,7 @@ async function trafficDetail(req, res) {
 async function kpis(req, res) {
   const now = Date.now();
   const week = thisWeekRange(now);
-  const [usersR, instR, prospR, progR, certR, wsR, reviewsPendingR, calendarWeekR, traffic] = await Promise.all([
+  const [usersR, instR, prospR, progR, certR, wsR, reviewsPendingR, calendarWeekR, clientsR, traffic] = await Promise.all([
     sb('/users?select=plan,created_at'),
     sb('/institutions?select=seat_count'),
     sb('/school_prospects?select=id,school_name,status,next_followup_at,meeting_at'),
@@ -109,9 +109,10 @@ async function kpis(req, res) {
     sb('/weekly_scores?select=id'),
     sb('/reviews?select=id&status=eq.pending'),
     sb(`/content_calendar?select=scheduled_date&scheduled_date=gte.${week.start}&scheduled_date=lte.${week.end}`),
+    sb('/client_schools?select=id,school_name,status,renewal_date'),
     fetchTrafficSafe(),
   ]);
-  if (!usersR.ok || !instR.ok || !prospR.ok || !progR.ok || !certR.ok || !wsR.ok || !reviewsPendingR.ok || !calendarWeekR.ok) {
+  if (!usersR.ok || !instR.ok || !prospR.ok || !progR.ok || !certR.ok || !wsR.ok || !reviewsPendingR.ok || !calendarWeekR.ok || !clientsR.ok) {
     return res.status(500).json({ error: 'Erreur récupération KPI.' });
   }
   const acquisition = summarizeAcquisition(usersR.data || [], now);
@@ -134,6 +135,7 @@ async function kpis(req, res) {
       ...contentGapsThisWeek(scheduledDates, now),
       overdueFollowups: severelyOverdueFollowups(prospects, now).map((p) => ({ id: p.id, school_name: p.school_name, next_followup_at: p.next_followup_at })),
       upcomingMeetings: upcomingMeetings(prospects, now).map((p) => ({ id: p.id, school_name: p.school_name, meeting_at: p.meeting_at })),
+      upcomingRenewals: upcomingRenewals(clientsR.data || [], now).map((c) => ({ id: c.id, school_name: c.school_name, renewal_date: c.renewal_date })),
     },
   });
 }
@@ -383,6 +385,51 @@ async function devIssueDelete(req, res) {
   return res.json({ ok: true });
 }
 
+// ─── Écoles clientes (post-vente) ──────────────────────────────────
+async function clientsList(req, res) {
+  const r = await sb('/client_schools?select=*&order=renewal_date.asc.nullslast,created_at.desc');
+  if (!r.ok) return res.status(500).json({ error: 'Erreur récupération des écoles clientes.' });
+  return res.json({ items: r.data || [] });
+}
+
+const CLIENT_FIELDS = ['prospect_id', 'school_name', 'contact_name', 'contact_email', 'contact_phone', 'city', 'seats', 'annual_price', 'contract_start_date', 'renewal_date', 'status', 'notes'];
+
+async function clientCreate(req, res) {
+  const { school_name } = req.body || {};
+  if (!school_name) return res.status(400).json({ error: "Nom d'école manquant." });
+  const patch = {};
+  for (const k of CLIENT_FIELDS) if (k in (req.body || {})) patch[k] = req.body[k] || null;
+  const r = await sb('/client_schools', { method: 'POST', body: JSON.stringify(patch) });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur création école cliente.' });
+  await logActivity('client_school', r.data[0].id, 'created', `Fiche cliente créée pour ${school_name}.`);
+  return res.status(201).json(r.data[0]);
+}
+
+async function clientUpdate(req, res) {
+  const { id, ...fields } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const patch = {};
+  for (const k of CLIENT_FIELDS) if (k in fields) patch[k] = fields[k];
+  if (!Object.keys(patch).length) return res.status(400).json({ error: 'Aucun champ à mettre à jour.' });
+  const beforeR = await sb(`/client_schools?id=eq.${encodeURIComponent(id)}&select=*`);
+  const before = beforeR.data && beforeR.data[0];
+  patch.updated_at = new Date().toISOString();
+  const r = await sb(`/client_schools?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Erreur mise à jour école cliente.' });
+  const summary = diffSummary(before, patch, CLIENT_FIELD_LABELS);
+  if (summary) await logActivity('client_school', id, 'updated', summary);
+  return res.json(r.data[0]);
+}
+
+async function clientDelete(req, res) {
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: 'id manquant.' });
+  const r = await sb(`/client_schools?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' });
+  if (!r.ok) return res.status(500).json({ error: 'Erreur suppression école cliente.' });
+  await deleteActivityLog('client_school', id);
+  return res.json({ ok: true });
+}
+
 // ─── Veille concurrentielle ─────────────────────────────────────────
 async function competitorsList(req, res) {
   const r = await sb('/competitors?select=*&order=name.asc');
@@ -574,6 +621,7 @@ const CONTENT_STATUS_LABELS_FR = { idee: 'Idée', a_faire: 'À faire', pret: 'Pr
 const DEV_FIELD_LABELS = { title: 'Titre', description: 'Description', item_type: 'Type', priority: 'Priorité', dev_owner: 'Développeur' };
 const DEV_STATUS_LABELS_FR = { backlog: 'Backlog', a_faire: 'À faire', en_cours: 'En cours', fait: 'Fait' };
 const COMPETITOR_FIELD_LABELS = { name: 'Nom', url: 'URL', strengths: 'Forces', weaknesses: 'Faiblesses', estimated_revenue: 'CA estimé', notes: 'Notes' };
+const CLIENT_FIELD_LABELS = { school_name: 'École', contact_name: 'Contact', contact_email: 'Email', contact_phone: 'Téléphone', city: 'Ville', seats: 'Sièges', annual_price: 'Montant annuel', contract_start_date: 'Début du contrat', renewal_date: 'Renouvellement', status: 'Statut', notes: 'Notes' };
 
 // ─── Prospection écoles ───────────────────────────────────────────
 async function prospectsList(req, res) {
@@ -1003,6 +1051,7 @@ module.exports = async function handler(req, res) {
         case 'links-list': return await linksList(req, res);
         case 'security-checklist': return await securityChecklistList(req, res);
         case 'dev-backlog': return await devBacklogList(req, res);
+        case 'clients-list': return await clientsList(req, res);
         case 'competitors-list': return await competitorsList(req, res);
         case 'competitor-suggestions-list': return await competitorSuggestionsList(req, res);
         case 'reviews': return await reviewsList(req, res);
@@ -1030,6 +1079,9 @@ module.exports = async function handler(req, res) {
         case 'dev-issue-create': return await devIssueCreate(req, res);
         case 'dev-issue-update': return await devIssueUpdate(req, res);
         case 'dev-issue-delete': return await devIssueDelete(req, res);
+        case 'client-create': return await clientCreate(req, res);
+        case 'client-update': return await clientUpdate(req, res);
+        case 'client-delete': return await clientDelete(req, res);
         case 'competitor-create': return await competitorCreate(req, res);
         case 'competitor-update': return await competitorUpdate(req, res);
         case 'competitor-delete': return await competitorDelete(req, res);

@@ -190,6 +190,14 @@ function upcomingMeetings(prospects, now, hours = 24) {
   });
 }
 
+// Écoles clientes actives dont le renouvellement tombe dans les `days`
+// prochains jours (par défaut 30), ou déjà passé sans avoir été marqué
+// annulé — à traiter avant que le contrat ne s'éteigne silencieusement.
+function upcomingRenewals(clients, now, days = 30) {
+  const limit = now + days * DAY_MS;
+  return clients.filter((c) => c.status === 'active' && c.renewal_date && new Date(c.renewal_date).getTime() <= limit);
+}
+
 // Retire les groupes de doublons explicitement marqués "pas un doublon" par
 // l'utilisateur (voir dismiss-duplicate, dashboard-app/api/dashboard.js) —
 // ne sont plus jamais reproposés dans la bannière d'alerte.
@@ -212,5 +220,5 @@ module.exports = {
   FOLLOWUP_DAYS, computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement,
   dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange,
   normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings,
-  excludeDismissedDuplicates, checklistItemStatus,
+  excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals,
 };

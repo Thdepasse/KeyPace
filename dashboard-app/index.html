@@ -33,6 +33,27 @@
   .nav .title{font-size:14px;color:var(--muted);font-weight:600}
   .logout{font-size:13px;color:var(--muted);cursor:pointer;border:1px solid var(--border);background:var(--card);padding:7px 12px;border-radius:9px;transition:color .15s,border-color .15s}
   .logout:hover{color:var(--txt);border-color:#D8D0C0}
+  .global-search{position:relative;width:260px}
+  .global-search input{width:100%;font-size:13px;padding:8px 12px;background:var(--card)}
+  .global-search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md,0 12px 28px rgba(0,0,0,.12));max-height:360px;overflow-y:auto;z-index:30;display:none}
+  .global-search-results.open{display:block}
+  .gsr-group-label{font-size:10.5px;text-transform:uppercase;font-weight:800;color:var(--muted);padding:8px 12px 4px}
+  .gsr-item{display:block;width:100%;text-align:left;padding:8px 12px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--txt)}
+  .gsr-item:hover,.gsr-item.active{background:var(--light)}
+  .gsr-item .gsr-meta{color:var(--muted);font-size:11.5px}
+  .gsr-empty{padding:14px 12px;font-size:12.5px;color:var(--muted)}
+  @media (max-width:860px){.global-search{width:180px}}
+  .tab-badge{background:#C23B2E;color:#fff;font-size:10px;font-weight:800;line-height:1;padding:3px 6px;border-radius:20px;margin-left:2px}
+  .toast-container{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:8px;z-index:100}
+  .toast{background:var(--txt);color:#fff;font-size:13px;font-weight:600;padding:10px 16px;border-radius:10px;box-shadow:0 12px 28px rgba(0,0,0,.22);animation:toast-in .18s ease}
+  .toast.error{background:#B3261E}
+  .toast.leaving{animation:toast-out .18s ease forwards}
+  @keyframes toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes toast-out{to{opacity:0;transform:translateY(8px)}}
+  .ic.spin{animation:ic-spin .8s linear infinite}
+  @keyframes ic-spin{to{transform:rotate(360deg)}}
+  .cal-day.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .cal-day.today .dnum{color:var(--accent)}
   .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 64px}
   section{margin:0 0 40px}
   section h2{font-size:20px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:9px}
@@ -44,13 +65,17 @@
   .tab-panel.active{display:block;animation:fade-in .2s ease}
   @media (max-width:640px){.tabs{overflow-x:auto}.tab-btn{flex:0 0 auto}}
   section h2 .sec-ic{font-size:18px;filter:saturate(1.1)}
+  .ic{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;flex-shrink:0}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
   .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-sm);transition:box-shadow .18s,transform .18s}
   .card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
   .card .label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
   .card .num{font-size:28px;font-weight:700;margin-top:6px}
   .card .sub{font-size:12px;color:var(--muted);margin-top:4px}
-  .kpi-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+  .kpi-groups{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .kpi-group .cards{grid-template-columns:1fr}
+  @media (max-width:1000px){.kpi-groups{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:560px){.kpi-groups{grid-template-columns:1fr}}
   .kpi-group h3{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--border)}
   .callout{background:#FFF6F2;border:1px solid #FFD9CC;border-radius:14px;padding:14px 18px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
   .callout.empty{background:var(--light);border-color:var(--border);color:var(--muted)}
@@ -118,6 +143,7 @@
   .btn.small{padding:5px 10px;font-size:12px;font-weight:600}
   .btn.danger{background:#fff;color:#C23B2E;border:1px solid #F3C7C1;box-shadow:none}
   .btn.danger:hover{background:#FFF5F4;box-shadow:none}
+  .btn:not(.ghost):not(.danger) .ic,.view-toggle-btn.active .ic{stroke:#fff}
   .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
   .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
   .panel h3{font-size:15px;font-weight:800;margin-bottom:12px}
@@ -157,11 +183,15 @@
   .cal-day.empty{background:transparent;border:none}
   .cal-day.dragover{border-color:var(--accent);background:#FFF6F2;box-shadow:var(--shadow-sm)}
   .cal-day .dnum{font-size:11px;color:var(--muted);font-weight:700;padding:2px 4px}
-  .content-card{background:var(--light);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;cursor:grab;line-height:1.35;transition:box-shadow .15s,transform .15s}
+  .content-card{background:var(--light);border:1px solid var(--border);border-left-width:3px;border-radius:8px;padding:6px 8px;font-size:12px;cursor:grab;line-height:1.35;transition:box-shadow .15s,transform .15s}
   .content-card:hover{box-shadow:var(--shadow-sm);transform:translateY(-1px)}
   .content-card:active{cursor:grabbing}
   .content-card .ctitle{font-weight:700;display:block}
   .content-card .cmeta{color:var(--muted);font-size:11px}
+  .content-card.cs-idee{border-left-color:var(--muted)}
+  .content-card.cs-a_faire{border-left-color:#C2540A}
+  .content-card.cs-pret{border-left-color:#6C5CE7}
+  .content-card.cs-publie{border-left-color:#1C8A45}
   .backlog{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:120px;box-shadow:var(--shadow-sm);transition:border-color .15s,background .15s}
   .backlog.dragover{border-color:var(--accent);background:#FFF6F2}
   .backlog h3{font-size:13px;font-weight:800;margin-bottom:2px}
@@ -230,6 +260,10 @@
       <span class="logo"><span class="k">K</span> KeyPace</span>
       <span class="title">Dashboard équipe</span>
       <span class="sp"></span>
+      <div class="global-search">
+        <input id="global-search-input" type="search" placeholder="Rechercher une école, un ticket..." oninput="onGlobalSearch()" onkeydown="onGlobalSearchKeydown(event)" onblur="closeGlobalSearchSoon()" onfocus="onGlobalSearch()">
+        <div class="global-search-results" id="global-search-results"></div>
+      </div>
       <span class="logout" onclick="logout()">Se déconnecter</span>
     </div>
   </header>
@@ -237,20 +271,21 @@
   <div class="wrap">
 
     <div class="tabs">
-      <button class="tab-btn" data-tab="kpi" onclick="switchTab('kpi')"><span class="sec-ic">📈</span>KPI</button>
-      <button class="tab-btn" data-tab="prospects" onclick="switchTab('prospects')"><span class="sec-ic">🏫</span>Prospection écoles</button>
-      <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')"><span class="sec-ic">🗓️</span>Calendrier marketing</button>
-      <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')"><span class="sec-ic">💬</span>Avis</button>
-      <button class="tab-btn" data-tab="backlog" onclick="switchTab('backlog')"><span class="sec-ic">🛠️</span>Backlog dev</button>
-      <button class="tab-btn" data-tab="security" onclick="switchTab('security')"><span class="sec-ic">🔒</span>Sécurité</button>
-      <button class="tab-btn" data-tab="competitors" onclick="switchTab('competitors')"><span class="sec-ic">🎯</span>Concurrents</button>
+      <button class="tab-btn" data-tab="kpi" onclick="switchTab('kpi')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,17 9,11 13,15 21,6"/><polyline points="14,6 21,6 21,13"/></svg></span>KPI</button>
+      <button class="tab-btn" data-tab="prospects" onclick="switchTab('prospects')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/></svg></span>Prospection écoles<span class="tab-badge" id="tab-badge-prospects" style="display:none"></span></button>
+      <button class="tab-btn" data-tab="clients" onclick="switchTab('clients')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5 21 2"/><path d="M16 7l3 3"/></svg></span>Écoles clientes<span class="tab-badge" id="tab-badge-clients" style="display:none"></span></button>
+      <button class="tab-btn" data-tab="calendar" onclick="switchTab('calendar')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg></span>Calendrier marketing</button>
+      <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg></span>Avis<span class="tab-badge" id="tab-badge-reviews" style="display:none"></span></button>
+      <button class="tab-btn" data-tab="backlog" onclick="switchTab('backlog')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 1 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2z"/></svg></span>Backlog dev<span class="tab-badge" id="tab-badge-backlog" style="display:none"></span></button>
+      <button class="tab-btn" data-tab="security" onclick="switchTab('security')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>Sécurité</button>
+      <button class="tab-btn" data-tab="competitors" onclick="switchTab('competitors')"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="#FF4D2E"/></svg></span>Concurrents</button>
     </div>
 
     <section id="kpi-section" class="tab-panel">
-      <h2><span class="sec-ic">📈</span>KPI de croissance</h2>
+      <h2><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,17 9,11 13,15 21,6"/><polyline points="14,6 21,6 21,13"/></svg></span>KPI de croissance</h2>
 
       <div class="callout" id="daily-brief" style="display:none">
-        <h3>🎯 Brief du jour</h3>
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="#FF4D2E"/></svg> Brief du jour</h3>
         <div id="daily-brief-items"></div>
       </div>
       <div class="wins-ticker" id="wins-ticker"></div>
@@ -327,12 +362,12 @@
 
     <section id="prospects-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">🏫</span>Prospection écoles</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/></svg></span>Prospection écoles</h2>
         <div style="display:flex;align-items:center;gap:10px">
           <span class="muted" id="last-sync" style="font-size:12px"></span>
-          <button class="btn ghost small" onclick="syncZimbra()" id="sync-btn">🔄 Sync emails</button>
-          <button class="btn ghost small" onclick="exportProspectsCSV()">⬇ Export CSV</button>
-          <button class="btn ghost small" onclick="document.getElementById('csv-file-input').click()">⬆ Import CSV</button>
+          <button class="btn ghost small" onclick="syncZimbra()" id="sync-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg> Sync emails</button>
+          <button class="btn ghost small" onclick="exportProspectsCSV()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7,11 12,16 17,11"/><path d="M4 20h16"/></svg> Export CSV</button>
+          <button class="btn ghost small" onclick="document.getElementById('csv-file-input').click()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21h16"/><path d="M12 17V4"/><polyline points="7,9 12,4 17,9"/></svg> Import CSV</button>
           <input type="file" id="csv-file-input" accept=".csv,text/csv" style="display:none" onchange="handleCSVImport(event)">
           <button class="btn" onclick="openAddForm()">+ Ajouter une école</button>
         </div>
@@ -361,7 +396,7 @@
           <button class="btn ghost" onclick="closeProspectForm()">Annuler</button>
         </div>
         <div id="prospect-history" class="history-section" style="display:none">
-          <h4>🕒 Historique</h4>
+          <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
           <div class="history-add">
             <input id="prospect-note-input" placeholder="Ajouter une note...">
             <button class="btn small ghost" style="width:auto" onclick="addProspectNote()">Ajouter</button>
@@ -379,17 +414,17 @@
         <select id="followup-msg-template" onchange="switchFollowupTemplate()" style="margin-bottom:10px;font-size:13px;padding:7px 10px"></select>
         <textarea id="followup-msg-text" style="min-height:150px"></textarea>
         <div class="form-actions">
-          <button class="btn" id="followup-msg-copy-btn" onclick="copyFollowupMessage()">📋 Copier</button>
+          <button class="btn" id="followup-msg-copy-btn" onclick="copyFollowupMessage()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg> Copier</button>
           <button class="btn ghost" onclick="closeFollowupMessage()">Fermer</button>
         </div>
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
-        <input id="prospect-search" type="search" placeholder="🔎 Rechercher (école, ville, contact, email...)" oninput="window.__duplicateGroupFilter=null;renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
+        <input id="prospect-search" type="search" placeholder="Rechercher (école, ville, contact, email...)" oninput="window.__duplicateGroupFilter=null;renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
         <div style="display:flex;align-items:center;gap:10px">
           <div class="view-toggle" id="prospects-view-toggle">
-            <button class="view-toggle-btn" id="prospects-view-btn-table" onclick="setProspectsView('table')">📋 Tableau</button>
-            <button class="view-toggle-btn" id="prospects-view-btn-kanban" onclick="setProspectsView('kanban')">📊 Kanban</button>
+            <button class="view-toggle-btn" id="prospects-view-btn-table" onclick="setProspectsView('table')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg> Tableau</button>
+            <button class="view-toggle-btn" id="prospects-view-btn-kanban" onclick="setProspectsView('kanban')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="4" height="16" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg> Kanban</button>
           </div>
           <select id="sort-select" onchange="renderProspects()" style="width:auto;font-size:13px;padding:7px 10px">
             <option value="relance">Trier par relance (défaut)</option>
@@ -415,17 +450,77 @@
       <div class="kanban-board" id="prospects-kanban" style="display:none"></div>
     </section>
 
+    <section id="clients-section" class="tab-panel">
+      <div class="toolbar">
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5 21 2"/><path d="M16 7l3 3"/></svg></span>Écoles clientes</h2>
+        <button class="btn" onclick="openClientForm()">+ Nouvelle école cliente</button>
+      </div>
+
+      <div id="clients-convert-callout"></div>
+      <div id="clients-renewal-callout"></div>
+
+      <div class="panel" id="client-form" style="display:none">
+        <h3 id="client-form-title">Nouvelle école cliente</h3>
+        <input type="hidden" id="c-prospect-id">
+        <div class="form-grid">
+          <input id="c-school" placeholder="Nom de l'école *">
+          <input id="c-contact" placeholder="Nom du contact">
+          <input id="c-email" type="email" placeholder="Email du contact">
+          <input id="c-phone" placeholder="Téléphone">
+          <input id="c-city" placeholder="Ville">
+          <input id="c-seats" type="number" min="0" placeholder="Sièges / licences">
+          <input id="c-price" type="number" min="0" step="0.01" placeholder="Montant annuel (€)">
+          <div>
+            <label style="font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">Début du contrat</label>
+            <input id="c-start" type="date">
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">Date de renouvellement</label>
+            <input id="c-renewal" type="date">
+          </div>
+          <select id="c-status">
+            <option value="active" selected>Active</option>
+            <option value="annule">Annulée / non renouvelée</option>
+          </select>
+        </div>
+        <textarea id="c-notes" placeholder="Notes" style="margin-top:10px"></textarea>
+        <div class="form-actions">
+          <button class="btn" onclick="saveClient()">Enregistrer</button>
+          <button class="btn ghost" onclick="closeClientForm()">Annuler</button>
+          <button class="btn danger" id="client-delete-btn" style="display:none;margin-left:auto" onclick="deleteClient(editingClientId)">Supprimer</button>
+        </div>
+        <div id="client-history" class="history-section" style="display:none">
+          <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
+          <div class="history-add">
+            <input id="client-note-input" placeholder="Ajouter une note...">
+            <button class="btn small ghost" style="width:auto" onclick="addClientNote()">Ajouter</button>
+          </div>
+          <div id="client-history-list" class="history-list"></div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="prospects">
+          <thead>
+            <tr><th>École</th><th>Sièges</th><th>Montant annuel</th><th>Renouvellement</th><th>Statut</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="clients-body"></tbody>
+        </table>
+      </div>
+    </section>
+
     <section id="calendar-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">🗓️</span>Calendrier marketing</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg></span>Calendrier marketing</h2>
         <div class="cal-nav">
           <div class="view-toggle" id="calendar-view-toggle">
-            <button class="view-toggle-btn" id="calendar-view-btn-grid" onclick="setCalendarView('grid')">🗓️ Calendrier</button>
-            <button class="view-toggle-btn" id="calendar-view-btn-kanban" onclick="setCalendarView('kanban')">📊 Kanban</button>
+            <button class="view-toggle-btn" id="calendar-view-btn-grid" onclick="setCalendarView('grid')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg> Calendrier</button>
+            <button class="view-toggle-btn" id="calendar-view-btn-kanban" onclick="setCalendarView('kanban')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="4" height="16" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg> Kanban</button>
           </div>
           <button class="cal-nav-arrow" onclick="shiftMonth(-1)">‹</button>
           <span class="mono" id="cal-label" style="font-weight:700;min-width:130px;text-align:center;display:inline-block"></span>
           <button class="cal-nav-arrow" onclick="shiftMonth(1)">›</button>
+          <button class="btn ghost small" style="width:auto" onclick="goToToday()">Aujourd'hui</button>
           <button class="btn small" style="width:auto" onclick="openAddEventForm()">+ Contenu</button>
         </div>
       </div>
@@ -433,7 +528,7 @@
       <div class="panel" id="idea-bank" style="margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
           <div>
-            <h3 style="margin:0 0 2px">💡 Banque d'idées</h3>
+            <h3 style="margin:0 0 2px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg> Banque d'idées</h3>
             <p class="muted" style="font-size:12.5px;margin:0">En panne d'inspiration ? Génère des idées prêtes à planifier.</p>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
@@ -446,7 +541,7 @@
               <option value="preuve_sociale">Preuve sociale</option>
               <option value="conversion">Conversion</option>
             </select>
-            <button class="btn small" style="width:auto" onclick="generateContentIdeas()">✨ Générer 5 idées</button>
+            <button class="btn small" style="width:auto" onclick="generateContentIdeas()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg> Générer 5 idées</button>
           </div>
         </div>
         <div id="idea-bank-results" style="margin-top:14px"></div>
@@ -486,7 +581,7 @@
         </div>
         <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
           <label style="font-size:12px;color:var(--muted);font-weight:700">Texte du post</label>
-          <button class="btn ghost small" type="button" style="width:auto;padding:4px 10px;font-size:12px" onclick="suggestHooks()">💡 Suggérer des accroches</button>
+          <button class="btn ghost small" type="button" style="width:auto;padding:4px 10px;font-size:12px" onclick="suggestHooks()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg> Suggérer des accroches</button>
         </div>
         <div id="hook-suggestions" style="display:none;margin-top:6px;flex-direction:column;gap:5px"></div>
         <textarea id="e-caption" placeholder="Texte du post (ce qui sera publié)" style="margin-top:6px;min-height:90px"></textarea>
@@ -498,7 +593,7 @@
         </div>
         <p class="muted" style="font-size:12px;margin:10px 0 0">Sans date : le contenu va dans « Idées à planifier » — glissez-le ensuite sur un jour.</p>
         <div id="content-history" class="history-section" style="display:none">
-          <h4>🕒 Historique</h4>
+          <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
           <div class="history-add">
             <input id="content-note-input" placeholder="Ajouter une note...">
             <button class="btn small ghost" style="width:auto" onclick="addContentNote()">Ajouter</button>
@@ -519,10 +614,10 @@
 
     <section id="reviews-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">💬</span>Avis</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg></span>Avis</h2>
         <div style="display:flex;align-items:center;gap:10px">
           <span class="muted" id="reviews-summary" style="font-size:12px"></span>
-          <button class="btn ghost small" onclick="syncGoogleReviews()" id="sync-google-btn">🔄 Sync avis Google</button>
+          <button class="btn ghost small" onclick="syncGoogleReviews()" id="sync-google-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg> Sync avis Google</button>
         </div>
       </div>
 
@@ -531,7 +626,7 @@
         <p class="muted" style="font-size:12.5px;margin:0 0 12px">Retrouve le <b>Place ID</b> de la fiche KeyPace pour configurer <code>GOOGLE_PLACE_ID</code> sur Vercel — sans jamais avoir à saisir la clé API ici. Si la recherche par nom renvoie des établissements sans rapport, cherche plutôt par <b>numéro de téléphone</b> (celui affiché sur la fiche Google), plus fiable.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <input id="google-query" placeholder="ex. KeyPace Namur ou +32 471 40 18 59" style="flex:1;min-width:220px">
-          <button class="btn small" style="width:auto" onclick="findGooglePlace()">🔍 Chercher</button>
+          <button class="btn small" style="width:auto" onclick="findGooglePlace()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Chercher</button>
         </div>
         <div id="google-place-results" style="margin-top:12px"></div>
       </div>
@@ -550,11 +645,11 @@
 
     <section id="backlog-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">🛠️</span>Backlog dev</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 1 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2z"/></svg></span>Backlog dev</h2>
         <div style="display:flex;align-items:center;gap:10px">
           <div class="view-toggle" id="backlog-view-toggle">
-            <button class="view-toggle-btn" id="backlog-view-btn-table" onclick="setBacklogView('table')">📋 Tableau</button>
-            <button class="view-toggle-btn" id="backlog-view-btn-kanban" onclick="setBacklogView('kanban')">📊 Kanban</button>
+            <button class="view-toggle-btn" id="backlog-view-btn-table" onclick="setBacklogView('table')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg> Tableau</button>
+            <button class="view-toggle-btn" id="backlog-view-btn-kanban" onclick="setBacklogView('kanban')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="4" height="16" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg> Kanban</button>
           </div>
           <button class="btn" onclick="openDevIssueForm()">+ Nouveau ticket</button>
         </div>
@@ -595,7 +690,7 @@
           <button class="btn danger" id="dev-issue-delete-btn" style="display:none;margin-left:auto" onclick="deleteDevIssue(editingDevIssueId)">Supprimer</button>
         </div>
         <div id="dev-issue-history" class="history-section" style="display:none">
-          <h4>🕒 Historique</h4>
+          <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
           <div class="history-add">
             <input id="dev-issue-note-input" placeholder="Ajouter une note...">
             <button class="btn small ghost" style="width:auto" onclick="addDevIssueNote()">Ajouter</button>
@@ -617,16 +712,16 @@
 
     <section id="security-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">🔒</span>Sécurité</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>Sécurité</h2>
       </div>
 
       <div class="callout" style="background:#FFF6F2;border-color:#FFD9CC">
-        <h3>⚠️ À ne jamais stocker ici</h3>
+        <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> À ne jamais stocker ici</h3>
         <p style="margin:0;font-size:13px;color:var(--txt)">La clé service Supabase et la clé secrète Stripe (production) : ce sont les clés qui donnent accès à l'endroit où ce coffre vit — les y stocker n'apporte aucune protection réelle. Garde-les dans un vrai gestionnaire de mots de passe (1Password, Bitwarden). Ce coffre chiffre au repos (protège contre une fuite de la base), mais pas contre une fuite de l'ADMIN_KEY du dashboard.</p>
       </div>
 
       <div class="toolbar" style="margin-top:20px">
-        <h3 style="margin:0">🔑 Coffre-fort de secrets</h3>
+        <h3 style="margin:0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5 21 2"/><path d="M16 7l3 3"/></svg> Coffre-fort de secrets</h3>
         <button class="btn small" style="width:auto" onclick="openVaultForm()">+ Ajouter un secret</button>
       </div>
 
@@ -649,7 +744,7 @@
       <div id="vault-list"></div>
 
       <div class="toolbar" style="margin-top:28px">
-        <h3 style="margin:0">🔗 Répertoire de liens</h3>
+        <h3 style="margin:0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M13 4l1.5-1.5a4 4 0 0 1 5.5 5.8L18 10"/><path d="M11 20l-1.5 1.5a4 4 0 0 1-5.5-5.8L6 14"/></svg> Répertoire de liens</h3>
         <button class="btn small" style="width:auto" onclick="openLinkForm()">+ Ajouter un lien</button>
       </div>
       <div class="panel" id="link-form" style="display:none;margin-bottom:16px">
@@ -666,7 +761,7 @@
       <div id="links-list"></div>
 
       <div class="toolbar" style="margin-top:28px">
-        <h3 style="margin:0">🛡️ Checklist sécurité périodique</h3>
+        <h3 style="margin:0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6l7-3z"/></svg> Checklist sécurité périodique</h3>
       </div>
       <p class="muted" style="font-size:13px;margin:-6px 0 14px">À parcourir régulièrement — basée sur les standards OWASP, les recommandations RGPD et le guide "Your Europe" de la Commission européenne sur la sécurisation d'un site web. Le but : repérer les failles et limites potentielles, pas remplacer un vrai audit de sécurité.</p>
       <div id="security-checklist"></div>
@@ -674,20 +769,20 @@
 
     <section id="competitors-section" class="tab-panel">
       <div class="toolbar">
-        <h2 style="margin:0"><span class="sec-ic">🎯</span>Concurrents</h2>
+        <h2 style="margin:0"><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="#FF4D2E"/></svg></span>Concurrents</h2>
         <div style="display:flex;gap:8px">
-          <button class="btn ghost" onclick="suggestCompetitor()">💡 Suggérer un concurrent</button>
+          <button class="btn ghost" onclick="suggestCompetitor()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg> Suggérer un concurrent</button>
           <button class="btn" onclick="openCompetitorForm()">+ Ajouter un concurrent</button>
         </div>
       </div>
 
       <div class="panel competitor-card" id="competitor-suggestion-panel" style="display:none">
         <div class="competitor-card-head">
-          <strong style="text-transform:none;font-size:14px">💡 Suggestion : <a id="suggestion-name" href="#" target="_blank" rel="noopener" class="fname"></a></strong>
+          <strong style="text-transform:none;font-size:14px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg> Suggestion : <a id="suggestion-name" href="#" target="_blank" rel="noopener" class="fname"></a></strong>
         </div>
         <p class="muted" id="suggestion-reason" style="margin:4px 0 12px"></p>
         <div class="form-actions">
-          <button class="btn small" onclick="acceptCompetitorSuggestion()">✅ Ajouter aux concurrents</button>
+          <button class="btn small" onclick="acceptCompetitorSuggestion()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8,12 11,15 16,9"/></svg> Ajouter aux concurrents</button>
           <button class="btn small ghost" onclick="dismissCompetitorSuggestion()">✕ Ignorer</button>
         </div>
       </div>
@@ -708,7 +803,7 @@
           <button class="btn danger" id="competitor-delete-btn" style="display:none;margin-left:auto" onclick="deleteCompetitor(editingCompetitorId)">Supprimer</button>
         </div>
         <div id="competitor-history" class="history-section" style="display:none">
-          <h4>🕒 Historique</h4>
+          <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
           <div class="history-add">
             <input id="competitor-note-input" placeholder="Ajouter une note...">
             <button class="btn small ghost" style="width:auto" onclick="addCompetitorNote()">Ajouter</button>
@@ -717,11 +812,27 @@
         </div>
       </div>
 
+      <div class="cards" id="competitors-overview" style="margin-bottom:20px"></div>
+
+      <div class="panel" style="margin-bottom:20px">
+        <h3 style="margin:0 0 12px">Vue d'ensemble</h3>
+        <div class="table-wrap">
+          <table class="prospects">
+            <thead>
+              <tr><th>Concurrent</th><th>CA estimé</th><th>Forces</th><th>Faiblesses</th><th>Dernière vérif.</th></tr>
+            </thead>
+            <tbody id="competitors-overview-body"></tbody>
+          </table>
+        </div>
+      </div>
+
       <div id="competitors-list"></div>
     </section>
 
   </div>
 </div>
+
+<div class="toast-container" id="toast-container"></div>
 
 <script>
 const KEY_STORAGE = 'kp_dashboard_key';
@@ -767,7 +878,77 @@ function logout(){
   document.getElementById('gate').style.display = 'flex';
 }
 
-const TAB_SECTIONS = { kpi: 'kpi-section', prospects: 'prospects-section', calendar: 'calendar-section', reviews: 'reviews-section', backlog: 'backlog-section', security: 'security-section', competitors: 'competitors-section' };
+// ─── Confirmations visuelles (toasts) ──────────────────────────────
+function showToast(message, type){
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast${type === 'error' ? ' error' : ''}`;
+  el.textContent = message;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('leaving');
+    setTimeout(() => el.remove(), 200);
+  }, 2200);
+}
+
+// ─── Badges de notification sur les onglets ────────────────────────
+function setTabBadge(tab, count){
+  const el = document.getElementById(`tab-badge-${tab}`);
+  if (!el) return;
+  el.textContent = count > 99 ? '99+' : String(count);
+  el.style.display = count > 0 ? '' : 'none';
+}
+
+// ─── Recherche globale (écoles, tickets, contenus) ─────────────────
+function globalSearchIndex(){
+  const items = [];
+  (window.__prospects || []).forEach(p => items.push({ group:'Prospection', tab:'prospects', label:p.school_name, meta:p.city || '', go:() => editProspect(p.id) }));
+  (window.__clients || []).forEach(c => items.push({ group:'Écoles clientes', tab:'clients', label:c.school_name, meta:c.city || '', go:() => editClient(c.id) }));
+  (window.__devIssues || []).forEach(d => items.push({ group:'Backlog dev', tab:'backlog', label:d.title, meta:DEV_TYPE_LABELS[d.item_type] || '', go:() => editDevIssue(d.id) }));
+  Object.values(window.__events || {}).forEach(e => items.push({ group:'Calendrier marketing', tab:'calendar', label:e.title, meta:e.content_type || '', go:() => editEvent(e.id) }));
+  return items;
+}
+
+function onGlobalSearch(){
+  const query = document.getElementById('global-search-input').value.trim().toLowerCase();
+  const resultsEl = document.getElementById('global-search-results');
+  if (query.length < 2) { resultsEl.classList.remove('open'); resultsEl.innerHTML = ''; return; }
+  const matches = globalSearchIndex().filter(it => it.label && it.label.toLowerCase().includes(query)).slice(0, 8);
+  if (!matches.length) {
+    resultsEl.innerHTML = `<div class="gsr-empty">Aucun résultat pour « ${escHtml(query)} ».</div>`;
+    resultsEl.classList.add('open');
+    return;
+  }
+  let lastGroup = null;
+  resultsEl.innerHTML = matches.map((it, i) => {
+    const groupLabel = it.group !== lastGroup ? `<div class="gsr-group-label">${it.group}</div>` : '';
+    lastGroup = it.group;
+    return `${groupLabel}<button type="button" class="gsr-item" data-idx="${i}" onmousedown="event.preventDefault();goToGlobalResult(${i})">${escHtml(it.label)}${it.meta ? ` <span class="gsr-meta">· ${escHtml(it.meta)}</span>` : ''}</button>`;
+  }).join('');
+  window.__globalSearchMatches = matches;
+  resultsEl.classList.add('open');
+}
+
+function goToGlobalResult(i){
+  const it = (window.__globalSearchMatches || [])[i];
+  if (!it) return;
+  document.getElementById('global-search-input').value = '';
+  document.getElementById('global-search-results').classList.remove('open');
+  switchTab(it.tab);
+  it.go();
+}
+
+function onGlobalSearchKeydown(ev){
+  if (ev.key === 'Escape') { ev.target.blur(); document.getElementById('global-search-results').classList.remove('open'); }
+  if (ev.key === 'Enter' && (window.__globalSearchMatches || []).length) goToGlobalResult(0);
+}
+
+// Laisse le temps à onmousedown de traiter le clic avant que blur ne ferme le menu.
+function closeGlobalSearchSoon(){
+  setTimeout(() => document.getElementById('global-search-results').classList.remove('open'), 150);
+}
+
+const TAB_SECTIONS = { kpi: 'kpi-section', prospects: 'prospects-section', clients: 'clients-section', calendar: 'calendar-section', reviews: 'reviews-section', backlog: 'backlog-section', security: 'security-section', competitors: 'competitors-section' };
 const REVIEW_STATUS_LABELS = { pending: 'En attente', published: 'Publié', rejected: 'Rejeté' };
 
 function switchTab(name){
@@ -784,6 +965,7 @@ function boot(){
   loadTrafficDetail();
   setProspectsView(prospectsView);
   loadProspects();
+  loadClients();
   renderCalendarHeader();
   setCalendarView(calendarView);
   loadCalendar();
@@ -857,35 +1039,39 @@ function renderDailyBrief(b, brief){
   // depuis un moment, RDV imminent), avant les priorités routinières.
   if (brief.overdueFollowups && brief.overdueFollowups.length) {
     const n = brief.overdueFollowups.length;
-    items.push({ ic:'🚨', text:`${n} relance${n>1?'s':''} en retard de plus de 3 jours : ${brief.overdueFollowups.map(p=>escHtml(p.school_name)).join(', ')}`, tab:'prospects', urgent:true });
+    items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>', text:`${n} relance${n>1?'s':''} en retard de plus de 3 jours : ${brief.overdueFollowups.map(p=>escHtml(p.school_name)).join(', ')}`, tab:'prospects', urgent:true });
   }
   if (brief.upcomingMeetings && brief.upcomingMeetings.length) {
     const n = brief.upcomingMeetings.length;
-    items.push({ ic:'📅', text:`RDV dans moins de 24h : ${brief.upcomingMeetings.map(p=>`${escHtml(p.school_name)} (${fmtDateTime(p.meeting_at)})`).join(', ')}`, tab:'prospects', urgent:true });
+    items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>', text:`RDV dans moins de 24h : ${brief.upcomingMeetings.map(p=>`${escHtml(p.school_name)} (${fmtDateTime(p.meeting_at)})`).join(', ')}`, tab:'prospects', urgent:true });
   }
-  if (b.dueFollowups > 0) items.push({ ic:'🏫', text:`${b.dueFollowups} école${b.dueFollowups>1?'s':''} à relancer`, tab:'prospects' });
-  if (brief.reviewsPending > 0) items.push({ ic:'💬', text:`${brief.reviewsPending} avis en attente de modération`, tab:'reviews' });
-  if (brief.gapDays.length > 0) items.push({ ic:'🗓️', text:`${brief.gapDays.length} jour${brief.gapDays.length>1?'s':''} cette semaine sans contenu planifié`, tab:'calendar' });
+  if (b.dueFollowups > 0) items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/></svg>', text:`${b.dueFollowups} école${b.dueFollowups>1?'s':''} à relancer`, tab:'prospects' });
+  if (brief.upcomingRenewals && brief.upcomingRenewals.length) {
+    const n = brief.upcomingRenewals.length;
+    items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5 21 2"/><path d="M16 7l3 3"/></svg>', text:`${n} renouvellement${n>1?'s':''} à traiter (30j) : ${brief.upcomingRenewals.map(c=>escHtml(c.school_name)).join(', ')}`, tab:'clients' });
+  }
+  if (brief.reviewsPending > 0) items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg>', text:`${brief.reviewsPending} avis en attente de modération`, tab:'reviews' });
+  if (brief.gapDays.length > 0) items.push({ ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>', text:`${brief.gapDays.length} jour${brief.gapDays.length>1?'s':''} cette semaine sans contenu planifié`, tab:'calendar' });
 
   const briefEl = document.getElementById('daily-brief');
   if (!items.length) {
     briefEl.style.display = 'block';
     briefEl.classList.add('empty');
-    document.getElementById('daily-brief-items').innerHTML = `<p style="margin:0;font-size:14px">Rien d'urgent aujourd'hui 🎉 Bon moment pour avancer sur du contenu ou de la prospection à froid.</p>`;
+    document.getElementById('daily-brief-items').innerHTML = `<p style="margin:0;font-size:14px">Rien d'urgent aujourd'hui <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg> Bon moment pour avancer sur du contenu ou de la prospection à froid.</p>`;
     return;
   }
   briefEl.style.display = 'block';
   briefEl.classList.remove('empty');
   document.getElementById('daily-brief-items').innerHTML =
-    `<div class="brief-focus">👉 Priorité : ${items[0].text}</div>` +
+    `<div class="brief-focus"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><polyline points="14,6 20,12 14,18"/></svg> Priorité : ${items[0].text}</div>` +
     items.map(it => `<div class="brief-item${it.urgent?' urgent':''}" onclick="switchTab('${it.tab}')"><span>${it.ic}</span><span>${it.text}</span></div>`).join('');
 }
 
 function renderWinsTicker(a, e){
   const wins = [
-    { ic:'👋', label:`${a.signups7d} nouvel${a.signups7d>1?'les':'le'} inscription${a.signups7d>1?'s':''} (7j)` },
-    { ic:'⚡', label:`${e.activeUsers7d} actif${e.activeUsers7d>1?'s':''} (7j)` },
-    { ic:'🏆', label:`${e.weeklyChallengeParticipants} participant${e.weeklyChallengeParticipants>1?'s':''} au défi hebdo` },
+    { ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a5 5 0 0 1 5-5h4"/><path d="M18 8v6"/><path d="M15 11h6"/></svg>', label:`${a.signups7d} nouvel${a.signups7d>1?'les':'le'} inscription${a.signups7d>1?'s':''} (7j)` },
+    { ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13,2 4,14 11,14 10,22 20,10 13,10"/></svg>', label:`${e.activeUsers7d} actif${e.activeUsers7d>1?'s':''} (7j)` },
+    { ic:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8 14.5 6.5 22l5.5-3 5.5 3-1.5-7.5"/></svg>', label:`${e.weeklyChallengeParticipants} participant${e.weeklyChallengeParticipants>1?'s':''} au défi hebdo` },
   ];
   document.getElementById('wins-ticker').innerHTML = wins.map(w => `<div class="win-chip">${w.ic} ${w.label}</div>`).join('');
 }
@@ -1012,13 +1198,14 @@ async function loadProspects(){
       : 'Jamais synchronisé';
     const now = Date.now();
     const due = list.filter(p => p.next_followup_at && new Date(p.next_followup_at).getTime() <= now && p.status !== 'signe' && p.status !== 'perdu');
+    setTabBadge('prospects', due.length);
 
     const calloutEl = document.getElementById('followup-callout');
     calloutEl.innerHTML = due.length
       ? `<div class="callout"><h3>À relancer aujourd'hui (${due.length})</h3>${due.map(p =>
           `<div class="followup-item"><span class="fname">${p.school_name}</span><span class="badge badge-${p.status}">${STATUS_LABELS[p.status]}</span><span class="muted">depuis le ${fmtDate(p.last_contact_at)}</span></div>`
         ).join('')}</div>`
-      : `<div class="callout empty">Aucune relance en attente 🎉</div>`;
+      : `<div class="callout empty">Aucune relance en attente <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg></div>`;
 
     renderDuplicatesCallout(list, duplicateGroups || []);
     renderMeetingsPanel(list, now);
@@ -1039,7 +1226,7 @@ function renderMeetingsPanel(list, now){
   const el = document.getElementById('meetings-panel');
   if (!upcoming.length) { el.innerHTML = ''; return; }
   el.innerHTML = `<div class="callout" style="background:#EEF5FF;border-color:#C7DEFF">
-    <h3>📅 Prochains rendez-vous (${upcoming.length})</h3>
+    <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg> Prochains rendez-vous (${upcoming.length})</h3>
     ${upcoming.map(p => `<div class="followup-item" style="cursor:pointer" onclick="editProspect('${p.id}')">
       <span class="fname">${escHtml(p.school_name)}</span>
       <span class="badge badge-${p.status}">${STATUS_LABELS[p.status]}</span>
@@ -1058,7 +1245,7 @@ function renderDuplicatesCallout(list, duplicateGroups){
   const calloutEl = document.getElementById('duplicates-callout');
   if (!duplicateGroups.length) { calloutEl.innerHTML = ''; return; }
   calloutEl.innerHTML = `<div class="callout" style="background:#FFF9E8;border-color:#F5E1A0">
-    <h3>⚠️ ${duplicateGroups.length} doublon${duplicateGroups.length>1?'s':''} potentiel${duplicateGroups.length>1?'s':''} détecté${duplicateGroups.length>1?'s':''}</h3>
+    <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> ${duplicateGroups.length} doublon${duplicateGroups.length>1?'s':''} potentiel${duplicateGroups.length>1?'s':''} détecté${duplicateGroups.length>1?'s':''}</h3>
     ${duplicateGroups.map(g => {
       const group = g.ids.map(id => byId[id]).filter(Boolean);
       if (!group.length) return '';
@@ -1069,7 +1256,7 @@ function renderDuplicatesCallout(list, duplicateGroups){
         </div>
         <div class="dup-group-actions">
           <button class="btn ghost small" style="width:auto" onclick='dismissDuplicateGroup(${JSON.stringify(g.key)});event.stopPropagation()'>✓ Pas un doublon</button>
-          ${group.map(p => `<button class="btn small danger" style="width:auto" onclick="deleteProspect('${p.id}');event.stopPropagation()">🗑️ Suppr. ${escHtml(p.school_name)}</button>`).join('')}
+          ${group.map(p => `<button class="btn small danger" style="width:auto" onclick="deleteProspect('${p.id}');event.stopPropagation()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg> Suppr. ${escHtml(p.school_name)}</button>`).join('')}
         </div>
       </div>`;
     }).join('')}
@@ -1114,13 +1301,13 @@ function renderProspects(){
     const dupIds = window.__duplicateIds || new Set();
     document.getElementById('prospects-body').innerHTML = view.length ? view.map(p => `
       <tr${dupIds.has(p.id) ? ' style="background:#FFFBEF"' : ''}>
-        <td><strong>${p.school_name}</strong>${dupIds.has(p.id) ? ' <span class="badge" style="background:#FFF3CD;color:#8A6D1D" title="Un autre dossier a un nom d\'école identique ou très proche">⚠️ doublon possible</span>' : ''}${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
-        <td>${p.city || '—'}${p.estimated_students ? `<div class="muted" style="font-size:12px" title="${escHtml(p.estimated_students_source || '')}">👥 ${escHtml(p.estimated_students)}</div>` : ''}</td>
+        <td><strong>${p.school_name}</strong>${dupIds.has(p.id) ? ' <span class="badge" style="background:#FFF3CD;color:#8A6D1D" title="Un autre dossier a un nom d\'école identique ou très proche"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> doublon possible</span>' : ''}${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
+        <td>${p.city || '—'}${p.estimated_students ? `<div class="muted" style="font-size:12px" title="${escHtml(p.estimated_students_source || '')}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5A4.5 4.5 0 0 1 7 14h4a4.5 4.5 0 0 1 4.5 4.5V20"/><circle cx="17" cy="8" r="3"/><path d="M17.5 14.3a4.5 4.5 0 0 1 3.9 4.5V20"/></svg> ${escHtml(p.estimated_students)}</div>` : ''}</td>
         <td>${p.contact_name || '—'}${p.contact_email ? `<div class="muted" style="font-size:12px">${p.contact_email}</div>` : ''}</td>
         <td><span class="badge badge-${p.status}" title="Cliquer pour changer le statut" onclick="openStatusPicker(event,'${p.id}','${p.status}')">${STATUS_LABELS[p.status]}</span></td>
         <td>${fmtDate(p.last_contact_at)}</td>
         <td>${fmtDate(p.next_followup_at)}</td>
-        <td><div class="actions"><button class="btn small ghost" onclick="openFollowupMessage('${p.id}')">✉️ Message</button><button class="btn small ghost" onclick="editProspect('${p.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
+        <td><div class="actions"><button class="btn small ghost" onclick="openFollowupMessage('${p.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> Message</button><button class="btn small ghost" onclick="editProspect('${p.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
       </tr>`).join('') : `<tr><td colspan="7" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
     renderProspectsKanban(view, dupIds);
   } catch (e) { console.error(e); }
@@ -1136,12 +1323,12 @@ function renderProspectsKanban(view, dupIds){
       <div class="kanban-col-body" ondragover="allowDrop(event)" ondrop="dropOnStatusColumn(event,'${status}')">
         ${byStatus[status].map(p => `
           <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${p.id}')" onclick="editProspect('${p.id}')">
-            <span class="kc-title">${escHtml(p.school_name)}${dupIds && dupIds.has(p.id) ? ' ⚠️' : ''}</span>
+            <span class="kc-title">${escHtml(p.school_name)}${dupIds && dupIds.has(p.id) ? ' <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>' : ''}</span>
             <span class="kc-meta">${escHtml(p.city || '')}${p.city && p.contact_name ? ' · ' : ''}${escHtml(p.contact_name || '')}</span>
-            ${p.meeting_at ? `<div class="kc-meta">📅 ${fmtDate(p.meeting_at)}</div>` : ''}
+            ${p.meeting_at ? `<div class="kc-meta"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg> ${fmtDate(p.meeting_at)}</div>` : ''}
             <div class="kc-actions" onclick="event.stopPropagation()">
-              <button onclick="openFollowupMessage('${p.id}')" title="Message">✉️</button>
-              <button onclick="deleteProspect('${p.id}')" title="Supprimer">🗑️</button>
+              <button onclick="openFollowupMessage('${p.id}')" title="Message"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></button>
+              <button onclick="deleteProspect('${p.id}')" title="Supprimer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></button>
             </div>
           </div>`).join('') || `<p class="muted" style="font-size:11.5px;margin:0;text-align:center">—</p>`}
       </div>
@@ -1293,6 +1480,158 @@ function toDatetimeLocalValue(iso){
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+// ─── Écoles clientes (post-vente) ──────────────────────────────────
+const CLIENT_STATUS_LABELS = { active: 'Active', annule: 'Annulée' };
+let editingClientId = null;
+
+function daysUntil(dateStr){
+  if (!dateStr) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(dateStr + 'T00:00:00');
+  return Math.round((target - today) / 86400000);
+}
+
+function renewalBadgeHtml(c){
+  if (c.status === 'annule') return `<span class="badge" style="background:var(--border);color:var(--muted)">Annulée</span>`;
+  if (!c.renewal_date) return `<span class="muted">—</span>`;
+  const d = daysUntil(c.renewal_date);
+  if (d < 0) return `<span class="badge badge-perdu"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> En retard de ${-d}j (${fmtDate(c.renewal_date)})</span>`;
+  if (d <= 30) return `<span class="badge badge-relance"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg> Dans ${d}j (${fmtDate(c.renewal_date)})</span>`;
+  return `<span class="badge badge-signe">${fmtDate(c.renewal_date)}</span>`;
+}
+
+async function loadClients(){
+  try {
+    const [{ items: clients }, { items: prospects }] = await Promise.all([api('clients-list'), api('prospects')]);
+    window.__clients = clients;
+    renderClientsTable(clients);
+
+    const convertedProspectIds = new Set(clients.map(c => c.prospect_id).filter(Boolean));
+    const toConvert = prospects.filter(p => p.status === 'signe' && !convertedProspectIds.has(p.id));
+    const convertEl = document.getElementById('clients-convert-callout');
+    convertEl.innerHTML = toConvert.length
+      ? `<div class="callout"><h3>Écoles signées pas encore ajoutées ici (${toConvert.length})</h3>${toConvert.map(p =>
+          `<div class="followup-item"><span class="fname">${escHtml(p.school_name)}</span><button class="btn small ghost" style="width:auto" onclick="convertProspectToClient('${p.id}')">+ Ajouter comme cliente</button></div>`
+        ).join('')}</div>`
+      : '';
+
+    const dueSoon = clients.filter(c => c.status === 'active' && c.renewal_date && daysUntil(c.renewal_date) <= 30);
+    const renewalEl = document.getElementById('clients-renewal-callout');
+    renewalEl.innerHTML = dueSoon.length
+      ? `<div class="callout"><h3>Renouvellements à traiter (${dueSoon.length})</h3>${dueSoon.map(c =>
+          `<div class="followup-item"><span class="fname">${escHtml(c.school_name)}</span>${renewalBadgeHtml(c)}</div>`
+        ).join('')}</div>`
+      : '';
+    setTabBadge('clients', dueSoon.length);
+  } catch (e) { console.error(e); }
+}
+
+function renderClientsTable(items){
+  document.getElementById('clients-body').innerHTML = items.length ? items.map(c => `
+    <tr>
+      <td><strong>${escHtml(c.school_name)}</strong>${c.city ? `<div class="muted" style="font-size:12px">${escHtml(c.city)}</div>` : ''}</td>
+      <td>${c.seats ?? '—'}</td>
+      <td>${c.annual_price != null ? Number(c.annual_price).toLocaleString('fr-BE') + ' €' : '—'}</td>
+      <td>${renewalBadgeHtml(c)}</td>
+      <td>${CLIENT_STATUS_LABELS[c.status] || c.status}</td>
+      <td><div class="actions"><button class="btn small ghost" onclick="editClient('${c.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button><button class="btn small danger" onclick="deleteClient('${c.id}')">Suppr.</button></div></td>
+    </tr>`).join('') : `<tr><td colspan="6" class="empty-msg">Aucune école cliente pour l'instant.</td></tr>`;
+}
+
+function openClientForm(prefill){
+  editingClientId = null;
+  ['c-school','c-contact','c-email','c-phone','c-city','c-seats','c-price','c-start','c-renewal','c-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('c-prospect-id').value = '';
+  document.getElementById('c-status').value = 'active';
+  if (prefill) {
+    document.getElementById('c-school').value = prefill.school_name || '';
+    document.getElementById('c-contact').value = prefill.contact_name || '';
+    document.getElementById('c-email').value = prefill.contact_email || '';
+    document.getElementById('c-phone').value = prefill.contact_phone || '';
+    document.getElementById('c-city').value = prefill.city || '';
+    document.getElementById('c-prospect-id').value = prefill.id || '';
+  }
+  document.getElementById('client-form-title').textContent = 'Nouvelle école cliente';
+  document.getElementById('client-delete-btn').style.display = 'none';
+  document.getElementById('client-history').style.display = 'none';
+  document.getElementById('client-form').style.display = 'block';
+}
+
+function convertProspectToClient(prospectId){
+  const p = (window.__prospects || []).find(x => x.id === prospectId);
+  if (!p) return;
+  openClientForm(p);
+}
+
+function editClient(id){
+  const c = (window.__clients || []).find(x => x.id === id);
+  if (!c) return;
+  editingClientId = id;
+  document.getElementById('c-school').value = c.school_name || '';
+  document.getElementById('c-contact').value = c.contact_name || '';
+  document.getElementById('c-email').value = c.contact_email || '';
+  document.getElementById('c-phone').value = c.contact_phone || '';
+  document.getElementById('c-city').value = c.city || '';
+  document.getElementById('c-seats').value = c.seats ?? '';
+  document.getElementById('c-price').value = c.annual_price ?? '';
+  document.getElementById('c-start').value = c.contract_start_date || '';
+  document.getElementById('c-renewal').value = c.renewal_date || '';
+  document.getElementById('c-status').value = c.status || 'active';
+  document.getElementById('c-prospect-id').value = c.prospect_id || '';
+  document.getElementById('client-form-title').textContent = `Modifier « ${c.school_name} »`;
+  document.getElementById('client-delete-btn').style.display = 'inline-flex';
+  document.getElementById('client-history').style.display = 'block';
+  document.getElementById('client-note-input').value = '';
+  renderActivityLog('client_school', id, 'client-history-list');
+  document.getElementById('client-form').style.display = 'block';
+}
+
+function closeClientForm(){
+  editingClientId = null;
+  document.getElementById('client-form').style.display = 'none';
+}
+
+async function saveClient(){
+  const school_name = document.getElementById('c-school').value.trim();
+  if (!school_name) return;
+  const body = {
+    school_name,
+    contact_name: document.getElementById('c-contact').value.trim(),
+    contact_email: document.getElementById('c-email').value.trim(),
+    contact_phone: document.getElementById('c-phone').value.trim(),
+    city: document.getElementById('c-city').value.trim(),
+    seats: document.getElementById('c-seats').value ? Number(document.getElementById('c-seats').value) : null,
+    annual_price: document.getElementById('c-price').value ? Number(document.getElementById('c-price').value) : null,
+    contract_start_date: document.getElementById('c-start').value || null,
+    renewal_date: document.getElementById('c-renewal').value || null,
+    status: document.getElementById('c-status').value,
+    notes: document.getElementById('c-notes').value.trim(),
+  };
+  if (!editingClientId) body.prospect_id = document.getElementById('c-prospect-id').value || null;
+  if (editingClientId) await api('client-update', { method:'POST', body: { id: editingClientId, ...body } });
+  else await api('client-create', { method:'POST', body });
+  showToast('École cliente enregistrée');
+  closeClientForm();
+  loadClients();
+}
+
+async function deleteClient(id){
+  if (!confirm('Supprimer cette école cliente ?')) return;
+  await api('client-delete', { method:'POST', body: { id } });
+  showToast('École cliente supprimée');
+  closeClientForm();
+  loadClients();
+}
+
+async function addClientNote(){
+  const input = document.getElementById('client-note-input');
+  const note = input.value.trim();
+  if (!note || !editingClientId) return;
+  await api('add-note', { method:'POST', body: { entity_type:'client_school', entity_id: editingClientId, note } });
+  input.value = '';
+  renderActivityLog('client_school', editingClientId, 'client-history-list');
+}
+
 // ─── Backlog de développement ──────────────────────────────────────
 const DEV_TYPE_LABELS = { bug:'Bug', feature:'Feature', tech_debt:'Dette technique', idee:'Idée' };
 const DEV_PRIORITY_LABELS = { basse:'Basse', moyenne:'Moyenne', haute:'Haute', urgente:'Urgente' };
@@ -1319,6 +1658,7 @@ async function loadDevBacklog(){
     window.__devIssues = items;
     renderDevBacklogTable(items);
     renderDevBacklogKanban(items);
+    setTabBadge('backlog', items.filter(d => d.priority === 'urgente' && d.status !== 'fait').length);
   } catch (e) { console.error(e); }
 }
 
@@ -1331,7 +1671,7 @@ function renderDevBacklogTable(items){
       <td>${DEV_STATUS_LABELS[d.status] || d.status}</td>
       <td>${DEV_OWNER_LABELS[d.dev_owner] || '—'}</td>
       <td>${fmtDate(d.updated_at)}</td>
-      <td><div class="actions"><button class="btn small ghost" onclick="editDevIssue('${d.id}')">✏️ Éditer</button><button class="btn small danger" onclick="deleteDevIssue('${d.id}')">Suppr.</button></div></td>
+      <td><div class="actions"><button class="btn small ghost" onclick="editDevIssue('${d.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button><button class="btn small danger" onclick="deleteDevIssue('${d.id}')">Suppr.</button></div></td>
     </tr>`).join('') : `<tr><td colspan="7" class="empty-msg">Aucun ticket pour l'instant.</td></tr>`;
 }
 
@@ -1408,6 +1748,7 @@ async function saveDevIssue(){
   };
   if (editingDevIssueId) await api('dev-issue-update', { method:'POST', body: { id: editingDevIssueId, ...body } });
   else await api('dev-issue-create', { method:'POST', body });
+  showToast('Ticket enregistré');
   closeDevIssueForm();
   loadDevBacklog();
 }
@@ -1415,6 +1756,7 @@ async function saveDevIssue(){
 async function deleteDevIssue(id){
   if (!confirm('Supprimer ce ticket du backlog ?')) return;
   await api('dev-issue-delete', { method:'POST', body: { id } });
+  showToast('Ticket supprimé');
   closeDevIssueForm();
   loadDevBacklog();
 }
@@ -1451,9 +1793,9 @@ function renderVaultList(items){
       </div>
       <span class="vault-item-secret" id="vault-secret-${v.id}" data-revealed="false">••••••••</span>
       <div class="actions">
-        <button class="btn small ghost" id="vault-toggle-${v.id}" onclick="toggleVaultSecret('${v.id}')">👁 Révéler</button>
-        <button class="btn small ghost" onclick="copyVaultSecret('${v.id}')" id="vault-copy-${v.id}">📋 Copier</button>
-        <button class="btn small ghost" onclick="editVaultSecret('${v.id}')">✏️ Éditer</button>
+        <button class="btn small ghost" id="vault-toggle-${v.id}" onclick="toggleVaultSecret('${v.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> Révéler</button>
+        <button class="btn small ghost" onclick="copyVaultSecret('${v.id}')" id="vault-copy-${v.id}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg> Copier</button>
+        <button class="btn small ghost" onclick="editVaultSecret('${v.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button>
       </div>
     </div>`).join('') : `<div class="empty-msg">Aucun secret enregistré pour l'instant.</div>`;
 }
@@ -1464,14 +1806,14 @@ async function toggleVaultSecret(id){
   if (span.dataset.revealed === 'true') {
     span.textContent = '••••••••';
     span.dataset.revealed = 'false';
-    btn.textContent = '👁 Révéler';
+    btn.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> Révéler';
     return;
   }
   try {
     const { secret } = await api('vault-reveal', { params: { id } });
     span.textContent = secret;
     span.dataset.revealed = 'true';
-    btn.textContent = '🙈 Masquer';
+    btn.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.2A10.6 10.6 0 0 1 12 5c6 0 10 7 10 7a17.6 17.6 0 0 1-3.4 4.2M6.5 6.5C4 8.2 2 12 2 12s4 7 10 7c1.4 0 2.7-.3 3.8-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg> Masquer';
   } catch (e) { console.error(e); }
 }
 
@@ -1529,6 +1871,7 @@ async function saveVaultSecret(){
   if (secret) body.secret = secret;
   if (editingVaultId) await api('vault-update', { method:'POST', body: { id: editingVaultId, ...body } });
   else await api('vault-create', { method:'POST', body });
+  showToast('Secret enregistré');
   closeVaultForm();
   loadVault();
 }
@@ -1536,6 +1879,7 @@ async function saveVaultSecret(){
 async function deleteVaultSecret(id){
   if (!confirm('Supprimer ce secret du coffre-fort ? Cette action est irréversible.')) return;
   await api('vault-delete', { method:'POST', body: { id } });
+  showToast('Secret supprimé');
   closeVaultForm();
   loadVault();
 }
@@ -1583,13 +1927,13 @@ function renderSecurityChecklist(items){
           <div class="checklist-item-label">${escHtml(item.label)}</div>
           <div class="checklist-item-why">${escHtml(item.why)}</div>
           <div class="checklist-item-meta">
-            <span class="badge ${item.overdue ? 'badge-overdue' : 'badge-ok'}">${item.overdue ? '⚠️ À vérifier' : '✅ À jour'}</span>
+            <span class="badge ${item.overdue ? 'badge-overdue' : 'badge-ok'}">${item.overdue ? '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> À vérifier' : '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8,12 11,15 16,9"/></svg> À jour'}</span>
             <span>${item.checkedAt ? `Vérifié il y a ${item.daysSinceCheck} jour${item.daysSinceCheck > 1 ? 's' : ''} (${fmtDate(item.checkedAt)})` : 'Jamais vérifié'}</span>
             ${item.frequencyDays ? `<span>· À revérifier tous les ${item.frequencyDays} jours</span>` : ''}
           </div>
         </div>
         <div class="checklist-item-actions">
-          <button class="btn small ghost" style="width:auto" onclick="checkSecurityItem('${item.key}')">✔️ Marquer vérifié</button>
+          <button class="btn small ghost" style="width:auto" onclick="checkSecurityItem('${item.key}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,12 9,17 20,6"/></svg> Marquer vérifié</button>
         </div>
       </div>`).join('')}
   `).join('');
@@ -1597,6 +1941,7 @@ function renderSecurityChecklist(items){
 
 async function checkSecurityItem(key){
   await api('security-checklist-check', { method:'POST', body: { key } });
+  showToast('Vérification enregistrée');
   loadSecurityChecklist();
 }
 
@@ -1614,6 +1959,7 @@ async function saveResourceLink(){
   const url = document.getElementById('l-url').value.trim();
   if (!label || !url) return;
   await api('link-create', { method:'POST', body: { label, url, category: document.getElementById('l-category').value.trim() } });
+  showToast('Lien enregistré');
   closeLinkForm();
   loadLinks();
 }
@@ -1621,6 +1967,7 @@ async function saveResourceLink(){
 async function deleteResourceLink(id){
   if (!confirm('Supprimer ce lien ?')) return;
   await api('link-delete', { method:'POST', body: { id } });
+  showToast('Lien supprimé');
   loadLinks();
 }
 
@@ -1631,9 +1978,39 @@ async function loadCompetitors(){
   try {
     const { items } = await api('competitors-list');
     window.__competitors = items;
+    renderCompetitorsOverview(items);
     renderCompetitorsList(items);
   } catch (e) { console.error(e); }
 }
+
+// Tendances de marché : uniquement à partir de champs fiables (dates de
+// vérification réelles, changements détectés par hash) — jamais un
+// classement par CA, ce champ est un texte libre non structuré
+// ("500k$/an", "non trouvé"...) qu'on ne peut pas comparer honnêtement.
+function renderCompetitorsOverview(items){
+  const overviewEl = document.getElementById('competitors-overview');
+  if (!items.length) { overviewEl.innerHTML = ''; document.getElementById('competitors-overview-body').innerHTML = ''; return; }
+  const changed = items.filter(c => c.content_changed).length;
+  const neverChecked = items.filter(c => !c.last_checked_at).length;
+  const stale = items.filter(c => c.last_checked_at && daysUntil(c.last_checked_at.slice(0,10)) < -30).length;
+  overviewEl.innerHTML =
+    kpiCard('Concurrents suivis', items.length) +
+    kpiCard('Changements à revoir', changed, changed ? 'Détectés depuis la dernière vérification' : undefined) +
+    kpiCard('Jamais vérifiés', neverChecked) +
+    kpiCard('Vérif. en retard (30j+)', stale);
+
+  const rows = [...items].sort((a, b) => (b.content_changed === a.content_changed ? 0 : b.content_changed ? 1 : -1));
+  document.getElementById('competitors-overview-body').innerHTML = rows.map(c => `
+    <tr>
+      <td><a href="${escHtml(c.url)}" target="_blank" rel="noopener" class="fname">${escHtml(c.name)}</a>${c.content_changed ? ' <span class="badge" style="background:#FFE9D6;color:#C2540A">Changé</span>' : ''}</td>
+      <td>${escHtml(c.estimated_revenue || '—')}</td>
+      <td style="max-width:220px;white-space:normal;font-size:12.5px">${escHtml(truncate(c.strengths, 90))}</td>
+      <td style="max-width:220px;white-space:normal;font-size:12.5px">${escHtml(truncate(c.weaknesses, 90))}</td>
+      <td>${c.last_checked_at ? fmtDate(c.last_checked_at) : `<span class="muted">Jamais</span>`}</td>
+    </tr>`).join('');
+}
+
+function truncate(s, n){ s = s || '—'; return s.length > n ? s.slice(0, n - 1) + '…' : s; }
 
 // ─── Suggestions de concurrents (file d'attente pré-alimentée) ─────
 let competitorSuggestions = [];
@@ -1691,7 +2068,7 @@ function renderCompetitorsList(items){
     <div class="competitor-card">
       <div class="competitor-card-head">
         <a href="${escHtml(c.url)}" target="_blank" rel="noopener" class="fname">${escHtml(c.name)}</a>
-        ${c.content_changed ? '<span class="badge" style="background:#FFE9D6;color:#C2540A">⚠️ Changement détecté</span>' : ''}
+        ${c.content_changed ? '<span class="badge" style="background:#FFE9D6;color:#C2540A"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> Changement détecté</span>' : ''}
         <span class="muted" style="font-size:12px">${c.last_checked_at ? 'Vérifié le ' + fmtDateTime(c.last_checked_at) : 'Jamais vérifié'}</span>
       </div>
       <div class="competitor-card-body">
@@ -1700,16 +2077,16 @@ function renderCompetitorsList(items){
         <div><strong>CA estimé</strong>${escHtml(c.estimated_revenue || '—')}</div>
       </div>
       <div class="actions">
-        <button class="btn small ghost" id="competitor-check-btn-${c.id}" onclick="checkCompetitor('${c.id}')">🔍 Vérifier les changements</button>
-        <button class="btn small ghost" onclick="editCompetitor('${c.id}')">✏️ Éditer</button>
+        <button class="btn small ghost" id="competitor-check-btn-${c.id}" onclick="checkCompetitor('${c.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Vérifier les changements</button>
+        <button class="btn small ghost" onclick="editCompetitor('${c.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button>
       </div>
     </div>`).join('') : `<div class="empty-msg">Aucun concurrent enregistré pour l'instant.</div>`;
 }
 
 async function checkCompetitor(id){
   const btn = document.getElementById(`competitor-check-btn-${id}`);
-  const original = btn.textContent;
-  btn.textContent = '⏳ Vérification...';
+  const original = btn.innerHTML;
+  btn.innerHTML = '<svg class="ic spin" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-opacity="0.25"/><path d="M21 12a9 9 0 0 0-9-9"/></svg> Vérification...';
   btn.disabled = true;
   try {
     await api('competitor-check', { method:'POST', body: { id } });
@@ -1717,7 +2094,7 @@ async function checkCompetitor(id){
     alert("Erreur lors de la vérification : " + e.message);
   }
   btn.disabled = false;
-  btn.textContent = original;
+  btn.innerHTML = original;
   loadCompetitors();
 }
 
@@ -1766,6 +2143,7 @@ async function saveCompetitor(){
   };
   if (editingCompetitorId) await api('competitor-update', { method:'POST', body: { id: editingCompetitorId, ...body } });
   else await api('competitor-create', { method:'POST', body });
+  showToast('Concurrent enregistré');
   closeCompetitorForm();
   loadCompetitors();
 }
@@ -1773,6 +2151,7 @@ async function saveCompetitor(){
 async function deleteCompetitor(id){
   if (!confirm('Supprimer ce concurrent du suivi ?')) return;
   await api('competitor-delete', { method:'POST', body: { id } });
+  showToast('Concurrent supprimé');
   closeCompetitorForm();
   loadCompetitors();
 }
@@ -1788,7 +2167,7 @@ async function addCompetitorNote(){
 
 // ─── Historique par élément (prospect ou contenu) ─────────────────
 // Générique : réutilisé par le formulaire prospect et le formulaire contenu.
-const ACTIVITY_ICONS = { created: '✨', updated: '✏️', status_changed: '🔄', note: '💬' };
+const ACTIVITY_ICONS = { created: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg>', updated: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>', status_changed: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg>', note: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg>' };
 
 async function renderActivityLog(entityType, entityId, listElId){
   const el = document.getElementById(listElId);
@@ -1871,6 +2250,7 @@ async function saveProspect(){
   };
   if (editingProspectId) await api('update-prospect', { method:'POST', body: { id: editingProspectId, ...body } });
   else await api('create-prospect', { method:'POST', body });
+  showToast('École enregistrée');
   closeProspectForm();
   loadProspects();
   loadKpis();
@@ -1978,6 +2358,7 @@ async function logContact(id, status){
 async function deleteProspect(id){
   if (!confirm('Supprimer cette école de la liste de prospection ?')) return;
   await api('delete-prospect', { method:'POST', body: { id } });
+  showToast('École supprimée');
   loadProspects();
   loadKpis();
 }
@@ -1986,7 +2367,7 @@ async function syncZimbra(){
   const btn = document.getElementById('sync-btn');
   const resultEl = document.getElementById('sync-result');
   btn.disabled = true;
-  btn.textContent = '⏳ Sync en cours…';
+  btn.innerHTML = '<svg class="ic spin" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-opacity="0.25"/><path d="M21 12a9 9 0 0 0-9-9"/></svg> Sync en cours…';
   resultEl.innerHTML = '';
   try {
     const r = await api('sync-zimbra', { method: 'POST' });
@@ -1997,7 +2378,7 @@ async function syncZimbra(){
     resultEl.innerHTML = `<div class="callout" style="margin:10px 0;background:#FBE7E5;border-color:#F3C7C1">${e.message}</div>`;
   } finally {
     btn.disabled = false;
-    btn.textContent = '🔄 Sync emails';
+    btn.innerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg> Sync emails';
   }
 }
 
@@ -2011,13 +2392,18 @@ function shiftMonth(delta){
   renderCalendarHeader();
   loadCalendar();
 }
+function goToToday(){
+  calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  renderCalendarHeader();
+  loadCalendar();
+}
 
 const ACCOUNT_LABELS = { keypace: 'KeyPace', fondateur_1: 'Théo', fondateur_2: 'Vincent' };
 
 function contentCardHtml(ev){
   const isTask = ev.content_type === 'tache';
-  return `<div class="content-card" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')" style="${isTask ? 'background:#FFF6F2;border-color:#FFD9CC' : ''}">
-    <span class="ctitle">${isTask ? '✅ ' : ''}${ev.title}</span>
+  return `<div class="content-card cs-${ev.status || 'idee'}" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')" title="${CONTENT_STATUS_LABELS[ev.status] || ''}" style="${isTask ? 'background:#FFF6F2' : ''}">
+    <span class="ctitle">${isTask ? '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8,12 11,15 16,9"/></svg> ' : ''}${ev.title}</span>
     <span class="cmeta">${(ev.platforms || []).map(p => `<span class="platform-tag">${p}</span>`).join('')}<span class="platform-tag" style="background:#EAE6F5">${ACCOUNT_LABELS[ev.account] || 'KeyPace'}</span>${isTask ? 'tâche' : ev.content_type}</span>
   </div>`;
 }
@@ -2035,12 +2421,13 @@ async function loadCalendar(){
     const daysInMonth = new Date(year, month+1, 0).getDate();
     const dows = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 
+    const todayStr = monthKey(new Date()) === monthKey(calMonth) ? String(new Date().getDate()) : null;
     let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
     for (let i=0;i<firstDow;i++) html += `<div class="cal-day empty"></div>`;
     for (let day=1; day<=daysInMonth; day++){
       const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
       const items = (byDay[dateStr] || []).map(contentCardHtml).join('');
-      html += `<div class="cal-day" ondragover="allowDrop(event)" ondrop="dropOnDay(event,'${dateStr}')">
+      html += `<div class="cal-day${todayStr === String(day) ? ' today' : ''}" ondragover="allowDrop(event)" ondrop="dropOnDay(event,'${dateStr}')">
         <div class="dnum">${day}</div>${items}
       </div>`;
     }
@@ -2094,9 +2481,9 @@ function renderCalendarKanban(events){
       <div class="kanban-col-body" ondragover="allowDrop(event)" ondrop="dropOnContentStatusColumn(event,'${status}')">
         ${byStatus[status].map(ev => `
           <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${ev.id}')" onclick="editEvent('${ev.id}')">
-            <span class="kc-title">${ev.content_type === 'tache' ? '✅ ' : ''}${escHtml(ev.title)}</span>
+            <span class="kc-title">${ev.content_type === 'tache' ? '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8,12 11,15 16,9"/></svg> ' : ''}${escHtml(ev.title)}</span>
             <span class="kc-meta">${(ev.platforms || []).map(p => `<span class="platform-tag">${p}</span>`).join('')}${ev.content_type}</span>
-            <div class="kc-meta">${ev.scheduled_date ? '📅 ' + fmtDate(ev.scheduled_date) : 'Backlog'}</div>
+            <div class="kc-meta">${ev.scheduled_date ? '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg> ' + fmtDate(ev.scheduled_date) : 'Backlog'}</div>
           </div>`).join('') || `<p class="muted" style="font-size:11.5px;margin:0;text-align:center">—</p>`}
       </div>
     </div>`).join('');
@@ -2155,6 +2542,7 @@ function editEvent(id){
 async function deleteEvent(id){
   if (!confirm('Supprimer ce contenu du calendrier ?')) return;
   await api('delete-event', { method:'POST', body: { id } });
+  showToast('Contenu supprimé');
   closeEventForm();
   loadCalendar();
 }
@@ -2217,7 +2605,7 @@ function generateContentIdeas(){
   const picks = [...pool].sort(() => Math.random() - 0.5).slice(0, 5);
   window.__currentIdeaPicks = picks;
   const el = document.getElementById('idea-bank-results');
-  const note = excludedCount ? `<p class="muted" style="font-size:12px;margin:0 0 10px">🧠 ${excludedCount} sujet${excludedCount>1?'s':''} déjà traité${excludedCount>1?'s':''} n'${excludedCount>1?'ont':'a'} pas été reproposé${excludedCount>1?'s':''}.</p>` : '';
+  const note = excludedCount ? `<p class="muted" style="font-size:12px;margin:0 0 10px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg> ${excludedCount} sujet${excludedCount>1?'s':''} déjà traité${excludedCount>1?'s':''} n'${excludedCount>1?'ont':'a'} pas été reproposé${excludedCount>1?'s':''}.</p>` : '';
   el.innerHTML = note + (picks.length ? `<div class="idea-grid">${picks.map((idea, i) => `
     <div class="idea-card" id="idea-card-${i}">
       <div class="ititle">${idea.title}</div>
@@ -2284,6 +2672,7 @@ async function saveEvent(){
   };
   if (editingEventId) await api('update-event', { method:'POST', body: { id: editingEventId, ...body } });
   else await api('create-event', { method:'POST', body });
+  showToast('Contenu enregistré');
   closeEventForm();
   loadCalendar();
 }
@@ -2304,6 +2693,7 @@ function renderReviews(){
   const pending = items.filter(r => r.status === 'pending').length;
   const published = items.filter(r => r.status === 'published').length;
   document.getElementById('reviews-summary').textContent = `${pending} en attente · ${published} publié${published > 1 ? 's' : ''}`;
+  setTabBadge('reviews', pending);
   document.getElementById('reviews-body').innerHTML = items.length ? items.map(r => `
     <tr>
       <td>${escHtml(r.author_name)}</td>
@@ -2321,6 +2711,7 @@ function renderReviews(){
 async function setReviewStatus(id, status){
   const action = status === 'published' ? 'publish-review' : 'reject-review';
   await api(action, { method: 'POST', body: { id } });
+  showToast(status === 'published' ? 'Avis publié' : 'Avis rejeté');
   await loadReviews();
 }
 

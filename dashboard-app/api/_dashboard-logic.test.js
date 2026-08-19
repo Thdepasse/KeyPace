@@ -2,7 +2,7 @@
 // Lancer : node --test api/_dashboard-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals } = require('./_dashboard-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -198,6 +198,17 @@ test('upcomingMeetings : RDV dans les prochaines 24h uniquement, pas le passé n
     { id: 4, meeting_at: null },
   ];
   assert.deepEqual(upcomingMeetings(prospects, NOW).map((p) => p.id), [1]);
+});
+
+test('upcomingRenewals : renouvellements actifs dans les 30 prochains jours ou déjà en retard', () => {
+  const clients = [
+    { id: 1, status: 'active', renewal_date: new Date(NOW + 10 * DAY).toISOString().slice(0, 10) }, // dans 10j : oui
+    { id: 2, status: 'active', renewal_date: new Date(NOW - 5 * DAY).toISOString().slice(0, 10) }, // en retard : oui
+    { id: 3, status: 'active', renewal_date: new Date(NOW + 60 * DAY).toISOString().slice(0, 10) }, // trop loin : non
+    { id: 4, status: 'annule', renewal_date: new Date(NOW + 1 * DAY).toISOString().slice(0, 10) }, // annulée : non
+    { id: 5, status: 'active', renewal_date: null }, // pas de date : non
+  ];
+  assert.deepEqual(upcomingRenewals(clients, NOW).map((c) => c.id), [1, 2]);
 });
 
 test('excludeDismissedDuplicates : retire uniquement les groupes explicitement écartés', () => {
