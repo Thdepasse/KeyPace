@@ -3,6 +3,7 @@
 // POST {token}                  : élève connecté, lit son propre avis (ou null).
 // POST {token,rating,comment}   : dépose/modifie son avis natif (1 par
 // utilisateur, resoumission = repasse en modération).
+const { setCorsOrigin } = require('./_cors');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
@@ -78,7 +79,7 @@ async function myReview(req, res) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  setCorsOrigin(req, res);
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();

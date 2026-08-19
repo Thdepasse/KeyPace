@@ -3,6 +3,7 @@
 // POST (body.action=contact) → formulaire de contact licence
 const { Resend } = require('resend');
 const crypto = require('crypto');
+const { setCorsOrigin } = require('./_cors');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -60,7 +61,7 @@ async function clearAdminKeyFailures(existing) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  setCorsOrigin(req, res);
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,X-Admin-Key');
   if (req.method === 'OPTIONS') return res.status(200).end();

@@ -1,5 +1,6 @@
 const { Resend } = require('resend');
 const { hashPassword } = require('./_auth');
+const { setCorsOrigin } = require('./_cors');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -207,7 +208,7 @@ async function verifyEmail(req, res) {
 module.exports = async function handler(req, res) {
   if (req.method === 'GET') return verifyEmail(req, res);
 
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  setCorsOrigin(req, res);
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -275,19 +276,22 @@ module.exports = async function handler(req, res) {
     if (consent !== true) {
       return res.status(400).json({ error: 'Tu dois accepter les conditions et la politique de confidentialité pour créer un compte.' });
     }
+    // Obligatoire (auparavant facultative) : le contrôle "email d'un parent
+    // requis si < 13 ans" juste en dessous ne s'appliquait que si la date
+    // était renseignée — un mineur pouvait donc simplement laisser le champ
+    // vide pour contourner la protection.
     const bd = (birthdate || '').trim();
-    if (bd) {
-      const d = new Date(bd);
-      if (isNaN(d.getTime())) return res.status(400).json({ error: 'Date de naissance invalide.' });
-      birthdateVal = bd;
-      const age = Math.floor((Date.now() - d.getTime()) / 31557600000); // ~365,25 j
-      if (age < 13) {
-        const pe = (parentEmail || '').trim();
-        if (!emailRe.test(pe)) {
-          return res.status(400).json({ error: "En dessous de 13 ans, l'accord d'un responsable légal est requis : indique son adresse email." });
-        }
-        parentEmailVal = pe;
+    if (!bd) return res.status(400).json({ error: 'Date de naissance requise.' });
+    const d = new Date(bd);
+    if (isNaN(d.getTime())) return res.status(400).json({ error: 'Date de naissance invalide.' });
+    birthdateVal = bd;
+    const age = Math.floor((Date.now() - d.getTime()) / 31557600000); // ~365,25 j
+    if (age < 13) {
+      const pe = (parentEmail || '').trim();
+      if (!emailRe.test(pe)) {
+        return res.status(400).json({ error: "En dessous de 13 ans, l'accord d'un responsable légal est requis : indique son adresse email." });
       }
+      parentEmailVal = pe;
     }
   }
 

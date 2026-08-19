@@ -3,9 +3,10 @@
 // Route par `action` dans le body JSON. Helpers dans _boss-shared / _duel-shared.
 const { sb, getCurrentChallenge, computeScore } = require('./_boss-shared');
 const { DUEL_TEXTS, userFromToken, generateRoomCode } = require('./_duel-shared');
+const { setCorsOrigin } = require('./_cors');
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  setCorsOrigin(req, res);
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();

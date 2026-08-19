@@ -1,5 +1,6 @@
 const { Resend } = require('resend');
 const { hashPassword, verifyPassword } = require('./_auth');
+const { setCorsOrigin } = require('./_cors');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -139,8 +140,106 @@ function emailChangeConfirmEmail(username, verifyUrl) {
 </body></html>`;
 }
 
+function inactivityWarningEmail(username) {
+  return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>:root{color-scheme:light only}body{background-color:#faf9f5!important}</style>
+</head>
+<body style="margin:0;padding:0;background-color:#faf9f5!important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#16140F">
+  <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#faf9f5" style="background-color:#faf9f5!important;padding:36px 16px">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px">
+        <tr><td align="center" style="padding-bottom:20px">
+          <table cellpadding="0" cellspacing="0"><tr>
+            <td bgcolor="#FF6B2B" style="background-color:#FF6B2B;border-radius:11px;width:36px;height:36px;text-align:center;vertical-align:middle">
+              <span style="font-family:'Courier New',monospace;font-size:18px;font-weight:700;color:#fff">K</span>
+            </td>
+            <td style="padding-left:9px;font-size:19px;font-weight:800;color:#16140F;letter-spacing:-0.02em">KeyPace</td>
+          </tr></table>
+        </td></tr>
+        <tr><td bgcolor="#ffffff" style="background-color:#fff;border:1px solid #E7E1D5;border-radius:22px;overflow:hidden">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td bgcolor="#FF6B2B" style="background-color:#FF6B2B;padding:28px 36px 24px;text-align:center">
+              <p style="margin:0 0 8px;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.02em">Ton compte va être supprimé</p>
+              <p style="margin:0;font-size:14px;color:rgba(255,255,255,.88)">Bonjour ${username}, ça fait longtemps qu'on ne t'a pas vu.</p>
+            </td></tr>
+            <tr><td style="padding:32px 36px 24px;text-align:center">
+              <p style="margin:0 0 20px;font-size:14px;color:#7A7365;line-height:1.6">Conformément à notre politique de confidentialité, les comptes gratuits inactifs depuis 24 mois sont supprimés. Ton compte et tes données seront <strong style="color:#16140F">définitivement effacés dans 30 jours</strong> si tu ne te reconnectes pas d'ici là.</p>
+              <a href="${APP_URL}" style="display:inline-block;background-color:#FF6B2B;color:#fff;text-decoration:none;font-size:15px;font-weight:700;padding:14px 36px;border-radius:13px">Me reconnecter</a>
+            </td></tr>
+            <tr><td bgcolor="#F8F5F0" style="background-color:#F8F5F0;border-top:1px solid #E7E1D5;padding:16px 36px;text-align:center">
+              <p style="margin:0;font-size:12px;color:#8A8275;line-height:1.6">Te reconnecter annule automatiquement cette suppression.</p>
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
+// Purge des comptes individuels gratuits inactifs (politique de rétention,
+// voir confidentialite.html section 7) — déclenchée par Vercel Cron (GET,
+// voir vercel.json), authentifiée par le header Authorization que Vercel
+// ajoute automatiquement quand CRON_SECRET est configuré côté projet.
+// Portée volontairement restreinte à role=eleve + institution_id null +
+// plan=free : les comptes Expert (abonnement actif) et les comptes
+// d'établissement (cycle de vie géré par l'école) sont exclus.
+const INACTIVITY_WARN_MS = 24 * 30 * 24 * 60 * 60 * 1000; // ~24 mois
+const INACTIVITY_DELETE_GRACE_MS = 30 * 24 * 60 * 60 * 1000; // 30 jours après l'email
+async function retentionSweep(req, res) {
+  const secret = process.env.CRON_SECRET;
+  if (!secret || req.headers['authorization'] !== `Bearer ${secret}`) {
+    return res.status(401).json({ error: 'Non autorisé.' });
+  }
+  const now = Date.now();
+  const warnCutoff = new Date(now - INACTIVITY_WARN_MS).toISOString();
+  const deleteCutoff = new Date(now - INACTIVITY_DELETE_GRACE_MS).toISOString();
+
+  // Étape 1 : avertir les comptes fraîchement inactifs (jamais avertis).
+  // last_seen_at=is.null couvre les comptes créés avant l'ajout de cette
+  // colonne (on retombe sur created_at pour eux).
+  const toWarnR = await sb(
+    `/users?role=eq.eleve&institution_id=is.null&plan=eq.free&deletion_warned_at=is.null` +
+    `&or=(last_seen_at.lt.${warnCutoff},and(last_seen_at.is.null,created_at.lt.${warnCutoff}))` +
+    `&select=id,username,email`
+  );
+  const toWarn = Array.isArray(toWarnR.data) ? toWarnR.data : [];
+  let warned = 0;
+  for (const u of toWarn) {
+    if (RESEND_API_KEY && u.email) {
+      try {
+        const resend = new Resend(RESEND_API_KEY);
+        await resend.emails.send({ from: FROM_EMAIL, to: u.email, subject: 'Ton compte KeyPace va être supprimé pour inactivité', html: inactivityWarningEmail(u.username) });
+      } catch (e) { console.error('Inactivity warning email error:', e.message); }
+    }
+    await sb(`/users?id=eq.${u.id}`, { method: 'PATCH', body: JSON.stringify({ deletion_warned_at: new Date().toISOString() }) });
+    warned++;
+  }
+
+  // Étape 2 : supprimer les comptes avertis il y a 30+ jours, toujours inactifs.
+  const toDeleteR = await sb(
+    `/users?role=eq.eleve&institution_id=is.null&plan=eq.free&deletion_warned_at=lt.${deleteCutoff}` +
+    `&or=(last_seen_at.lt.${warnCutoff},last_seen_at.is.null)&select=id`
+  );
+  const toDelete = Array.isArray(toDeleteR.data) ? toDeleteR.data : [];
+  for (const u of toDelete) {
+    await sb(`/reviews?user_id=eq.${u.id}`, { method: 'DELETE' });
+    await sb(`/users?id=eq.${u.id}`, { method: 'DELETE' });
+  }
+
+  return res.json({ ok: true, warned, deleted: toDelete.length });
+}
+
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Vercel Cron (GET, voir vercel.json) — routé avant le garde POST-only
+  // ci-dessous, même principe que verifyEmail() dans api/register.js.
+  if (req.method === 'GET') {
+    const action = (req.query && req.query.action) || new URL(req.url, `https://${req.headers.host}`).searchParams.get('action');
+    if (action === 'retention-sweep-cron') return retentionSweep(req, res);
+    return res.status(400).json({ error: 'Action inconnue.' });
+  }
+  setCorsOrigin(req, res);
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -201,6 +300,8 @@ module.exports = async function handler(req, res) {
         verification_expires_at: null,
         session_token: newSession,
         session_expires_at: sessionExpiresAt(),
+        last_seen_at: new Date().toISOString(),
+        deletion_warned_at: null,
         failed_attempts: 0,
         locked_until: null,
         must_change_password: false, // ce reset auto-choisi compte comme le changement exigé, s'il l'était
@@ -256,6 +357,11 @@ module.exports = async function handler(req, res) {
     const user = uR.data && uR.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     if (!verifyPassword(passwordHash, user.password_hash).ok) return res.status(401).json({ error: 'Mot de passe incorrect.' });
+    // reviews.user_id est en `on delete set null` (le commentaire reste affiché
+    // publiquement après suppression du compte, uniquement délié) — on le
+    // supprime explicitement avant, le droit à l'effacement porte sur le
+    // commentaire nommé, pas seulement sur le lien vers le compte.
+    await sb(`/reviews?user_id=eq.${user.id}`, { method: 'DELETE' });
     // Les FK on delete cascade nettoient progress, class_members, scores, etc.
     await sb(`/users?id=eq.${user.id}`, { method: 'DELETE' });
     return res.json({ ok: true });
@@ -394,6 +500,7 @@ module.exports = async function handler(req, res) {
     const r = await sb(`/users?${sessionFilter(token)}&select=*`);
     const user = r.data && r.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ last_seen_at: new Date().toISOString(), deletion_warned_at: null }) });
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
     const progress = pr.data && pr.data[0];
     return res.json({ id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, email: user.email || null, displayName: user.display_name || null, mustChangePassword: !!user.must_change_password, institutionName: await institutionNameFor(user.institution_id), hasClass: await hasAnyClass(user.id), token, data: progress?.data || {} });
@@ -423,7 +530,7 @@ module.exports = async function handler(req, res) {
   if (user.verification_token) return res.status(403).json({ error: 'Confirme ton adresse email avant de te connecter. Vérifie ta boîte mail.', code: 'EMAIL_NOT_VERIFIED' });
 
   const token = require('crypto').randomUUID();
-  const patch = { session_token: token, session_expires_at: sessionExpiresAt(), failed_attempts: 0, locked_until: null };
+  const patch = { session_token: token, session_expires_at: sessionExpiresAt(), last_seen_at: new Date().toISOString(), deletion_warned_at: null, failed_attempts: 0, locked_until: null };
   if (check.upgrade) patch.password_hash = check.upgrade; // migration SHA-256 brut -> scrypt
   await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
 
