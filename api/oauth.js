@@ -170,7 +170,7 @@ async function findOrCreateUser(provider, profile, inviteCtx) {
     // Liaison auto + nouvelle session ; on confirme l'email au passage.
     // Note : une invitation présente ici n'est pas appliquée à un compte déjà
     // existant (même périmètre que register.js, qui ne gère que la création).
-    const patch = { session_token: session, session_expires_at: sessionExpiresAt(), email_verified: true };
+    const patch = { session_token: session, session_expires_at: sessionExpiresAt(), last_seen_at: new Date().toISOString(), deletion_warned_at: null, email_verified: true };
     if (!existing.oauth_provider) patch.oauth_provider = provider;
     if (existing.verification_token) patch.verification_token = null;
     await sb(`/users?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify(patch) });

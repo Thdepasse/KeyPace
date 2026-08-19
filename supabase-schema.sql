@@ -601,3 +601,21 @@ create table if not exists admin_key_attempts (
   locked_until timestamptz
 );
 alter table admin_key_attempts enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Politique de rétention des comptes individuels gratuits inactifs (août
+-- 2026, voir confidentialite.html section 7) — purge automatique via Vercel
+-- Cron (api/login.js, action=retention-sweep-cron, tourne quotidiennement).
+-- last_seen_at : mise à jour à chaque connexion (login, session-login,
+--   reset de mot de passe, SSO) ; NULL pour les comptes créés avant l'ajout
+--   de cette colonne (le sweep retombe alors sur created_at).
+-- deletion_warned_at : horodatage de l'email d'avertissement envoyé après
+--   24 mois d'inactivité ; remis à NULL dès que le compte se reconnecte
+--   (annule la suppression programmée). Le compte est supprimé 30 jours
+--   après cet avertissement s'il reste inactif.
+-- Portée : uniquement role=eleve + institution_id null + plan=free — les
+-- comptes Expert et les comptes d'établissement en sont exclus.
+-- ───────────────────────────────────────────────────────────────
+alter table users
+  add column if not exists last_seen_at timestamptz,
+  add column if not exists deletion_warned_at timestamptz;

@@ -30,5 +30,8 @@
           { "source": "/guide/ordinateur-portable-ou-fixe", "destination": "/guide/ordinateur-portable-ou-fixe.html" },
           { "source": "/api/verify-email", "destination": "/api/register" },
           { "source": "/((?!api/).*)", "destination": "/index.html" }
+    ],
+    "crons": [
+          { "path": "/api/login?action=retention-sweep-cron", "schedule": "0 6 * * *" }
     ]
 }
