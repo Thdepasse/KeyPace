@@ -649,3 +649,42 @@ alter table admin_key_attempts enable row level security;
 alter table users
   add column if not exists last_seen_at timestamptz,
   add column if not exists deletion_warned_at timestamptz;
+
+-- ───────────────────────────────────────────────────────────────
+-- Policies RLS explicites (août 2026)
+-- Chaque table listée ci-dessus avait RLS activée mais AUCUNE policy
+-- écrite — ça bloque déjà tout accès pour la clé anonyme (deny-by-default
+-- Postgres), mais un outil d'audit (ou une relecture humaine) ne peut pas
+-- distinguer "volontairement verrouillé" de "policy oubliée". Ces policies
+-- ne changent donc AUCUN comportement : elles rendent explicite un
+-- deny-all déjà en vigueur.
+-- Le code applicatif (api/*.js) n'est jamais concerné : il utilise la clé
+-- service-role, qui contourne RLS entièrement (BYPASSRLS), qu'il y ait une
+-- policy ou non. Seule la clé anonyme (utilisée côté client uniquement pour
+-- Supabase Realtime — canaux broadcast/presence du Duel 1v1, jamais de
+-- requête de table directe) est concernée par ces policies.
+-- ───────────────────────────────────────────────────────────────
+create policy "no_anon_access" on weekly_challenges for all to anon using (false) with check (false);
+create policy "no_anon_access" on weekly_scores for all to anon using (false) with check (false);
+create policy "no_anon_access" on duel_rooms for all to anon using (false) with check (false);
+create policy "no_anon_access" on duel_results for all to anon using (false) with check (false);
+create policy "no_anon_access" on classes for all to anon using (false) with check (false);
+create policy "no_anon_access" on class_members for all to anon using (false) with check (false);
+create policy "no_anon_access" on assignments for all to anon using (false) with check (false);
+create policy "no_anon_access" on prof_invites for all to anon using (false) with check (false);
+create policy "no_anon_access" on certificates for all to anon using (false) with check (false);
+create policy "no_anon_access" on school_prospects for all to anon using (false) with check (false);
+create policy "no_anon_access" on content_calendar for all to anon using (false) with check (false);
+create policy "no_anon_access" on activity_log for all to anon using (false) with check (false);
+create policy "no_anon_access" on dev_backlog for all to anon using (false) with check (false);
+create policy "no_anon_access" on client_schools for all to anon using (false) with check (false);
+create policy "no_anon_access" on competitors for all to anon using (false) with check (false);
+create policy "no_anon_access" on competitor_suggestions for all to anon using (false) with check (false);
+create policy "no_anon_access" on dismissed_duplicates for all to anon using (false) with check (false);
+create policy "no_anon_access" on security_checklist_checks for all to anon using (false) with check (false);
+create policy "no_anon_access" on vault_secrets for all to anon using (false) with check (false);
+create policy "no_anon_access" on resource_links for all to anon using (false) with check (false);
+create policy "no_anon_access" on zimbra_sync_log for all to anon using (false) with check (false);
+create policy "no_anon_access" on reviews for all to anon using (false) with check (false);
+create policy "no_anon_access" on analytics_events for all to anon using (false) with check (false);
+create policy "no_anon_access" on admin_key_attempts for all to anon using (false) with check (false);

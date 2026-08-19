@@ -3,6 +3,7 @@
 const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary,
   essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats } = require('./_class-logic');
 const { hashPassword } = require('./_auth');
+const { setCorsOrigin } = require('./_cors');
 
 const crypto = require('crypto');
 function sha256hex(s) { return crypto.createHash('sha256').update(s, 'utf8').digest('hex'); }
@@ -990,7 +991,7 @@ async function essayDetail(req, res) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  setCorsOrigin(req, res);
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();

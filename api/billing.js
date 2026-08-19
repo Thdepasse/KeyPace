@@ -1,4 +1,5 @@
 const Stripe = require('stripe');
+const { setCorsOrigin } = require('./_cors');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
@@ -24,7 +25,7 @@ async function sb(path, opts = {}) {
 //   POST /api/billing  { action: 'portal',   token }              -> ouvre le portail client
 //   POST /api/billing  { action: 'verify',   token, session_id }  -> confirme le paiement (filet de sécurité, indépendant du webhook)
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  setCorsOrigin(req, res);
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
