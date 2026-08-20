@@ -715,6 +715,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .gword .gtyped{color:var(--accent)}
 .gword .grest{color:rgba(255,255,255,0.9)}
 @keyframes tierup{0%{transform:scale(1.5);color:#fff}100%{transform:scale(1);color:var(--accent)}}
+@keyframes sourisshake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
 @keyframes cdPop{0%{transform:scale(1.5);opacity:0}40%{opacity:1;transform:scale(1)}85%{opacity:1}100%{opacity:.2;transform:scale(.88)}}
 #game-cd{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.88);gap:10px;pointer-events:none;border-radius:24px}
 .cd-n{font-family:'JetBrains Mono',monospace;font-size:100px;font-weight:900;color:#fff;display:block;animation:cdPop .85s ease forwards}
@@ -835,7 +836,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 @keyframes simonblink{50%{opacity:0}}
 .simon-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:14px;max-width:420px;width:100%}
 .simon-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#ff8a5c);border-radius:3px;transition:width .1s linear}
-@media(prefers-reduced-motion:reduce){.simon-caret{animation:none}.simon-bar-fill{transition:none}.race-car{transition:none}.ttarget-life-fill{transition:none}}
+@media(prefers-reduced-motion:reduce){.simon-caret{animation:none}.simon-bar-fill{transition:none}.race-car{transition:none}.ttarget-life-fill{transition:none}.game-arena{animation:none!important}}
 
 /* BOSS DE LA SEMAINE */
 .boss-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:28px}
@@ -1313,6 +1314,11 @@ const ICONS={
   bulb:_icon('<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.2 1 2v.5h6v-.5c0-.8.3-1.4 1-2A6 6 0 0 0 12 3z"/>'),
   clock:_icon('<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/>'),
   stop:_icon('<rect x="5" y="5" width="14" height="14" rx="2" fill="currentColor" stroke="none"/>'),
+  grid:_icon('<rect x="3" y="3" width="6" height="6" rx="1.2"/><rect x="9.5" y="3" width="6" height="6" rx="1.2"/><rect x="16" y="3" width="5" height="6" rx="1.2"/><rect x="3" y="9.5" width="6" height="6" rx="1.2"/><rect x="9.5" y="9.5" width="6" height="6" rx="1.2"/><rect x="16" y="9.5" width="5" height="6" rx="1.2"/><rect x="3" y="16" width="6" height="5" rx="1.2"/><rect x="9.5" y="16" width="6" height="5" rx="1.2"/><rect x="16" y="16" width="5" height="5" rx="1.2"/>'),
+  layers:_icon('<polygon points="12 2 22 8 12 14 2 8 12 2"/><polyline points="2 13 12 19 22 13"/><polyline points="2 17.5 12 23 22 17.5"/>'),
+  palette:_icon('<path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.9-.5-1.4 0-1.1.9-2 2-2h2a4 4 0 0 0 4-4c0-3.9-4-7.2-9-7.2z"/><circle cx="7.5" cy="11.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="10" cy="7.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="7.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="17" cy="12" r="1.2" fill="currentColor" stroke="none"/>'),
+  hand:_icon('<path d="M8 13V5a1.5 1.5 0 0 1 3 0v6"/><path d="M11 11V4a1.5 1.5 0 0 1 3 0v7"/><path d="M14 11.5V6a1.5 1.5 0 0 1 3 0v8"/><path d="M17 12v-2a1.5 1.5 0 0 1 3 0v6c0 3.3-2.7 6-6 6h-1c-2 0-3-.6-4.3-2.1L5 15.8c-.6-.7-.5-1.7.2-2.3.6-.5 1.5-.5 2.1.1L9 15.5"/>'),
+  medal:_icon('<circle cx="12" cy="15" r="6"/><path d="M9 4h6l2.5 6.5-3 2-2.5-2-2.5 2-3-2z"/>'),
 };
 
 /* ── ANALYTICS MAISON (remplace Umami) : beacon fire-and-forget vers /api/track ── */
@@ -1966,12 +1972,15 @@ async function flushStats(){
   }catch{}
 }
 function mergeStats(remote){
-  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,simonBest:null,sourisBest:0,ghostBest:null,goals:{minWpm:20,maxErrors:8}};
+  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,simonBest:null,sourisBest:0,ghostBest:null,goals:{minWpm:20,maxErrors:8},
+    sourisHub:{streak:0,lastPlayDate:null,missionDate:null,missionIdx:0,missionProgress:0,missionDone:false,badges:[],skinsUnlocked:['classic'],equippedSkin:'classic',handConfig:null},
+    sourisSoloBest:null,sourisGridBest:null,sourisWavesBest:null,sourisHybridBest:null,sourisTilesBest:null,sourisDuoBest:null};
   const s=Object.assign(def, remote||{});
   s.tests=s.tests||[];s.lessons=s.lessons||{};s.goals=s.goals||{};
   if(typeof s.goals.minWpm!=='number')s.goals.minWpm=20;
   if(typeof s.goals.maxErrors!=='number')s.goals.maxErrors=8;
   if(typeof s.gameBest!=='number')s.gameBest=0;
+  s.sourisHub=Object.assign({},def.sourisHub,s.sourisHub||{});
   Object.keys(s.lessons).forEach(k=>{const v=s.lessons[k];if(typeof v==='number')s.lessons[k]={bestWpm:v,bestErr:0,cleared:true};});
   return s;
 }
@@ -3522,6 +3531,7 @@ const app={
     if(this.view==='games'&&this.activeGame==='simon'&&this.simon&&this.simon.on){this.simonKey(e);return;}
     if(this.view==='games'&&this.activeGame==='boss'&&this.boss&&this.boss.phase==='playing'){this.bossKey(e);return;}
     if(this.view==='games'&&this.activeGame==='duel'&&this.duel&&this.duel.phase==='racing'){this.duelKey(e);return;}
+    if(this.view==='games'&&this.activeGame==='souris'&&this.souris&&this.souris.phase==='play'){this.sourisKey(e);return;}
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   exitActiveGame(){
@@ -4709,8 +4719,10 @@ const app={
 
   /* ── GAMES ── */
 /* ═══════════════════════════════════════════════════════════════
-   VISÉE — maîtrise de la souris en 5 niveaux progressifs
-   1 survol · 2 clic · 3 discrimination · 4 glisser-déposer · 5 ZQSD
+   VISÉE — maîtrise de la souris et du clavier en 12 niveaux progressifs
+   1 survol · 2 clic · 3 cœur de cible · 4 réaction · 5 pièges ·
+   6 bonus · 7 pièges express · 8 glisser-déposer · 9 tri rapide ·
+   10 ZQSD seul · 11 souris+clavier · 12 chaos (tout combiné)
    Chaque niveau explique sa nouveauté avant de démarrer.
    Conventions : setInterval + stopSouris(), état dans this.souris.
    ═══════════════════════════════════════════════════════════════ */
@@ -4785,6 +4797,200 @@ const app={
       12:{click:1,core:1,traps:1,disguise:1,fast:1,bonus:1,smaller:1,move:1,hazards:1},
     })[lvl]||{};
   },
+
+  /* ═══════════════════════════════════════════════════════════════
+     VISÉE — LE HUB
+     Écran d'accueil de Visée : série de jours, mission du jour,
+     badges, skins de cible, et les cartes de piste (la piste souris
+     historique + les nouvelles). Toutes les pistes sont gratuites.
+     ═══════════════════════════════════════════════════════════════ */
+
+  _sourisTracks:[
+    {id:'mouse',name:'Précision souris',icon:'mouse',desc:'12 niveaux : viser, cliquer, glisser-déposer, ZQSD.'},
+    {id:'solo',name:'Cible unique',icon:'target',desc:'Une lettre, un rythme. Pure réaction clavier.'},
+    {id:'grid',name:'Grille réflexe',icon:'grid',desc:'9 cases, une s’allume : tape-la avant les pièges.'},
+    {id:'waves',name:'Vagues & Boss',icon:'flag',desc:'4 vagues, une règle qui change à chaque fois, un mot-boss.'},
+    {id:'hybrid',name:'Duo souris + clavier',icon:'hand',desc:'Vise à la souris, valide au clavier — une main, une lettre.'},
+    {id:'tiles',name:'Magic Tiles',icon:'layers',desc:'4 couloirs qui défilent en rythme, souris et clavier.'},
+    {id:'duo2',name:'Double piste',icon:'swords',desc:'Les deux mains sollicitées en même temps. Le plus exigeant.',advanced:true},
+  ],
+  _sourisTrackBestField(id){return {solo:'sourisSoloBest',grid:'sourisGridBest',waves:'sourisWavesBest',hybrid:'sourisHybridBest',tiles:'sourisTilesBest',duo2:'sourisDuoBest'}[id];},
+  _sourisTrackTier(id){
+    if(id==='mouse')return null;
+    const f=this._sourisTrackBestField(id);
+    const b=f&&this.stats&&this.stats[f];
+    return b?b.tier:null;
+  },
+  _sourisDuo2Unlocked(){
+    const ids=['solo','grid','waves','hybrid','tiles'];
+    return ids.filter(id=>this._sourisTrackTier(id)).length>=3;
+  },
+  _sourisTrackOpen(id){return id!=='duo2'||this._sourisDuo2Unlocked();},
+
+  _sourisMissionPool:[
+    {id:'hits20',label:'20 cibles réussies aujourd’hui, toutes pistes confondues',target:20,metric:'hits'},
+    {id:'streak10',label:'Une série de 10 réussites sans faute',target:10,metric:'bestStreak'},
+    {id:'score150',label:'150 points en une seule partie',target:150,metric:'score'},
+    {id:'combo5',label:'Un combo ×5 ou plus',target:5,metric:'combo'},
+    {id:'twoTracks',label:'Essayer 2 pistes différentes aujourd’hui',target:2,metric:'tracksToday'},
+    {id:'anyGold',label:'Décrocher une médaille d’or',target:1,metric:'goldEarned'},
+  ],
+  _sourisBadgeDefs:[
+    {id:'first_level',label:'Première cible touchée',icon:'target',check:s=>(s.sourisBest||0)>=1},
+    {id:'explorer',label:'Explorateur — 3 pistes essayées',icon:'layers',check:s=>['sourisSoloBest','sourisGridBest','sourisWavesBest','sourisHybridBest','sourisTilesBest'].filter(f=>s[f]).length>=3},
+    {id:'completionist',label:'Toutes les pistes essayées',icon:'trophy',check:s=>['sourisSoloBest','sourisGridBest','sourisWavesBest','sourisHybridBest','sourisTilesBest'].every(f=>s[f])},
+    {id:'first_gold',label:'Première médaille d’or',icon:'medal',check:s=>Object.values(s.sourisTiers||{}).includes('gold')||['sourisSoloBest','sourisGridBest','sourisWavesBest','sourisHybridBest','sourisTilesBest','sourisDuoBest'].some(f=>s[f]&&s[f].tier==='gold')},
+    {id:'streak3',label:'3 jours de suite',icon:'flame',check:s=>(s.sourisHub.streak||0)>=3},
+    {id:'streak7',label:'7 jours de suite',icon:'flame',check:s=>(s.sourisHub.streak||0)>=7},
+  ],
+  _sourisSkinDefs:[
+    {id:'classic',label:'Classique',color:'#1FA971'},
+    {id:'ember',label:'Braise (niveau 6 souris atteint)',color:'#FF4D2E',check:s=>(s.sourisBest||0)>=6},
+    {id:'aurora',label:'Aurora (2 pistes essayées)',color:'#5B8DEF',check:s=>['sourisSoloBest','sourisGridBest','sourisWavesBest','sourisHybridBest','sourisTilesBest'].filter(f=>s[f]).length>=2},
+    {id:'gold',label:'Or (une médaille d’or)',color:'#FFD84D',check:s=>Object.values(s.sourisTiers||{}).includes('gold')||['sourisSoloBest','sourisGridBest','sourisWavesBest','sourisHybridBest','sourisTilesBest','sourisDuoBest'].some(f=>s[f]&&s[f].tier==='gold')},
+  ],
+  _sourisSkinColor(){
+    const id=(this.stats&&this.stats.sourisHub&&this.stats.sourisHub.equippedSkin)||'classic';
+    return (this._sourisSkinDefs.find(s=>s.id===id)||this._sourisSkinDefs[0]).color;
+  },
+  _sourisEquipSkin(id){
+    if(!this.stats.sourisHub.skinsUnlocked.includes(id))return;
+    this.stats.sourisHub.equippedSkin=id;
+    saveStats(this.stats);
+    this.renderSouris();
+  },
+
+  _sourisTodayStr(){
+    const d=new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  },
+  _sourisTouchStreak(){
+    const h=this.stats.sourisHub, today=this._sourisTodayStr();
+    if(h.lastPlayDate===today)return;
+    const y=new Date(Date.now()-86400000);
+    const yStr=y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
+    h.streak=(h.lastPlayDate===yStr)?(h.streak||0)+1:1;
+    h.lastPlayDate=today;
+  },
+  _sourisEnsureMission(){
+    const h=this.stats.sourisHub, today=this._sourisTodayStr();
+    if(h.missionDate===today)return;
+    let hash=0;for(let i=0;i<today.length;i++)hash=(hash*31+today.charCodeAt(i))>>>0;
+    h.missionDate=today;h.missionIdx=hash%this._sourisMissionPool.length;
+    h.missionProgress=0;h.missionDone=false;h._tracksToday=[];
+  },
+  // sessionResult: {track, hits, score, combo, streakRun, tier}
+  _sourisUpdateMission(sessionResult){
+    this._sourisEnsureMission();
+    const h=this.stats.sourisHub, m=this._sourisMissionPool[h.missionIdx];
+    if(h.missionDone)return;
+    h._tracksToday=h._tracksToday||[];
+    if(!h._tracksToday.includes(sessionResult.track))h._tracksToday.push(sessionResult.track);
+    const v={
+      hits:(h.missionProgress||0)+(sessionResult.hits||0),
+      bestStreak:Math.max(h.missionProgress||0,sessionResult.streakRun||0),
+      score:Math.max(h.missionProgress||0,sessionResult.score||0),
+      combo:Math.max(h.missionProgress||0,sessionResult.combo||0),
+      tracksToday:h._tracksToday.length,
+      goldEarned:sessionResult.tier==='gold'?1:(h.missionProgress||0),
+    }[m.metric];
+    h.missionProgress=v;
+    if(v>=m.target&&!h.missionDone){h.missionDone=true;return true;} // mission tout juste terminée
+    return false;
+  },
+  _sourisCheckBadges(){
+    const h=this.stats.sourisHub;let gained=null;
+    this._sourisBadgeDefs.forEach(b=>{
+      if(!h.badges.includes(b.id)&&b.check(this.stats)){h.badges.push(b.id);gained=b;}
+    });
+    return gained;
+  },
+  _sourisCheckSkins(){
+    const h=this.stats.sourisHub;let gained=null;
+    this._sourisSkinDefs.forEach(sk=>{
+      if(!h.skinsUnlocked.includes(sk.id)&&sk.check&&sk.check(this.stats)){h.skinsUnlocked.push(sk.id);gained=sk;}
+    });
+    return gained;
+  },
+  // Point d'entrée commun à toutes les nouvelles pistes en fin de partie :
+  // paliers médaille, série de jours, mission, badges/skins, son+confettis,
+  // sauvegarde. Les pistes appellent ceci puis affichent leur écran de fin.
+  _sourisFinishTrack(trackId,{score,thresholds,extra,sessionResult}){
+    const field=this._sourisTrackBestField(trackId);
+    const tier=score>=thresholds.gold?'gold':score>=thresholds.silver?'silver':score>=thresholds.bronze?'bronze':null;
+    const prevRank={bronze:1,silver:2,gold:3};
+    const prev=this.stats[field];
+    const isNewBest=tier&&(!prev||(prevRank[tier]||0)>(prevRank[prev.tier]||0)||(tier===prev.tier&&score>prev.score));
+    if(isNewBest)this.stats[field]=Object.assign({score,tier,date:Date.now()},extra||{});
+    this._sourisTouchStreak();
+    const missionJustDone=this._sourisUpdateMission(Object.assign({track:trackId,score,tier},sessionResult||{}));
+    const badge=this._sourisCheckBadges();
+    const skin=this._sourisCheckSkins();
+    try{track('game_completed',{game:'souris',mode:trackId,score,tier:tier||null});}catch{}
+    saveStats(this.stats);
+    if(isNewBest)this._celebrateGame(null,prev?'record':'levelup');
+    else if(missionJustDone||badge||skin)this._celebrateGame(null,'levelup');
+    return {tier,isNewBest,missionJustDone,badge,skin};
+  },
+
+  _sourisRenderHub(){
+    this._sourisEnsureMission();
+    const h=this.stats.sourisHub;
+    const mission=this._sourisMissionPool[h.missionIdx];
+    const mPct=Math.min(100,Math.round(((h.missionProgress||0)/mission.target)*100));
+    const badgesHtml=this._sourisBadgeDefs.map(b=>{
+      const got=h.badges.includes(b.id);
+      return `<div title="${this._esc(b.label)}" style="width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;transition:transform .15s;${got?'background:rgba(255,77,46,.12);border:1.5px solid var(--accent);color:var(--accent)':'background:var(--light);border:1.5px dashed var(--border);color:var(--muted);opacity:.4'}">${ICONS[b.icon]||ICONS.medal}</div>`;
+    }).join('');
+    const skinsHtml=this._sourisSkinDefs.map(sk=>{
+      const unlocked=h.skinsUnlocked.includes(sk.id);
+      const equipped=h.equippedSkin===sk.id;
+      return `<div onclick="${unlocked?`app._sourisEquipSkin('${sk.id}')`:''}" title="${this._esc(sk.label)}" style="width:40px;height:40px;border-radius:11px;flex-shrink:0;cursor:${unlocked?'pointer':'default'};background:${unlocked?sk.color:'var(--light)'};display:grid;place-items:center;border:${equipped?'3px solid #16140F':'1.5px solid var(--border)'};box-shadow:${unlocked?'0 4px 10px '+sk.color+'55':'none'};opacity:${unlocked?1:.4};font-size:15px">${unlocked?'':'🔒'}</div>`;
+    }).join('');
+    const tierIcon={gold:'🥇',silver:'🥈',bronze:'🥉'};
+    const cardsHtml=this._sourisTracks.map(t=>{
+      const open=this._sourisTrackOpen(t.id);
+      const tier=this._sourisTrackTier(t.id);
+      const sub=t.id==='mouse'?`${this._sourisBest()}/12 franchis`:(tier?tierIcon[tier]+' '+tier.toUpperCase():'À essayer');
+      const onclick=t.id==='mouse'?`app.souris={phase:'mouseMenu'};app.renderSouris()`:`app._sourisEnterTrack('${t.id}')`;
+      return `<div class="game-sel-card" onclick="${open?onclick:''}" style="${open?'':'opacity:.45;cursor:not-allowed'};position:relative">
+        <div class="game-sel-icon" style="color:var(--accent)">${open?ICONS[t.icon]:'🔒'}</div>
+        <div class="game-sel-name">${t.name}${t.advanced?' <span style=\"font-size:11px;color:var(--muted);font-weight:600\">(avancé)</span>':''}</div>
+        <div class="game-sel-desc">${this._esc(t.desc)}</div>
+        <span class="game-sel-tag free" style="${!open?'background:var(--light);color:var(--muted)':tier?'background:rgba(31,169,113,.15);color:#1FA971':''}">${open?sub:'3 pistes à bronze requises'}</span>
+      </div>`;
+    }).join('');
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:1120px;margin:0 auto;padding:0 24px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Visée</h2>
+        <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:${h.streak?'var(--accent)':'var(--muted)'}">${ICONS.flame} ${h.streak||0} j</div>
+      </div>
+      <div style="max-width:1120px;margin:0 auto;padding:0 24px 22px;display:flex;gap:14px;flex-wrap:wrap;align-items:stretch">
+        <div style="flex:2;min-width:260px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px 18px">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">${ICONS.flag} Mission du jour</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:10px">${this._esc(mission.label)}</div>
+          <div style="height:8px;border-radius:99px;background:var(--light);overflow:hidden"><div style="height:100%;width:${mPct}%;background:${h.missionDone?'#1FA971':'var(--accent)'};transition:width .3s"></div></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:6px">${h.missionDone?'Terminée ✓':`${h.missionProgress||0} / ${mission.target}`}</div>
+        </div>
+        <div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px 18px">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px">${ICONS.award} Badges</div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap">${badgesHtml}</div>
+        </div>
+        <div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px 18px">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px">${ICONS.palette} Skins de cible</div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap">${skinsHtml}</div>
+        </div>
+      </div>
+      <div class="game-selector">${cardsHtml}</div>
+    </div>`;
+  },
+  _sourisEnterTrack(id){
+    if(id==='duo2'&&!this._sourisDuo2Unlocked())return;
+    this.souris={phase:'brief',track:id};
+    this.renderSouris();
+  },
+
   _sourisBest(){return (this.stats&&this.stats.sourisBest)||0;},
   _sourisUnlocked(){
     // Niveau n débloqué si le précédent est réussi. Toujours au moins le 1.
@@ -4795,7 +5001,7 @@ const app={
     if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectSouris(lvl));return;}
     if(lvl>this._sourisUnlocked())return;
     this.activeGame='souris';
-    this.souris={phase:'brief',lvl,score:0,lives:this._sourisLevels[lvl-1].lives,hit:0,miss:0,t0:0};
+    this.souris={phase:'brief',track:'mouse',lvl,score:0,lives:3,hit:0,miss:0,t0:0};
     this.renderGames();
   },
 
@@ -4810,10 +5016,30 @@ const app={
   renderSouris(){
     const s=this.souris;
     if(!s){this.activeGame=null;this.renderGames();return;}
-    if(s.phase==='menu'){return this._sourisRenderMenu();}
+    if(s.phase==='hub'){return this._sourisRenderHub();}
+    const track=s.track||'mouse';
+    if(track==='solo')return this._sourisSoloRender();
+    if(track==='grid')return this._sourisGridRender();
+    if(track==='waves')return this._sourisWavesRender();
+    if(track==='hybrid')return this._sourisHybridRender();
+    if(track==='tiles')return this._sourisTilesRender();
+    if(track==='duo2')return this._sourisDuo2Render();
+    if(s.phase==='mouseMenu'){return this._sourisRenderMenu();}
     if(s.phase==='brief'){return this._sourisRenderBrief();}
     if(s.phase==='over'||s.phase==='win'){return this._sourisRenderEnd();}
     this._sourisRenderArena();
+  },
+
+  sourisKey(e){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    const track=s.track||'mouse';
+    if(track==='solo')return this._sourisSoloKey(e);
+    if(track==='grid')return this._sourisGridKey(e);
+    if(track==='waves')return this._sourisWavesKey(e);
+    if(track==='hybrid')return this._sourisHybridKey(e);
+    if(track==='tiles')return this._sourisTilesKey(e);
+    if(track==='duo2')return this._sourisDuo2Key(e);
+    // 'mouse' : géré par son propre listener ZQSD, rien à faire ici.
   },
 
   _sourisRenderMenu(){
@@ -4824,8 +5050,8 @@ const app={
     const golds=Object.values(tiers).filter(t=>t==='gold').length;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:1120px;margin:0 auto;padding:0 24px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Visée — 12 niveaux</h2>
+        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Visée</button>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Précision souris — 12 niveaux</h2>
         <div style="font-size:13px;color:var(--muted);font-weight:600">${best}/12 franchis${golds?' · '+golds+' 🥇':''}</div>
       </div>
       <div class="game-selector">
@@ -4846,14 +5072,14 @@ const app={
     const s=this.souris, l=this._sourisLevels[s.lvl-1];
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.souris={phase:'menu'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Niveaux</button>
+        <button onclick="app.souris={phase:'mouseMenu'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Niveaux</button>
         <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
           <div style="font-size:52px">${l.icon}</div>
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Niveau ${l.n} — ${l.name}</h2>
           <div style="background:rgba(255,77,46,.14);border:1px solid rgba(255,77,46,.3);border-radius:12px;padding:9px 16px;font-size:13px;font-weight:700;color:#FF9478">NOUVEAU : ${this._esc(l.newThing)}</div>
           <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">${l.brief}</p>
           <div style="display:flex;gap:26px;margin-top:4px">
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${l.bronze} · 🥈${l.silver} · 🥇${l.gold}</div></div>
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${l.bronze} · 🥈${l.silver} · 🥇${l.gold}</div></div>
             <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">${'♥'.repeat(s.lives||3)}</div></div>
           </div>
           <button class="game-play-btn" style="margin-top:8px" onclick="app.startSouris()">Commencer</button>
@@ -4878,11 +5104,11 @@ const app={
           <div class="game-final">${s.score} pts</div>
           <p style="color:rgba(255,255,255,.7);font-size:14.5px;margin:0">${s.hit} réussite${s.hit>1?'s':''} · ${acc}% de précision${s.cores?' · '+s.cores+' cœur'+(s.cores>1?'s':''):''}${s.regen?' · +'+s.regen+' ♥ régénérée'+(s.regen>1?'s':''):''}</p>
           ${win&&nextTier?`<div style="font-size:12.5px;color:rgba(255,255,255,.55)">Prochain palier : ${nextTier}</div>`:''}
-          ${!win?`<div style="font-size:13px;color:rgba(255,255,255,.6)">Il fallait ${l.bronze} pts (bronze). Tu y étais${s.score>=l.bronze*0.7?' presque':''}.</div>`:''}
+          ${!win?`<div style="font-size:13px;color:rgba(255,255,255,.6)">Il fallait ${l.bronze} pts (bronze)${s.score>=l.bronze*0.7?' — tu y étais presque !':' pour valider ce niveau.'}</div>`:''}
           <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center">
             ${win&&!last?`<button class="game-play-btn" onclick="app.selectSouris(${s.lvl+1})">Niveau ${s.lvl+1} →</button>`:''}
             <button class="res-btn sec" style="flex:none;padding:13px 26px" onclick="app.selectSouris(${s.lvl})">${win&&s.tier!=='gold'?'Viser mieux':'Rejouer'}</button>
-            <button class="res-btn sec" style="flex:none;padding:13px 26px" onclick="app.souris={phase:'menu'};app.renderSouris()">Niveaux</button>
+            <button class="res-btn sec" style="flex:none;padding:13px 26px" onclick="app.souris={phase:'mouseMenu'};app.renderSouris()">Niveaux</button>
           </div>
         </div>
       </div>
@@ -4919,7 +5145,7 @@ const app={
         <div style="position:relative;height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin:-6px 0 12px;overflow:hidden"><div style="height:100%;width:${tpct}%;background:${sec<=5?'#E5484D':'rgba(255,255,255,.35)'};transition:width .05s linear"></div></div>
         <div class="game-arena" id="souris-arena" style="cursor:${cap.click||cap.drag?'crosshair':'default'};user-select:none"></div>
         <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:-12px">${hint}
-          · <button onclick="app.stopSouris();app.souris={phase:'menu'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+          · <button onclick="app.stopSouris();app.souris={phase:'mouseMenu'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
     this._sourisArena=document.getElementById('souris-arena');
@@ -4967,8 +5193,8 @@ const app={
         if(!s.drag)return;
         const t=s.drag;t.grabbed=false;s.drag=null;
         const z=this._sourisZoneAt(t.x,t.y);
-        if(z===t.color){s.score++;s.hit++;s.targets=s.targets.filter(x=>x!==t);this._sourisFlash('#1FA971');}
-        else{s.miss++;s.score=Math.max(0,s.score-1);this._sourisFlash('#E5484D');t.x=t.hx;t.y=t.hy;}
+        if(z===t.color){s.score++;s.hit++;s.targets=s.targets.filter(x=>x!==t);playSound('hit');this._sourisFlash('#1FA971');}
+        else{s.miss++;s.score=Math.max(0,s.score-1);playSound('miss');this._sourisFlash('#E5484D');t.x=t.hx;t.y=t.hy;}
       };
     }
   },
@@ -4995,7 +5221,7 @@ const app={
     if(!t){s.miss++;s.streak=0;this._sourisFlash('rgba(255,255,255,.12)');return;}
     if(t.bonus){
       s.targets=s.targets.filter(x=>x!==t);
-      s.hit++;
+      s.hit++;playSound('hit');
       if(t.bonus==='points'){s.mult=2;s.multUntil=Date.now()+5000;this._sourisFlash('#3B82F6');this._sourisPop('×2 !','#3B82F6');}
       else if(t.bonus==='time'){s.tLeft=(s.tLeft||0)+2000;this._sourisFlash('#A855F7');this._sourisPop('+2s','#A855F7');}
       else if(t.bonus==='jackpot'){const g=8;s.score+=g;this._sourisFlash('#FFD84D');this._sourisPop('+'+g,'#FFD84D');}
@@ -5004,14 +5230,14 @@ const app={
     if(t.bad){
       s.miss++;s.streak=0;
       s.score=Math.max(0,s.score-2);
-      this._sourisFlash('#E5484D');
+      playSound('miss');this._sourisFlash('#E5484D');
       s.targets=s.targets.filter(x=>x!==t);
       return;
     }
     const mult=(s.mult&&Date.now()<s.multUntil)?s.mult:1;
     const core=!!c.core&&this._sourisInCore(t,s.mx,s.my);
     s.score+=(core?3:1)*mult;
-    s.hit++;
+    s.hit++;playSound('hit');
     if(core){
       s.streak=(s.streak||0)+1;
       s.cores=(s.cores||0)+1;
@@ -5099,18 +5325,35 @@ const app={
     this.renderSouris();
   },
 
+  // Place une nouvelle cible sans qu'elle chevauche une cible existante :
+  // sinon le clic peut viser visuellement une cible mais en toucher une
+  // autre cachée dessous (bug de hit-test).
+  _sourisFreeSpot(xr,yr,r){
+    const s=this.souris;
+    let x=xr[0],y=yr[0],guard=0,ok=false;
+    while(!ok&&guard++<20){
+      x=xr[0]+Math.random()*(xr[1]-xr[0]);
+      y=yr[0]+Math.random()*(yr[1]-yr[0]);
+      ok=(s.targets||[]).every(o=>{
+        const dx=(o.x-x)*1.6,dy=o.y-y;
+        return Math.sqrt(dx*dx+dy*dy)>(o.r||4)+r+2;
+      });
+    }
+    return{x,y};
+  },
   _sourisSpawn(){
     const s=this.souris, c=this._sourisCaps(s.lvl);
     const rnd=(a,b)=>a+Math.random()*(b-a);
     if(c.drag){
       const palette=c.sort3?['#1FA971','#3B82F6','#E5722B']:['#1FA971','#3B82F6'];
       const color=palette[Math.floor(Math.random()*palette.length)];
-      const x=rnd(12,88), y=rnd(8,42);
+      const{x,y}=this._sourisFreeSpot([12,88],[8,42],4.6);
       s.targets.push({x,y,hx:x,hy:y,r:4.6,color,shape:Math.random()<.5?'circle':'square',born:Date.now()});
       return;
     }
     if(c.pads){
-      s.targets.push({x:rnd(12,88),y:rnd(12,88),r:7,pad:true,born:Date.now(),life:6000,hover:0});
+      const{x,y}=this._sourisFreeSpot([12,88],[12,88],7);
+      s.targets.push({x,y,r:7,pad:true,born:Date.now(),life:6000,hover:0});
       return;
     }
     if(c.bonus&&Math.random()<.14&&!(s.targets||[]).some(t=>t.bonus)){
@@ -5120,14 +5363,16 @@ const app={
         {bonus:'jackpot',color:'#FFD84D',icon:'★',life:1500},
       ];
       const k=kinds[Math.floor(Math.random()*kinds.length)];
-      s.targets.push({x:rnd(12,88),y:rnd(12,88),r:4.4,born:Date.now(),hover:0,...k});
+      const{x,y}=this._sourisFreeSpot([12,88],[12,88],4.4);
+      s.targets.push({x,y,r:4.4,born:Date.now(),hover:0,...k});
       return;
     }
     const bad=!!c.traps&&Math.random()<(c.fast?.34:.3);
     const base=c.fast?rnd(2.6,4.0):rnd(3.4,5.4);
+    const r=c.hover?7:base;
+    const{x,y}=this._sourisFreeSpot([8,92],[10,90],r);
     s.targets.push({
-      x:rnd(8,92), y:rnd(10,90),
-      r:c.hover?7:base,
+      x, y, r,
       bad,
       disguised:bad&&!!c.disguise&&Math.random()<.6,
       born:Date.now(),
@@ -5158,7 +5403,7 @@ const app={
         if(t.hover>=800){
           s.score++;s.hit++;
           s.targets=s.targets.filter(x=>x!==t);
-          this._sourisFlash('#1FA971');
+          playSound('hit');this._sourisFlash('#1FA971');
           this._sourisCheck();
         }
       }
@@ -5167,14 +5412,15 @@ const app={
     // Glisser-déposer : une pièce jamais déposée finit par disparaître (coûte une vie)
     if(c.drag){
       const gone=(s.targets||[]).filter(t=>now-t.born>8000&&t!==s.drag);
+      if(gone.length)playSound('miss');
       gone.forEach(()=>{s.miss++;this._sourisLoseLife();});
       s.targets=(s.targets||[]).filter(t=>!(now-t.born>8000&&t!==s.drag));
     }
     // Expiration : laisser filer une cible utile coûte une vie
     if(!c.drag){
-      const gone=(s.targets||[]).filter(t=>now-t.born>t.life);
-      gone.forEach(t=>{
-        if(t.bad)return;
+      const gone=(s.targets||[]).filter(t=>now-t.born>t.life&&!t.bad);
+      if(gone.length)playSound('miss');
+      gone.forEach(()=>{
         s.miss++;s.streak=0;
         if(!c.hover&&!c.pads)this._sourisLoseLife();
       });
@@ -5201,7 +5447,7 @@ const app={
           if(t.hover>=400){
             s.score++;s.hit++;
             s.targets=s.targets.filter(x=>x!==t);
-            this._sourisFlash('#1FA971');
+            playSound('hit');this._sourisFlash('#1FA971');
             this._sourisCheck();
           }
         } else t.hover=0;
@@ -5221,7 +5467,7 @@ const app={
         if(Math.sqrt(dx*dx+dy*dy)<h.r&&!s._inv){
           s._inv=true;setTimeout(()=>{s._inv=false;},1400);
           s.score=Math.max(0,s.score-1);s.streak=0;
-          this._sourisFlash('#E5484D');
+          playSound('miss');this._sourisFlash('#E5484D');
         }
       });
     }
@@ -5237,7 +5483,7 @@ const app={
         const dx=(h.x-s.player.x)*1.6,dy=h.y-s.player.y;
         if(Math.sqrt(dx*dx+dy*dy)<h.r&&!s._inv){
           s._inv=true;setTimeout(()=>{s._inv=false;},1400);
-          this._sourisLoseLife();this._sourisFlash('#E5484D');
+          playSound('miss');this._sourisLoseLife();this._sourisFlash('#E5484D');
         }
       });
     }
@@ -5306,6 +5552,890 @@ const app={
     a.innerHTML=html;
   },
 
+  /* ═══════════════════════════════════════════════════════════════
+     VISÉE — CIBLE UNIQUE (piste "solo")
+     Une lettre au centre, un anneau qui se resserre : la taper avant
+     qu'il n'atteigne zéro. 100% clavier — la cible est un repère
+     visuel, pas une zone à viser à la souris.
+     ═══════════════════════════════════════════════════════════════ */
+  _sourisTiers:{solo:{bronze:40,silver:75,gold:120},grid:{bronze:35,silver:65,gold:100},waves:{bronze:2,silver:4,gold:5},hybrid:{bronze:35,silver:60,gold:90},tiles:{bronze:60,silver:110,gold:170},duo2:{bronze:40,silver:65,gold:88}},
+  _sourisLetterPool(){
+    if(this._kbLetters)return this._kbLetters;
+    this._kbLetters=KB.slice(1).flat().map(k=>k.l.toLowerCase()).filter(l=>/^[a-z]$/.test(l));
+    return this._kbLetters;
+  },
+  _sourisSoloBrief(){
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
+          <div style="color:var(--accent)">${ICONS.target}</div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Cible unique</h2>
+          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:420px;margin:0">Une lettre s'affiche au centre. Tape-la avant que l'anneau ne se referme. Un combo qui monte réchauffe la cible. <b>3 fautes et la partie s'arrête.</b></p>
+          <div style="display:flex;gap:26px;margin-top:4px">
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${this._sourisTiers.solo.bronze} · 🥈${this._sourisTiers.solo.silver} · 🥇${this._sourisTiers.solo.gold}</div></div>
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">♥♥♥</div></div>
+          </div>
+          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisSoloStart()">Commencer</button>
+        </div>
+      </div>
+    </div>`;
+  },
+  _sourisSoloStart(){
+    this.stopSouris();
+    const pool=this._sourisLetterPool();
+    this.souris={phase:'play',track:'solo',score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,streakRun:0,bestStreak:0,
+      letter:pool[Math.floor(Math.random()*pool.length)],ringDur:2600,tLeft:2600,sessionLeft:45000};
+    this.renderSouris();
+    this._sourisLoop=setInterval(()=>this._sourisSoloTick(),50);
+  },
+  _sourisSoloNextLetter(){
+    const s=this.souris,pool=this._sourisLetterPool();
+    s.letter=pool[Math.floor(Math.random()*pool.length)];
+    s.ringDur=Math.max(900,2600-s.hits*40);
+    s.tLeft=s.ringDur;
+  },
+  _sourisSoloHit(){
+    const s=this.souris;
+    const mult=s.combo>=8?3:s.combo>=4?2:1;
+    s.score+=1*mult;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
+    s.streakRun++;s.bestStreak=Math.max(s.bestStreak,s.streakRun);
+    playSound('hit');this._flashArena('#1FA971');
+    this._sourisSoloNextLetter();
+    this.renderSouris();
+  },
+  _sourisSoloMiss(){
+    const s=this.souris;
+    s.combo=0;s.misses++;s.lives--;s.streakRun=0;
+    playSound('miss');this._flashArena('#E5484D');
+    if(s.lives<=0){this._sourisSoloEnd();return;}
+    this._sourisSoloNextLetter();
+    this.renderSouris();
+  },
+  _flashArena(color){
+    const a=document.getElementById('souris-arena')||document.querySelector('.game-arena');
+    if(!a)return;
+    a.style.boxShadow='inset 0 0 0 3px '+color;
+    setTimeout(()=>{if(a)a.style.boxShadow='';},120);
+  },
+  _sourisSoloTick(){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    s.tLeft-=50;s.sessionLeft-=50;
+    if(s.sessionLeft<=0){this._sourisSoloEnd();return;}
+    if(s.tLeft<=0){this._sourisSoloMiss();return;}
+    this.renderSouris();
+  },
+  _sourisSoloKey(e){
+    const k=(e._composedKey||e.key||'');
+    if(k.length!==1)return;
+    e.preventDefault();
+    if(k.toLowerCase()===this.souris.letter)this._sourisSoloHit();
+    else this._sourisSoloMiss();
+  },
+  _sourisSoloEnd(){
+    this.stopSouris();
+    const s=this.souris;
+    const acc=(s.hits+s.misses)?Math.round(100*s.hits/(s.hits+s.misses)):0;
+    const res=this._sourisFinishTrack('solo',{score:s.score,thresholds:this._sourisTiers.solo,extra:{combo:s.bestCombo},sessionResult:{hits:s.hits,combo:s.bestCombo,streakRun:s.bestStreak}});
+    s.phase='end';s._result=res;s._acc=acc;
+    this.renderSouris();
+  },
+  _sourisSoloRender(){
+    const s=this.souris;
+    if(s.phase==='brief')return this._sourisSoloBrief();
+    if(s.phase==='end')return this._sourisSoloEndScreen();
+    this._sourisSoloArena();
+  },
+  _sourisSoloArena(){
+    const s=this.souris;
+    const pct=Math.max(0,Math.round((s.tLeft/s.ringDur)*100));
+    const hot=s.combo>=8?'#FF4D2E':s.combo>=4?'#FF8A4C':'#1FA971';
+    const scale=1+Math.min(.35,s.combo*.03);
+    const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <div class="game-hud">
+          <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
+          <div style="display:flex;gap:1px">${hearts}</div>
+        </div>
+        <div class="game-arena" id="souris-arena" style="height:340px;display:grid;place-items:center;position:relative">
+          <div style="position:absolute;top:14px;left:0;right:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:${s.combo>1?hot:'rgba(255,255,255,.4)'}">${s.combo>1?'COMBO ×'+s.combo:''}</div>
+          <div style="position:relative;width:150px;height:150px;transform:scale(${scale});transition:transform .15s">
+            <svg width="150" height="150" style="position:absolute;inset:0;transform:rotate(-90deg)"><circle cx="75" cy="75" r="68" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="75" cy="75" r="68" fill="none" stroke="${pct<25?'#E5484D':hot}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${2*Math.PI*68}" stroke-dashoffset="${2*Math.PI*68*(1-pct/100)}" style="transition:stroke-dashoffset .05s linear"/></svg>
+            <div style="position:absolute;inset:0;display:grid;place-items:center;border-radius:50%;background:${hot}22;border:2.5px solid ${hot}">
+              <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;color:#fff">${s.letter}</span>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">Tape la lettre affichée avant que l'anneau se referme
+          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+      </div>
+    </div>`;
+  },
+  _sourisSoloEndScreen(){
+    const s=this.souris,r=s._result;
+    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        ${this._gameResult({
+          icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
+          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+          boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
+          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisSoloStart()',
+          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
+        })}
+      </div>
+    </div>`;
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     VISÉE — GRILLE RÉFLEXE (piste "grid")
+     9 cases fixes (Q S D / F G H / J K L). Une case s'allume en vert
+     = cible à taper. Plus tard : deux cibles à la fois, puis une case
+     piège (rouge) qui ne doit surtout pas être tapée. 100% clavier.
+     ═══════════════════════════════════════════════════════════════ */
+  _sourisGridLetters:['q','s','d','f','g','h','j','k','l'],
+  _sourisGridBrief(){
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
+          <div style="color:var(--accent)">${ICONS.grid}</div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Grille réflexe</h2>
+          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:420px;margin:0">Une case s'allume en vert : tape sa lettre. Ça se corse vite : deux cases à la fois, puis des cases <b style="color:#E5484D">pièges</b> à ne surtout pas taper.</p>
+          <div style="display:flex;gap:26px;margin-top:4px">
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${this._sourisTiers.grid.bronze} · 🥈${this._sourisTiers.grid.silver} · 🥇${this._sourisTiers.grid.gold}</div></div>
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">♥♥♥</div></div>
+          </div>
+          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisGridStart()">Commencer</button>
+        </div>
+      </div>
+    </div>`;
+  },
+  _sourisGridStart(){
+    this.stopSouris();
+    this.souris={phase:'play',track:'grid',score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,streakRun:0,bestStreak:0,
+      cells:this._sourisGridLetters.map(l=>({letter:l,state:null,life:0,dur:0})),sessionLeft:45000,spawnAcc:0};
+    this.renderSouris();
+    this._sourisLoop=setInterval(()=>this._sourisGridTick(),50);
+  },
+  _sourisGridDifficulty(){
+    const s=this.souris;
+    if(s.hits>=12)return{targets:2,traps:1};
+    if(s.hits>=5)return{targets:2,traps:0};
+    return{targets:1,traps:0};
+  },
+  _sourisGridSpawn(){
+    const s=this.souris,diff=this._sourisGridDifficulty();
+    const dur=Math.max(1100,2000-s.hits*30);
+    const activeTargets=s.cells.filter(c=>c.state==='target').length;
+    let free=s.cells.filter(c=>!c.state);
+    if(activeTargets<diff.targets&&free.length){
+      const pick=free[Math.floor(Math.random()*free.length)];
+      pick.state='target';pick.life=dur;pick.dur=dur;
+    }
+    const activeTraps=s.cells.filter(c=>c.state==='trap').length;
+    free=s.cells.filter(c=>!c.state);
+    if(activeTraps<diff.traps&&free.length){
+      const pick=free[Math.floor(Math.random()*free.length)];
+      pick.state='trap';pick.life=dur;pick.dur=dur;
+    }
+  },
+  _sourisGridTick(){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    s.sessionLeft-=50;
+    if(s.sessionLeft<=0){this._sourisGridEnd();return;}
+    s.cells.forEach(c=>{
+      if(!c.state||s.phase!=='play')return;
+      c.life-=50;
+      if(c.life<=0){
+        if(c.state==='target'){
+          s.misses++;s.combo=0;s.streakRun=0;playSound('miss');this._flashArena('#E5484D');
+          c.state=null;s.lives--;
+          if(s.lives<=0){this._sourisGridEnd();return;}
+        } else c.state=null;
+      }
+    });
+    if(s.phase!=='play')return;
+    s.spawnAcc+=50;
+    if(s.spawnAcc>=260){s.spawnAcc=0;this._sourisGridSpawn();}
+    this.renderSouris();
+  },
+  _sourisGridKey(e){
+    const k=(e._composedKey||e.key||'').toLowerCase();
+    if(k.length!==1)return;
+    const s=this.souris;
+    const cell=s.cells.find(c=>c.letter===k&&c.state);
+    if(!cell)return;
+    e.preventDefault();
+    if(cell.state==='trap'){
+      s.misses++;s.combo=0;s.streakRun=0;s.lives--;
+      playSound('miss');this._flashArena('#E5484D');
+      cell.state=null;
+      if(s.lives<=0){this._sourisGridEnd();return;}
+    } else {
+      const mult=s.combo>=8?3:s.combo>=4?2:1;
+      s.score+=1*mult;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
+      s.streakRun++;s.bestStreak=Math.max(s.bestStreak,s.streakRun);
+      playSound('hit');this._flashArena('#1FA971');
+      cell.state=null;
+    }
+    this.renderSouris();
+  },
+  _sourisGridEnd(){
+    if(this.souris.phase==='end')return;
+    this.stopSouris();
+    const s=this.souris;
+    const acc=(s.hits+s.misses)?Math.round(100*s.hits/(s.hits+s.misses)):0;
+    const res=this._sourisFinishTrack('grid',{score:s.score,thresholds:this._sourisTiers.grid,extra:{combo:s.bestCombo},sessionResult:{hits:s.hits,combo:s.bestCombo,streakRun:s.bestStreak}});
+    s.phase='end';s._result=res;s._acc=acc;
+    this.renderSouris();
+  },
+  _sourisGridRender(){
+    const s=this.souris;
+    if(s.phase==='brief')return this._sourisGridBrief();
+    if(s.phase==='end')return this._sourisGridEndScreen();
+    this._sourisGridArena();
+  },
+  _sourisGridArena(){
+    const s=this.souris;
+    const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
+    const cellsHtml=s.cells.map(c=>{
+      const isTarget=c.state==='target', isTrap=c.state==='trap';
+      const bg=isTarget?'rgba(31,169,113,.18)':isTrap?'rgba(229,72,77,.18)':'rgba(255,255,255,.05)';
+      const bd=isTarget?'2.5px solid #1FA971':isTrap?'2.5px solid #E5484D':'1.5px dashed rgba(255,255,255,.16)';
+      const col=isTarget?'#1FA971':isTrap?'#E5484D':'rgba(255,255,255,.35)';
+      const op=c.state?Math.max(.35,c.life/c.dur):1;
+      return `<div style="aspect-ratio:1;border-radius:14px;background:${bg};border:${bd};display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:${col};opacity:${op};transition:background .1s,border-color .1s">${c.letter}</div>`;
+    }).join('');
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:520px;margin:0 auto;padding:0 24px">
+        <div class="game-hud">
+          <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
+          <div style="display:flex;gap:1px">${hearts}</div>
+        </div>
+        <div class="game-arena" id="souris-arena" style="height:auto;aspect-ratio:1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:24px">${cellsHtml}</div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">${s.combo>1?'Combo ×'+s.combo+' · ':''}Tape la lettre qui s'allume en vert. Les cases sombres sont des pièges.
+          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+      </div>
+    </div>`;
+  },
+  _sourisGridEndScreen(){
+    const s=this.souris,r=s._result;
+    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        ${this._gameResult({
+          icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
+          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+          boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
+          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisGridStart()',
+          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
+        })}
+      </div>
+    </div>`;
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     VISÉE — VAGUES & BOSS (piste "waves")
+     4 vagues de 4 mots, une règle qui change à chaque vague (mots
+     courts → moyens → accentués → longs), puis un mot-boss à 3
+     tentatives. Frappe en avant uniquement (comme Tireur d'élite) :
+     une faute ne s'efface pas, elle fait perdre une vie et remet le
+     mot à zéro.
+     ═══════════════════════════════════════════════════════════════ */
+  _sourisWavesPools:[()=>TIREUR_EASY,()=>TIREUR_MID,()=>TIREUR_ACCENTS,()=>TIREUR_HARD],
+  _sourisWavesLabels:['Mots courts','Mots moyens','Accents','Mots longs'],
+  _sourisWavesBrief(){
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
+          <div style="color:var(--accent)">${ICONS.flag}</div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Vagues & Boss</h2>
+          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">4 vagues de 4 mots, chacune avec sa règle : mots courts, moyens, accentués puis longs. Une faute ne s'efface pas — elle coûte une vie. Passe les 4 vagues et affronte le <b>mot-boss</b>, à 3 tentatives.</p>
+          <div style="display:flex;gap:26px;margin-top:4px">
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">PALIERS</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff">🥉 2 vagues · 🥈 4 vagues · 🥇 boss battu</div></div>
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">♥♥♥</div></div>
+          </div>
+          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisWavesStart()">Commencer</button>
+        </div>
+      </div>
+    </div>`;
+  },
+  _sourisWavesPickWord(wave){
+    const pool=this._sourisWavesPools[wave-1]();
+    return pool[Math.floor(Math.random()*pool.length)];
+  },
+  _sourisWavesBossWord(){
+    const sorted=[...TIREUR_ACCENTS].sort((a,b)=>b.length-a.length);
+    return sorted[Math.floor(Math.random()*3)]; // parmi les 3 plus longs
+  },
+  _sourisWavesStart(){
+    this.stopSouris();
+    this.souris={phase:'play',track:'waves',wave:1,wordsInWave:0,wordsNeeded:4,lives:3,score:0,typedLen:0,
+      word:this._sourisWavesPickWord(1),bossAttempts:0,bossWord:null};
+    this.renderSouris();
+  },
+  _sourisWavesNextWord(){
+    const s=this.souris;
+    s.typedLen=0;
+    s.word=this._sourisWavesPickWord(s.wave);
+  },
+  _sourisWavesAdvanceWave(){
+    const s=this.souris;
+    s.wave++;s.wordsInWave=0;
+    if(s.wave>4){
+      s.phase='boss';s.bossWord=this._sourisWavesBossWord();s.typedLen=0;s.bossAttempts=0;
+      this._sourisWavesShake();
+    } else {
+      s.typedLen=0;s.word=this._sourisWavesPickWord(s.wave);
+    }
+  },
+  _sourisWavesShake(){
+    this.souris._shaking=true;
+    setTimeout(()=>{if(this.souris)this.souris._shaking=false;this.renderSouris();},420);
+  },
+  _sourisWavesKey(e){
+    const k=e._composedKey||e.key;
+    if(k.length!==1)return;
+    e.preventDefault();
+    const s=this.souris;
+    const word=s.phase==='boss'?s.bossWord:s.word;
+    if(k===word[s.typedLen]){
+      s.typedLen++;
+      if(s.typedLen>=word.length){
+        s.score+=word.length;
+        playSound('hit');this._flashArena('#1FA971');
+        if(s.phase==='boss'){this._sourisWavesEnd(true);return;}
+        s.wordsInWave++;
+        if(s.wordsInWave>=s.wordsNeeded)this._sourisWavesAdvanceWave();
+        else this._sourisWavesNextWord();
+      }
+    } else {
+      playSound('miss');this._flashArena('#E5484D');
+      if(s.phase==='boss'){
+        s.bossAttempts++;s.typedLen=0;
+        if(s.bossAttempts>=3){this._sourisWavesEnd(false);return;}
+      } else {
+        s.lives--;s.typedLen=0;
+        if(s.lives<=0){this._sourisWavesEnd(false);return;}
+      }
+    }
+    this.renderSouris();
+  },
+  _sourisWavesEnd(bossBeaten){
+    if(this.souris.phase==='end')return;
+    this.stopSouris();
+    const s=this.souris;
+    const wavesCleared=s.wave>4?4:s.wave-1;
+    const tierScore=wavesCleared+(bossBeaten?1:0);
+    const res=this._sourisFinishTrack('waves',{score:tierScore,thresholds:this._sourisTiers.waves,extra:{points:s.score,bossBeaten},sessionResult:{hits:wavesCleared*4,streakRun:wavesCleared}});
+    s.phase='end';s._result=res;s._wavesCleared=wavesCleared;s._bossBeaten=bossBeaten;
+    this.renderSouris();
+  },
+  _sourisWavesRender(){
+    const s=this.souris;
+    if(s.phase==='brief')return this._sourisWavesBrief();
+    if(s.phase==='end')return this._sourisWavesEndScreen();
+    this._sourisWavesArena();
+  },
+  _sourisWavesArena(){
+    const s=this.souris;
+    const isBoss=s.phase==='boss';
+    const word=isBoss?s.bossWord:s.word;
+    const wordHtml=`<span style="color:var(--accent)">${word.slice(0,s.typedLen)}</span><span style="color:rgba(255,255,255,.85)">${word.slice(s.typedLen)}</span>`;
+    const segs=[1,2,3,4].map(i=>`<div style="flex:1;height:8px;border-radius:99px;background:${i<s.wave?'#1FA971':i===s.wave&&!isBoss?'var(--accent)':'rgba(255,255,255,.14)'}"></div>`).join('');
+    const hearts=isBoss?`<div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)">Tentative ${s.bossAttempts+1}/3</div>`
+      :[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:640px;margin:0 auto;padding:0 24px">
+        <div class="game-hud">
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)">${isBoss?'BOSS':'VAGUE '+s.wave+'/4 — '+this._sourisWavesLabels[s.wave-1]}</div>
+          <div style="display:flex;gap:1px">${hearts}</div>
+        </div>
+        ${!isBoss?`<div style="display:flex;gap:6px;margin:-6px 0 14px">${segs}</div>`:''}
+        <div class="game-arena" style="height:auto;padding:${isBoss?'56px 40px':'40px'};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;${isBoss?'border:2px solid var(--accent);animation:'+(s._shaking?'sourisshake .42s':'none'):''}">
+          ${isBoss?`<div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent)">MOT-BOSS</div>`:''}
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:${isBoss?'34px':'28px'};letter-spacing:.02em">${wordHtml}</div>
+        </div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">Tape le mot affiché, sans backspace
+          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+      </div>
+    </div>`;
+  },
+  _sourisWavesEndScreen(){
+    const s=this.souris,r=s._result;
+    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        ${this._gameResult({
+          icon:medal,title:s._bossBeaten?'Boss vaincu !':(r.tier?'Palier franchi !':'Partie terminée'),
+          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+          boxes:[{label:'Vagues franchies',value:s._wavesCleared+'/4',accent:true},{label:'Boss',value:s._bossBeaten?'Battu':'—'},{label:'Points',value:s.score}],
+          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisWavesStart()',
+          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
+        })}
+      </div>
+    </div>`;
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     VISÉE — DUO SOURIS + CLAVIER (piste "hybrid")
+     Une main sur la souris, une main sur le clavier. Écran de config
+     obligatoire au premier lancement (où est ta souris ?), puis un
+     aim trainer : viser la cible à la souris ET taper sa lettre
+     pendant que le curseur est dedans — sinon la frappe ne compte pas.
+     ═══════════════════════════════════════════════════════════════ */
+  _sourisHandLetters(handConfig){
+    const side=handConfig==='mouse-left'?'r':'l'; // souris à gauche -> clavier main droite, et inversement
+    return KB.slice(1).flat().filter(k=>k.f&&k.f[0]===side).map(k=>k.l.toLowerCase()).filter(l=>/^[a-z]$/.test(l));
+  },
+  _sourisHybridSetHand(v){
+    this.stats.sourisHub.handConfig=v;
+    saveStats(this.stats);
+    this.souris.phase='brief';
+    this.renderSouris();
+  },
+  _sourisHybridConfigScreen(){
+    const kb=(side,dim)=>KB.slice(1).flat().filter(k=>k.f&&k.f[0]===side).map(k=>k.l.toLowerCase()).filter(l=>/^[a-z]$/.test(l))
+      .map(l=>`<span style="flex:1;border:1.5px solid ${dim?'rgba(255,255,255,.15)':'#fff'};background:${dim?'rgba(255,255,255,.04)':'rgba(255,77,46,.15)'};border-radius:7px;text-align:center;padding:7px 0;font:700 12px 'JetBrains Mono',monospace;color:${dim?'rgba(255,255,255,.3)':'#fff'}">${l}</span>`).join('');
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:600px;margin:0 auto;padding:0 24px">
+        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <div class="game-arena" style="height:auto;padding:36px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#fff;margin:0">Où est ta souris ?</h2>
+          <p style="color:rgba(255,255,255,.7);font-size:14px;margin:0">Le jeu ne proposera que les lettres atteignables par la main restée au clavier. Modifiable à tout moment.</p>
+          <div style="display:flex;gap:12px;width:100%;margin-top:6px">
+            <div onclick="app._sourisHybridSetHand('mouse-right')" style="flex:1;border:2.5px solid var(--accent);background:rgba(255,77,46,.1);border-radius:14px;padding:16px;cursor:pointer">
+              <div style="font:800 16px 'Bricolage Grotesque',sans-serif;color:#fff">Souris à droite</div>
+              <div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px">clavier = main gauche</div>
+            </div>
+            <div onclick="app._sourisHybridSetHand('mouse-left')" style="flex:1;border:1.5px dashed rgba(255,255,255,.25);border-radius:14px;padding:16px;cursor:pointer">
+              <div style="font:800 16px 'Bricolage Grotesque',sans-serif;color:#fff">Souris à gauche</div>
+              <div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px">clavier = main droite</div>
+            </div>
+          </div>
+          <div style="width:100%;text-align:left;margin-top:8px">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Touches qui seront proposées si tu choisis « souris à droite »</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;gap:6px">${kb('l',false)}</div>
+              <div style="display:flex;gap:6px">${kb('r',true)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  },
+  _sourisHybridBrief(){
+    const hand=this.stats.sourisHub.handConfig;
+    const label=hand==='mouse-left'?'Souris à gauche · clavier main droite':'Souris à droite · clavier main gauche';
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
+          <div style="color:var(--accent)">${ICONS.hand}</div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Duo souris + clavier</h2>
+          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:420px;margin:0">Survole la cible avec la souris, puis tape sa lettre <b>pendant que le curseur reste dedans</b>. 15 cibles, deux scores : rapidité de visée et précision de frappe.</p>
+          <div style="font-size:12.5px;color:rgba(255,255,255,.55)">${label} · <span onclick="app.souris={phase:'config'};app.renderSouris()" style="color:var(--accent);cursor:pointer;text-decoration:underline">changer</span></div>
+          <div style="display:flex;gap:26px;margin-top:4px">
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${this._sourisTiers.hybrid.bronze} · 🥈${this._sourisTiers.hybrid.silver} · 🥇${this._sourisTiers.hybrid.gold}</div></div>
+          </div>
+          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisHybridStart()">Commencer</button>
+        </div>
+      </div>
+    </div>`;
+  },
+  _sourisHybridStart(){
+    this.stopSouris();
+    this.souris={phase:'play',track:'hybrid',score:0,rounds:0,hits:0,misses:0,aimTimes:[],
+      letter:'',tx:50,ty:50,tr:9,spawnAt:0,firstHoverAt:null,_hovering:false};
+    this._sourisHybridSpawn();
+    this.renderSouris();
+  },
+  _sourisHybridSpawn(){
+    const s=this.souris;
+    const pool=this._sourisHandLetters(this.stats.sourisHub.handConfig);
+    s.letter=pool[Math.floor(Math.random()*pool.length)];
+    s.tx=16+Math.random()*68;s.ty=18+Math.random()*64;s.tr=9;
+    s.spawnAt=Date.now();s.firstHoverAt=null;s._hovering=false;
+  },
+  _sourisHybridBindArena(){
+    const a=document.getElementById('souris-arena');if(!a)return;
+    const s=this.souris;
+    a.onmousemove=(e)=>{
+      const r=a.getBoundingClientRect();
+      const mx=(e.clientX-r.left)/r.width*100, my=(e.clientY-r.top)/r.height*100;
+      const dx=(s.tx-mx)*1.6, dy=s.ty-my;
+      const hov=Math.sqrt(dx*dx+dy*dy)<s.tr;
+      if(hov&&!s._hovering){s._hovering=true;if(!s.firstHoverAt)s.firstHoverAt=Date.now();this._sourisHybridPaintHover(true);}
+      else if(!hov&&s._hovering){s._hovering=false;this._sourisHybridPaintHover(false);}
+    };
+  },
+  _sourisHybridPaintHover(on){
+    const t=document.getElementById('hybrid-target');if(!t)return;
+    t.style.background=on?'rgba(31,169,113,.28)':'rgba(255,77,46,.15)';
+    t.style.borderColor=on?'#1FA971':'var(--accent)';
+    t.style.animation=on?'none':'calib-pulse 1s infinite';
+  },
+  _sourisHybridKey(e){
+    const k=(e._composedKey||e.key||'').toLowerCase();
+    if(k.length!==1||k!==this.souris.letter)return;
+    e.preventDefault();
+    const s=this.souris;
+    if(s._hovering){
+      s.hits++;
+      const aimMs=Math.max(60,(s.firstHoverAt||Date.now())-s.spawnAt);
+      s.aimTimes.push(aimMs);
+      s.score+=Math.max(1,Math.round(20-aimMs/150));
+      playSound('hit');this._flashArena('#1FA971');
+      s.rounds++;
+      if(s.rounds>=15){this._sourisHybridEnd();return;}
+      this._sourisHybridSpawn();
+    } else {
+      s.misses++;
+      playSound('miss');this._flashArena('#E5484D');
+    }
+    this.renderSouris();
+  },
+  _sourisHybridEnd(){
+    if(this.souris.phase==='end')return;
+    this.stopSouris();
+    const s=this.souris;
+    const acc=(s.hits+s.misses)?Math.round(100*s.hits/(s.hits+s.misses)):0;
+    const avgAim=s.aimTimes.length?Math.round(s.aimTimes.reduce((a,b)=>a+b,0)/s.aimTimes.length):0;
+    const res=this._sourisFinishTrack('hybrid',{score:s.score,thresholds:this._sourisTiers.hybrid,extra:{aimMs:avgAim,acc},sessionResult:{hits:s.hits}});
+    s.phase='end';s._result=res;s._acc=acc;s._avgAim=avgAim;
+    this.renderSouris();
+  },
+  _sourisHybridRender(){
+    const s=this.souris;
+    if(!this.stats.sourisHub.handConfig&&s.phase!=='config')s.phase='config';
+    if(s.phase==='config')return this._sourisHybridConfigScreen();
+    if(s.phase==='brief')return this._sourisHybridBrief();
+    if(s.phase==='end')return this._sourisHybridEndScreen();
+    this._sourisHybridArena();
+  },
+  _sourisHybridArena(){
+    const s=this.souris;
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:640px;margin:0 auto;padding:0 24px">
+        <div class="game-hud">
+          <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.5)">${s.rounds}/15</div>
+        </div>
+        <div class="game-arena" id="souris-arena" style="height:340px;position:relative;cursor:crosshair">
+          <div id="hybrid-target" style="position:absolute;left:${s.tx}%;top:${s.ty}%;width:${s.tr*2}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid var(--accent);background:rgba(255,77,46,.15);display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#fff;animation:calib-pulse 1s infinite">${s.letter}</div>
+        </div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">Curseur dans la cible + touche = valide
+          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+      </div>
+    </div>`;
+    this._sourisHybridBindArena();
+  },
+  _sourisHybridEndScreen(){
+    const s=this.souris,r=s._result;
+    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        ${this._gameResult({
+          icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
+          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+          boxes:[{label:'Score',value:s.score,accent:true},{label:'Visée',value:s._avgAim,unit:'ms'},{label:'Frappe',value:s._acc,unit:'%'}],
+          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisHybridStart()',
+          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
+        })}
+      </div>
+    </div>`;
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     VISÉE — MAGIC TILES (piste "tiles")
+     4 couloirs qui défilent en rythme : 2 couloirs clic souris, 2
+     couloirs lettre clavier. Jugement parfait/bien/raté à la ligne de
+     frappe. Le tempo (BPM) monte tous les 10 combos.
+     ═══════════════════════════════════════════════════════════════ */
+  _sourisTilesLanes:[{type:'click'},{type:'click'},{type:'key'},{type:'key'}],
+  _sourisTilesHitLineY:82,
+  _sourisTilesBrief(){
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
+          <div style="color:var(--accent)">${ICONS.layers}</div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Magic Tiles</h2>
+          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">4 couloirs qui défilent en rythme jusqu'à la ligne : <b>clique</b> les 2 de gauche, <b>tape la lettre</b> des 2 de droite. Le tempo accélère avec ton combo.</p>
+          <div style="display:flex;gap:26px;margin-top:4px">
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${this._sourisTiers.tiles.bronze} · 🥈${this._sourisTiers.tiles.silver} · 🥇${this._sourisTiers.tiles.gold}</div></div>
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">♥♥♥</div></div>
+          </div>
+          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisTilesStart()">Commencer</button>
+        </div>
+      </div>
+    </div>`;
+  },
+  _sourisTilesStart(){
+    this.stopSouris();
+    this.souris={phase:'play',track:'tiles',score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,
+      bpm:100,tiles:[null,null,null,null],spawnAcc:0,sessionLeft:45000};
+    this.renderSouris();
+    this._sourisLoop=setInterval(()=>this._sourisTilesTick(),50);
+  },
+  _sourisTilesJudge(t){
+    const dist=Math.abs(t.y-this._sourisTilesHitLineY);
+    if(dist<=6)return'perfect';
+    if(dist<=16)return'good';
+    return'bad';
+  },
+  _sourisTilesPopJudge(laneIdx,j){
+    const a=document.getElementById('souris-arena');if(!a)return;
+    const label=j==='perfect'?'PARFAIT':'BIEN';
+    const col=j==='perfect'?'#FFD84D':'#1FA971';
+    const d=document.createElement('div');
+    d.textContent=label;
+    d.style.cssText=`position:absolute;left:${(laneIdx+0.5)*25}%;top:${this._sourisTilesHitLineY}%;transform:translate(-50%,-50%);color:${col};font-family:'JetBrains Mono',monospace;font-weight:800;font-size:14px;pointer-events:none;z-index:6;transition:all .5s ease-out`;
+    a.appendChild(d);
+    setTimeout(()=>{d.style.top=(this._sourisTilesHitLineY-12)+'%';d.style.opacity='0';},20);
+    setTimeout(()=>{d.remove();},520);
+  },
+  _sourisTilesResolve(laneIdx){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    const t=s.tiles[laneIdx];
+    if(!t)return;
+    const j=this._sourisTilesJudge(t);
+    s.tiles[laneIdx]=null;
+    if(j==='bad'){
+      s.misses++;s.combo=0;s.lives--;
+      playSound('miss');this._flashArena('#E5484D');
+      if(s.lives<=0){this._sourisTilesEnd();return;}
+    } else {
+      const pts=j==='perfect'?3:1;
+      s.score+=pts;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
+      if(s.combo>0&&s.combo%10===0)s.bpm=Math.min(170,s.bpm+10);
+      playSound('hit');this._flashArena(j==='perfect'?'#FFD84D':'#1FA971');
+      this._sourisTilesPopJudge(laneIdx,j);
+    }
+    this.renderSouris();
+  },
+  _sourisTilesKey(e){
+    const k=(e._composedKey||e.key||'').toLowerCase();
+    if(k.length!==1)return;
+    const s=this.souris;
+    const laneIdx=s.tiles.findIndex((t,i)=>t&&this._sourisTilesLanes[i].type==='key'&&t.letter===k);
+    if(laneIdx<0)return;
+    e.preventDefault();
+    this._sourisTilesResolve(laneIdx);
+  },
+  _sourisTilesTick(){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    s.sessionLeft-=50;
+    if(s.sessionLeft<=0){this._sourisTilesEnd();return;}
+    const now=Date.now();
+    for(let i=0;i<4;i++){
+      const t=s.tiles[i];if(!t)continue;
+      t.y=(now-t.born)/t.dur*100;
+      if(t.y>=100){
+        s.tiles[i]=null;s.misses++;s.combo=0;s.lives--;
+        playSound('miss');this._flashArena('#E5484D');
+        if(s.lives<=0){this._sourisTilesEnd();return;}
+      }
+    }
+    if(s.phase!=='play')return;
+    s.spawnAcc+=50;
+    const interval=60000/s.bpm;
+    if(s.spawnAcc>=interval){
+      s.spawnAcc=0;
+      const free=[0,1,2,3].filter(i=>!s.tiles[i]);
+      if(free.length){
+        const i=free[Math.floor(Math.random()*free.length)];
+        const dur=Math.max(900,60000/s.bpm*4);
+        const pool=this._sourisLetterPool();
+        const letter=this._sourisTilesLanes[i].type==='key'?pool[Math.floor(Math.random()*pool.length)]:null;
+        s.tiles[i]={y:0,born:now,dur,letter};
+      }
+    }
+    this.renderSouris();
+  },
+  _sourisTilesEnd(){
+    if(this.souris.phase==='end')return;
+    this.stopSouris();
+    const s=this.souris;
+    const acc=(s.hits+s.misses)?Math.round(100*s.hits/(s.hits+s.misses)):0;
+    const res=this._sourisFinishTrack('tiles',{score:s.score,thresholds:this._sourisTiers.tiles,extra:{combo:s.bestCombo},sessionResult:{hits:s.hits,combo:s.bestCombo}});
+    s.phase='end';s._result=res;s._acc=acc;
+    this.renderSouris();
+  },
+  _sourisTilesRender(){
+    const s=this.souris;
+    if(s.phase==='brief')return this._sourisTilesBrief();
+    if(s.phase==='end')return this._sourisTilesEndScreen();
+    this._sourisTilesArena();
+  },
+  _sourisTilesArena(){
+    const s=this.souris;
+    const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
+    const lanesHtml=this._sourisTilesLanes.map((lane,i)=>{
+      const t=s.tiles[i];
+      const tileHtml=t?`<div style="position:absolute;left:6%;right:6%;top:${t.y}%;height:34px;transform:translateY(-50%);border-radius:9px;background:${lane.type==='click'?'rgba(255,77,46,.85)':'rgba(31,169,113,.85)'};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:15px;box-shadow:0 4px 12px rgba(0,0,0,.35)">${lane.type==='click'?ICONS.mouse:t.letter}</div>`:'';
+      return `<div onclick="${lane.type==='click'?'app._sourisTilesResolve('+i+')':''}" style="position:relative;flex:1;border-left:${i>0?'1.5px dashed rgba(255,255,255,.1)':'none'};cursor:${lane.type==='click'?'pointer':'default'}">${tileHtml}</div>`;
+    }).join('');
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:640px;margin:0 auto;padding:0 24px">
+        <div class="game-hud">
+          <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.5)">${s.bpm} BPM${s.combo>1?' · ×'+s.combo:''}</div>
+          <div style="display:flex;gap:1px">${hearts}</div>
+        </div>
+        <div class="game-arena" id="souris-arena" style="height:360px;display:flex;position:relative;overflow:hidden">
+          ${lanesHtml}
+          <div style="position:absolute;left:0;right:0;top:${this._sourisTilesHitLineY}%;height:2px;background:rgba(255,255,255,.4)"></div>
+          <div style="position:absolute;left:0;right:0;bottom:10px;display:flex;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-align:center">
+            <div style="flex:1">CLIC</div><div style="flex:1">CLIC</div><div style="flex:1">LETTRE</div><div style="flex:1">LETTRE</div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">Agis quand la tuile touche la ligne
+          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+      </div>
+    </div>`;
+  },
+  _sourisTilesEndScreen(){
+    const s=this.souris,r=s._result;
+    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        ${this._gameResult({
+          icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
+          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+          boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
+          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisTilesStart()',
+          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
+        })}
+      </div>
+    </div>`;
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     VISÉE — DOUBLE PISTE (piste "duo2", avancée)
+     Une piste souris (suivre une cible qui erre en continu) et une
+     piste clavier (vider une file de lettres) EN MÊME TEMPS. Pas de
+     vies : un score de synchro continu, moitié souris moitié clavier.
+     ═══════════════════════════════════════════════════════════════ */
+  _sourisDuo2Brief(){
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
+          <div style="color:var(--accent)">${ICONS.swords}</div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Double piste</h2>
+          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">35 secondes, deux tâches en même temps : <b>garde le curseur sur la cible qui erre</b> en haut, tout en <b>tapant la lettre en tête de file</b> en bas. Aucune vie — un score de synchro continu.</p>
+          <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">PALIERS (SYNCHRO)<br><span style="font-family:'JetBrains Mono',monospace;font-size:15px;color:#fff">🥉${this._sourisTiers.duo2.bronze}% · 🥈${this._sourisTiers.duo2.silver}% · 🥇${this._sourisTiers.duo2.gold}%</span></div>
+          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisDuo2Start()">Commencer</button>
+        </div>
+      </div>
+    </div>`;
+  },
+  _sourisDuo2RefillQueue(){
+    const s=this.souris,pool=this._sourisLetterPool();
+    while(s.queue.length<4)s.queue.push(pool[Math.floor(Math.random()*pool.length)]);
+  },
+  _sourisDuo2Start(){
+    this.stopSouris();
+    this.souris={phase:'play',track:'duo2',sessionLeft:35000,tx:50,ty:50,mx:50,my:50,
+      onTargetTicks:0,totalTicks:0,queue:[],keyHits:0,tAngle:Math.random()*Math.PI*2};
+    this._sourisDuo2RefillQueue();
+    this.renderSouris();
+    this._sourisLoop=setInterval(()=>this._sourisDuo2Tick(),50);
+  },
+  _sourisDuo2BindArena(){
+    const a=document.getElementById('souris-arena');if(!a)return;
+    const s=this.souris;
+    a.onmousemove=(e)=>{
+      const r=a.getBoundingClientRect();
+      s.mx=(e.clientX-r.left)/r.width*100;s.my=Math.min(58,(e.clientY-r.top)/r.height*100);
+    };
+  },
+  _sourisDuo2Key(e){
+    const k=(e._composedKey||e.key||'').toLowerCase();
+    if(k.length!==1)return;
+    const s=this.souris;
+    if(!s.queue.length||k!==s.queue[0])return;
+    e.preventDefault();
+    s.queue.shift();s.keyHits++;
+    this._sourisDuo2RefillQueue();
+    playSound('hit');
+  },
+  _sourisDuo2Tick(){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    s.sessionLeft-=50;
+    if(s.sessionLeft<=0){this._sourisDuo2End();return;}
+    s.tAngle+=0.05;
+    s.tx=50+32*Math.sin(s.tAngle*1.3);
+    s.ty=29+22*Math.cos(s.tAngle*0.9);
+    s.totalTicks++;
+    const dx=(s.tx-s.mx)*1.6,dy=s.ty-s.my;
+    if(Math.sqrt(dx*dx+dy*dy)<9)s.onTargetTicks++;
+    this.renderSouris();
+  },
+  _sourisDuo2End(){
+    if(this.souris.phase==='end')return;
+    this.stopSouris();
+    const s=this.souris;
+    const mousePct=s.totalTicks?Math.round(100*s.onTargetTicks/s.totalTicks):0;
+    const keyPct=Math.min(100,Math.round(s.keyHits*4));
+    const synchro=Math.round(mousePct*0.5+keyPct*0.5);
+    const res=this._sourisFinishTrack('duo2',{score:synchro,thresholds:this._sourisTiers.duo2,extra:{mousePct,keyHits:s.keyHits},sessionResult:{hits:s.keyHits}});
+    s.phase='end';s._result=res;s._mousePct=mousePct;s._synchro=synchro;
+    this.renderSouris();
+  },
+  _sourisDuo2Render(){
+    const s=this.souris;
+    if(s.phase==='brief')return this._sourisDuo2Brief();
+    if(s.phase==='end')return this._sourisDuo2EndScreen();
+    this._sourisDuo2Arena();
+  },
+  _sourisDuo2Arena(){
+    const s=this.souris;
+    const sec=Math.ceil(s.sessionLeft/1000);
+    const onTarget=s.totalTicks?100*s.onTargetTicks/Math.max(1,s.totalTicks):0;
+    const queueHtml=s.queue.map((l,i)=>`<div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:${i===0?'20px':'16px'};background:${i===0?'rgba(255,77,46,.22)':'rgba(255,255,255,.06)'};border:${i===0?'2px solid var(--accent)':'1.5px dashed rgba(255,255,255,.14)'};color:${i===0?'#fff':'rgba(255,255,255,.5)'}">${l}</div>`).join('');
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:640px;margin:0 auto;padding:0 24px">
+        <div class="game-hud">
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)">SYNCHRO ${Math.round(onTarget)}%</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:${sec<=5?'#E5484D':'#fff'}">${sec}s</div>
+        </div>
+        <div class="game-arena" id="souris-arena" style="height:360px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="position:relative;flex:1;border-bottom:1.5px dashed rgba(255,255,255,.12)">
+            <div style="position:absolute;left:10px;top:8px;font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.35)">SOURIS — suis la cible</div>
+            <div style="position:absolute;left:${s.tx}%;top:${s.ty}%;width:18%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid var(--accent);background:rgba(255,77,46,.18)"></div>
+          </div>
+          <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.35)">CLAVIER — vide la file</div>
+            <div style="display:flex;gap:8px">${queueHtml}</div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">Souris sur la cible + tape la première lettre de la file
+          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+      </div>
+    </div>`;
+    this._sourisDuo2BindArena();
+  },
+  _sourisDuo2EndScreen(){
+    const s=this.souris,r=s._result;
+    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        ${this._gameResult({
+          icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
+          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+          boxes:[{label:'Synchro',value:s._synchro,unit:'%',accent:true},{label:'Précision souris',value:s._mousePct,unit:'%'},{label:'Lettres tapées',value:s.keyHits}],
+          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisDuo2Start()',
+          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
+        })}
+      </div>
+    </div>`;
+  },
+
   renderGames(){
     if(this.activeGame==='sprint'){this.renderSprint();return;}
     if(this.activeGame==='frappe'){this.renderFrappe();return;}
@@ -5350,7 +6480,7 @@ const app={
         <div class="game-sel-card" onclick="app.selectGame('souris')">
           <div class="game-sel-icon" style="color:var(--accent)">${ICONS.mouse}</div>
           <div class="game-sel-name">Visée</div>
-          <div class="game-sel-desc">Maîtrise la souris en 5 niveaux : viser, cliquer, éviter les pièges, glisser-déposer, puis ZQSD et souris en même temps.</div>
+          <div class="game-sel-desc">7 pistes pour la souris et le clavier : précision, réflexes, vagues & boss, et des défis à deux mains. Mission du jour, badges et skins à débloquer.</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
         </div>
         <div class="game-sel-card" onclick="app.selectGame('duel')">
@@ -5414,7 +6544,7 @@ const app={
       this.duelLeave();this.activeGame='duel';this.duel={phase:'menu'};this.renderGames();
     } else if(which==='souris'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('souris'));return;}
-      this.activeGame='souris';this.souris={phase:'menu'};this.renderGames();
+      this.activeGame='souris';this.souris={phase:'hub'};this.renderGames();
     } else {
       this.activeGame='frappe';this.game=null;this.renderGames();
     }
