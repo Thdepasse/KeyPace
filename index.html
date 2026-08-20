@@ -307,7 +307,7 @@ body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI
 .conv-overlay{position:fixed;inset:0;z-index:2100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(22,20,15,.5);backdrop-filter:blur(6px);animation:cel-fade .25s ease}
 .conv-card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:30px 28px 24px;max-width:440px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(22,20,15,.35);animation:cel-pop .4s cubic-bezier(.2,.9,.3,1.4)}
 .conv-x{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:14px;cursor:pointer;line-height:1}
-.conv-icon{font-size:40px;line-height:1;margin-bottom:8px}
+.conv-icon{font-size:40px;line-height:1;margin-bottom:8px;color:var(--accent)}
 .conv-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
 .conv-title{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:5px 0 8px}
 .conv-body{color:var(--muted);font-size:14.5px;line-height:1.55;margin:0 auto 16px;max-width:34ch}
@@ -547,7 +547,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .pricing-card .pc-price small{font-size:15px;color:var(--muted);font-weight:500}
 .pricing-card ul{font-size:14px;color:#7A7365;line-height:2;list-style:none}
 .pricing-card ul li::before{content:'✓ ';font-weight:700;color:#1FA971}
-.pricing-card ul li.locked::before{content:'🔒 ';color:var(--muted)}
+.pricing-card ul li.locked::before{content:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%238A8275" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>');margin-right:6px;color:var(--muted)}
 .pricing-card .pc-btn{width:100%;padding:12px;border:none;border-radius:12px;font-weight:700;font-size:15px;margin-top:20px;cursor:pointer;font-family:inherit}
 .pc-btn.pri{background:var(--accent);color:#fff;box-shadow:0 6px 16px rgba(255,77,46,0.3)}
 .pc-btn.sec{background:var(--light);color:var(--txt)}
@@ -1079,7 +1079,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <button class="auth-btn" id="school-submit" onclick="submitSchoolContact()">Envoyer la demande →</button>
     </div>
     <div id="school-success" style="display:none;text-align:center;padding:20px 0">
-      <div style="font-size:44px;margin-bottom:14px">🎉</div>
+      <div style="font-size:44px;margin-bottom:14px;color:var(--accent)">✓</div>
       <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;margin-bottom:8px">Demande envoyée !</div>
       <p style="font-size:14px;color:#7A7365;line-height:1.6">Merci pour votre intérêt. Nous avons bien reçu votre demande et reviendrons vers vous <strong style="color:var(--txt)">dans les plus brefs délais</strong>.</p>
       <button onclick="closeModal('school-modal')" style="margin-top:18px;background:var(--light);border:1px solid var(--border);border-radius:11px;padding:10px 22px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Fermer</button>
@@ -1272,6 +1272,43 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <script>
 'use strict';
 
+/* ── Icônes maison (style sobre, monochrome, hérite de la couleur du texte) ── */
+function _icon(inner,extra){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em" style="vertical-align:-0.15em;flex-shrink:0"${extra?' '+extra:''}>${inner}</svg>`;}
+const ICONS={
+  mail:_icon('<rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/>'),
+  lock:_icon('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
+  key:_icon('<circle cx="8" cy="15" r="4"/><line x1="11" y1="12" x2="20" y2="3"/><path d="M14 9l2 2"/><path d="M17 6l2 2"/>'),
+  eye:_icon('<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>'),
+  volume:_icon('<polygon points="3 9 7 9 12 4 12 20 7 15 3 15"/><path d="M16.5 8a5 5 0 0 1 0 8"/><path d="M19.5 5a9 9 0 0 1 0 14"/>'),
+  user:_icon('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>'),
+  shield:_icon('<path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z"/>'),
+  zap:_icon('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
+  gamepad:_icon('<rect x="2" y="7" width="20" height="11" rx="5.5"/><path d="M7 10v4M5 12h4"/><circle cx="16" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="18.5" cy="13" r="1" fill="currentColor" stroke="none"/>'),
+  barChart:_icon('<rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="14" width="4" height="7" rx="1"/>','fill="currentColor" stroke="none"'),
+  monitor:_icon('<rect x="3" y="4" width="18" height="12" rx="2"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="16" x2="12" y2="20"/>'),
+  gradCap:_icon('<path d="M12 3l10 5-10 5L2 8l10-5z"/><path d="M6 10.5V16c0 1.5 2.5 3 6 3s6-1.5 6-3v-5.5"/>'),
+  award:_icon('<circle cx="12" cy="8" r="5"/><path d="M9 12.5L7 21l5-3 5 3-2-8.5"/>'),
+  trendUp:_icon('<polyline points="3 17 9 11 13 15 21 6"/><polyline points="15 6 21 6 21 12"/>'),
+  target:_icon('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>'),
+  fileText:_icon('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/>'),
+  clipboard:_icon('<rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><line x1="8.5" y1="10" x2="15.5" y2="10"/><line x1="8.5" y1="14" x2="15.5" y2="14"/>'),
+  pencil:_icon('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>'),
+  bookOpen:_icon('<path d="M2 5c3-1 6-1 9 1v13c-3-2-6-2-9-1V5z"/><path d="M22 5c-3-1-6-1-9 1v13c3-2 6-2 9-1V5z"/>'),
+  mic:_icon('<rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="8" y1="21" x2="16" y2="21"/>'),
+  school:_icon('<path d="M4 21V8l8-5 8 5v13"/><line x1="4" y1="21" x2="20" y2="21"/><rect x="10" y="14" width="4" height="7"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="11" r="1" fill="currentColor" stroke="none"/>'),
+  inbox:_icon('<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13l3.5 7v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-7l3.5-7z"/>'),
+  flame:_icon('<path d="M12 2c1 4-3 5-3 9a3 3 0 0 0 6 0c0-1-1-2-1-3 2 1 3 3 3 5a5 5 0 0 1-10 0c0-4 3-6 5-11z"/>'),
+  message:_icon('<path d="M4 4h16v12H8l-4 4V4z"/>'),
+  rocket:_icon('<path d="M12 2.5c2.3 2 3.7 5.2 3.7 8.5 0 1.9-.5 3.7-1.4 5.1L12 18.5l-2.3-2.4c-.9-1.4-1.4-3.2-1.4-5.1 0-3.3 1.4-6.5 3.7-8.5z"/><circle cx="12" cy="9.5" r="1.4" fill="currentColor" stroke="none"/><path d="M9 16l-2.5 1.5.5-3"/><path d="M15 16l2.5 1.5-.5-3"/>'),
+  flag:_icon('<line x1="5" y1="3" x2="5" y2="21"/><path d="M5 4h11l-3 4 3 4H5"/>'),
+  cookie:_icon('<circle cx="12" cy="12" r="9"/><circle cx="9" cy="9" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="14.5" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>'),
+  trophy:_icon('<path d="M8 3h8v4a4 4 0 0 1-8 0V3z"/><path d="M8 5H5a2 2 0 0 0 0 4h1"/><path d="M16 5h3a2 2 0 0 1 0 4h-1"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="10" y1="11" x2="10" y2="15"/><line x1="14" y1="11" x2="14" y2="15"/><line x1="8" y1="19" x2="16" y2="19"/>'),
+  keyboard:_icon('<rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="10.01"/><line x1="10" y1="10" x2="10" y2="10.01"/><line x1="14" y1="10" x2="14" y2="10.01"/><line x1="18" y1="10" x2="18" y2="10.01"/><line x1="7" y1="15" x2="17" y2="15"/>'),
+  bulb:_icon('<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.2 1 2v.5h6v-.5c0-.8.3-1.4 1-2A6 6 0 0 0 12 3z"/>'),
+  clock:_icon('<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/>'),
+  stop:_icon('<rect x="5" y="5" width="14" height="14" rx="2" fill="currentColor" stroke="none"/>'),
+};
+
 /* ── ANALYTICS MAISON (remplace Umami) : beacon fire-and-forget vers /api/track ── */
 function track(event, props){
   try{
@@ -1460,7 +1497,7 @@ async function authSubmit(){
       switchTab('login');
       const ctx=document.getElementById('auth-context-msg');
       const instLine=d.institutionName?` Ton compte a été rattaché à <strong>${app._esc(d.institutionName)}</strong> — il ne te reste plus qu'à rejoindre ta classe avec le code donné par ton professeur.`:'';
-      ctx.innerHTML='📧 <strong>Compte '+(wasProf?'enseignant ':'')+'créé !</strong> Un lien de confirmation a été envoyé à ton adresse email. Clique dessus, puis reviens te connecter ici.'+instLine;
+      ctx.innerHTML=ICONS.mail+' <strong>Compte '+(wasProf?'enseignant ':'')+'créé !</strong> Un lien de confirmation a été envoyé à ton adresse email. Clique dessus, puis reviens te connecter ici.'+instLine;
       ctx.style.cssText='background:rgba(31,169,113,0.1);border:1px solid rgba(31,169,113,0.25);border-radius:10px;padding:10px 13px;font-size:13px;color:#15784f;margin-bottom:16px;display:block';
       return;
     } else {
@@ -1531,7 +1568,7 @@ function showForcedPasswordChangeModal(d,oldPasswordHash){
   overlay.className='settings-overlay';overlay.id='forced-pw-overlay';overlay.style.zIndex='1300';
   overlay.innerHTML=`<div class="settings-modal" style="max-width:420px">
     <div class="settings-modal-head">
-      <div class="settings-modal-avatar">🔑</div>
+      <div class="settings-modal-avatar">${ICONS.key}</div>
       <div class="settings-modal-head-info"><strong>Choisis ton mot de passe</strong><span style="color:var(--muted);font-size:12px">Ton professeur a créé ce compte — à toi de définir un mot de passe que toi seul connais</span></div>
     </div>
     <div class="settings-section">
@@ -1837,7 +1874,7 @@ function showEmailPendingBanner(username){
   el.id='email-pending-banner';
   el.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:600;max-width:480px;width:calc(100% - 32px);background:#fff;border:1.5px solid #E7E1D5;border-radius:18px;padding:22px 24px;box-shadow:0 12px 36px rgba(0,0,0,0.13)';
   el.innerHTML=`<div style="display:flex;gap:14px;align-items:flex-start">
-    <div style="width:40px;height:40px;background:#FF4D2E;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📧</div>
+    <div style="width:40px;height:40px;background:#FF4D2E;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0">${ICONS.mail}</div>
     <div style="flex:1">
       <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:16px;margin-bottom:4px">Vérifie ta boîte mail, ${username} !</div>
       <div style="font-size:13px;color:#7A7365;line-height:1.5">Un email de confirmation vient d'être envoyé. Clique sur le lien pour activer ton compte et commencer.</div>
@@ -1855,12 +1892,12 @@ function handleVerificationReturn(){
   if(!verified)return;
   history.replaceState({},'',location.pathname);
   const messages={
-    success:{icon:'✅',title:'Email confirmé !',body:'Ton compte est actif. Connecte-toi pour commencer.',cta:'Se connecter',action:"openAuth('login')"},
-    already:{icon:'✅',title:'Déjà confirmé',body:'Ton adresse email est déjà vérifiée. Connecte-toi.',cta:'Se connecter',action:"openAuth('login')"},
-    'email-changed':{icon:'✅',title:'Nouvelle adresse confirmée !',body:'Ton adresse email a bien été mise à jour.',cta:'',action:''},
-    expired:{icon:'⏱️',title:'Lien expiré',body:'Le lien a expiré (24h). Crée un nouveau compte ou contacte le support.',cta:'Créer un compte',action:"openAuth('register')"},
-    invalid:{icon:'❌',title:'Lien invalide',body:'Ce lien de confirmation n\'est pas valide.',cta:'Retour à l\'accueil',action:''},
-    error:{icon:'⚠️',title:'Erreur temporaire',body:'La confirmation a échoué côté serveur. Réessaie en recliquant sur le lien dans quelques instants.',cta:'Retour à l\'accueil',action:''},
+    success:{icon:'✓',title:'Email confirmé !',body:'Ton compte est actif. Connecte-toi pour commencer.',cta:'Se connecter',action:"openAuth('login')"},
+    already:{icon:'✓',title:'Déjà confirmé',body:'Ton adresse email est déjà vérifiée. Connecte-toi.',cta:'Se connecter',action:"openAuth('login')"},
+    'email-changed':{icon:'✓',title:'Nouvelle adresse confirmée !',body:'Ton adresse email a bien été mise à jour.',cta:'',action:''},
+    expired:{icon:`<span style="color:var(--accent)">${ICONS.clock}</span>`,title:'Lien expiré',body:'Le lien a expiré (24h). Crée un nouveau compte ou contacte le support.',cta:'Créer un compte',action:"openAuth('register')"},
+    invalid:{icon:'✕',title:'Lien invalide',body:'Ce lien de confirmation n\'est pas valide.',cta:'Retour à l\'accueil',action:''},
+    error:{icon:'⚠',title:'Erreur temporaire',body:'La confirmation a échoué côté serveur. Réessaie en recliquant sur le lien dans quelques instants.',cta:'Retour à l\'accueil',action:''},
   };
   const m=messages[verified]||messages.invalid;
   const el=document.createElement('div');
@@ -1955,7 +1992,7 @@ function celebrateLesson(lesson,res){
   const ov=document.createElement('div');ov.className='cel-overlay';
   ov.innerHTML='<div class="cel-card">'
     +'<div class="cel-eyebrow">Leçon terminée</div>'
-    +'<div class="cel-title">Bravo ! 🎉</div>'
+    +'<div class="cel-title">Bravo !</div>'
     +'<div class="cel-sub">'+(lesson.title||'')+'</div>'
     +'<div class="cel-stats"><div class="cel-stat"><b>'+(res?res.wpm:0)+'</b><span>mots/min</span></div><div class="cel-stat"><b>'+(res?res.acc:0)+'%</b><span>précision</span></div></div>'
     +'<div class="cel-kb">'+kb+'</div>'
@@ -2001,13 +2038,13 @@ function _convSet(k,v){try{localStorage.setItem(k,v);}catch{}}
 function showConvertPopup(kind,res){
   if(document.querySelector('.conv-overlay'))return; // jamais deux à la fois
   const cfg = kind==='guest' ? {
-    icon:'🚀', eyebrow:'Ton essai est prometteur', title:'Crée ton compte gratuit',
+    icon:ICONS.rocket, eyebrow:'Ton essai est prometteur', title:'Crée ton compte gratuit',
     body:(res?('Beau départ à '+res.wpm+' mots/min ! '):'')+'Débloque les 10 premières leçons et garde ta progression.',
     feats:['10 leçons gratuites','Suivi de ta progression','Tes records sauvegardés'],
     cta:'Créer mon compte gratuit',
     act:()=>openAuth('register','Crée ton compte pour débloquer les 10 leçons gratuites.')
   } : {
-    icon:'⚡', eyebrow:'Passe au niveau supérieur', title:'Débloque tout avec Expert',
+    icon:ICONS.zap, eyebrow:'Passe au niveau supérieur', title:'Débloque tout avec Expert',
     body:'Les 65 leçons, tous les jeux et les défis pour progresser bien plus vite et exploser ton score.',
     feats:['65 leçons complètes','Tous les jeux & défis','Certification de niveau'],
     cta:'Passer à Expert',
@@ -3130,7 +3167,7 @@ const app={
         <div style="flex:1"><label style="${lbl}">Maximum de mots</label><input id="asg-essay-max" type="number" min="1" placeholder="ex. 200" style="${fld}"></div>
       </div>
       <div id="asg-essay-audio-note" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:var(--muted);line-height:1.5">
-        🔊 <b style="color:var(--txt)">Transcription</b> — enregistre l'audio que l'élève devra transcrire via l'onglet « Texte personnalisé » en mode Vocal, ou laisse vide pour une transcription à partir d'un document externe.
+        <span style="color:var(--accent)">${ICONS.volume}</span> <b style="color:var(--txt)">Transcription</b> — enregistre l'audio que l'élève devra transcrire via l'onglet « Texte personnalisé » en mode Vocal, ou laisse vide pour une transcription à partir d'un document externe.
       </div>
     </div>`;
   },
@@ -3213,7 +3250,7 @@ const app={
         <audio controls src="${this._esc(a.audioUrl)}" style="width:100%;height:38px;border-radius:8px"></audio>
       </div>`:''}
       <div style="background:rgba(255,77,46,.06);border:1px solid rgba(255,77,46,.2);border-radius:12px;padding:11px 14px;margin-bottom:22px;font-size:12.5px;color:var(--muted);line-height:1.5">
-        ✍️ Ce devoir se rédige au clavier : le collage est désactivé. Écris ton texte toi-même.
+        <span style="color:var(--accent)">${ICONS.pencil}</span> Ce devoir se rédige au clavier : le collage est désactivé. Écris ton texte toi-même.
       </div>
       ${fields}
       <div id="essay-err" style="color:#E5484D;font-size:13px;margin:0 0 12px;display:none"></div>
@@ -3402,7 +3439,7 @@ const app={
         </div>`;
       }).join('')}
 
-      <button onclick="app._essayCopy('${assignmentId}','${studentId}')" style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px 18px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)">📋 Copier le texte</button>
+      <button onclick="app._essayCopy('${assignmentId}','${studentId}')" style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px 18px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)">${ICONS.clipboard} Copier le texte</button>
     </div>`;
     this._essayLast=d;
   },
@@ -4029,22 +4066,22 @@ const app={
       ${!isGuest?'':`
       <div class="home-feat-grid">
         <div class="home-feat-cell" onclick="go('lessons')">
-          <div class="home-feat-cell-icon" style="background:rgba(255,77,46,0.1)">⌨️</div>
+          <div class="home-feat-cell-icon" style="background:rgba(255,77,46,0.1);color:var(--accent)">${ICONS.keyboard}</div>
           <div class="home-feat-cell-title">65 leçons</div>
           <div class="home-feat-cell-sub">Débutant à expert, clavier AZERTY</div>
         </div>
         <div class="home-feat-cell" onclick="go('test')">
-          <div class="home-feat-cell-icon" style="background:rgba(234,179,8,0.1)">⚡</div>
+          <div class="home-feat-cell-icon" style="background:rgba(234,179,8,0.1);color:#CA8A04">${ICONS.zap}</div>
           <div class="home-feat-cell-title">Test de vitesse</div>
           <div class="home-feat-cell-sub">Mesure tes mots/minute</div>
         </div>
         <div class="home-feat-cell" onclick="go('games')">
-          <div class="home-feat-cell-icon" style="background:rgba(34,197,94,0.1)">🎮</div>
+          <div class="home-feat-cell-icon" style="background:rgba(34,197,94,0.1);color:#16A34A">${ICONS.gamepad}</div>
           <div class="home-feat-cell-title">Jeux de frappe</div>
           <div class="home-feat-cell-sub">Apprends en t'amusant</div>
         </div>
         <div class="home-feat-cell" onclick="go('stats')">
-          <div class="home-feat-cell-icon" style="background:rgba(99,102,241,0.1)">📊</div>
+          <div class="home-feat-cell-icon" style="background:rgba(99,102,241,0.1);color:#4F46E5">${ICONS.barChart}</div>
           <div class="home-feat-cell-title">Tes progrès</div>
           <div class="home-feat-cell-sub">Vitesse et précision</div>
         </div>
@@ -4062,13 +4099,13 @@ const app={
           ${isGuest ? "Créer mon compte gratuitement" : "Voir mes progrès →"}
         </button>
         <div class="home-mobile-cta-sub">Sans carte bancaire · Sans installation</div>
-        <div style="margin-top:18px;background:var(--light);border-radius:14px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.55;text-align:left">💻 <b style="color:var(--txt)">Les cours, les jeux et le test se font sur ordinateur</b> : ils demandent un vrai clavier. Depuis ton téléphone, tu peux suivre tes progrès et tes devoirs.</div>
+        <div style="margin-top:18px;background:var(--light);border-radius:14px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.55;text-align:left"><span style="color:var(--accent)">${ICONS.monitor}</span> <b style="color:var(--txt)">Les cours, les jeux et le test se font sur ordinateur</b> : ils demandent un vrai clavier. Depuis ton téléphone, tu peux suivre tes progrès et tes devoirs.</div>
       </div>
 
       <div class="features-grid home-features-desktop">
-        <div class="feature-card"><div class="icon">⌨️</div><h3>Cours progressifs</h3><p>65 leçons progressives couvrant tout le clavier AZERTY, des bases aux accents et symboles.</p></div>
-        <div class="feature-card"><div class="icon">⚡</div><h3>Test de vitesse</h3><p>Mesure tes mots par minute et ta précision sur des textes variés.</p></div>
-        <div class="feature-card"><div class="icon">🎮</div><h3>Jeu de mots</h3><p>Des mots tombent du ciel : tape-les avant qu'ils touchent le sol !</p></div>
+        <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.keyboard}</div><h3>Cours progressifs</h3><p>65 leçons progressives couvrant tout le clavier AZERTY, des bases aux accents et symboles.</p></div>
+        <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.zap}</div><h3>Test de vitesse</h3><p>Mesure tes mots par minute et ta précision sur des textes variés.</p></div>
+        <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.gamepad}</div><h3>Jeu de mots</h3><p>Des mots tombent du ciel : tape-les avant qu'ils touchent le sol !</p></div>
       </div>
       `}
       ${getUserPlan()!=='expert'?`<div class="pricing-section">
@@ -4113,7 +4150,7 @@ const app={
       <div class="school-banner">
         <div class="school-banner-inner">
           <div class="school-banner-content">
-            <span class="school-banner-badge">🎓 Écoles · Universités · Centres de formation</span>
+            <span class="school-banner-badge">${ICONS.gradCap} Écoles · Universités · Centres de formation</span>
             <h2>Équipez toute votre classe pour taper plus vite</h2>
             <p>Offrez un accès <strong>Expert</strong> à chacun de vos étudiants : 65 leçons progressives, jeux de frappe et suivi de progression individuel. Tarif établissement avantageux et mise en place en quelques minutes.</p>
             <ul class="school-banner-feats">
@@ -4126,7 +4163,7 @@ const app={
               <button class="school-banner-link" onclick="go('etablissement')" style="background:none;border:none;cursor:pointer;font-family:inherit">En savoir plus</button>
             </div>
           </div>
-          <div class="school-banner-visual" aria-hidden="true">🎓</div>
+          <div class="school-banner-visual" style="color:#fff" aria-hidden="true">${ICONS.gradCap}</div>
         </div>
       </div>
       `}
@@ -4189,7 +4226,7 @@ const app={
     if(etab.error){
       document.getElementById('page-home').innerHTML=`
         <div style="max-width:560px;margin:0 auto;padding:72px 24px;text-align:center">
-          <div style="width:52px;height:52px;border-radius:14px;background:rgba(229,72,77,0.1);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px">⚠️</div>
+          <div style="width:52px;height:52px;border-radius:14px;background:rgba(229,72,77,0.1);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px">⚠</div>
           <div style="font-size:17px;font-weight:700;margin-bottom:8px">Impossible de charger le tableau de bord</div>
           <div style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:22px">${etab.error}${/réserv|enseignant|403/i.test(etab.error)?'<br>Ton compte n\'a pas encore le rôle enseignant en base. Demande à l\'administrateur de le passer en « prof ».':''}</div>
           <button class="btn-primary" style="padding:10px 22px;font-size:14px" onclick="app.loadEtab(true)">Réessayer</button>
@@ -4310,7 +4347,7 @@ const app={
       </div>`:'';
     document.getElementById('page-test').innerHTML=`<div class="typing-section" style="padding-top:36px">
       ${this._guestGate({
-        icon:'⏳',
+        icon:ICONS.clock,
         eyebrow:'Test du jour terminé',
         title:'Reviens demain… ou entraîne-toi maintenant',
         text:"Sans compte, tu as droit à un test par jour. Crée ton compte gratuit pour t'entraîner autant que tu veux et voir ta progression.",
@@ -4412,7 +4449,7 @@ const app={
       </div>`;
     }
     const typingTitle=titled?(s.title||'Devoir'):les?les.title:'Test de vitesse';
-    const typingSub=cert?(vocal?"🎓 Dictée de certification — garde les yeux sur l'écran (≥ 90% requis), écoute et tape.":"🎓 Examen de certification — regard sur l'écran ≥ 90% et précision ≥ 90% requis."):custom?(vocal?'📖 Dictée : écoute le texte et tape ce que tu entends.':'Recopie le texte ci-dessous le plus vite et juste possible.'):les?`Touches : ${les.keys||''}  ·  Objectif ${goals.minWpm} mpm, max ${goals.maxErrors} fautes`:'Tape le texte ci-dessous le plus vite et juste possible.';
+    const typingSub=cert?(vocal?`<span style="color:var(--accent)">${ICONS.gradCap}</span> Dictée de certification — garde les yeux sur l'écran (≥ 90% requis), écoute et tape.`:`<span style="color:var(--accent)">${ICONS.gradCap}</span> Examen de certification — regard sur l'écran ≥ 90% et précision ≥ 90% requis.`):custom?(vocal?`<span style="color:var(--accent)">${ICONS.bookOpen}</span> Dictée : écoute le texte et tape ce que tu entends.`:'Recopie le texte ci-dessous le plus vite et juste possible.'):les?`Touches : ${les.keys||''}  ·  Objectif ${goals.minWpm} mpm, max ${goals.maxErrors} fautes`:'Tape le texte ci-dessous le plus vite et juste possible.';
     const next=s&&!s.finished&&!vocal?s.text[s.idx]:null;
     let tbHTML='';
     if(s){let wbuf=[];const flush=()=>{if(wbuf.length){tbHTML+='<span style="white-space:nowrap">'+wbuf.join('')+'</span>';wbuf=[];}};s.text.split('').forEach((ch,i)=>{let cls='todo';if(i<s.idx)cls=s.typed[i]==='w'?'wrong':'ok';else if(i===s.idx)cls='cur';if(ch===' '){flush();tbHTML+=`<span class="ch ${cls}">&nbsp;</span>`;}else wbuf.push(`<span class="ch ${cls}">${ch}</span>`);});flush();}
@@ -4420,7 +4457,7 @@ const app={
     document.getElementById(pageId).innerHTML=`<div class="typing-section">
       <div class="typing-header">
         <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br>':custom?'<button onclick="go(\'classes\')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Mes devoirs</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
-        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')">💡 Explication</button>`:''}${vocal&&!finished?`<button class="btn-sm btn-outline" onclick="app.speakAssignment()">🔊 Réécouter</button>`:''}${!isLesson&&!custom&&!cert?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()">${this._gaze.enabled?'👁 Traqueur actif':'👁 Activer traqueur des yeux'}</button>${this._gaze.permError?`<span style="font-size:11px;color:var(--danger);max-width:220px;text-align:right">${this._gaze.permError}</span>`:''}</div></div>
+        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')"><span style="color:var(--accent)">${ICONS.bulb}</span> Explication</button>`:''}${vocal&&!finished?`<button class="btn-sm btn-outline" onclick="app.speakAssignment()"><span style="color:var(--accent)">${ICONS.volume}</span> Réécouter</button>`:''}${!isLesson&&!custom&&!cert?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()">${this._gaze.enabled?`<span style="color:#fff">${ICONS.eye}</span> Traqueur actif`:`<span style="color:var(--accent)">${ICONS.eye}</span> Activer traqueur des yeux`}</button>${this._gaze.permError?`<span style="font-size:11px;color:var(--danger);max-width:220px;text-align:right">${this._gaze.permError}</span>`:''}</div></div>
       </div>
       <div class="live-stats" style="${finished?'display:none':''}">
         <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val">${s&&s.started?liveWpm+'<span class="stat-unit"> mpm</span>':'·'}</div></div>
@@ -4440,7 +4477,7 @@ const app={
       ${!finished&&isLesson&&les&&les.tip&&s&&!s.started?`<div class="lesson-tip"><div class="lesson-tip-icon">💡</div><div>${les.tip}</div></div>`:''}
       ${!finished?(vocal?`<div class="typing-box" style="text-align:center;padding:34px 20px">
         <div style="font-size:13px;color:var(--muted);margin-bottom:18px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5">Écoute le texte et tape ce que tu entends. Le texte n'est pas affiché : c'est une dictée.</div>
-        <button onclick="app.speakAssignment()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px 30px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit">🔊 ${s&&s.started?'Réécouter':'Écouter la dictée'}</button>
+        <button onclick="app.speakAssignment()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px 30px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit">${ICONS.volume} ${s&&s.started?'Réécouter':'Écouter la dictée'}</button>
         <div style="margin-top:18px;font-size:13px;color:var(--muted)">Avancement : <span id="voc-count" style="font-weight:700;color:var(--txt)">${s.idx} / ${s.text.length}</span> caractères</div>
       </div>`:`<div class="typing-box"><div class="typing-box-inner" id="tb-scroll">${tbHTML}</div></div>`):''}
       ${finished?`<div class="result-box"><div class="result-badge">${badge}</div>
@@ -4459,7 +4496,7 @@ const app={
           const _card=(icon,iconBg,iconColor,title,titleColor,sub,rightVal,barPct,barColor,leftLbl,rightLbl)=>`<div style="margin-top:16px;background:var(--light);border:1px solid var(--border);border-radius:16px;padding:18px 20px">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
               <div style="display:flex;align-items:center;gap:12px">
-                <div style="width:38px;height:38px;border-radius:10px;background:${iconBg};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${icon}</div>
+                <div style="width:38px;height:38px;border-radius:10px;background:${iconBg};color:${iconColor};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${icon}</div>
                 <div><div style="font-size:14px;font-weight:700;color:${titleColor}">${title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${sub}</div></div>
               </div>
               <div style="text-align:right;flex-shrink:0;margin-left:12px"><span style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:${titleColor}">${rightVal}</span><span style="font-size:13px;color:var(--muted);font-weight:500"> mpm</span></div>
@@ -4467,11 +4504,11 @@ const app={
             <div style="height:6px;border-radius:3px;background:var(--border);overflow:hidden"><div style="height:100%;width:${barPct}%;background:${barColor};border-radius:3px"></div></div>
             <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:11px;color:var(--muted)">${leftLbl}</span><span style="font-size:11px;color:var(--muted)">${rightLbl}</span></div>
           </div>`;
-          if(isFirst)return _card('🏅','rgba(31,169,113,.15)','#1FA971','Premier record établi !','#1FA971',`Ton score de <b style="color:#1FA971">${resWpm} mpm</b> est maintenant ta référence.`,resWpm,100,'#1FA971',`${resWpm} mpm (ce test)`,'1er record');
-          if(isRecord){const diff=resWpm-prev;return _card('🏆','rgba(31,169,113,.15)','#1FA971','Nouveau record personnel !','#1FA971',`Tu bats ton ancien record de <b style="color:#1FA971">+${diff} mpm</b>.`,resWpm,100,'#1FA971',`Ancien : ${prev} mpm`,`Nouveau : ${resWpm} mpm ✓`);}
+          if(isFirst)return _card(ICONS.award,'rgba(31,169,113,.15)','#1FA971','Premier record établi !','#1FA971',`Ton score de <b style="color:#1FA971">${resWpm} mpm</b> est maintenant ta référence.`,resWpm,100,'#1FA971',`${resWpm} mpm (ce test)`,'1er record');
+          if(isRecord){const diff=resWpm-prev;return _card(ICONS.trophy,'rgba(31,169,113,.15)','#1FA971','Nouveau record personnel !','#1FA971',`Tu bats ton ancien record de <b style="color:#1FA971">+${diff} mpm</b>.`,resWpm,100,'#1FA971',`Ancien : ${prev} mpm`,`Nouveau : ${resWpm} mpm ✓`);}
           const gap=prev-resWpm;const pct=Math.min(99,Math.round(100*resWpm/prev));
           const equalRecord=resWpm===prev;
-          return _card(equalRecord?'🎯':'📈',equalRecord?'rgba(31,169,113,.15)':'rgba(255,77,46,.1)',equalRecord?'#1FA971':'var(--accent)',equalRecord?'Record égalé !':'Meilleur score à battre','var(--txt)',equalRecord?'Tu es au niveau de ton record.':gap===1?'Il te manque <b style="color:var(--accent)">1 mpm</b> pour le record.':`Il te manque <b style="color:var(--accent)">${gap} mpm</b> pour le record.`,prev,pct,equalRecord?'#1FA971':'var(--accent)',`${resWpm} mpm (ce test)`,`Record : ${prev} mpm`);
+          return _card(equalRecord?ICONS.target:ICONS.trendUp,equalRecord?'rgba(31,169,113,.15)':'rgba(255,77,46,.1)',equalRecord?'#1FA971':'var(--accent)',equalRecord?'Record égalé !':'Meilleur score à battre','var(--txt)',equalRecord?'Tu es au niveau de ton record.':gap===1?'Il te manque <b style="color:var(--accent)">1 mpm</b> pour le record.':`Il te manque <b style="color:var(--accent)">${gap} mpm</b> pour le record.`,prev,pct,equalRecord?'#1FA971':'var(--accent)',`${resWpm} mpm (ce test)`,`Record : ${prev} mpm`);
         })()}
         ${(custom||cert)?`<div style="margin-top:16px;text-align:left;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px">
           <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px">${vocal?'Texte de la dictée':cert?"Texte de l'examen":'Texte du devoir'}</div>
@@ -4490,7 +4527,7 @@ const app={
         const segs=stats.samples.map(v=>`<div class="gaze-timeline-seg ${v?'on':'off'}"></div>`).join('');
         const msg=stats.pct>=85?'Excellent ! Tu gardes les yeux sur l\'écran.':stats.pct>=65?'Bien ! Essaie de moins regarder le clavier.':'Entraîne-toi à regarder l\'écran plutôt que tes doigts.';
         return`<div class="gaze-bar-section">
-          <div class="gaze-bar-title">👁 Suivi du regard</div>
+          <div class="gaze-bar-title"><span style="color:var(--accent)">${ICONS.eye}</span> Suivi du regard</div>
           <div class="gaze-timeline">${segs}</div>
           <div class="gaze-bar-stats">
             <span><span class="gaze-dot" style="background:var(--success);display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px"></span>Écran <b>${stats.pct}%</b></span>
@@ -4603,7 +4640,7 @@ const app={
     });
 
     const guestBanner = !currentUser ? this._guestGate({
-      icon:'📚',
+      icon:ICONS.bookOpen,
       eyebrow:'Accès aux cours',
       title:'Commence tes leçons gratuitement',
       text:"Les 10 premières leçons sont offertes. Crée ton compte pour débloquer le parcours, sauvegarder ta progression et reprendre là où tu t'es arrêté.",
@@ -4619,7 +4656,7 @@ const app={
         const progressLocked=statusById[les.id]&&statusById[les.id].locked;
         const s=statusById[les.id]||{cleared:false,locked:false,best:0};
         const isAccessible=isFree&&!currentUser;
-        const icon=s.cleared?'✓':(expertLocked||guestExpertLocked)?'':(!currentUser||progressLocked)?'🔒':'▸';
+        const icon=s.cleared?'✓':(expertLocked||guestExpertLocked)?'':(!currentUser||progressLocked)?ICONS.lock:'▸';
         const dotCls=s.cleared?'c':(expertLocked||guestExpertLocked)?'ex':(!currentUser||progressLocked)?'l':'t';
         const isTodo=currentUser&&!progressLocked&&!s.cleared&&isFree;
         const cardCls=`lesson-card${isTodo?' todo-c':''}${(expertLocked||guestExpertLocked)?' expert-locked':''}`;
@@ -5575,7 +5612,7 @@ const app={
       const badge=prec>=90?"Tireur d'élite !":prec>=70?'Belle précision !':prec>=50?'Continue !':'Vise mieux !';
       const uniqMissed=[...new Set(t.missed)];
       const topKeys=Object.keys(t.errKeys).sort((a,b)=>t.errKeys[b]-t.errKeys[a]).slice(0,5);
-      const extraHtml=(uniqMissed.length?`<div style="text-align:center;margin-bottom:12px"><div style="color:var(--muted);font-size:12px;font-weight:700;margin-bottom:6px;letter-spacing:.04em">MOTS RATÉS</div><div class="tireur-chips">${uniqMissed.slice(0,12).map(w=>`<span class="tireur-chip">${w}</span>`).join('')}</div></div>`:'<p style="color:var(--success);font-weight:700;text-align:center">Sans faute ! 🎉</p>')
+      const extraHtml=(uniqMissed.length?`<div style="text-align:center;margin-bottom:12px"><div style="color:var(--muted);font-size:12px;font-weight:700;margin-bottom:6px;letter-spacing:.04em">MOTS RATÉS</div><div class="tireur-chips">${uniqMissed.slice(0,12).map(w=>`<span class="tireur-chip">${w}</span>`).join('')}</div></div>`:'<p style="color:var(--success);font-weight:700;text-align:center">Sans faute !</p>')
         +(topKeys.length?`<div style="color:var(--muted);font-size:12px;text-align:center">Touches à surveiller : ${topKeys.map(k=>`<b style="color:var(--txt)">${k===' '?'espace':k}</b>`).join(' · ')}</div>`:'');
       overlay=`<div class="game-overlay">${this._gameResult({
         title:badge,
@@ -6487,7 +6524,7 @@ const app={
       </div>`;
     } else if(d.phase==='result'){
       const iWon=d.winner===d.role;const draw=d.winner==='draw';
-      const title=draw?'Égalité !':iWon?'Victoire ! 🎉':'Défaite';
+      const title=draw?'Égalité !':iWon?'Victoire !':'Défaite';
       const emoji=draw?'🤝':iWon?'🏆':'😤';
       const myName=currentUser||'Toi';
       const oppName=d.oppLabel||'Adversaire';
@@ -6567,7 +6604,7 @@ const app={
       </div>
       <div class="settings-modal-body">
       <div class="settings-section" id="settings-gaze-section">
-        <div class="settings-section-title"><span>👁</span> Traqueur du regard</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.eye}</span> Traqueur du regard</div>
         <div class="settings-row">
           <div class="settings-row-info">
             <strong>Calibration du regard</strong>
@@ -6581,7 +6618,7 @@ const app={
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title"><span>🔊</span> Sons</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.volume}</span> Sons</div>
         <div class="settings-row">
           <div class="settings-row-info">
             <strong>Sons de jeu</strong>
@@ -6591,7 +6628,7 @@ const app={
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title"><span>👤</span> Profil</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.user}</span> Profil</div>
         <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px">
           <div class="settings-row-info" style="width:100%">
             <strong>Nom d'utilisateur</strong>
@@ -6616,7 +6653,7 @@ const app={
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title"><span>✉️</span> Email</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.mail}</span> Email</div>
         <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px">
           <div class="settings-row-info" style="width:100%">
             <strong>Adresse actuelle</strong>
@@ -6631,7 +6668,7 @@ const app={
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title"><span>🔐</span> Compte</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.lock}</span> Compte</div>
         <div class="settings-row">
           <div class="settings-row-info">
             <strong>Tutoriel de démarrage</strong>
@@ -6665,7 +6702,7 @@ const app={
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title"><span>🛡️</span> Confidentialité (RGPD)</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.shield}</span> Confidentialité (RGPD)</div>
         <div class="settings-row">
           <div class="settings-row-info">
             <strong>Exporter mes données</strong>
@@ -6724,7 +6761,7 @@ const app={
     overlay.className='settings-overlay';overlay.id='delete-acct-overlay';overlay.style.zIndex='1200';
     overlay.innerHTML=`<div class="settings-modal" style="max-width:420px">
       <div class="settings-modal-head">
-        <div class="settings-modal-avatar" style="background:#E5484D">⚠️</div>
+        <div class="settings-modal-avatar" style="background:#E5484D">⚠</div>
         <div class="settings-modal-head-info"><strong>Supprimer mon compte</strong><span style="color:var(--muted);font-size:12px">Cette action est définitive</span></div>
       </div>
       <div class="settings-section">
@@ -6869,7 +6906,7 @@ const app={
     overlay.style.zIndex='1200';
     overlay.innerHTML=`<div class="settings-modal" style="max-width:400px">
       <div class="settings-modal-head">
-        <div class="settings-modal-avatar">🔑</div>
+        <div class="settings-modal-avatar">${ICONS.key}</div>
         <div class="settings-modal-head-info"><strong>Nouveau mot de passe</strong><span style="color:var(--muted);font-size:12px">Choisis un mot de passe sécurisé</span></div>
       </div>
       <div class="settings-section">
@@ -6968,7 +7005,7 @@ const app={
       await new Promise(resolve=>{
         overlay.innerHTML=`
           <div style="color:#888;font-size:14px;margin-bottom:24px;">Phase 2/2 — Regarde ton clavier (${i+1}/${kbPoints})</div>
-          <div style="color:#fff;font-size:24px;margin-bottom:16px;">⌨️</div>
+          <div style="color:#fff;font-size:24px;margin-bottom:16px;">${ICONS.keyboard}</div>
           <div style="color:#fff;font-size:18px;margin-bottom:8px;">Baisse les yeux vers ton clavier</div>
           <div style="color:#555;font-size:13px;">Naturellement, comme quand tu tapes</div>
           <button id="calib-kb-btn" style="margin-top:32px;padding:12px 32px;background:#4f8ef7;border:none;border-radius:8px;color:#fff;font-size:16px;cursor:pointer;">Cliquer (${i+1}/${kbPoints})</button>
@@ -7020,14 +7057,14 @@ const app={
     overlay.className='gaze-modal-overlay';
     overlay.id='gaze-modal-overlay';
     overlay.innerHTML=`<div class="gaze-modal">
-      <div class="gaze-modal-icon">👁</div>
+      <div class="gaze-modal-icon" style="color:var(--accent)">${ICONS.eye}</div>
       <h3>Traqueur du regard</h3>
       <div class="gaze-modal-body">
         Ce plugin utilise ta <strong>webcam</strong> pour estimer où tu regardes pendant le test. Il détecte si tes yeux restent sur l'écran ou descendent vers le clavier.
         <br><br>
         À la fin du test, tu verras une <strong>timeline colorée</strong> et le pourcentage de temps passé les yeux sur l'écran — un indicateur clé pour progresser en dactylo.
       </div>
-      <div class="gaze-modal-note">⚠️ Valable uniquement pour ce test. Le traqueur se désactive automatiquement à la fin ou si tu recommences.<br><br>🎯 Pour une meilleure précision, <span onclick="document.getElementById('gaze-modal-overlay')?.remove();app.openSettings('gaze')" style="cursor:pointer;text-decoration:underline;color:var(--accent);font-weight:700">calibre le traqueur dans les paramètres →</span></div>
+      <div class="gaze-modal-note">⚠ Valable uniquement pour ce test. Le traqueur se désactive automatiquement à la fin ou si tu recommences.<br><br><span style="color:var(--accent)">${ICONS.target}</span> Pour unemeilleure précision, <span onclick="document.getElementById('gaze-modal-overlay')?.remove();app.openSettings('gaze')" style="cursor:pointer;text-decoration:underline;color:var(--accent);font-weight:700">calibre le traqueur dans les paramètres →</span></div>
       <div class="gaze-modal-actions">
         <button class="sec" onclick="document.getElementById('gaze-modal-overlay').remove()">Annuler</button>
         <button class="pri" onclick="app._gazeConfirm()">Activer</button>
@@ -7056,7 +7093,7 @@ const app={
     if(el)return;
     el=document.createElement('div');el.id='gaze-init';
     el.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:1200;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 18px;font-size:14px;font-weight:600;color:var(--txt);box-shadow:0 12px 32px rgba(0,0,0,.15);display:flex;align-items:center;gap:10px';
-    el.innerHTML='👁 Autorise la caméra pour activer le traqueur…';
+    el.innerHTML=`<span style="color:var(--accent)">${ICONS.eye}</span> Autorise la caméra pour activer le traqueur…`;
     document.body.appendChild(el);
   },
   _gazeFixationPrompt(){
@@ -7072,7 +7109,7 @@ const app={
             <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="5"/>
             <circle id="gaze-fix-ring" cx="40" cy="40" r="34" fill="none" stroke="#FF6B2B" stroke-width="5" stroke-dasharray="213.6" stroke-dashoffset="213.6" stroke-linecap="round"/>
           </svg>
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px">👁</div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;color:#fff">${ICONS.eye}</div>
         </div>
         <p style="color:rgba(255,255,255,.38);font-size:13px;margin:0">Le test commence automatiquement</p>
       `;
@@ -7301,7 +7338,7 @@ const app={
     const segs=stats.samples.map(v=>`<div class="gaze-timeline-seg ${v?'on':'off'}"></div>`).join('');
     const onPct=stats.pct;const offPct=100-onPct;
     return`<div class="gaze-result">
-      <div class="gaze-result-title">👁 Suivi du regard</div>
+      <div class="gaze-result-title"><span style="color:var(--accent)">${ICONS.eye}</span> Suivi du regard</div>
       <div class="gaze-timeline">${segs}</div>
       <div class="gaze-stat-row">
         <div class="gaze-stat"><div class="gaze-dot" style="background:#1FA971"></div>Écran : <b>${onPct}%</b></div>
@@ -7328,7 +7365,7 @@ const app={
     };
     if(locked){
       return`<div class="spanel" style="margin-bottom:22px">
-        <h3>👁 Analyse regard × performance <span style="font-size:12px;font-weight:600;background:var(--light);color:var(--muted);border-radius:6px;padding:2px 8px;margin-left:8px">🔒 ${n} / ${MIN_TESTS} tests</span></h3>
+        <h3><span style="color:var(--accent)">${ICONS.eye}</span> Analyse regard × performance <span style="font-size:12px;font-weight:600;background:var(--light);color:var(--muted);border-radius:6px;padding:2px 8px;margin-left:8px">${ICONS.lock} ${n} / ${MIN_TESTS} tests</span></h3>
         <p style="color:var(--muted);font-size:14px;margin:10px 0 16px;line-height:1.6">Active le traqueur du regard pendant <b>${MIN_TESTS-n} test${MIN_TESTS-n>1?'s':''} supplémentaire${MIN_TESTS-n>1?'s':''}</b> pour débloquer la corrélation regard ↔ vitesse / précision.</p>
         <div style="display:flex;gap:6px">${Array.from({length:MIN_TESTS},(_,i)=>`<div style="flex:1;height:5px;border-radius:3px;background:${i<n?'var(--accent)':'var(--border)'}"></div>`).join('')}</div>
       </div>`;
@@ -7362,26 +7399,26 @@ const app={
     const maxWpm=Math.max(avgOnWpm||0,avgOffWpm||0,20)*1.25;
     const cols=hasAcc&&hasWpm?'1fr 1fr':'1fr';
     return`<div class="spanel" style="margin-bottom:22px">
-      <h3>👁 Analyse regard × performance <span style="font-size:12px;font-weight:600;background:#1FA97120;color:#1FA971;border-radius:6px;padding:2px 8px;margin-left:8px">✓ ${n} tests</span></h3>
+      <h3><span style="color:var(--accent)">${ICONS.eye}</span> Analyse regard × performance <span style="font-size:12px;font-weight:600;background:#1FA97120;color:#1FA971;border-radius:6px;padding:2px 8px;margin-left:8px">✓ ${n} tests</span></h3>
       <p style="color:var(--muted);font-size:13px;margin:6px 0 18px">Regard sur l'écran en moyenne : <b style="color:var(--txt)">${avgGaze}%</b>${trendHTML}</p>
       <div style="display:grid;grid-template-columns:${cols};gap:14px;margin-bottom:14px">
         ${hasAcc?`<div style="background:var(--light);border-radius:14px;padding:16px">
           <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Précision par regard</div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:3px"><span>👁 Écran</span><b>${avgOnAcc}%</b></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:3px"><span style="color:#1FA971">${ICONS.eye}</span> Écran<b>${avgOnAcc}%</b></div>
           ${bar(avgOnAcc,avgOffAcc,maxAcc,'#1FA971')}
-          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin:10px 0 3px"><span>⌨️ Clavier</span><b>${avgOffAcc}%</b></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin:10px 0 3px"><span style="color:#E5484D">${ICONS.keyboard}</span> Clavier<b>${avgOffAcc}%</b></div>
           ${bar(avgOffAcc,avgOnAcc,maxAcc,'#E5484D')}
         </div>`:''}
         ${hasWpm?`<div style="background:var(--light);border-radius:14px;padding:16px">
           <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Vitesse par regard (mpm)</div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:3px"><span>👁 Écran</span><b>${avgOnWpm}</b></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:3px"><span style="color:#1FA971">${ICONS.eye}</span> Écran<b>${avgOnWpm}</b></div>
           ${bar(avgOnWpm,avgOffWpm,maxWpm,'#1FA971')}
-          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin:10px 0 3px"><span>⌨️ Clavier</span><b>${avgOffWpm}</b></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin:10px 0 3px"><span style="color:#E5484D">${ICONS.keyboard}</span> Clavier<b>${avgOffWpm}</b></div>
           ${bar(avgOffWpm,avgOnWpm,maxWpm,'#E5484D')}
         </div>`:''}
         ${!hasAcc&&!hasWpm?`<div style="color:var(--muted);font-size:14px;padding:8px 0">Pas encore assez de données par-frappe. Refais quelques tests avec le traqueur.</div>`:''}
       </div>
-      <div style="background:rgba(31,169,113,.08);border-left:3px solid #1FA971;border-radius:0 10px 10px 0;padding:10px 14px;font-size:14px;color:var(--txt);line-height:1.5">💡 ${insightText}</div>
+      <div style="background:rgba(31,169,113,.08);border-left:3px solid #1FA971;border-radius:0 10px 10px 0;padding:10px 14px;font-size:14px;color:var(--txt);line-height:1.5"><span style="color:#1FA971">${ICONS.bulb}</span> ${insightText}</div>
     </div>`;
   },
 
@@ -7395,40 +7432,41 @@ const app={
       ['AZERTY',"clavier français natif","conçu pour le français dès le départ"],
     ];
     const avantItems=[
-      ['❌',"frappe à 2 index, regard sur le clavier"],
-      ['❌',"rédactions bâclées par manque de temps"],
-      ['❌',"fatigue cognitive liée à l'effort de frappe"],
-      ['❌',"aucun suivi possible pour l'enseignant"],
-      ['❌',"TBI et logiciels lourds à installer"],
+      ['✕',"frappe à 2 index, regard sur le clavier"],
+      ['✕',"rédactions bâclées par manque de temps"],
+      ['✕',"fatigue cognitive liée à l'effort de frappe"],
+      ['✕',"aucun suivi possible pour l'enseignant"],
+      ['✕',"TBI et logiciels lourds à installer"],
     ];
     const apresItems=[
-      ['✅',"frappe à 10 doigts, regard sur l'écran"],
-      ['✅',"rédactions plus longues et mieux construites"],
-      ['✅',"toute l'énergie cognitive pour le fond"],
-      ['✅',"tableau de bord élève par élève en temps réel"],
-      ['✅',"100% web, aucune installation, aucun IT"],
+      ['✓',"frappe à 10 doigts, regard sur l'écran"],
+      ['✓',"rédactions plus longues et mieux construites"],
+      ['✓',"toute l'énergie cognitive pour le fond"],
+      ['✓',"tableau de bord élève par élève en temps réel"],
+      ['✓',"100% web, aucune installation, aucun IT"],
     ];
     const features=[
-      ['📊','Suivi individuel en temps réel',"Vitesse (mots/min), précision, leçons validées, temps d'inactivité — tout est visible d'un coup d'œil pour chaque élève."],
-      ['📝','Devoirs assignables en 3 clics',"Leçon du parcours, test de vitesse libre, texte personnalisé ou dictée vocale — choisissez, ciblez, envoyez."],
-      ['🎙️','Dictées avec votre propre voix',"Enregistrez votre voix sur n'importe quel texte. L'élève entend votre audio et tape ce qu'il entend, texte caché."],
-      ['⚠️','Alertes automatiques',"KeyPace détecte les élèves bloqués ou inactifs depuis trop longtemps et vous le signale proactivement."],
-      ['📄','Export CSV en un clic',"Extrayez les résultats de toute la classe pour vos bulletins ou rapports pédagogiques."],
-      ['🏫','Multi-classes, multi-profs',"Un compte établissement peut gérer plusieurs classes et plusieurs enseignants indépendants."],
+      [ICONS.barChart,'Suivi individuel en temps réel',"Vitesse (mots/min), précision, leçons validées, temps d'inactivité — tout est visible d'un coup d'œil pour chaque élève."],
+      [ICONS.pencil,'Devoirs assignables en 3 clics',"Leçon du parcours, test de vitesse libre, texte personnalisé ou dictée vocale — choisissez, ciblez, envoyez."],
+      [ICONS.mic,'Dictées avec votre propre voix',"Enregistrez votre voix sur n'importe quel texte. L'élève entend votre audio et tape ce qu'il entend, texte caché."],
+      ['⚠','Alertes automatiques',"KeyPace détecte les élèves bloqués ou inactifs depuis trop longtemps et vous le signale proactivement."],
+      [ICONS.fileText,'Export CSV en un clic',"Extrayez les résultats de toute la classe pour vos bulletins ou rapports pédagogiques."],
+      [ICONS.school,'Multi-classes, multi-profs',"Un compte établissement peut gérer plusieurs classes et plusieurs enseignants indépendants."],
     ];
+    const _dot=c=>`<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${c};border:1px solid rgba(0,0,0,.08)"></span>`;
     const modules=[
-      ['🟠','Position de base','F et J, les repères des index'],
-      ['🔵','Rangée du haut','Toutes les lettres fréquentes'],
-      ['🟢','Rangée du bas','C, V, N, B et la ponctuation'],
-      ['🟡','Accents & circonflexes','é, è, à, â, ê, û, ç et les ligatures'],
-      ['⚪','Chiffres & symboles','Pavé numérique et caractères spéciaux'],
+      [_dot('#F5A623'),'Position de base','F et J, les repères des index'],
+      [_dot('#4A90D9'),'Rangée du haut','Toutes les lettres fréquentes'],
+      [_dot('#4CAF50'),'Rangée du bas','C, V, N, B et la ponctuation'],
+      [_dot('#F2C94C'),'Accents & circonflexes','é, è, à, â, ê, û, ç et les ligatures'],
+      [_dot('#E5E1D8'),'Chiffres & symboles','Pavé numérique et caractères spéciaux'],
     ];
     const eleves=[
-      ['Camille D.','42 mpm','94%','18/65','🟢'],
-      ['Lucas M.','31 mpm','89%','12/65','🟢'],
-      ['Inès R.','19 mpm','78%','7/65','🟡'],
-      ['Tom B.','12 mpm','71%','3/65','🔴'],
-      ['Sofia L.','38 mpm','91%','15/65','🟢'],
+      ['Camille D.','42 mpm','94%','18/65',_dot('#4CAF50')],
+      ['Lucas M.','31 mpm','89%','12/65',_dot('#4CAF50')],
+      ['Inès R.','19 mpm','78%','7/65',_dot('#F2C94C')],
+      ['Tom B.','12 mpm','71%','3/65',_dot('var(--danger)')],
+      ['Sofia L.','38 mpm','91%','15/65',_dot('#4CAF50')],
     ];
     const steps=[
       ['1','Créez votre compte établissement',"Contactez-nous, on configure votre accès en moins d'une heure. Vous recevez un lien d'invitation unique pour votre classe."],
@@ -7436,10 +7474,10 @@ const app={
       ['3','Suivez et guidez',"Assignez des devoirs, suivez la progression en temps réel, identifiez les élèves en difficulté. Tout depuis votre tableau de bord."],
     ];
     const studentFeats=[
-      ['🎮','Jeux de frappe compétitifs',"Le Tireur, la Course contre des bots, le Simon de la frappe — apprendre sans avoir l'impression de travailler."],
-      ['🏆','Certification de niveau',"Un examen officiel KeyPace avec un certificat numérique partageable. Un objectif concret qui motive."],
-      ['📈','Progrès visibles en temps réel',"Courbes de vitesse, précision par touche, leçons validées — l'élève voit clairement où il en est."],
-      ['🎯','Objectifs personnalisés',"L'enseignant fixe le seuil à atteindre (ex. 30 mpm, max 5 erreurs). L'élève sait exactement ce qu'on attend de lui."],
+      [ICONS.gamepad,'Jeux de frappe compétitifs',"Le Tireur, la Course contre des bots, le Simon de la frappe — apprendre sans avoir l'impression de travailler."],
+      [ICONS.trophy,'Certification de niveau',"Un examen officiel KeyPace avec un certificat numérique partageable. Un objectif concret qui motive."],
+      [ICONS.trendUp,'Progrès visibles en temps réel',"Courbes de vitesse, précision par touche, leçons validées — l'élève voit clairement où il en est."],
+      [ICONS.target,'Objectifs personnalisés',"L'enseignant fixe le seuil à atteindre (ex. 30 mpm, max 5 erreurs). L'élève sait exactement ce qu'on attend de lui."],
     ];
     const faqs=[
       ['Quel matériel est nécessaire ?',"N'importe quel ordinateur avec un navigateur web récent (Chrome, Firefox, Edge, Safari). Pas d'application à installer, pas de plugin. Un clavier AZERTY physique est recommandé pour un apprentissage optimal — les claviers de laptops suffisent."],
@@ -7458,7 +7496,7 @@ const app={
   <!-- HERO -->
   <div class="etab-hero" style="text-align:center;padding:60px 0 52px">
     <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,77,46,.1);color:${A};font-size:13px;font-weight:700;padding:6px 14px;border-radius:20px;margin-bottom:22px;letter-spacing:.02em">
-      🎓 Écoles · Universités · Centres de formation
+      ${ICONS.gradCap} Écoles · Universités · Centres de formation
     </div>
     <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:clamp(30px,5vw,56px);line-height:1.08;letter-spacing:-.02em;margin:0 0 20px;max-width:820px;margin-left:auto;margin-right:auto">
       Vos élèves tapent encore avec deux doigts.<br><span style="color:${A}">Il est temps de changer ça.</span>
@@ -7499,7 +7537,7 @@ const app={
       <p style="color:var(--muted);font-size:15px;max-width:480px;margin:0 auto">Suivez la progression de chaque élève sans quitter votre navigateur. Assignez des devoirs ciblés en 30 secondes.</p>
     </div>
     <div class="etab-features-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
-      ${features.map(([ic,t,d])=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 20px"><div style="font-size:28px;margin-bottom:12px">${ic}</div><div style="font-weight:700;font-size:15px;margin-bottom:7px">${t}</div><div style="color:var(--muted);font-size:13.5px;line-height:1.55">${d}</div></div>`).join('')}
+      ${features.map(([ic,t,d])=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 20px"><div style="font-size:28px;margin-bottom:12px;color:var(--accent)">${ic}</div><div style="font-weight:700;font-size:15px;margin-bottom:7px">${t}</div><div style="color:var(--muted);font-size:13.5px;line-height:1.55">${d}</div></div>`).join('')}
     </div>
   </div>
   <!-- PARCOURS + DASHBOARD MOCK -->
@@ -7541,7 +7579,7 @@ const app={
       <p style="color:var(--muted);font-size:15px;max-width:500px;margin:0 auto">Pas un simple exercice scolaire — un vrai produit avec des jeux, des défis et une progression visible qui accroche les élèves.</p>
     </div>
     <div class="etab-student-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
-      ${studentFeats.map(([ic,t,d])=>`<div style="background:rgba(255,255,255,.7);border:1px solid rgba(255,77,46,.12);border-radius:16px;padding:20px"><div style="font-size:26px;margin-bottom:10px">${ic}</div><div style="font-weight:700;font-size:14px;margin-bottom:6px">${t}</div><div style="color:var(--muted);font-size:13px;line-height:1.5">${d}</div></div>`).join('')}
+      ${studentFeats.map(([ic,t,d])=>`<div style="background:rgba(255,255,255,.7);border:1px solid rgba(255,77,46,.12);border-radius:16px;padding:20px"><div style="font-size:26px;margin-bottom:10px;color:var(--accent)">${ic}</div><div style="font-weight:700;font-size:14px;margin-bottom:6px">${t}</div><div style="color:var(--muted);font-size:13px;line-height:1.5">${d}</div></div>`).join('')}
     </div>
   </div>
   <!-- FAQ -->
@@ -7556,7 +7594,7 @@ const app={
     <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%"></div>
     <div style="position:absolute;bottom:-60px;left:-30px;width:250px;height:250px;background:rgba(0,0,0,.06);border-radius:50%"></div>
     <div style="position:relative;z-index:1">
-      <div style="font-size:52px;margin-bottom:16px">🎓</div>
+      <div style="font-size:52px;margin-bottom:16px;color:#fff">${ICONS.gradCap}</div>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:clamp(22px,4vw,38px);margin:0 0 14px;line-height:1.1">Prêt à équiper votre établissement ?</h2>
       <p style="font-size:16px;opacity:.9;max-width:480px;margin:0 auto 32px;line-height:1.5">Contactez-nous pour une démonstration gratuite ou pour obtenir un devis. Mise en place en moins d'une heure.</p>
       <div class="etab-cta-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
@@ -7571,7 +7609,7 @@ const app={
   renderStats(){
     if(!currentUser){
       document.getElementById('page-stats').innerHTML=`<div style="max-width:820px;margin:40px auto;padding:0 24px">${this._guestGate({
-        icon:'📈',
+        icon:ICONS.trendUp,
         eyebrow:'Suivi de progression',
         title:"Tes progrès t'attendent",
         text:'Crée un compte gratuit pour suivre ta vitesse, ta précision et ta série de jours, et voir tes courbes de progression évoluer test après test.',
@@ -7601,7 +7639,7 @@ const app={
       <div class="stats-cards">
         <div class="scard"><div class="scard-label">Meilleure vitesse</div><div class="scard-val acc">${bestWpm}</div><div class="scard-unit">mots / minute</div></div>
         <div class="scard"><div class="scard-label">Précision moy.</div><div class="scard-val">${avgAcc}%</div><div class="scard-unit">sur tous les tests</div></div>
-        <div class="scard"><div class="scard-label">Série</div><div class="scard-val">${streak}🔥</div><div class="scard-unit">jours d'affilée</div></div>
+        <div class="scard"><div class="scard-label">Série</div><div class="scard-val">${streak}<span style="color:var(--accent);font-size:0.7em">${ICONS.flame}</span></div><div class="scard-unit">jours d'affilée</div></div>
         <div class="scard"><div class="scard-label">Cours validés</div><div class="scard-val">${clearedLessons} <span style="font-size:20px;color:var(--muted)">/ ${ALL_LESSONS.length}</span></div><div class="scard-unit">leçons terminées</div></div>
       </div>
       ${this._certPanel()}
@@ -7620,7 +7658,7 @@ const app={
         <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint : record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3>⚔️ Duel 1v1</h3>${this.stats.duelRecord&&(this.stats.duelRecord.wins+this.stats.duelRecord.losses+this.stats.duelRecord.draws)>0?(()=>{const r=this.stats.duelRecord;const total=r.wins+r.losses+r.draws;const winRate=Math.round(100*r.wins/total);return`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${r.wins}<span style="font-size:16px;color:var(--muted);font-weight:500">V</span> · ${r.losses}<span style="font-size:16px;color:var(--muted);font-weight:500">D</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${winRate}% de victoires${r.draws?' · '+r.draws+' nul'+(r.draws>1?'s':''):''} sur ${total} duel${total>1?'s':''}</p>`;})():'<p style="color:var(--muted);font-size:14px;margin-top:8px">Défie un ami pour ton premier duel !</p>'}</div>
       </div>
-      <div class="spanel" style="margin-bottom:22px"><h3>⌨️ Tes touches difficiles</h3><div style="font-size:13px;color:var(--muted);margin:4px 0 16px">Les touches en rouge sont celles où tu fais le plus de fautes. Concentre-toi dessus !</div>${this._keyHeatmap(this.stats.keyStats)}</div>
+      <div class="spanel" style="margin-bottom:22px"><h3><span style="color:var(--accent)">${ICONS.keyboard}</span> Tes touches difficiles</h3><div style="font-size:13px;color:var(--muted);margin:4px 0 16px">Les touches en rouge sont celles où tu fais le plus de fautes. Concentre-toi dessus !</div>${this._keyHeatmap(this.stats.keyStats)}</div>
       ${this._gazeAnalysisPanel(tests)}
       <div style="text-align:center;padding:8px 0 24px;color:var(--muted);font-size:13px">${tests.length} exercice${tests.length>1?'s':''} réalisé${tests.length>1?'s':''}</div>
     </div>`;
@@ -7640,21 +7678,21 @@ const app={
   },
   _certPanel(){
     const c=this._myCert;
-    const wrap=(inner)=>`<div class="spanel" style="margin-bottom:22px;background:linear-gradient(135deg,rgba(255,77,46,0.06),rgba(124,58,237,0.06))"><h3>🎓 Certification de niveau</h3>${inner}</div>`;
+    const wrap=(inner)=>`<div class="spanel" style="margin-bottom:22px;background:linear-gradient(135deg,rgba(255,77,46,0.06),rgba(124,58,237,0.06))"><h3><span style="color:var(--accent)">${ICONS.gradCap}</span> Certification de niveau</h3>${inner}</div>`;
     if(c===undefined)return wrap(`<div style="color:var(--muted);font-size:14px;padding:8px 0">Chargement…</div>`);
     if(!c)return wrap(`<div style="font-size:14px;color:var(--muted);line-height:1.6;margin:6px 0 16px">Obtiens un certificat officiel de ton niveau de dactylographie. Conditions : <b>regard sur l'écran ≥ 90%</b> (traqueur des yeux activé) et <b>précision ≥ 90%</b>, sur un texte standardisé. Passe-le en mode écrit et/ou en dictée vocale.</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         ${isMobileLayout()
-          ?`<div style="background:var(--light);border-radius:12px;padding:13px 15px;font-size:13.5px;color:var(--muted);line-height:1.5">💻 <b style="color:var(--txt)">L'examen se passe sur ordinateur</b> : il demande un clavier et la webcam (suivi du regard).</div>`
-          :`<button class="btn-primary" style="padding:10px 18px;font-size:14px" onclick="app.startCertExam('written')">📄 Examen écrit</button>
-        <button class="btn-primary" style="padding:10px 18px;font-size:14px;background:#7C3AED" onclick="app.startCertExam('vocal')">🔊 Dictée de certification</button>`}
+          ?`<div style="background:var(--light);border-radius:12px;padding:13px 15px;font-size:13.5px;color:var(--muted);line-height:1.5"><span style="color:var(--accent)">${ICONS.monitor}</span> <b style="color:var(--txt)">L'examen se passe sur ordinateur</b> : il demande un clavier et la webcam (suivi du regard).</div>`
+          :`<button class="btn-primary" style="padding:10px 18px;font-size:14px" onclick="app.startCertExam('written')">${ICONS.fileText} Examen écrit</button>
+        <button class="btn-primary" style="padding:10px 18px;font-size:14px;background:#7C3AED" onclick="app.startCertExam('vocal')">${ICONS.volume} Dictée de certification</button>`}
       </div>`);
     const lines=[];
-    if(c.writtenWpm!=null)lines.push(`📄 Écrit <b>${c.writtenWpm} mpm</b>`);
-    if(c.vocalWpm!=null)lines.push(`🔊 Dictée <b>${c.vocalWpm} mpm</b>`);
+    if(c.writtenWpm!=null)lines.push(`<span style="color:var(--accent)">${ICONS.fileText}</span> Écrit <b>${c.writtenWpm} mpm</b>`);
+    if(c.vocalWpm!=null)lines.push(`<span style="color:var(--accent)">${ICONS.volume}</span> Dictée <b>${c.vocalWpm} mpm</b>`);
     const date=new Date(c.updatedAt||c.issuedAt).toLocaleDateString('fr-FR');
     return wrap(`<div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin:6px 0 14px">
-        <div style="width:54px;height:54px;border-radius:14px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🏅</div>
+        <div style="width:54px;height:54px;border-radius:14px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">${ICONS.award}</div>
         <div style="flex:1;min-width:200px">
           <div style="font-size:18px;font-weight:800">Niveau ${c.level}</div>
           <div style="font-size:13px;color:var(--muted);margin-top:2px">${lines.join(' · ')} · délivré le ${date}</div>
@@ -7666,7 +7704,7 @@ const app={
         ${isMobileLayout()?'':`<button class="btn-secondary" style="padding:9px 16px;font-size:14px" onclick="app.startCertExam('written')">${c.writtenWpm==null?"Passer l'écrit":"Repasser l'écrit"}</button>
         <button class="btn-secondary" style="padding:9px 16px;font-size:14px" onclick="app.startCertExam('vocal')">${c.vocalWpm==null?'Passer la dictée':'Repasser la dictée'}</button>`}
       </div>
-      ${isMobileLayout()?`<div style="margin-top:12px;background:var(--light);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);line-height:1.5">💻 Pour passer (ou repasser) un examen, connecte-toi sur ordinateur.</div>`:''}`);
+      ${isMobileLayout()?`<div style="margin-top:12px;background:var(--light);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);line-height:1.5"><span style="color:var(--accent)">${ICONS.monitor}</span> Pour passer (ou repasser) un examen, connecte-toi sur ordinateur.</div>`:''}`);
   },
 
   /* ── AVIS ── */
@@ -7687,12 +7725,12 @@ const app={
     const eligible=clearedLessons>=10||(this._myCert&&this._myCert.level);
     if(!eligible)return '';
     if(this._myReview===undefined){this.loadMyReview();return '';}
-    const wrap=(inner)=>`<div class="spanel" style="margin-bottom:22px"><h3>💬 Ton avis compte</h3>${inner}</div>`;
+    const wrap=(inner)=>`<div class="spanel" style="margin-bottom:22px"><h3><span style="color:var(--accent)">${ICONS.message}</span> Ton avis compte</h3>${inner}</div>`;
     if(this._myReview){
-      const msg=this._myReview.status==='published'?"Merci, ton avis est publié sur la page d'accueil ! 🎉":"Merci ! Ton avis est en cours de vérification avant publication.";
+      const msg=this._myReview.status==='published'?"Merci, ton avis est publié sur la page d'accueil !":"Merci ! Ton avis est en cours de vérification avant publication.";
       return wrap(`<div style="font-size:14px;color:var(--muted)">${msg}</div>`);
     }
-    return wrap(`<div style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:14px">Tu progresses bien, ça nous ferait très plaisir d'avoir ton avis sur KeyPace 🙏</div>
+    return wrap(`<div style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:14px">Tu progresses bien, ça nous ferait très plaisir d'avoir ton avis sur KeyPace</div>
       <div style="display:flex;gap:6px;margin-bottom:12px;font-size:26px">
         ${[1,2,3,4,5].map(n=>`<span onclick="app.setReviewStar(${n})" style="cursor:pointer;opacity:.35" id="rstar-${n}">★</span>`).join('')}
       </div>
@@ -7732,7 +7770,7 @@ const app={
     ov.style.cssText='position:fixed;inset:0;background:rgba(20,16,12,.45);backdrop-filter:blur(6px);z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px;animation:settings-fade .18s ease';
     ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:22px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(20,16,12,.28);animation:settings-pop .22s cubic-bezier(.16,1,.3,1)">
       <div style="padding:28px 28px 14px;text-align:center">
-        <div style="width:58px;height:58px;border-radius:17px;background:linear-gradient(135deg,var(--accent),#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 15px;box-shadow:0 8px 22px rgba(255,77,46,.3)">🎓</div>
+        <div style="width:58px;height:58px;border-radius:17px;background:linear-gradient(135deg,var(--accent),#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 15px;box-shadow:0 8px 22px rgba(255,77,46,.3)">${ICONS.gradCap}</div>
         <h2 style="margin:0 0 6px;font-size:20px;letter-spacing:-.01em">Examen de certification</h2>
         <p style="margin:0;font-size:13.5px;color:var(--muted);line-height:1.55">Indique ton nom complet : il figurera sur ton certificat officiel.</p>
       </div>
@@ -7766,21 +7804,21 @@ const app={
   },
   async _finishCertExam(s,res){
     const gaze=s._gazeStats?s._gazeStats.pct:0;
-    this._certModal('⏳','Validation…','Envoi de ton résultat…','');
+    this._certModal(ICONS.clock,'Validation…','Envoi de ton résultat…','');
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cert-exam-pass',token:currentToken,mode:s.certMode,wpm:res.wpm,acc:res.acc,gazePct:gaze,fullName:this._certName})});
       const d=await r.json();
-      if(!r.ok){this._certModal('❌','Examen non validé',d.error||'Réessaie.',`<button class="btn-primary" style="padding:10px 18px" onclick="app._closeCertModal();app.startCertExam('${s.certMode}')">Réessayer</button><button class="btn-secondary" style="padding:10px 18px" onclick="app._closeCertModal()">Fermer</button>`);return;}
+      if(!r.ok){this._certModal('✕','Examen non validé',d.error||'Réessaie.',`<button class="btn-primary" style="padding:10px 18px" onclick="app._closeCertModal();app.startCertExam('${s.certMode}')">Réessayer</button><button class="btn-secondary" style="padding:10px 18px" onclick="app._closeCertModal()">Fermer</button>`);return;}
       this._myCert=d.certificate;
-      this._certModal('🎉','Certificat obtenu !',`Niveau <b>${d.certificate.level}</b> · ${s.certMode==='vocal'?'dictée vocale':'écrit'} <b>${res.wpm} mpm</b> · précision ${res.acc}% · regard ${gaze}%`,`<button class="btn-primary" style="padding:10px 18px" onclick="app._closeCertModal();app.downloadCertificate()">⬇ Télécharger</button><button class="btn-secondary" style="padding:10px 18px" onclick="app._closeCertModal();go('stats')">Voir mes progrès</button>`);
-    }catch{this._certModal('❌','Erreur réseau','Réessaie dans un instant.',`<button class="btn-secondary" style="padding:10px 18px" onclick="app._closeCertModal()">Fermer</button>`);}
+      this._certModal('✓','Certificat obtenu !',`Niveau <b>${d.certificate.level}</b> · ${s.certMode==='vocal'?'dictée vocale':'écrit'} <b>${res.wpm} mpm</b> · précision ${res.acc}% · regard ${gaze}%`,`<button class="btn-primary" style="padding:10px 18px" onclick="app._closeCertModal();app.downloadCertificate()">⬇ Télécharger</button><button class="btn-secondary" style="padding:10px 18px" onclick="app._closeCertModal();go('stats')">Voir mes progrès</button>`);
+    }catch{this._certModal('✕','Erreur réseau','Réessaie dans un instant.',`<button class="btn-secondary" style="padding:10px 18px" onclick="app._closeCertModal()">Fermer</button>`);}
   },
   _certModal(icon,title,body,actions){
     this._closeCertModal();
     const ov=document.createElement('div');ov.id='cert-modal';
     ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px';
     ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:30px;max-width:420px;width:100%;text-align:center">
-      <div style="font-size:42px;margin-bottom:10px">${icon}</div>
+      <div style="font-size:42px;margin-bottom:10px;color:var(--accent)">${icon}</div>
       <h2 style="margin:0 0 10px;font-size:21px">${title}</h2>
       <div style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:20px">${body}</div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">${actions}</div>
@@ -7866,7 +7904,7 @@ const app={
     ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px';
     const modes=[];if(c){if(c.writtenWpm!=null)modes.push(`Écrit : ${c.writtenWpm} mpm`);if(c.vocalWpm!=null)modes.push(`Dictée : ${c.vocalWpm} mpm`);}
     ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:30px;max-width:440px;width:100%;text-align:center">
-      <div style="width:60px;height:60px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:30px;background:${ok?'rgba(31,169,113,0.15)':'rgba(229,72,77,0.12)'}">${ok?'✅':'❌'}</div>
+      <div style="width:60px;height:60px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:30px;background:${ok?'rgba(31,169,113,0.15)':'rgba(229,72,77,0.12)'}">${ok?'✓':'✕'}</div>
       <h2 style="margin:0 0 6px;font-size:21px">${ok?'Certificat authentique':'Certificat invalide'}</h2>
       ${ok?`<div style="font-size:14px;color:var(--muted);line-height:1.7">
           <div style="font-size:20px;font-weight:800;color:var(--txt);margin:8px 0 2px">${esc(c.fullName)}</div>
@@ -7908,9 +7946,9 @@ const app={
           ${asg.map(a=>{
             const due=a.dueDate?new Date(a.dueDate).toLocaleDateString('fr-FR'):null;
             return`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px">
-              <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':(a.mode==='essay'?'✍️':'📝')}</div>
+              <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};color:${a.done?'#1FA971':'var(--accent)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':(a.mode==='essay'?ICONS.pencil:ICONS.fileText)}</div>
               <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.className}${a.targetWpm?(' · objectif '+a.targetWpm+' mpm'):''}${due?(' · pour le '+due):''}</div></div>
-              ${a.mode==='essay'?`<button onclick="app.openEssay('${a.id}')" style="background:${a.done?'var(--card)':'var(--accent)'};color:${a.done?'var(--muted)':'#fff'};border:${a.done?'1px solid var(--border)':'none'};border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.done?'Revoir ma copie':'✍️ Rédiger'}</button>`:a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.customText?`app.startAssignment('${a.id}')`:a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.customText&&a.mode==='vocal'?'🔊 Faire la dictée':"Faire l'exercice"}</button>`}
+              ${a.mode==='essay'?`<button onclick="app.openEssay('${a.id}')" style="background:${a.done?'var(--card)':'var(--accent)'};color:${a.done?'var(--muted)':'#fff'};border:${a.done?'1px solid var(--border)':'none'};border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.done?'Revoir ma copie':ICONS.pencil+' Rédiger'}</button>`:a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.customText?`app.startAssignment('${a.id}')`:a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.customText&&a.mode==='vocal'?ICONS.volume+' Faire la dictée':"Faire l'exercice"}</button>`}
             </div>`;
           }).join('')}
         </div>
@@ -7926,7 +7964,7 @@ const app={
         ${devoirs}
         ${list.length===0?`
           <div style="text-align:center;padding:72px 20px;color:var(--muted)">
-            <div style="font-size:48px;margin-bottom:16px">🎓</div>
+            <div style="font-size:48px;margin-bottom:16px;color:var(--accent)">${ICONS.gradCap}</div>
             <div style="font-size:17px;font-weight:700;color:var(--txt);margin-bottom:8px">Tu n'as rejoint aucune classe</div>
             <div style="font-size:14px;max-width:360px;margin:0 auto 22px;line-height:1.6">${currentInstitutionName?`Ton compte est rattaché à <b style="color:var(--txt)">${this._esc(currentInstitutionName)}</b>, mais il te manque encore une classe.<br>`:''}Demande son code à ton professeur, puis clique sur « Rejoindre une classe » et saisis-le.</div>
             <button class="btn-primary" style="padding:10px 22px;font-size:14px" onclick="joinClassPrompt()">+ Rejoindre une classe</button>
@@ -7962,13 +8000,13 @@ const app={
       ${asg.map(a=>{
         const due=a.dueDate?new Date(a.dueDate).toLocaleDateString('fr-FR'):null;
         return`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px">
-          <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':(a.mode==='essay'?'✍️':'📝')}</div>
+          <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};color:${a.done?'#1FA971':'var(--accent)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':(a.mode==='essay'?ICONS.pencil:ICONS.fileText)}</div>
           <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.targetWpm?('objectif '+a.targetWpm+' mpm'):'Exercice libre'}${due?(' · pour le '+due):''}</div></div>
-          ${a.mode==='essay'?`<button onclick="app.openEssay('${a.id}')" style="background:${a.done?'var(--card)':'var(--accent)'};color:${a.done?'var(--muted)':'#fff'};border:${a.done?'1px solid var(--border)':'none'};border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.done?'Revoir ma copie':'✍️ Rédiger'}</button>`:a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.customText?`app.startAssignment('${a.id}')`:a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.customText&&a.mode==='vocal'?'🔊 Faire la dictée':"Faire l'exercice"}</button>`}
+          ${a.mode==='essay'?`<button onclick="app.openEssay('${a.id}')" style="background:${a.done?'var(--card)':'var(--accent)'};color:${a.done?'var(--muted)':'#fff'};border:${a.done?'1px solid var(--border)':'none'};border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.done?'Revoir ma copie':ICONS.pencil+' Rédiger'}</button>`:a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.customText?`app.startAssignment('${a.id}')`:a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.customText&&a.mode==='vocal'?ICONS.volume+' Faire la dictée':"Faire l'exercice"}</button>`}
         </div>`;
       }).join('')}
     </div>`:`<div style="text-align:center;padding:56px 20px;color:var(--muted)">
-        <div style="font-size:40px;margin-bottom:14px">📭</div>
+        <div style="font-size:40px;margin-bottom:14px;color:var(--muted)">${ICONS.inbox}</div>
         <div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun devoir pour l'instant</div>
         <div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Ton professeur n'a pas encore assigné de devoir dans cette classe.</div>
       </div>`;
@@ -8005,7 +8043,7 @@ const app={
       <div style="max-width:900px;padding-bottom:60px">
         ${classes.length===0?`
           <div style="text-align:center;padding:80px 20px;color:var(--muted)">
-            <div style="font-size:52px;margin-bottom:16px">🏫</div>
+            <div style="font-size:52px;margin-bottom:16px;color:var(--accent)">${ICONS.school}</div>
             <div style="font-size:18px;font-weight:700;color:var(--txt);margin-bottom:8px">Aucune classe encore</div>
             <div style="font-size:14px;max-width:340px;margin:0 auto 22px;line-height:1.6">Crée ta première classe, partage le code d'invitation et suis les progrès de tes élèves.</div>
             <button class="btn-primary" style="padding:10px 22px;font-size:14px" onclick="app.createClass()">+ Créer une classe</button>
@@ -8035,7 +8073,7 @@ const app={
   },
 
   async createClass(){
-    const name=await promptModal({icon:'🏫',title:'Nom de la classe',placeholder:'ex: 5e Latin-Grec',confirmText:'Créer la classe'});
+    const name=await promptModal({icon:ICONS.school,title:'Nom de la classe',placeholder:'ex: 5e Latin-Grec',confirmText:'Créer la classe'});
     if(!name)return;
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-create',token:currentToken,name})});
@@ -8100,7 +8138,7 @@ const app={
             <div style="font-size:13px;font-weight:700;color:${pct>=100?'#1FA971':'var(--txt)'}">${a.doneCount}/${a.total} terminé${a.doneCount>1?'s':''}</div>
             <div style="height:6px;background:var(--light);border-radius:4px;margin-top:5px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct>=100?'#1FA971':'var(--accent)'}"></div></div>
           </div>
-          ${a.mode==='essay'?`<button onclick="app.viewEssays('${a.id}')" style="background:var(--light);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--txt);white-space:nowrap;margin-right:4px">📄 Voir les copies</button>`:''}
+          ${a.mode==='essay'?`<button onclick="app.viewEssays('${a.id}')" style="background:var(--light);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--txt);white-space:nowrap;margin-right:4px"><span style="color:var(--accent)">${ICONS.fileText}</span> Voir les copies</button>`:''}
           <button onclick="app.deleteAssignment('${a.id}','${d.id}')" title="Supprimer" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;opacity:.6" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
         </div>`;
       }).join('')}
@@ -8126,20 +8164,20 @@ const app={
         </div>`:''}
 
         <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🔑</div>
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,77,46,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">${ICONS.key}</div>
           <div style="flex:1;min-width:0">
             <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:2px">CODE D'INVITATION</div>
             <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:.12em;color:var(--accent)">${d.inviteCode}</div>
           </div>
           <button id="copy-code-btn" onclick="app.copyClassLink('${link}')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Copier le lien</button>
-          <button onclick="openImportModal('${d.id}')" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt);white-space:nowrap;flex-shrink:0">📋 Importer un CSV</button>
+          <button onclick="openImportModal('${d.id}')" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt);white-space:nowrap;flex-shrink:0"><span style="color:var(--accent)">${ICONS.clipboard}</span> Importer un CSV</button>
         </div>
 
         ${asgHtml}
 
         ${students.length===0?`
           <div style="text-align:center;padding:64px 20px;color:var(--muted)">
-            <div style="width:60px;height:60px;border-radius:16px;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 16px">👩‍🎓</div>
+            <div style="width:60px;height:60px;border-radius:16px;background:var(--light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 16px">${ICONS.user}</div>
             <div style="font-size:16px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun élève encore</div>
             <div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Partage le code <b style="color:var(--accent);font-family:'JetBrains Mono',monospace">${d.inviteCode}</b> ou le lien. Tes élèves rejoignent la classe en quelques secondes.</div>
           </div>
@@ -8253,7 +8291,7 @@ const app={
       const timer=document.getElementById('asg-rec-timer');
       const status=document.getElementById('asg-rec-status');
       const preview=document.getElementById('asg-rec-preview-wrap');
-      if(btn){btn.textContent='⏹️ Arrêter';btn.style.background='#E5484D';}
+      if(btn){btn.innerHTML=ICONS.stop+' Arrêter';btn.style.background='#E5484D';}
       if(timer){timer.style.display='';timer.textContent='0:00';}
       if(status)status.textContent='Enregistrement en cours…';
       if(preview)preview.style.display='none';
@@ -8273,7 +8311,7 @@ const app={
     if(this._asgRecStream)this._asgRecStream.getTracks().forEach(t=>t.stop());
     if(this._asgRecInterval){clearInterval(this._asgRecInterval);this._asgRecInterval=null;}
     const btn=document.getElementById('asg-rec-btn');
-    if(btn){btn.textContent='🎙️ Enregistrer';btn.style.background='var(--accent)';}
+    if(btn){btn.innerHTML=ICONS.mic+' Enregistrer';btn.style.background='var(--accent)';}
     const timer=document.getElementById('asg-rec-timer');
     if(timer)timer.style.display='none';
   },
@@ -8312,16 +8350,16 @@ const app={
     const lbl='display:block;font-size:12px;font-weight:700;color:var(--muted)';
     ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:22px;max-width:480px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(20,16,12,.28);animation:settings-pop .22s cubic-bezier(.16,1,.3,1)">
       <div style="padding:24px 28px 18px;background:linear-gradient(135deg,rgba(255,77,46,.10),rgba(124,58,237,.06));border-bottom:1px solid var(--border);display:flex;align-items:center;gap:13px">
-        <div style="width:46px;height:46px;border-radius:13px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 6px 16px rgba(255,77,46,.3)">📝</div>
+        <div style="width:46px;height:46px;border-radius:13px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 6px 16px rgba(255,77,46,.3)">${ICONS.pencil}</div>
         <div style="flex:1;min-width:0"><h2 style="margin:0;font-size:19px;letter-spacing:-.01em">Assigner un devoir</h2><div style="font-size:12.5px;color:var(--muted);margin-top:2px">Un exercice du parcours ou ton propre texte</div></div>
         <button onclick="app._asgStopRecording();this.closest('[style*=fixed]').remove()" style="background:rgba(20,16,12,.06);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--muted);font-size:15px;flex-shrink:0">✕</button>
       </div>
       <div style="padding:22px 28px;overflow-y:auto">
         <input type="hidden" id="asg-type" value="lesson">
         <div style="display:flex;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:13px;padding:5px;margin-bottom:18px">
-          <button type="button" id="asg-seg-lesson" onclick="app._asgSetType('lesson')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:all .15s">📚 Exercice</button>
-          <button type="button" id="asg-seg-custom" onclick="app._asgSetType('custom')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">✍️ Texte</button>
-          <button type="button" id="asg-seg-essay" onclick="app._asgSetType('essay')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">📄 Essai</button>
+          <button type="button" id="asg-seg-lesson" onclick="app._asgSetType('lesson')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:all .15s">${ICONS.bookOpen} Exercice</button>
+          <button type="button" id="asg-seg-custom" onclick="app._asgSetType('custom')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">${ICONS.pencil} Texte</button>
+          <button type="button" id="asg-seg-essay" onclick="app._asgSetType('essay')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">${ICONS.fileText} Essai</button>
         </div>
         <div id="asg-block-lesson">
           <label style="${lbl}">Exercice</label>
@@ -8334,14 +8372,14 @@ const app={
           <textarea id="asg-text" rows="5" placeholder="Colle ou écris le texte du devoir…" style="${fld};resize:vertical;min-height:96px;line-height:1.5"></textarea>
           <label style="${lbl}">Présentation</label>
           <div style="display:flex;gap:10px;margin:6px 0 14px">
-            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="written" checked onchange="app._asgOnModeChange()" style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px">📄 Écrit</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">L'élève voit le texte et le recopie</span></span></label>
-            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="vocal" onchange="app._asgOnModeChange()" style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px">🔊 Vocal</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">Dictée : le texte est lu, caché</span></span></label>
+            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="written" checked onchange="app._asgOnModeChange()" style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px"><span style="color:var(--accent)">${ICONS.fileText}</span> Écrit</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">L'élève voit le texte et le recopie</span></span></label>
+            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="vocal" onchange="app._asgOnModeChange()" style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px"><span style="color:var(--accent)">${ICONS.volume}</span> Vocal</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">Dictée : le texte est lu, caché</span></span></label>
           </div>
           <div id="asg-record-block" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px">
             <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px">ENREGISTREMENT VOCAL DU PROF</div>
             <div id="asg-rec-hint" style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Enregistre ta voix lisant le texte. L'élève entendra ton audio à la place de la synthèse vocale.</div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-              <button id="asg-rec-btn" type="button" onclick="app._asgRecToggle()" style="display:flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">🎙️ Enregistrer</button>
+              <button id="asg-rec-btn" type="button" onclick="app._asgRecToggle()" style="display:flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">${ICONS.mic} Enregistrer</button>
               <span id="asg-rec-timer" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);display:none">0:00</span>
               <span id="asg-rec-status" style="font-size:12px;color:var(--muted)"></span>
             </div>
@@ -8578,7 +8616,7 @@ const app={
           <div style="display:flex;align-items:flex-end;gap:5px;height:140px">${bars}</div>
         </div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 22px">
-          <div style="font-size:13px;font-weight:700;margin-bottom:4px">⌨️ Touches à travailler</div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px"><span style="color:var(--accent)">${ICONS.keyboard}</span> Touches à travailler</div>
           <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Taux de fautes par touche, sur l'ensemble de ses frappes.</div>
           ${this._keyHeatmap(d.keyStats)}
         </div>
@@ -8637,7 +8675,7 @@ const app={
   _renderHomeAdmin(){
     const ad=this.admin;
     if(!ad||!ad.loaded){this.loadAdmin();document.getElementById('page-home').innerHTML=`<div style="max-width:1100px;margin:0 auto;padding:80px 24px;text-align:center;color:var(--muted)"><div style="font-size:14px">Chargement du tableau de bord établissement…</div></div>`;return;}
-    if(ad.error){document.getElementById('page-home').innerHTML=`<div style="max-width:560px;margin:0 auto;padding:72px 24px;text-align:center"><div style="width:52px;height:52px;border-radius:14px;background:rgba(229,72,77,0.1);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px">⚠️</div><div style="font-size:17px;font-weight:700;margin-bottom:8px">Impossible de charger le tableau de bord</div><div style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:22px">${ad.error}</div><button class="btn-primary" style="padding:10px 22px;font-size:14px" onclick="app.loadAdmin(true)">Réessayer</button></div>`;return;}
+    if(ad.error){document.getElementById('page-home').innerHTML=`<div style="max-width:560px;margin:0 auto;padding:72px 24px;text-align:center"><div style="width:52px;height:52px;border-radius:14px;background:rgba(229,72,77,0.1);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px">⚠</div><div style="font-size:17px;font-weight:700;margin-bottom:8px">Impossible de charger le tableau de bord</div><div style="font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:22px">${ad.error}</div><button class="btn-primary" style="padding:10px 22px;font-size:14px" onclick="app.loadAdmin(true)">Réessayer</button></div>`;return;}
     const profs=ad.profs||[];const inst=ad.institution||{};
     const g=ad.global||{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null};
     const series=ad.series||[];
@@ -8677,8 +8715,8 @@ const app={
     const daysLeft=expiresAt?Math.ceil((expiresAt-Date.now())/86400000):null;
     const expiryWarn=daysLeft!=null&&daysLeft<=30;
     const expiryText=!expiresAt?"Licence sans date d'expiration"
-      :(daysLeft>=0?'Licence valable jusqu\'au '+expiresAt.toLocaleDateString('fr-FR')+(expiryWarn?' ⚠️ ('+daysLeft+' j restants)':'')
-                   :'⚠️ Licence expirée le '+expiresAt.toLocaleDateString('fr-FR'));
+      :(daysLeft>=0?'Licence valable jusqu\'au '+expiresAt.toLocaleDateString('fr-FR')+(expiryWarn?' ⚠ ('+daysLeft+' j restants)':'')
+                   :'⚠ Licence expirée le '+expiresAt.toLocaleDateString('fr-FR'));
     const licenceBannerHtml=`
       <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
         <div style="flex:1;min-width:220px">
@@ -8748,7 +8786,7 @@ const app={
         <div style="font-size:14px;font-weight:800;color:var(--txt);flex-shrink:0">${p.avgWpm!=null?p.avgWpm+' mpm':'—'}</div>
         <button onclick="app.archiveProf('${p.profId}')" title="Retirer ce professeur" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;font-weight:600;padding:6px;opacity:.7;font-family:inherit" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.7';this.style.color='var(--muted)'">Retirer</button>
       </div>`;
-    }).join(''):`<div style="text-align:center;padding:48px 20px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">👩‍🏫</div><div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun professeur</div><div style="font-size:13px">Invite ton équipe enseignante avec le bouton ci-dessus.</div></div>`;
+    }).join(''):`<div style="text-align:center;padding:48px 20px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">${ICONS.user}</div><div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun professeur</div><div style="font-size:13px">Invite ton équipe enseignante avec le bouton ci-dessus.</div></div>`;
     const invHtml=invites.length?`<div style="margin-top:30px"><h2 style="font-size:16px;margin:0 0 12px">Invitations en attente</h2><div style="display:flex;flex-direction:column;gap:8px">${invites.map(iv=>{
       const link=`${location.origin}?prof=${iv.token}`;
       return`<div style="background:var(--card);border:1px dashed var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px">
@@ -8788,7 +8826,7 @@ const app={
         <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">${c.name}</div><div style="font-size:12px;color:var(--muted)">${c.memberCount} élève${c.memberCount!==1?'s':''} · ${c.agg.activeThisWeek} actif${c.agg.activeThisWeek!==1?'s':''} cette semaine</div></div>
         <div style="text-align:right"><div style="font-size:15px;font-weight:800">${c.agg.avgWpm!=null?c.agg.avgWpm:'—'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div></div>
         <div style="color:var(--muted)">›</div>
-      </div>`).join(''):`<div style="text-align:center;padding:48px 20px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">📚</div><div style="font-size:14px">Ce professeur n'a pas encore créé de classe.</div></div>`;
+      </div>`).join(''):`<div style="text-align:center;padding:48px 20px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">${ICONS.bookOpen}</div><div style="font-size:14px">Ce professeur n'a pas encore créé de classe.</div></div>`;
     document.getElementById(pageId).innerHTML=`<div class="stats-section">
       <div class="stats-header" style="padding-bottom:24px">
         <button onclick="app.renderInstitution()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;padding:0 0 14px;display:flex;align-items:center;gap:6px">‹ Professeurs</button>
@@ -8906,7 +8944,7 @@ async function handleClassJoin(){
     const overlay=document.createElement('div');
     overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center';
     overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:90%;text-align:center">
-      <div style="font-size:40px;margin-bottom:12px">🏫</div>
+      <div style="font-size:40px;margin-bottom:12px;color:var(--accent)">${ICONS.school}</div>
       <h2 style="margin:0 0 8px;font-size:20px">Rejoindre une classe</h2>
       <p style="color:var(--muted);font-size:14px;margin:0 0 24px" id="join-class-name">Vérification en cours…</p>
       <div id="join-actions" style="display:none;gap:10px;flex-direction:column">
@@ -8946,7 +8984,7 @@ function promptModal({icon,title,placeholder,confirmText}){
     const overlay=document.createElement('div');
     overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
     overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:100%;text-align:center">
-      <div style="font-size:40px;margin-bottom:12px">${icon}</div>
+      <div style="font-size:40px;margin-bottom:12px;color:var(--accent)">${icon}</div>
       <h2 style="margin:0 0 16px;font-size:20px;font-family:'Bricolage Grotesque',sans-serif">${title}</h2>
       <input id="pm-input" type="text" placeholder="${placeholder}" autocomplete="off" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--txt);outline:none;box-sizing:border-box;text-align:center;margin-bottom:8px">
       <div id="pm-error" style="color:#E5484D;font-size:13px;margin-bottom:8px;display:none"></div>
@@ -8979,7 +9017,7 @@ function openImportModal(classId){
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
   overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:86vh;overflow-y:auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <h2 style="margin:0;font-size:19px;font-family:'Bricolage Grotesque',sans-serif">📋 Importer des élèves</h2>
+      <h2 style="margin:0;font-size:19px;font-family:'Bricolage Grotesque',sans-serif"><span style="color:var(--accent)">${ICONS.clipboard}</span> Importer des élèves</h2>
       <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
     </div>
     <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Un élève par ligne : <code>nom_utilisateur,email</code> (email optionnel). Un compte est créé pour chacun et ajouté directement à la classe.</p>
@@ -8999,7 +9037,7 @@ async function startClassJoin(code){
   const overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center';
   overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:90%;text-align:center">
-    <div style="font-size:40px;margin-bottom:12px">🏫</div>
+    <div style="font-size:40px;margin-bottom:12px;color:var(--accent)">${ICONS.school}</div>
     <h2 style="margin:0 0 8px;font-size:20px">Rejoindre une classe</h2>
     <p style="color:var(--muted);font-size:14px;margin:0 0 24px" id="cj-name">Vérification du code « ${code} »…</p>
     <div id="cj-actions" style="display:none;gap:10px;flex-direction:column">
@@ -9027,7 +9065,7 @@ async function startClassJoin(code){
 }
 
 async function joinClassPrompt(){
-  const code=await promptModal({icon:'🔑',title:'Rejoindre une classe',placeholder:'Code donné par ton professeur, ex. ABC123',confirmText:'Continuer'});
+  const code=await promptModal({icon:ICONS.key,title:'Rejoindre une classe',placeholder:'Code donné par ton professeur, ex. ABC123',confirmText:'Continuer'});
   if(code)startClassJoin(code.toUpperCase());
 }
 
@@ -9045,7 +9083,7 @@ function handleProfInvite(){
   window._profInviteToken=t;
   history.replaceState(null,'',location.pathname);
   if(currentUser){alert('Tu es déjà connecté. Déconnecte-toi pour créer un compte enseignant avec ce lien d\'invitation.');window._profInviteToken=null;return;}
-  setTimeout(()=>openAuth('register','👩‍🏫 Crée ton compte enseignant. Tu seras automatiquement rattaché à ton établissement.'),300);
+  setTimeout(()=>openAuth('register',`${ICONS.user} Crée ton compte enseignant. Tu seras automatiquement rattaché à ton établissement.`),300);
 }
 
 // Défi entre amis : ?defi=Prenom~mpm~precision (score encodé dans l'URL, sans backend).
@@ -9060,7 +9098,7 @@ function handleChallenge(){
   try{track('challenge_link_used',{wpm});}catch{}
   // Sur mobile, le test n'existe pas : on explique qu'il faut un ordinateur.
   if(isMobileLayout()){
-    setTimeout(()=>app._certModal('🏁',`${name} te défie !`,
+    setTimeout(()=>app._certModal(ICONS.flag,`${name} te défie !`,
       `Son score : <b>${wpm} mpm</b>${p[2]?' · '+parseInt(p[2],10)+'% de précision':''}.<br><br>Ouvre ce lien sur un <b>ordinateur</b> pour relever le défi : le test de vitesse demande un vrai clavier.`,
       `<button class="btn-primary" style="padding:11px 22px;font-size:14px" onclick="app._closeCertModal()">Compris</button>`),400);
     return;

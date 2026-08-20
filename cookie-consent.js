@@ -70,8 +70,8 @@
     btn.id = 'cookie-consent-reopen';
     btn.title = 'Gérer mes cookies';
     btn.setAttribute('aria-label', 'Gérer mes cookies');
-    btn.textContent = '🍪';
-    btn.style.cssText = 'position:fixed;left:14px;bottom:14px;z-index:9998;width:36px;height:36px;border-radius:50%;border:1px solid var(--border,#E7E1D5);background:var(--card,#fff);box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer;font-size:16px;line-height:1;';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="9" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="14.5" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>';
+    btn.style.cssText = 'position:fixed;left:14px;bottom:14px;z-index:9998;width:36px;height:36px;border-radius:50%;border:1px solid var(--border,#E7E1D5);background:var(--card,#fff);color:#FF4D2E;box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;';
     btn.addEventListener('click', renderBanner);
     document.body.appendChild(btn);
   }
