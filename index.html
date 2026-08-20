@@ -769,6 +769,75 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .game-sel-tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.04em;display:inline-block}
 .game-sel-tag.free{background:rgba(31,169,113,0.12);color:#1FA971}
 .game-sel-tag.expert{background:rgba(255,77,46,0.1);color:var(--accent)}
+
+/* GAMES – hero cinématique + carrousel */
+@keyframes gcineHintBob{0%,100%{transform:translateY(0);opacity:.75}50%{transform:translateY(7px);opacity:1}}
+.gcine-root{background:#0d0b09}
+.gcine-scroller{height:230vh;position:relative}
+.gcine-stage{position:sticky;top:0;height:100vh;overflow:hidden}
+.gcine-glow{position:absolute;inset:0;background:radial-gradient(900px 520px at 50% 18%,rgba(255,77,46,.16),transparent 70%),radial-gradient(700px 460px at 85% 80%,rgba(255,140,60,.08),transparent 72%)}
+.gcine-fade{position:absolute;left:0;right:0;bottom:0;height:26vh;background:linear-gradient(to bottom,rgba(13,11,9,0),rgba(13,11,9,.92) 82%);z-index:12;pointer-events:none}
+.gcine-persp{position:absolute;inset:0;perspective:1250px;perspective-origin:50% 42%}
+.gcine-3d{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
+.gcine-floor{position:absolute;left:50%;top:50%;width:1500px;height:900px;margin-left:-750px;margin-top:-450px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,77,46,.16),transparent 72%);transform:translateZ(-40px)}
+.gcine-key{position:absolute;left:50%;top:50%;width:74px;height:74px;margin-left:-37px;margin-top:-37px;transform-style:preserve-3d;transition:transform .35s ease-out;will-change:transform}
+.gcine-key-base{position:absolute;inset:0;border-radius:14px;background:#0f0d0b;transform:translateZ(-24px);box-shadow:0 0 0 1px rgba(255,255,255,.04)}
+.gcine-key-top{position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#231e19,#1a1611);border:1px solid rgba(255,255,255,.07);transition:background .3s,box-shadow .3s,border-color .3s}
+.gcine-key-label{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:17px;color:rgba(255,255,255,.28);transition:color .3s}
+.gcine-traveler{position:absolute;left:50%;top:50%;width:74px;height:74px;margin-left:-37px;margin-top:-37px;transform-style:preserve-3d;z-index:50;will-change:transform}
+.gcine-traveler-face{position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;background:linear-gradient(150deg,#ff8a5c,var(--accent) 66%);border:1px solid rgba(255,210,190,.6);box-shadow:0 0 46px rgba(255,77,46,.6), inset 0 2px 0 rgba(255,255,255,.35)}
+.gcine-traveler-face span{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:26px;color:#fff}
+.gcine-hero{position:absolute;left:8%;top:18%;z-index:20;max-width:640px}
+.gcine-badge{display:inline-flex;align-items:center;gap:9px;background:rgba(255,77,46,.14);border:1px solid rgba(255,77,46,.3);color:#ff9a7a;font-size:13px;font-weight:700;border-radius:999px;padding:8px 16px;margin-bottom:22px;white-space:nowrap}
+.gcine-h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:64px;line-height:.98;letter-spacing:-.03em;color:#fff;margin:0}
+.gcine-sub{font-size:17px;line-height:1.6;color:rgba(255,255,255,.6);max-width:460px;margin-top:22px}
+.gcine-hint{position:absolute;left:50%;bottom:38px;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;align-items:center;gap:10px}
+.gcine-hint-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.28em;color:rgba(255,255,255,.5)}
+.gcine-hint-arrow{font-size:18px;color:rgba(255,255,255,.5);animation:gcineHintBob 1.8s ease-in-out infinite}
+.gcine-panel{position:relative;z-index:20;background:var(--bg);border-radius:44px 44px 0 0;padding:64px 24px 80px;box-shadow:0 -40px 90px rgba(0,0,0,.5)}
+.gcine-panel-head{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:1120px;margin:0 auto;padding-bottom:36px;text-align:center}
+.gcine-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.3em;color:var(--accent)}
+.gcine-h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:46px;line-height:1.02;color:var(--txt);letter-spacing:-.02em;margin:0}
+.gcine-panel-sub{font-size:15px;color:var(--muted);margin:0}
+.gcine-carousel{position:relative;height:420px;max-width:1120px;margin:0 auto;perspective:1400px}
+.gcine-cards{position:absolute;inset:0}
+.gcine-card{position:absolute;top:50%;left:50%;will-change:transform,opacity}
+.gcine-card-inner{width:270px;height:360px;border-radius:32px;overflow:hidden;position:relative;padding:26px;display:flex;flex-direction:column;justify-content:space-between;background:#fff;border:1px solid var(--border);box-shadow:0 10px 30px rgba(21,19,15,.07);transition:box-shadow .2s}
+.gcine-card:not(.is-center):hover .gcine-card-inner{box-shadow:0 16px 40px rgba(21,19,15,.14)}
+.gcine-card.is-center .gcine-card-inner{background:linear-gradient(140deg,#ff7a4d,var(--accent) 64%);box-shadow:0 26px 60px rgba(255,77,46,.34);border-color:transparent}
+.gcine-blob{position:absolute;border-radius:50%;background:#fff5f1}
+.gcine-blob-a{width:200px;height:200px;right:-72px;top:-80px}
+.gcine-blob-b{width:140px;height:140px;left:-52px;bottom:-60px}
+.gcine-card.is-center .gcine-blob{background:rgba(255,255,255,.11)}
+.gcine-card-top{position:relative;display:flex;align-items:flex-start;justify-content:space-between}
+.gcine-card-icon{font-size:46px;line-height:1;color:var(--accent)}
+.gcine-card.is-center .gcine-card-icon{color:#fff}
+.gcine-card-tag{font-size:11px;font-weight:700;letter-spacing:.1em;padding:6px 12px;border-radius:999px;background:#fff0eb;color:var(--accent)}
+.gcine-card.is-center .gcine-card-tag{background:rgba(255,255,255,.22);color:#fff}
+.gcine-card-body{position:relative;display:flex;flex-direction:column;gap:9px}
+.gcine-card-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;line-height:1.1;letter-spacing:-.02em;color:var(--txt)}
+.gcine-card.is-center .gcine-card-name{color:#fff}
+.gcine-card-desc{font-size:13px;line-height:1.55;color:var(--muted)}
+.gcine-card.is-center .gcine-card-desc{color:rgba(255,255,255,.9)}
+.gcine-card-cta{display:none;position:relative;align-items:center;justify-content:center;gap:9px;background:#fff;color:var(--accent);font-weight:700;font-size:14px;padding:14px;border-radius:16px;cursor:pointer;box-shadow:0 6px 18px rgba(21,19,15,.14)}
+.gcine-card.is-center .gcine-card-cta{display:flex}
+.gcine-card-n{position:relative;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:#b9b3a8}
+.gcine-card.is-center .gcine-card-n{display:none}
+.gcine-controls{display:flex;align-items:center;justify-content:center;gap:24px;margin-top:8px}
+.gcine-arrow{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--txt);cursor:pointer;transition:border-color .2s,color .2s}
+.gcine-arrow:hover{border-color:var(--accent);color:var(--accent)}
+.gcine-dots{display:flex;align-items:center;gap:7px}
+.gcine-dot{width:8px;height:8px;border-radius:999px;background:#e2ddd4;cursor:pointer;transition:.3s}
+.gcine-dot.is-active{width:26px;background:var(--accent)}
+@media(max-width:860px){
+  .gcine-h1{font-size:38px}
+  .gcine-hero{left:6%;top:14%;max-width:80%}
+  .gcine-sub{font-size:15px}
+  .gcine-h2{font-size:32px}
+  .gcine-card-inner{width:220px;height:310px;padding:20px}
+  .gcine-card-name{font-size:20px}
+}
+
 .sprint-arena{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:28px;max-width:1120px;margin:0 auto;padding-bottom:32px}
 .sprint-hud{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .sprint-timer{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:48px;line-height:1;color:var(--txt);transition:color .3s}
@@ -2990,6 +3059,44 @@ const ALL_LESSONS=[],ALL_MODULES=[];
 // Texte standardisé de l'examen de certification (plus long que les tests pour
 // refléter le vrai niveau et limiter l'effet « coup de chance »).
 const CERT_TEXT="La maîtrise du clavier ne se mesure pas à la vitesse seule, mais à la régularité et à la justesse de chaque frappe. En gardant les yeux fixés sur l'écran et les doigts ancrés sur la rangée de repos, le geste devient peu à peu automatique. La patience d'aujourd'hui prépare l'aisance de demain : avance avec calme, précision et constance.";
+
+/* ── Jeux : hero cinématique (touche qui traverse le clavier) + carrousel ── */
+const GCINE_GAMES=[
+  {key:'frappe',icon:'target',name:'Frappe-mots',desc:"Des mots tombent du ciel : tape-les avant qu'ils touchent le sol. Vitesse et réactivité.",expert:false},
+  {key:'tireur',icon:'crosshair',name:"Tireur d'élite",desc:"Tape chaque mot sans la moindre faute. Une seule erreur et la cible est ratée : la précision avant tout.",expert:false},
+  {key:'simon',icon:'brain',name:'Simon des mots',desc:"Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.",expert:false},
+  {key:'souris',icon:'mouse',name:'Visée',desc:"7 pistes pour la souris et le clavier : précision, réflexes, vagues & boss, et des défis à deux mains. Mission du jour, badges et skins à débloquer.",expert:false},
+  {key:'duel',icon:'swords',name:'Duel 1v1',desc:"Défie un ami en temps réel sur le même texte. Partage un lien, comptez 3-2-1, et que le plus rapide gagne !",expert:false},
+  {key:'course',icon:'raceCar',name:'Course de dactylo',desc:"Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !",expert:true},
+  {key:'sprint',icon:'flag',name:'Le Sprint',desc:"30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace : chaque seconde compte.",expert:true},
+  {key:'boss',icon:'trophy',name:'Boss de la semaine',desc:"Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !",expert:true},
+  {key:'ghost',icon:'ghost',name:'Contre ton fantôme',desc:"Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !",expert:true},
+];
+const GCINE_ROWS=[
+  {keys:'AZERTYUIOP'.split(''),indent:0},
+  {keys:'QSDFGHJKLM'.split(''),indent:34},
+  {keys:'WXCVBN,;:'.split(''),indent:78},
+  {keys:['','','espace','',''],indent:120,wide:true},
+];
+const GCINE_KW=74,GCINE_KH=74,GCINE_GAP=12,GCINE_LIFT=16;
+function gcineComputeLayout(){
+  const layout=[];
+  GCINE_ROWS.forEach((row,r)=>{
+    let x=row.indent;
+    row.keys.forEach(ch=>{
+      const w=(row.wide&&ch==='espace')?GCINE_KW*4+GCINE_GAP*3:GCINE_KW;
+      layout.push({ch,x:x+w/2,y:r*(GCINE_KH+GCINE_GAP),w});
+      x+=w+GCINE_GAP;
+    });
+  });
+  const maxX=Math.max.apply(null,layout.map(k=>k.x+k.w/2));
+  const maxY=Math.max.apply(null,layout.map(k=>k.y));
+  const cx=maxX/2,cy=maxY/2;
+  layout.forEach(k=>{k.cx=k.x-cx;k.cy=k.y-cy;});
+  return {layout,cx,cy};
+}
+const GCINE_LAYOUT=gcineComputeLayout();
+
 const app={
   view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,simon:null,boss:null,duel:null,activeGame:null,now:Date.now(),
   _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
@@ -3786,7 +3893,7 @@ const app={
     if(v==='classes'&&currentUser&&!isTeacher()&&!currentInstitutionName&&!currentHasClass)v='stats';
     this.view=v;
     maybeConvNudge(v);
-    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;}
+    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;this._gcineTeardown();}
     // Sans ça, le poll 25s de viewClass() continuait après avoir quitté la vue
     // "classes" par un onglet de nav (au lieu du bouton ← Retour), et renvoyait
     // de force l'utilisateur vers la liste des classes à chaque tick.
@@ -6448,73 +6555,198 @@ const app={
     if(this.activeGame==='souris'){this.renderSouris();return;}
     // selector
     const gamesGate=!currentUser?`<div style="max-width:1120px;margin:0 auto;padding:0 24px">${this._guestGate({
-      icon:'🎮',
+      icon:ICONS.gamepad,
       eyebrow:'Salle de jeux',
       title:'Joue pour progresser plus vite',
       text:"7 jeux pour travailler ta vitesse, ta précision et tes réflexes sans voir le temps passer. Crée ton compte gratuit pour y jouer et enregistrer tes records.",
       feats:['Jeux gratuits inclus','Records sauvegardés','Défis et classements'],
       cta:'Créer mon compte et jouer',
     })}</div>`:'';
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;max-width:1120px;margin:0 auto;padding:0 24px 20px">Jeux de frappe</h2>
-      ${gamesGate}
-      <div class="game-selector${currentUser?'':' gate-teased'}">
-        <div class="game-sel-card" onclick="app.selectGame('frappe')">
-          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.target}</div>
-          <div class="game-sel-name">Frappe-mots</div>
-          <div class="game-sel-desc">Des mots tombent du ciel : tape-les avant qu'ils touchent le sol. Vitesse et réactivité.</div>
-          <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
+    const cardsHTML=GCINE_GAMES.map((g,i)=>this._gcineCard(g,i)).join('');
+    const dotsHTML=GCINE_GAMES.map((g,i)=>`<div class="gcine-dot" data-idx="${i}"></div>`).join('');
+    const keysHTML=GCINE_LAYOUT.layout.map((k,i)=>`<div class="gcine-key" id="gk-${i}"><div class="gcine-key-base"></div><div class="gcine-key-top"><span class="gcine-key-label">${k.ch}</span></div></div>`).join('');
+    document.getElementById('page-games').innerHTML=`<div class="gcine-root">
+      <div class="gcine-scroller" id="gcine-scroller">
+        <div class="gcine-stage" id="gcine-stage">
+          <div class="gcine-glow"></div>
+          <div class="gcine-fade"></div>
+          <div class="gcine-persp" id="gcine-persp">
+            <div class="gcine-3d" id="gcine-3d">
+              <div class="gcine-floor"></div>
+              ${keysHTML}
+              <div class="gcine-traveler" id="gcine-traveler"><div class="gcine-traveler-face"><span>K</span></div></div>
+            </div>
+          </div>
+          <div class="gcine-hero" id="gcine-hero">
+            <div class="gcine-badge">${ICONS.gamepad} 9 jeux de frappe</div>
+            <h1 class="gcine-h1">Apprends à taper<br>en jouant.</h1>
+            <p class="gcine-sub">Neuf exercices déguisés en jeux. Fais défiler : la touche traverse le clavier jusqu'à tes jeux.</p>
+          </div>
+          <div class="gcine-hint" id="gcine-hint">
+            <div class="gcine-hint-lbl">FAIS DÉFILER</div>
+            <div class="gcine-hint-arrow">↓</div>
+          </div>
         </div>
-        <div class="game-sel-card" onclick="app.selectGame('tireur')">
-          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.crosshair}</div>
-          <div class="game-sel-name">Tireur d'élite</div>
-          <div class="game-sel-desc">Tape chaque mot sans la moindre faute. Une seule erreur et la cible est ratée : la précision avant tout.</div>
-          <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
+      </div>
+      <div class="gcine-panel">
+        <div class="gcine-panel-head">
+          <div class="gcine-eyebrow">LA TOUCHE EST ARRIVÉE</div>
+          <h2 class="gcine-h2">Choisis ton jeu</h2>
+          <p class="gcine-panel-sub">Fais glisser le bandeau. Le jeu au centre est prêt à démarrer.</p>
         </div>
-        <div class="game-sel-card" onclick="app.selectGame('simon')">
-          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.brain}</div>
-          <div class="game-sel-name">Simon des mots</div>
-          <div class="game-sel-desc">Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.</div>
-          <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
-        </div>
-        <div class="game-sel-card" onclick="app.selectGame('souris')">
-          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.mouse}</div>
-          <div class="game-sel-name">Visée</div>
-          <div class="game-sel-desc">7 pistes pour la souris et le clavier : précision, réflexes, vagues & boss, et des défis à deux mains. Mission du jour, badges et skins à débloquer.</div>
-          <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
-        </div>
-        <div class="game-sel-card" onclick="app.selectGame('duel')">
-          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.swords}</div>
-          <div class="game-sel-name">Duel 1v1</div>
-          <div class="game-sel-desc">Défie un ami en temps réel sur le même texte. Partage un lien, comptez 3-2-1, et que le plus rapide gagne !</div>
-          <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
-        </div>
-        <div class="game-sel-card expert-card" onclick="app.selectGame('course')">
-          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.raceCar}</div>
-          <div class="game-sel-name">Course de dactylo</div>
-          <div class="game-sel-desc">Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !</div>
-          <span class="game-sel-tag expert">EXPERT</span>
-        </div>
-        <div class="game-sel-card expert-card" onclick="app.selectGame('sprint')">
-          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.flag}</div>
-          <div class="game-sel-name">Le Sprint</div>
-          <div class="game-sel-desc">30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace : chaque seconde compte.</div>
-          <span class="game-sel-tag expert">EXPERT</span>
-        </div>
-        <div class="game-sel-card expert-card" onclick="app.selectGame('boss')">
-          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.trophy}</div>
-          <div class="game-sel-name">Boss de la semaine</div>
-          <div class="game-sel-desc">Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !</div>
-          <span class="game-sel-tag expert">EXPERT</span>
-        </div>
-        <div class="game-sel-card expert-card" onclick="app.selectGame('ghost')">
-          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.ghost}</div>
-          <div class="game-sel-name">Contre ton fantôme</div>
-          <div class="game-sel-desc">Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !</div>
-          <span class="game-sel-tag expert">EXPERT</span>
+        ${gamesGate}
+        <div class="${currentUser?'':'gate-teased'}">
+          <div class="gcine-carousel" id="gcine-carousel">
+            <div class="gcine-cards" id="gcine-cards">${cardsHTML}</div>
+          </div>
+          <div class="gcine-controls">
+            <button class="gcine-arrow" id="gcine-prev" aria-label="Jeu précédent">←</button>
+            <div class="gcine-dots" id="gcine-dots">${dotsHTML}</div>
+            <button class="gcine-arrow" id="gcine-next" aria-label="Jeu suivant">→</button>
+          </div>
         </div>
       </div>
     </div>`;
+    this._gcineInit();
+  },
+  _gcineCard(g,i){
+    const tag=g.expert?'EXPERT':(currentUser?'GRATUIT':'Compte requis');
+    return `<div class="gcine-card" data-idx="${i}">
+      <div class="gcine-card-inner">
+        <div class="gcine-blob gcine-blob-a"></div>
+        <div class="gcine-blob gcine-blob-b"></div>
+        <div class="gcine-card-top">
+          <div class="gcine-card-icon">${ICONS[g.icon]}</div>
+          <div class="gcine-card-tag">${tag}</div>
+        </div>
+        <div class="gcine-card-body">
+          <div class="gcine-card-name">${g.name}</div>
+          <div class="gcine-card-desc">${g.desc}</div>
+        </div>
+        <div class="gcine-card-cta">Jouer maintenant →</div>
+        <div class="gcine-card-n">${String(i+1).padStart(2,'0')}</div>
+      </div>
+    </div>`;
+  },
+  _gcineTeardown(){},
+  _gcineInit(){
+    this._gcineTeardown();
+    const scroller=document.getElementById('gcine-scroller');
+    if(!scroller)return;
+    const stage=document.getElementById('gcine-stage');
+    const persp=document.getElementById('gcine-persp');
+    const g3d=document.getElementById('gcine-3d');
+    const traveler=document.getElementById('gcine-traveler');
+    const hero=document.getElementById('gcine-hero');
+    const hint=document.getElementById('gcine-hint');
+    const cardsEl=document.getElementById('gcine-cards');
+    const dotsEl=document.getElementById('gcine-dots');
+    const keyEls=GCINE_LAYOUT.layout.map((k,i)=>document.getElementById('gk-'+i));
+    const cardEls=Array.prototype.slice.call(cardsEl.children);
+    const dotEls=Array.prototype.slice.call(dotsEl.children);
+    const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+    const lerp=(a,b,t)=>a+(b-a)*t;
+
+    const setStageTop=()=>{
+      const navH=(document.getElementById('main-nav')||{}).offsetHeight||0;
+      stage.style.top=navH+'px';
+      stage.style.height='calc(100vh - '+navH+'px)';
+    };
+    setStageTop();
+
+    let idx=3;
+    const renderCarousel=()=>{
+      const gap=232;
+      cardEls.forEach((el,i)=>{
+        const o=i-idx,a=Math.abs(o),hidden=a>3,center=o===0;
+        const scale=center?1:Math.max(0.6,1-a*0.15);
+        el.style.transform='translate(-50%,-50%) translateX('+(o*gap)+'px) scale('+scale+') rotateY('+(-o*12)+'deg)';
+        el.style.zIndex=20-a;
+        el.style.opacity=hidden?0:center?1:(a===1?0.95:0.6);
+        el.style.pointerEvents=hidden?'none':'auto';
+        el.style.cursor=center?'default':'pointer';
+        el.classList.toggle('is-center',center);
+      });
+      dotEls.forEach((d,i)=>d.classList.toggle('is-active',i===idx));
+    };
+    const setIdx=v=>{idx=clamp(v,0,GCINE_GAMES.length-1);renderCarousel();};
+    renderCarousel();
+
+    const onCardsClick=e=>{
+      const card=e.target.closest('.gcine-card');
+      if(!card)return;
+      const i=+card.dataset.idx;
+      if(i===idx)this.selectGame(GCINE_GAMES[i].key);
+      else setIdx(i);
+    };
+    cardsEl.addEventListener('click',onCardsClick);
+    const dotHandlers=dotEls.map((d,i)=>{const h=()=>setIdx(i);d.addEventListener('click',h);return h;});
+    const prevBtn=document.getElementById('gcine-prev'),nextBtn=document.getElementById('gcine-next');
+    const onPrev=()=>setIdx(idx-1),onNext=()=>setIdx(idx+1);
+    prevBtn.addEventListener('click',onPrev);
+    nextBtn.addEventListener('click',onNext);
+
+    let dragging=false,dx0=0,di0=0;
+    const carouselEl=document.getElementById('gcine-carousel');
+    const onDown=e=>{dragging=true;dx0=e.clientX;di0=idx;};
+    const onMove=e=>{if(!dragging)return;const d=e.clientX-dx0;if(Math.abs(d)>55)setIdx(di0-Math.round(d/110));};
+    const onUp=()=>{dragging=false;};
+    carouselEl.addEventListener('pointerdown',onDown);
+    window.addEventListener('pointermove',onMove);
+    window.addEventListener('pointerup',onUp);
+
+    let rafId=null;
+    const tick=()=>{
+      rafId=null;
+      if(!document.body.contains(scroller)){this._gcineTeardown();return;}
+      const rect=scroller.getBoundingClientRect();
+      const total=scroller.offsetHeight-stage.offsetHeight;
+      const scrolled=clamp(-rect.top,0,total);
+      const raw=total>0?clamp(scrolled/total,0,1):0;
+      const p=raw<0.5?2*raw*raw:1-Math.pow(-2*raw+2,2)/2;
+      const tilt=lerp(64,44,p);
+      persp.style.opacity=lerp(1,0.6,p);
+      g3d.style.transform='translate(-50%,-50%) translate('+lerp(20,-30,p)+'px,'+lerp(100,140,p)+'px) rotateX('+tilt+'deg) rotateZ('+lerp(-22,-6,p)+'deg) scale('+lerp(0.84,0.96,p)+')';
+      const tx=lerp(-GCINE_LAYOUT.cx*0.3,GCINE_LAYOUT.cx*0.62,p);
+      const ty=lerp(-GCINE_LAYOUT.cy-20,GCINE_LAYOUT.cy-4,p)+Math.sin(p*Math.PI*3)*26;
+      const roll=p*1180;
+      GCINE_LAYOUT.layout.forEach((k,i)=>{
+        const el=keyEls[i];if(!el)return;
+        const kx=k.cx,ky=k.cy;
+        const d=Math.hypot(kx-tx,ky-ty);
+        const near=clamp(1-d/150,0,1);
+        const passed=kx<tx-10;
+        const glow=Math.pow(near,1.6);
+        el.style.transform='translate3d('+kx+'px,'+ky+'px,'+(GCINE_LIFT+glow*26)+'px)';
+        const top=el.querySelector('.gcine-key-top');
+        const label=el.querySelector('.gcine-key-label');
+        top.style.background=glow>0.04
+          ?'linear-gradient(150deg,rgba(255,122,77,'+(0.25+glow*0.75)+'),rgba(255,74,28,'+(0.3+glow*0.7)+'))'
+          :passed?'linear-gradient(150deg,#2b241d,#211b16)':'linear-gradient(150deg,#231e19,#1a1611)';
+        top.style.borderColor=glow>0.04?'rgba(255,190,160,.55)':passed?'rgba(255,122,77,.22)':'rgba(255,255,255,.07)';
+        top.style.boxShadow=glow>0.04?'0 0 '+(18+glow*40)+'px rgba(255,74,28,'+(0.35+glow*0.45)+'), inset 0 1px 0 rgba(255,255,255,.25)':'inset 0 1px 0 rgba(255,255,255,.05)';
+        label.style.color=glow>0.04?'#fff':passed?'rgba(255,178,150,.5)':'rgba(255,255,255,.28)';
+      });
+      traveler.style.transform='translate3d('+tx+'px,'+ty+'px,'+(GCINE_LIFT+GCINE_KH/2+4)+'px) rotateX(90deg) rotateZ('+roll+'deg)';
+      hero.style.transform='translateY('+(-p*90)+'px)';
+      hero.style.opacity=clamp(1-p*1.9,0,1);
+      hero.style.pointerEvents=p>0.4?'none':'auto';
+      hint.style.opacity=clamp(1-p*3,0,1);
+    };
+    const schedule=()=>{if(rafId==null)rafId=requestAnimationFrame(tick);};
+    const onResize=()=>{setStageTop();schedule();};
+    tick();
+    window.addEventListener('scroll',schedule,{passive:true});
+    window.addEventListener('resize',onResize);
+
+    this._gcineTeardown=()=>{
+      window.removeEventListener('scroll',schedule);
+      window.removeEventListener('resize',onResize);
+      window.removeEventListener('pointermove',onMove);
+      window.removeEventListener('pointerup',onUp);
+      if(rafId)cancelAnimationFrame(rafId);
+      this._gcineTeardown=()=>{};
+    };
   },
   selectGame(which){
     if(which==='sprint'){
