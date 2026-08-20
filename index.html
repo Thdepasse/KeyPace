@@ -1286,7 +1286,7 @@ const ICONS={
   gamepad:_icon('<rect x="2" y="7" width="20" height="11" rx="5.5"/><path d="M7 10v4M5 12h4"/><circle cx="16" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="18.5" cy="13" r="1" fill="currentColor" stroke="none"/>'),
   barChart:_icon('<rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="14" width="4" height="7" rx="1"/>','fill="currentColor" stroke="none"'),
   monitor:_icon('<rect x="3" y="4" width="18" height="12" rx="2"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="16" x2="12" y2="20"/>'),
-  gradCap:_icon('<path d="M12 3l10 5-10 5L2 8l10-5z"/><path d="M6 10.5V16c0 1.5 2.5 3 6 3s6-1.5 6-3v-5.5"/>'),
+  gradCap:_icon('<path d="M12 4L2 9l10 5 10-5-10-5z"/><path d="M6 11.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5"/><line x1="19" y1="10" x2="19" y2="15.3"/><circle cx="19" cy="16.3" r="1.1" fill="currentColor" stroke="none"/>'),
   award:_icon('<circle cx="12" cy="8" r="5"/><path d="M9 12.5L7 21l5-3 5 3-2-8.5"/>'),
   trendUp:_icon('<polyline points="3 17 9 11 13 15 21 6"/><polyline points="15 6 21 6 21 12"/>'),
   target:_icon('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>'),
@@ -1303,6 +1303,12 @@ const ICONS={
   flag:_icon('<line x1="5" y1="3" x2="5" y2="21"/><path d="M5 4h11l-3 4 3 4H5"/>'),
   cookie:_icon('<circle cx="12" cy="12" r="9"/><circle cx="9" cy="9" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="14.5" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>'),
   trophy:_icon('<path d="M8 3h8v4a4 4 0 0 1-8 0V3z"/><path d="M8 5H5a2 2 0 0 0 0 4h1"/><path d="M16 5h3a2 2 0 0 1 0 4h-1"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="10" y1="11" x2="10" y2="15"/><line x1="14" y1="11" x2="14" y2="15"/><line x1="8" y1="19" x2="16" y2="19"/>'),
+  crosshair:_icon('<circle cx="12" cy="12" r="8"/><line x1="12" y1="1" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="23"/><line x1="1" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="23" y2="12"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>'),
+  brain:_icon('<path d="M9 3a3 3 0 0 0-3 3 3 3 0 0 0-1 5.8 3.5 3.5 0 0 0 2 6.2h1a2 2 0 0 0 2-2V6a3 3 0 0 0-1-3z"/><path d="M15 3a3 3 0 0 1 3 3 3 3 0 0 1 1 5.8 3.5 3.5 0 0 1-2 6.2h-1a2 2 0 0 1-2-2V6a3 3 0 0 1 1-3z"/>'),
+  mouse:_icon('<rect x="7" y="3" width="10" height="18" rx="5"/><line x1="12" y1="7" x2="12" y2="11"/>'),
+  swords:_icon('<path d="M4 20L20 4"/><path d="M13 4l-2 2 7 7 2-2z"/><circle cx="4" cy="20" r="1.2" fill="currentColor" stroke="none"/><path d="M20 20L4 4"/><path d="M11 20l-2-2 7-7 2 2z"/><circle cx="20" cy="20" r="1.2" fill="currentColor" stroke="none"/>'),
+  raceCar:_icon('<path d="M3 13l2-5a2 2 0 0 1 2-1h10a2 2 0 0 1 2 1l2 5"/><rect x="2" y="13" width="20" height="5" rx="2"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>'),
+  ghost:_icon('<path d="M6 21V11a6 6 0 0 1 12 0v10l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5z"/><circle cx="9.5" cy="10.5" r="0.9" fill="currentColor" stroke="none"/><circle cx="14.5" cy="10.5" r="0.9" fill="currentColor" stroke="none"/>'),
   keyboard:_icon('<rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="10.01"/><line x1="10" y1="10" x2="10" y2="10.01"/><line x1="14" y1="10" x2="14" y2="10.01"/><line x1="18" y1="10" x2="18" y2="10.01"/><line x1="7" y1="15" x2="17" y2="15"/>'),
   bulb:_icon('<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.2 1 2v.5h6v-.5c0-.8.3-1.4 1-2A6 6 0 0 0 12 3z"/>'),
   clock:_icon('<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/>'),
@@ -3832,7 +3838,7 @@ const app={
       :tag==='free'?'<span class="game-sel-tag free" style="margin-left:4px">GRATUIT</span>':'';
     return `<div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
       <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
-      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">${title} ${emoji}</h2>
+      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">${title} <span style="color:var(--accent)">${emoji}</span></h2>
       ${tagHtml}
     </div>`;
   },
@@ -3992,7 +3998,7 @@ const app={
     const progressPct=s?Math.round(100*(30-timeLeft)/30):0;
 
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Le Sprint','🏁','expert')}
+      ${this._gameHeader('Le Sprint',ICONS.flag,'expert')}
       <div class="sprint-arena">
         ${isOver?`
           ${this._gameResult({
@@ -5324,55 +5330,55 @@ const app={
       ${gamesGate}
       <div class="game-selector${currentUser?'':' gate-teased'}">
         <div class="game-sel-card" onclick="app.selectGame('frappe')">
-          <div class="game-sel-icon">🎯</div>
+          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.target}</div>
           <div class="game-sel-name">Frappe-mots</div>
           <div class="game-sel-desc">Des mots tombent du ciel : tape-les avant qu'ils touchent le sol. Vitesse et réactivité.</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
         </div>
         <div class="game-sel-card" onclick="app.selectGame('tireur')">
-          <div class="game-sel-icon">🏹</div>
+          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.crosshair}</div>
           <div class="game-sel-name">Tireur d'élite</div>
           <div class="game-sel-desc">Tape chaque mot sans la moindre faute. Une seule erreur et la cible est ratée : la précision avant tout.</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
         </div>
         <div class="game-sel-card" onclick="app.selectGame('simon')">
-          <div class="game-sel-icon">🧠</div>
+          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.brain}</div>
           <div class="game-sel-name">Simon des mots</div>
           <div class="game-sel-desc">Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
         </div>
         <div class="game-sel-card" onclick="app.selectGame('souris')">
-          <div class="game-sel-icon">🖱️</div>
+          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.mouse}</div>
           <div class="game-sel-name">Visée</div>
           <div class="game-sel-desc">Maîtrise la souris en 5 niveaux : viser, cliquer, éviter les pièges, glisser-déposer, puis ZQSD et souris en même temps.</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
         </div>
         <div class="game-sel-card" onclick="app.selectGame('duel')">
-          <div class="game-sel-icon">⚔️</div>
+          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.swords}</div>
           <div class="game-sel-name">Duel 1v1</div>
           <div class="game-sel-desc">Défie un ami en temps réel sur le même texte. Partage un lien, comptez 3-2-1, et que le plus rapide gagne !</div>
           <span class="game-sel-tag free">${currentUser?'GRATUIT':'Compte requis'}</span>
         </div>
         <div class="game-sel-card expert-card" onclick="app.selectGame('course')">
-          <div class="game-sel-icon">🏎️</div>
+          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.raceCar}</div>
           <div class="game-sel-name">Course de dactylo</div>
           <div class="game-sel-desc">Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !</div>
           <span class="game-sel-tag expert">EXPERT</span>
         </div>
         <div class="game-sel-card expert-card" onclick="app.selectGame('sprint')">
-          <div class="game-sel-icon">🏁</div>
+          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.flag}</div>
           <div class="game-sel-name">Le Sprint</div>
           <div class="game-sel-desc">30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace : chaque seconde compte.</div>
           <span class="game-sel-tag expert">EXPERT</span>
         </div>
         <div class="game-sel-card expert-card" onclick="app.selectGame('boss')">
-          <div class="game-sel-icon">🏆</div>
+          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.trophy}</div>
           <div class="game-sel-name">Boss de la semaine</div>
           <div class="game-sel-desc">Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !</div>
           <span class="game-sel-tag expert">EXPERT</span>
         </div>
         <div class="game-sel-card expert-card" onclick="app.selectGame('ghost')">
-          <div class="game-sel-icon">👻</div>
+          <div class="game-sel-icon" style="color:var(--accent)">${ICONS.ghost}</div>
           <div class="game-sel-name">Contre ton fantôme</div>
           <div class="game-sel-desc">Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !</div>
           <span class="game-sel-tag expert">EXPERT</span>
@@ -5468,7 +5474,7 @@ const app={
     // Countdown/tierBanner are body-injected : no overlay needed here
     const overlay=!currentUser?guestOverlay:gameIdle?idleOverlay:gameOver?gameOverOverlay:'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Frappe-mots','🎯','free')}
+      ${this._gameHeader('Frappe-mots',ICONS.target,'free')}
       <div class="game-arena" style="max-width:1120px;margin:0 auto;margin-left:24px;margin-right:24px">
         <div class="game-hud"><div class="game-score-val">${score}<span> pts</span></div>${tierHTML}<div style="display:flex;gap:5px">${hearts}</div></div>
         ${wordsHTML}${overlay}
@@ -5627,7 +5633,7 @@ const app={
       })}</div>`;
     }
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader("Tireur d'élite",'🏹','free')}
+      ${this._gameHeader("Tireur d'élite",ICONS.crosshair,'free')}
       <div class="game-arena" style="max-width:1120px;margin:0 auto;margin-left:24px;margin-right:24px">
         <div class="game-hud">
           <div style="display:flex;gap:22px;align-items:flex-end">
@@ -5747,7 +5753,7 @@ const app={
       primaryLabel:'Rejouer',primaryOnClick:'app.startCourse()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Course de dactylo','🏎️','expert')}
+      ${this._gameHeader('Course de dactylo',ICONS.raceCar,'expert')}
       <div class="sprint-arena" style="position:relative">
         ${idle&&!IS_TOUCH_ONLY()?`<div class="sprint-result"><h2 style="margin-bottom:12px">Prêt à courir ?</h2><p style="color:var(--muted);font-size:15px;margin-bottom:20px">Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary" onclick="app.startCourse()">Lancer la course ▸</button></div>`:''}
         ${c?`
@@ -5893,7 +5899,7 @@ const app={
       primaryLabel:'Rejouer',primaryOnClick:'app.startGhost()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Contre ton fantôme','👻','expert')}
+      ${this._gameHeader('Contre ton fantôme',ICONS.ghost,'expert')}
       <div class="sprint-arena" style="position:relative">
         ${idle&&!IS_TOUCH_ONLY()?`<div class="sprint-result"><h2 style="margin-bottom:12px">Prêt à courir ?</h2><p style="color:var(--muted);font-size:15px;margin-bottom:20px">${best?'Bats ton meilleur temps sur ce texte : ton fantôme court à ton propre rythme précédent.':'Ta toute première course sur ce texte : elle enregistrera ton fantôme pour la prochaine fois.'}${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary" onclick="app.startGhost()">Lancer la course ▸</button></div>`:''}
         ${c?`
@@ -6039,7 +6045,7 @@ const app={
       })}</div>`;
     }
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Simon des mots','🧠','free')}
+      ${this._gameHeader('Simon des mots',ICONS.brain,'free')}
       <div class="simon-arena">
         <div class="simon-hud">
           <div style="display:flex;gap:22px;align-items:flex-end">
@@ -6162,7 +6168,7 @@ const app={
   },
   renderBoss(){
     const b=this.boss;
-    const head=this._gameHeader('Boss de la semaine','🏆','expert');
+    const head=this._gameHeader('Boss de la semaine',ICONS.trophy,'expert');
     let body='';
     if(!b||b.phase==='loading'){
       body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Chargement du défi…</div></div>`;
@@ -6445,7 +6451,7 @@ const app={
   },
   renderDuel(){
     const d=this.duel;
-    const head=this._gameHeader('Duel 1v1','⚔️','free');
+    const head=this._gameHeader('Duel 1v1',ICONS.swords,'free');
     let body='';
     if(!d||d.phase==='menu'){
       const codeErr=d&&d._codeError?d._codeError:'';
@@ -7649,14 +7655,14 @@ const app={
         <div class="spanel" style="margin-bottom:0"><h3>Derniers tests</h3><div class="recent-list">${recentHTML}</div></div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:22px">
-        <div class="spanel" style="margin-bottom:0"><h3>🎯 Frappe-mots : meilleur score</h3><div class="scard-val acc" style="font-size:36px;margin-top:8px">${gameBest} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div>${gameBest===0?'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le jeu pour établir un score !</p>':''}</div>
-        <div class="spanel" style="margin-bottom:0"><h3>🏹 Tireur d'élite : précision record</h3>${this.stats.tireurBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.tireurBest.precision}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.tireurBest.wpm} mpm</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le Tireur d\'élite pour établir ton record de précision !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3>🏎️ Course de dactylo : record</h3>${this.stats.courseBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.courseBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.courseBest.acc}% précision · ${this.stats.courseBest.rank===1?'1ʳᵉ place 🥇':this.stats.courseBest.rank+'ᵉ place'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour établir ton record !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3>👻 Contre ton fantôme : record</h3>${this.stats.ghostBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.ghostBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.ghostBest.acc}% précision</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour enregistrer ton premier fantôme !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3>🧠 Simon des mots : record</h3>${this.stats.simonBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.simonBest.score} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">séquence max : ${this.stats.simonBest.maxSeq} mots</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance Simon des mots pour établir ton record de mémoire !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3>🏆 Boss de la semaine</h3>${this.stats.bossBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">#${this.stats.bossBest.rank}</div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.bossBest.score} pts · ${this.stats.bossBest.wpm} mpm ${this.stats.bossBest.isoWeek===this._currentIsoWeek()?'cette semaine':'(semaine '+this.stats.bossBest.isoWeek.replace(/^\d+-W/,'')+')'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Tente le défi pour apparaître au classement !</p>'}<button onclick="go('games');setTimeout(()=>app.selectGame('boss'),0)" style="background:none;border:none;padding:0;margin-top:8px;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;text-decoration:underline">Voir le classement →</button></div>
-        <div class="spanel" style="margin-bottom:0"><h3>🏁 Le Sprint : record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3>⚔️ Duel 1v1</h3>${this.stats.duelRecord&&(this.stats.duelRecord.wins+this.stats.duelRecord.losses+this.stats.duelRecord.draws)>0?(()=>{const r=this.stats.duelRecord;const total=r.wins+r.losses+r.draws;const winRate=Math.round(100*r.wins/total);return`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${r.wins}<span style="font-size:16px;color:var(--muted);font-weight:500">V</span> · ${r.losses}<span style="font-size:16px;color:var(--muted);font-weight:500">D</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${winRate}% de victoires${r.draws?' · '+r.draws+' nul'+(r.draws>1?'s':''):''} sur ${total} duel${total>1?'s':''}</p>`;})():'<p style="color:var(--muted);font-size:14px;margin-top:8px">Défie un ami pour ton premier duel !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.target}</span> Frappe-mots : meilleur score</h3><div class="scard-val acc" style="font-size:36px;margin-top:8px">${gameBest} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div>${gameBest===0?'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le jeu pour établir un score !</p>':''}</div>
+        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.crosshair}</span> Tireur d'élite : précision record</h3>${this.stats.tireurBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.tireurBest.precision}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.tireurBest.wpm} mpm</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le Tireur d\'élite pour établir ton record de précision !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.raceCar}</span> Course de dactylo : record</h3>${this.stats.courseBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.courseBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.courseBest.acc}% précision · ${this.stats.courseBest.rank===1?'1ʳᵉ place 🥇':this.stats.courseBest.rank+'ᵉ place'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour établir ton record !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.ghost}</span> Contre ton fantôme : record</h3>${this.stats.ghostBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.ghostBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.ghostBest.acc}% précision</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour enregistrer ton premier fantôme !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.brain}</span> Simon des mots : record</h3>${this.stats.simonBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.simonBest.score} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">séquence max : ${this.stats.simonBest.maxSeq} mots</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance Simon des mots pour établir ton record de mémoire !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.trophy}</span> Boss de la semaine</h3>${this.stats.bossBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">#${this.stats.bossBest.rank}</div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.bossBest.score} pts · ${this.stats.bossBest.wpm} mpm ${this.stats.bossBest.isoWeek===this._currentIsoWeek()?'cette semaine':'(semaine '+this.stats.bossBest.isoWeek.replace(/^\d+-W/,'')+')'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Tente le défi pour apparaître au classement !</p>'}<button onclick="go('games');setTimeout(()=>app.selectGame('boss'),0)" style="background:none;border:none;padding:0;margin-top:8px;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;text-decoration:underline">Voir le classement →</button></div>
+        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.flag}</span> Le Sprint : record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance un Sprint pour établir ton record !</p>'}</div>
+        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.swords}</span> Duel 1v1</h3>${this.stats.duelRecord&&(this.stats.duelRecord.wins+this.stats.duelRecord.losses+this.stats.duelRecord.draws)>0?(()=>{const r=this.stats.duelRecord;const total=r.wins+r.losses+r.draws;const winRate=Math.round(100*r.wins/total);return`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${r.wins}<span style="font-size:16px;color:var(--muted);font-weight:500">V</span> · ${r.losses}<span style="font-size:16px;color:var(--muted);font-weight:500">D</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${winRate}% de victoires${r.draws?' · '+r.draws+' nul'+(r.draws>1?'s':''):''} sur ${total} duel${total>1?'s':''}</p>`;})():'<p style="color:var(--muted);font-size:14px;margin-top:8px">Défie un ami pour ton premier duel !</p>'}</div>
       </div>
       <div class="spanel" style="margin-bottom:22px"><h3><span style="color:var(--accent)">${ICONS.keyboard}</span> Tes touches difficiles</h3><div style="font-size:13px;color:var(--muted);margin:4px 0 16px">Les touches en rouge sont celles où tu fais le plus de fautes. Concentre-toi dessus !</div>${this._keyHeatmap(this.stats.keyStats)}</div>
       ${this._gazeAnalysisPanel(tests)}
