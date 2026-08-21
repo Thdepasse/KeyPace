@@ -594,7 +594,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .reviews-summary .reviews-avg{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--txt);font-size:20px}
 .reviews-summary .reviews-stars{color:#F5A623;letter-spacing:1px}
 .reviews-carousel{position:relative;overflow:hidden}
-.reviews-track{overflow:hidden}
+.reviews-track{overflow:hidden;-webkit-mask-image:linear-gradient(to right,transparent 0,#000 60px,#000 calc(100% - 60px),transparent 100%);mask-image:linear-gradient(to right,transparent 0,#000 60px,#000 calc(100% - 60px),transparent 100%)}
 .reviews-grid{display:flex}
 .review-slide{flex:0 0 84%;padding:0 8px;box-sizing:border-box}
 .review-card{border:1.5px solid var(--border);border-radius:18px;padding:22px;background:var(--card);filter:blur(3px);opacity:.45;transition:filter .5s,opacity .5s}
@@ -605,6 +605,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 @media(max-width:768px){
   .reviews-section{padding:0 16px 44px}
   .reviews-section h2{font-size:26px}
+  .reviews-track{-webkit-mask-image:linear-gradient(to right,transparent 0,#000 28px,#000 calc(100% - 28px),transparent 100%);mask-image:linear-gradient(to right,transparent 0,#000 28px,#000 calc(100% - 28px),transparent 100%)}
 }
 
 /* TYPING */
