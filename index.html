@@ -5235,24 +5235,26 @@ const app={
     const hint=cap.pads?'Z Q S D pour entrer dans les cercles verts':cap.move&&cap.click?'Z Q S D pour bouger · clique les cibles et leurs cœurs':cap.move?'Z Q S D pour bouger':cap.sort3?'Trie chaque forme dans sa couleur':cap.drag?'Attrape et dépose dans la bonne zone':cap.bonus?'Attrape les bonus… ou reste sur les vertes ?':cap.disguise?'Méfie-toi : certains rouges se déguisent en orange':cap.traps?'Vertes oui, rouges non · vise le cœur':cap.core?'Vise le cœur doré : 3 pts, 5 d’affilée = +1 ♥':cap.click?'Clique les cibles':'Survole les cibles un instant';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <div class="game-hud">
-          <div class="game-score-val" style="min-width:70px">${s.score} <span style="font-size:12px">pts</span></div>
-          <div style="flex:1;margin:0 16px">
-            <div style="position:relative;height:8px;background:rgba(255,255,255,.1);border-radius:4px">
-              <div style="height:100%;width:${spct}%;background:${barCol};border-radius:4px;transition:width .2s"></div>
-              ${mark(l.bronze,'#CD7F44')}${mark(l.silver,'#C0C7D0')}${mark(l.gold,'#FFD84D')}
+        <div class="game-arena" style="height:auto;padding:16px 20px 20px;display:flex;flex-direction:column;cursor:${cap.click||cap.drag?'crosshair':'default'}">
+          <div class="game-hud">
+            <div class="game-score-val" style="min-width:70px">${s.score} <span style="font-size:12px">pts</span></div>
+            <div style="flex:1;margin:0 16px">
+              <div style="position:relative;height:8px;background:rgba(255,255,255,.14);border-radius:4px">
+                <div style="height:100%;width:${spct}%;background:${barCol};border-radius:4px;transition:width .2s"></div>
+                ${mark(l.bronze,'#CD7F44')}${mark(l.silver,'#C0C7D0')}${mark(l.gold,'#FFD84D')}
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:10.5px;color:rgba(255,255,255,.55);font-weight:700;margin-top:4px"><span>🥉${l.bronze}</span><span>🥈${l.silver}</span><span>🥇${l.gold}</span></div>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:9.5px;color:rgba(255,255,255,.4);font-weight:700;margin-top:3px"><span>🥉${l.bronze}</span><span>🥈${l.silver}</span><span>🥇${l.gold}</span></div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:${sec<=5?'#E5484D':'#fff'};min-width:42px;text-align:right">${sec}s</div>
+              <div style="display:flex;gap:1px">${hearts}</div>
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:${sec<=5?'#E5484D':'#fff'};min-width:42px;text-align:right">${sec}s</div>
-            <div style="display:flex;gap:1px">${hearts}</div>
-          </div>
+          <div style="position:relative;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin:10px 0 10px;overflow:hidden"><div style="height:100%;width:${tpct}%;background:${sec<=5?'#E5484D':'rgba(255,255,255,.4)'};transition:width .05s linear"></div></div>
+          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.55);margin-bottom:8px">${l.name} — ${this._esc(hint)}</div>
+          <div id="souris-arena" style="position:relative;flex:1;min-height:300px;user-select:none"></div>
         </div>
-        <div style="position:relative;height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin:-6px 0 12px;overflow:hidden"><div style="height:100%;width:${tpct}%;background:${sec<=5?'#E5484D':'rgba(255,255,255,.35)'};transition:width .05s linear"></div></div>
-        <div class="game-arena" id="souris-arena" style="cursor:${cap.click||cap.drag?'crosshair':'default'};user-select:none"></div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:-12px">${hint}
-          · <button onclick="app.stopSouris();app.souris={phase:'mouseMenu'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'mouseMenu'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
     this._sourisArena=document.getElementById('souris-arena');
@@ -5287,12 +5289,16 @@ const app={
       const r=a.getBoundingClientRect();
       s.mx=(e.clientX-r.left)/r.width*100;
       s.my=(e.clientY-r.top)/r.height*100;
-      if(s.drag){s.drag.x=s.mx;s.drag.y=s.my;}
+      if(s.drag){e.preventDefault();s.drag.x=s.mx;s.drag.y=s.my;}
     };
     const c=this._sourisCaps(s.lvl);
     if(c.click)a.onmousedown=(e)=>this._sourisClick(e);
     if(c.drag){
+      // Sans preventDefault, un mousedown+mousemove sur du texte (ex. les
+      // libellés VERTE/BLEUE) déclenche la sélection native du navigateur
+      // au lieu de laisser le glisser-déposer JS gérer le geste.
       a.onmousedown=(e)=>{
+        e.preventDefault();
         const t=this._sourisAt(s.mx,s.my);
         if(t){s.drag=t;t.grabbed=true;}
       };
@@ -5761,21 +5767,23 @@ const app={
     const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <div class="game-hud">
-          <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
-          <div style="display:flex;gap:1px">${hearts}</div>
-        </div>
-        <div class="game-arena" id="souris-arena" style="height:340px;display:grid;place-items:center;position:relative">
-          <div style="position:absolute;top:14px;left:0;right:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:${s.combo>1?hot:'rgba(255,255,255,.4)'}">${s.combo>1?'COMBO ×'+s.combo:''}</div>
-          <div style="position:relative;width:150px;height:150px;transform:scale(${scale});transition:transform .15s">
-            <svg width="150" height="150" style="position:absolute;inset:0;transform:rotate(-90deg)"><circle cx="75" cy="75" r="68" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="75" cy="75" r="68" fill="none" stroke="${pct<25?'#E5484D':hot}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${2*Math.PI*68}" stroke-dashoffset="${2*Math.PI*68*(1-pct/100)}" style="transition:stroke-dashoffset .05s linear"/></svg>
-            <div style="position:absolute;inset:0;display:grid;place-items:center;border-radius:50%;background:${hot}22;border:2.5px solid ${hot}">
-              <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;color:#fff">${s.letter}</span>
+        <div class="game-arena" style="height:auto;min-height:380px;display:flex;flex-direction:column;padding:16px 20px 26px">
+          <div class="game-hud">
+            <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
+            <div style="display:flex;gap:1px">${hearts}</div>
+          </div>
+          <div style="font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);text-align:center;margin-top:6px">Tape la lettre affichée avant que l'anneau se referme</div>
+          <div style="flex:1;display:grid;place-items:center;position:relative">
+            <div style="position:absolute;top:0;left:0;right:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:${s.combo>1?hot:'rgba(255,255,255,.4)'}">${s.combo>1?'COMBO ×'+s.combo:''}</div>
+            <div style="position:relative;width:150px;height:150px;transform:scale(${scale});transition:transform .15s">
+              <svg width="150" height="150" style="position:absolute;inset:0;transform:rotate(-90deg)"><circle cx="75" cy="75" r="68" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="75" cy="75" r="68" fill="none" stroke="${pct<25?'#E5484D':hot}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${2*Math.PI*68}" stroke-dashoffset="${2*Math.PI*68*(1-pct/100)}" style="transition:stroke-dashoffset .05s linear"/></svg>
+              <div style="position:absolute;inset:0;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 30%,${hot}55,${hot}1a 70%);border:2.5px solid ${hot};box-shadow:0 8px 24px ${hot}44">
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3)">${s.letter}</span>
+              </div>
             </div>
           </div>
         </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">Tape la lettre affichée avant que l'anneau se referme
-          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
   },
@@ -5909,7 +5917,7 @@ const app={
     const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
     const cellsHtml=s.cells.map(c=>{
       const isTarget=c.state==='target', isTrap=c.state==='trap';
-      const bg=isTarget?'rgba(31,169,113,.18)':isTrap?'rgba(229,72,77,.18)':'rgba(255,255,255,.05)';
+      const bg=isTarget?'radial-gradient(circle at 35% 30%,rgba(31,169,113,.4),rgba(31,169,113,.12) 70%)':isTrap?'radial-gradient(circle at 35% 30%,rgba(229,72,77,.4),rgba(229,72,77,.12) 70%)':'rgba(255,255,255,.05)';
       const bd=isTarget?'2.5px solid #1FA971':isTrap?'2.5px solid #E5484D':'1.5px dashed rgba(255,255,255,.16)';
       const col=isTarget?'#1FA971':isTrap?'#E5484D':'rgba(255,255,255,.35)';
       const op=c.state?Math.max(.35,c.life/c.dur):1;
@@ -5917,13 +5925,15 @@ const app={
     }).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:520px;margin:0 auto;padding:0 24px">
-        <div class="game-hud">
-          <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
-          <div style="display:flex;gap:1px">${hearts}</div>
+        <div class="game-arena" style="height:auto;padding:16px 20px 20px">
+          <div class="game-hud">
+            <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
+            <div style="display:flex;gap:1px">${hearts}</div>
+          </div>
+          <div style="font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);text-align:center;margin:6px 0 14px">${s.combo>1?'Combo ×'+s.combo+' · ':''}Tape la lettre qui s'allume en vert. Les cases sombres sont des pièges.</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">${cellsHtml}</div>
         </div>
-        <div class="game-arena" id="souris-arena" style="height:auto;aspect-ratio:1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:24px">${cellsHtml}</div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">${s.combo>1?'Combo ×'+s.combo+' · ':''}Tape la lettre qui s'allume en vert. Les cases sombres sont des pièges.
-          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
   },
@@ -6057,17 +6067,19 @@ const app={
       :[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:640px;margin:0 auto;padding:0 24px">
-        <div class="game-hud">
-          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)">${isBoss?'BOSS':'VAGUE '+s.wave+'/4 — '+this._sourisWavesLabels[s.wave-1]}</div>
-          <div style="display:flex;gap:1px">${hearts}</div>
+        <div class="game-arena" style="height:auto;min-height:280px;padding:16px 20px 20px;display:flex;flex-direction:column;${isBoss?'border:2px solid var(--accent);animation:'+(s._shaking?'sourisshake .42s':'none'):''}">
+          <div class="game-hud">
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)">${isBoss?'BOSS':'VAGUE '+s.wave+'/4 — '+this._sourisWavesLabels[s.wave-1]}</div>
+            <div style="display:flex;gap:1px">${hearts}</div>
+          </div>
+          ${!isBoss?`<div style="display:flex;gap:6px;margin:10px 0 0">${segs}</div>`:''}
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+            ${isBoss?`<div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent)">MOT-BOSS</div>`:''}
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:${isBoss?'34px':'28px'};letter-spacing:.02em">${wordHtml}</div>
+          </div>
+          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5)">Tape le mot affiché, sans backspace</div>
         </div>
-        ${!isBoss?`<div style="display:flex;gap:6px;margin:-6px 0 14px">${segs}</div>`:''}
-        <div class="game-arena" style="height:auto;padding:${isBoss?'56px 40px':'40px'};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;${isBoss?'border:2px solid var(--accent);animation:'+(s._shaking?'sourisshake .42s':'none'):''}">
-          ${isBoss?`<div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent)">MOT-BOSS</div>`:''}
-          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:${isBoss?'34px':'28px'};letter-spacing:.02em">${wordHtml}</div>
-        </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">Tape le mot affiché, sans backspace
-          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
   },
@@ -6227,15 +6239,17 @@ const app={
     const s=this.souris;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:640px;margin:0 auto;padding:0 24px">
-        <div class="game-hud">
-          <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
-          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.5)">${s.rounds}/15</div>
+        <div class="game-arena" style="height:auto;padding:16px 20px 20px;display:flex;flex-direction:column;cursor:crosshair">
+          <div class="game-hud">
+            <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.5)">${s.rounds}/15</div>
+          </div>
+          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin:6px 0 10px">Curseur dans la cible + touche = valide</div>
+          <div id="souris-arena" style="position:relative;flex:1;min-height:300px">
+            <div id="hybrid-target" style="position:absolute;left:${s.tx}%;top:${s.ty}%;width:${s.tr*2}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid var(--accent);background:radial-gradient(circle at 35% 30%,rgba(255,77,46,.5),rgba(255,77,46,.12) 70%);box-shadow:0 8px 24px rgba(255,77,46,.3);display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3);animation:calib-pulse 1s infinite">${s.letter}</div>
+          </div>
         </div>
-        <div class="game-arena" id="souris-arena" style="height:340px;position:relative;cursor:crosshair">
-          <div id="hybrid-target" style="position:absolute;left:${s.tx}%;top:${s.ty}%;width:${s.tr*2}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid var(--accent);background:rgba(255,77,46,.15);display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#fff;animation:calib-pulse 1s infinite">${s.letter}</div>
-        </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">Curseur dans la cible + touche = valide
-          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
     this._sourisHybridBindArena();
@@ -6383,25 +6397,28 @@ const app={
     const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
     const lanesHtml=this._sourisTilesLanes.map((lane,i)=>{
       const t=s.tiles[i];
-      const tileHtml=t?`<div style="position:absolute;left:6%;right:6%;top:${t.y}%;height:34px;transform:translateY(-50%);border-radius:9px;background:${lane.type==='click'?'rgba(255,77,46,.85)':'rgba(31,169,113,.85)'};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:15px;box-shadow:0 4px 12px rgba(0,0,0,.35)">${lane.type==='click'?ICONS.mouse:t.letter}</div>`:'';
+      const grad=lane.type==='click'?'linear-gradient(160deg,#FF7A5C,#FF4D2E)':'linear-gradient(160deg,#3DC98A,#1FA971)';
+      const tileHtml=t?`<div style="position:absolute;left:6%;right:6%;top:${t.y}%;height:34px;transform:translateY(-50%);border-radius:9px;background:${grad};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:15px;box-shadow:0 4px 12px rgba(0,0,0,.35)">${lane.type==='click'?ICONS.mouse:t.letter}</div>`:'';
       return `<div onclick="${lane.type==='click'?'app._sourisTilesResolve('+i+')':''}" style="position:relative;flex:1;border-left:${i>0?'1.5px dashed rgba(255,255,255,.1)':'none'};cursor:${lane.type==='click'?'pointer':'default'}">${tileHtml}</div>`;
     }).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:640px;margin:0 auto;padding:0 24px">
-        <div class="game-hud">
-          <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
-          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.5)">${s.bpm} BPM${s.combo>1?' · ×'+s.combo:''}</div>
-          <div style="display:flex;gap:1px">${hearts}</div>
-        </div>
-        <div class="game-arena" id="souris-arena" style="height:360px;display:flex;position:relative;overflow:hidden">
-          ${lanesHtml}
-          <div style="position:absolute;left:0;right:0;top:${this._sourisTilesHitLineY}%;height:2px;background:rgba(255,255,255,.4)"></div>
-          <div style="position:absolute;left:0;right:0;bottom:10px;display:flex;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-align:center">
-            <div style="flex:1">CLIC</div><div style="flex:1">CLIC</div><div style="flex:1">LETTRE</div><div style="flex:1">LETTRE</div>
+        <div class="game-arena" style="height:auto;padding:16px 20px 20px;display:flex;flex-direction:column">
+          <div class="game-hud">
+            <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.5)">${s.bpm} BPM${s.combo>1?' · ×'+s.combo:''}</div>
+            <div style="display:flex;gap:1px">${hearts}</div>
+          </div>
+          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin:6px 0 10px">Agis quand la tuile touche la ligne</div>
+          <div id="souris-arena" style="flex:1;min-height:300px;display:flex;position:relative;overflow:hidden">
+            ${lanesHtml}
+            <div style="position:absolute;left:0;right:0;top:${this._sourisTilesHitLineY}%;height:2px;background:rgba(255,255,255,.4)"></div>
+            <div style="position:absolute;left:0;right:0;bottom:10px;display:flex;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-align:center">
+              <div style="flex:1">CLIC</div><div style="flex:1">CLIC</div><div style="flex:1">LETTRE</div><div style="flex:1">LETTRE</div>
+            </div>
           </div>
         </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">Agis quand la tuile touche la ligne
-          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
   },
@@ -6507,22 +6524,24 @@ const app={
     const queueHtml=s.queue.map((l,i)=>`<div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:${i===0?'20px':'16px'};background:${i===0?'rgba(255,77,46,.22)':'rgba(255,255,255,.06)'};border:${i===0?'2px solid var(--accent)':'1.5px dashed rgba(255,255,255,.14)'};color:${i===0?'#fff':'rgba(255,255,255,.5)'}">${l}</div>`).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:640px;margin:0 auto;padding:0 24px">
-        <div class="game-hud">
-          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)">SYNCHRO ${Math.round(onTarget)}%</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:${sec<=5?'#E5484D':'#fff'}">${sec}s</div>
-        </div>
-        <div class="game-arena" id="souris-arena" style="height:360px;display:flex;flex-direction:column;position:relative;overflow:hidden">
-          <div style="position:relative;flex:1;border-bottom:1.5px dashed rgba(255,255,255,.12)">
-            <div style="position:absolute;left:10px;top:8px;font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.35)">SOURIS — suis la cible</div>
-            <div style="position:absolute;left:${s.tx}%;top:${s.ty}%;width:18%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid var(--accent);background:rgba(255,77,46,.18)"></div>
+        <div class="game-arena" style="height:auto;padding:16px 20px 20px;display:flex;flex-direction:column">
+          <div class="game-hud">
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)">SYNCHRO ${Math.round(onTarget)}%</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:${sec<=5?'#E5484D':'#fff'}">${sec}s</div>
           </div>
-          <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
-            <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.35)">CLAVIER — vide la file</div>
-            <div style="display:flex;gap:8px">${queueHtml}</div>
+          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin:6px 0 10px">Souris sur la cible + tape la première lettre de la file</div>
+          <div id="souris-arena" style="flex:1;min-height:320px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+            <div style="position:relative;flex:1;border-bottom:1.5px dashed rgba(255,255,255,.12)">
+              <div style="position:absolute;left:10px;top:8px;font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.35)">SOURIS — suis la cible</div>
+              <div style="position:absolute;left:${s.tx}%;top:${s.ty}%;width:18%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid var(--accent);background:radial-gradient(circle at 35% 30%,rgba(255,77,46,.5),rgba(255,77,46,.12) 70%);box-shadow:0 8px 20px rgba(255,77,46,.3)"></div>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.35)">CLAVIER — vide la file</div>
+              <div style="display:flex;gap:8px">${queueHtml}</div>
+            </div>
           </div>
         </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px">Souris sur la cible + tape la première lettre de la file
-          · <button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
     this._sourisDuo2BindArena();
