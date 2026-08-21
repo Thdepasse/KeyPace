@@ -593,8 +593,12 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .reviews-summary{text-align:center;color:#7A7365;font-size:16px;margin-bottom:32px}
 .reviews-summary .reviews-avg{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--txt);font-size:20px}
 .reviews-summary .reviews-stars{color:#F5A623;letter-spacing:1px}
-.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.review-card{border:1.5px solid var(--border);border-radius:18px;padding:22px;background:var(--card)}
+.reviews-carousel{position:relative;overflow:hidden}
+.reviews-track{overflow:hidden}
+.reviews-grid{display:flex}
+.review-slide{flex:0 0 84%;padding:0 8px;box-sizing:border-box}
+.review-card{border:1.5px solid var(--border);border-radius:18px;padding:22px;background:var(--card);filter:blur(3px);opacity:.45;transition:filter .5s,opacity .5s}
+.review-slide.active .review-card{filter:none;opacity:1}
 .review-card .review-stars{color:#F5A623;letter-spacing:1px;margin-bottom:10px}
 .review-card p{font-size:14.5px;color:var(--txt);line-height:1.55;margin-bottom:14px}
 .review-card .review-author{font-size:13px;color:var(--muted);font-weight:700}
@@ -4302,7 +4306,9 @@ const app={
       <div class="reviews-section" id="home-reviews" style="display:none">
         <h2>Ce qu'ils en pensent</h2>
         <div class="reviews-summary"></div>
-        <div class="reviews-grid"></div>
+        <div class="reviews-carousel">
+          <div class="reviews-track"><div class="reviews-grid"></div></div>
+        </div>
       </div>
 
       <div class="home-faq" style="max-width:1120px;margin:0 auto 72px;padding:0 24px">
@@ -4329,7 +4335,7 @@ const app={
       const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
       const stars=n=>'★'.repeat(Math.round(n))+'☆'.repeat(5-Math.round(n));
       el.querySelector('.reviews-summary').innerHTML=`<span class="reviews-avg">${d.average.toFixed(1)}</span> <span class="reviews-stars">${stars(d.average)}</span> sur ${d.count} avis`;
-      el.querySelector('.reviews-grid').innerHTML=d.items.slice(0,6).map(it=>`<div class="review-card"><div class="review-stars">${stars(it.rating)}</div><p>${esc(it.comment)}</p><div class="review-author">${esc(it.author_name)}</div></div>`).join('');
+      this._initReviewsCarousel(el.querySelector('.reviews-grid'), d.items.slice(0,12), esc, stars);
       el.style.display='';
       let ld=document.getElementById('reviews-jsonld');
       if(!ld){ld=document.createElement('script');ld.type='application/ld+json';ld.id='reviews-jsonld';document.head.appendChild(ld);}
@@ -4342,6 +4348,34 @@ const app={
         review:d.items.slice(0,10).map(it=>({'@type':'Review',author:{'@type':'Person',name:it.author_name},reviewRating:{'@type':'Rating',ratingValue:it.rating,bestRating:5,worstRating:1},reviewBody:it.comment})),
       });
     }catch(e){}
+  },
+
+  // Carrousel des avis : un avis net au centre, les voisins floutés dépassant
+  // sur les côtés, avance automatiquement d'un cran toutes les 4.5s en boucle
+  // infinie (3 copies de la liste, recentrage invisible une fois la 3e atteinte).
+  _initReviewsCarousel(grid, items, esc, stars){
+    if(this._reviewsTimer){clearInterval(this._reviewsTimer);this._reviewsTimer=null;}
+    const N=items.length;
+    if(!N)return;
+    const loop=items.concat(items).concat(items);
+    grid.innerHTML=loop.map(it=>`<div class="review-slide"><div class="review-card"><div class="review-stars">${stars(it.rating)}</div><p>${esc(it.comment)}</p><div class="review-author">${esc(it.author_name)}</div></div></div>`).join('');
+    const slides=()=>[...grid.children];
+    let index=N;
+    const SLIDE_PCT=84, OFFSET_PCT=(100-SLIDE_PCT)/2; // garder en phase avec .review-slide{flex:0 0 84%}
+    const apply=(withTransition)=>{
+      grid.style.transition=withTransition?'transform .6s cubic-bezier(.4,0,.2,1)':'none';
+      grid.style.transform=`translateX(calc(-${index*SLIDE_PCT}% + ${OFFSET_PCT}%))`;
+      slides().forEach((s,i)=>s.classList.toggle('active',i===index));
+    };
+    apply(false);
+    grid.offsetHeight;
+    this._reviewsTimer=setInterval(()=>{
+      index++;
+      apply(true);
+      if(index>=N*2){
+        setTimeout(()=>{index-=N;apply(false);grid.offsetHeight;},620);
+      }
+    },4500);
   },
 
   _renderHomeEtab(){
