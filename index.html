@@ -779,34 +779,34 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 
 /* GAMES – hero cinématique + carrousel */
 @keyframes gcineHintBob{0%,100%{transform:translateY(0);opacity:.75}50%{transform:translateY(7px);opacity:1}}
-.gcine-root{background:#0d0b09}
+.gcine-root{background:var(--bg)}
 .gcine-scroller{height:230vh;position:relative}
 .gcine-stage{position:sticky;top:0;height:100vh;overflow:hidden}
-.gcine-glow{position:absolute;inset:0;background:radial-gradient(900px 520px at 50% 18%,rgba(255,77,46,.16),transparent 70%),radial-gradient(700px 460px at 85% 80%,rgba(255,140,60,.08),transparent 72%)}
-.gcine-fade{position:absolute;left:0;right:0;bottom:0;height:26vh;background:linear-gradient(to bottom,rgba(13,11,9,0),rgba(13,11,9,.92) 82%);z-index:12;pointer-events:none}
+.gcine-glow{position:absolute;inset:0;background:radial-gradient(900px 520px at 50% 18%,rgba(255,77,46,.12),transparent 70%),radial-gradient(700px 460px at 85% 80%,rgba(255,140,60,.07),transparent 72%)}
+.gcine-fade{position:absolute;left:0;right:0;bottom:0;height:26vh;background:linear-gradient(to bottom,rgba(250,249,245,0),rgba(250,249,245,.94) 82%);z-index:12;pointer-events:none}
 .gcine-persp{position:absolute;inset:0;perspective:1250px;perspective-origin:50% 42%}
 .gcine-3d{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
-.gcine-floor{position:absolute;left:50%;top:50%;width:1500px;height:900px;margin-left:-750px;margin-top:-450px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,77,46,.16),transparent 72%);transform:translateZ(-40px)}
+.gcine-floor{position:absolute;left:50%;top:50%;width:1700px;height:1000px;margin-left:-850px;margin-top:-500px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,90,40,.32),transparent 65%),radial-gradient(closest-side,rgba(60,35,20,.14),transparent 50%);transform:translateZ(-40px)}
 .gcine-key{position:absolute;left:50%;top:50%;width:74px;height:74px;margin-left:-37px;margin-top:-37px;transform-style:preserve-3d;transition:transform .35s ease-out;will-change:transform}
-.gcine-key-base{position:absolute;inset:0;border-radius:14px;background:#0f0d0b;transform:translateZ(-24px);box-shadow:0 0 0 1px rgba(255,255,255,.04)}
-.gcine-key-top{position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#231e19,#1a1611);border:1px solid rgba(255,255,255,.07);transition:background .3s,box-shadow .3s,border-color .3s}
-.gcine-key-label{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:17px;color:rgba(255,255,255,.28);transition:color .3s}
+.gcine-key-base{position:absolute;inset:0;border-radius:14px;background:var(--border);transform:translateZ(-24px);box-shadow:0 0 0 1px rgba(0,0,0,.03)}
+.gcine-key-top{position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#ffffff,var(--light));border:1px solid var(--border);box-shadow:inset 0 1px 0 #fff;transition:background .3s,box-shadow .3s,border-color .3s}
+.gcine-key-label{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:17px;color:#B5AE9F;transition:color .3s}
 .gcine-traveler{position:absolute;left:50%;top:50%;width:74px;height:74px;margin-left:-37px;margin-top:-37px;transform-style:preserve-3d;z-index:50;will-change:transform}
-.gcine-traveler-face{position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;background:linear-gradient(150deg,#ff8a5c,var(--accent) 66%);border:1px solid rgba(255,210,190,.6);box-shadow:0 0 46px rgba(255,77,46,.6), inset 0 2px 0 rgba(255,255,255,.35)}
+.gcine-traveler-face{position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;background:linear-gradient(150deg,#ff8a5c,var(--accent) 66%);border:1px solid rgba(255,210,190,.6);box-shadow:0 0 40px rgba(255,77,46,.4), inset 0 2px 0 rgba(255,255,255,.35)}
 .gcine-traveler-face span{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:26px;color:#fff}
-.gcine-hero{position:absolute;left:8%;top:18%;z-index:20;max-width:640px}
-.gcine-badge{display:inline-flex;align-items:center;gap:9px;background:rgba(255,77,46,.14);border:1px solid rgba(255,77,46,.3);color:#ff9a7a;font-size:13px;font-weight:700;border-radius:999px;padding:8px 16px;margin-bottom:22px;white-space:nowrap}
-.gcine-h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:64px;line-height:.98;letter-spacing:-.03em;color:#fff;margin:0}
-.gcine-sub{font-size:17px;line-height:1.6;color:rgba(255,255,255,.6);max-width:460px;margin-top:22px}
+.gcine-hero{position:absolute;left:8%;top:9%;z-index:20;max-width:640px}
+.gcine-badge{display:inline-flex;align-items:center;gap:9px;background:rgba(255,77,46,.1);border:1px solid rgba(255,77,46,.28);color:var(--accent);font-size:13px;font-weight:700;border-radius:999px;padding:8px 16px;margin-bottom:22px;white-space:nowrap}
+.gcine-h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:64px;line-height:.98;letter-spacing:-.03em;color:var(--txt);margin:0}
+.gcine-sub{font-size:17px;line-height:1.6;color:var(--muted);max-width:460px;margin-top:22px}
 .gcine-hint{position:absolute;left:50%;bottom:38px;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;align-items:center;gap:10px}
-.gcine-hint-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.28em;color:rgba(255,255,255,.5)}
-.gcine-hint-arrow{font-size:18px;color:rgba(255,255,255,.5);animation:gcineHintBob 1.8s ease-in-out infinite}
-.gcine-panel{position:relative;z-index:20;background:var(--bg);border-radius:44px 44px 0 0;padding:64px 24px 80px;box-shadow:0 -40px 90px rgba(0,0,0,.5)}
+.gcine-hint-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.28em;color:var(--muted)}
+.gcine-hint-arrow{font-size:18px;color:var(--muted);animation:gcineHintBob 1.8s ease-in-out infinite}
+.gcine-panel{position:relative;z-index:20;padding:24px 24px 80px}
 .gcine-panel-head{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:1120px;margin:0 auto;padding-bottom:36px;text-align:center}
 .gcine-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.3em;color:var(--accent)}
 .gcine-h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:46px;line-height:1.02;color:var(--txt);letter-spacing:-.02em;margin:0}
 .gcine-panel-sub{font-size:15px;color:var(--muted);margin:0}
-.gcine-carousel{position:relative;height:420px;max-width:1120px;margin:0 auto;perspective:1400px}
+.gcine-carousel{position:relative;height:420px;max-width:1120px;margin:0 auto;perspective:1400px;cursor:grab;touch-action:pan-y;user-select:none}
 .gcine-cards{position:absolute;inset:0}
 .gcine-card{position:absolute;top:50%;left:50%;will-change:transform,opacity}
 .gcine-card-inner{width:270px;height:360px;border-radius:32px;overflow:hidden;position:relative;padding:26px;display:flex;flex-direction:column;justify-content:space-between;background:#fff;border:1px solid var(--border);box-shadow:0 10px 30px rgba(21,19,15,.07);transition:box-shadow .2s}
@@ -838,7 +838,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .gcine-dot.is-active{width:26px;background:var(--accent)}
 @media(max-width:860px){
   .gcine-h1{font-size:38px}
-  .gcine-hero{left:6%;top:14%;max-width:80%}
+  .gcine-hero{left:6%;top:8%;max-width:80%}
   .gcine-sub{font-size:15px}
   .gcine-h2{font-size:32px}
   .gcine-card-inner{width:220px;height:310px;padding:20px}
@@ -6591,7 +6591,7 @@ const app={
     })}</div>`:'';
     const cardsHTML=GCINE_GAMES.map((g,i)=>this._gcineCard(g,i)).join('');
     const dotsHTML=GCINE_GAMES.map((g,i)=>`<div class="gcine-dot" data-idx="${i}"></div>`).join('');
-    const keysHTML=GCINE_LAYOUT.layout.map((k,i)=>`<div class="gcine-key" id="gk-${i}"><div class="gcine-key-base"></div><div class="gcine-key-top"><span class="gcine-key-label">${k.ch}</span></div></div>`).join('');
+    const keysHTML=GCINE_LAYOUT.layout.map((k,i)=>`<div class="gcine-key" id="gk-${i}" style="width:${k.w}px;margin-left:${-k.w/2}px"><div class="gcine-key-base"></div><div class="gcine-key-top"><span class="gcine-key-label">${k.ch}</span></div></div>`).join('');
     document.getElementById('page-games').innerHTML=`<div class="gcine-root">
       <div class="gcine-scroller" id="gcine-scroller">
         <div class="gcine-stage" id="gcine-stage">
@@ -6681,13 +6681,13 @@ const app={
     };
     setStageTop();
 
-    let idx=3;
+    const GAP=232;
+    let idx=3,dragOffset=0;
     const renderCarousel=()=>{
-      const gap=232;
       cardEls.forEach((el,i)=>{
-        const o=i-idx,a=Math.abs(o),hidden=a>3,center=o===0;
+        const o=i-idx,a=Math.abs(o),hidden=a>3,center=o===0&&dragOffset===0;
         const scale=center?1:Math.max(0.6,1-a*0.15);
-        el.style.transform='translate(-50%,-50%) translateX('+(o*gap)+'px) scale('+scale+') rotateY('+(-o*12)+'deg)';
+        el.style.transform='translate(-50%,-50%) translateX('+(o*GAP+dragOffset)+'px) scale('+scale+') rotateY('+(-o*12)+'deg)';
         el.style.zIndex=20-a;
         el.style.opacity=hidden?0:center?1:(a===1?0.95:0.6);
         el.style.pointerEvents=hidden?'none':'auto';
@@ -6699,7 +6699,9 @@ const app={
     const setIdx=v=>{idx=clamp(v,0,GCINE_GAMES.length-1);renderCarousel();};
     renderCarousel();
 
+    let justDragged=false;
     const onCardsClick=e=>{
+      if(justDragged){justDragged=false;return;}
       const card=e.target.closest('.gcine-card');
       if(!card)return;
       const i=+card.dataset.idx;
@@ -6715,9 +6717,23 @@ const app={
 
     let dragging=false,dx0=0,di0=0;
     const carouselEl=document.getElementById('gcine-carousel');
-    const onDown=e=>{dragging=true;dx0=e.clientX;di0=idx;};
-    const onMove=e=>{if(!dragging)return;const d=e.clientX-dx0;if(Math.abs(d)>55)setIdx(di0-Math.round(d/110));};
-    const onUp=()=>{dragging=false;};
+    const onDown=e=>{dragging=true;dx0=e.clientX;di0=idx;dragOffset=0;carouselEl.style.cursor='grabbing';};
+    const onMove=e=>{
+      if(!dragging)return;
+      dragOffset=e.clientX-dx0;
+      if(Math.abs(dragOffset)>4)justDragged=true;
+      renderCarousel();
+    };
+    const onUp=()=>{
+      if(!dragging)return;
+      dragging=false;
+      carouselEl.style.cursor='';
+      const moved=dragOffset;
+      dragOffset=0;
+      const deltaIdx=-Math.round(moved/GAP);
+      if(deltaIdx!==0)setIdx(di0+deltaIdx);
+      else renderCarousel();
+    };
     carouselEl.addEventListener('pointerdown',onDown);
     window.addEventListener('pointermove',onMove);
     window.addEventListener('pointerup',onUp);
@@ -6733,7 +6749,7 @@ const app={
       const p=raw<0.5?2*raw*raw:1-Math.pow(-2*raw+2,2)/2;
       const tilt=lerp(64,44,p);
       persp.style.opacity=lerp(1,0.6,p);
-      g3d.style.transform='translate(-50%,-50%) translate('+lerp(20,-30,p)+'px,'+lerp(100,140,p)+'px) rotateX('+tilt+'deg) rotateZ('+lerp(-22,-6,p)+'deg) scale('+lerp(0.84,0.96,p)+')';
+      g3d.style.transform='translate(-50%,-50%) translate('+lerp(30,-30,p)+'px,'+lerp(40,70,p)+'px) rotateX('+tilt+'deg) rotateZ('+lerp(-22,-6,p)+'deg) scale('+lerp(1.05,1.2,p)+')';
       const tx=lerp(-GCINE_LAYOUT.cx*0.3,GCINE_LAYOUT.cx*0.62,p);
       const ty=lerp(-GCINE_LAYOUT.cy-20,GCINE_LAYOUT.cy-4,p)+Math.sin(p*Math.PI*3)*26;
       const roll=p*1180;
@@ -6749,10 +6765,10 @@ const app={
         const label=el.querySelector('.gcine-key-label');
         top.style.background=glow>0.04
           ?'linear-gradient(150deg,rgba(255,122,77,'+(0.25+glow*0.75)+'),rgba(255,74,28,'+(0.3+glow*0.7)+'))'
-          :passed?'linear-gradient(150deg,#2b241d,#211b16)':'linear-gradient(150deg,#231e19,#1a1611)';
-        top.style.borderColor=glow>0.04?'rgba(255,190,160,.55)':passed?'rgba(255,122,77,.22)':'rgba(255,255,255,.07)';
-        top.style.boxShadow=glow>0.04?'0 0 '+(18+glow*40)+'px rgba(255,74,28,'+(0.35+glow*0.45)+'), inset 0 1px 0 rgba(255,255,255,.25)':'inset 0 1px 0 rgba(255,255,255,.05)';
-        label.style.color=glow>0.04?'#fff':passed?'rgba(255,178,150,.5)':'rgba(255,255,255,.28)';
+          :passed?'linear-gradient(150deg,#fff3ee,#ffe8df)':'linear-gradient(150deg,#ffffff,#F4F1EA)';
+        top.style.borderColor=glow>0.04?'rgba(255,190,160,.55)':passed?'rgba(255,77,46,.25)':'#E7E1D5';
+        top.style.boxShadow=glow>0.04?'0 0 '+(14+glow*32)+'px rgba(255,74,28,'+(0.28+glow*0.35)+'), inset 0 1px 0 rgba(255,255,255,.6)':'inset 0 1px 0 #fff';
+        label.style.color=glow>0.04?'#fff':passed?'rgba(255,77,46,.55)':'#B5AE9F';
       });
       traveler.style.transform='translate3d('+tx+'px,'+ty+'px,'+(GCINE_LIFT+GCINE_KH/2+4)+'px) rotateX(90deg) rotateZ('+roll+'deg)';
       hero.style.transform='translateY('+(-p*90)+'px)';
