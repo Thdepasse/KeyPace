@@ -62,7 +62,6 @@ async function myReview(req, res) {
     return res.status(400).json({ error: 'Note invalide (1 à 5).' });
   }
   const text = String(comment || '').trim().slice(0, 2000);
-  if (!text) return res.status(400).json({ error: 'Commentaire manquant.' });
 
   const up = await sb('/reviews?on_conflict=user_id', {
     method: 'POST',

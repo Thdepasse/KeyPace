@@ -4361,7 +4361,7 @@ const app={
     const N=items.length;
     if(!N)return;
     const loop=items.concat(items).concat(items);
-    grid.innerHTML=loop.map(it=>`<div class="review-slide"><div class="review-card"><div class="review-stars">${stars(it.rating)}</div><p>${esc(it.comment)}</p><div class="review-author">${esc(it.author_name)}</div></div></div>`).join('');
+    grid.innerHTML=loop.map(it=>`<div class="review-slide"><div class="review-card"><div class="review-stars">${stars(it.rating)}</div>${it.comment?`<p>${esc(it.comment)}</p>`:''}<div class="review-author">${esc(it.author_name)}</div></div></div>`).join('');
     const slides=()=>[...grid.children];
     let index=N;
     const SLIDE_PCT=84, OFFSET_PCT=(100-SLIDE_PCT)/2; // garder en phase avec .review-slide{flex:0 0 84%}
@@ -9182,7 +9182,7 @@ const app={
       <div style="display:flex;gap:6px;margin-bottom:12px;font-size:26px">
         ${[1,2,3,4,5].map(n=>`<span onclick="app.setReviewStar(${n})" style="cursor:pointer;opacity:.35" id="rstar-${n}">★</span>`).join('')}
       </div>
-      <textarea id="review-comment" rows="3" maxlength="2000" placeholder="Qu'est-ce qui t'a aidé avec KeyPace ?" style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px;font-family:inherit;font-size:14px;resize:vertical"></textarea>
+      <textarea id="review-comment" rows="3" maxlength="2000" placeholder="Qu'est-ce qui t'a aidé avec KeyPace ? (optionnel)" style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px;font-family:inherit;font-size:14px;resize:vertical"></textarea>
       <div style="margin-top:10px"><button class="btn-primary" style="padding:9px 18px;font-size:14px" onclick="app.submitReview()">Envoyer mon avis</button></div>`);
   },
   setReviewStar(n){
@@ -9193,7 +9193,6 @@ const app={
     const rating=this._reviewStar||0;
     const comment=(document.getElementById('review-comment')||{}).value||'';
     if(!rating){alert('Choisis une note de 1 à 5 étoiles.');return;}
-    if(!comment.trim()){alert('Ajoute un petit commentaire.');return;}
     try{
       const r=await fetch('/api/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,rating,comment:comment.trim()})});
       if(!r.ok){const d=await r.json().catch(()=>({}));alert(d.error||"Erreur lors de l'envoi.");return;}
