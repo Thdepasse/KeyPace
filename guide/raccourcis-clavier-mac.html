@@ -61,7 +61,7 @@
     {
       "@type": "Question",
       "name": "Comment taper le symbole € sur un clavier Mac belge ou français ?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Le plus souvent avec ⌥ (Option) + E. Si ça ne fonctionne pas, ouvre la Visionneuse de clavier (Réglages Système > Clavier) pour voir la combinaison exacte de ta disposition." }
+      "acceptedAnswer": { "@type": "Answer", "text": "Avec ⌥ (Option) + $ — la touche $ * € juste à côté de la touche Entrée sur un clavier AZERTY. Si ça ne fonctionne pas, ouvre la Visionneuse de clavier (Réglages Système > Clavier) pour voir la combinaison exacte de ta disposition." }
     },
     {
       "@type": "Question",
@@ -80,7 +80,7 @@
   :root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:820px;margin:0 auto;padding:0 22px}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 22px}
   a{color:var(--accent);text-decoration:none}
   a:hover{text-decoration:underline}
   h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1}
@@ -123,6 +123,16 @@
   footer a{color:var(--muted)}
   .final-cta{background:linear-gradient(135deg,#FFEDE8,#FFF6F2);border:1px solid var(--border);border-radius:22px;padding:28px 24px;text-align:center;margin:20px 0}
   .final-cta h2{margin-top:0}
+  .shortcut-search{margin:20px 0 6px}
+  .shortcut-search input{width:100%;padding:14px 18px;border:1.5px solid var(--border);border-radius:14px;background:var(--card);font-size:16px;font-family:inherit;color:var(--txt)}
+  .shortcut-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,.14)}
+  .kb-search-count{display:block;margin-top:8px;font-size:13px;color:var(--muted)}
+  .kb-no-results{display:none;text-align:center;color:var(--muted);padding:18px 0;font-size:14.5px}
+  .table-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin:14px 0}
+  .tcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 22px}
+  .tcard h3{margin:0 0 10px;font-size:17px}
+  .tcard table{margin:0}
+  .tcard p.tip{font-size:13.5px;color:var(--muted);margin:10px 0 0}
 </style>
 </head>
 <body>
@@ -144,76 +154,88 @@
     <h1>Raccourcis clavier Mac : la liste complète</h1>
     <p class="lead">Copier-coller, captures d'écran, navigation, Finder... et les subtilités propres au clavier AZERTY belge et français (accents, œ, €). De quoi gagner de vraies minutes chaque jour.</p>
     <div class="cta-row">
-      <a class="btn" href="/">S'entraîner sur AZERTY</a>
+      <a class="btn js-cta-primary" href="/">S'entraîner sur AZERTY</a>
       <a class="btn ghost" href="/guide/raccourcis-clavier-windows">Version Windows</a>
     </div>
+    <div class="callout" id="os-smart-banner" style="display:none"></div>
   </div>
 
-  <section>
-    <h2>Les raccourcis universels à connaître</h2>
-    <p>Ce sont les incontournables, valables dans presque toutes les applications macOS (Safari, Mail, Pages, Finder...).</p>
-    <table>
-      <thead><tr><th>Action</th><th>Raccourci</th></tr></thead>
-      <tbody>
-        <tr><td>Copier</td><td><kbd>⌘</kbd> + <kbd>C</kbd></td></tr>
-        <tr><td>Coller</td><td><kbd>⌘</kbd> + <kbd>V</kbd></td></tr>
-        <tr><td>Couper</td><td><kbd>⌘</kbd> + <kbd>X</kbd></td></tr>
-        <tr><td>Annuler</td><td><kbd>⌘</kbd> + <kbd>Z</kbd></td></tr>
-        <tr><td>Rétablir</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>Z</kbd></td></tr>
-        <tr><td>Tout sélectionner</td><td><kbd>⌘</kbd> + <kbd>A</kbd></td></tr>
-        <tr><td>Rechercher</td><td><kbd>⌘</kbd> + <kbd>F</kbd></td></tr>
-        <tr><td>Enregistrer</td><td><kbd>⌘</kbd> + <kbd>S</kbd></td></tr>
-        <tr><td>Imprimer</td><td><kbd>⌘</kbd> + <kbd>P</kbd></td></tr>
-        <tr><td>Nouvelle fenêtre / onglet</td><td><kbd>⌘</kbd>+<kbd>N</kbd> / <kbd>⌘</kbd>+<kbd>T</kbd></td></tr>
-        <tr><td>Fermer la fenêtre</td><td><kbd>⌘</kbd> + <kbd>W</kbd></td></tr>
-        <tr><td>Quitter l'application</td><td><kbd>⌘</kbd> + <kbd>Q</kbd></td></tr>
-      </tbody>
-    </table>
-  </section>
+  <div class="shortcut-search">
+    <input type="search" id="kb-search" placeholder="Rechercher un raccourci (ex. capture d'écran, copier, €...)" aria-label="Rechercher un raccourci clavier">
+    <span class="kb-search-count" id="kb-search-count"></span>
+  </div>
+  <p class="kb-no-results" id="kb-no-results">Aucun raccourci trouvé pour cette recherche.</p>
 
   <section>
-    <h2>Naviguer entre applications et fenêtres</h2>
-    <table>
-      <thead><tr><th>Action</th><th>Raccourci</th></tr></thead>
-      <tbody>
-        <tr><td>Changer d'application</td><td><kbd>⌘</kbd> + <kbd>Tab</kbd></td></tr>
-        <tr><td>Changer de fenêtre (même app)</td><td><kbd>⌘</kbd> + <kbd>`</kbd></td></tr>
-        <tr><td>Ouvrir Spotlight (recherche)</td><td><kbd>⌘</kbd> + <kbd>Espace</kbd></td></tr>
-        <tr><td>Masquer l'application</td><td><kbd>⌘</kbd> + <kbd>H</kbd></td></tr>
-        <tr><td>Réduire la fenêtre</td><td><kbd>⌘</kbd> + <kbd>M</kbd></td></tr>
-        <tr><td>Mission Control (vue d'ensemble)</td><td><kbd>Ctrl</kbd> + <kbd>↑</kbd></td></tr>
-        <tr><td>Forcer à quitter une application</td><td><kbd>⌘</kbd> + <kbd>⌥</kbd> + <kbd>Échap</kbd></td></tr>
-      </tbody>
-    </table>
-  </section>
+    <h2>Tous les raccourcis à connaître</h2>
+    <p>Regroupés par thème : les incontournables, la navigation entre applications, les captures d'écran et le Finder.</p>
+    <div class="table-grid">
+      <div class="tcard">
+        <h3>Les incontournables</h3>
+        <table>
+          <thead><tr><th>Action</th><th>Raccourci</th></tr></thead>
+          <tbody>
+            <tr><td>Copier</td><td><kbd>⌘</kbd> + <kbd>C</kbd></td></tr>
+            <tr><td>Coller</td><td><kbd>⌘</kbd> + <kbd>V</kbd></td></tr>
+            <tr><td>Couper</td><td><kbd>⌘</kbd> + <kbd>X</kbd></td></tr>
+            <tr><td>Annuler</td><td><kbd>⌘</kbd> + <kbd>Z</kbd></td></tr>
+            <tr><td>Rétablir</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>Z</kbd></td></tr>
+            <tr><td>Tout sélectionner</td><td><kbd>⌘</kbd> + <kbd>A</kbd></td></tr>
+            <tr><td>Rechercher</td><td><kbd>⌘</kbd> + <kbd>F</kbd></td></tr>
+            <tr><td>Enregistrer</td><td><kbd>⌘</kbd> + <kbd>S</kbd></td></tr>
+            <tr><td>Imprimer</td><td><kbd>⌘</kbd> + <kbd>P</kbd></td></tr>
+            <tr><td>Nouvelle fenêtre / onglet</td><td><kbd>⌘</kbd>+<kbd>N</kbd> / <kbd>⌘</kbd>+<kbd>T</kbd></td></tr>
+            <tr><td>Fermer la fenêtre</td><td><kbd>⌘</kbd> + <kbd>W</kbd></td></tr>
+            <tr><td>Quitter l'application</td><td><kbd>⌘</kbd> + <kbd>Q</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
 
-  <section>
-    <h2>Captures d'écran sur Mac</h2>
-    <table>
-      <thead><tr><th>Action</th><th>Raccourci</th></tr></thead>
-      <tbody>
-        <tr><td>Capturer tout l'écran</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>3</kbd></td></tr>
-        <tr><td>Capturer une zone choisie</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>4</kbd></td></tr>
-        <tr><td>Capturer une fenêtre précise</td><td><kbd>⌘</kbd>+<kbd>⇧</kbd>+<kbd>4</kbd> puis <kbd>Espace</kbd></td></tr>
-        <tr><td>Barre d'outils de capture (+ vidéo)</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>5</kbd></td></tr>
-      </tbody>
-    </table>
-    <p>Par défaut, les captures atterrissent sur le Bureau. Astuce : après une capture, une miniature apparaît en bas à droite — clique-la avant qu'elle ne disparaisse pour l'annoter ou la partager directement.</p>
-  </section>
+      <div class="tcard">
+        <h3>Naviguer entre applications et fenêtres</h3>
+        <table>
+          <thead><tr><th>Action</th><th>Raccourci</th></tr></thead>
+          <tbody>
+            <tr><td>Changer d'application</td><td><kbd>⌘</kbd> + <kbd>Tab</kbd></td></tr>
+            <tr><td>Changer de fenêtre (même app)</td><td><kbd>⌘</kbd> + <kbd>`</kbd></td></tr>
+            <tr><td>Ouvrir Spotlight (recherche)</td><td><kbd>⌘</kbd> + <kbd>Espace</kbd></td></tr>
+            <tr><td>Masquer l'application</td><td><kbd>⌘</kbd> + <kbd>H</kbd></td></tr>
+            <tr><td>Réduire la fenêtre</td><td><kbd>⌘</kbd> + <kbd>M</kbd></td></tr>
+            <tr><td>Mission Control (vue d'ensemble)</td><td><kbd>Ctrl</kbd> + <kbd>↑</kbd></td></tr>
+            <tr><td>Forcer à quitter une application</td><td><kbd>⌘</kbd> + <kbd>⌥</kbd> + <kbd>Échap</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
 
-  <section>
-    <h2>Dans le Finder</h2>
-    <table>
-      <thead><tr><th>Action</th><th>Raccourci</th></tr></thead>
-      <tbody>
-        <tr><td>Nouveau dossier</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>N</kbd></td></tr>
-        <tr><td>Aperçu rapide d'un fichier</td><td><kbd>Espace</kbd></td></tr>
-        <tr><td>Mettre à la corbeille</td><td><kbd>⌘</kbd> + <kbd>Suppr</kbd></td></tr>
-        <tr><td>Vider la corbeille</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>Suppr</kbd></td></tr>
-        <tr><td>Afficher les fichiers cachés</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>.</kbd></td></tr>
-        <tr><td>Obtenir des informations</td><td><kbd>⌘</kbd> + <kbd>I</kbd></td></tr>
-      </tbody>
-    </table>
+      <div class="tcard">
+        <h3>Captures d'écran</h3>
+        <table>
+          <thead><tr><th>Action</th><th>Raccourci</th></tr></thead>
+          <tbody>
+            <tr><td>Capturer tout l'écran</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>3</kbd></td></tr>
+            <tr><td>Capturer une zone choisie</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>4</kbd></td></tr>
+            <tr><td>Capturer une fenêtre précise</td><td><kbd>⌘</kbd>+<kbd>⇧</kbd>+<kbd>4</kbd> puis <kbd>Espace</kbd></td></tr>
+            <tr><td>Barre d'outils de capture (+ vidéo)</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>5</kbd></td></tr>
+          </tbody>
+        </table>
+        <p class="tip">Par défaut, les captures atterrissent sur le Bureau. Astuce : clique la miniature en bas à droite avant qu'elle ne disparaisse pour l'annoter ou la partager.</p>
+      </div>
+
+      <div class="tcard">
+        <h3>Dans le Finder</h3>
+        <table>
+          <thead><tr><th>Action</th><th>Raccourci</th></tr></thead>
+          <tbody>
+            <tr><td>Nouveau dossier</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>N</kbd></td></tr>
+            <tr><td>Aperçu rapide d'un fichier</td><td><kbd>Espace</kbd></td></tr>
+            <tr><td>Mettre à la corbeille</td><td><kbd>⌘</kbd> + <kbd>Suppr</kbd></td></tr>
+            <tr><td>Vider la corbeille</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>Suppr</kbd></td></tr>
+            <tr><td>Afficher les fichiers cachés</td><td><kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>.</kbd></td></tr>
+            <tr><td>Obtenir des informations</td><td><kbd>⌘</kbd> + <kbd>I</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </section>
 
   <section>
@@ -243,11 +265,11 @@
       <tbody>
         <tr><td>œ</td><td><kbd>⌥</kbd> (Option) + <kbd>O</kbd></td></tr>
         <tr><td>Œ</td><td><kbd>⌥</kbd> + <kbd>⇧</kbd> + <kbd>O</kbd></td></tr>
-        <tr><td>€ (euro)</td><td><kbd>⌥</kbd> + <kbd>E</kbd> *</td></tr>
+        <tr><td>€ (euro)</td><td><kbd>⌥</kbd> + <kbd>$</kbd> *</td></tr>
         <tr><td>Voir les variantes d'un accent (â, ä, á...)</td><td>Maintenir la touche <kbd>E</kbd> (ou toute voyelle) enfoncée</td></tr>
       </tbody>
     </table>
-    <p style="font-size:13px;color:var(--muted)">* La combinaison du symbole € peut varier légèrement selon que macOS est réglé sur la disposition « Français » ou « Belge ». En cas de doute, ouvre <strong>Réglages Système → Clavier → Saisie de texte → Visionneuse de clavier</strong> : elle affiche en direct quel caractère produit chaque touche selon les touches de modification (⌥, ⇧) enfoncées.</p>
+    <p style="font-size:13px;color:var(--muted)">* La touche $ * € se trouve juste à côté de la touche Entrée sur un clavier AZERTY. En cas de doute sur ta disposition exacte, ouvre <strong>Réglages Système → Clavier → Saisie de texte → Visionneuse de clavier</strong> : elle affiche en direct quel caractère produit chaque touche selon les touches de modification (⌥, ⇧) enfoncées.</p>
   </section>
 
   <section>
@@ -268,7 +290,7 @@
     </details>
     <details>
       <summary>Comment taper le symbole € sur un clavier Mac belge ou français ?</summary>
-      <p>Généralement avec ⌥ (Option) + E. En cas de doute, vérifie via la Visionneuse de clavier dans Réglages Système → Clavier.</p>
+      <p>Avec ⌥ (Option) + $, la touche juste à côté de la touche Entrée sur un clavier AZERTY. En cas de doute, vérifie via la Visionneuse de clavier dans Réglages Système → Clavier.</p>
     </details>
     <details>
       <summary>Quelle est la différence entre ⌘ (Cmd) et Ctrl sur Mac ?</summary>
@@ -283,7 +305,7 @@
   <div class="final-cta">
     <h2>Les raccourcis font gagner des secondes. La frappe à dix doigts, des heures.</h2>
     <p style="color:var(--muted);max-width:46ch;margin:0 auto 18px">Apprends à taper vite et sans regarder le clavier, gratuitement pour commencer.</p>
-    <a class="btn" href="/">Commencer gratuitement →</a>
+    <a class="btn js-cta-primary" href="/">Commencer gratuitement →</a>
   </div>
 </div>
 
@@ -297,5 +319,49 @@
     <a href="/mentions-legales">Mentions légales</a>
   </div>
 </footer>
+<script>
+(function(){
+  var input=document.getElementById('kb-search');
+  var countEl=document.getElementById('kb-search-count');
+  var noResults=document.getElementById('kb-no-results');
+  if(input){
+    var norm=function(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');};
+    var filter=function(){
+      var q=norm(input.value.trim());
+      var totalShown=0;
+      document.querySelectorAll('.wrap table tbody tr').forEach(function(tr){
+        var match=!q||norm(tr.textContent).indexOf(q)!==-1;
+        tr.style.display=match?'':'none';
+        if(match)totalShown++;
+      });
+      document.querySelectorAll('.wrap table').forEach(function(table){
+        var visible=table.querySelectorAll('tbody tr:not([style*="display: none"])').length;
+        var card=table.closest('.tcard');
+        if(card)card.style.display=visible?'':'none';
+        else table.style.display=visible?'':'none';
+      });
+      if(countEl)countEl.textContent=q?(totalShown+' résultat'+(totalShown===1?'':'s')):'';
+      if(noResults)noResults.style.display=(q&&totalShown===0)?'':'none';
+    };
+    input.addEventListener('input',filter);
+  }
+  // CTA intelligent : élève déjà inscrit → on l'invite à reprendre plutôt qu'à commencer
+  try{
+    var s=JSON.parse(localStorage.getItem('klak_session')||'{}');
+    if(s&&s.username){
+      document.querySelectorAll('.js-cta-primary').forEach(function(el){el.textContent='Reprendre mes leçons →';});
+    }
+  }catch(e){}
+  // CTA intelligent : suggère le guide Windows si le visiteur ne semble pas être sur Mac
+  try{
+    var isWin=/Windows/.test(navigator.userAgent||'');
+    var banner=document.getElementById('os-smart-banner');
+    if(banner&&isWin){
+      banner.style.display='';
+      banner.innerHTML='<p style="margin:0">🪟 On dirait que tu es sur <strong>Windows</strong> plutôt que Mac. Les raccourcis ne sont pas les mêmes : <a href="/guide/raccourcis-clavier-windows">voir le guide Windows →</a></p>';
+    }
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
