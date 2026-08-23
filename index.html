@@ -5533,8 +5533,13 @@ const app={
         if(!s.drag)return;
         const t=s.drag;t.grabbed=false;s.drag=null;
         const z=this._sourisZoneAt(t.x,t.y);
-        if(z===t.color){s.score++;s.hit++;s.targets=s.targets.filter(x=>x!==t);playSound('hit');this._sourisFlash('#1FA971');}
-        else{s.miss++;s.score=Math.max(0,s.score-1);playSound('miss');this._sourisFlash('#E5484D');t.x=t.hx;t.y=t.hy;}
+        if(z===t.color){
+          s.score++;s.hit++;s.streak=(s.streak||0)+1;s.lastReaction=Date.now()-t.born;
+          s.targets=s.targets.filter(x=>x!==t);playSound('hit');this._sourisFlash('#1FA971');
+        } else {
+          s.miss++;s.streak=0;s.score=Math.max(0,s.score-1);
+          playSound('miss');this._sourisFlash('#E5484D');t.x=t.hx;t.y=t.hy;
+        }
       };
     }
   },
@@ -5578,6 +5583,7 @@ const app={
     const core=!!c.core&&this._sourisInCore(t,s.mx,s.my);
     s.score+=(core?3:1)*mult;
     s.hit++;playSound('hit');
+    s.lastReaction=Date.now()-t.born;
     if(core){
       s.streak=(s.streak||0)+1;
       s.cores=(s.cores||0)+1;
@@ -5585,8 +5591,13 @@ const app={
         s.lives++;s.regen=(s.regen||0)+1;
         this._sourisFlash('#FFD84D');this._sourisRegenPop();
       }else this._sourisFlash('#FFD84D');
-    }else{
+    }else if(c.core){
+      // Niveaux à cœur : seul un cœur enchaîne la série, un bord la casse.
       s.streak=0;
+      this._sourisFlash('#1FA971');
+    }else{
+      // Niveaux sans cœur (Clic, etc.) : chaque cible réussie enchaîne.
+      s.streak=(s.streak||0)+1;
       this._sourisFlash('#1FA971');
     }
     s.targets=s.targets.filter(x=>x!==t);
@@ -5599,25 +5610,19 @@ const app={
     return Math.sqrt(dx*dx+dy*dy)<=t.r*frac;
   },
 
+  // Déclaratif (comme _sourisHoverPop) : _sourisPaint() réécrit tout le
+  // canevas à chaque tick, donc un nœud ajouté ici disparaîtrait avant même
+  // sa transition CSS. On stocke l'état, _sourisPaint() dessine la position/
+  // opacité courantes à partir de `until`.
   _sourisPop(txt,color){
-    const a=this._sourisArena;if(!a)return;
-    const d=document.createElement('div');
-    d.textContent=txt;
-    d.style.cssText='position:absolute;left:'+(this.souris.mx||50)+'%;top:'+(this.souris.my||50)+'%;transform:translate(-50%,-50%);color:'+color+';font-family:JetBrains Mono,monospace;font-weight:800;font-size:22px;text-shadow:0 3px 12px rgba(0,0,0,.6);pointer-events:none;z-index:6;transition:all .6s ease-out';
-    a.appendChild(d);
-    setTimeout(()=>{d.style.top=(this.souris.my-12||38)+'%';d.style.opacity='0';},30);
-    setTimeout(()=>{d.remove();},640);
+    const s=this.souris;
+    s.pop={txt,color,x:s.mx||50,y:s.my||50,born:Date.now(),until:Date.now()+640};
   },
 
   // Le cœur : tiers central du rayon (aire ~11% du disque) — il faut vraiment viser.
   _sourisRegenPop(){
-    const a=this._sourisArena;if(!a)return;
-    const d=document.createElement('div');
-    d.textContent='+1 ♥';
-    d.style.cssText='position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);color:#FFD84D;font-family:JetBrains Mono,monospace;font-weight:800;font-size:34px;text-shadow:0 4px 18px rgba(0,0,0,.6);pointer-events:none;z-index:5;transition:all .7s ease-out';
-    a.appendChild(d);
-    setTimeout(()=>{d.style.top='24%';d.style.opacity='0';},30);
-    setTimeout(()=>{d.remove();},760);
+    const s=this.souris;
+    s.regenPop={born:Date.now(),until:Date.now()+760};
   },
 
   _sourisFlash(color){
@@ -5777,7 +5782,7 @@ const app={
     if(c.drag){
       const gone=(s.targets||[]).filter(t=>now-t.born>8000&&t!==s.drag);
       if(gone.length)playSound('miss');
-      gone.forEach(()=>{s.miss++;this._sourisLoseLife();});
+      gone.forEach(()=>{s.miss++;s.streak=0;this._sourisLoseLife();});
       s.targets=(s.targets||[]).filter(t=>!(now-t.born>8000&&t!==s.drag));
     }
     // Expiration : laisser filer une cible utile coûte une vie. Une cible
@@ -5808,9 +5813,11 @@ const app={
       (s.targets||[]).forEach(t=>{
         const dx=(t.x-p.x)*1.6, dy=t.y-p.y;
         if(Math.sqrt(dx*dx+dy*dy)<t.r){
+          if(!t._enteredAt)t._enteredAt=now;
           t.hover+=50;
           if(t.hover>=400){
-            s.score++;s.hit++;
+            s.score++;s.hit++;s.streak=(s.streak||0)+1;
+            s.lastReaction=t._enteredAt-t.born;
             s.targets=s.targets.filter(x=>x!==t);
             playSound('hit');this._sourisFlash('#1FA971');
             this._sourisCheck();
@@ -5905,7 +5912,7 @@ const app={
       const age=now-t.born;
       if(c.drag){
         const sz=t.r*2;
-        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${t.color};border-radius:${t.shape==='circle'?'50%':'8px'};box-shadow:0 6px 18px rgba(0,0,0,.4)${t.grabbed?';outline:3px solid #fff':''};cursor:${t.grabbed?'grabbing':'grab'}"></div>`;
+        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:linear-gradient(160deg,${t.color},${t.color}cc);border-radius:${t.shape==='circle'?'50%':'8px'};box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),0 6px 18px rgba(0,0,0,.4)${t.grabbed?';outline:3px solid #fff':''};cursor:${t.grabbed?'grabbing':'grab'}"></div>`;
         return;
       }
       if(t.pad){
@@ -5939,10 +5946,11 @@ const app={
       const left=Math.max(0,1-age/t.life);
       const sz=t.r*2*(.55+left*.45);
       const col=t.bad?(t.disguised?'#D98A3D':'#E5484D'):'#1FA971';
+      const grad=t.bad?(t.disguised?'radial-gradient(circle at 35% 30%,#F0BE7E,#D98A3D 70%)':'radial-gradient(circle at 35% 30%,#F28B8B,#E5484D 70%)'):'radial-gradient(circle at 35% 30%,#4EE0A0,#1FA971 70%)';
       const mark=t.bad&&!t.disguised?'✕':'';
       const frac=c.smaller?0.26:0.30;
       const core=(c.core&&!t.bad)?`<div style="position:absolute;left:50%;top:50%;width:${frac*2*100}%;height:${frac*2*100}%;transform:translate(-50%,-50%);border-radius:50%;background:#FFD84D;box-shadow:0 0 8px #FFD84D"></div>`:'';
-      html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${col};border-radius:50%;box-shadow:0 0 ${t.bad?'20':'16'}px ${col}88;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${mark}${core}</div>`;
+      html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${grad};border-radius:50%;box-shadow:inset 0 -2px 0 rgba(0,0,0,.15),0 0 ${t.bad?'20':'16'}px ${col}88;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${mark}${core}</div>`;
     });
     if(c.hover&&s.judge&&s.judge.until>now){
       const j=s.judge;
@@ -5951,6 +5959,14 @@ const app={
         <div class="gsouris-judge-pill${j.isBonus?' bonus':''}">${j.sub}</div>
       </div>`;
     }
+    if(s.pop&&s.pop.until>now){
+      const p=s.pop, frac=Math.max(0,Math.min(1,(now-p.born)/(p.until-p.born)));
+      html+=`<div style="position:absolute;left:${p.x}%;top:${p.y-frac*12}%;transform:translate(-50%,-50%);color:${p.color};font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;text-shadow:0 3px 12px rgba(0,0,0,.6);opacity:${1-frac};pointer-events:none;z-index:6">${p.txt}</div>`;
+    }
+    if(s.regenPop&&s.regenPop.until>now){
+      const p=s.regenPop, frac=Math.max(0,Math.min(1,(now-p.born)/(p.until-p.born)));
+      html+=`<div style="position:absolute;left:50%;top:${38-frac*14}%;transform:translate(-50%,-50%);color:#FFD84D;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:34px;text-shadow:0 4px 18px rgba(0,0,0,.6);opacity:${1-frac};pointer-events:none;z-index:5">+1 ♥</div>`;
+    }
     if(c.move||c.pads){
       html+=`<div style="position:absolute;left:${s.player.x}%;top:${s.player.y}%;width:5%;aspect-ratio:1;transform:translate(-50%,-50%);background:#fff;border-radius:50%;box-shadow:0 0 14px rgba(255,255,255,.7);opacity:${s._inv?.4:1};display:flex;align-items:center;justify-content:center;font-size:12px">🙂</div>`;
     }
@@ -5958,9 +5974,11 @@ const app={
       html+=`<div style="position:absolute;left:12px;top:10px;background:#3B82F6;color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:14px;font-family:JetBrains Mono,monospace">×${s.mult} ${Math.ceil((s.multUntil-now)/1000)}s</div>`;
     }
     if(c.core&&(s.streak||0)>0){
+      // Le compte de série est déjà affiché dans le pied de partie ; ces
+      // points ne montrent que la progression fine vers le prochain +1 ♥.
       const dots=[0,1,2,3,4].map(i=>`<span style="width:7px;height:7px;border-radius:50%;background:${i<(s.streak%5||5)?'#FFD84D':'rgba(255,255,255,.2)'}"></span>`).join('');
       html+=`<div style="position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);padding:6px 12px;border-radius:20px">
-        <span style="font-size:11px;font-weight:700;color:#FFD84D;letter-spacing:.04em">SÉRIE</span>${dots}
+        ${dots}
         ${s.lives>=3?'<span style="font-size:10px;color:rgba(255,255,255,.45)">vies au max</span>':'<span style="font-size:10px;color:rgba(255,255,255,.6)">5 = +1 ♥</span>'}
       </div>`;
     }
