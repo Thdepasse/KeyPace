@@ -547,6 +547,11 @@ alter table reviews enable row level security;
 alter table reviews add column if not exists external_id text;
 create unique index if not exists reviews_source_external_idx on reviews(source, external_id);
 
+-- Un avis "published" compte toujours dans la moyenne/le total affichés sur
+-- la home, mais show_card=false permet de l'exclure des cartes témoignages
+-- (avis réel qu'on préfère ne pas mettre en avant textuellement).
+alter table reviews add column if not exists show_card boolean not null default true;
+
 -- ───────────────────────────────────────────────────────────────
 -- Analytics maison (remplace Umami Cloud, août 2026).
 -- Un événement = une pageview ('event_name'='pageview') ou un événement

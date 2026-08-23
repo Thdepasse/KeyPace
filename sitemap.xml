@@ -1,22 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
     <url>
           <loc>https://keypace.be/</loc>
-          <lastmod>2026-08-20</lastmod>
+          <lastmod>2026-08-21</lastmod>
           <changefreq>weekly</changefreq>
           <priority>1.0</priority>
+          <image:image>
+                <image:loc>https://keypace.be/images/keypace-accueil-hero.png</image:loc>
+                <image:title>KeyPace - apprendre à taper vite sur clavier AZERTY</image:title>
+                <image:caption>Page d'accueil de KeyPace, application gratuite d'apprentissage de la frappe au clavier AZERTY</image:caption>
+          </image:image>
     </url>
     <url>
           <loc>https://keypace.be/test-vitesse-frappe</loc>
-          <lastmod>2026-08-16</lastmod>
+          <lastmod>2026-08-21</lastmod>
           <changefreq>monthly</changefreq>
           <priority>0.9</priority>
+          <image:image>
+                <image:loc>https://keypace.be/images/keypace-test-vitesse-frappe.png</image:loc>
+                <image:title>Test de vitesse de frappe KeyPace</image:title>
+                <image:caption>Test de vitesse de frappe KeyPace : mots par minute et précision sur clavier AZERTY</image:caption>
+          </image:image>
     </url>
     <url>
           <loc>https://keypace.be/cours-dactylographie</loc>
-          <lastmod>2026-08-16</lastmod>
+          <lastmod>2026-08-21</lastmod>
           <changefreq>monthly</changefreq>
           <priority>0.9</priority>
+          <image:image>
+                <image:loc>https://keypace.be/images/keypace-lecons-azerty.png</image:loc>
+                <image:title>Cours de dactylographie KeyPace</image:title>
+                <image:caption>Cours de dactylographie KeyPace : leçons progressives pour apprendre à taper sur clavier AZERTY</image:caption>
+          </image:image>
     </url>
     <url>
           <loc>https://keypace.be/ebook-gratuit-dactylographie</loc>
@@ -32,9 +47,14 @@
     </url>
     <url>
           <loc>https://keypace.be/jeux-dactylo</loc>
-          <lastmod>2026-08-20</lastmod>
+          <lastmod>2026-08-21</lastmod>
           <changefreq>monthly</changefreq>
           <priority>0.8</priority>
+          <image:image>
+                <image:loc>https://keypace.be/images/keypace-jeux-dactylo.png</image:loc>
+                <image:title>Jeux de dactylo KeyPace</image:title>
+                <image:caption>Jeux de dactylo KeyPace pour s'entraîner à taper vite sur clavier AZERTY</image:caption>
+          </image:image>
     </url>
     <url>
           <loc>https://keypace.be/ecoles</loc>
@@ -137,6 +157,18 @@
           <lastmod>2026-08-16</lastmod>
           <changefreq>monthly</changefreq>
           <priority>0.6</priority>
+    </url>
+    <url>
+          <loc>https://keypace.be/guide/raccourcis-clavier-mac</loc>
+          <lastmod>2026-08-22</lastmod>
+          <changefreq>monthly</changefreq>
+          <priority>0.75</priority>
+    </url>
+    <url>
+          <loc>https://keypace.be/guide/raccourcis-clavier-windows</loc>
+          <lastmod>2026-08-22</lastmod>
+          <changefreq>monthly</changefreq>
+          <priority>0.75</priority>
     </url>
     <url>
           <loc>https://keypace.be/conditions</loc>

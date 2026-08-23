@@ -32,11 +32,14 @@ function queryParam(req, name) {
 }
 
 async function listPublished(req, res) {
-  const r = await sb('/reviews?select=author_name,rating,comment,published_at&status=eq.published&order=published_at.desc&limit=30');
+  const r = await sb('/reviews?select=author_name,rating,comment,published_at,show_card&status=eq.published&order=published_at.desc&limit=30');
   if (!r.ok) return res.status(500).json({ error: 'Erreur récupération avis.' });
-  const items = r.data || [];
-  const count = items.length;
-  const average = count ? Math.round((items.reduce((a, it) => a + it.rating, 0) / count) * 10) / 10 : 0;
+  const all = r.data || [];
+  // count/average portent sur tous les avis publiés ; show_card=false permet
+  // d'avoir un avis réel qui compte dans la moyenne sans afficher sa carte.
+  const count = all.length;
+  const average = count ? Math.round((all.reduce((a, it) => a + it.rating, 0) / count) * 10) / 10 : 0;
+  const items = all.filter((it) => it.show_card !== false);
   return res.json({ items, count, average });
 }
 
@@ -59,7 +62,6 @@ async function myReview(req, res) {
     return res.status(400).json({ error: 'Note invalide (1 à 5).' });
   }
   const text = String(comment || '').trim().slice(0, 2000);
-  if (!text) return res.status(400).json({ error: 'Commentaire manquant.' });
 
   const up = await sb('/reviews?on_conflict=user_id', {
     method: 'POST',
