@@ -1049,6 +1049,58 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
   .course-lane-name{width:96px;font-size:11px}
 }
 
+/* PRÉCISION SOURIS (Visée) — écran d'accroche */
+.gsouris-intro{position:relative;padding:56px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;overflow:hidden}
+.gsouris-intro-ring{position:absolute;left:50%;top:50%;border:1px solid rgba(255,77,46,.22);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0}
+.gsouris-intro-ring.a{width:520px;height:520px}
+.gsouris-intro-ring.b{width:360px;height:360px;border-color:rgba(255,77,46,.32)}
+.gsouris-intro-kicker{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;letter-spacing:.4em;text-transform:uppercase;color:#FF9868}
+.gsouris-intro-title{position:relative;z-index:1;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(44px,9vw,88px);line-height:.94;letter-spacing:-.01em;text-transform:uppercase;color:#fff;margin:0;text-shadow:0 0 40px rgba(255,140,90,.5)}
+.gsouris-intro-sub{position:relative;z-index:1;color:rgba(255,255,255,.62);font-size:16px;line-height:1.6;max-width:440px;margin:0}
+.gsouris-intro-chips{position:relative;z-index:1;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:4px 0 6px}
+.gsouris-intro-chip{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.16);border-radius:999px;padding:9px 18px}
+.gsouris-intro-chip.accent{color:var(--accent);border-color:rgba(255,77,46,.5);background:rgba(255,77,46,.1)}
+/* HUD en jeu */
+.gsouris-life{width:13px;height:13px;transform:rotate(45deg);border-radius:3px;background:rgba(255,255,255,.14);display:inline-block}
+.gsouris-life.on{background:linear-gradient(160deg,#FF9868,#FF4D2E);box-shadow:0 0 8px rgba(255,77,46,.55)}
+.gsouris-section{position:relative;z-index:1;display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.gsouris-section::before,.gsouris-section::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,77,46,.4))}
+.gsouris-section::after{background:linear-gradient(90deg,rgba(255,77,46,.4),transparent)}
+.gsouris-section span{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11.5px;letter-spacing:.12em;color:#FF9868;white-space:nowrap}
+/* Reticle décoratif (survol) */
+.gsouris-reticle{position:absolute;inset:0;pointer-events:none;z-index:0}
+.gsouris-reticle-dash{position:absolute;left:50%;top:52%;width:130px;height:130px;transform:translate(-50%,-50%);border:1.5px dashed rgba(255,255,255,.1);border-radius:50%}
+.gsouris-chevron{position:absolute;width:10px;height:10px;border-top:2px solid rgba(255,255,255,.16);border-right:2px solid rgba(255,255,255,.16)}
+.gsouris-chevron.up{left:50%;top:14%;transform:translate(-50%,0) rotate(-45deg)}
+.gsouris-chevron.down{left:50%;bottom:16%;transform:translate(-50%,0) rotate(135deg)}
+.gsouris-chevron.left{left:6%;top:50%;transform:translate(0,-50%) rotate(-135deg)}
+.gsouris-chevron.right{right:6%;top:50%;transform:translate(0,-50%) rotate(45deg)}
+/* Cible cercles concentriques (survol) */
+.gsouris-target{position:absolute;aspect-ratio:1;transform:translate(-50%,-50%)}
+.gsouris-target-ring{position:absolute;inset:0;border:2px solid rgba(255,255,255,.18);border-radius:50%}
+.gsouris-target-prog{position:absolute;inset:9%;border-radius:50%}
+.gsouris-target-core{position:absolute;inset:22%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FF9868,#FF4D2E 70%);box-shadow:0 0 22px rgba(255,77,46,.55)}
+.gsouris-target-dot{position:absolute;inset:44%;border-radius:50%;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.85)}
+.gsouris-target-lock{position:absolute;left:50%;top:100%;margin-top:8px;transform:translateX(-50%);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:rgba(255,255,255,.5)}
+.gsouris-bonus-label{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:11px;letter-spacing:.04em;color:#FFD84D}
+/* Popup "TOUCHÉ" */
+.gsouris-judge{position:absolute;text-align:center;z-index:6;pointer-events:none;animation:gsourisPop .22s ease-out;transform:translate(-50%,-120%)}
+.gsouris-judge-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:rgba(255,255,255,.5);text-transform:uppercase}
+.gsouris-judge-pill{display:inline-flex;align-items:center;gap:6px;margin-top:2px;border-radius:999px;padding:5px 14px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff;background:rgba(255,77,46,.9)}
+.gsouris-judge-pill.bonus{background:rgba(255,216,77,.92);color:#16140F}
+@keyframes gsourisPop{0%{transform:translate(-50%,-90%) scale(.7);opacity:0}100%{transform:translate(-50%,-120%) scale(1);opacity:1}}
+/* Pied de partie : stats live + PTS DE L'OR + rejouer */
+.gsouris-footer{position:relative;z-index:1;display:flex;align-items:center;gap:26px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
+.gsouris-stat-label{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.1em;display:block;margin-bottom:2px}
+.gsouris-stat-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;color:#fff}
+.gsouris-stat-val.accent{color:var(--accent)}
+.gsouris-footer-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.gsouris-gold-left{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;color:rgba(255,255,255,.45)}
+.gsouris-replay{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:13px;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:8px 14px;cursor:pointer}
+.gsouris-replay:hover{background:rgba(255,255,255,.14)}
+@media(prefers-reduced-motion:reduce){.gsouris-judge{animation:none}}
+@media(max-width:640px){.gsouris-intro-title{font-size:clamp(34px,11vw,60px)}.gsouris-footer{gap:16px}.gsouris-footer-right{margin-left:0;width:100%;justify-content:space-between}}
+
 /* MAGIC TILES */
 .tiles-hud{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
 .tiles-hud-label{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.16em;margin-bottom:3px}
@@ -5338,18 +5390,23 @@ const app={
   _sourisRenderBrief(){
     const s=this.souris, l=this._sourisLevels[s.lvl-1];
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+      <div style="max-width:900px;margin:0 auto;padding:0 24px">
         <button onclick="app.souris={phase:'mouseMenu'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Niveaux</button>
-        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
-          <div style="font-size:52px">${l.icon}</div>
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Niveau ${l.n} — ${l.name}</h2>
-          <div style="background:rgba(255,77,46,.14);border:1px solid rgba(255,77,46,.3);border-radius:12px;padding:9px 16px;font-size:13px;font-weight:700;color:#FF9478">NOUVEAU : ${this._esc(l.newThing)}</div>
-          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">${l.brief}</p>
-          <div style="display:flex;gap:26px;margin-top:4px">
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${l.bronze} · 🥈${l.silver} · 🥇${l.gold}</div></div>
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">${'♥'.repeat(s.lives||3)}</div></div>
+        <div class="game-arena" style="height:auto;padding:0">
+          <div class="gsouris-intro">
+            <div class="gsouris-intro-ring a"></div>
+            <div class="gsouris-intro-ring b"></div>
+            <div class="gsouris-intro-kicker">Précision souris</div>
+            <h2 class="gsouris-intro-title">${this._esc(l.name)}</h2>
+            <p class="gsouris-intro-sub">${l.brief}</p>
+            <div class="gsouris-intro-chips">
+              <div class="gsouris-intro-chip accent">${l.dur||30} secondes</div>
+              <div class="gsouris-intro-chip">${s.lives||3} vies</div>
+              <div class="gsouris-intro-chip">Or à ${l.gold} pts</div>
+            </div>
+            <button class="btn-primary" autofocus onclick="app.startSouris()">Entrer dans la salle ›</button>
+            <div class="gidle-espace">OU APPUIE SUR ESPACE</div>
           </div>
-          <button class="game-play-btn" style="margin-top:8px" onclick="app.startSouris()">Commencer</button>
         </div>
       </div>
     </div>`;
@@ -5384,7 +5441,7 @@ const app={
 
   _sourisRenderArena(){
     const s=this.souris, l=this._sourisLevels[s.lvl-1], cap=this._sourisCaps(s.lvl);
-    const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
+    const lives=[0,1,2].map(i=>`<span class="gsouris-life${i<s.lives?' on':''}"></span>`).join('');
     const sec=Math.ceil((s.tLeft||0)/1000);
     const tpct=Math.max(0,Math.min(100,(s.tLeft||0)/((l.dur||30)*1000)*100));
     const gpct=(v)=>Math.min(100,v/l.gold*100);
@@ -5392,7 +5449,8 @@ const app={
     const tier=this._sourisTier(l,s.score);
     const barCol=tier==='gold'?'#FFD84D':tier==='silver'?'#C0C7D0':tier==='bronze'?'#CD7F44':'var(--accent)';
     const mark=(v,col)=>`<div style="position:absolute;left:${gpct(v)}%;top:-3px;bottom:-3px;width:2px;background:${col}"></div>`;
-    const hint=cap.pads?'Z Q S D pour entrer dans les cercles verts':cap.move&&cap.click?'Z Q S D pour bouger · clique les cibles et leurs cœurs':cap.move?'Z Q S D pour bouger':cap.sort3?'Trie chaque forme dans sa couleur':cap.drag?'Attrape et dépose dans la bonne zone':cap.bonus?'Attrape les bonus… ou reste sur les vertes ?':cap.disguise?'Méfie-toi : certains rouges se déguisent en orange':cap.traps?'Vertes oui, rouges non · vise le cœur':cap.core?'Vise le cœur doré : 3 pts, 5 d’affilée = +1 ♥':cap.click?'Clique les cibles':'Survole les cibles un instant';
+    const hint=cap.pads?'Z Q S D pour entrer dans les cercles verts':cap.move&&cap.click?'Z Q S D pour bouger · clique les cibles et leurs cœurs':cap.move?'Z Q S D pour bouger':cap.sort3?'Trie chaque forme dans sa couleur':cap.drag?'Attrape et dépose dans la bonne zone':cap.bonus?'Attrape les bonus… ou reste sur les vertes ?':cap.disguise?'Méfie-toi : certains rouges se déguisent en orange':cap.traps?'Vertes oui, rouges non · vise le cœur':cap.core?'Vise le cœur doré : 3 pts, 5 d’affilée = +1 ♥':cap.click?'Clique les cibles':'Maintiens la cible';
+    const acc=(s.hit+s.miss)?Math.round(100*s.hit/(s.hit+s.miss)):100;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:auto;padding:16px 20px 20px;display:flex;flex-direction:column;cursor:${cap.click||cap.drag?'crosshair':'default'}">
@@ -5407,12 +5465,21 @@ const app={
             </div>
             <div style="display:flex;align-items:center;gap:12px">
               <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:${sec<=5?'#E5484D':'#fff'};min-width:42px;text-align:right">${sec}s</div>
-              <div style="display:flex;gap:1px">${hearts}</div>
+              <div style="display:flex;gap:4px">${lives}</div>
             </div>
           </div>
           <div style="position:relative;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin:10px 0 10px;overflow:hidden"><div style="height:100%;width:${tpct}%;background:${sec<=5?'#E5484D':'rgba(255,255,255,.4)'};transition:width .05s linear"></div></div>
-          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.55);margin-bottom:8px">${l.name} — ${this._esc(hint)}</div>
+          <div class="gsouris-section"><span>${this._esc(l.name.toUpperCase())} · ${this._esc(hint.toUpperCase())}</span></div>
           <div id="souris-arena" style="position:relative;flex:1;min-height:300px;user-select:none"></div>
+          <div class="gsouris-footer">
+            <div><span class="gsouris-stat-label">PRÉCISION</span><span class="gsouris-stat-val">${acc}%</span></div>
+            <div><span class="gsouris-stat-label">TEMPS DE RÉACTION</span><span class="gsouris-stat-val">${s.lastReaction?s.lastReaction+'ms':'–'}</span></div>
+            <div><span class="gsouris-stat-label">SÉRIE</span><span class="gsouris-stat-val accent">${s.streak||0}</span></div>
+            <div class="gsouris-footer-right">
+              <span class="gsouris-gold-left">${Math.max(0,l.gold-s.score)} PTS DE L'OR</span>
+              <button class="gsouris-replay" onclick="app.startSouris()">↺ Rejouer</button>
+            </div>
+          </div>
         </div>
         <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'mouseMenu'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
@@ -5427,7 +5494,7 @@ const app={
   startSouris(){
     const s=this.souris, l=this._sourisLevels[s.lvl-1];
     this.stopSouris();
-    Object.assign(s,{phase:'play',score:0,lives:3,hit:0,miss:0,t0:Date.now(),targets:[],drag:null,tick:0,streak:0,cores:0,regen:0,hazards:[],tLeft:(l.dur||30)*1000,mult:1,multUntil:0});
+    Object.assign(s,{phase:'play',score:0,lives:3,hit:0,miss:0,t0:Date.now(),targets:[],drag:null,tick:0,streak:0,cores:0,regen:0,hazards:[],tLeft:(l.dur||30)*1000,mult:1,multUntil:0,lastReaction:0});
     const c=this._sourisCaps(s.lvl);
     if(c.move||c.pads){
       s.player={x:50,y:50};
@@ -5640,6 +5707,12 @@ const app={
       s.targets.push({x,y,r:4.4,born:Date.now(),hover:0,...k});
       return;
     }
+    // Niveau survol : une cible bonus dorée, verrouillage éclair, ×2 pts 5s.
+    if(c.hover&&Math.random()<.1&&!(s.targets||[]).some(t=>t.bonus)){
+      const{x,y}=this._sourisFreeSpot([10,90],[12,88],5.2);
+      s.targets.push({x,y,r:5.2,bonus:'points',color:'#FFD84D',icon:'×2',label:'×2 RAPIDE',born:Date.now(),life:2600,hover:0});
+      return;
+    }
     const bad=!!c.traps&&Math.random()<(c.fast?.34:.3);
     const base=c.fast?rnd(2.6,4.0):rnd(3.4,5.4);
     const r=c.hover?7:base;
@@ -5667,16 +5740,34 @@ const app={
     const rate=c.hover?14:c.pads?26:(c.move?12:10);
     if((s.targets||[]).length<maxT&&s.tick%rate===0)this._sourisSpawn();
 
-    // Niveau survol : rester sur la cible la valide
+    // Niveau survol : rester sur la cible la valide. Le temps de verrouillage
+    // se resserre avec la série (800ms → plancher 400ms) : récompense les
+    // séries en demandant plus de précision de tenue, jamais plus vite que
+    // ce plancher pour rester jouable.
     if(c.hover){
       const t=this._sourisAt(s.mx,s.my);
       (s.targets||[]).forEach(x=>{if(x!==t)x.hover=0;});
       if(t){
+        if(!t._firstHoverAt)t._firstHoverAt=now;
         t.hover+=50;
-        if(t.hover>=800){
-          s.score++;s.hit++;
+        const req=t.bonus?Math.max(200,this._sourisHoverReq(s)/2):this._sourisHoverReq(s);
+        if(t.hover>=req){
           s.targets=s.targets.filter(x=>x!==t);
-          playSound('hit');this._sourisFlash('#1FA971');
+          s.lastReaction=t._firstHoverAt-t.born;
+          if(t.bonus){
+            s.mult=2;s.multUntil=now+5000;s.hit++;
+            playSound('hit');this._sourisFlash('#FFD84D');
+            this._sourisHoverPop('BONUS','×2 · 5s',true);
+          } else {
+            const mult=(s.mult&&now<s.multUntil)?s.mult:1;
+            const core=this._sourisHoverInCore(t,s.mx,s.my);
+            const pts=(core?3:1)*mult;
+            s.score+=pts;s.hit++;
+            if(core)s.cores=(s.cores||0)+1;
+            s.streak=(s.streak||0)+1;
+            playSound('hit');this._sourisFlash(core?'#FFD84D':'#1FA971');
+            this._sourisHoverPop('TOUCHÉ','+'+pts+' · SÉRIE '+s.streak,false);
+          }
           this._sourisCheck();
         }
       }
@@ -5689,9 +5780,10 @@ const app={
       gone.forEach(()=>{s.miss++;this._sourisLoseLife();});
       s.targets=(s.targets||[]).filter(t=>!(now-t.born>8000&&t!==s.drag));
     }
-    // Expiration : laisser filer une cible utile coûte une vie
+    // Expiration : laisser filer une cible utile coûte une vie. Une cible
+    // bonus n'est jamais punitive — la rater ne coûte ni vie ni série.
     if(!c.drag){
-      const gone=(s.targets||[]).filter(t=>now-t.born>t.life&&!t.bad);
+      const gone=(s.targets||[]).filter(t=>now-t.born>t.life&&!t.bad&&!t.bonus);
       if(gone.length)playSound('miss');
       gone.forEach(()=>{
         s.miss++;s.streak=0;
@@ -5761,7 +5853,28 @@ const app={
       });
     }
 
-    if(s.phase==='play')this._sourisPaint();
+    // Rendu complet (pas juste le canevas des cibles) : le score, le chrono,
+    // la barre de progression et les vies doivent bouger en direct pendant
+    // la partie, pas seulement à l'écran de fin.
+    if(s.phase==='play')this._sourisRenderArena();
+  },
+
+  _sourisHoverReq(s){return Math.max(400,800-(s.streak||0)*40);},
+
+  // Vrai si le curseur est resté dans le petit disque blanc central au
+  // moment du verrouillage : ×3 points, comme le cœur de cible du niveau 3.
+  _sourisHoverInCore(t,x,y){
+    const dx=(t.x-x)*1.6, dy=t.y-y;
+    return Math.sqrt(dx*dx+dy*dy)<=t.r*0.12;
+  },
+
+  // État déclaratif (comme les autres jeux de cette session) : le canevas
+  // est réécrit en entier à chaque tick, donc un nœud DOM ajouté ici serait
+  // effacé au tick suivant. On stocke plutôt le popup dans l'état et
+  // _sourisPaint() le dessine tant que `until` n'est pas dépassé.
+  _sourisHoverPop(title,sub,isBonus){
+    const s=this.souris;
+    s.judge={title,sub,isBonus,x:s.mx||50,y:s.my||50,until:Date.now()+650};
   },
 
   _sourisPaint(){
@@ -5770,6 +5883,13 @@ const app={
     const c=this._sourisCaps(s.lvl);
     const now=Date.now();
     let html='';
+    if(c.hover){
+      html+=`<div class="gsouris-reticle">
+        <div class="gsouris-reticle-dash"></div>
+        <span class="gsouris-chevron up"></span><span class="gsouris-chevron down"></span>
+        <span class="gsouris-chevron left"></span><span class="gsouris-chevron right"></span>
+      </div>`;
+    }
     if(c.drag){
       const zones=c.sort3
         ?[['#1FA971','VERTE',0,33.3],['#3B82F6','BLEUE',33.3,66.6],['#E5722B','ORANGE',66.6,100]]
@@ -5798,17 +5918,39 @@ const app={
         const pulse=0.85+0.15*Math.sin(now/90);
         html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${t.r*2}%;aspect-ratio:1;transform:translate(-50%,-50%) scale(${pulse});border-radius:50%;background:${t.color};box-shadow:0 0 22px ${t.color};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;border:2px solid #fff">${t.icon}</div>`;
         html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${t.r*2.6}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2px solid ${t.color};opacity:${left*.6};pointer-events:none"></div>`;
+        if(t.label)html+=`<div class="gsouris-bonus-label" style="left:${t.x}%;top:${t.y+t.r*1.15}%">${t.label}</div>`;
+        return;
+      }
+      if(c.hover){
+        // Cible "réticule" à cercles concentriques : l'anneau de progression
+        // se remplit (conic-gradient) jusqu'au temps de verrouillage requis,
+        // masqué au centre par le cœur plein pour ne garder que l'anneau.
+        const req=this._sourisHoverReq(s);
+        const pct=Math.min(100,Math.round((t.hover/req)*100));
+        html+=`<div class="gsouris-target" style="left:${t.x}%;top:${t.y}%;width:${t.r*2}%">
+          <div class="gsouris-target-ring"></div>
+          <div class="gsouris-target-prog" style="background:conic-gradient(#fff ${pct}%,transparent 0)"></div>
+          <div class="gsouris-target-core"></div>
+          <div class="gsouris-target-dot"></div>
+          ${t.hover>0?`<div class="gsouris-target-lock">VERROUILLAGE ${(req/1000).toFixed(1)}s</div>`:''}
+        </div>`;
         return;
       }
       const left=Math.max(0,1-age/t.life);
-      const sz=t.r*2*(c.hover?1:(.55+left*.45));
+      const sz=t.r*2*(.55+left*.45);
       const col=t.bad?(t.disguised?'#D98A3D':'#E5484D'):'#1FA971';
       const mark=t.bad&&!t.disguised?'✕':'';
-      const ring=c.hover&&t.hover>0?`<div style="position:absolute;inset:-6px;border-radius:50%;border:3px solid #fff;opacity:${t.hover/800}"></div>`:'';
       const frac=c.smaller?0.26:0.30;
       const core=(c.core&&!t.bad)?`<div style="position:absolute;left:50%;top:50%;width:${frac*2*100}%;height:${frac*2*100}%;transform:translate(-50%,-50%);border-radius:50%;background:#FFD84D;box-shadow:0 0 8px #FFD84D"></div>`:'';
-      html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${col};border-radius:50%;box-shadow:0 0 ${t.bad?'20':'16'}px ${col}88;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${mark}${core}${ring}</div>`;
+      html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${col};border-radius:50%;box-shadow:0 0 ${t.bad?'20':'16'}px ${col}88;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${mark}${core}</div>`;
     });
+    if(c.hover&&s.judge&&s.judge.until>now){
+      const j=s.judge;
+      html+=`<div class="gsouris-judge" style="left:${j.x}%;top:${j.y}%">
+        <div class="gsouris-judge-text">${j.title}</div>
+        <div class="gsouris-judge-pill${j.isBonus?' bonus':''}">${j.sub}</div>
+      </div>`;
+    }
     if(c.move||c.pads){
       html+=`<div style="position:absolute;left:${s.player.x}%;top:${s.player.y}%;width:5%;aspect-ratio:1;transform:translate(-50%,-50%);background:#fff;border-radius:50%;box-shadow:0 0 14px rgba(255,255,255,.7);opacity:${s._inv?.4:1};display:flex;align-items:center;justify-content:center;font-size:12px">🙂</div>`;
     }
