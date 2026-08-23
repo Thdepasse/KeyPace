@@ -4369,7 +4369,6 @@ const app={
   /* ── SPRINT ── */
   startSprint(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startSprint());return;}
-    if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
     this.stopSprint();this.stopGame();
     this.activeGame='sprint';
     const text=genSprintText();
@@ -4449,7 +4448,7 @@ const app={
     const progressPct=s?Math.round(100*(30-timeLeft)/30):0;
 
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Le Sprint',ICONS.flag,'expert')}
+      ${this._gameHeader('Le Sprint',ICONS.flag,'free')}
       <div class="sprint-arena">
         ${isIdle?`
           <div class="gidle"><h2 class="gidle-title">Le Sprint<span class="dot"> .</span></h2><p>30 secondes, texte infini. Pas de retour arrière : chaque seconde compte.${best>0?`<br>Record : <b style="color:var(--accent)">${best} mpm</b>`:''}</p>
@@ -7537,7 +7536,6 @@ const app={
   },
   startCourse(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startCourse());return;}
-    if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
     this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();
     this.activeGame='course';this._courseRec=false;
     const text=RACE_TEXTS[Math.floor(Math.random()*RACE_TEXTS.length)];
@@ -7659,7 +7657,7 @@ const app={
       primaryLabel:'Rejouer',primaryOnClick:'app.startCourse()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Course de dactylo',ICONS.raceCar,'expert')}
+      ${this._gameHeader('Course de dactylo',ICONS.raceCar,'free')}
       <div class="course-arena">
         ${idle&&!IS_TOUCH_ONLY()?`<div class="course-idle"><h2>Course de dactylo<span class="dot"> .</span></h2><p>Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary course-cta" autofocus onclick="app.startCourse()">Lancer la course ▸</button><div class="course-espace">OU APPUIE SUR ESPACE</div></div>`:''}
         ${c?`
@@ -7688,7 +7686,6 @@ const app={
      sur exactement le même texte. */
   startGhost(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startGhost());return;}
-    if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
     this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();
     this.activeGame='ghost';
     this.ghost={on:true,over:false,text:GHOST_TEXT,typed:[],correct:0,keystrokes:0,
@@ -7772,11 +7769,13 @@ const app={
     const liveAcc=c&&c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     const ghostElapsed=c&&c.raceStarted?Date.now()-c.startTime:0;
     const ghostProg=c&&best?(c.ghostFinished?1:this._ghostProgAt(best.timeline,ghostElapsed)):0;
+    // Mêmes capsules à traînée que Course de dactylo (_courseLanesHTML),
+    // toujours 2 pistes ici : toi et ton fantôme.
     const lanes=c?[
-      {name:'Toi',emoji:'🏎️',prog:playerProg,you:true},
-      ...(best?[{name:'Ton fantôme',emoji:'👻',prog:ghostProg,namePrefix:false}]:[]),
+      {name:'Toi',prog:playerProg,you:true},
+      ...(best?[{name:'Ton fantôme',prog:ghostProg}]:[]),
     ]:[];
-    const lanesHTML=this._raceLanesHTML(lanes);
+    const lanesHTML=this._courseLanesHTML(lanes);
     let textHTML='';
     if(c){
       let word=[];const flushWord=()=>{if(word.length){textHTML+='<span class="race-word">'+word.join('')+'</span>';word=[];}};
@@ -7806,7 +7805,7 @@ const app={
       primaryLabel:'Rejouer',primaryOnClick:'app.startGhost()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Contre ton fantôme',ICONS.ghost,'expert')}
+      ${this._gameHeader('Contre ton fantôme',ICONS.ghost,'free')}
       <div class="sprint-arena" style="position:relative">
         ${idle&&!IS_TOUCH_ONLY()?`<div class="gidle"><h2 class="gidle-title">Contre ton fantôme<span class="dot"> .</span></h2><p>${best?'Bats ton meilleur temps sur ce texte : ton fantôme court à ton propre rythme précédent.':'Ta toute première course sur ce texte : elle enregistrera ton fantôme pour la prochaine fois.'}${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary" autofocus onclick="app.startGhost()">Lancer la course ▸</button><div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`:''}
         ${c?`
@@ -8171,7 +8170,7 @@ const app={
   },
   renderBoss(){
     const b=this.boss;
-    const head=this._gameHeader('Boss de la semaine',ICONS.trophy,'expert');
+    const head=this._gameHeader('Boss de la semaine',ICONS.trophy,'free');
     let body='';
     if(!b||b.phase==='loading'){
       body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Chargement du défi…</div></div>`;
