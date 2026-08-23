@@ -801,28 +801,32 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .gcine-panel-sub{font-size:15px;color:var(--muted);margin:0}
 .gcine-carousel{position:relative;height:420px;max-width:1120px;margin:0 auto;perspective:1400px;cursor:grab;touch-action:pan-y;user-select:none}
 .gcine-cards{position:absolute;inset:0}
-.gcine-card{position:absolute;top:50%;left:50%;will-change:transform,opacity}
-.gcine-card-inner{width:270px;height:360px;border-radius:32px;overflow:hidden;position:relative;padding:26px;display:flex;flex-direction:column;justify-content:space-between;background:#fff;border:1px solid var(--border);box-shadow:0 10px 30px rgba(21,19,15,.07);transition:box-shadow .2s}
+.gcine-card{position:absolute;top:50%;left:50%;will-change:transform,opacity;transition:transform .45s cubic-bezier(.22,.9,.3,1),opacity .35s}
+.gcine-cards.is-dragging .gcine-card{transition:none}
+.gcine-card-inner{width:270px;height:360px;border-radius:32px;overflow:hidden;position:relative;padding:26px;display:flex;flex-direction:column;justify-content:space-between;background:#fff;border:1px solid var(--border);box-shadow:0 10px 30px rgba(21,19,15,.07);transition:border-color .45s cubic-bezier(.22,.9,.3,1),box-shadow .3s}
+.gcine-card-inner::before{content:'';position:absolute;inset:0;z-index:0;background:linear-gradient(140deg,#ff7a4d,var(--accent) 64%);opacity:0;transition:opacity .45s cubic-bezier(.22,.9,.3,1)}
 .gcine-card:not(.is-center):hover .gcine-card-inner{box-shadow:0 16px 40px rgba(21,19,15,.14)}
-.gcine-card.is-center .gcine-card-inner{background:linear-gradient(140deg,#ff7a4d,var(--accent) 64%);box-shadow:0 26px 60px rgba(255,77,46,.34);border-color:transparent}
-.gcine-blob{position:absolute;border-radius:50%;background:#fff5f1}
+.gcine-card.is-center .gcine-card-inner{box-shadow:0 26px 60px rgba(255,77,46,.34);border-color:transparent}
+.gcine-card.is-center .gcine-card-inner::before{opacity:1}
+.gcine-blob{position:absolute;border-radius:50%;background:#fff5f1;transition:background .45s cubic-bezier(.22,.9,.3,1)}
 .gcine-blob-a{width:200px;height:200px;right:-72px;top:-80px}
 .gcine-blob-b{width:140px;height:140px;left:-52px;bottom:-60px}
 .gcine-card.is-center .gcine-blob{background:rgba(255,255,255,.11)}
 .gcine-card-top{position:relative;display:flex;align-items:flex-start;justify-content:space-between}
-.gcine-card-icon{font-size:46px;line-height:1;color:var(--accent)}
+.gcine-card-icon{font-size:46px;line-height:1;color:var(--accent);transition:color .45s cubic-bezier(.22,.9,.3,1)}
 .gcine-card.is-center .gcine-card-icon{color:#fff}
-.gcine-card-tag{font-size:11px;font-weight:700;letter-spacing:.1em;padding:6px 12px;border-radius:999px;background:#fff0eb;color:var(--accent)}
+.gcine-card-tag{font-size:11px;font-weight:700;letter-spacing:.1em;padding:6px 12px;border-radius:999px;background:#fff0eb;color:var(--accent);transition:background .45s cubic-bezier(.22,.9,.3,1),color .45s cubic-bezier(.22,.9,.3,1)}
 .gcine-card.is-center .gcine-card-tag{background:rgba(255,255,255,.22);color:#fff}
 .gcine-card-body{position:relative;display:flex;flex-direction:column;gap:9px}
-.gcine-card-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;line-height:1.1;letter-spacing:-.02em;color:var(--txt)}
+.gcine-card-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;line-height:1.1;letter-spacing:-.02em;color:var(--txt);transition:color .45s cubic-bezier(.22,.9,.3,1)}
 .gcine-card.is-center .gcine-card-name{color:#fff}
-.gcine-card-desc{font-size:13px;line-height:1.55;color:var(--muted)}
+.gcine-card-desc{font-size:13px;line-height:1.55;color:var(--muted);transition:color .45s cubic-bezier(.22,.9,.3,1)}
 .gcine-card.is-center .gcine-card-desc{color:rgba(255,255,255,.9)}
-.gcine-card-cta{display:none;position:relative;align-items:center;justify-content:center;gap:9px;background:#fff;color:var(--accent);font-weight:700;font-size:14px;padding:14px;border-radius:16px;cursor:pointer;box-shadow:0 6px 18px rgba(21,19,15,.14)}
-.gcine-card.is-center .gcine-card-cta{display:flex}
-.gcine-card-n{position:relative;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:#b9b3a8}
-.gcine-card.is-center .gcine-card-n{display:none}
+.gcine-card-foot{position:relative;height:46px}
+.gcine-card-cta{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;color:var(--accent);font-weight:700;font-size:14px;border-radius:16px;cursor:pointer;box-shadow:0 6px 18px rgba(21,19,15,.14);opacity:0;pointer-events:none;transition:opacity .45s cubic-bezier(.22,.9,.3,1)}
+.gcine-card.is-center .gcine-card-cta{opacity:1;pointer-events:auto}
+.gcine-card-n{position:absolute;left:0;bottom:0;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:#b9b3a8;opacity:1;transition:opacity .45s cubic-bezier(.22,.9,.3,1)}
+.gcine-card.is-center .gcine-card-n{opacity:0}
 .gcine-controls{display:flex;align-items:center;justify-content:center;gap:24px;margin-top:8px}
 .gcine-arrow{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--txt);cursor:pointer;transition:border-color .2s,color .2s}
 .gcine-arrow:hover{border-color:var(--accent);color:var(--accent)}
@@ -6642,8 +6646,10 @@ const app={
           <div class="gcine-card-name">${g.name}</div>
           <div class="gcine-card-desc">${g.desc}</div>
         </div>
-        <div class="gcine-card-cta">Jouer maintenant →</div>
-        <div class="gcine-card-n">${String(i+1).padStart(2,'0')}</div>
+        <div class="gcine-card-foot">
+          <div class="gcine-card-cta">Jouer maintenant →</div>
+          <div class="gcine-card-n">${String(i+1).padStart(2,'0')}</div>
+        </div>
       </div>
     </div>`;
   },
@@ -6709,7 +6715,7 @@ const app={
 
     let dragging=false,dx0=0,di0=0;
     const carouselEl=document.getElementById('gcine-carousel');
-    const onDown=e=>{dragging=true;dx0=e.clientX;di0=idx;dragOffset=0;carouselEl.style.cursor='grabbing';};
+    const onDown=e=>{dragging=true;dx0=e.clientX;di0=idx;dragOffset=0;carouselEl.style.cursor='grabbing';cardsEl.classList.add('is-dragging');};
     const onMove=e=>{
       if(!dragging)return;
       dragOffset=e.clientX-dx0;
@@ -6720,6 +6726,7 @@ const app={
       if(!dragging)return;
       dragging=false;
       carouselEl.style.cursor='';
+      cardsEl.classList.remove('is-dragging');
       const moved=dragOffset;
       dragOffset=0;
       const deltaIdx=-Math.round(moved/GAP);
