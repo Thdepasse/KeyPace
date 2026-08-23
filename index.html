@@ -873,7 +873,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
   .gcine-boss-cta{align-self:flex-end}
 }
 
-/* Carte désactivée (ex: Battle Royale, "Bientôt disponible") */
+/* Carte désactivée : "Bientôt disponible" (ex: Battle Royale) ou verrouillée dynamiquement (ex: Double piste) */
 .gcine-card.is-disabled .gcine-card-inner{filter:grayscale(.35);opacity:.72}
 .gcine-card.is-disabled.is-center .gcine-card-inner{background:linear-gradient(140deg,#c9c2b6,#a9a196 64%);box-shadow:0 20px 44px rgba(21,19,15,.18)}
 .gcine-card.is-disabled.is-center .gcine-card-cta{color:var(--muted);cursor:not-allowed}
@@ -2105,15 +2105,13 @@ async function flushStats(){
   }catch{}
 }
 function mergeStats(remote){
-  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,simonBest:null,clavierBest:null,sourisBest:0,ghostBest:null,goals:{minWpm:20,maxErrors:8},
-    sourisHub:{streak:0,lastPlayDate:null,missionDate:null,missionIdx:0,missionProgress:0,missionDone:false,badges:[],skinsUnlocked:['classic'],equippedSkin:'classic',handConfig:null},
+  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,simonBest:null,clavierBest:null,sourisBest:0,sourisHybridHand:null,ghostBest:null,goals:{minWpm:20,maxErrors:8},
     sourisSoloBest:null,sourisGridBest:null,sourisWavesBest:null,sourisHybridBest:null,sourisTilesBest:null,sourisDuoBest:null};
   const s=Object.assign(def, remote||{});
   s.tests=s.tests||[];s.lessons=s.lessons||{};s.goals=s.goals||{};
   if(typeof s.goals.minWpm!=='number')s.goals.minWpm=20;
   if(typeof s.goals.maxErrors!=='number')s.goals.maxErrors=8;
   if(typeof s.gameBest!=='number')s.gameBest=0;
-  s.sourisHub=Object.assign({},def.sourisHub,s.sourisHub||{});
   Object.keys(s.lessons).forEach(k=>{const v=s.lessons[k];if(typeof v==='number')s.lessons[k]={bestWpm:v,bestErr:0,cleared:true};});
   return s;
 }
@@ -3141,7 +3139,13 @@ const GCINE_GAMES=[
   {key:'course',icon:'raceCar',name:'Course de dactylo',desc:"Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !",expert:true,category:'vitesse'},
   {key:'ghost',icon:'ghost',name:'Contre ton fantôme',desc:"Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !",expert:true,category:'vitesse'},
   {key:'tireur',icon:'crosshair',name:"Tireur d'élite",desc:"Tape chaque mot sans la moindre faute. Une seule erreur et la cible est ratée : la précision avant tout.",expert:false,category:'precision'},
-  {key:'souris',icon:'mouse',name:'Visée',desc:"7 niveaux pour la souris et le clavier : précision, réflexes, vagues & boss, et des défis à deux mains. Mission du jour, badges et skins à débloquer.",expert:false,category:'precision'},
+  {key:'souris',icon:'mouse',name:'Précision souris',desc:"12 niveaux qui montent en difficulté : viser, cliquer, glisser-déposer, puis le clavier (ZQSD) en renfort.",expert:false,category:'precision'},
+  {key:'sourisSolo',icon:'target',name:'Cible unique',desc:"Une lettre, un rythme : repère la cible et tape sa lettre avant qu'elle ne disparaisse. Pure réaction clavier.",expert:false,category:'precision'},
+  {key:'sourisGrid',icon:'grid',name:'Grille réflexe',desc:"9 cases, une s'allume : tape sa lettre avant les pièges qui s'allument aussi.",expert:false,category:'precision'},
+  {key:'sourisWaves',icon:'flag',name:'Vagues & Boss',desc:"4 vagues, une règle différente à chaque fois, puis un mot-boss pour finir.",expert:false,category:'precision'},
+  {key:'sourisHybrid',icon:'hand',name:'Duo souris + clavier',desc:"Vise à la souris, valide au clavier — une main sur chaque, une lettre à la fois.",expert:false,category:'precision'},
+  {key:'sourisTiles',icon:'layers',name:'Magic Tiles',desc:"4 couloirs qui défilent en rythme : souris et clavier pour ne rien laisser filer.",expert:false,category:'precision'},
+  {key:'sourisDuo2',icon:'swords',name:'Double piste',desc:"Les deux mains sollicitées en même temps. Le plus exigeant des jeux de précision.",expert:false,category:'precision',locked:a=>!a._sourisDuo2Unlocked(),lockedTag:'3 pistes à bronze+ requises'},
   {key:'simon',icon:'brain',name:'Simon des mots',desc:"Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.",expert:false,category:'memoire'},
   {key:'clavier',icon:'keyboard',name:'Clavier vide',desc:"Le clavier est totalement vide : replace chaque lettre au bon endroit, de mémoire. Chrono lancé, chaque erreur compte.",expert:false,category:'memoire'},
   {key:'duel',icon:'swords',name:'Duel 1v1',desc:"Défie un ami en temps réel sur le même texte. Partage un lien, comptez 3-2-1, et que le plus rapide gagne !",expert:false,category:'multi'},
@@ -3149,6 +3153,10 @@ const GCINE_GAMES=[
 ];
 const GCINE_BOSS={key:'boss',icon:'trophy',name:'Boss de la semaine',desc:"Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !",expert:true};
 const CLAVIER_ROWS=['AZERTYUIOP'.split(''),'QSDFGHJKLM'.split(''),'WXCVBN'.split('')];
+// Les 7 jeux ex-Visée partagent un seul state (this.souris) et un seul rendu/
+// routeur clavier (renderSouris/sourisKey), qui dispatchent déjà sur
+// this.souris.track — seule la clé `activeGame` diffère selon la carte cliquée.
+const SOURIS_GAMES=['souris','sourisSolo','sourisGrid','sourisWaves','sourisHybrid','sourisTiles','sourisDuo2'];
 function shuffleArr(a){
   const r=a.slice();
   for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}
@@ -3194,7 +3202,7 @@ const app={
     this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();
     if(this._onKey){window.removeEventListener('keydown',this._onKey);this._onKey=null;}
     if(this._clavierFlashT){clearTimeout(this._clavierFlashT);this._clavierFlashT=null;}
-    this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.clavier=null;this.activeGame=null;
+    this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.clavier=null;this.souris=null;this.activeGame=null;
   },
 
   lessonRec(id){const v=(this.stats&&this.stats.lessons||{})[id];if(!v)return{bestWpm:0,bestErr:null,cleared:false};if(typeof v==='number')return{bestWpm:v,bestErr:null,cleared:true};return v;},
@@ -3721,14 +3729,14 @@ const app={
     if(this.view==='games'&&this.activeGame==='simon'&&this.simon&&this.simon.on){this.simonKey(e);return;}
     if(this.view==='games'&&this.activeGame==='boss'&&this.boss&&this.boss.phase==='playing'){this.bossKey(e);return;}
     if(this.view==='games'&&this.activeGame==='duel'&&this.duel&&this.duel.phase==='racing'){this.duelKey(e);return;}
-    if(this.view==='games'&&this.activeGame==='souris'&&this.souris&&this.souris.phase==='play'){this.sourisKey(e);return;}
+    if(this.view==='games'&&SOURIS_GAMES.includes(this.activeGame)&&this.souris&&this.souris.phase==='play'){this.sourisKey(e);return;}
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   exitActiveGame(){
     this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();
     if(this.duel)this.duelLeave();
     if(this._clavierFlashT){clearTimeout(this._clavierFlashT);this._clavierFlashT=null;}
-    this.activeGame=null;this.game=null;this.sprint=null;this.tireur=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.clavier=null;
+    this.activeGame=null;this.game=null;this.sprint=null;this.tireur=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.clavier=null;this.souris=null;
     this.renderGames();
   },
   typeKey(e){
@@ -4029,7 +4037,7 @@ const app={
      (overlay sombre, carte claire à grille de stats, stage clair sans
      grille), avec trois vocabulaires de boutons distincts. Un seul système
      désormais pour ces 6 : bouton .res-btn.pri/.sec, résultat en grille de
-     stats. Duel et Visée/Souris gardent volontairement leur propre écran de
+     stats. Duel et Précision souris gardent volontairement leur propre écran de
      résultat (vs-adversaire à 2 colonnes pour l'un, paliers médaille pour
      l'autre — la forme {boxes,primaryLabel,secondaryLabel} ne les couvre pas
      proprement) ; ne pas forcer leur migration dans ce helper sans d'abord
@@ -5020,21 +5028,13 @@ const app={
   },
 
   /* ═══════════════════════════════════════════════════════════════
-     VISÉE — LE HUB
-     Écran d'accueil de Visée : série de jours, mission du jour,
-     badges, skins de cible, et les cartes de piste (la piste souris
-     historique + les nouvelles). Toutes les pistes sont gratuites.
+     VISÉE — devenue 7 jeux indépendants (catégorie Précision) :
+     'souris' (12 niveaux persistés) + 6 pistes à session unique
+     (solo/grid/waves/hybrid/tiles/duo2). _sourisTrackTier/BestField
+     et _sourisDuo2Unlocked restent : ils pilotent le verrou dynamique
+     de Double piste (3 des 5 autres pistes à bronze+).
      ═══════════════════════════════════════════════════════════════ */
 
-  _sourisTracks:[
-    {id:'mouse',name:'Précision souris',icon:'mouse',desc:'12 niveaux : viser, cliquer, glisser-déposer, ZQSD.'},
-    {id:'solo',name:'Cible unique',icon:'target',desc:'Une lettre, un rythme. Pure réaction clavier.'},
-    {id:'grid',name:'Grille réflexe',icon:'grid',desc:'9 cases, une s’allume : tape-la avant les pièges.'},
-    {id:'waves',name:'Vagues & Boss',icon:'flag',desc:'4 vagues, une règle qui change à chaque fois, un mot-boss.'},
-    {id:'hybrid',name:'Duo souris + clavier',icon:'hand',desc:'Vise à la souris, valide au clavier — une main, une lettre.'},
-    {id:'tiles',name:'Magic Tiles',icon:'layers',desc:'4 couloirs qui défilent en rythme, souris et clavier.'},
-    {id:'duo2',name:'Double piste',icon:'swords',desc:'Les deux mains sollicitées en même temps. Le plus exigeant.',advanced:true},
-  ],
   _sourisTrackBestField(id){return {solo:'sourisSoloBest',grid:'sourisGridBest',waves:'sourisWavesBest',hybrid:'sourisHybridBest',tiles:'sourisTilesBest',duo2:'sourisDuoBest'}[id];},
   _sourisTrackTier(id){
     if(id==='mouse')return null;
@@ -5046,170 +5046,21 @@ const app={
     const ids=['solo','grid','waves','hybrid','tiles'];
     return ids.filter(id=>this._sourisTrackTier(id)).length>=3;
   },
-  _sourisTrackOpen(id){return id!=='duo2'||this._sourisDuo2Unlocked();},
 
-  _sourisMissionPool:[
-    {id:'hits20',label:'20 cibles réussies aujourd’hui, toutes pistes confondues',target:20,metric:'hits'},
-    {id:'streak10',label:'Une série de 10 réussites sans faute',target:10,metric:'bestStreak'},
-    {id:'score150',label:'150 points en une seule partie',target:150,metric:'score'},
-    {id:'combo5',label:'Un combo ×5 ou plus',target:5,metric:'combo'},
-    {id:'twoTracks',label:'Essayer 2 pistes différentes aujourd’hui',target:2,metric:'tracksToday'},
-    {id:'anyGold',label:'Décrocher une médaille d’or',target:1,metric:'goldEarned'},
-  ],
-  _sourisBadgeDefs:[
-    {id:'first_level',label:'Première cible touchée',icon:'target',check:s=>(s.sourisBest||0)>=1},
-    {id:'explorer',label:'Explorateur — 3 pistes essayées',icon:'layers',check:s=>['sourisSoloBest','sourisGridBest','sourisWavesBest','sourisHybridBest','sourisTilesBest'].filter(f=>s[f]).length>=3},
-    {id:'completionist',label:'Toutes les pistes essayées',icon:'trophy',check:s=>['sourisSoloBest','sourisGridBest','sourisWavesBest','sourisHybridBest','sourisTilesBest'].every(f=>s[f])},
-    {id:'first_gold',label:'Première médaille d’or',icon:'medal',check:s=>Object.values(s.sourisTiers||{}).includes('gold')||['sourisSoloBest','sourisGridBest','sourisWavesBest','sourisHybridBest','sourisTilesBest','sourisDuoBest'].some(f=>s[f]&&s[f].tier==='gold')},
-    {id:'streak3',label:'3 jours de suite',icon:'flame',check:s=>(s.sourisHub.streak||0)>=3},
-    {id:'streak7',label:'7 jours de suite',icon:'flame',check:s=>(s.sourisHub.streak||0)>=7},
-  ],
-  _sourisSkinDefs:[
-    {id:'classic',label:'Classique',color:'#1FA971'},
-    {id:'ember',label:'Braise (niveau 6 souris atteint)',color:'#FF4D2E',check:s=>(s.sourisBest||0)>=6},
-    {id:'aurora',label:'Aurora (2 pistes essayées)',color:'#5B8DEF',check:s=>['sourisSoloBest','sourisGridBest','sourisWavesBest','sourisHybridBest','sourisTilesBest'].filter(f=>s[f]).length>=2},
-    {id:'gold',label:'Or (une médaille d’or)',color:'#FFD84D',check:s=>Object.values(s.sourisTiers||{}).includes('gold')||['sourisSoloBest','sourisGridBest','sourisWavesBest','sourisHybridBest','sourisTilesBest','sourisDuoBest'].some(f=>s[f]&&s[f].tier==='gold')},
-  ],
-  _sourisSkinColor(){
-    const id=(this.stats&&this.stats.sourisHub&&this.stats.sourisHub.equippedSkin)||'classic';
-    return (this._sourisSkinDefs.find(s=>s.id===id)||this._sourisSkinDefs[0]).color;
-  },
-  _sourisEquipSkin(id){
-    if(!this.stats.sourisHub.skinsUnlocked.includes(id))return;
-    this.stats.sourisHub.equippedSkin=id;
-    saveStats(this.stats);
-    this.renderSouris();
-  },
-
-  _sourisTodayStr(){
-    const d=new Date();
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  },
-  _sourisTouchStreak(){
-    const h=this.stats.sourisHub, today=this._sourisTodayStr();
-    if(h.lastPlayDate===today)return;
-    const y=new Date(Date.now()-86400000);
-    const yStr=y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
-    h.streak=(h.lastPlayDate===yStr)?(h.streak||0)+1:1;
-    h.lastPlayDate=today;
-  },
-  _sourisEnsureMission(){
-    const h=this.stats.sourisHub, today=this._sourisTodayStr();
-    if(h.missionDate===today)return;
-    let hash=0;for(let i=0;i<today.length;i++)hash=(hash*31+today.charCodeAt(i))>>>0;
-    h.missionDate=today;h.missionIdx=hash%this._sourisMissionPool.length;
-    h.missionProgress=0;h.missionDone=false;h._tracksToday=[];
-  },
-  // sessionResult: {track, hits, score, combo, streakRun, tier}
-  _sourisUpdateMission(sessionResult){
-    this._sourisEnsureMission();
-    const h=this.stats.sourisHub, m=this._sourisMissionPool[h.missionIdx];
-    if(h.missionDone)return;
-    h._tracksToday=h._tracksToday||[];
-    if(!h._tracksToday.includes(sessionResult.track))h._tracksToday.push(sessionResult.track);
-    const v={
-      hits:(h.missionProgress||0)+(sessionResult.hits||0),
-      bestStreak:Math.max(h.missionProgress||0,sessionResult.streakRun||0),
-      score:Math.max(h.missionProgress||0,sessionResult.score||0),
-      combo:Math.max(h.missionProgress||0,sessionResult.combo||0),
-      tracksToday:h._tracksToday.length,
-      goldEarned:sessionResult.tier==='gold'?1:(h.missionProgress||0),
-    }[m.metric];
-    h.missionProgress=v;
-    if(v>=m.target&&!h.missionDone){h.missionDone=true;return true;} // mission tout juste terminée
-    return false;
-  },
-  _sourisCheckBadges(){
-    const h=this.stats.sourisHub;let gained=null;
-    this._sourisBadgeDefs.forEach(b=>{
-      if(!h.badges.includes(b.id)&&b.check(this.stats)){h.badges.push(b.id);gained=b;}
-    });
-    return gained;
-  },
-  _sourisCheckSkins(){
-    const h=this.stats.sourisHub;let gained=null;
-    this._sourisSkinDefs.forEach(sk=>{
-      if(!h.skinsUnlocked.includes(sk.id)&&sk.check&&sk.check(this.stats)){h.skinsUnlocked.push(sk.id);gained=sk;}
-    });
-    return gained;
-  },
-  // Point d'entrée commun à toutes les nouvelles pistes en fin de partie :
-  // paliers médaille, série de jours, mission, badges/skins, son+confettis,
-  // sauvegarde. Les pistes appellent ceci puis affichent leur écran de fin.
-  _sourisFinishTrack(trackId,{score,thresholds,extra,sessionResult}){
+  // Point d'entrée commun aux 6 pistes à session unique en fin de partie :
+  // palier médaille + meilleur score, son+confettis, sauvegarde. Chaque
+  // piste appelle ceci puis affiche son propre écran de fin.
+  _sourisFinishTrack(trackId,{score,thresholds,extra}){
     const field=this._sourisTrackBestField(trackId);
     const tier=score>=thresholds.gold?'gold':score>=thresholds.silver?'silver':score>=thresholds.bronze?'bronze':null;
     const prevRank={bronze:1,silver:2,gold:3};
     const prev=this.stats[field];
     const isNewBest=tier&&(!prev||(prevRank[tier]||0)>(prevRank[prev.tier]||0)||(tier===prev.tier&&score>prev.score));
     if(isNewBest)this.stats[field]=Object.assign({score,tier,date:Date.now()},extra||{});
-    this._sourisTouchStreak();
-    const missionJustDone=this._sourisUpdateMission(Object.assign({track:trackId,score,tier},sessionResult||{}));
-    const badge=this._sourisCheckBadges();
-    const skin=this._sourisCheckSkins();
     try{track('game_completed',{game:'souris',mode:trackId,score,tier:tier||null});}catch{}
     saveStats(this.stats);
     if(isNewBest)this._celebrateGame(null,prev?'record':'levelup');
-    else if(missionJustDone||badge||skin)this._celebrateGame(null,'levelup');
-    return {tier,isNewBest,missionJustDone,badge,skin};
-  },
-
-  _sourisRenderHub(){
-    this._sourisEnsureMission();
-    const h=this.stats.sourisHub;
-    const mission=this._sourisMissionPool[h.missionIdx];
-    const mPct=Math.min(100,Math.round(((h.missionProgress||0)/mission.target)*100));
-    const badgesHtml=this._sourisBadgeDefs.map(b=>{
-      const got=h.badges.includes(b.id);
-      return `<div title="${this._esc(b.label)}" style="width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;transition:transform .15s;${got?'background:rgba(255,77,46,.12);border:1.5px solid var(--accent);color:var(--accent)':'background:var(--light);border:1.5px dashed var(--border);color:var(--muted);opacity:.4'}">${ICONS[b.icon]||ICONS.medal}</div>`;
-    }).join('');
-    const skinsHtml=this._sourisSkinDefs.map(sk=>{
-      const unlocked=h.skinsUnlocked.includes(sk.id);
-      const equipped=h.equippedSkin===sk.id;
-      return `<div onclick="${unlocked?`app._sourisEquipSkin('${sk.id}')`:''}" title="${this._esc(sk.label)}" style="width:40px;height:40px;border-radius:11px;flex-shrink:0;cursor:${unlocked?'pointer':'default'};background:${unlocked?sk.color:'var(--light)'};display:grid;place-items:center;border:${equipped?'3px solid #16140F':'1.5px solid var(--border)'};box-shadow:${unlocked?'0 4px 10px '+sk.color+'55':'none'};opacity:${unlocked?1:.4};font-size:15px">${unlocked?'':'🔒'}</div>`;
-    }).join('');
-    const tierIcon={gold:'🥇',silver:'🥈',bronze:'🥉'};
-    const cardsHtml=this._sourisTracks.map(t=>{
-      const open=this._sourisTrackOpen(t.id);
-      const tier=this._sourisTrackTier(t.id);
-      const sub=t.id==='mouse'?`${this._sourisBest()}/12 franchis`:(tier?tierIcon[tier]+' '+tier.toUpperCase():'À essayer');
-      const onclick=t.id==='mouse'?`app.souris={phase:'mouseMenu'};app.renderSouris()`:`app._sourisEnterTrack('${t.id}')`;
-      return `<div class="game-sel-card" onclick="${open?onclick:''}" style="${open?'':'opacity:.45;cursor:not-allowed'};position:relative">
-        <div class="game-sel-icon" style="color:var(--accent)">${open?ICONS[t.icon]:'🔒'}</div>
-        <div class="game-sel-name">${t.name}${t.advanced?' <span style=\"font-size:11px;color:var(--muted);font-weight:600\">(avancé)</span>':''}</div>
-        <div class="game-sel-desc">${this._esc(t.desc)}</div>
-        <span class="game-sel-tag free" style="${!open?'background:var(--light);color:var(--muted)':tier?'background:rgba(31,169,113,.15);color:#1FA971':''}">${open?sub:'3 pistes à bronze requises'}</span>
-      </div>`;
-    }).join('');
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:1120px;margin:0 auto;padding:0 24px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Visée</h2>
-        <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:${h.streak?'var(--accent)':'var(--muted)'}">${ICONS.flame} ${h.streak||0} j</div>
-      </div>
-      <div style="max-width:1120px;margin:0 auto;padding:0 24px 22px;display:flex;gap:14px;flex-wrap:wrap;align-items:stretch">
-        <div style="flex:2;min-width:260px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px 18px">
-          <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">${ICONS.flag} Mission du jour</div>
-          <div style="font-size:14px;font-weight:600;margin-bottom:10px">${this._esc(mission.label)}</div>
-          <div style="height:8px;border-radius:99px;background:var(--light);overflow:hidden"><div style="height:100%;width:${mPct}%;background:${h.missionDone?'#1FA971':'var(--accent)'};transition:width .3s"></div></div>
-          <div style="font-size:12px;color:var(--muted);margin-top:6px">${h.missionDone?'Terminée ✓':`${h.missionProgress||0} / ${mission.target}`}</div>
-        </div>
-        <div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px 18px">
-          <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px">${ICONS.award} Badges</div>
-          <div style="display:flex;gap:7px;flex-wrap:wrap">${badgesHtml}</div>
-        </div>
-        <div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px 18px">
-          <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px">${ICONS.palette} Skins de cible</div>
-          <div style="display:flex;gap:7px;flex-wrap:wrap">${skinsHtml}</div>
-        </div>
-      </div>
-      <div class="game-selector">${cardsHtml}</div>
-    </div>`;
-  },
-  _sourisEnterTrack(id){
-    if(id==='duo2'&&!this._sourisDuo2Unlocked())return;
-    this.souris={phase:'brief',track:id};
-    this.renderSouris();
+    return {tier,isNewBest};
   },
 
   _sourisBest(){return (this.stats&&this.stats.sourisBest)||0;},
@@ -5237,7 +5088,6 @@ const app={
   renderSouris(){
     const s=this.souris;
     if(!s){this.activeGame=null;this.renderGames();return;}
-    if(s.phase==='hub'){return this._sourisRenderHub();}
     const track=s.track||'mouse';
     if(track==='solo')return this._sourisSoloRender();
     if(track==='grid')return this._sourisGridRender();
@@ -5271,7 +5121,7 @@ const app={
     const golds=Object.values(tiers).filter(t=>t==='gold').length;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:1120px;margin:0 auto;padding:0 24px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Visée</button>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
         <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Précision souris — 12 niveaux</h2>
         <div style="font-size:13px;color:var(--muted);font-weight:600">${best}/12 franchis${golds?' · '+golds+' 🥇':''}</div>
       </div>
@@ -5794,7 +5644,7 @@ const app={
   _sourisSoloBrief(){
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
         <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
           <div style="color:var(--accent)">${ICONS.target}</div>
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Cible unique</h2>
@@ -5897,7 +5747,7 @@ const app={
             </div>
           </div>
         </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
   },
@@ -5911,7 +5761,6 @@ const app={
           record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
           boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
           primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisSoloStart()',
-          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
         })}
       </div>
     </div>`;
@@ -5927,7 +5776,7 @@ const app={
   _sourisGridBrief(){
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
         <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
           <div style="color:var(--accent)">${ICONS.grid}</div>
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Grille réflexe</h2>
@@ -6047,7 +5896,7 @@ const app={
           <div style="font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);text-align:center;margin:6px 0 14px">${s.combo>1?'Combo ×'+s.combo+' · ':''}Tape la lettre qui s'allume en vert. Les cases sombres sont des pièges.</div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">${cellsHtml}</div>
         </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
   },
@@ -6061,7 +5910,6 @@ const app={
           record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
           boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
           primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisGridStart()',
-          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
         })}
       </div>
     </div>`;
@@ -6080,7 +5928,7 @@ const app={
   _sourisWavesBrief(){
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
         <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
           <div style="color:var(--accent)">${ICONS.flag}</div>
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Vagues & Boss</h2>
@@ -6193,7 +6041,7 @@ const app={
           </div>
           <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5)">Tape le mot affiché, sans backspace</div>
         </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
   },
@@ -6207,7 +6055,6 @@ const app={
           record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
           boxes:[{label:'Vagues franchies',value:s._wavesCleared+'/4',accent:true},{label:'Boss',value:s._bossBeaten?'Battu':'—'},{label:'Points',value:s.score}],
           primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisWavesStart()',
-          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
         })}
       </div>
     </div>`;
@@ -6225,7 +6072,7 @@ const app={
     return KB.slice(1).flat().filter(k=>k.f&&k.f[0]===side).map(k=>k.l.toLowerCase()).filter(l=>/^[a-z]$/.test(l));
   },
   _sourisHybridSetHand(v){
-    this.stats.sourisHub.handConfig=v;
+    this.stats.sourisHybridHand=v;
     saveStats(this.stats);
     this.souris.phase='brief';
     this.renderSouris();
@@ -6235,7 +6082,7 @@ const app={
       .map(l=>`<span style="flex:1;border:1.5px solid ${dim?'rgba(255,255,255,.15)':'#fff'};background:${dim?'rgba(255,255,255,.04)':'rgba(255,77,46,.15)'};border-radius:7px;text-align:center;padding:7px 0;font:700 12px 'JetBrains Mono',monospace;color:${dim?'rgba(255,255,255,.3)':'#fff'}">${l}</span>`).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:600px;margin:0 auto;padding:0 24px">
-        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
         <div class="game-arena" style="height:auto;padding:36px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#fff;margin:0">Où est ta souris ?</h2>
           <p style="color:rgba(255,255,255,.7);font-size:14px;margin:0">Le jeu ne proposera que les lettres atteignables par la main restée au clavier. Modifiable à tout moment.</p>
@@ -6261,11 +6108,11 @@ const app={
     </div>`;
   },
   _sourisHybridBrief(){
-    const hand=this.stats.sourisHub.handConfig;
+    const hand=this.stats.sourisHybridHand;
     const label=hand==='mouse-left'?'Souris à gauche · clavier main droite':'Souris à droite · clavier main gauche';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
         <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
           <div style="color:var(--accent)">${ICONS.hand}</div>
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Duo souris + clavier</h2>
@@ -6288,7 +6135,7 @@ const app={
   },
   _sourisHybridSpawn(){
     const s=this.souris;
-    const pool=this._sourisHandLetters(this.stats.sourisHub.handConfig);
+    const pool=this._sourisHandLetters(this.stats.sourisHybridHand);
     s.letter=pool[Math.floor(Math.random()*pool.length)];
     s.tx=16+Math.random()*68;s.ty=18+Math.random()*64;s.tr=9;
     s.spawnAt=Date.now();s.firstHoverAt=null;s._hovering=false;
@@ -6343,7 +6190,7 @@ const app={
   },
   _sourisHybridRender(){
     const s=this.souris;
-    if(!this.stats.sourisHub.handConfig&&s.phase!=='config')s.phase='config';
+    if(!this.stats.sourisHybridHand&&s.phase!=='config')s.phase='config';
     if(s.phase==='config')return this._sourisHybridConfigScreen();
     if(s.phase==='brief')return this._sourisHybridBrief();
     if(s.phase==='end')return this._sourisHybridEndScreen();
@@ -6363,7 +6210,7 @@ const app={
             <div id="hybrid-target" style="position:absolute;left:${s.tx}%;top:${s.ty}%;width:${s.tr*2}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid var(--accent);background:radial-gradient(circle at 35% 30%,rgba(255,77,46,.5),rgba(255,77,46,.12) 70%);box-shadow:0 8px 24px rgba(255,77,46,.3);display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3);animation:calib-pulse 1s infinite">${s.letter}</div>
           </div>
         </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
     this._sourisHybridBindArena();
@@ -6378,7 +6225,6 @@ const app={
           record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
           boxes:[{label:'Score',value:s.score,accent:true},{label:'Visée',value:s._avgAim,unit:'ms'},{label:'Frappe',value:s._acc,unit:'%'}],
           primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisHybridStart()',
-          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
         })}
       </div>
     </div>`;
@@ -6395,7 +6241,7 @@ const app={
   _sourisTilesBrief(){
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
         <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
           <div style="color:var(--accent)">${ICONS.layers}</div>
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Magic Tiles</h2>
@@ -6532,7 +6378,7 @@ const app={
             </div>
           </div>
         </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
   },
@@ -6546,7 +6392,6 @@ const app={
           record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
           boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
           primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisTilesStart()',
-          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
         })}
       </div>
     </div>`;
@@ -6561,7 +6406,7 @@ const app={
   _sourisDuo2Brief(){
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Visée</button>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
         <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
           <div style="color:var(--accent)">${ICONS.swords}</div>
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Double piste</h2>
@@ -6655,7 +6500,7 @@ const app={
             </div>
           </div>
         </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'hub'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
     </div>`;
     this._sourisDuo2BindArena();
@@ -6670,7 +6515,6 @@ const app={
           record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
           boxes:[{label:'Synchro',value:s._synchro,unit:'%',accent:true},{label:'Précision souris',value:s._mousePct,unit:'%'},{label:'Lettres tapées',value:s.keyHits}],
           primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisDuo2Start()',
-          secondaryLabel:'← Visée',secondaryOnClick:"app.souris={phase:'hub'};app.renderSouris()",
         })}
       </div>
     </div>`;
@@ -6685,7 +6529,7 @@ const app={
     if(this.activeGame==='simon'){this.renderSimon();return;}
     if(this.activeGame==='boss'){this.renderBoss();return;}
     if(this.activeGame==='duel'){this.renderDuel();return;}
-    if(this.activeGame==='souris'){this.renderSouris();return;}
+    if(SOURIS_GAMES.includes(this.activeGame)){this.renderSouris();return;}
     if(this.activeGame==='clavier'){this.renderClavier();return;}
     // selector
     const totalPlayable=GCINE_GAMES.filter(g=>!g.comingSoon).length+1; // +1 = Boss de la semaine, hors catégories
@@ -6766,20 +6610,23 @@ const app={
     this.renderGames();
   },
   _gcineCard(g,i){
-    const tag=g.comingSoon?'Bientôt disponible':(g.expert?'EXPERT':(currentUser?'GRATUIT':'Compte requis'));
-    return `<div class="gcine-card${g.comingSoon?' is-disabled':''}" data-idx="${i}">
+    const locked=typeof g.locked==='function'&&g.locked(this);
+    const disabled=g.comingSoon||locked;
+    const tag=g.comingSoon?'Bientôt disponible':locked?'🔒 Verrouillé':(g.expert?'EXPERT':(currentUser?'GRATUIT':'Compte requis'));
+    const cta=g.comingSoon?'Bientôt disponible ⏳':locked?(g.lockedTag||'Verrouillé'):'Jouer maintenant →';
+    return `<div class="gcine-card${disabled?' is-disabled':''}" data-idx="${i}">
       <div class="gcine-card-inner">
         <div class="gcine-blob gcine-blob-a"></div>
         <div class="gcine-blob gcine-blob-b"></div>
         <div class="gcine-card-top">
-          <div class="gcine-card-icon">${ICONS[g.icon]}</div>
+          <div class="gcine-card-icon">${locked?'🔒':ICONS[g.icon]}</div>
           <div class="gcine-card-tag">${tag}</div>
         </div>
         <div class="gcine-card-body">
           <div class="gcine-card-name">${g.name}</div>
           <div class="gcine-card-desc">${g.desc}</div>
         </div>
-        <div class="gcine-card-cta">${g.comingSoon?'Bientôt disponible ⏳':'Jouer maintenant →'}</div>
+        <div class="gcine-card-cta">${cta}</div>
         <div class="gcine-card-n">${String(i+1).padStart(2,'0')}</div>
       </div>
     </div>`;
@@ -6836,8 +6683,9 @@ const app={
       if(!card)return;
       const i=+card.dataset.idx;
       if(i!==idx){setIdx(i);return;}
-      if(visibleGames[i].comingSoon)return;
-      this.selectGame(visibleGames[i].key);
+      const g=visibleGames[i];
+      if(g.comingSoon||(typeof g.locked==='function'&&g.locked(this)))return;
+      this.selectGame(g.key);
     };
     cardsEl.addEventListener('click',onCardsClick);
     const dotHandlers=dotEls.map((d,i)=>{const h=()=>setIdx(i);d.addEventListener('click',h);return h;});
@@ -6950,7 +6798,26 @@ const app={
       this.duelLeave();this.activeGame='duel';this.duel={phase:'menu'};this.renderGames();
     } else if(which==='souris'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('souris'));return;}
-      this.activeGame='souris';this.souris={phase:'hub'};this.renderGames();
+      this.activeGame='souris';this.souris={phase:'mouseMenu'};this.renderGames();
+    } else if(which==='sourisSolo'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisSolo'));return;}
+      this.activeGame='sourisSolo';this.souris={phase:'brief',track:'solo'};this.renderGames();
+    } else if(which==='sourisGrid'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisGrid'));return;}
+      this.activeGame='sourisGrid';this.souris={phase:'brief',track:'grid'};this.renderGames();
+    } else if(which==='sourisWaves'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisWaves'));return;}
+      this.activeGame='sourisWaves';this.souris={phase:'brief',track:'waves'};this.renderGames();
+    } else if(which==='sourisHybrid'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisHybrid'));return;}
+      this.activeGame='sourisHybrid';this.souris={phase:'brief',track:'hybrid'};this.renderGames();
+    } else if(which==='sourisTiles'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisTiles'));return;}
+      this.activeGame='sourisTiles';this.souris={phase:'brief',track:'tiles'};this.renderGames();
+    } else if(which==='sourisDuo2'){
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisDuo2'));return;}
+      if(!this._sourisDuo2Unlocked())return; // carte verrouillée dans l'UI, garde défensive ici
+      this.activeGame='sourisDuo2';this.souris={phase:'brief',track:'duo2'};this.renderGames();
     } else if(which==='clavier'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('clavier'));return;}
       this.activeGame='clavier';this.clavier=null;this.renderGames();
