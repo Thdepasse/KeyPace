@@ -3369,15 +3369,15 @@ const GCINE_CATS=[
 ];
 const GCINE_GAMES=[
   {key:'frappe',icon:'target',name:'Frappe-mots',desc:"Des mots tombent du ciel : tape-les avant qu'ils touchent le sol. Vitesse et réactivité.",expert:false,category:'vitesse'},
-  {key:'sprint',icon:'flag',name:'Le Sprint',desc:"30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace : chaque seconde compte.",expert:true,category:'vitesse'},
-  {key:'course',icon:'raceCar',name:'Course de dactylo',desc:"Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !",expert:true,category:'vitesse'},
-  {key:'ghost',icon:'ghost',name:'Contre ton fantôme',desc:"Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !",expert:true,category:'vitesse'},
+  {key:'sprint',icon:'flag',name:'Le Sprint',desc:"30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace : chaque seconde compte.",expert:false,category:'vitesse'},
+  {key:'course',icon:'raceCar',name:'Course de dactylo',desc:"Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !",expert:false,category:'vitesse'},
+  {key:'ghost',icon:'ghost',name:'Contre ton fantôme',desc:"Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !",expert:false,category:'vitesse'},
   {key:'tireur',icon:'crosshair',name:"Tireur d'élite",desc:"Tape chaque mot sans la moindre faute. Une seule erreur et la cible est ratée : la précision avant tout.",expert:false,category:'precision'},
   {key:'souris',icon:'mouse',name:'Précision souris',desc:"12 niveaux qui montent en difficulté : viser, cliquer, glisser-déposer, puis le clavier (ZQSD) en renfort.",expert:false,category:'precision'},
   {key:'sourisSolo',icon:'target',name:'Cible unique',desc:"Une lettre, un rythme : repère la cible et tape sa lettre avant qu'elle ne disparaisse. Pure réaction clavier.",expert:false,category:'precision'},
   {key:'sourisGrid',icon:'grid',name:'Grille réflexe',desc:"9 cases, une s'allume : tape sa lettre avant les pièges qui s'allument aussi.",expert:false,category:'precision'},
-  {key:'sourisWaves',icon:'flag',name:'Vagues & Boss',desc:"4 vagues, une règle différente à chaque fois, puis un mot-boss pour finir.",expert:false,category:'precision'},
-  {key:'sourisHybrid',icon:'hand',name:'Duo souris + clavier',desc:"Vise à la souris, valide au clavier — une main sur chaque, une lettre à la fois.",expert:false,category:'precision'},
+  {key:'sourisWaves',icon:'flag',name:'Vagues & Boss',desc:"4 vagues, une règle différente à chaque fois, puis un mot-boss pour finir.",expert:true,category:'precision'},
+  {key:'sourisHybrid',icon:'hand',name:'Duo souris + clavier',desc:"Vise à la souris, valide au clavier — une main sur chaque, une lettre à la fois.",expert:true,category:'precision'},
   {key:'sourisTiles',icon:'layers',name:'Magic Tiles',desc:"8 couloirs, ta rangée de repos QSDF JKLM : tape ou tiens la touche avant la ligne.",expert:false,category:'precision'},
   {key:'sourisDuo2',icon:'swords',name:'Double piste',desc:"Les deux mains sollicitées en même temps. Le plus exigeant des jeux de précision.",expert:false,category:'precision',locked:a=>!a._sourisDuo2Unlocked(),lockedTag:'3 pistes à bronze+ requises'},
   {key:'simon',icon:'brain',name:'Simon des mots',desc:"Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.",expert:false,category:'memoire'},
@@ -3385,7 +3385,7 @@ const GCINE_GAMES=[
   {key:'duel',icon:'swords',name:'Duel 1v1',desc:"Défie un ami en temps réel sur le même texte. Partage un lien, comptez 3-2-1, et que le plus rapide gagne !",expert:false,category:'multi'},
   {key:'royale',icon:'gamepad',name:'Battle Royale',desc:"Jusqu'à 50 joueurs, un seul texte, un seul survivant. Le mode multijoueur le plus ambitieux de KeyPace arrive bientôt.",expert:false,category:'multi',comingSoon:true},
 ];
-const GCINE_BOSS={key:'boss',icon:'trophy',name:'Boss de la semaine',desc:"Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !",expert:true};
+const GCINE_BOSS={key:'boss',icon:'trophy',name:'Boss de la semaine',desc:"Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !",expert:false};
 const CLAVIER_ROWS=['AZERTYUIOP'.split(''),'QSDFGHJKLM'.split(''),'WXCVBN'.split('')];
 // Les 7 jeux ex-Visée partagent un seul state (this.souris) et un seul rendu/
 // routeur clavier (renderSouris/sourisKey), qui dispatchent déjà sur
@@ -7241,25 +7241,21 @@ const app={
   selectGame(which){
     if(which==='sprint'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sprint'));return;}
-      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='sprint';this.sprint=null;this.renderGames();
     } else if(which==='tireur'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('tireur'));return;}
       this.activeGame='tireur';this.tireur=null;this.renderGames();
     } else if(which==='course'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('course'));return;}
-      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='course';this.course=null;this.renderGames();
     } else if(which==='ghost'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('ghost'));return;}
-      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='ghost';this.ghost=null;this.renderGames();
     } else if(which==='simon'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('simon'));return;}
       this.activeGame='simon';this.simon=null;this.renderGames();
     } else if(which==='boss'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('boss'));return;}
-      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='boss';this.boss=null;this.startBossLoop();this.bossLoad();
     } else if(which==='duel'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('duel'));return;}
@@ -7275,9 +7271,11 @@ const app={
       this.activeGame='sourisGrid';this.souris={phase:'brief',track:'grid'};this.renderGames();
     } else if(which==='sourisWaves'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisWaves'));return;}
+      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='sourisWaves';this.souris={phase:'brief',track:'waves'};this.renderGames();
     } else if(which==='sourisHybrid'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisHybrid'));return;}
+      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='sourisHybrid';this.souris={phase:'brief',track:'hybrid'};this.renderGames();
     } else if(which==='sourisTiles'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisTiles'));return;}
