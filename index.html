@@ -744,7 +744,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
    utilisé par les écrans de fin/portail invité, où le glow serait excessif). */
 .gidle{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:40px 20px}
 .gidle p{color:rgba(255,255,255,.55);font-size:15px;line-height:1.6;max-width:420px;margin:0}
-.gidle-title{font-size:44px!important;text-shadow:0 0 30px rgba(255,140,90,.7),0 0 70px rgba(255,77,46,.4)}
+.gidle-title{font-size:44px!important;color:#fff;text-shadow:0 0 30px rgba(255,140,90,.7),0 0 70px rgba(255,77,46,.4)}
 .gidle-title .dot{color:var(--accent);text-shadow:0 0 24px rgba(255,77,46,.9)}
 .gidle-espace{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;color:rgba(255,255,255,.35);margin-top:-4px}
 @media(max-width:640px){.gidle-title{font-size:30px!important}}
@@ -1048,6 +1048,59 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
   .course-stat-val{font-size:32px}
   .course-lane-name{width:96px;font-size:11px}
 }
+
+/* MAGIC TILES */
+.tiles-hud{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.tiles-hud-label{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.16em;margin-bottom:3px}
+.tiles-hud-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:30px;line-height:1;color:var(--accent);text-shadow:0 0 24px rgba(255,77,46,.5)}
+.tiles-hud-val.sec{color:#fff;text-shadow:0 0 18px rgba(255,255,255,.25)}
+.tiles-rank{text-align:center}
+.tiles-rank-row{display:flex;align-items:center;gap:8px}
+.tiles-rank-cur{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:16px;color:var(--accent);text-shadow:0 0 14px rgba(255,77,46,.6)}
+.tiles-rank-bar{width:76px;height:5px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
+.tiles-rank-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#ff8a5c);border-radius:3px;transition:width .25s ease-out;box-shadow:0 0 8px rgba(255,77,46,.6)}
+.tiles-rank-next{font-family:'JetBrains Mono',monospace;font-weight:700;color:rgba(255,255,255,.35);font-size:11px}
+.tiles-meta{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;margin:0 0 10px}
+.tiles-bpm{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.05em;transition:color .2s}
+.tiles-bpm.hot{color:#FF8A5C;text-shadow:0 0 10px rgba(255,138,92,.7)}
+.tiles-hearts span{font-size:16px;margin-left:1px}
+.tiles-board{position:relative;z-index:1;min-height:300px;display:flex;background:rgba(255,255,255,.02);border-radius:14px;overflow:hidden}
+.tiles-lane{position:relative;flex:1;border-left:1.5px dashed rgba(255,255,255,.08)}
+.tiles-lane:first-child{border-left:none}
+.tiles-tile{position:absolute;left:9%;right:9%;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:15px;text-transform:uppercase;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 4px 14px rgba(0,0,0,.4);transition:top .05s linear}
+.tiles-tile::after{content:'';position:absolute;left:8%;right:8%;top:3px;height:30%;border-radius:6px;background:linear-gradient(rgba(255,255,255,.35),transparent)}
+.tiles-tile.holding{box-shadow:0 0 0 2px #fff,inset 0 -3px 0 rgba(0,0,0,.25),0 0 20px rgba(255,255,255,.5);transition:none}
+.tiles-tile.bonus{background:linear-gradient(160deg,#FFE27A,#F4B400)!important;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),0 0 22px rgba(255,216,77,.65)}
+.tiles-hitline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55) 15%,rgba(255,255,255,.55) 85%,transparent);box-shadow:0 0 14px rgba(255,255,255,.35);z-index:1}
+.tiles-keys{position:relative;z-index:1;display:flex}
+.tiles-key{flex:1;text-align:center;padding:9px 0;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:rgba(255,255,255,.75);background:rgba(255,255,255,.05);border-left:1.5px dashed rgba(255,255,255,.08);border-bottom:3px solid rgba(255,255,255,.12);border-radius:0 0 8px 8px;transition:transform .08s,box-shadow .08s,background .08s}
+.tiles-key:first-child{border-left:none}
+.tiles-key.locked{opacity:.25}
+.tiles-key.pressed{transform:translateY(2px);border-bottom-color:transparent;background:rgba(255,77,46,.3);box-shadow:0 0 16px rgba(255,77,46,.45)}
+.tiles-judge{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);text-align:center;z-index:6;pointer-events:none;animation:tilesPop .22s ease-out}
+.tiles-judge-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;color:#fff;text-shadow:0 0 26px rgba(255,255,255,.35)}
+.tiles-judge-pill{display:inline-flex;align-items:center;gap:6px;margin-top:6px;border-radius:999px;padding:5px 15px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff}
+@keyframes tilesPop{0%{transform:translate(-50%,-50%) scale(.6);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.tiles-banner{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:7;padding:8px 20px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12px;letter-spacing:.05em;white-space:nowrap;animation:tilesBannerIn .3s ease-out}
+.tiles-banner.stage{background:rgba(255,77,46,.16);border:1px solid rgba(255,77,46,.5);color:#fff;box-shadow:0 0 20px rgba(255,77,46,.35)}
+.tiles-banner.intense{background:rgba(229,72,77,.2);border:1px solid #E5484D;color:#fff;box-shadow:0 0 24px rgba(229,72,77,.5);animation:tilesBannerIn .3s ease-out,tilesPulse 1s ease-in-out infinite}
+.tiles-banner.success{background:rgba(31,169,113,.18);border:1px solid #1FA971;color:#fff;box-shadow:0 0 20px rgba(31,169,113,.45)}
+@keyframes tilesBannerIn{0%{opacity:0;transform:translate(-50%,-8px)}100%{opacity:1;transform:translate(-50%,0)}}
+@keyframes tilesPulse{0%,100%{box-shadow:0 0 24px rgba(229,72,77,.5)}50%{box-shadow:0 0 34px rgba(229,72,77,.85)}}
+/* MAGIC TILES — écran d'accroche */
+.tiles-intro{position:relative;padding:56px 32px 44px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;overflow:hidden}
+.tiles-intro-deco{position:absolute;width:130px;height:130px;border-radius:26px;z-index:0;pointer-events:none;filter:blur(.3px)}
+.tiles-intro-deco.l{left:-46px;top:22%;background:linear-gradient(160deg,#33291f,#181310);transform:rotate(-9deg)}
+.tiles-intro-deco.r{right:-46px;top:14%;background:linear-gradient(160deg,#FF9868,#FF4D2E);opacity:.92;animation:tilesIntroDecoFloat 4.6s ease-in-out infinite}
+@keyframes tilesIntroDecoFloat{0%,100%{transform:translateY(0) rotate(11deg)}50%{transform:translateY(34px) rotate(-16deg)}}
+.tiles-intro-title{position:relative;z-index:1;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(44px,9vw,100px);line-height:.94;letter-spacing:-.01em;text-transform:uppercase;color:#fff;margin:0;text-shadow:0 0 40px rgba(255,140,90,.5)}
+.tiles-intro-sub{position:relative;z-index:1;color:rgba(255,255,255,.62);font-size:16px;line-height:1.6;max-width:440px;margin:0}
+.tiles-intro-keys{position:relative;z-index:1;display:flex;gap:11px;justify-content:center;margin:6px 0 4px;flex-wrap:wrap}
+.tiles-intro-key{width:56px;height:56px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:19px;color:#fff;text-transform:uppercase;box-shadow:inset 0 -3px 0 rgba(0,0,0,.28),0 4px 12px rgba(0,0,0,.4);background-image:linear-gradient(100deg,var(--dim) 0%,var(--bright) 15%,var(--dim) 30%,var(--bright) 45%,var(--dim) 60%);background-size:300% 100%;animation:tilesIntroFlow 4s linear infinite}
+@keyframes tilesIntroFlow{from{background-position:0% 0%}to{background-position:-300% 0%}}
+@media(max-width:640px){.tiles-intro-key{width:42px;height:42px;font-size:16px;border-radius:12px}.tiles-intro-deco{width:80px;height:80px}}
+@media(prefers-reduced-motion:reduce){.tiles-judge{animation:none}.tiles-banner{animation:none!important}.tiles-tile{transition:none}.tiles-intro-key{animation:none}.tiles-intro-deco.r{animation:none}}
+@media(max-width:640px){.tiles-hud-val{font-size:24px}.tiles-judge-text{font-size:26px}}
 
 /* SIMON DES MOTS */
 .simon-arena{background:#16140F;color:#fff;border-radius:24px;padding:28px;max-width:1120px;margin:0 auto;position:relative;min-height:380px;overflow:hidden}
@@ -1581,6 +1634,7 @@ const SOUND_FILES={
   victory:'/sounds/victory.mp3',
   defeat:'/sounds/defeat.mp3',
   countdown:'/sounds/countdown.mp3',
+  life:'/sounds/life.mp3',
 };
 const _soundCache={};
 function isSoundMuted(){try{return localStorage.getItem('kp_sound_muted')==='1';}catch{return false;}}
@@ -2347,6 +2401,35 @@ const KB=[
   [{l:'A',f:'lp'},{l:'Z',f:'lr'},{l:'E',f:'lm'},{l:'R',f:'li'},{l:'T',f:'li'},{l:'Y',f:'ri'},{l:'U',f:'ri'},{l:'I',f:'rm'},{l:'O',f:'rr'},{l:'P',f:'rp'}],
   [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
   [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'!',s:'§',f:'rp'}]
+];
+// Magic Tiles (Visée) : 8 couloirs FIXES, un par doigt hors pouces — Q S D F
+// (main gauche) et J K L M (main droite), la vraie rangée de repos. Chaque
+// colonne correspond toujours à la même touche (comme un vrai piano tiles),
+// pas une lettre aléatoire par couloir.
+const TILES_LANES=[
+  {letter:'q',hand:'l'},{letter:'s',hand:'l'},{letter:'d',hand:'l'},{letter:'f',hand:'l'},
+  {letter:'j',hand:'r'},{letter:'k',hand:'r'},{letter:'l',hand:'r'},{letter:'m',hand:'r'},
+];
+const TILES_HAND_GRADIENT={l:'linear-gradient(160deg,#FF9868,#FF4D2E)',r:'linear-gradient(160deg,#A8493A,#6F2A20)'};
+const TILES_RANKS=['D','C','B','A','S','SS','SSS'];
+const TILES_RANK_SCORE=[0,120,280,480,750,1100,1600];
+// Difficulté progressive : de plus en plus de couloirs s'activent au fil de
+// la partie (indices dans TILES_LANES). Chaque palier ≥1 reçoit, 6s après son
+// début, un "passage intense" de 3.5s (tempo accéléré) — annoncé à l'écran.
+const TILES_SESSION_MS=45000;
+const TILES_STAGES=[
+  {lanes:[3,4],t:0,label:'2 TOUCHES · F · J'},
+  {lanes:[2,3,4,5],t:9000,label:'4 TOUCHES · D F J K'},
+  {lanes:[1,2,3,4,5,6],t:20000,label:'6 TOUCHES · S D F J K L'},
+  {lanes:[0,1,2,3,4,5,6,7],t:32000,label:'8 TOUCHES · CLAVIER COMPLET'},
+];
+// Rampe décorative pour l'écran d'accroche (indépendante des couleurs de jeu
+// TILES_HAND_GRADIENT) : sombre à gauche, incandescente au centre-droit. Chaque
+// touche anime son propre dégradé (dim→bright) pour un effet de lumière qui
+// se balade en continu, décalé touche par touche.
+const TILES_INTRO_KEY_RAMP=[
+  ['#1a1512','#3c2e22'],['#33221a','#6b3d26'],['#55261a','#9c4023'],['#7c2e1c','#d1521f'],
+  ['#9c3a1c','#ff6a30'],['#b8451f','#ff8348'],['#b8451f','#ff9455'],['#6f2c1c','#c85a2e'],
 ];
 const PASSAGES=["le matin, la lumière douce traverse les rideaux et réveille doucement la maison encore endormie sous un ciel calme et clair.", "le petit renard roux traverse le champ gelé, observe les oiseaux au loin, puis disparaît derrière la vieille grange en bois.", "la pluie tombe sur les toits de la vieille ville, les rues brillent sous les lampadaires et un chat traverse sans bruit la place déserte.", "le train file à travers la campagne verte, les collines défilent derrière la vitre et le voyageur sourit en pensant au bord de mer qui l'attend.", "en automne, les feuilles rousses tombent une à une sur le chemin de terre, formant un tapis doré que le vent balaie doucement.", "la neige recouvre les toits du village et étouffe les bruits de la rue, laissant place à un silence blanc et paisible.", "au bord du lac, les roseaux ploient sous la brise tandis qu'un héron immobile guette patiemment le passage d'un poisson.", "le soleil se couche lentement derrière les montagnes, teintant le ciel d'orange et de rose avant que la nuit ne tombe.", "un orage gronde au loin, les nuages s'assombrissent et les premières gouttes viennent frapper les vitres de la cuisine.", "dans la forêt humide, la mousse recouvre les pierres et l'odeur de terre mouillée se mêle à celle des feuilles pourries.", "le vent d'hiver siffle entre les branches nues des arbres, faisant claquer les volets de la vieille ferme abandonnée.", "les vagues viennent mourir sur le sable fin, laissant derrière elles des coquillages que les enfants ramassent avec joie.", "au printemps, les premières fleurs percent la terre encore froide et annoncent le retour des beaux jours pour tous.", "la brume matinale enveloppe la vallée, cachant les sommets et donnant au paysage une allure mystérieuse et calme.", "un arc-en-ciel apparaît après l'averse, dessinant ses couleurs vives au-dessus des champs encore luisants de pluie.", "les étoiles scintillent dans le ciel dégagé de la montagne, loin des lumières de la ville qui les cachent d'habitude.", "le ruisseau serpente entre les rochers, son eau claire reflétant les branches des saules penchés au-dessus de lui.", "la chaleur de l'été rend l'air épais et immobile, poussant chacun à chercher l'ombre fraîche des grands platanes.", "un vol d'oies sauvages traverse le ciel gris de novembre, formant un grand triangle qui s'éloigne vers le sud.", "la rosée du matin perle sur les toiles d'araignée tendues entre les herbes hautes du jardin encore silencieux.", "le petit chat gris se glisse entre les pots de fleurs, curieux de découvrir ce qui se cache derrière la haie du voisin.", "un troupeau de moutons traverse lentement la route de campagne, guidé par un vieux berger et son chien fidèle.", "les hirondelles reviennent chaque printemps construire leur nid sous le toit de la vieille maison familiale.", "le hérisson sort de sa cachette à la tombée de la nuit pour chercher quelques insectes dans l'herbe humide.", "dans l'étable, les vaches ruminent tranquillement pendant que le fermier prépare le foin pour l'hiver prochain.", "un écureuil bondit de branche en branche, cherchant les noisettes qu'il a cachées un peu partout dans le parc.", "le chien attend patiemment devant la porte, la queue frétillante, guettant le retour de son maître chaque soir.", "les abeilles butinent les fleurs du jardin, transportant le pollen d'une plante à l'autre sous le soleil de juin.", "un cerf traverse la clairière au petit matin, immobile un instant avant de disparaître dans les fourrés épais.", "les poules picorent dans la cour de la ferme, tandis que le coq surveille attentivement les alentours du poulailler.", "le dauphin saute hors de l'eau près du bateau, ravissant les touristes venus observer la vie marine côtière.", "un papillon multicolore se pose délicatement sur une fleur, restant immobile quelques secondes avant de repartir.", "les chevaux galopent dans le pré, profitant des premiers rayons du soleil après une longue nuit d'hiver.", "le lapin détale à travers le potager dès qu'il entend le moindre bruit venant de la maison voisine.", "les grenouilles chantent près de l'étang, créant un concert nocturne qui accompagne les longues soirées d'été.", "le café fume doucement sur la table de la cuisine pendant que la radio annonce les nouvelles du matin.", "chaque dimanche, la famille se retrouve autour d'un grand repas préparé avec soin par les grands-parents.", "la lessive sèche sur le fil tendu entre deux arbres, se balançant doucement au rythme léger du vent.", "après le dîner, les enfants rangent leurs jouets pendant que les parents discutent tranquillement au salon.", "le réveil sonne trop tôt ce matin-là, et il faut se dépêcher pour ne pas rater le bus habituel.", "la vieille horloge du couloir sonne midi, rappelant à chacun qu'il est temps de passer à table.", "un livre oublié traîne sur la table basse, marque-page glissé entre deux pages depuis plusieurs jours déjà.", "la maison sent bon le pain frais, tout juste sorti du four que la grand-mère surveille avec attention.", "le chat s'installe confortablement sur le canapé, roulé en boule près de la fenêtre baignée de soleil.", "chaque soir, avant de dormir, les enfants demandent une histoire que leur mère raconte avec plaisir.", "la boîte aux lettres déborde de publicités, cachant presque la lettre attendue depuis plusieurs semaines.", "le grenier renferme de vieilles photographies jaunies qui racontent l'histoire de plusieurs générations.", "le jardin réclame quelques soins avant l'arrivée du printemps : tailler les rosiers, retourner la terre.", "une odeur de gâteau au chocolat envahit la maison, annonçant l'anniversaire tant attendu par les enfants.", "le samedi matin, le marché du village s'anime tôt avec les cris joyeux des commerçants installant leurs étals.", "la clé tourne difficilement dans la serrure de la vieille porte, usée par des années d'ouverture quotidienne.", "les volets claquent doucement sous la brise, rappelant qu'il faudrait les réparer avant l'hiver prochain.", "un plateau de fruits frais trône sur la table, prêt à être partagé après le repas de midi.", "la cave garde une fraîcheur agréable même pendant les journées les plus chaudes de l'été.", "le linge propre s'empile sur le lit, attendant d'être plié avant que la soirée ne commence.", "le professeur explique lentement la leçon du jour pendant que les élèves prennent des notes attentivement.", "chaque exercice de dactylographie demande de la patience, mais les progrès arrivent plus vite qu'on ne le pense.", "apprendre à taper vite ressemble à une course : au début chaque mot compte, puis le rythme s'installe naturellement.", "la bibliothèque de l'école reste ouverte tard le soir pour permettre aux élèves de réviser avant les examens.", "un cahier neuf sent toujours particulièrement bon, avec ses pages blanches encore vierges de toute écriture.", "la cloche sonne la fin des cours, libérant dans la cour une foule d'élèves pressés de rentrer chez eux.", "chaque champion a commencé débutant : la vraie différence se joue dans la régularité et le plaisir de progresser.", "le tableau noir se remplit peu à peu de formules que les élèves recopient avec application dans leur cahier.", "réviser régulièrement, même quelques minutes chaque jour, aide bien plus qu'une longue session juste avant l'examen.", "la salle informatique bourdonne du bruit des claviers pendant que chacun termine son exercice de frappe.", "un élève lève la main timidement pour poser une question sur l'exercice qu'il n'a pas bien compris.", "la rentrée approche et il faut déjà préparer le nouveau cartable ainsi que les fournitures scolaires.", "progresser demande de la constance : mieux vaut s'entraîner quinze minutes chaque jour qu'une heure une seule fois.", "le dictionnaire posé sur le bureau permet de vérifier l'orthographe des mots les plus difficiles à retenir.", "chaque niveau franchi apporte une nouvelle confiance, poussant l'élève à viser encore un peu plus haut.", "le bureau reste silencieux tôt le matin, avant que les collègues n'arrivent un à un pour commencer la journée.", "un rapport urgent doit être terminé avant midi, ce qui pousse chacun à taper plus vite que d'habitude.", "la réunion s'éternise autour de la table, tandis que certains prennent des notes sur leur ordinateur portable.", "écrire vite, c'est surtout écrire juste : vise la précision avant la vitesse, et la cadence viendra naturellement.", "le téléphone sonne sans arrêt ce matin-là, interrompant sans cesse la rédaction du courrier important.", "chaque employé dispose désormais d'un poste équipé d'un clavier confortable pour limiter la fatigue des mains.", "la pause déjeuner permet à toute l'équipe de se retrouver autour d'un café loin des écrans lumineux.", "un nouveau logiciel de gestion vient d'être installé, obligeant chacun à apprendre de nouvelles habitudes.", "le responsable relit attentivement chaque document avant de l'envoyer aux clients pour validation finale.", "taper un courrier professionnel demande autant de clarté que de rapidité pour convaincre le destinataire.", "les dossiers s'empilent sur le bureau, mais un peu d'organisation permet toujours d'y voir plus clair.", "le télétravail change les habitudes : certains préfèrent désormais travailler tôt le matin dans le calme.", "la présentation de fin d'année demande plusieurs jours de préparation minutieuse avant d'être enfin prête.", "un simple courriel bien tapé peut parfois éviter des heures de discussion inutile entre collègues.", "chaque projet avance étape par étape, et la patience finit toujours par porter ses fruits au bureau.", "le coureur accélère dans la dernière ligne droite, puisant dans ses dernières forces pour franchir la ligne.", "chaque samedi matin, le club de football se retrouve sur le terrain pour un entraînement intensif.", "la piscine municipale accueille de nombreux nageurs dès l'ouverture, profitant du calme avant la foule.", "un match de tennis serré tient les spectateurs en haleine jusqu'au tout dernier point de la rencontre.", "grimper en montagne demande autant d'endurance que de concentration pour ne jamais perdre l'équilibre.", "le vélo reste le moyen préféré des habitants pour se déplacer dans les petites rues du centre-ville.", "une partie d'échecs peut durer des heures, chaque joueur réfléchissant longuement avant de bouger une pièce.", "le groupe de randonneurs s'arrête au sommet pour admirer le paysage avant de redescendre lentement.", "la salle de danse résonne de musique joyeuse pendant que les élèves répètent leur chorégraphie du spectacle.", "jouer aux cartes en famille reste une tradition du dimanche soir, entre rires et petites disputes amicales.", "le pêcheur attend patiemment sur la rive, sa ligne tendue vers l'eau calme du fleuve tranquille.", "chaque compétition de dactylographie attire des passionnés venus mesurer leur vitesse face à d'autres joueurs.", "la course cycliste traverse plusieurs villages avant d'arriver enfin dans la ville qui accueille l'arrivée.", "le yoga du matin aide à retrouver calme et concentration avant de commencer une longue journée chargée.", "un tournoi de basket réunit chaque été les équipes des quartiers voisins autour d'une compétition amicale.", "la gare grouille de voyageurs pressés, valises à la main, cherchant le quai de leur prochain train.", "le tramway glisse silencieusement le long des avenues, s'arrêtant à chaque station pour laisser monter les passagers.", "un vieux pont de pierre relie les deux rives de la rivière, offrant une vue magnifique sur la vallée.", "la ville s'éveille doucement, les commerces ouvrent leurs volets et les premiers passants arpentent les trottoirs.", "un long voyage en voiture traverse plusieurs régions, chacune offrant des paysages différents et surprenants.", "le port bruisse d'activité dès l'aube, entre pêcheurs qui rentrent et bateaux qui se préparent à partir.", "les ruelles étroites du centre historique cachent de petites boutiques que seuls les habitués connaissent vraiment.", "l'avion survole les nuages, offrant aux passagers une vue imprenable sur les montagnes enneigées en contrebas.", "chaque quartier de la capitale possède son propre caractère, entre marchés animés et places tranquilles.", "le bateau quitte lentement le port, laissant derrière lui une traînée blanche sur l'eau bleue et calme.", "visiter une nouvelle ville demande de se perdre un peu, loin des itinéraires trop connus des guides.", "la place centrale se remplit chaque soir de terrasses animées où les gens discutent jusque tard.", "un long chemin de montagne mène jusqu'au village perché, accessible seulement à pied ou à vélo.", "le métro traverse la ville sous terre, transportant chaque jour des milliers de passagers pressés.", "les phares du bord de mer guident encore aujourd'hui les bateaux perdus dans la brume nocturne.", "la soupe mijote doucement sur le feu, embaumant toute la cuisine d'une odeur chaude et réconfortante.", "préparer une tarte demande du temps, mais le résultat récompense toujours les efforts fournis en cuisine.", "le pain croustillant sort du four juste à temps pour accompagner le repas du soir en famille.", "chaque marché propose des légumes frais cueillis le matin même dans les fermes des environs.", "la recette de grand-mère se transmet depuis plusieurs générations, gardée précieusement dans un vieux carnet.", "un plat mijoté toute la journée développe des saveurs bien plus riches qu'une cuisson rapide.", "la table du dîner s'orne d'une nappe blanche, préparée avec soin pour un repas de fête.", "couper les légumes finement demande de l'entraînement, mais le geste devient vite naturel avec la pratique.", "le café du matin accompagne toujours une lecture rapide du journal avant de partir travailler.", "préparer un repas simple mais soigné reste souvent plus satisfaisant qu'une recette compliquée et longue.", "la boulangerie du coin ouvre tôt chaque matin pour proposer croissants et pains frais aux habitants.", "une salade colorée réunit tomates, concombres et herbes fraîches directement cueillies dans le jardin.", "taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides.", "un clavier bien positionné évite les douleurs aux poignets lors de longues sessions de frappe quotidienne.", "la précision compte autant que la vitesse : mieux vaut taper juste plutôt que corriger sans cesse.", "apprendre la position des doigts sur la rangée de base constitue la première étape vers une frappe rapide.", "chaque exercice répété renforce la mémoire des doigts, rendant les mouvements de plus en plus naturels.", "un ordinateur récent facilite grandement le travail quotidien, à condition de savoir l'utiliser efficacement.", "la disposition du clavier belge diffère légèrement du clavier français, ce qui surprend parfois les débutants.", "suivre sa progression au fil des semaines motive à continuer, même quand les résultats semblent lents.", "un bon éclairage aide à mieux voir l'écran sans fatiguer les yeux pendant une longue session de travail.", "la régularité prime sur l'intensité : dix minutes chaque jour valent mieux qu'une heure une fois par semaine.", "maîtriser son clavier permet d'écrire ses idées presque aussi vite qu'on les pense, sans y réfléchir.", "chaque touche du clavier correspond à un doigt précis, une règle simple qui change tout une fois assimilée.", "les jeux de frappe rendent l'entraînement plus amusant tout en améliorant discrètement la vitesse et la précision.", "garder le dos droit et les poignets détendus améliore grandement le confort pendant les longues séances de frappe.", "apprendre à taper à dix doigts change durablement la façon de travailler devant un ordinateur au quotidien.", "la patience d'aujourd'hui prépare l'aisance de demain : avance avec calme, précision et constance chaque jour.", "les petites habitudes répétées chaque jour finissent toujours par produire de grands changements avec le temps.", "il vaut mieux avancer lentement mais sûrement que de se précipiter et abandonner après quelques essais.", "chaque erreur apprend quelque chose de nouveau, à condition de prendre le temps de la comprendre vraiment.", "se fixer un petit objectif chaque semaine aide à garder la motivation sur le long terme.", "la persévérance finit toujours par payer, même quand les progrès semblent invisibles au jour le jour.", "prendre le temps de bien faire les choses évite souvent d'avoir à les recommencer plus tard.", "comparer ses résultats d'une semaine à l'autre montre des progrès qu'on ne remarque pas au quotidien.", "apprendre une nouvelle compétence demande du temps, mais chaque effort investi finit par porter ses fruits.", "garder une attitude positive face aux difficultés aide à surmonter plus facilement les obstacles du quotidien.", "fixer des objectifs clairs et atteignables rend le chemin vers la réussite beaucoup plus motivant.", "le calme et la concentration valent souvent mieux que la précipitation pour réussir une tâche difficile.", "chaque jour offre une nouvelle occasion de progresser un peu, même par de tout petits pas.", "accepter ses erreurs sans se décourager reste la meilleure façon d'apprendre durablement quelque chose de nouveau.", "la confiance en soi se construit progressivement, à force de petites réussites accumulées au fil du temps.", "les grands-parents racontent souvent des histoires anciennes que les petits-enfants écoutent avec grand intérêt.", "un simple appel téléphonique suffit parfois à réchauffer l'âme d'une personne qui se sentait seule.", "retrouver de vieux amis après plusieurs années procure une joie difficile à décrire avec des mots.", "les enfants grandissent si vite que chaque moment partagé avec eux mérite d'être pleinement savouré.", "un simple sourire échangé dans la rue peut parfois illuminer toute une journée compliquée.", "écrire une lettre à un proche demande plus de temps qu'un message, mais elle touche davantage.", "les repas de famille rassemblent plusieurs générations autour d'une même table, entre rires et souvenirs partagés.", "apprendre à écouter vraiment quelqu'un reste l'une des compétences les plus précieuses dans une relation.", "un anniversaire fêté simplement, entourée des siens, vaut souvent bien plus qu'une grande célébration.", "partager un projet avec un ami renforce souvent une amitié bien plus qu'une simple conversation."];
 const CURRICULUM=[
@@ -3243,7 +3326,7 @@ const GCINE_GAMES=[
   {key:'sourisGrid',icon:'grid',name:'Grille réflexe',desc:"9 cases, une s'allume : tape sa lettre avant les pièges qui s'allument aussi.",expert:false,category:'precision'},
   {key:'sourisWaves',icon:'flag',name:'Vagues & Boss',desc:"4 vagues, une règle différente à chaque fois, puis un mot-boss pour finir.",expert:false,category:'precision'},
   {key:'sourisHybrid',icon:'hand',name:'Duo souris + clavier',desc:"Vise à la souris, valide au clavier — une main sur chaque, une lettre à la fois.",expert:false,category:'precision'},
-  {key:'sourisTiles',icon:'layers',name:'Magic Tiles',desc:"4 couloirs qui défilent en rythme : souris et clavier pour ne rien laisser filer.",expert:false,category:'precision'},
+  {key:'sourisTiles',icon:'layers',name:'Magic Tiles',desc:"8 couloirs, ta rangée de repos QSDF JKLM : tape ou tiens la touche avant la ligne.",expert:false,category:'precision'},
   {key:'sourisDuo2',icon:'swords',name:'Double piste',desc:"Les deux mains sollicitées en même temps. Le plus exigeant des jeux de précision.",expert:false,category:'precision',locked:a=>!a._sourisDuo2Unlocked(),lockedTag:'3 pistes à bronze+ requises'},
   {key:'simon',icon:'brain',name:'Simon des mots',desc:"Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.",expert:false,category:'memoire'},
   {key:'clavier',icon:'keyboard',name:'Clavier vide',desc:"Le clavier est totalement vide : replace chaque lettre au bon endroit, de mémoire. Chrono lancé, chaque erreur compte.",expert:false,category:'memoire'},
@@ -5221,7 +5304,7 @@ const app={
     if(track==='grid')return this._sourisGridKey(e);
     if(track==='waves')return this._sourisWavesKey(e);
     if(track==='hybrid')return this._sourisHybridKey(e);
-    if(track==='tiles')return this._sourisTilesKey(e);
+    // 'tiles' : écouteurs keydown/keyup dédiés (tenues de touche), rien à faire ici.
     if(track==='duo2')return this._sourisDuo2Key(e);
     // 'mouse' : géré par son propre listener ZQSD, rien à faire ici.
   },
@@ -6345,107 +6428,183 @@ const app={
 
   /* ═══════════════════════════════════════════════════════════════
      VISÉE — MAGIC TILES (piste "tiles")
-     4 couloirs qui défilent en rythme : 2 couloirs clic souris, 2
-     couloirs lettre clavier. Jugement parfait/bien/raté à la ligne de
-     frappe. Le tempo (BPM) monte tous les 10 combos.
+     8 couloirs fixes Q S D F | J K L M (rangée de repos hors pouces).
+     Écouteurs keydown/keyup dédiés (comme la piste "mouse") pour gérer
+     les tuiles longues à tenir, en plus des tuiles courtes à taper.
+     Score × multiplicateur de combo, rang de morceau D→SSS en HUD.
      ═══════════════════════════════════════════════════════════════ */
-  _sourisTilesLanes:[{type:'click'},{type:'click'},{type:'key'},{type:'key'}],
+  _sourisTilesLanes:TILES_LANES,
   _sourisTilesHitLineY:82,
+  _sourisTilesRank(score){
+    let i=0;for(;i<TILES_RANK_SCORE.length-1&&score>=TILES_RANK_SCORE[i+1];i++);
+    const cur=TILES_RANK_SCORE[i],next=TILES_RANK_SCORE[i+1];
+    const pct=next?Math.min(100,Math.round(100*(score-cur)/(next-cur))):100;
+    return {label:TILES_RANKS[i],next:TILES_RANKS[i+1]||null,pct};
+  },
   _sourisTilesBrief(){
+    const best=this.stats&&this.stats.sourisTilesBest;
+    const keysHtml=TILES_LANES.map((l,i)=>`<div class="tiles-intro-key" style="--dim:${TILES_INTRO_KEY_RAMP[i][0]};--bright:${TILES_INTRO_KEY_RAMP[i][1]};animation-delay:${(i*-0.35).toFixed(2)}s">${l.letter}</div>`).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+      <div style="max-width:900px;margin:0 auto;padding:0 24px">
         <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
-        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
-          <div style="color:var(--accent)">${ICONS.layers}</div>
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Magic Tiles</h2>
-          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">4 couloirs qui défilent en rythme jusqu'à la ligne : <b>clique</b> les 2 de gauche, <b>tape la lettre</b> des 2 de droite. Le tempo accélère avec ton combo.</p>
-          <div style="display:flex;gap:26px;margin-top:4px">
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${this._sourisTiers.tiles.bronze} · 🥈${this._sourisTiers.tiles.silver} · 🥇${this._sourisTiers.tiles.gold}</div></div>
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">♥♥♥</div></div>
+        <div class="game-arena" style="height:auto;padding:0">
+          <div class="tiles-intro">
+            <div class="tiles-intro-deco l"></div>
+            <div class="tiles-intro-deco r"></div>
+            <h2 class="tiles-intro-title">Magic Tiles</h2>
+            <p class="tiles-intro-sub">Tape la tuile pile sur la ligne. Ne rate aucun temps.${best?'<br><span style="opacity:.7">Record : <b style="color:var(--accent);opacity:1">'+best.score+' pts</b></span>':''}</p>
+            <div class="tiles-intro-keys">${keysHtml}</div>
+            <button class="btn-primary" autofocus onclick="app._sourisTilesStart()">Lancer le morceau ›</button>
+            <div class="gidle-espace">OU APPUIE SUR ESPACE</div>
           </div>
-          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisTilesStart()">Commencer</button>
         </div>
       </div>
     </div>`;
   },
+  _sourisTilesStageIdx(elapsed){
+    let idx=0;for(let i=TILES_STAGES.length-1;i>=0;i--){if(elapsed>=TILES_STAGES[i].t){idx=i;break;}}
+    return idx;
+  },
   _sourisTilesStart(){
     this.stopSouris();
     this.souris={phase:'play',track:'tiles',score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,
-      bpm:100,tiles:[null,null,null,null],spawnAcc:0,sessionLeft:45000};
+      bpm:100,tiles:Array(8).fill(null),spawnAcc:0,sessionLeft:TILES_SESSION_MS,judge:null,
+      stageIdx:0,banner:{text:TILES_STAGES[0].label,kind:'stage',until:Date.now()+2200},
+      intenseActive:false,intenseLostLife:false};
+    this._sourisKeys={};TILES_LANES.forEach(l=>this._sourisKeys[l.letter]=false);
+    this._sourisKeyH=(e)=>{
+      const k=(e.key||'').toLowerCase();
+      if(!(k in this._sourisKeys)||this._sourisKeys[k])return; // touche déjà tenue : ignore la répétition auto
+      this._sourisKeys[k]=true;
+      e.preventDefault();
+      this._sourisTilesPress(k);
+      this.renderSouris();
+    };
+    this._sourisKeyUpH=(e)=>{
+      const k=(e.key||'').toLowerCase();
+      if(!(k in this._sourisKeys))return;
+      this._sourisKeys[k]=false;
+      this._sourisTilesRelease(k);
+      this.renderSouris();
+    };
+    window.addEventListener('keydown',this._sourisKeyH);
+    window.addEventListener('keyup',this._sourisKeyUpH);
     this.renderSouris();
     this._sourisLoop=setInterval(()=>this._sourisTilesTick(),50);
   },
-  _sourisTilesJudge(t){
+  _sourisTilesJudgeDist(t){
     const dist=Math.abs(t.y-this._sourisTilesHitLineY);
     if(dist<=6)return'perfect';
     if(dist<=16)return'good';
     return'bad';
   },
-  _sourisTilesPopJudge(laneIdx,j){
-    const a=document.getElementById('souris-arena');if(!a)return;
-    const label=j==='perfect'?'PARFAIT':'BIEN';
-    const col=j==='perfect'?'#FFD84D':'#1FA971';
-    const d=document.createElement('div');
-    d.textContent=label;
-    d.style.cssText=`position:absolute;left:${(laneIdx+0.5)*25}%;top:${this._sourisTilesHitLineY}%;transform:translate(-50%,-50%);color:${col};font-family:'JetBrains Mono',monospace;font-weight:800;font-size:14px;pointer-events:none;z-index:6;transition:all .5s ease-out`;
-    a.appendChild(d);
-    setTimeout(()=>{d.style.top=(this._sourisTilesHitLineY-12)+'%';d.style.opacity='0';},20);
-    setTimeout(()=>{d.remove();},520);
+  _sourisTilesMiss(){
+    const s=this.souris;
+    s.misses++;s.combo=0;s.lives--;
+    playSound('miss');this._flashArena('#E5484D');
+    s.judge={text:'RATÉ',pts:null,multi:null,kind:'bad',until:Date.now()+550};
+    if(s.intenseActive)s.intenseLostLife=true;
+    if(s.lives<=0){this._sourisTilesEnd();return true;}
+    return false;
   },
-  _sourisTilesResolve(laneIdx){
-    const s=this.souris;if(!s||s.phase!=='play')return;
-    const t=s.tiles[laneIdx];
-    if(!t)return;
-    const j=this._sourisTilesJudge(t);
-    s.tiles[laneIdx]=null;
+  _sourisTilesApply(j){
+    const s=this.souris;
     if(j==='bad'){
-      s.misses++;s.combo=0;s.lives--;
-      playSound('miss');this._flashArena('#E5484D');
-      if(s.lives<=0){this._sourisTilesEnd();return;}
+      if(this._sourisTilesMiss())return;
     } else {
-      const pts=j==='perfect'?3:1;
+      const multi=1+Math.min(3,Math.floor(s.combo/10));
+      const pts=(j==='perfect'?3:1)*multi;
       s.score+=pts;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
       if(s.combo>0&&s.combo%10===0)s.bpm=Math.min(170,s.bpm+10);
       playSound('hit');this._flashArena(j==='perfect'?'#FFD84D':'#1FA971');
-      this._sourisTilesPopJudge(laneIdx,j);
+      s.judge={text:j==='perfect'?'PARFAIT':'BIEN',pts,multi,kind:'good',until:Date.now()+550};
     }
     this.renderSouris();
   },
-  _sourisTilesKey(e){
-    const k=(e._composedKey||e.key||'').toLowerCase();
-    if(k.length!==1)return;
-    const s=this.souris;
-    const laneIdx=s.tiles.findIndex((t,i)=>t&&this._sourisTilesLanes[i].type==='key'&&t.letter===k);
-    if(laneIdx<0)return;
-    e.preventDefault();
-    this._sourisTilesResolve(laneIdx);
+  _sourisTilesPress(k){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    const laneIdx=TILES_LANES.findIndex(l=>l.letter===k);
+    const t=s.tiles[laneIdx];
+    if(!t||t.holding)return;
+    if(t.bonus){
+      s.tiles[laneIdx]=null;
+      s.lives=Math.min(3,s.lives+1);s.score+=15;
+      playSound('life');this._flashArena('#FFD84D');
+      s.judge={text:'+1 VIE',pts:15,multi:null,kind:'bonus',until:Date.now()+650};
+      return;
+    }
+    if(t.long){
+      if(t.y<this._sourisTilesHitLineY-16)return; // trop tôt : pas de pénalité, on peut réessayer
+      t.holding=true;t.holdStart=Date.now();
+      return;
+    }
+    s.tiles[laneIdx]=null;
+    this._sourisTilesApply(this._sourisTilesJudgeDist(t));
+  },
+  _sourisTilesRelease(k){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    const laneIdx=TILES_LANES.findIndex(l=>l.letter===k);
+    const t=s.tiles[laneIdx];
+    if(!t||!t.holding)return;
+    const held=Date.now()-t.holdStart;
+    s.tiles[laneIdx]=null;
+    this._sourisTilesApply(held>=t.holdDur?'perfect':'bad');
   },
   _sourisTilesTick(){
     const s=this.souris;if(!s||s.phase!=='play')return;
     s.sessionLeft-=50;
     if(s.sessionLeft<=0){this._sourisTilesEnd();return;}
     const now=Date.now();
-    for(let i=0;i<4;i++){
+    const elapsed=TILES_SESSION_MS-s.sessionLeft;
+    // palier de difficulté : de plus en plus de couloirs actifs
+    const idx=this._sourisTilesStageIdx(elapsed);
+    if(idx>s.stageIdx){
+      s.stageIdx=idx;
+      s.banner={text:TILES_STAGES[idx].label,kind:'stage',until:now+2200};
+      playSound('levelup');
+    }
+    // passage intense : une fenêtre par palier ≥1, tempo accéléré
+    const intenseStart=s.stageIdx>=1?TILES_STAGES[s.stageIdx].t+6000:-1;
+    const intenseEnd=intenseStart+3500;
+    const wasIntense=s.intenseActive;
+    s.intenseActive=intenseStart>=0&&elapsed>=intenseStart&&elapsed<intenseEnd;
+    if(s.intenseActive&&!wasIntense){s.banner={text:'PASSAGE INTENSE !',kind:'intense',until:now+1800};s.intenseLostLife=false;}
+    if(wasIntense&&!s.intenseActive&&!s.intenseLostLife){s.score+=20;s.banner={text:'SECTION RÉUSSIE · +20',kind:'success',until:now+1800};playSound('record');}
+    for(let i=0;i<8;i++){
       const t=s.tiles[i];if(!t)continue;
+      if(t.holding){
+        if(now-t.holdStart>=t.holdDur){s.tiles[i]=null;this._sourisTilesApply('perfect');}
+        continue;
+      }
       t.y=(now-t.born)/t.dur*100;
-      if(t.y>=100){
-        s.tiles[i]=null;s.misses++;s.combo=0;s.lives--;
-        playSound('miss');this._flashArena('#E5484D');
-        if(s.lives<=0){this._sourisTilesEnd();return;}
+      const missAt=t.long?this._sourisTilesHitLineY+16:100;
+      if(t.y>=missAt){
+        s.tiles[i]=null;
+        if(t.bonus)continue; // bonus optionnelle : aucune pénalité si ratée
+        if(this._sourisTilesMiss())return;
       }
     }
     if(s.phase!=='play')return;
     s.spawnAcc+=50;
-    const interval=60000/s.bpm;
+    const effBpm=s.bpm*(s.intenseActive?1.35:1);
+    const interval=60000/effBpm;
     if(s.spawnAcc>=interval){
       s.spawnAcc=0;
-      const free=[0,1,2,3].filter(i=>!s.tiles[i]);
-      if(free.length){
-        const i=free[Math.floor(Math.random()*free.length)];
-        const dur=Math.max(900,60000/s.bpm*4);
-        const pool=this._sourisLetterPool();
-        const letter=this._sourisTilesLanes[i].type==='key'?pool[Math.floor(Math.random()*pool.length)]:null;
-        s.tiles[i]={y:0,born:now,dur,letter};
+      const activeLanes=TILES_STAGES[s.stageIdx].lanes;
+      const inactiveFree=[0,1,2,3,4,5,6,7].filter(i=>!activeLanes.includes(i)&&!s.tiles[i]);
+      const wantBonus=s.lives<3&&inactiveFree.length&&Math.random()<0.16;
+      if(wantBonus){
+        const i=inactiveFree[Math.floor(Math.random()*inactiveFree.length)];
+        const dur=Math.max(1300,60000/effBpm*5);
+        s.tiles[i]={y:0,born:now,dur,letter:TILES_LANES[i].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:true};
+      } else {
+        const free=activeLanes.filter(i=>!s.tiles[i]);
+        if(free.length){
+          const i=free[Math.floor(Math.random()*free.length)];
+          const dur=Math.max(900,60000/effBpm*4);
+          const long=Math.random()<0.18;
+          s.tiles[i]={y:0,born:now,dur,letter:TILES_LANES[i].letter,long,holding:false,holdStart:0,holdDur:500+Math.random()*300,bonus:false};
+        }
       }
     }
     this.renderSouris();
@@ -6467,29 +6626,59 @@ const app={
   },
   _sourisTilesArena(){
     const s=this.souris;
-    const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
-    const lanesHtml=this._sourisTilesLanes.map((lane,i)=>{
+    const rank=this._sourisTilesRank(s.score);
+    const hasLong=s.tiles.some(t=>t&&t.long&&!t.holding);
+    const activeLanes=TILES_STAGES[s.stageIdx].lanes;
+    const lanesHtml=TILES_LANES.map((lane,i)=>{
       const t=s.tiles[i];
-      const grad=lane.type==='click'?'linear-gradient(160deg,#FF7A5C,#FF4D2E)':'linear-gradient(160deg,#3DC98A,#1FA971)';
-      const tileHtml=t?`<div style="position:absolute;left:6%;right:6%;top:${t.y}%;height:34px;transform:translateY(-50%);border-radius:9px;background:${grad};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:15px;box-shadow:0 4px 12px rgba(0,0,0,.35)">${lane.type==='click'?ICONS.mouse:t.letter}</div>`:'';
-      return `<div onclick="${lane.type==='click'?'app._sourisTilesResolve('+i+')':''}" style="position:relative;flex:1;border-left:${i>0?'1.5px dashed rgba(255,255,255,.1)':'none'};cursor:${lane.type==='click'?'pointer':'default'}">${tileHtml}</div>`;
+      let tileHtml='';
+      if(t){
+        const h=t.long?64:(t.bonus?38:34);
+        const y=t.holding?this._sourisTilesHitLineY:t.y;
+        const bg=t.bonus?'':`background:${TILES_HAND_GRADIENT[lane.hand]};`;
+        tileHtml=`<div class="tiles-tile${t.holding?' holding':''}${t.bonus?' bonus':''}" style="top:${y}%;height:${h}px;transform:translateY(-50%);${bg}">${t.bonus?'♥':lane.letter}</div>`;
+      }
+      return `<div class="tiles-lane">${tileHtml}</div>`;
+    }).join('');
+    const judge=s.judge&&s.judge.until>Date.now()?s.judge:null;
+    const judgeHtml=judge?`<div class="tiles-judge">
+      <div class="tiles-judge-text">${judge.text}</div>
+      ${judge.pts?`<div class="tiles-judge-pill" style="background:${judge.kind==='bonus'?'rgba(255,216,77,.9)':'rgba(255,77,46,.85)'};color:${judge.kind==='bonus'?'#16140F':'#fff'}">+${judge.pts}${judge.multi>1?` · MULTI ×${judge.multi}`:''}</div>`:''}
+    </div>`:'';
+    const banner=s.banner&&s.banner.until>Date.now()?s.banner:null;
+    const bannerHtml=banner?`<div class="tiles-banner ${banner.kind}">${banner.text}</div>`:'';
+    const keysHtml=TILES_LANES.map((l,i)=>{
+      const locked=!activeLanes.includes(i);
+      const pressed=this._sourisKeys&&this._sourisKeys[l.letter];
+      return `<div class="tiles-key${locked?' locked':''}${pressed?' pressed':''}">${l.letter}</div>`;
     }).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:640px;margin:0 auto;padding:0 24px">
-        <div class="game-arena" style="height:auto;padding:16px 20px 20px;display:flex;flex-direction:column">
-          <div class="game-hud">
-            <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
-            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.5)">${s.bpm} BPM${s.combo>1?' · ×'+s.combo:''}</div>
-            <div style="display:flex;gap:1px">${hearts}</div>
-          </div>
-          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin:6px 0 10px">Agis quand la tuile touche la ligne</div>
-          <div id="souris-arena" style="flex:1;min-height:300px;display:flex;position:relative;overflow:hidden">
-            ${lanesHtml}
-            <div style="position:absolute;left:0;right:0;top:${this._sourisTilesHitLineY}%;height:2px;background:rgba(255,255,255,.4)"></div>
-            <div style="position:absolute;left:0;right:0;bottom:10px;display:flex;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-align:center">
-              <div style="flex:1">CLIC</div><div style="flex:1">CLIC</div><div style="flex:1">LETTRE</div><div style="flex:1">LETTRE</div>
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <div class="game-arena" style="padding:16px 20px 20px;display:flex;flex-direction:column">
+          <div class="tiles-hud">
+            <div><div class="tiles-hud-label">SCORE</div><div class="tiles-hud-val">${s.score}</div></div>
+            <div class="tiles-rank">
+              <div class="tiles-hud-label">RANG DU MORCEAU</div>
+              <div class="tiles-rank-row">
+                <span class="tiles-rank-cur">${rank.label}</span>
+                <div class="tiles-rank-bar"><div class="tiles-rank-bar-fill" style="width:${rank.pct}%"></div></div>
+                <span class="tiles-rank-next">${rank.next||'MAX'}</span>
+              </div>
             </div>
+            <div style="text-align:right"><div class="tiles-hud-label">COMBO</div><div class="tiles-hud-val sec">${s.combo}<span style="font-size:14px"> ✱</span></div></div>
           </div>
+          <div class="tiles-meta">
+            <div class="tiles-bpm${s.intenseActive?' hot':''}">${Math.round(s.bpm*(s.intenseActive?1.35:1))} BPM${s.intenseActive?' · INTENSE':''}</div>
+            <div class="tiles-hearts">${[0,1,2].map(i=>`<span style="color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('')}</div>
+          </div>
+          <div class="tiles-board">
+            ${lanesHtml}
+            <div class="tiles-hitline" style="top:${this._sourisTilesHitLineY}%"></div>
+            ${bannerHtml}
+            ${judgeHtml}
+          </div>
+          <div class="tiles-keys">${keysHtml}</div>
+          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin-top:10px">${hasLong?'TUILE LONGUE · MAINTIENS LA TOUCHE':'Frappe la lettre avant la ligne'}</div>
         </div>
         <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
