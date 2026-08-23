@@ -1900,6 +1900,7 @@ function completeLogin(d){
   saveSession(d.username, d.plan, d.token, d.id, _mergedData.role||null, d.email, d.displayName, d.institutionName, d.hasClass);
   try{track('login',{method:'password'});}catch{}
   app.stats=_mergedData;
+  _statsLoaded=true; // réponse de login fraîche et authoritative : sûr d'autoriser la sauvegarde
   window._needsOnboarding = !d.onboarding_completed;
   if(!d.onboarding_completed)localStorage.removeItem('klak_ob');else localStorage.setItem('klak_ob','1');
   loginUser(d.username);
@@ -2299,14 +2300,27 @@ async function handlePaymentReturn(){
 /* ── DATA ── */
 let _saveDebounce=null;
 // _statsDirty : true dès qu'une vraie modif locale (jeu, test, leçon…) a eu lieu.
-// On n'écrit JAMAIS au serveur tant que ce drapeau est faux -> impossible d'écraser
-// la progression serveur avec les valeurs par défaut vides du démarrage.
+// _statsLoaded : true seulement une fois la VRAIE progression serveur reçue
+// (login frais, ou réponse de loadProgressFromServer). Tant qu'il est faux,
+// app.stats n'est qu'un squelette vide affiché en attendant le réseau — le
+// flusher DOIT refuser d'écrire, sinon une action rapide (jeu, leçon) juste
+// après un rechargement de page écraserait tout l'historique serveur avec
+// ce squelette avant même qu'il ait eu la chance d'être remplacé par les
+// vraies données. C'est précisément le bug qui a effacé de la progression :
+// _statsDirty passait à true sur le squelette avant l'arrivée de la réponse,
+// ce qui faisait ignorer les données serveur ET renvoyait le squelette.
 let _statsDirty=false;
+let _statsLoaded=false;
 async function flushStats(){
   if(!currentUser||!currentToken||!app.stats||!_statsDirty)return;
+  if(!_statsLoaded){_saveDebounce=setTimeout(flushStats,800);return;} // attend le vrai chargement
   try{
-    await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:app.stats})});
-    _statsDirty=false;
+    const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:app.stats})});
+    // Le serveur peut refuser (409) une écriture qui régresserait la
+    // progression enregistrée — dans ce cas on garde _statsDirty=true pour
+    // réessayer plus tard plutôt que de faire comme si la sauvegarde avait
+    // réussi : mieux vaut retenter indéfiniment que perdre le signal d'échec.
+    if(r.ok)_statsDirty=false;
   }catch{}
 }
 function mergeStats(remote){
@@ -11160,6 +11174,7 @@ async function handleSSOReturn(){
     saveSession(d.username,d.plan,d.token,d.id,_mergedData.role||null,d.email,d.displayName,d.institutionName,d.hasClass);
     try{track('login',{method:'oauth'});}catch{}
     app.stats=_mergedData;
+    _statsLoaded=true; // réponse de login fraîche et authoritative : sûr d'autoriser la sauvegarde
     window._needsOnboarding = !d.onboarding_completed;
     if(!d.onboarding_completed)localStorage.removeItem('klak_ob');else localStorage.setItem('klak_ob','1');
     closeModal('auth-modal');
@@ -11168,21 +11183,36 @@ async function handleSSOReturn(){
   }catch(e){openAuth('login');setTimeout(()=>showAuthError('La connexion a échoué, réessaie.'),120);}
 }
 
-async function loadProgressFromServer(){
+// Charge la vraie progression serveur pour remplacer le squelette vide posé
+// au démarrage. Contrairement à l'ancienne version, on fait TOUJOURS confiance
+// aux données serveur dès qu'elles arrivent (jamais l'inverse) : le pire cas
+// possible est de perdre une modif locale survenue dans la poignée de
+// centaines de ms avant la réponse, bien préférable à écraser tout
+// l'historique du serveur avec le squelette. En cas d'échec réseau, on
+// réessaie plusieurs fois avant d'abandonner — et si on abandonne, on laisse
+// _statsLoaded à false pour le reste de la session : impossible d'écrire
+// quoi que ce soit tant que la vraie progression n'a jamais pu être
+// confirmée, plutôt que de risquer de sauvegarder un squelette.
+async function loadProgressFromServer(attempt){
+  attempt=attempt||0;
   if(!currentUser||!currentToken)return;
   try{
     const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+    if(!r.ok)throw new Error('http '+r.status);
     const d=await r.json();
     if(d){
-      // Si l'utilisateur a déjà modifié ses stats localement pendant le chargement
-      // (ex. il a fini un jeu avant que le serveur réponde), on ne les écrase PAS :
-      // on garde la version locale et on la renvoie au serveur.
-      if(d.data&&!_statsDirty)app.stats=mergeStats(d.data);
+      if(d.data)app.stats=mergeStats(d.data);
+      _statsLoaded=true;
       const _s=JSON.parse(localStorage.getItem('klak_session')||'{}');let _changed=false;if(d.id&&!currentUserId){currentUserId=d.id;_s.userId=d.id;_changed=true;}if(app.stats&&app.stats.role&&_s.role!==app.stats.role){_s.role=app.stats.role||null;_changed=true;}if(_changed)localStorage.setItem('klak_session',JSON.stringify(_s));
       updateNavUser();app.renderCurrent();if(isAdmin())app.loadAdmin();else if(isTeacher())app.loadEtab();
-      if(_statsDirty)flushStats(); // persister les modifs locales faites avant le chargement
+      if(_statsDirty)flushStats(); // persiste une éventuelle modif locale, maintenant en toute sécurité sur la base réelle
     }
-  }catch{}
+  }catch(e){
+    if(attempt<3){setTimeout(()=>loadProgressFromServer(attempt+1),1000*Math.pow(2,attempt));}
+    // Après 3 essais, on abandonne pour cette session : _statsLoaded reste
+    // false, donc flushStats() continuera de refuser d'écrire — aucune perte
+    // de données possible, seulement une session sans sauvegarde serveur.
+  }
 }
 loadSession();
 if(currentUser){
