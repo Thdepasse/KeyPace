@@ -161,7 +161,7 @@
       "name": "Comment je vous contacte si j'ai un problème ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Écris-nous à contact@keypace.be — on répond en général sous 24 à 48h."
+        "text": "Écris-nous à contact@keypace.be : on répond en général sous 24 à 48h."
       }
     }
   ]
@@ -248,7 +248,7 @@
   "alternateName": ["KeyPace dactylo", "KeyPace AZERTY", "keypace.be"],
   "url": "https://keypace.be",
   "inLanguage": "fr",
-  "description": "KeyPace — application de dactylographie AZERTY gratuite en français : 65 leçons progressives, test de vitesse, jeux de frappe et certification de niveau.",
+  "description": "KeyPace, application de dactylographie AZERTY gratuite en français : 65 leçons progressives, test de vitesse, jeux de frappe et certification de niveau.",
   "publisher": { "@type": "Organization", "name": "KeyPace", "url": "https://keypace.be" },
   "potentialAction": {
     "@type": "SearchAction",
@@ -1880,7 +1880,7 @@ async function checkInstitutionDomain(){
     const r=await fetch('/api/institutions?domain='+encodeURIComponent(domain));
     const d=await r.json();
     if(seq!==_domainCheckSeq)return;
-    if(d.matched){hint.textContent='✓ Compte rattaché à '+d.name+' — accès Expert offert';hint.style.display='block';}
+    if(d.matched){hint.textContent='✓ Compte rattaché à '+d.name+' : accès Expert offert';hint.style.display='block';}
     else hint.style.display='none';
   }catch{if(seq===_domainCheckSeq)hint.style.display='none';}
 }
@@ -1933,7 +1933,7 @@ async function authSubmit(){
       try{track('signup',{type:wasProf?'teacher_invite':'student'});}catch{}
       switchTab('login');
       const ctx=document.getElementById('auth-context-msg');
-      const instLine=d.institutionName?` Ton compte a été rattaché à <strong>${app._esc(d.institutionName)}</strong> — il ne te reste plus qu'à rejoindre ta classe avec le code donné par ton professeur.`:'';
+      const instLine=d.institutionName?` Ton compte a été rattaché à <strong>${app._esc(d.institutionName)}</strong>. Il ne te reste plus qu'à rejoindre ta classe avec le code donné par ton professeur.`:'';
       ctx.innerHTML=ICONS.mail+' <strong>Compte '+(wasProf?'enseignant ':'')+'créé !</strong> Un lien de confirmation a été envoyé à ton adresse email. Clique dessus, puis reviens te connecter ici.'+instLine;
       ctx.style.cssText='background:rgba(31,169,113,0.1);border:1px solid rgba(31,169,113,0.25);border-radius:10px;padding:10px 13px;font-size:13px;color:#15784f;margin-bottom:16px;display:block';
       return;
@@ -2007,7 +2007,7 @@ function showForcedPasswordChangeModal(d,oldPasswordHash){
   overlay.innerHTML=`<div class="settings-modal" style="max-width:420px">
     <div class="settings-modal-head">
       <div class="settings-modal-avatar">${ICONS.key}</div>
-      <div class="settings-modal-head-info"><strong>Choisis ton mot de passe</strong><span style="color:var(--muted);font-size:12px">Ton professeur a créé ce compte — à toi de définir un mot de passe que toi seul connais</span></div>
+      <div class="settings-modal-head-info"><strong>Choisis ton mot de passe</strong><span style="color:var(--muted);font-size:12px">Ton professeur a créé ce compte : à toi de définir un mot de passe que toi seul connais</span></div>
     </div>
     <div class="settings-section">
       <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">NOUVEAU MOT DE PASSE</label>
@@ -3487,7 +3487,7 @@ const GCINE_GAMES=[
   {key:'ghost',icon:'ghost',name:'Contre ton fantôme',desc:"Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !",expert:false,category:'vitesse'},
   {key:'souris',icon:'mouse',name:'Précision souris',desc:"12 niveaux qui montent en difficulté : viser, cliquer, glisser-déposer, puis le clavier (ZQSD) en renfort.",expert:false,category:'precision'},
   {key:'sourisGrid',icon:'grid',name:'Grille réflexe',desc:"9 cases, une s'allume : tape sa lettre avant les pièges qui s'allument aussi.",expert:false,category:'precision'},
-  {key:'sourisHybrid',icon:'hand',name:'Duo souris + clavier',desc:"Vise à la souris, valide au clavier — une main sur chaque, une lettre à la fois.",expert:true,category:'precision'},
+  {key:'sourisHybrid',icon:'hand',name:'Duo souris + clavier',desc:"Vise à la souris, valide au clavier : une main sur chaque, une lettre à la fois.",expert:true,category:'precision'},
   {key:'sourisTiles',icon:'layers',name:'Magic Tiles',desc:"8 couloirs, ta rangée de repos QSDF JKLM : tape ou tiens la touche avant la ligne.",expert:false,category:'precision'},
   {key:'simon',icon:'brain',name:'Simon des mots',desc:"Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.",expert:false,category:'memoire'},
   {key:'clavier',icon:'keyboard',name:'Clavier vide',desc:"Le clavier est totalement vide : replace chaque lettre au bon endroit, de mémoire. Chrono lancé, chaque erreur compte.",expert:false,category:'memoire'},
@@ -3723,7 +3723,7 @@ const app={
         <div style="flex:1"><label style="${lbl}">Maximum de mots</label><input id="asg-essay-max" type="number" min="1" placeholder="ex. 200" style="${fld}"></div>
       </div>
       <div id="asg-essay-audio-note" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:var(--muted);line-height:1.5">
-        <span style="color:var(--accent)">${ICONS.volume}</span> <b style="color:var(--txt)">Transcription</b> — enregistre l'audio que l'élève devra transcrire via l'onglet « Texte personnalisé » en mode Vocal, ou laisse vide pour une transcription à partir d'un document externe.
+        <span style="color:var(--accent)">${ICONS.volume}</span> <b style="color:var(--txt)">Transcription</b> : enregistre l'audio que l'élève devra transcrire via l'onglet « Texte personnalisé » en mode Vocal, ou laisse vide pour une transcription à partir d'un document externe.
       </div>
     </div>`;
   },
@@ -3831,7 +3831,7 @@ const app={
     const prev=el.style.borderColor;
     el.style.borderColor='#E5484D';
     setTimeout(()=>{el.style.borderColor=prev||'';},600);
-    this._essayToast('Le collage est désactivé pour ce devoir — écris ton texte toi-même.');
+    this._essayToast('Le collage est désactivé pour ce devoir : écris ton texte toi-même.');
     return false;
   },
 
@@ -3981,7 +3981,7 @@ const app={
         </div>
         ${sig.flags.length?`<ul style="margin:0;padding-left:18px;font-size:13px;color:var(--txt);line-height:1.7">${sig.flags.map(f=>`<li>${this._esc(f.label)}</li>`).join('')}</ul>`:''}
         <div style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">
-          Vitesse apparente ${sig.apparentWpm==null?'—':sig.apparentWpm+' mpm'}${d.baselineWpm?' · moyenne habituelle de l\u2019élève '+d.baselineWpm+' mpm':''} · ${Math.round(sig.activeMs/60000)} min d'écriture active.
+          Vitesse apparente ${sig.apparentWpm==null?'-':sig.apparentWpm+' mpm'}${d.baselineWpm?' · moyenne habituelle de l\u2019élève '+d.baselineWpm+' mpm':''} · ${Math.round(sig.activeMs/60000)} min d'écriture active.
           ${sig.flags.length?'Ces indices sont indicatifs, pas une preuve : à recouper avec ce que tu sais de l\u2019élève.':''}
         </div>
       </div>
@@ -4618,7 +4618,7 @@ const app={
       ['À qui est-ce que ça s\'adresse ?',"À tout le monde : débutant complet qui tape encore avec deux doigts, étudiant qui veut prendre des notes plus vite, ou professionnel qui prépare un test de frappe pour un poste administratif. Les leçons s'adaptent à ton niveau."],
       ['C\'est vraiment gratuit ?',"Les 10 premières leçons et le test de vitesse sont gratuits, sans carte bancaire. Pour débloquer les 65 leçons, les jeux avancés et le suivi complet, l'abonnement Expert est à 4,99€/mois, résiliable à tout moment."],
       ['Qui est derrière KeyPace ?',"KeyPace a été fondé par deux étudiants de l'Université de Namur, confrontés eux-mêmes aux défis de la prise de notes en cours. Toute l'histoire est sur notre <a href=\"/a-propos\" style=\"color:var(--accent)\">page à propos</a>."],
-      ['Comment je vous contacte si j\'ai un problème ?',"Écris-nous à <a href=\"mailto:contact@keypace.be\" style=\"color:var(--accent)\">contact@keypace.be</a> — on répond en général sous 24 à 48h."],
+      ['Comment je vous contacte si j\'ai un problème ?',"Écris-nous à <a href=\"mailto:contact@keypace.be\" style=\"color:var(--accent)\">contact@keypace.be</a> : on répond en général sous 24 à 48h."],
     ];
 
     document.getElementById('page-home').innerHTML=`
@@ -4891,7 +4891,7 @@ const app={
     const classRows=classes.map(c=>`<div onclick="app.viewClass('${c.id}')" style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:12px;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
         <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;flex-shrink:0">${c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
         <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--txt)">${c.name}</div><div style="font-size:12px;color:var(--muted);margin-top:1px">${c.memberCount} élève${c.memberCount!==1?'s':''} · ${c.agg.activeThisWeek} actif${c.agg.activeThisWeek!==1?'s':''} cette semaine</div></div>
-        <div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:800;color:var(--txt)">${c.agg.avgWpm!=null?c.agg.avgWpm:'—'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:800;color:var(--txt)">${c.agg.avgWpm!=null?c.agg.avgWpm:'-'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div></div>
         <div style="color:var(--muted);font-size:14px">›</div>
       </div>`).join('');
 
@@ -4906,8 +4906,8 @@ const app={
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px">
           ${statCard('ÉLÈVES ACTIFS',g.activeThisWeek,'','cette semaine sur '+g.total)}
           ${statCard('SESSIONS',g.totalSessions,'','cumulées')}
-          ${statCard('VITESSE MOY.',g.avgWpm!=null?g.avgWpm:'—',g.avgWpm!=null?' mpm':'',g.avgWpm!=null?'tous élèves confondus':'Pas encore de données')}
-          ${statCard('PRÉCISION MOY.',g.avgAcc!=null?g.avgAcc:'—',g.avgAcc!=null?' %':'',g.avgAcc!=null?'tous élèves confondus':'Pas encore de données',accColor)}
+          ${statCard('VITESSE MOY.',g.avgWpm!=null?g.avgWpm:'-',g.avgWpm!=null?' mpm':'',g.avgWpm!=null?'tous élèves confondus':'Pas encore de données')}
+          ${statCard('PRÉCISION MOY.',g.avgAcc!=null?g.avgAcc:'-',g.avgAcc!=null?' %':'',g.avgAcc!=null?'tous élèves confondus':'Pas encore de données',accColor)}
         </div>
 
         <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 22px;margin-bottom:20px">
@@ -5050,12 +5050,12 @@ const app={
       chalResult=`<div style="margin-top:18px;border-top:1px solid var(--border);padding-top:18px">
         ${vs}
         <div style="font-size:15px;font-weight:800;margin-bottom:4px">🏁 Défie tes amis</div>
-        <div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">Envoie-leur ton score : le lien leur débloque un test pour te battre. Pour continuer le duel, <b>demande-leur de te renvoyer leur score</b> — chaque lien reçu te redonne un test.</div>
+        <div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">Envoie-leur ton score : le lien leur débloque un test pour te battre. Pour continuer le duel, <b>demande-leur de te renvoyer leur score</b> : chaque lien reçu te redonne un test.</div>
         ${this._challengeForm(resWpm,resAcc)}
       </div>`;
     }
     const typingTitle=titled?(s.title||'Devoir'):les?les.title:'Test de vitesse';
-    const typingSub=cert?(vocal?`<span style="color:var(--accent)">${ICONS.gradCap}</span> Dictée de certification — garde les yeux sur l'écran (≥ 90% requis), écoute et tape.`:`<span style="color:var(--accent)">${ICONS.gradCap}</span> Examen de certification — regard sur l'écran ≥ 90% et précision ≥ 90% requis.`):custom?(vocal?`<span style="color:var(--accent)">${ICONS.bookOpen}</span> Dictée : écoute le texte et tape ce que tu entends.`:'Recopie le texte ci-dessous le plus vite et juste possible.'):les?`Touches : ${les.keys||''}  ·  Objectif ${goals.minWpm} mpm, max ${goals.maxErrors} fautes`:'Tape le texte ci-dessous le plus vite et juste possible.';
+    const typingSub=cert?(vocal?`<span style="color:var(--accent)">${ICONS.gradCap}</span> Dictée de certification : garde les yeux sur l'écran (≥ 90% requis), écoute et tape.`:`<span style="color:var(--accent)">${ICONS.gradCap}</span> Examen de certification : regard sur l'écran ≥ 90% et précision ≥ 90% requis.`):custom?(vocal?`<span style="color:var(--accent)">${ICONS.bookOpen}</span> Dictée : écoute le texte et tape ce que tu entends.`:'Recopie le texte ci-dessous le plus vite et juste possible.'):les?`Touches : ${les.keys||''}  ·  Objectif ${goals.minWpm} mpm, max ${goals.maxErrors} fautes`:'Tape le texte ci-dessous le plus vite et juste possible.';
     const next=s&&!s.finished&&!vocal?s.text[s.idx]:null;
     let tbHTML='';
     if(s){let wbuf=[];const flush=()=>{if(wbuf.length){tbHTML+='<span style="white-space:nowrap">'+wbuf.join('')+'</span>';wbuf=[];}};s.text.split('').forEach((ch,i)=>{let cls='todo';if(i<s.idx)cls=s.typed[i]==='w'?'wrong':'ok';else if(i===s.idx)cls='cur';if(ch===' '){flush();tbHTML+=`<span class="ch ${cls}">&nbsp;</span>`;}else wbuf.push(`<span class="ch ${cls}">${ch}</span>`);});flush();}
@@ -5301,7 +5301,7 @@ const app={
       result=`<div style="max-width:1120px;margin:20px auto 0;background:#fff;border:1px solid #ece8e0;border-radius:16px;padding:20px 24px">
         ${vs}
         <div style="font-size:15px;font-weight:800;margin-bottom:4px">🏁 Défie tes amis</div>
-        <div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">Envoie-leur ton score : le lien leur débloque un test pour te battre. Pour continuer le duel, <b>demande-leur de te renvoyer leur score</b> — chaque lien reçu te redonne un test.</div>
+        <div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">Envoie-leur ton score : le lien leur débloque un test pour te battre. Pour continuer le duel, <b>demande-leur de te renvoyer leur score</b> : chaque lien reçu te redonne un test.</div>
         ${this._challengeForm(res.wpm,res.acc)}
       </div>`;
     }
@@ -5362,7 +5362,7 @@ const app={
     const pb=currentUser&&this.stats?Math.max(0,...(this.stats.tests||[]).map(t=>t.wpm)):0;
     const beating=!!(pb&&s.started&&!s.finished&&wpm>pb);
 
-    const hintText=s.finished?`Terminé — ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé — garde le rythme':'Commence à taper pour démarrer le chrono…';
+    const hintText=s.finished?`Terminé : ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé, garde le rythme':'Commence à taper pour démarrer le chrono…';
     const hintCls='t4a-hint'+(s.finished?' done':!s.started?' idle':'');
 
     const chal=this._t4aChallenge(s,!!s.finished);
@@ -5384,7 +5384,7 @@ const app={
           </div>
         </div>
         <div class="t4a-eyebanner${eyeOn?' on':''}" id="t4a-eyebanner">
-          <div>Traqueur des yeux actif — <span id="t4a-glances">${this._t4a.glances}</span> coup d'œil vers le clavier détecté${this._t4a.glances===1?'':'s'}.</div>
+          <div>Traqueur des yeux actif : <span id="t4a-glances">${this._t4a.glances}</span> coup d'œil vers le clavier détecté${this._t4a.glances===1?'':'s'}.</div>
           <div class="t4a-eyebanner-cam">CAMÉRA · ${this._gaze.permError?'ERREUR':'OK'}</div>
         </div>
         <div class="t4a-stats">
@@ -5396,7 +5396,7 @@ const app={
             </div>
             <div class="t4a-spark" id="t4a-spark">${this._t4aSparkHTML()}</div>
           </div>
-          <div class="t4a-stat"><div class="t4a-stat-label">PRÉCISION</div><div class="t4a-stat-val" id="t4a-acc">${s.idx?acc+'%':'—'}</div><div class="t4a-stat-sub" id="t4a-accmeta">${err} faute${err===1?'':'s'}</div></div>
+          <div class="t4a-stat"><div class="t4a-stat-label">PRÉCISION</div><div class="t4a-stat-val" id="t4a-acc">${s.idx?acc+'%':'-'}</div><div class="t4a-stat-sub" id="t4a-accmeta">${err} faute${err===1?'':'s'}</div></div>
           <div class="t4a-stat"><div class="t4a-stat-label">TEMPS</div><div class="t4a-stat-val" id="t4a-time">${elapsed.toFixed(1)}s</div><div class="t4a-stat-sub" id="t4a-timemeta">${s.finished?'test terminé':'en cours'}</div></div>
           <div class="t4a-stat"><div class="t4a-stat-label">PROGRESSION</div><div class="t4a-stat-val" id="t4a-prog">${prog}%</div><div class="t4a-stat-sub" id="t4a-progmeta">${s.idx} / ${T.length} car.</div></div>
         </div>
@@ -5447,7 +5447,7 @@ const app={
     const $=id=>document.getElementById(id);
     const speedSub=$('t4a-odo')&&$('t4a-odo').parentElement.querySelector('.t4a-stat-sub');
     if(speedSub)speedSub.innerHTML='mots / min'+(beating?` <span class="t4a-record">🏆 record !</span>`:'');
-    const accEl=$('t4a-acc');if(accEl)accEl.textContent=s.idx?acc+'%':'—';
+    const accEl=$('t4a-acc');if(accEl)accEl.textContent=s.idx?acc+'%':'-';
     const accMetaEl=$('t4a-accmeta');if(accMetaEl)accMetaEl.textContent=err+' faute'+(err===1?'':'s');
     const timeEl=$('t4a-time');if(timeEl)timeEl.textContent=elapsed.toFixed(1)+'s';
     const timeMetaEl=$('t4a-timemeta');if(timeMetaEl)timeMetaEl.textContent=s.finished?'test terminé':'en cours';
@@ -5479,7 +5479,7 @@ const app={
 
     const hintEl=$('t4a-hint');
     if(hintEl){
-      const txt=s.finished?`Terminé — ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé — garde le rythme':'Commence à taper pour démarrer le chrono…';
+      const txt=s.finished?`Terminé : ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé, garde le rythme':'Commence à taper pour démarrer le chrono…';
       if(hintEl.textContent!==txt)hintEl.textContent=txt;
       hintEl.classList.toggle('done',!!s.finished);
       hintEl.classList.toggle('idle',!s.started&&!s.finished);
@@ -5607,7 +5607,7 @@ const app={
      dur:30,bronze:74,silver:110,gold:145},
     {n:5,icon:'⚠️',name:'Pièges',tag:'Ne clique pas n’importe quoi',
      brief:'Les <b style="color:#1FA971">vertes</b> rapportent, les <b style="color:#E5484D">rouges</b> te coûtent des points. Mais toutes ne se ressemblent pas : <b>lis avant de cliquer</b>.',
-     newThing:'Distinguer le bon du piège — le rouge se déguise.',
+     newThing:'Distinguer le bon du piège : le rouge se déguise.',
      dur:34,bronze:34,silver:50,gold:66},
     {n:6,icon:'💎',name:'Bonus & choix',tag:'Choisis bien',
      brief:'Des cibles spéciales apparaissent : <b style="color:#3B82F6">bleue</b> = points doublés un temps, <b style="color:#A855F7">violette</b> = +2 s au chrono, <b style="color:#FFD84D">dorée</b> = jackpot bref. Elles disparaissent vite : <b>vaut-il mieux la chasser ou rester sur les vertes ?</b>',
@@ -5627,11 +5627,11 @@ const app={
      dur:34,bronze:35,silver:50,gold:62},
     {n:10,icon:'🕹️',name:'ZQSD seul',tag:'Apprends à te déplacer',
      brief:'Pose la souris. Déplace ton personnage avec <b>Z Q S D</b> pour <b>entrer dans les cercles verts</b> et esquiver les zones rouges.',
-     newThing:'Le clavier pour bouger — main gauche seule.',
+     newThing:'Le clavier pour bouger, main gauche seule.',
      dur:34,bronze:10,silver:14,gold:19},
     {n:11,icon:'🎮',name:'Souris + clavier',tag:'Tout en même temps',
      brief:'Déplace-toi avec <b>Z Q S D</b> pour esquiver les zones rouges, <b>tout en cliquant</b> les cibles et leurs cœurs.',
-     newThing:'Les deux mains à la fois — comme un vrai jeu.',
+     newThing:'Les deux mains à la fois, comme un vrai jeu.',
      dur:36,bronze:74,silver:110,gold:145},
     {n:12,icon:'🔥',name:'Chaos',tag:'La totale',
      brief:'Tout, en même temps, plus vite : cœurs, pièges déguisés, bonus, déplacement et zones mobiles. Le test ultime de la coordination.',
@@ -5736,7 +5736,7 @@ const app={
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:1120px;margin:0 auto;padding:0 24px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
         <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Précision souris — 12 niveaux</h2>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Précision souris · 12 niveaux</h2>
         <div style="font-size:13px;color:var(--muted);font-weight:600">${best}/12 franchis${golds?' · '+golds+' 🥇':''}</div>
       </div>
       <div class="game-selector">
@@ -5744,7 +5744,7 @@ const app={
           const open=lv.n<=unlocked, done=lv.n<=best, tier=tiers[lv.n];
           return `<div class="game-sel-card" onclick="${open?`app.selectSouris(${lv.n})`:''}" style="${open?'':'opacity:.45;cursor:not-allowed'};position:relative">
             <div class="game-sel-icon">${open?lv.icon:'🔒'}</div>
-            <div class="game-sel-name">Niv. ${lv.n} — ${lv.name} ${tier?medal[tier]:''}</div>
+            <div class="game-sel-name">Niv. ${lv.n} · ${lv.name} ${tier?medal[tier]:''}</div>
             <div class="game-sel-desc">${lv.tag}. ${this._esc(lv.newThing)}</div>
             <span class="game-sel-tag free" style="${done?'background:rgba(31,169,113,.15);color:#1FA971':''}">${tier?medal[tier]+' '+tier.toUpperCase():open?'À FAIRE':'VERROUILLÉ'}</span>
           </div>`;
@@ -5794,7 +5794,7 @@ const app={
           <div class="game-final">${s.score} pts</div>
           <p style="color:rgba(255,255,255,.7);font-size:14.5px;margin:0">${s.hit} réussite${s.hit>1?'s':''} · ${acc}% de précision${s.cores?' · '+s.cores+' cœur'+(s.cores>1?'s':''):''}${s.regen?' · +'+s.regen+' ♥ régénérée'+(s.regen>1?'s':''):''}</p>
           ${win&&nextTier?`<div style="font-size:12.5px;color:rgba(255,255,255,.55)">Prochain palier : ${nextTier}</div>`:''}
-          ${!win?`<div style="font-size:13px;color:rgba(255,255,255,.6)">Il fallait ${l.bronze} pts (bronze)${s.score>=l.bronze*0.7?' — tu y étais presque !':' pour valider ce niveau.'}</div>`:''}
+          ${!win?`<div style="font-size:13px;color:rgba(255,255,255,.6)">Il fallait ${l.bronze} pts (bronze)${s.score>=l.bronze*0.7?', tu y étais presque !':' pour valider ce niveau.'}</div>`:''}
           <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center">
             ${win&&!last?`<button class="game-play-btn" onclick="app.selectSouris(${s.lvl+1})">Niveau ${s.lvl+1} →</button>`:''}
             <button class="res-btn sec" style="flex:none;padding:13px 26px" onclick="app.selectSouris(${s.lvl})">${win&&s.tier!=='gold'?'Viser mieux':'Rejouer'}</button>
@@ -8331,7 +8331,7 @@ const app={
       } else if(d._rematchError){
         rematchHTML=`<p style="color:var(--danger);font-size:13px;margin-top:10px">${d._rematchError}</p>`;
       } else if(d._myRematch&&d._oppRematch){
-        rematchHTML=`<p style="color:var(--success);font-size:14px;font-weight:600;margin-top:12px">Les deux joueurs sont prêts — lancement…</p>`;
+        rematchHTML=`<p style="color:var(--success);font-size:14px;font-weight:600;margin-top:12px">Les deux joueurs sont prêts, lancement…</p>`;
       } else if(d._myRematch){
         rematchHTML=`<p style="color:var(--muted);font-size:14px;margin-top:12px">En attente de ${oppName}…</p>`;
       } else if(d._oppRematch){
@@ -8405,7 +8405,7 @@ const app={
         <div class="settings-row">
           <div class="settings-row-info">
             <strong>Calibration du regard</strong>
-            <span>${calibrated?`Calibré le ${new Date(calibData.date).toLocaleDateString('fr-FR')} — seuil ${calibData.threshold.toFixed(3)}`:'Clique sur les zones affichées en les regardant pour calibrer la détection haut/bas.'}</span>
+            <span>${calibrated?`Calibré le ${new Date(calibData.date).toLocaleDateString('fr-FR')} · seuil ${calibData.threshold.toFixed(3)}`:'Clique sur les zones affichées en les regardant pour calibrer la détection haut/bas.'}</span>
           </div>
           ${calibrated?'<span class="gaze-calibrated-badge">✓ Calibré</span>':''}
         </div>
@@ -8429,7 +8429,7 @@ const app={
         <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px">
           <div class="settings-row-info" style="width:100%">
             <strong>Nom d'utilisateur</strong>
-            <span>Ton identifiant de connexion. Les élèves rattachés à un établissement ne peuvent pas le modifier — utilise le nom affiché ci-dessous à la place.</span>
+            <span>Ton identifiant de connexion. Les élèves rattachés à un établissement ne peuvent pas le modifier : utilise le nom affiché ci-dessous à la place.</span>
           </div>
           <div style="display:flex;gap:8px;width:100%">
             <input id="settings-username-input" value="${user.replace(/"/g,'&quot;')}" maxlength="24" style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
@@ -8489,7 +8489,7 @@ const app={
         ${currentPlan==='expert'?`<div class="settings-row" style="margin-top:10px">
           <div class="settings-row-info">
             <strong>Abonnement Expert</strong>
-            <span>Factures, moyen de paiement, résiliation — via le portail sécurisé Stripe</span>
+            <span>Factures, moyen de paiement, résiliation : via le portail sécurisé Stripe</span>
           </div>
           <button class="settings-btn" id="billing-portal-btn" onclick="app.openBillingPortal(this)">Gérer</button>
         </div>`:''}
@@ -8645,7 +8645,7 @@ const app={
       if(!r.ok)throw new Error(d.error||'Erreur.');
       currentDisplayName=d.displayName||null;
       const s=JSON.parse(localStorage.getItem('klak_session')||'{}');s.displayName=currentDisplayName;localStorage.setItem('klak_session',JSON.stringify(s));
-      showMsg(currentDisplayName?'Nom affiché mis à jour !':"Nom affiché réinitialisé — ton nom d'utilisateur sera utilisé.",true);
+      showMsg(currentDisplayName?'Nom affiché mis à jour !':"Nom affiché réinitialisé : ton nom d'utilisateur sera utilisé.",true);
     }catch(e){showMsg(e.message,false);}
     finally{btn.disabled=false;btn.textContent=old;}
   },
@@ -8782,7 +8782,7 @@ const app={
       const pt=screenPoints[i];
       await new Promise(resolve=>{
         overlay.innerHTML=`
-          <div style="color:#888;font-size:14px;margin-bottom:24px;">Phase 1/2 — Regarde l'écran (${i+1}/${screenPoints.length})</div>
+          <div style="color:#888;font-size:14px;margin-bottom:24px;">Phase 1/2 · Regarde l'écran (${i+1}/${screenPoints.length})</div>
           <div style="color:#fff;font-size:18px;margin-bottom:8px;">Regarde le point et clique dessus</div>
           <div style="color:#555;font-size:13px;">Garde la tête droite, yeux vers l'écran</div>
           <div id="calib-dot" style="position:fixed;left:${pt.x};top:${pt.y};transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:#4f8ef7;box-shadow:0 0 0 8px rgba(79,142,247,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;user-select:none;">${i+1}</div>
@@ -8801,7 +8801,7 @@ const app={
     for(let i=0;i<kbPoints;i++){
       await new Promise(resolve=>{
         overlay.innerHTML=`
-          <div style="color:#888;font-size:14px;margin-bottom:24px;">Phase 2/2 — Regarde ton clavier (${i+1}/${kbPoints})</div>
+          <div style="color:#888;font-size:14px;margin-bottom:24px;">Phase 2/2 · Regarde ton clavier (${i+1}/${kbPoints})</div>
           <div style="color:#fff;font-size:24px;margin-bottom:16px;">${ICONS.keyboard}</div>
           <div style="color:#fff;font-size:18px;margin-bottom:8px;">Baisse les yeux vers ton clavier</div>
           <div style="color:#555;font-size:13px;">Naturellement, comme quand tu tapes</div>
@@ -8859,7 +8859,7 @@ const app={
       <div class="gaze-modal-body">
         Ce plugin utilise ta <strong>webcam</strong> pour estimer où tu regardes pendant le test. Il détecte si tes yeux restent sur l'écran ou descendent vers le clavier.
         <br><br>
-        À la fin du test, tu verras une <strong>timeline colorée</strong> et le pourcentage de temps passé les yeux sur l'écran — un indicateur clé pour progresser en dactylo.
+        À la fin du test, tu verras une <strong>timeline colorée</strong> et le pourcentage de temps passé les yeux sur l'écran, un indicateur clé pour progresser en dactylo.
       </div>
       <div class="gaze-modal-note">⚠ Valable uniquement pour ce test. Le traqueur se désactive automatiquement à la fin ou si tu recommences.<br><br><span style="color:var(--accent)">${ICONS.target}</span> Pour unemeilleure précision, <span onclick="document.getElementById('gaze-modal-overlay')?.remove();app.openSettings('gaze')" style="cursor:pointer;text-decoration:underline;color:var(--accent);font-weight:700">calibre le traqueur dans les paramètres →</span></div>
       <div class="gaze-modal-actions">
@@ -8932,7 +8932,7 @@ const app={
           g._FilesetResolver=mp.FilesetResolver;
         }catch(e){
           g._wgPromise=null;
-          g.permError='Chargement MediaPipe échoué — vérifie ta connexion.';
+          g.permError='Chargement MediaPipe échoué : vérifie ta connexion.';
           g.enabled=false;this.renderCurrent();return false;
         }
       }
@@ -8942,7 +8942,7 @@ const app={
         stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:false});
       }catch(e){
         g._wgPromise=null;
-        g.permError=e.name==='NotAllowedError'?'Caméra refusée — autorise dans les paramètres du navigateur.':'Caméra indisponible sur cet appareil.';
+        g.permError=e.name==='NotAllowedError'?'Caméra refusée : autorise dans les paramètres du navigateur.':'Caméra indisponible sur cet appareil.';
         g.enabled=false;this.renderCurrent();return false;
       }
       // Élément vidéo caché
@@ -9189,7 +9189,7 @@ const app={
     }
     // Insight combiné
     const insights=[];
-    if(hasAcc){const d=avgOnAcc-avgOffAcc;if(Math.abs(d)>=3)insights.push(d>0?`+${d}% de précision en regardant l'écran`:`${d}% de précision (clavier meilleur — données à confirmer)`);}
+    if(hasAcc){const d=avgOnAcc-avgOffAcc;if(Math.abs(d)>=3)insights.push(d>0?`+${d}% de précision en regardant l'écran`:`${d}% de précision (clavier meilleur, données à confirmer)`);}
     if(hasWpm){const d=avgOnWpm-avgOffWpm;if(Math.abs(d)>=3)insights.push(d>0?`+${d} mpm en regardant l'écran`:`${d} mpm (vitesse similaire selon le regard)`);}
     const insightText=insights.length?insights.join(' · '):`Continue à t'entraîner avec le traqueur pour affiner l'analyse.`;
     const maxAcc=100;
@@ -9243,8 +9243,8 @@ const app={
       ['✓',"100% web, aucune installation, aucun IT"],
     ];
     const features=[
-      [ICONS.barChart,'Suivi individuel en temps réel',"Vitesse (mots/min), précision, leçons validées, temps d'inactivité — tout est visible d'un coup d'œil pour chaque élève."],
-      [ICONS.pencil,'Devoirs assignables en 3 clics',"Leçon du parcours, test de vitesse libre, texte personnalisé ou dictée vocale — choisissez, ciblez, envoyez."],
+      [ICONS.barChart,'Suivi individuel en temps réel',"Vitesse (mots/min), précision, leçons validées, temps d'inactivité : tout est visible d'un coup d'œil pour chaque élève."],
+      [ICONS.pencil,'Devoirs assignables en 3 clics',"Leçon du parcours, test de vitesse libre, texte personnalisé ou dictée vocale : choisissez, ciblez, envoyez."],
       [ICONS.mic,'Dictées avec votre propre voix',"Enregistrez votre voix sur n'importe quel texte. L'élève entend votre audio et tape ce qu'il entend, texte caché."],
       ['⚠','Alertes automatiques',"KeyPace détecte les élèves bloqués ou inactifs depuis trop longtemps et vous le signale proactivement."],
       [ICONS.fileText,'Export CSV en un clic',"Extrayez les résultats de toute la classe pour vos bulletins ou rapports pédagogiques."],
@@ -9271,14 +9271,14 @@ const app={
       ['3','Suivez et guidez',"Assignez des devoirs, suivez la progression en temps réel, identifiez les élèves en difficulté. Tout depuis votre tableau de bord."],
     ];
     const studentFeats=[
-      [ICONS.gamepad,'Jeux de frappe compétitifs',"La Course contre des bots, le Simon de la frappe — apprendre sans avoir l'impression de travailler."],
+      [ICONS.gamepad,'Jeux de frappe compétitifs',"La Course contre des bots, le Simon de la frappe : apprendre sans avoir l'impression de travailler."],
       [ICONS.trophy,'Certification de niveau',"Un examen officiel KeyPace avec un certificat numérique partageable. Un objectif concret qui motive."],
-      [ICONS.trendUp,'Progrès visibles en temps réel',"Courbes de vitesse, précision par touche, leçons validées — l'élève voit clairement où il en est."],
+      [ICONS.trendUp,'Progrès visibles en temps réel',"Courbes de vitesse, précision par touche, leçons validées : l'élève voit clairement où il en est."],
       [ICONS.target,'Objectifs personnalisés',"L'enseignant fixe le seuil à atteindre (ex. 30 mpm, max 5 erreurs). L'élève sait exactement ce qu'on attend de lui."],
     ];
     const faqs=[
-      ['Quel matériel est nécessaire ?',"N'importe quel ordinateur avec un navigateur web récent (Chrome, Firefox, Edge, Safari). Pas d'application à installer, pas de plugin. Un clavier AZERTY physique est recommandé pour un apprentissage optimal — les claviers de laptops suffisent."],
-      ['Combien coûte une licence établissement ?',"Le tarif est établi au cas par cas selon la taille de l'établissement et le nombre de classes. Contactez-nous pour un devis personnalisé — nous proposons des tarifs très accessibles pour le secteur éducatif."],
+      ['Quel matériel est nécessaire ?',"N'importe quel ordinateur avec un navigateur web récent (Chrome, Firefox, Edge, Safari). Pas d'application à installer, pas de plugin. Un clavier AZERTY physique est recommandé pour un apprentissage optimal, mais les claviers de laptops suffisent."],
+      ['Combien coûte une licence établissement ?',"Le tarif est établi au cas par cas selon la taille de l'établissement et le nombre de classes. Contactez-nous pour un devis personnalisé : nous proposons des tarifs très accessibles pour le secteur éducatif."],
       ['Les élèves peuvent-ils utiliser KeyPace depuis chez eux ?',"Oui, 100%. KeyPace est une application web accessible depuis n'importe où. Les élèves s'entraînent autant à la maison qu'en classe, et leur progression est synchronisée."],
       ['Un élève peut-il rejoindre plusieurs classes ?',"Oui. Un même compte élève peut appartenir à plusieurs classes (utile si un prof de français et un prof d'informatique utilisent KeyPace en parallèle)."],
       ["Peut-on importer une liste d'élèves ?","Actuellement les élèves s'inscrivent eux-mêmes via un lien d'invitation. L'import CSV est sur notre roadmap. Contactez-nous si c'est un besoin prioritaire."],
@@ -9316,7 +9316,7 @@ const app={
       <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:12px">LE PROBLÈME</div>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,32px);line-height:1.15;margin:0 0 18px">Chaque heure de cours perdue à taper lentement ne se rattrape pas</h2>
       <p style="color:var(--muted);font-size:15px;line-height:1.7;margin:0 0 14px">Un élève qui tape à 15 mots/min met 4× plus de temps à rédiger un devoir. Cette friction invisible plombe la concentration, la qualité des écrits et la confiance en soi.</p>
-      <p style="color:var(--muted);font-size:15px;line-height:1.7;margin:0">La frappe ne s'apprend pas naturellement — elle demande une progression structurée, des exercices répétés et du feedback immédiat. C'est exactement ce que fait KeyPace.</p>
+      <p style="color:var(--muted);font-size:15px;line-height:1.7;margin:0">La frappe ne s'apprend pas naturellement : elle demande une progression structurée, des exercices répétés et du feedback immédiat. C'est exactement ce que fait KeyPace.</p>
     </div>
     <div class="etab-avant-apres" style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8">
       <div style="color:var(--muted);margin-bottom:14px;font-size:11px;font-weight:700;letter-spacing:.06em">AVANT KEYPACE</div>
@@ -9344,7 +9344,7 @@ const app={
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(18px,2.5vw,28px);line-height:1.2;margin:0 0 14px">65 leçons du niveau zéro à la frappe experte</h2>
       <p style="color:var(--muted);font-size:14px;line-height:1.65;margin:0 0 18px">Le parcours est divisé en modules progressifs. Chaque leçon introduit 1 ou 2 touches nouvelles et les consolide dans un texte réel en français.</p>
       <div style="display:flex;flex-direction:column;gap:8px">
-        ${modules.map(([dot,mod,desc])=>`<div style="display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:10px;padding:10px 14px"><span style="font-size:10px">${dot}</span><div><b style="font-size:13px">${mod}</b> <span style="color:var(--muted);font-size:12px">— ${desc}</span></div></div>`).join('')}
+        ${modules.map(([dot,mod,desc])=>`<div style="display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:10px;padding:10px 14px"><span style="font-size:10px">${dot}</span><div><b style="font-size:13px">${mod}</b> <span style="color:var(--muted);font-size:12px">: ${desc}</span></div></div>`).join('')}
       </div>
     </div>
     <div class="etab-dashboard">
@@ -9373,7 +9373,7 @@ const app={
     <div style="text-align:center;margin-bottom:36px">
       <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:10px">POUR LES ÉLÈVES</div>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,32px);margin:0 0 12px">Une expérience qui donne envie de progresser</h2>
-      <p style="color:var(--muted);font-size:15px;max-width:500px;margin:0 auto">Pas un simple exercice scolaire — un vrai produit avec des jeux, des défis et une progression visible qui accroche les élèves.</p>
+      <p style="color:var(--muted);font-size:15px;max-width:500px;margin:0 auto">Pas un simple exercice scolaire : un vrai produit avec des jeux, des défis et une progression visible qui accroche les élèves.</p>
     </div>
     <div class="etab-student-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
       ${studentFeats.map(([ic,t,d])=>`<div style="background:rgba(255,255,255,.7);border:1px solid rgba(255,77,46,.12);border-radius:16px;padding:20px"><div style="font-size:26px;margin-bottom:10px;color:var(--accent)">${ic}</div><div style="font-weight:700;font-size:14px;margin-bottom:6px">${t}</div><div style="color:var(--muted);font-size:13px;line-height:1.5">${d}</div></div>`).join('')}
@@ -9593,7 +9593,7 @@ const app={
     this._certMode=mode;
     this.stopTimer();this._showIntro=false;
     this._gaze.enabled=true;this._gaze.permError=null;
-    this.sess={mode:'test',lessonId:null,text:CERT_TEXT,idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false,cert:true,certMode:mode,vocal:mode==='vocal',title:'Examen de certification — '+(mode==='vocal'?'dictée vocale':'écrit')};
+    this.sess={mode:'test',lessonId:null,text:CERT_TEXT,idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false,cert:true,certMode:mode,vocal:mode==='vocal',title:'Examen de certification : '+(mode==='vocal'?'dictée vocale':'écrit')};
     this.renderView('test');
     this._gazeStart(); // demande la webcam tout de suite
     if(mode==='vocal')setTimeout(()=>this.speakAssignment(),700);
@@ -9646,7 +9646,7 @@ const app={
     if(c.writtenWpm!=null)modes.push(`Épreuve écrite : <b>${c.writtenWpm} mots/min</b> (regard ${c.writtenGaze!=null?c.writtenGaze:'≥90'}%)`);
     if(c.vocalWpm!=null)modes.push(`Dictée vocale : <b>${c.vocalWpm} mots/min</b> (regard ${c.vocalGaze!=null?c.vocalGaze:'≥90'}%)`);
     const watermark=Array.from({length:60}).map(()=>esc(c.code)).join(' &nbsp; ');
-    const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Certificat KeyPace — ${esc(c.fullName)}</title>
+    const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Certificat KeyPace · ${esc(c.fullName)}</title>
     <style>*{box-sizing:border-box}body{margin:0;font-family:Georgia,'Times New Roman',serif;color:#16140F;background:#fff}
     .cert{position:relative;width:1000px;max-width:96vw;margin:24px auto;padding:54px 60px;border:3px solid #FF4D2E;border-radius:8px;overflow:hidden}
     .cert:before{content:'';position:absolute;inset:10px;border:1px solid #E7C9B0;border-radius:4px;pointer-events:none}
@@ -9857,7 +9857,7 @@ const app={
                 <div style="display:flex;align-items:center;gap:20px">
                   <div style="text-align:center">
                     <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">VITESSE MOY.</div>
-                    <div style="font-size:20px;font-weight:800;color:var(--txt);margin-top:2px">${c.agg.avgWpm!=null?c.agg.avgWpm:'—'}<span style="font-size:12px;color:var(--muted);font-weight:500"> mpm</span></div>
+                    <div style="font-size:20px;font-weight:800;color:var(--txt);margin-top:2px">${c.agg.avgWpm!=null?c.agg.avgWpm:'-'}<span style="font-size:12px;color:var(--muted);font-weight:500"> mpm</span></div>
                   </div>
                   <button onclick="event.stopPropagation();app.deleteClass('${c.id}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:6px;border-radius:8px;line-height:1;opacity:.6" title="Archiver" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
                 </div>
@@ -9955,8 +9955,8 @@ const app={
         ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ÉLÈVES</div><div style="font-size:28px;font-weight:800">${agg.total!=null?agg.total:students.length}</div></div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ACTIFS / SEM.</div><div style="font-size:28px;font-weight:800">${agg.activeThisWeek||0}</div></div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">VITESSE MOY.</div><div style="font-size:28px;font-weight:800">${agg.avgWpm!=null?agg.avgWpm:'—'}<span style="font-size:14px;color:var(--muted);font-weight:500"> mpm</span></div></div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">PRÉCISION MOY.</div><div style="font-size:28px;font-weight:800">${agg.avgAcc!=null?agg.avgAcc:'—'}<span style="font-size:14px;color:var(--muted);font-weight:500">${agg.avgAcc!=null?' %':''}</span></div></div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">VITESSE MOY.</div><div style="font-size:28px;font-weight:800">${agg.avgWpm!=null?agg.avgWpm:'-'}<span style="font-size:14px;color:var(--muted);font-weight:500"> mpm</span></div></div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">PRÉCISION MOY.</div><div style="font-size:28px;font-weight:800">${agg.avgAcc!=null?agg.avgAcc:'-'}<span style="font-size:14px;color:var(--muted);font-weight:500">${agg.avgAcc!=null?' %':''}</span></div></div>
         </div>`:''}
 
         <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -9996,9 +9996,9 @@ const app={
               const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'#E5722B':'var(--muted)';
               return`<div onclick="app.viewStudent('${d.id}','${st.studentId}')" style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px 16px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
                 <div><div style="font-weight:600;font-size:14px">${st.username}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${st.clearedLessons} leçon${st.clearedLessons!==1?'s':''} validée${st.clearedLessons!==1?'s':''}</div></div>
-                <div style="text-align:center;font-size:16px;font-weight:800;color:${wpmColor}">${st.avgWpm!=null?st.avgWpm:'—'}</div>
-                <div style="text-align:center;font-size:16px;font-weight:800;color:${accColor}">${st.avgAcc!=null?st.avgAcc+'%':'—'}</div>
-                <div style="text-align:center;font-size:14px;color:var(--muted);font-weight:600">${st.sessions||'—'}</div>
+                <div style="text-align:center;font-size:16px;font-weight:800;color:${wpmColor}">${st.avgWpm!=null?st.avgWpm:'-'}</div>
+                <div style="text-align:center;font-size:16px;font-weight:800;color:${accColor}">${st.avgAcc!=null?st.avgAcc+'%':'-'}</div>
+                <div style="text-align:center;font-size:14px;color:var(--muted);font-weight:600">${st.sessions||'-'}</div>
                 <div style="text-align:right;font-size:13px;font-weight:600;color:${lastColor}">${last}</div>
                 <div style="text-align:right;color:var(--muted);font-size:14px">›</div>
               </div>`;
@@ -10038,8 +10038,8 @@ const app={
         <div style="font-size:13px;font-weight:700;margin-bottom:8px">${created.length} compte${created.length!==1?'s':''} créé${created.length!==1?'s':''}${rest.length?(' · '+rest.length+' ignoré'+(rest.length!==1?'s':'')):''}</div>
         ${created.length?`<div style="background:var(--light);border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;white-space:pre-wrap;max-height:160px;overflow-y:auto">${this._esc(list)}</div>
         <button id="imp-copy-list" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:9px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer">Copier la liste (identifiant / mot de passe)</button>
-        <p style="font-size:11.5px;color:var(--muted);margin:8px 0 0;line-height:1.5">Communique à chaque élève son identifiant et son mot de passe temporaire — il pourra le changer une fois connecté.</p>`:''}
-        ${rest.length?`<div style="margin-top:10px;font-size:12px;color:var(--muted)">${rest.map(x=>this._esc(x.username)+' — '+this._esc(x.reason)).join('<br>')}</div>`:''}
+        <p style="font-size:11.5px;color:var(--muted);margin:8px 0 0;line-height:1.5">Communique à chaque élève son identifiant et son mot de passe temporaire : il pourra le changer une fois connecté.</p>`:''}
+        ${rest.length?`<div style="margin-top:10px;font-size:12px;color:var(--muted)">${rest.map(x=>this._esc(x.username)+' · '+this._esc(x.reason)).join('<br>')}</div>`:''}
       `;
       const copyBtn=document.getElementById('imp-copy-list');
       if(copyBtn)copyBtn.addEventListener('click',()=>{navigator.clipboard.writeText(list);copyBtn.textContent='✓ Copié !';setTimeout(()=>{copyBtn.textContent='Copier la liste (identifiant / mot de passe)';},2000);});
@@ -10099,7 +10099,7 @@ const app={
       },500);
     }catch(e){
       const status=document.getElementById('asg-rec-status');
-      if(status)status.textContent='Micro inaccessible — vérifie les permissions.';
+      if(status)status.textContent='Micro inaccessible : vérifie les permissions.';
     }
   },
   _asgStopRecording(){
@@ -10239,7 +10239,7 @@ const app={
     }else{
       lessonId=document.getElementById('asg-lesson').value;
       if(lessonId){const l=this.lessonById(lessonId);title=l?l.title:'Exercice';}
-      else{if(!wpm)return fail('Pour un test libre, fixe un objectif de vitesse.');title='Test de vitesse — '+wpm+' mpm';}
+      else{if(!wpm)return fail('Pour un test libre, fixe un objectif de vitesse.');title='Test de vitesse · '+wpm+' mpm';}
     }
     const btn=document.getElementById('asg-save');btn.disabled=true;btn.textContent='…';
     // Upload audio si mode vocal et enregistrement en attente
@@ -10316,9 +10316,9 @@ const app={
     const esc=v=>String(v==null?'':v).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
     const rowsHtml=d.students.map(s=>{
       const last=s.daysSinceActive==null?'jamais':s.daysSinceActive===0?"aujourd'hui":s.daysSinceActive+' j';
-      return`<tr><td>${esc(s.username)}</td><td class="n">${s.avgWpm==null?'—':s.avgWpm}</td><td class="n">${s.avgAcc==null?'—':s.avgAcc+'%'}</td><td class="n">${s.sessions||0}</td><td class="n">${s.clearedLessons||0}</td><td class="n">${last}</td></tr>`;
+      return`<tr><td>${esc(s.username)}</td><td class="n">${s.avgWpm==null?'-':s.avgWpm}</td><td class="n">${s.avgAcc==null?'-':s.avgAcc+'%'}</td><td class="n">${s.sessions||0}</td><td class="n">${s.clearedLessons||0}</td><td class="n">${last}</td></tr>`;
     }).join('');
-    const html='<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>KeyPace — '+esc(d.name)+'</title>'
+    const html='<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>KeyPace · '+esc(d.name)+'</title>'
       +'<style>*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#16140F;padding:36px;margin:0}'
       +'.hd{display:flex;align-items:center;gap:10px;margin-bottom:4px}.logo{width:30px;height:30px;border-radius:8px;background:#FF4D2E;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}'
       +'h1{font-size:24px;margin:14px 0 2px}.sub{color:#7A7365;font-size:13px;margin:0 0 20px}'
@@ -10329,8 +10329,8 @@ const app={
       +'<h1>'+esc(d.name)+'</h1><p class="sub">Rapport de classe · '+d.students.length+' élève(s) · édité le '+date+'</p>'
       +'<div class="cards">'
       +'<div class="card"><div class="l">ÉLÈVES ACTIFS / SEM.</div><div class="v">'+(agg.activeThisWeek||0)+'</div></div>'
-      +'<div class="card"><div class="l">VITESSE MOY.</div><div class="v">'+(agg.avgWpm!=null?agg.avgWpm+' mpm':'—')+'</div></div>'
-      +'<div class="card"><div class="l">PRÉCISION MOY.</div><div class="v">'+(agg.avgAcc!=null?agg.avgAcc+' %':'—')+'</div></div>'
+      +'<div class="card"><div class="l">VITESSE MOY.</div><div class="v">'+(agg.avgWpm!=null?agg.avgWpm+' mpm':'-')+'</div></div>'
+      +'<div class="card"><div class="l">PRÉCISION MOY.</div><div class="v">'+(agg.avgAcc!=null?agg.avgAcc+' %':'-')+'</div></div>'
       +'</div>'
       +'<table><thead><tr><th>Élève</th><th class="n">Vitesse</th><th class="n">Précision</th><th class="n">Tests</th><th class="n">Leçons</th><th class="n">Dernière activité</th></tr></thead><tbody>'+rowsHtml+'</tbody></table>'
       +'<script>window.onload=function(){window.print();}<\/script></body></html>';
@@ -10394,14 +10394,14 @@ const app={
       <div class="stats-header" style="padding-bottom:24px">
         <button onclick="app.viewClass('${d.classId}')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Retour à la classe</button>
         <h1 style="margin-bottom:4px">${d.username}</h1>
-        <p style="margin:0">Inscrit le ${d.joinedAt?new Date(d.joinedAt).toLocaleDateString('fr-FR'):'—'} · dernière activité : ${last}</p>
+        <p style="margin:0">Inscrit le ${d.joinedAt?new Date(d.joinedAt).toLocaleDateString('fr-FR'):'-'} · dernière activité : ${last}</p>
         ${isAdmin()?`<button onclick="app.adminDeleteStudent('${d.studentId}')" style="margin-top:12px;background:none;border:1px solid #E5484D;color:#E5484D;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Supprimer cet élève (RGPD)</button>`:''}
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px">
           ${card('SESSIONS',s.sessions||0,'')}
-          ${card('VITESSE MOY.',s.avgWpm!=null?s.avgWpm:'—',s.avgWpm!=null?' mpm':'')}
-          ${card('PRÉCISION MOY.',s.avgAcc!=null?s.avgAcc:'—',s.avgAcc!=null?' %':'',accColor)}
+          ${card('VITESSE MOY.',s.avgWpm!=null?s.avgWpm:'-',s.avgWpm!=null?' mpm':'')}
+          ${card('PRÉCISION MOY.',s.avgAcc!=null?s.avgAcc:'-',s.avgAcc!=null?' %':'',accColor)}
           ${card('LEÇONS VALIDÉES',s.clearedLessons||0,'')}
         </div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 22px;margin-bottom:20px">
@@ -10463,7 +10463,7 @@ const app={
     return`<div onclick="app.viewProf('${p.profId}')" style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:12px;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
         <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;flex-shrink:0">${init}</div>
         <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--txt)">${p.username}</div><div style="font-size:12px;color:var(--muted);margin-top:1px">${p.classCount} classe${p.classCount!==1?'s':''} · ${p.studentCount} élève${p.studentCount!==1?'s':''} · ${lastTxt}</div></div>
-        <div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:800;color:var(--txt)">${p.avgWpm!=null?p.avgWpm:'—'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:800;color:var(--txt)">${p.avgWpm!=null?p.avgWpm:'-'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div></div>
         <div style="color:var(--muted);font-size:14px">›</div>
       </div>`;
   },
@@ -10489,7 +10489,7 @@ const app={
     const classBreakRow=(c)=>`<div onclick="app.viewClass('${c.classId}')" style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:12px;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
         <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;flex-shrink:0">${(c.className||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
         <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--txt)">${c.className}</div><div style="font-size:12px;color:var(--muted);margin-top:1px">${c.profUsername} · ${c.activeThisWeek}/${c.total} actif${c.total!==1?'s':''} cette semaine</div></div>
-        <div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:800;color:var(--txt)">${c.avgWpm!=null?c.avgWpm:'—'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div></div>
+        <div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:800;color:var(--txt)">${c.avgWpm!=null?c.avgWpm:'-'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div></div>
         <div style="color:var(--muted);font-size:14px">›</div>
       </div>`;
     const classesBreakHtml=classesBreak.length?classesBreak.map(classBreakRow).join(''):`<div style="padding:18px 4px;color:var(--muted);font-size:13px">Aucune classe pour l'instant.</div>`;
@@ -10516,11 +10516,11 @@ const app={
     const licenceBannerHtml=`
       <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
         <div style="flex:1;min-width:220px">
-          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px"><span>SIÈGES UTILISÉS</span><span style="color:${seatColor}">${seatsUsed} / ${seatCount||'—'}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px"><span>SIÈGES UTILISÉS</span><span style="color:${seatColor}">${seatsUsed} / ${seatCount||'-'}</span></div>
           <div style="height:8px;background:var(--light);border-radius:5px;overflow:hidden"><div style="height:100%;width:${Math.min(100,seatPct)}%;background:${seatColor};border-radius:5px"></div></div>
         </div>
         <div style="font-size:13px;color:${expiryWarn||(daysLeft!=null&&daysLeft<0)?'#E5484D':'var(--muted)'};font-weight:${expiryWarn?'700':'500'}">${expiryText}</div>
-        <a href="mailto:contact@keypace.be?subject=${encodeURIComponent('Renouvellement licence KeyPace — '+(inst.name||''))}" style="background:var(--light);border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--txt);text-decoration:none;white-space:nowrap">Renouveler / ajuster →</a>
+        <a href="mailto:contact@keypace.be?subject=${encodeURIComponent('Renouvellement licence KeyPace · '+(inst.name||''))}" style="background:var(--light);border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--txt);text-decoration:none;white-space:nowrap">Renouveler / ajuster →</a>
       </div>`;
     document.getElementById('page-home').innerHTML=`
       <div style="max-width:1100px;margin:0 auto;padding:44px 24px 80px">
@@ -10533,8 +10533,8 @@ const app={
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px">
           ${statCard('PROFESSEURS',profs.length,'','dans ton établissement')}
           ${statCard('ÉLÈVES ACTIFS',g.activeThisWeek,'','cette semaine sur '+g.total)}
-          ${statCard('VITESSE MOY.',g.avgWpm!=null?g.avgWpm:'—',g.avgWpm!=null?' mpm':'','tous élèves confondus')}
-          ${statCard('PRÉCISION MOY.',g.avgAcc!=null?g.avgAcc:'—',g.avgAcc!=null?'%':'','sur les derniers tests',accColor)}
+          ${statCard('VITESSE MOY.',g.avgWpm!=null?g.avgWpm:'-',g.avgWpm!=null?' mpm':'','tous élèves confondus')}
+          ${statCard('PRÉCISION MOY.',g.avgAcc!=null?g.avgAcc:'-',g.avgAcc!=null?'%':'','sur les derniers tests',accColor)}
         </div>
         <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start;margin-bottom:16px">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px 24px">
@@ -10579,7 +10579,7 @@ const app={
           <div style="width:40px;height:40px;border-radius:11px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;flex-shrink:0">${init}</div>
           <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">${p.username}</div><div style="font-size:12px;color:var(--muted)">${p.classCount} classe${p.classCount!==1?'s':''} · ${p.studentCount} élève${p.studentCount!==1?'s':''}</div></div>
         </div>
-        <div style="font-size:14px;font-weight:800;color:var(--txt);flex-shrink:0">${p.avgWpm!=null?p.avgWpm+' mpm':'—'}</div>
+        <div style="font-size:14px;font-weight:800;color:var(--txt);flex-shrink:0">${p.avgWpm!=null?p.avgWpm+' mpm':'-'}</div>
         <button onclick="app.archiveProf('${p.profId}')" title="Retirer ce professeur" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;font-weight:600;padding:6px;opacity:.7;font-family:inherit" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.7';this.style.color='var(--muted)'">Retirer</button>
       </div>`;
     }).join(''):`<div style="text-align:center;padding:48px 20px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">${ICONS.user}</div><div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun professeur</div><div style="font-size:13px">Invite ton équipe enseignante avec le bouton ci-dessus.</div></div>`;
@@ -10620,7 +10620,7 @@ const app={
     const classRows=classes.length?classes.map(c=>`<div onclick="app.viewClass('${c.id}')" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:box-shadow .15s" onmouseenter="this.style.boxShadow='0 4px 18px rgba(0,0,0,0.07)'" onmouseleave="this.style.boxShadow='none'">
         <div style="width:40px;height:40px;border-radius:11px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;flex-shrink:0">${(c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
         <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">${c.name}</div><div style="font-size:12px;color:var(--muted)">${c.memberCount} élève${c.memberCount!==1?'s':''} · ${c.agg.activeThisWeek} actif${c.agg.activeThisWeek!==1?'s':''} cette semaine</div></div>
-        <div style="text-align:right"><div style="font-size:15px;font-weight:800">${c.agg.avgWpm!=null?c.agg.avgWpm:'—'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div></div>
+        <div style="text-align:right"><div style="font-size:15px;font-weight:800">${c.agg.avgWpm!=null?c.agg.avgWpm:'-'}<span style="font-size:11px;font-weight:500;color:var(--muted)"> mpm</span></div></div>
         <div style="color:var(--muted)">›</div>
       </div>`).join(''):`<div style="text-align:center;padding:48px 20px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">${ICONS.bookOpen}</div><div style="font-size:14px">Ce professeur n'a pas encore créé de classe.</div></div>`;
     document.getElementById(pageId).innerHTML=`<div class="stats-section">

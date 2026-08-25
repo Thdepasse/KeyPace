@@ -6,7 +6,7 @@
 <script src="/cookie-consent.js" defer></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>KeyPace Battle Royale — Écran géant</title>
+<title>KeyPace Battle Royale | Écran géant</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -72,8 +72,8 @@ button{cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size
 <header>
   <div class="logo">Key<span>Pace</span> · Battle Royale</div>
   <div class="hud">
-    <div>Salon<b class="mono" id="hudRoom">—</b></div>
-    <div>En course<b id="hudAlive">—</b></div>
+    <div>Salon<b class="mono" id="hudRoom">-</b></div>
+    <div>En course<b id="hudAlive">-</b></div>
     <div>Chrono<b class="mono" id="hudTime">0:00</b></div>
   </div>
 </header>
@@ -146,7 +146,7 @@ function spectate(roomId){
   });
   socket.on('room:playerJoined', (d) => {
     playerCount = d.playerCount;
-    $('waitCount').textContent = playerCount + '/' + d.maxPlayers + ' joueurs — minimum ' + d.minPlayers;
+    $('waitCount').textContent = playerCount + '/' + d.maxPlayers + ' joueurs, minimum ' + d.minPlayers;
   });
   socket.on('room:playerLeft', (d) => {
     playerCount = d.playerCount;

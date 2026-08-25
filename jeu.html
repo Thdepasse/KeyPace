@@ -6,7 +6,7 @@
 <script src="/cookie-consent.js" defer></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>KeyPace Battle Royale — Jouer</title>
+<title>KeyPace Battle Royale | Jouer</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -177,7 +177,7 @@ footer{text-align:center;padding:14px;color:var(--muted);font-size:12px}
   </section>
 
 </main>
-<footer>KeyPace Battle Royale — anti-triche actif (max 250 mots/min)</footer>
+<footer>KeyPace Battle Royale · anti-triche actif (max 250 mots/min)</footer>
 
 <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 <script>
@@ -243,7 +243,7 @@ function onJoined(res){
 }
 
 function renderLobby(count, min, max){
-  $('lobbyCount').textContent = count + '/' + max + ' joueurs — minimum ' + min + ' pour démarrer';
+  $('lobbyCount').textContent = count + '/' + max + ' joueurs, minimum ' + min + ' pour démarrer';
   $('lobbyPlayers').innerHTML = '';
   for (const [id, name] of lobby) {
     const c = document.createElement('span');
@@ -314,7 +314,7 @@ function bindGameEvents(s){
 
   s.on('player:finished', (d) => {
     raceOver = true; myState = 'finished';
-    $('raceMsg').textContent = '🏁 Terminé ! Position #' + d.rank + ' — ' + d.wpm + ' WPM. En attente du podium…';
+    $('raceMsg').textContent = '🏁 Terminé ! Position #' + d.rank + ' · ' + d.wpm + ' WPM. En attente du podium…';
     $('typeInput').disabled = true;
   });
   s.on('player:eliminated', () => {
