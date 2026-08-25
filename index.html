@@ -839,7 +839,6 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .gword .gtyped{color:var(--accent)}
 .gword .grest{color:rgba(255,255,255,0.9)}
 @keyframes tierup{0%{transform:scale(1.5);color:#fff}100%{transform:scale(1);color:var(--accent)}}
-@keyframes sourisshake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
 @keyframes cdPop{0%{transform:scale(1.5);opacity:0}40%{opacity:1;transform:scale(1)}85%{opacity:1}100%{opacity:.2;transform:scale(.88)}}
 #game-cd{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.88);gap:10px;pointer-events:none;border-radius:24px}
 .cd-n{font-family:'JetBrains Mono',monospace;font-size:100px;font-weight:900;color:#fff;display:block;animation:cdPop .85s ease forwards}
@@ -991,7 +990,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
   .gcine-boss-cta{align-self:flex-end}
 }
 
-/* Carte désactivée : "Bientôt disponible" (ex: Battle Royale) ou verrouillée dynamiquement (ex: Double piste) */
+/* Carte désactivée : "Bientôt disponible" (ex: Battle Royale) ou verrouillée dynamiquement */
 .gcine-card.is-disabled .gcine-card-inner{filter:grayscale(.35);opacity:.72}
 .gcine-card.is-disabled.is-center .gcine-card-inner{box-shadow:0 20px 44px rgba(21,19,15,.18)}
 .gcine-card.is-disabled.is-center .gcine-card-cta{color:var(--muted);cursor:not-allowed}
@@ -1042,18 +1041,6 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .sprint-progress{position:relative;z-index:1;height:6px;background:rgba(255,255,255,.12);border-radius:3px;margin-bottom:8px;overflow:hidden}
 .sprint-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),#ff8a5c);transition:width .1s}
 
-/* TIREUR D'ÉLITE */
-.ttarget{position:absolute;transform:translate(-50%,-50%);background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.16);border-radius:13px;padding:8px 13px 9px;text-align:center;z-index:2}
-.ttarget.active{border-color:var(--accent);background:rgba(255,77,46,0.13);box-shadow:0 0 0 3px rgba(255,77,46,0.22)}
-.ttarget-word{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:18px;white-space:nowrap;line-height:1}
-.ttarget .ttyped{color:var(--accent)}
-.ttarget .trest{color:rgba(255,255,255,0.92)}
-.ttarget-life{height:4px;border-radius:2px;background:rgba(255,255,255,0.16);margin-top:8px;overflow:hidden}
-.ttarget-life-fill{height:100%;border-radius:2px;background:#1FA971;transition:width .05s linear}
-.ttarget-life-fill.low{background:var(--accent)}
-.timpact{position:absolute;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:30px;pointer-events:none;z-index:4}
-.tireur-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:420px;margin:0 auto}
-.tireur-chip{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.85);border-radius:7px;padding:3px 9px}
 .sr-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* COURSE DE DACTYLO */
@@ -1257,7 +1244,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 @keyframes simonblink{50%{opacity:0}}
 .simon-bar{position:relative;z-index:1;height:6px;background:rgba(255,255,255,.14);border-radius:3px;overflow:hidden;margin-top:14px;max-width:420px;width:100%}
 .simon-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#ff8a5c);border-radius:3px;transition:width .1s linear}
-@media(prefers-reduced-motion:reduce){.simon-caret{animation:none}.simon-bar-fill{transition:none}.race-car{transition:none}.ttarget-life-fill{transition:none}.game-arena{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.simon-caret{animation:none}.simon-bar-fill{transition:none}.race-car{transition:none}.tscope-ring{transition:none}.game-arena{animation:none!important}}
 
 /* BOSS DE LA SEMAINE */
 .boss-card{background:#16140F;color:#fff;border-radius:24px;padding:28px;position:relative;overflow:hidden}
@@ -2411,8 +2398,8 @@ async function flushStats(){
   }catch{}
 }
 function mergeStats(remote){
-  const def={tests:[],lessons:{},gameBest:0,tireurBest:null,courseBest:null,simonBest:null,clavierBest:null,sourisBest:0,sourisHybridHand:null,ghostBest:null,goals:{minWpm:20,maxErrors:8},
-    sourisSoloBest:null,sourisGridBest:null,sourisWavesBest:null,sourisHybridBest:null,sourisTilesBest:null,sourisDuoBest:null};
+  const def={tests:[],lessons:{},gameBest:0,courseBest:null,simonBest:null,clavierBest:null,sourisBest:0,sourisHybridHand:null,ghostBest:null,goals:{minWpm:20,maxErrors:8},
+    sourisGridBest:null,sourisHybridBest:null,sourisTilesBest:null};
   const s=Object.assign(def, remote||{});
   s.tests=s.tests||[];s.lessons=s.lessons||{};s.goals=s.goals||{};
   if(typeof s.goals.minWpm!=='number')s.goals.minWpm=20;
@@ -3436,7 +3423,6 @@ const SPRINT_WORDS=["le","la","les","un","une","de","des","et","ou","dans","sur"
 const TIREUR_ACCENTS=["école","élève","fenêtre","château","préféré","règle","forêt","crème","théâtre","numéro","côté","cœur","français","intérêt","élément","problème","éléphant","lumière","révéler","différent"];
 const TIREUR_EASY=SPRINT_WORDS.filter(w=>w.length<=4);
 const TIREUR_MID=[...WORDS,...SPRINT_WORDS].filter(w=>w.length>=5&&w.length<=7);
-const TIREUR_HARD=[...new Set([...[...WORDS,...SPRINT_WORDS].filter(w=>w.length>=7),...TIREUR_ACCENTS])];
 
 /* Course de dactylo : textes FR cohérents (réutilise PASSAGES) + bots locaux */
 const RACE_TEXTS=[...PASSAGES,
@@ -3486,14 +3472,10 @@ const GCINE_GAMES=[
   {key:'sprint',icon:'flag',name:'Le Sprint',desc:"30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace : chaque seconde compte.",expert:false,category:'vitesse'},
   {key:'course',icon:'raceCar',name:'Course de dactylo',desc:"Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !",expert:false,category:'vitesse'},
   {key:'ghost',icon:'ghost',name:'Contre ton fantôme',desc:"Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !",expert:false,category:'vitesse'},
-  {key:'tireur',icon:'crosshair',name:"Tireur d'élite",desc:"Tape chaque mot sans la moindre faute. Une seule erreur et la cible est ratée : la précision avant tout.",expert:false,category:'precision'},
   {key:'souris',icon:'mouse',name:'Précision souris',desc:"12 niveaux qui montent en difficulté : viser, cliquer, glisser-déposer, puis le clavier (ZQSD) en renfort.",expert:false,category:'precision'},
-  {key:'sourisSolo',icon:'target',name:'Cible unique',desc:"Une lettre, un rythme : repère la cible et tape sa lettre avant qu'elle ne disparaisse. Pure réaction clavier.",expert:false,category:'precision'},
   {key:'sourisGrid',icon:'grid',name:'Grille réflexe',desc:"9 cases, une s'allume : tape sa lettre avant les pièges qui s'allument aussi.",expert:false,category:'precision'},
-  {key:'sourisWaves',icon:'flag',name:'Vagues & Boss',desc:"4 vagues, une règle différente à chaque fois, puis un mot-boss pour finir.",expert:true,category:'precision'},
   {key:'sourisHybrid',icon:'hand',name:'Duo souris + clavier',desc:"Vise à la souris, valide au clavier — une main sur chaque, une lettre à la fois.",expert:true,category:'precision'},
   {key:'sourisTiles',icon:'layers',name:'Magic Tiles',desc:"8 couloirs, ta rangée de repos QSDF JKLM : tape ou tiens la touche avant la ligne.",expert:false,category:'precision'},
-  {key:'sourisDuo2',icon:'swords',name:'Double piste',desc:"Les deux mains sollicitées en même temps. Le plus exigeant des jeux de précision.",expert:false,category:'precision',locked:a=>!a._sourisDuo2Unlocked(),lockedTag:'3 pistes à bronze+ requises'},
   {key:'simon',icon:'brain',name:'Simon des mots',desc:"Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.",expert:false,category:'memoire'},
   {key:'clavier',icon:'keyboard',name:'Clavier vide',desc:"Le clavier est totalement vide : replace chaque lettre au bon endroit, de mémoire. Chrono lancé, chaque erreur compte.",expert:false,category:'memoire'},
   {key:'duel',icon:'swords',name:'Duel 1v1',desc:"Défie un ami en temps réel sur le même texte. Partage un lien, comptez 3-2-1, et que le plus rapide gagne !",expert:false,category:'multi'},
@@ -3501,10 +3483,10 @@ const GCINE_GAMES=[
 ];
 const GCINE_BOSS={key:'boss',icon:'trophy',name:'Boss de la semaine',desc:"Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !",expert:false};
 const CLAVIER_ROWS=['AZERTYUIOP'.split(''),'QSDFGHJKLM'.split(''),'WXCVBN'.split('')];
-// Les 7 jeux ex-Visée partagent un seul state (this.souris) et un seul rendu/
+// Les 4 jeux ex-Visée partagent un seul state (this.souris) et un seul rendu/
 // routeur clavier (renderSouris/sourisKey), qui dispatchent déjà sur
 // this.souris.track — seule la clé `activeGame` diffère selon la carte cliquée.
-const SOURIS_GAMES=['souris','sourisSolo','sourisGrid','sourisWaves','sourisHybrid','sourisTiles','sourisDuo2'];
+const SOURIS_GAMES=['souris','sourisGrid','sourisHybrid','sourisTiles'];
 function shuffleArr(a){
   const r=a.slice();
   for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}
@@ -3536,8 +3518,8 @@ function gcineComputeLayout(){
 const GCINE_LAYOUT=gcineComputeLayout();
 
 const app={
-  view:'home',sess:null,stats:null,game:null,sprint:null,tireur:null,course:null,simon:null,boss:null,duel:null,clavier:null,activeGame:null,now:Date.now(),_gcineCat:'vitesse',_gcineVisible:null,_clavierFlashT:null,
-  _timer:null,_gameLoop:null,_sprintLoop:null,_tireurLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_onKey:null,_wid:0,_gameRec:false,_tireurRec:false,_courseRec:false,
+  view:'home',sess:null,stats:null,game:null,sprint:null,course:null,simon:null,boss:null,duel:null,clavier:null,activeGame:null,now:Date.now(),_gcineCat:'vitesse',_gcineVisible:null,_clavierFlashT:null,
+  _timer:null,_gameLoop:null,_sprintLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_onKey:null,_wid:0,_gameRec:false,_courseRec:false,
   _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,_wgPromise:null,_stream:null,_video:null,_landmarker:null,_raf:null,_baseline:null,_baselineBuf:[],_smooth:null,_lastScore:null,_lastGazeOn:null,_calib:null,_sessionThreshold:null,samples:[],permError:null,_fixBaseline:null},
 
   init(){
@@ -3547,10 +3529,10 @@ const app={
     window.addEventListener('keydown',this._onKey);
   },
   stopAll(){
-    this.stopTimer();this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();
+    this.stopTimer();this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();
     if(this._onKey){window.removeEventListener('keydown',this._onKey);this._onKey=null;}
     if(this._clavierFlashT){clearTimeout(this._clavierFlashT);this._clavierFlashT=null;}
-    this.game=null;this.sess=null;this.sprint=null;this.tireur=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.clavier=null;this.souris=null;this.activeGame=null;
+    this.game=null;this.sess=null;this.sprint=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.clavier=null;this.souris=null;this.activeGame=null;
   },
 
   lessonRec(id){const v=(this.stats&&this.stats.lessons||{})[id];if(!v)return{bestWpm:0,bestErr:null,cleared:false};if(typeof v==='number')return{bestWpm:v,bestErr:null,cleared:true};return v;},
@@ -4071,7 +4053,6 @@ const app={
     if(e.key==='Escape'&&this.view==='games'&&this.activeGame){this.exitActiveGame();return;}
     if(this.view==='games'&&this.activeGame==='sprint'&&this.sprint&&this.sprint.on){this.sprintKey(e);return;}
     if(this.view==='games'&&this.activeGame==='frappe'&&this.game&&this.game.on){this.gameKey(e);return;}
-    if(this.view==='games'&&this.activeGame==='tireur'&&this.tireur&&this.tireur.on){this.tireurKey(e);return;}
     if(this.view==='games'&&this.activeGame==='course'&&this.course&&this.course.on){this.courseKey(e);return;}
     if(this.view==='games'&&this.activeGame==='ghost'&&this.ghost&&this.ghost.on){this.ghostKey(e);return;}
     if(this.view==='games'&&this.activeGame==='simon'&&this.simon&&this.simon.on){this.simonKey(e);return;}
@@ -4081,10 +4062,10 @@ const app={
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   exitActiveGame(){
-    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();
+    this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();
     if(this.duel)this.duelLeave();
     if(this._clavierFlashT){clearTimeout(this._clavierFlashT);this._clavierFlashT=null;}
-    this.activeGame=null;this.game=null;this.sprint=null;this.tireur=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.clavier=null;this.souris=null;
+    this.activeGame=null;this.game=null;this.sprint=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.clavier=null;this.souris=null;
     this.renderGames();
   },
   typeKey(e){
@@ -4334,7 +4315,7 @@ const app={
     if(v==='classes'&&currentUser&&!isTeacher()&&!currentInstitutionName&&!currentHasClass)v='stats';
     this.view=v;
     maybeConvNudge(v);
-    if(v!=='games'){this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;this._gcineTeardown();}
+    if(v!=='games'){this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;this._gcineTeardown();}
     // Sans ça, le poll 25s de viewClass() continuait après avoir quitté la vue
     // "classes" par un onglet de nav (au lieu du bouton ← Retour), et renvoyait
     // de force l'utilisateur vers la liste des classes à chaque tick.
@@ -4355,7 +4336,7 @@ const app={
       home:['KeyPace – Apprenez à taper vite sur clavier AZERTY','KeyPace : 65 leçons progressives pour apprendre la dactylographie AZERTY. Test de vitesse, jeux de frappe et suivi de progression. Gratuit, en français, sans installation.'],
       lessons:['Cours de dactylographie AZERTY – KeyPace','Parcourez les 65 leçons KeyPace et progressez du niveau zéro à 60 mots/min sur clavier AZERTY. Exercices progressifs avec feedback immédiat.'],
       test:['Test de vitesse de frappe – KeyPace','Mesurez votre vitesse de frappe en mots par minute et votre précision. Test chronométré sur clavier AZERTY, résultats instantanés.'],
-      games:['Jeux de dactylographie – KeyPace','Entraînez-vous en vous amusant : Tireur d\'élite, Course de dactylo, Simon des mots, Sprint et Boss de la semaine. Progressez sans vous en rendre compte.'],
+      games:['Jeux de dactylographie – KeyPace','Entraînez-vous en vous amusant : Course de dactylo, Simon des mots, Sprint et Boss de la semaine. Progressez sans vous en rendre compte.'],
       stats:['Mes progrès – KeyPace','Suivez votre progression en dactylographie : vitesse (mots/min), précision, série de jours, leçons validées et touches difficiles.'],
       classes:['Ma classe – KeyPace','Gérez vos classes, suivez vos élèves et assignez des devoirs depuis votre tableau de bord KeyPace.'],
       etablissement:['KeyPace pour les établissements scolaires','Plateforme de dactylographie AZERTY pour écoles, universités et centres de formation. Tableau de bord enseignant, devoirs assignables, 65 leçons progressives.'],
@@ -4380,8 +4361,8 @@ const app={
   },
 
   /* ── COQUILLE PARTAGÉE DES JEUX ──
-     En-tête et écran de résultat communs à 6 des 8 jeux (Sprint, Frappe-mots,
-     Tireur, Course, Simon, Boss) : avant ce helper, chaque jeu réécrivait son
+     En-tête et écran de résultat communs à 5 des 8 jeux (Sprint, Frappe-mots,
+     Course, Simon, Boss) : avant ce helper, chaque jeu réécrivait son
      propre HTML d'en-tête et un des trois écrans de résultat différents
      (overlay sombre, carte claire à grille de stats, stage clair sans
      grille), avec trois vocabulaires de boutons distincts. Un seul système
@@ -4419,8 +4400,8 @@ const app={
     </div>`;
   },
   // Feuille de route façon Visée (paliers avec icône/cadenas + progression) —
-  // habillage visuel uniquement, appliqué à Frappe-mots et Tireur d'élite qui
-  // n'avaient qu'une rangée de pastilles plates pour représenter leurs paliers.
+  // habillage visuel uniquement, appliqué à Frappe-mots qui n'avait qu'une
+  // rangée de pastilles plates pour représenter ses paliers.
   // items: [{label, sub, state:'done'|'current'|'locked'}]
   // Longueur du préfixe correct — logique identique dans Course/Boss/Duel,
   // chacun ne faisant que passer sa propre paire (typed,text).
@@ -5665,26 +5646,14 @@ const app={
   },
 
   /* ═══════════════════════════════════════════════════════════════
-     VISÉE — devenue 7 jeux indépendants (catégorie Précision) :
-     'souris' (12 niveaux persistés) + 6 pistes à session unique
-     (solo/grid/waves/hybrid/tiles/duo2). _sourisTrackTier/BestField
-     et _sourisDuo2Unlocked restent : ils pilotent le verrou dynamique
-     de Double piste (3 des 5 autres pistes à bronze+).
+     VISÉE — devenue 4 jeux indépendants (catégorie Précision) :
+     'souris' (12 niveaux persistés) + 3 pistes à session unique
+     (grid/hybrid/tiles).
      ═══════════════════════════════════════════════════════════════ */
 
-  _sourisTrackBestField(id){return {solo:'sourisSoloBest',grid:'sourisGridBest',waves:'sourisWavesBest',hybrid:'sourisHybridBest',tiles:'sourisTilesBest',duo2:'sourisDuoBest'}[id];},
-  _sourisTrackTier(id){
-    if(id==='mouse')return null;
-    const f=this._sourisTrackBestField(id);
-    const b=f&&this.stats&&this.stats[f];
-    return b?b.tier:null;
-  },
-  _sourisDuo2Unlocked(){
-    const ids=['solo','grid','waves','hybrid','tiles'];
-    return ids.filter(id=>this._sourisTrackTier(id)).length>=3;
-  },
+  _sourisTrackBestField(id){return {grid:'sourisGridBest',hybrid:'sourisHybridBest',tiles:'sourisTilesBest'}[id];},
 
-  // Point d'entrée commun aux 6 pistes à session unique en fin de partie :
+  // Point d'entrée commun aux 3 pistes à session unique en fin de partie :
   // palier médaille + meilleur score, son+confettis, sauvegarde. Chaque
   // piste appelle ceci puis affiche son propre écran de fin.
   _sourisFinishTrack(trackId,{score,thresholds,extra}){
@@ -5726,12 +5695,9 @@ const app={
     const s=this.souris;
     if(!s){this.activeGame=null;this.renderGames();return;}
     const track=s.track||'mouse';
-    if(track==='solo')return this._sourisSoloRender();
     if(track==='grid')return this._sourisGridRender();
-    if(track==='waves')return this._sourisWavesRender();
     if(track==='hybrid')return this._sourisHybridRender();
     if(track==='tiles')return this._sourisTilesRender();
-    if(track==='duo2')return this._sourisDuo2Render();
     if(s.phase==='mouseMenu'){return this._sourisRenderMenu();}
     if(s.phase==='brief'){return this._sourisRenderBrief();}
     if(s.phase==='over'||s.phase==='win'){return this._sourisRenderEnd();}
@@ -5741,12 +5707,9 @@ const app={
   sourisKey(e){
     const s=this.souris;if(!s||s.phase!=='play')return;
     const track=s.track||'mouse';
-    if(track==='solo')return this._sourisSoloKey(e);
     if(track==='grid')return this._sourisGridKey(e);
-    if(track==='waves')return this._sourisWavesKey(e);
     if(track==='hybrid')return this._sourisHybridKey(e);
     // 'tiles' : écouteurs keydown/keyup dédiés (tenues de touche), rien à faire ici.
-    if(track==='duo2')return this._sourisDuo2Key(e);
     // 'mouse' : géré par son propre listener ZQSD, rien à faire ici.
   },
 
@@ -6374,141 +6337,12 @@ const app={
     a.innerHTML=html;
   },
 
-  /* ═══════════════════════════════════════════════════════════════
-     VISÉE — CIBLE UNIQUE (piste "solo")
-     Une lettre au centre, un anneau qui se resserre : la taper avant
-     qu'il n'atteigne zéro. 100% clavier — la cible est un repère
-     visuel, pas une zone à viser à la souris.
-     ═══════════════════════════════════════════════════════════════ */
-  _sourisTiers:{solo:{bronze:40,silver:75,gold:120},grid:{bronze:35,silver:65,gold:100},waves:{bronze:2,silver:4,gold:5},hybrid:{bronze:35,silver:60,gold:90},tiles:{bronze:60,silver:110,gold:170},duo2:{bronze:40,silver:65,gold:88}},
-  _sourisLetterPool(){
-    if(this._kbLetters)return this._kbLetters;
-    this._kbLetters=KB.slice(1).flat().map(k=>k.l.toLowerCase()).filter(l=>/^[a-z]$/.test(l));
-    return this._kbLetters;
-  },
-  _sourisSoloBrief(){
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
-        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
-          <div style="color:var(--accent)">${ICONS.target}</div>
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Cible unique</h2>
-          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:420px;margin:0">Une lettre s'affiche au centre. Tape-la avant que l'anneau ne se referme. Un combo qui monte réchauffe la cible. <b>3 fautes et la partie s'arrête.</b></p>
-          <div style="display:flex;gap:26px;margin-top:4px">
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${this._sourisTiers.solo.bronze} · 🥈${this._sourisTiers.solo.silver} · 🥇${this._sourisTiers.solo.gold}</div></div>
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">♥♥♥</div></div>
-          </div>
-          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisSoloStart()">Commencer</button>
-        </div>
-      </div>
-    </div>`;
-  },
-  _sourisSoloStart(){
-    this.stopSouris();
-    const pool=this._sourisLetterPool();
-    this.souris={phase:'play',track:'solo',score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,streakRun:0,bestStreak:0,
-      letter:pool[Math.floor(Math.random()*pool.length)],ringDur:2600,tLeft:2600,sessionLeft:45000};
-    this.renderSouris();
-    this._sourisLoop=setInterval(()=>this._sourisSoloTick(),50);
-  },
-  _sourisSoloNextLetter(){
-    const s=this.souris,pool=this._sourisLetterPool();
-    s.letter=pool[Math.floor(Math.random()*pool.length)];
-    s.ringDur=Math.max(900,2600-s.hits*40);
-    s.tLeft=s.ringDur;
-  },
-  _sourisSoloHit(){
-    const s=this.souris;
-    const mult=s.combo>=8?3:s.combo>=4?2:1;
-    s.score+=1*mult;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
-    s.streakRun++;s.bestStreak=Math.max(s.bestStreak,s.streakRun);
-    playSound('hit');this._flashArena('#1FA971');
-    this._sourisSoloNextLetter();
-    this.renderSouris();
-  },
-  _sourisSoloMiss(){
-    const s=this.souris;
-    s.combo=0;s.misses++;s.lives--;s.streakRun=0;
-    playSound('miss');this._flashArena('#E5484D');
-    if(s.lives<=0){this._sourisSoloEnd();return;}
-    this._sourisSoloNextLetter();
-    this.renderSouris();
-  },
+  _sourisTiers:{grid:{bronze:35,silver:65,gold:100},hybrid:{bronze:35,silver:60,gold:90},tiles:{bronze:60,silver:110,gold:170}},
   _flashArena(color){
     const a=document.getElementById('souris-arena')||document.querySelector('.game-arena');
     if(!a)return;
     a.style.boxShadow='inset 0 0 0 3px '+color;
     setTimeout(()=>{if(a)a.style.boxShadow='';},120);
-  },
-  _sourisSoloTick(){
-    const s=this.souris;if(!s||s.phase!=='play')return;
-    s.tLeft-=50;s.sessionLeft-=50;
-    if(s.sessionLeft<=0){this._sourisSoloEnd();return;}
-    if(s.tLeft<=0){this._sourisSoloMiss();return;}
-    this.renderSouris();
-  },
-  _sourisSoloKey(e){
-    const k=(e._composedKey||e.key||'');
-    if(k.length!==1)return;
-    e.preventDefault();
-    if(k.toLowerCase()===this.souris.letter)this._sourisSoloHit();
-    else this._sourisSoloMiss();
-  },
-  _sourisSoloEnd(){
-    this.stopSouris();
-    const s=this.souris;
-    const acc=(s.hits+s.misses)?Math.round(100*s.hits/(s.hits+s.misses)):0;
-    const res=this._sourisFinishTrack('solo',{score:s.score,thresholds:this._sourisTiers.solo,extra:{combo:s.bestCombo},sessionResult:{hits:s.hits,combo:s.bestCombo,streakRun:s.bestStreak}});
-    s.phase='end';s._result=res;s._acc=acc;
-    this.renderSouris();
-  },
-  _sourisSoloRender(){
-    const s=this.souris;
-    if(s.phase==='brief')return this._sourisSoloBrief();
-    if(s.phase==='end')return this._sourisSoloEndScreen();
-    this._sourisSoloArena();
-  },
-  _sourisSoloArena(){
-    const s=this.souris;
-    const pct=Math.max(0,Math.round((s.tLeft/s.ringDur)*100));
-    const hot=s.combo>=8?'#FF4D2E':s.combo>=4?'#FF8A4C':'#1FA971';
-    const scale=1+Math.min(.35,s.combo*.03);
-    const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <div class="game-arena" style="height:auto;min-height:380px;display:flex;flex-direction:column;padding:16px 20px 26px">
-          <div class="game-hud">
-            <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
-            <div style="display:flex;gap:1px">${hearts}</div>
-          </div>
-          <div style="font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);text-align:center;margin-top:6px">Tape la lettre affichée avant que l'anneau se referme</div>
-          <div style="flex:1;display:grid;place-items:center;position:relative">
-            <div style="position:absolute;top:0;left:0;right:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:${s.combo>1?hot:'rgba(255,255,255,.4)'}">${s.combo>1?'COMBO ×'+s.combo:''}</div>
-            <div style="position:relative;width:150px;height:150px;transform:scale(${scale});transition:transform .15s">
-              <svg width="150" height="150" style="position:absolute;inset:0;transform:rotate(-90deg)"><circle cx="75" cy="75" r="68" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="75" cy="75" r="68" fill="none" stroke="${pct<25?'#E5484D':hot}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${2*Math.PI*68}" stroke-dashoffset="${2*Math.PI*68*(1-pct/100)}" style="transition:stroke-dashoffset .05s linear"/></svg>
-              <div style="position:absolute;inset:0;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 30%,${hot}55,${hot}1a 70%);border:2.5px solid ${hot};box-shadow:0 8px 24px ${hot}44">
-                <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3)">${s.letter}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
-      </div>
-    </div>`;
-  },
-  _sourisSoloEndScreen(){
-    const s=this.souris,r=s._result;
-    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        ${this._gameResult({
-          icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
-          boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
-          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisSoloStart()',
-        })}
-      </div>
-    </div>`;
   },
 
   /* ═══════════════════════════════════════════════════════════════
@@ -6660,150 +6494,6 @@ const app={
     </div>`;
   },
 
-  /* ═══════════════════════════════════════════════════════════════
-     VISÉE — VAGUES & BOSS (piste "waves")
-     4 vagues de 4 mots, une règle qui change à chaque vague (mots
-     courts → moyens → accentués → longs), puis un mot-boss à 3
-     tentatives. Frappe en avant uniquement (comme Tireur d'élite) :
-     une faute ne s'efface pas, elle fait perdre une vie et remet le
-     mot à zéro.
-     ═══════════════════════════════════════════════════════════════ */
-  _sourisWavesPools:[()=>TIREUR_EASY,()=>TIREUR_MID,()=>TIREUR_ACCENTS,()=>TIREUR_HARD],
-  _sourisWavesLabels:['Mots courts','Mots moyens','Accents','Mots longs'],
-  _sourisWavesBrief(){
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
-        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
-          <div style="color:var(--accent)">${ICONS.flag}</div>
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Vagues & Boss</h2>
-          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">4 vagues de 4 mots, chacune avec sa règle : mots courts, moyens, accentués puis longs. Une faute ne s'efface pas — elle coûte une vie. Passe les 4 vagues et affronte le <b>mot-boss</b>, à 3 tentatives.</p>
-          <div style="display:flex;gap:26px;margin-top:4px">
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">PALIERS</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff">🥉 2 vagues · 🥈 4 vagues · 🥇 boss battu</div></div>
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">♥♥♥</div></div>
-          </div>
-          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisWavesStart()">Commencer</button>
-        </div>
-      </div>
-    </div>`;
-  },
-  _sourisWavesPickWord(wave){
-    const pool=this._sourisWavesPools[wave-1]();
-    return pool[Math.floor(Math.random()*pool.length)];
-  },
-  _sourisWavesBossWord(){
-    const sorted=[...TIREUR_ACCENTS].sort((a,b)=>b.length-a.length);
-    return sorted[Math.floor(Math.random()*3)]; // parmi les 3 plus longs
-  },
-  _sourisWavesStart(){
-    this.stopSouris();
-    this.souris={phase:'play',track:'waves',wave:1,wordsInWave:0,wordsNeeded:4,lives:3,score:0,typedLen:0,
-      word:this._sourisWavesPickWord(1),bossAttempts:0,bossWord:null};
-    this.renderSouris();
-  },
-  _sourisWavesNextWord(){
-    const s=this.souris;
-    s.typedLen=0;
-    s.word=this._sourisWavesPickWord(s.wave);
-  },
-  _sourisWavesAdvanceWave(){
-    const s=this.souris;
-    s.wave++;s.wordsInWave=0;
-    if(s.wave>4){
-      s.phase='boss';s.bossWord=this._sourisWavesBossWord();s.typedLen=0;s.bossAttempts=0;
-      this._sourisWavesShake();
-    } else {
-      s.typedLen=0;s.word=this._sourisWavesPickWord(s.wave);
-    }
-  },
-  _sourisWavesShake(){
-    this.souris._shaking=true;
-    setTimeout(()=>{if(this.souris)this.souris._shaking=false;this.renderSouris();},420);
-  },
-  _sourisWavesKey(e){
-    const k=e._composedKey||e.key;
-    if(k.length!==1)return;
-    e.preventDefault();
-    const s=this.souris;
-    const word=s.phase==='boss'?s.bossWord:s.word;
-    if(k===word[s.typedLen]){
-      s.typedLen++;
-      if(s.typedLen>=word.length){
-        s.score+=word.length;
-        playSound('hit');this._flashArena('#1FA971');
-        if(s.phase==='boss'){this._sourisWavesEnd(true);return;}
-        s.wordsInWave++;
-        if(s.wordsInWave>=s.wordsNeeded)this._sourisWavesAdvanceWave();
-        else this._sourisWavesNextWord();
-      }
-    } else {
-      playSound('miss');this._flashArena('#E5484D');
-      if(s.phase==='boss'){
-        s.bossAttempts++;s.typedLen=0;
-        if(s.bossAttempts>=3){this._sourisWavesEnd(false);return;}
-      } else {
-        s.lives--;s.typedLen=0;
-        if(s.lives<=0){this._sourisWavesEnd(false);return;}
-      }
-    }
-    this.renderSouris();
-  },
-  _sourisWavesEnd(bossBeaten){
-    if(this.souris.phase==='end')return;
-    this.stopSouris();
-    const s=this.souris;
-    const wavesCleared=s.wave>4?4:s.wave-1;
-    const tierScore=wavesCleared+(bossBeaten?1:0);
-    const res=this._sourisFinishTrack('waves',{score:tierScore,thresholds:this._sourisTiers.waves,extra:{points:s.score,bossBeaten},sessionResult:{hits:wavesCleared*4,streakRun:wavesCleared}});
-    s.phase='end';s._result=res;s._wavesCleared=wavesCleared;s._bossBeaten=bossBeaten;
-    this.renderSouris();
-  },
-  _sourisWavesRender(){
-    const s=this.souris;
-    if(s.phase==='brief')return this._sourisWavesBrief();
-    if(s.phase==='end')return this._sourisWavesEndScreen();
-    this._sourisWavesArena();
-  },
-  _sourisWavesArena(){
-    const s=this.souris;
-    const isBoss=s.phase==='boss';
-    const word=isBoss?s.bossWord:s.word;
-    const wordHtml=`<span style="color:var(--accent)">${word.slice(0,s.typedLen)}</span><span style="color:rgba(255,255,255,.85)">${word.slice(s.typedLen)}</span>`;
-    const segs=[1,2,3,4].map(i=>`<div style="flex:1;height:8px;border-radius:99px;background:${i<s.wave?'#1FA971':i===s.wave&&!isBoss?'var(--accent)':'rgba(255,255,255,.14)'}"></div>`).join('');
-    const hearts=isBoss?`<div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)">Tentative ${s.bossAttempts+1}/3</div>`
-      :[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:640px;margin:0 auto;padding:0 24px">
-        <div class="game-arena" style="height:auto;min-height:280px;padding:16px 20px 20px;display:flex;flex-direction:column;${isBoss?'border:2px solid var(--accent);animation:'+(s._shaking?'sourisshake .42s':'none'):''}">
-          <div class="game-hud">
-            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)">${isBoss?'BOSS':'VAGUE '+s.wave+'/4 — '+this._sourisWavesLabels[s.wave-1]}</div>
-            <div style="display:flex;gap:1px">${hearts}</div>
-          </div>
-          ${!isBoss?`<div style="display:flex;gap:6px;margin:10px 0 0">${segs}</div>`:''}
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
-            ${isBoss?`<div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent)">MOT-BOSS</div>`:''}
-            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:${isBoss?'34px':'28px'};letter-spacing:.02em">${wordHtml}</div>
-          </div>
-          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5)">Tape le mot affiché, sans backspace</div>
-        </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
-      </div>
-    </div>`;
-  },
-  _sourisWavesEndScreen(){
-    const s=this.souris,r=s._result;
-    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        ${this._gameResult({
-          icon:medal,title:s._bossBeaten?'Boss vaincu !':(r.tier?'Palier franchi !':'Partie terminée'),
-          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
-          boxes:[{label:'Vagues franchies',value:s._wavesCleared+'/4',accent:true},{label:'Boss',value:s._bossBeaten?'Battu':'—'},{label:'Points',value:s.score}],
-          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisWavesStart()',
-        })}
-      </div>
-    </div>`;
-  },
 
   /* ═══════════════════════════════════════════════════════════════
      VISÉE — DUO SOURIS + CLAVIER (piste "hybrid")
@@ -7248,133 +6938,9 @@ const app={
     </div>`;
   },
 
-  /* ═══════════════════════════════════════════════════════════════
-     VISÉE — DOUBLE PISTE (piste "duo2", avancée)
-     Une piste souris (suivre une cible qui erre en continu) et une
-     piste clavier (vider une file de lettres) EN MÊME TEMPS. Pas de
-     vies : un score de synchro continu, moitié souris moitié clavier.
-     ═══════════════════════════════════════════════════════════════ */
-  _sourisDuo2Brief(){
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
-        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
-          <div style="color:var(--accent)">${ICONS.swords}</div>
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Double piste</h2>
-          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">35 secondes, deux tâches en même temps : <b>garde le curseur sur la cible qui erre</b> en haut, tout en <b>tapant la lettre en tête de file</b> en bas. Aucune vie — un score de synchro continu.</p>
-          <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">PALIERS (SYNCHRO)<br><span style="font-family:'JetBrains Mono',monospace;font-size:15px;color:#fff">🥉${this._sourisTiers.duo2.bronze}% · 🥈${this._sourisTiers.duo2.silver}% · 🥇${this._sourisTiers.duo2.gold}%</span></div>
-          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisDuo2Start()">Commencer</button>
-        </div>
-      </div>
-    </div>`;
-  },
-  _sourisDuo2RefillQueue(){
-    const s=this.souris,pool=this._sourisLetterPool();
-    while(s.queue.length<4)s.queue.push(pool[Math.floor(Math.random()*pool.length)]);
-  },
-  _sourisDuo2Start(){
-    this.stopSouris();
-    this.souris={phase:'play',track:'duo2',sessionLeft:35000,tx:50,ty:50,mx:50,my:50,
-      onTargetTicks:0,totalTicks:0,queue:[],keyHits:0,tAngle:Math.random()*Math.PI*2};
-    this._sourisDuo2RefillQueue();
-    this.renderSouris();
-    this._sourisLoop=setInterval(()=>this._sourisDuo2Tick(),50);
-  },
-  _sourisDuo2BindArena(){
-    const a=document.getElementById('souris-arena');if(!a)return;
-    const s=this.souris;
-    a.onmousemove=(e)=>{
-      const r=a.getBoundingClientRect();
-      s.mx=(e.clientX-r.left)/r.width*100;s.my=Math.min(58,(e.clientY-r.top)/r.height*100);
-    };
-  },
-  _sourisDuo2Key(e){
-    const k=(e._composedKey||e.key||'').toLowerCase();
-    if(k.length!==1)return;
-    const s=this.souris;
-    if(!s.queue.length||k!==s.queue[0])return;
-    e.preventDefault();
-    s.queue.shift();s.keyHits++;
-    this._sourisDuo2RefillQueue();
-    playSound('hit');
-  },
-  _sourisDuo2Tick(){
-    const s=this.souris;if(!s||s.phase!=='play')return;
-    s.sessionLeft-=50;
-    if(s.sessionLeft<=0){this._sourisDuo2End();return;}
-    s.tAngle+=0.05;
-    s.tx=50+32*Math.sin(s.tAngle*1.3);
-    s.ty=29+22*Math.cos(s.tAngle*0.9);
-    s.totalTicks++;
-    const dx=(s.tx-s.mx)*1.6,dy=s.ty-s.my;
-    if(Math.sqrt(dx*dx+dy*dy)<9)s.onTargetTicks++;
-    this.renderSouris();
-  },
-  _sourisDuo2End(){
-    if(this.souris.phase==='end')return;
-    this.stopSouris();
-    const s=this.souris;
-    const mousePct=s.totalTicks?Math.round(100*s.onTargetTicks/s.totalTicks):0;
-    const keyPct=Math.min(100,Math.round(s.keyHits*4));
-    const synchro=Math.round(mousePct*0.5+keyPct*0.5);
-    const res=this._sourisFinishTrack('duo2',{score:synchro,thresholds:this._sourisTiers.duo2,extra:{mousePct,keyHits:s.keyHits},sessionResult:{hits:s.keyHits}});
-    s.phase='end';s._result=res;s._mousePct=mousePct;s._synchro=synchro;
-    this.renderSouris();
-  },
-  _sourisDuo2Render(){
-    const s=this.souris;
-    if(s.phase==='brief')return this._sourisDuo2Brief();
-    if(s.phase==='end')return this._sourisDuo2EndScreen();
-    this._sourisDuo2Arena();
-  },
-  _sourisDuo2Arena(){
-    const s=this.souris;
-    const sec=Math.ceil(s.sessionLeft/1000);
-    const onTarget=s.totalTicks?100*s.onTargetTicks/Math.max(1,s.totalTicks):0;
-    const queueHtml=s.queue.map((l,i)=>`<div style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:${i===0?'20px':'16px'};background:${i===0?'rgba(255,77,46,.22)':'rgba(255,255,255,.06)'};border:${i===0?'2px solid var(--accent)':'1.5px dashed rgba(255,255,255,.14)'};color:${i===0?'#fff':'rgba(255,255,255,.5)'}">${l}</div>`).join('');
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:640px;margin:0 auto;padding:0 24px">
-        <div class="game-arena" style="height:auto;padding:16px 20px 20px;display:flex;flex-direction:column">
-          <div class="game-hud">
-            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.6)">SYNCHRO ${Math.round(onTarget)}%</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:${sec<=5?'#E5484D':'#fff'}">${sec}s</div>
-          </div>
-          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin:6px 0 10px">Souris sur la cible + tape la première lettre de la file</div>
-          <div id="souris-arena" style="flex:1;min-height:320px;display:flex;flex-direction:column;position:relative;overflow:hidden">
-            <div style="position:relative;flex:1;border-bottom:1.5px dashed rgba(255,255,255,.12)">
-              <div style="position:absolute;left:10px;top:8px;font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.35)">SOURIS — suis la cible</div>
-              <div style="position:absolute;left:${s.tx}%;top:${s.ty}%;width:18%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid var(--accent);background:radial-gradient(circle at 35% 30%,rgba(255,77,46,.5),rgba(255,77,46,.12) 70%);box-shadow:0 8px 20px rgba(255,77,46,.3)"></div>
-            </div>
-            <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
-              <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.35)">CLAVIER — vide la file</div>
-              <div style="display:flex;gap:8px">${queueHtml}</div>
-            </div>
-          </div>
-        </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
-      </div>
-    </div>`;
-    this._sourisDuo2BindArena();
-  },
-  _sourisDuo2EndScreen(){
-    const s=this.souris,r=s._result;
-    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        ${this._gameResult({
-          icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
-          boxes:[{label:'Synchro',value:s._synchro,unit:'%',accent:true},{label:'Précision souris',value:s._mousePct,unit:'%'},{label:'Lettres tapées',value:s.keyHits}],
-          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisDuo2Start()',
-        })}
-      </div>
-    </div>`;
-  },
-
   renderGames(){
     if(this.activeGame==='sprint'){this.renderSprint();return;}
     if(this.activeGame==='frappe'){this.renderFrappe();return;}
-    if(this.activeGame==='tireur'){this.renderTireur();return;}
     if(this.activeGame==='course'){this.renderCourse();return;}
     if(this.activeGame==='ghost'){this.renderGhost();return;}
     if(this.activeGame==='simon'){this.renderSimon();return;}
@@ -7631,9 +7197,6 @@ const app={
     if(which==='sprint'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sprint'));return;}
       this.activeGame='sprint';this.sprint=null;this.renderGames();
-    } else if(which==='tireur'){
-      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('tireur'));return;}
-      this.activeGame='tireur';this.tireur=null;this.renderGames();
     } else if(which==='course'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('course'));return;}
       this.activeGame='course';this.course=null;this.renderGames();
@@ -7652,16 +7215,9 @@ const app={
     } else if(which==='souris'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('souris'));return;}
       this.activeGame='souris';this.souris={phase:'mouseMenu'};this.renderGames();
-    } else if(which==='sourisSolo'){
-      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisSolo'));return;}
-      this.activeGame='sourisSolo';this.souris={phase:'brief',track:'solo'};this.renderGames();
     } else if(which==='sourisGrid'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisGrid'));return;}
       this.activeGame='sourisGrid';this.souris={phase:'brief',track:'grid'};this.renderGames();
-    } else if(which==='sourisWaves'){
-      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisWaves'));return;}
-      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
-      this.activeGame='sourisWaves';this.souris={phase:'brief',track:'waves'};this.renderGames();
     } else if(which==='sourisHybrid'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisHybrid'));return;}
       if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
@@ -7669,10 +7225,6 @@ const app={
     } else if(which==='sourisTiles'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisTiles'));return;}
       this.activeGame='sourisTiles';this.souris={phase:'brief',track:'tiles'};this.renderGames();
-    } else if(which==='sourisDuo2'){
-      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisDuo2'));return;}
-      if(!this._sourisDuo2Unlocked())return; // carte verrouillée dans l'UI, garde défensive ici
-      this.activeGame='sourisDuo2';this.souris={phase:'brief',track:'duo2'};this.renderGames();
     } else if(which==='clavier'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('clavier'));return;}
       this.activeGame='clavier';this.clavier=null;this.renderGames();
@@ -7747,173 +7299,6 @@ const app={
     </div>`;
   },
 
-  /* ── TIREUR D'ÉLITE ── */
-  startTireur(){
-    if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startTireur());return;}
-    this.stopGame();this.stopSprint();this.stopTireur();
-    this.activeGame='tireur';this._tireurRec=false;
-    this.tireur={on:true,over:false,targets:[],fx:[],roundSize:20,spawned:0,resolved:0,hits:0,
-      missed:[],errKeys:{},correctChars:0,started:false,startTime:0,endTime:0,spawnAcc:0,_id:0};
-    this.renderCurrent();
-    this._tireurLoop=setInterval(()=>this.tireurTick(),50);
-  },
-  stopTireur(){if(this._tireurLoop){clearInterval(this._tireurLoop);this._tireurLoop=null;}},
-  _tireurWord(){
-    const p=this.tireur.spawned;
-    const pool=p<7?TIREUR_EASY:p<14?TIREUR_MID:TIREUR_HARD;
-    return pool[Math.floor(Math.random()*pool.length)];
-  },
-  spawnTarget(){
-    const t=this.tireur;
-    const dur=Math.max(1800,3600-t.spawned*90);
-    let x=50,y=50,ok=false,guard=0;
-    while(!ok&&guard++<30){
-      x=12+Math.random()*76;y=16+Math.random()*64;
-      ok=t.targets.every(o=>Math.abs(o.x-x)>14||Math.abs(o.y-y)>13);
-    }
-    t.targets.push({id:++t._id,text:this._tireurWord(),x,y,typedLen:0,life:1,dur});
-    t.spawned++;
-  },
-  tireurTick(){
-    const t=this.tireur;if(!t||!t.on)return;
-    const dt=50;
-    const survivors=[];
-    t.targets.forEach(tg=>{
-      if(tg.typedLen>0){survivors.push(tg);return;} // cible en cours : ne s'efface pas
-      tg.life-=dt/tg.dur;
-      if(tg.life<=0){t.missed.push(tg.text);t.resolved++;t.fx.push({x:tg.x,y:tg.y,type:'miss',t:6});}
-      else survivors.push(tg);
-    });
-    t.targets=survivors;
-    t.fx=t.fx.map(f=>({...f,t:f.t-1})).filter(f=>f.t>0);
-    t.spawnAcc+=dt;
-    const interval=Math.max(700,1300-t.spawned*30);
-    if(t.spawned<t.roundSize&&t.targets.length<5&&t.spawnAcc>=interval){t.spawnAcc=0;this.spawnTarget();}
-    if(t.resolved>=t.roundSize&&t.targets.length===0){t.on=false;t.over=true;t.endTime=Date.now();}
-    this.renderCurrent();
-    if(t.over&&!this._tireurRec){this._tireurRec=true;this.stopTireur();this.afterTireur();}
-  },
-  tireurKey(e){
-    const k=e._composedKey||e.key;
-    if(k==='Backspace'){e.preventDefault();return;} // pas de correction
-    if(k.length!==1)return;
-    e.preventDefault();
-    const t=this.tireur;if(!t||!t.on)return;
-    if(!t.started){t.started=true;t.startTime=Date.now();}
-    const norm=c=>c.toLowerCase();
-    let active=t.targets.find(tg=>tg.typedLen>0);
-    if(!active){
-      const cands=t.targets.filter(tg=>norm(tg.text[0])===norm(k)).sort((a,b)=>a.life-b.life);
-      if(!cands.length)return; // touche sans cible correspondante : sans effet
-      active=cands[0];active.typedLen=1;t.correctChars++;
-      if(active.typedLen>=active.text.length)this._tireurHit(active);
-    } else {
-      if(norm(active.text[active.typedLen])===norm(k)){
-        active.typedLen++;t.correctChars++;
-        if(active.typedLen>=active.text.length)this._tireurHit(active);
-      } else {
-        t.errKeys[k]=(t.errKeys[k]||0)+1;
-        t.missed.push(active.text);t.resolved++;
-        t.fx.push({x:active.x,y:active.y,type:'miss',t:6});
-        t.targets=t.targets.filter(tg=>tg!==active);
-      }
-    }
-    this.renderCurrent();
-  },
-  _tireurHit(tg){
-    const t=this.tireur;
-    t.hits++;t.resolved++;
-    t.fx.push({x:tg.x,y:tg.y,type:'hit',t:6});
-    t.targets=t.targets.filter(x=>x!==tg);
-  },
-  afterTireur(){
-    const t=this.tireur;
-    const precision=Math.round(100*t.hits/t.roundSize);
-    const mins=t.started?Math.max((t.endTime-t.startTime)/60000,1/600):1/600;
-    const wpm=Math.round((t.correctChars/5)/mins);
-    t._precision=precision;t._wpm=wpm;t._isRecord=false;
-    try{track('game_completed',{game:'tireur',wpm,precision});}catch{}
-    if(currentUser&&this.stats){
-      const b=this.stats.tireurBest;
-      if((!b||precision>b.precision||(precision===b.precision&&wpm>b.wpm))&&precision>0){
-        t._isRecord=true;
-        this.stats.tireurBest={precision,wpm,date:Date.now()};
-        saveStats(this.stats);
-        this._celebrateGame();
-      }
-    }
-    this.renderCurrent();
-  },
-  renderTireur(){
-    const t=this.tireur;
-    const over=!!(t&&t.over),idle=!t||(!t.on&&!t.over);
-    const best=currentUser&&this.stats&&this.stats.tireurBest?this.stats.tireurBest:null;
-    const resolved=t?t.resolved:0,hits=t?t.hits:0,roundSize=t?t.roundSize:20;
-    const livePrec=resolved>0?Math.round(100*hits/resolved):100;
-    const reduce=PREFERS_REDUCED_MOTION();
-    const targetsHTML=(t&&t.targets?t.targets:[]).map(tg=>{
-      const lifePct=Math.max(0,Math.round(tg.life*100));
-      const low=tg.life<0.35;
-      return`<div class="ttarget${tg.typedLen>0?' active':''}" style="left:${tg.x}%;top:${tg.y}%">
-        <div class="ttarget-word"><span class="ttyped">${tg.text.slice(0,tg.typedLen)}</span><span class="trest">${tg.text.slice(tg.typedLen)}</span></div>
-        <div class="ttarget-life"><div class="ttarget-life-fill${low?' low':''}" style="width:${lifePct}%"></div></div>
-      </div>`;
-    }).join('');
-    const fxHTML=(t&&t.fx?t.fx:[]).map(f=>{
-      const op=f.t/6;const scale=f.type==='hit'?(1+(1-op)*0.9):1;
-      const sym=f.type==='hit'?'✓':'✕';const col=f.type==='hit'?'var(--success)':'var(--danger)';
-      return`<div class="timpact" style="left:${f.x}%;top:${f.y}%;color:${col};opacity:${reduce?0.9:op};transform:translate(-50%,-50%) scale(${reduce?1:scale})">${sym}</div>`;
-    }).join('');
-    let overlay='';
-    if(IS_TOUCH_ONLY()&&idle){
-      overlay=`<div class="game-overlay"><h2>⌨️ Clavier requis</h2><p>Le Tireur d'élite se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p><button class="game-play-btn" onclick="app.exitActiveGame()">← Jeux</button></div>`;
-    } else if(!currentUser){
-      overlay=`<div class="game-overlay"><h2>Tireur d'élite</h2><p>Crée un compte gratuit pour jouer.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
-    } else if(idle){
-      const tireurRoadmap=this._tierRoadmap([
-        {label:'Mots courts',sub:'cibles 1-6',state:'upcoming'},
-        {label:'Mots moyens',sub:'cibles 7-13',state:'upcoming'},
-        {label:'Mots difficiles',sub:'cibles 14-20',state:'upcoming'},
-      ]);
-      overlay=`<div class="game-overlay"><h2 class="gidle-title">Tireur d'élite<span class="dot"> .</span></h2><p style="margin-bottom:6px">Tape chaque mot sans la moindre faute.<br>Une erreur = cible ratée.${best?'<br>Record : <b style="color:#fff">'+best.precision+'% de précision</b>':''}</p>
-        ${tireurRoadmap}
-        <button class="game-play-btn" autofocus onclick="app.startTireur()" style="margin-top:4px">Jouer ▸</button>
-        <div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`;
-    } else if(over){
-      const prec=t._precision,wpm=t._wpm;
-      const badge=prec>=90?"Tireur d'élite !":prec>=70?'Belle précision !':prec>=50?'Continue !':'Vise mieux !';
-      const uniqMissed=[...new Set(t.missed)];
-      const topKeys=Object.keys(t.errKeys).sort((a,b)=>t.errKeys[b]-t.errKeys[a]).slice(0,5);
-      const extraHtml=(uniqMissed.length?`<div style="text-align:center;margin-bottom:12px"><div style="color:var(--muted);font-size:12px;font-weight:700;margin-bottom:6px;letter-spacing:.04em">MOTS RATÉS</div><div class="tireur-chips">${uniqMissed.slice(0,12).map(w=>`<span class="tireur-chip">${w}</span>`).join('')}</div></div>`:'<p style="color:var(--success);font-weight:700;text-align:center">Sans faute !</p>')
-        +(topKeys.length?`<div style="color:var(--muted);font-size:12px;text-align:center">Touches à surveiller : ${topKeys.map(k=>`<b style="color:#fff">${k===' '?'espace':k}</b>`).join(' · ')}</div>`:'');
-      overlay=`<div class="game-overlay">${this._gameResult({
-        title:badge,
-        record:t._isRecord?'Nouveau record de précision !':null,
-        boxes:[
-          {label:'Précision',value:prec,unit:'%',accent:true},
-          {label:'Vitesse',value:wpm,unit:'mpm'},
-          {label:'Cibles touchées',value:hits+'/'+roundSize},
-        ],
-        extra:extraHtml,
-        primaryLabel:'Rejouer ▸',primaryOnClick:'app.startTireur()',
-      })}</div>`;
-    }
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader("Tireur d'élite",ICONS.crosshair,'free')}
-      <div class="game-arena" style="max-width:1120px;margin:0 auto;margin-left:24px;margin-right:24px">
-        <div class="game-hud">
-          <div style="display:flex;gap:22px;align-items:flex-end">
-            <div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:.04em">PRÉCISION</div><div class="game-score-val" style="color:var(--accent)">${livePrec}<span> %</span></div></div>
-            <div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:.04em">CIBLES</div><div class="game-score-val">${resolved}<span> / ${roundSize}</span></div></div>
-          </div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:right">Une faute<br>= cible ratée</div>
-        </div>
-        <div aria-live="polite" class="sr-live">${over&&t?`Partie terminée. ${t._precision}% de précision.`:''}</div>
-        ${targetsHTML}${fxHTML}${overlay}
-      </div>
-    </div>`;
-  },
-
   /* ── COURSE DE DACTYLO ── */
   // Vitesse des bots calée sur le record du joueur (au lieu de 30/50/72 mpm
   // fixes) : un débutant a une vraie chance, un joueur avancé garde un défi.
@@ -7926,7 +7311,7 @@ const app={
   },
   startCourse(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startCourse());return;}
-    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();
+    this.stopGame();this.stopSprint();this.stopCourse();
     this.activeGame='course';this._courseRec=false;
     const text=RACE_TEXTS[Math.floor(Math.random()*RACE_TEXTS.length)];
     this.course={on:true,over:false,text,typed:[],correct:0,keystrokes:0,
@@ -8076,7 +7461,7 @@ const app={
      sur exactement le même texte. */
   startGhost(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startGhost());return;}
-    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();
+    this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();
     this.activeGame='ghost';
     this.ghost={on:true,over:false,text:GHOST_TEXT,typed:[],correct:0,keystrokes:0,
       raceStarted:false,startAt:Date.now()+3000,startTime:0,endTime:0,finished:false,
@@ -8217,7 +7602,7 @@ const app={
   /* ── SIMON DES MOTS ── */
   startSimon(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startSimon());return;}
-    this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();
+    this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();
     this.activeGame='simon';
     this.simon={on:true,over:false,phase:'show',level:1,lives:3,score:0,maxSeq:0,
       words:[],currentWord:'',wordIdx:0,showUntil:0,failUntil:0,inputStart:0,_showTotal:0,_lastBonus:0};
@@ -9872,7 +9257,7 @@ const app={
       ['3','Suivez et guidez',"Assignez des devoirs, suivez la progression en temps réel, identifiez les élèves en difficulté. Tout depuis votre tableau de bord."],
     ];
     const studentFeats=[
-      [ICONS.gamepad,'Jeux de frappe compétitifs',"Le Tireur, la Course contre des bots, le Simon de la frappe — apprendre sans avoir l'impression de travailler."],
+      [ICONS.gamepad,'Jeux de frappe compétitifs',"La Course contre des bots, le Simon de la frappe — apprendre sans avoir l'impression de travailler."],
       [ICONS.trophy,'Certification de niveau',"Un examen officiel KeyPace avec un certificat numérique partageable. Un objectif concret qui motive."],
       [ICONS.trendUp,'Progrès visibles en temps réel',"Courbes de vitesse, précision par touche, leçons validées — l'élève voit clairement où il en est."],
       [ICONS.target,'Objectifs personnalisés',"L'enseignant fixe le seuil à atteindre (ex. 30 mpm, max 5 erreurs). L'élève sait exactement ce qu'on attend de lui."],
@@ -10048,7 +9433,6 @@ const app={
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:22px">
         <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.target}</span> Frappe-mots : meilleur score</h3><div class="scard-val acc" style="font-size:36px;margin-top:8px">${gameBest} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div>${gameBest===0?'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le jeu pour établir un score !</p>':''}</div>
-        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.crosshair}</span> Tireur d'élite : précision record</h3>${this.stats.tireurBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.tireurBest.precision}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.tireurBest.wpm} mpm</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le Tireur d\'élite pour établir ton record de précision !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.raceCar}</span> Course de dactylo : record</h3>${this.stats.courseBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.courseBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.courseBest.acc}% précision · ${this.stats.courseBest.rank===1?'1ʳᵉ place 🥇':this.stats.courseBest.rank+'ᵉ place'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour établir ton record !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.ghost}</span> Contre ton fantôme : record</h3>${this.stats.ghostBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.ghostBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.ghostBest.acc}% précision</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Réservé aux comptes <span style="color:var(--accent);font-weight:700">Expert</span>. Lance une course pour enregistrer ton premier fantôme !</p>'}</div>
         <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.brain}</span> Simon des mots : record</h3>${this.stats.simonBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.simonBest.score} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">séquence max : ${this.stats.simonBest.maxSeq} mots</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance Simon des mots pour établir ton record de mémoire !</p>'}</div>
