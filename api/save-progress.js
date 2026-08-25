@@ -38,6 +38,22 @@ module.exports = async function handler(req, res) {
     return res.json({ ok: true, id: user.id, data: (row && row.data) || {} });
   }
 
+  // Garde-fou : une écriture ne doit jamais effacer des leçons déjà validées.
+  // Ça arrive si le client sauvegarde avant d'avoir fini de charger la vraie
+  // progression (bug côté client déjà corrigé, mais on protège aussi ici :
+  // un ancien onglet resté ouvert, un cache non rafraîchi, etc. peuvent
+  // encore envoyer un blob incomplet). On ne bloque qu'une VRAIE régression
+  // du nombre de leçons ; l'ajout ou le maintien du même nombre passe toujours.
+  const prevRow = await sb(`/progress?user_id=eq.${user.id}&select=data`);
+  const prevData = prevRow.data && prevRow.data[0] && prevRow.data[0].data;
+  if (prevData) {
+    const prevLessons = Object.keys(prevData.lessons || {}).length;
+    const nextLessons = Object.keys((data && data.lessons) || {}).length;
+    if (prevLessons > 0 && nextLessons < prevLessons) {
+      return res.status(409).json({ error: 'Sauvegarde refusée : régression de progression détectée.' });
+    }
+  }
+
   // Sinon => écriture en upsert (insère la ligne si elle n'existe pas encore)
   await sb(`/progress?on_conflict=user_id`, {
     method: 'POST',

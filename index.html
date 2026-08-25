@@ -818,6 +818,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 /* GAMES */
 .games-section{max-width:1120px;margin:0 auto;padding:24px}
 .game-arena{background:#16140F;border-radius:24px;padding:20px;position:relative;height:520px;overflow:hidden;margin-bottom:24px}
+.game-arena::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.05) 1.1px,transparent 1.1px);background-size:18px 18px;pointer-events:none;z-index:0}
 .game-hud{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;z-index:2}
 .game-score-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:22px;color:#fff}
 .game-score-val span{font-size:12px;color:rgba(255,255,255,0.4);font-weight:500}
@@ -826,6 +827,16 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .game-overlay p{color:rgba(255,255,255,0.7);font-size:16px;text-align:center;max-width:300px;margin:0}
 .game-final{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:48px;color:var(--accent)}
 .game-play-btn{background:var(--accent);color:#fff;border:none;border-radius:13px;padding:15px 32px;font-family:inherit;font-weight:700;font-size:18px;box-shadow:0 10px 26px rgba(255,77,46,0.4)}
+/* Écran de démarrage partagé (titre géant lumineux + indice ESPACE) — même
+   traitement que Course de dactylo, appliqué à l'écran idle de chaque jeu.
+   Classes neutres .gidle-* pour ne pas alourdir .game-overlay h2 (aussi
+   utilisé par les écrans de fin/portail invité, où le glow serait excessif). */
+.gidle{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:40px 20px}
+.gidle p{color:rgba(255,255,255,.55);font-size:15px;line-height:1.6;max-width:420px;margin:0}
+.gidle-title{font-size:44px!important;color:#fff;text-shadow:0 0 30px rgba(255,140,90,.7),0 0 70px rgba(255,77,46,.4)}
+.gidle-title .dot{color:var(--accent);text-shadow:0 0 24px rgba(255,77,46,.9)}
+.gidle-espace{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;color:rgba(255,255,255,.35);margin-top:-4px}
+@media(max-width:640px){.gidle-title{font-size:30px!important}}
 .gword{position:absolute;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;white-space:nowrap;text-shadow:0 2px 8px rgba(0,0,0,0.4)}
 .gword .gtyped{color:var(--accent)}
 .gword .grest{color:rgba(255,255,255,0.9)}
@@ -992,14 +1003,14 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .clavier-stage{display:flex;flex-direction:column;align-items:center;gap:26px;padding:12px 0 4px}
 .clavier-board{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 .clavier-row{display:flex;gap:8px}
-.clavier-key{width:44px;height:44px;border-radius:10px;background:var(--light);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:var(--txt);cursor:pointer;transition:background .15s,border-color .15s,transform .1s}
+.clavier-key{position:relative;z-index:1;width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff;cursor:pointer;transition:background .15s,border-color .15s,transform .1s}
 .clavier-key:hover{border-color:var(--accent)}
-.clavier-key.is-placed{background:#fff;border-color:var(--border);cursor:default;color:var(--muted)}
-.clavier-key.is-ok{background:rgba(31,169,113,0.18);border-color:#1FA971;color:#1FA971;transform:scale(1.08)}
-.clavier-key.is-bad{background:rgba(255,77,46,0.16);border-color:var(--accent);animation:clavierShake .26s}
+.clavier-key.is-placed{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.16);cursor:default;color:rgba(255,255,255,.5)}
+.clavier-key.is-ok{background:rgba(31,169,113,0.24);border-color:#1FA971;color:#fff;transform:scale(1.08)}
+.clavier-key.is-bad{background:rgba(255,77,46,0.22);border-color:var(--accent);animation:clavierShake .26s}
 @keyframes clavierShake{0%,100%{transform:translateX(0)}30%{transform:translateX(-4px)}60%{transform:translateX(4px)}}
 .clavier-bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:560px}
-.clavier-tile{width:40px;height:40px;border-radius:10px;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:var(--txt);cursor:pointer;transition:.15s}
+.clavier-tile{position:relative;z-index:1;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff;cursor:pointer;transition:.15s}
 .clavier-tile:hover{border-color:var(--accent);color:var(--accent)}
 .clavier-tile.is-selected{background:linear-gradient(140deg,#ff7a4d,var(--accent) 64%);border-color:transparent;color:#fff;box-shadow:0 6px 16px rgba(255,77,46,.32)}
 @media(max-width:640px){
@@ -1009,25 +1020,28 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
   .clavier-board{gap:6px}
 }
 
-.sprint-arena{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:28px;max-width:1120px;margin:0 auto;padding-bottom:32px}
-.sprint-hud{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.sprint-timer{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:48px;line-height:1;color:var(--txt);transition:color .3s}
-.sprint-timer.low{color:var(--accent)}
+.sprint-arena{background:#16140F;color:#fff;border-radius:24px;padding:28px;max-width:1120px;margin:0 auto;padding-bottom:32px;position:relative;overflow:hidden}
+.sprint-arena::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.05) 1.1px,transparent 1.1px);background-size:18px 18px;pointer-events:none;z-index:0}
+.sprint-hud{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.sprint-timer{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:48px;line-height:1;color:#fff;text-shadow:0 0 20px rgba(255,255,255,.25);transition:color .3s}
+.sprint-timer.low{color:var(--accent);text-shadow:0 0 24px rgba(255,77,46,.55)}
 .sprint-score-wrap{text-align:right}
-.sprint-score-label{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px}
-.sprint-score-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:36px;color:var(--accent)}
-.sprint-text-box{background:#faf9f5;border:1.5px solid var(--border);border-radius:16px;padding:24px 28px;min-height:110px;margin-bottom:20px;font-family:'JetBrains Mono',monospace;font-size:20px;line-height:1.8;letter-spacing:.01em;overflow:hidden;position:relative}
-.sprint-wrong{color:#E5484D;background:rgba(229,72,77,0.16);border-radius:3px}
-.sprint-ok{color:var(--txt)}
-.sprint-cur{color:var(--txt);background:rgba(255,77,46,0.14);box-shadow:inset 0 -3px 0 var(--accent);border-radius:3px}
-.sprint-todo{color:#C2BBAC}
-.sprint-hint{font-size:13px;color:var(--muted);text-align:center;min-height:20px;margin-bottom:16px}
-.sprint-result{text-align:center;padding:16px 0 8px}
+.sprint-score-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px}
+.sprint-score-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:36px;color:var(--accent);text-shadow:0 0 24px rgba(255,77,46,.5)}
+.sprint-score-val.sec{color:#fff;text-shadow:0 0 18px rgba(255,255,255,.25)}
+.sprint-text-box{position:relative;z-index:1;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.14);border-radius:16px;padding:24px 28px;min-height:110px;margin-bottom:20px;font-family:'JetBrains Mono',monospace;font-size:20px;line-height:1.8;letter-spacing:.01em;overflow:hidden}
+.sprint-wrong{color:#ff6b6b;background:rgba(229,72,77,0.25);border-radius:3px}
+.sprint-ok{color:#fff}
+.sprint-cur{color:#fff;background:var(--accent);box-shadow:0 0 16px rgba(255,77,46,.6);border-radius:3px}
+.sprint-todo{color:rgba(255,255,255,.3)}
+.sprint-hint{position:relative;z-index:1;font-size:13px;color:rgba(255,255,255,.45);text-align:center;min-height:20px;margin-bottom:16px}
+.sprint-result{position:relative;z-index:1;color:#fff;text-align:center;padding:16px 0 8px}
+.sprint-result .stat-box{border-right-color:rgba(255,255,255,.14)}
 .sprint-result h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;margin-bottom:20px}
 .sprint-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
 .sprint-record{background:rgba(31,169,113,0.1);border:1.5px solid #1FA971;border-radius:12px;padding:10px 16px;font-size:14px;font-weight:700;color:#1FA971;margin-bottom:20px;display:none}
 .sprint-record.show{display:block}
-.sprint-progress{height:6px;background:var(--border);border-radius:3px;margin-bottom:8px;overflow:hidden}
+.sprint-progress{position:relative;z-index:1;height:6px;background:rgba(255,255,255,.12);border-radius:3px;margin-bottom:8px;overflow:hidden}
 .sprint-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),#ff8a5c);transition:width .1s}
 
 /* TIREUR D'ÉLITE */
@@ -1045,57 +1059,227 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .sr-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* COURSE DE DACTYLO */
-.race-track{background:var(--light);border:1px solid var(--border);border-radius:14px;padding:6px 14px;margin-bottom:18px}
-.race-lane{position:relative;display:flex;align-items:center;height:34px;border-bottom:1px dashed var(--border)}
+.race-track{position:relative;z-index:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:6px 14px;margin-bottom:18px}
+.race-lane{position:relative;display:flex;align-items:center;height:34px;border-bottom:1px dashed rgba(255,255,255,.12)}
 .race-lane:last-child{border-bottom:none}
-.race-lane-name{width:96px;flex-shrink:0;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.race-lane-name{width:96px;flex-shrink:0;font-size:12px;font-weight:700;color:rgba(255,255,255,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .race-lane.you .race-lane-name{color:var(--accent)}
-.race-strip{position:relative;flex:1;height:100%;border-left:2px solid var(--border)}
+.race-strip{position:relative;flex:1;height:100%;border-left:2px solid rgba(255,255,255,.16)}
 .race-strip::after{content:'🏁';position:absolute;right:-4px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.7}
 .race-car{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:20px;transition:left .12s linear;z-index:2}
-.race-text-box{background:#faf9f5;border:1.5px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:19px;line-height:1.9;letter-spacing:.01em;white-space:normal;word-break:normal;overflow-wrap:break-word}
+.race-text-box{position:relative;z-index:1;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.14);border-radius:16px;padding:22px 26px;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:19px;line-height:1.9;letter-spacing:.01em;white-space:normal;word-break:normal;overflow-wrap:break-word}
 .race-word{display:inline-block}
 .race-space{white-space:normal}
-.race-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(255,255,255,0.82);backdrop-filter:blur(3px);border-radius:24px;z-index:5;text-align:center}
-.race-overlay h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px}
-.race-overlay p{color:var(--muted);font-size:15px}
-.race-count{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:80px;line-height:1;color:var(--accent)}
+.race-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(22,20,15,0.88);backdrop-filter:blur(4px);border-radius:24px;z-index:5;text-align:center}
+.race-overlay h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#fff}
+.race-overlay p{color:rgba(255,255,255,.6);font-size:15px}
+.race-count{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:80px;line-height:1;color:var(--accent);text-shadow:0 0 40px rgba(255,77,46,.6)}
+
+/* COURSE DE DACTYLO — relookage arène sombre. Classes .course-xxx dédiées et
+   indépendantes des classes race/sprint partagées avec Fantôme, Sprint, Duel
+   et Boss : seule Course de dactylo change pour l'instant. */
+.course-arena{background:#16140F;color:#fff;border-radius:24px;padding:32px;max-width:1120px;margin:0 auto;position:relative;overflow:hidden}
+.course-arena::before{content:'';position:absolute;inset:0;background:radial-gradient(600px 300px at 50% -10%,rgba(255,77,46,.18),transparent 70%),radial-gradient(circle,rgba(255,255,255,.05) 1.1px,transparent 1.1px);background-size:auto,18px 18px;pointer-events:none}
+.course-idle{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:40px 20px}
+.course-idle h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:52px;line-height:1;color:#fff;margin:0;text-shadow:0 0 30px rgba(255,140,90,.7),0 0 70px rgba(255,77,46,.4)}
+.course-idle h2 .dot{color:var(--accent);text-shadow:0 0 24px rgba(255,77,46,.9)}
+.course-idle p{color:rgba(255,255,255,.55);font-size:15px;line-height:1.6;max-width:420px;margin:0}
+.course-idle .course-cta{margin-top:6px}
+.course-idle .course-espace{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;color:rgba(255,255,255,.35);margin-top:2px}
+.course-hud{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px}
+.course-stat-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.18em;margin-bottom:4px}
+.course-stat-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:48px;line-height:1;color:var(--accent);text-shadow:0 0 26px rgba(255,77,46,.55)}
+.course-stat-val.sec{color:#fff;text-shadow:0 0 20px rgba(255,255,255,.25)}
+.course-stat-unit{font-size:16px;color:rgba(255,255,255,.4);font-weight:500}
+.course-track{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.course-lane{position:relative;display:flex;align-items:center;gap:14px;height:38px;padding:0 14px;border-radius:11px;background:rgba(255,255,255,.03);border:1px solid transparent;overflow:hidden}
+.course-lane.you{background:rgba(255,77,46,.08);border-color:rgba(255,77,46,.4);box-shadow:0 0 22px rgba(255,77,46,.18)}
+.course-lane.finish-flash{animation:courseFinishFlash .7s ease-out}
+@keyframes courseFinishFlash{0%{background-color:rgba(255,255,255,.22);box-shadow:0 0 0 2px rgba(255,255,255,.85),0 0 30px rgba(255,255,255,.55)}100%{background-color:transparent;box-shadow:none}}
+@media(prefers-reduced-motion:reduce){.course-lane.finish-flash{animation:none}}
+.course-lane-name{position:relative;z-index:1;width:128px;flex-shrink:0;font-size:12px;font-weight:700;color:rgba(255,255,255,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.03em}
+.course-lane.you .course-lane-name{color:var(--accent)}
+.course-strip{position:relative;z-index:1;flex:1;height:2px;background:rgba(255,255,255,.12);border-radius:2px}
+.course-car{position:absolute;top:50%;left:0;transform:translate(-100%,-50%);width:30px;height:13px;border-radius:9px 50% 50% 9px;background:linear-gradient(90deg,rgba(255,255,255,.3),#fff);box-shadow:0 0 8px rgba(255,255,255,.7),0 0 18px rgba(255,255,255,.35);z-index:2;transition:left .12s linear}
+.course-car::before{content:'';position:absolute;right:100%;top:50%;width:160px;height:6px;transform:translateY(-50%);background:linear-gradient(to left,rgba(255,255,255,.85),rgba(255,255,255,.25) 35%,transparent);filter:blur(1.5px)}
+.course-car::after{content:'';position:absolute;right:100%;top:50%;width:60px;height:1.5px;transform:translateY(-50%);background:linear-gradient(to left,rgba(255,255,255,.9),transparent)}
+.course-lane.you .course-car{background:linear-gradient(90deg,#ff5a2e,#ff8a5c);box-shadow:0 0 10px rgba(255,120,70,.9),0 0 26px rgba(255,77,46,.6)}
+.course-lane.you .course-car::before{background:linear-gradient(to left,rgba(255,120,70,.95),rgba(255,77,46,.35) 35%,transparent)}
+.course-lane.you .course-car::after{background:linear-gradient(to left,rgba(255,190,150,.95),transparent)}
+.course-textbox{position:relative;z-index:1;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px 26px;margin-bottom:14px;font-family:'JetBrains Mono',monospace;font-size:19px;line-height:1.9;letter-spacing:.01em;white-space:normal;word-break:normal;overflow-wrap:break-word}
+.course-textbox.shake{animation:courseShake .3s;border-color:rgba(255,77,46,.4)}
+@keyframes courseShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@media(prefers-reduced-motion:reduce){.course-textbox.shake{animation:none}}
+.course-word{display:inline-block}
+.course-space{white-space:normal}
+.course-ok{color:#fff}
+.course-ok.spark{position:relative}
+.course-ok.spark::after{content:'';position:absolute;left:50%;top:0;width:4px;height:4px;border-radius:50%;background:#fff;box-shadow:0 0 6px 2px rgba(255,140,90,.8);animation:courseSparkPop .45s ease-out forwards;pointer-events:none}
+@keyframes courseSparkPop{0%{opacity:1;transform:translate(-50%,-2px) scale(1)}100%{opacity:0;transform:translate(-50%,-20px) scale(.3)}}
+@media(prefers-reduced-motion:reduce){.course-ok.spark::after{animation:none;display:none}}
+.course-wrong{color:#ff6b6b;background:rgba(229,72,77,0.25);border-radius:3px}
+.course-cur{color:#fff;background:var(--accent);box-shadow:0 0 16px rgba(255,77,46,.6);border-radius:3px}
+.course-todo{color:rgba(255,255,255,.3)}
+.course-hint{position:relative;z-index:1;font-size:13px;color:rgba(255,255,255,.45);text-align:left;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.course-restart{flex-shrink:0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.75);border-radius:9px;padding:6px 12px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.15s}
+.course-restart:hover{background:rgba(255,255,255,.14);color:#fff}
+.course-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(22,20,15,0.88);backdrop-filter:blur(4px);border-radius:24px;z-index:5;text-align:center}
+.course-overlay h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#fff;margin:0}
+.course-overlay p{color:rgba(255,255,255,.65);font-size:15px;margin:0}
+.course-count{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:80px;line-height:1;color:var(--accent);text-shadow:0 0 40px rgba(255,77,46,.6)}
+.course-toast{position:relative;z-index:1;margin:0 auto 14px;width:fit-content;padding:8px 18px;border-radius:999px;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:13px;white-space:nowrap;animation:courseToastPop .3s ease-out;pointer-events:none}
+.course-toast.pos{background:rgba(31,169,113,.16);border:1px solid rgba(31,169,113,.5);color:#4ee0a0;box-shadow:0 0 20px rgba(31,169,113,.25)}
+.course-toast.neg{background:rgba(255,77,46,.16);border:1px solid rgba(255,77,46,.5);color:#ff9e7a;box-shadow:0 0 20px rgba(255,77,46,.25)}
+@keyframes courseToastPop{from{opacity:0;transform:translateY(-6px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.course-toast{animation:none}}
+@media(max-width:640px){
+  .course-idle h2{font-size:34px}
+  .course-stat-val{font-size:32px}
+  .course-lane-name{width:96px;font-size:11px}
+}
+
+/* PRÉCISION SOURIS (Visée) — écran d'accroche */
+.gsouris-intro{position:relative;padding:56px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;overflow:hidden}
+.gsouris-intro-ring{position:absolute;left:50%;top:50%;border:1px solid rgba(255,77,46,.22);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0}
+.gsouris-intro-ring.a{width:520px;height:520px}
+.gsouris-intro-ring.b{width:360px;height:360px;border-color:rgba(255,77,46,.32)}
+.gsouris-intro-kicker{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;letter-spacing:.4em;text-transform:uppercase;color:#FF9868}
+.gsouris-intro-title{position:relative;z-index:1;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(44px,9vw,88px);line-height:.94;letter-spacing:-.01em;text-transform:uppercase;color:#fff;margin:0;text-shadow:0 0 40px rgba(255,140,90,.5)}
+.gsouris-intro-sub{position:relative;z-index:1;color:rgba(255,255,255,.62);font-size:16px;line-height:1.6;max-width:440px;margin:0}
+.gsouris-intro-chips{position:relative;z-index:1;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:4px 0 6px}
+.gsouris-intro-chip{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.16);border-radius:999px;padding:9px 18px}
+.gsouris-intro-chip.accent{color:var(--accent);border-color:rgba(255,77,46,.5);background:rgba(255,77,46,.1)}
+/* HUD en jeu */
+.gsouris-life{width:13px;height:13px;transform:rotate(45deg);border-radius:3px;background:rgba(255,255,255,.14);display:inline-block}
+.gsouris-life.on{background:linear-gradient(160deg,#FF9868,#FF4D2E);box-shadow:0 0 8px rgba(255,77,46,.55)}
+.gsouris-section{position:relative;z-index:1;display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.gsouris-section::before,.gsouris-section::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,77,46,.4))}
+.gsouris-section::after{background:linear-gradient(90deg,rgba(255,77,46,.4),transparent)}
+.gsouris-section span{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11.5px;letter-spacing:.12em;color:#FF9868;white-space:nowrap}
+/* Reticle décoratif (survol) */
+.gsouris-reticle{position:absolute;inset:0;pointer-events:none;z-index:0}
+.gsouris-reticle-dash{position:absolute;left:50%;top:52%;width:130px;height:130px;transform:translate(-50%,-50%);border:1.5px dashed rgba(255,255,255,.1);border-radius:50%}
+.gsouris-chevron{position:absolute;width:10px;height:10px;border-top:2px solid rgba(255,255,255,.16);border-right:2px solid rgba(255,255,255,.16)}
+.gsouris-chevron.up{left:50%;top:14%;transform:translate(-50%,0) rotate(-45deg)}
+.gsouris-chevron.down{left:50%;bottom:16%;transform:translate(-50%,0) rotate(135deg)}
+.gsouris-chevron.left{left:6%;top:50%;transform:translate(0,-50%) rotate(-135deg)}
+.gsouris-chevron.right{right:6%;top:50%;transform:translate(0,-50%) rotate(45deg)}
+/* Cible cercles concentriques (survol) */
+.gsouris-target{position:absolute;aspect-ratio:1;transform:translate(-50%,-50%)}
+.gsouris-target-ring{position:absolute;inset:0;border:2px solid rgba(255,255,255,.18);border-radius:50%}
+.gsouris-target-prog{position:absolute;inset:9%;border-radius:50%}
+.gsouris-target-core{position:absolute;inset:22%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FF9868,#FF4D2E 70%);box-shadow:0 0 22px rgba(255,77,46,.55)}
+.gsouris-target-dot{position:absolute;inset:44%;border-radius:50%;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.85)}
+.gsouris-target-lock{position:absolute;left:50%;top:100%;margin-top:8px;transform:translateX(-50%);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:rgba(255,255,255,.5)}
+.gsouris-bonus-label{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:11px;letter-spacing:.04em;color:#FFD84D}
+/* Popup "TOUCHÉ" */
+.gsouris-judge{position:absolute;text-align:center;z-index:6;pointer-events:none;animation:gsourisPop .22s ease-out;transform:translate(-50%,-120%)}
+.gsouris-judge-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:rgba(255,255,255,.5);text-transform:uppercase}
+.gsouris-judge-pill{display:inline-flex;align-items:center;gap:6px;margin-top:2px;border-radius:999px;padding:5px 14px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff;background:rgba(255,77,46,.9)}
+.gsouris-judge-pill.bonus{background:rgba(255,216,77,.92);color:#16140F}
+@keyframes gsourisPop{0%{transform:translate(-50%,-90%) scale(.7);opacity:0}100%{transform:translate(-50%,-120%) scale(1);opacity:1}}
+/* Pied de partie : stats live + PTS DE L'OR + rejouer */
+.gsouris-footer{position:relative;z-index:1;display:flex;align-items:center;gap:26px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
+.gsouris-stat-label{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.1em;display:block;margin-bottom:2px}
+.gsouris-stat-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;color:#fff}
+.gsouris-stat-val.accent{color:var(--accent)}
+.gsouris-footer-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.gsouris-gold-left{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;color:rgba(255,255,255,.45)}
+.gsouris-replay{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:13px;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:8px 14px;cursor:pointer}
+.gsouris-replay:hover{background:rgba(255,255,255,.14)}
+@media(prefers-reduced-motion:reduce){.gsouris-judge{animation:none}}
+@media(max-width:640px){.gsouris-intro-title{font-size:clamp(34px,11vw,60px)}.gsouris-footer{gap:16px}.gsouris-footer-right{margin-left:0;width:100%;justify-content:space-between}}
+
+/* MAGIC TILES */
+.tiles-hud{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.tiles-hud-label{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.16em;margin-bottom:3px}
+.tiles-hud-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:30px;line-height:1;color:var(--accent);text-shadow:0 0 24px rgba(255,77,46,.5)}
+.tiles-hud-val.sec{color:#fff;text-shadow:0 0 18px rgba(255,255,255,.25)}
+.tiles-rank{text-align:center}
+.tiles-rank-row{display:flex;align-items:center;gap:8px}
+.tiles-rank-cur{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:16px;color:var(--accent);text-shadow:0 0 14px rgba(255,77,46,.6)}
+.tiles-rank-bar{width:76px;height:5px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
+.tiles-rank-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#ff8a5c);border-radius:3px;transition:width .25s ease-out;box-shadow:0 0 8px rgba(255,77,46,.6)}
+.tiles-rank-next{font-family:'JetBrains Mono',monospace;font-weight:700;color:rgba(255,255,255,.35);font-size:11px}
+.tiles-meta{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;margin:0 0 10px}
+.tiles-bpm{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.05em;transition:color .2s}
+.tiles-bpm.hot{color:#FF8A5C;text-shadow:0 0 10px rgba(255,138,92,.7)}
+.tiles-hearts span{font-size:16px;margin-left:1px}
+.tiles-board{position:relative;z-index:1;min-height:300px;display:flex;background:rgba(255,255,255,.02);border-radius:14px;overflow:hidden}
+.tiles-lane{position:relative;flex:1;border-left:1.5px dashed rgba(255,255,255,.08)}
+.tiles-lane:first-child{border-left:none}
+.tiles-tile{position:absolute;left:9%;right:9%;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:15px;text-transform:uppercase;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 4px 14px rgba(0,0,0,.4);transition:top .05s linear}
+.tiles-tile::after{content:'';position:absolute;left:8%;right:8%;top:3px;height:30%;border-radius:6px;background:linear-gradient(rgba(255,255,255,.35),transparent)}
+.tiles-tile.holding{box-shadow:0 0 0 2px #fff,inset 0 -3px 0 rgba(0,0,0,.25),0 0 20px rgba(255,255,255,.5);transition:none}
+.tiles-tile.bonus{background:linear-gradient(160deg,#FFE27A,#F4B400)!important;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),0 0 22px rgba(255,216,77,.65)}
+.tiles-hitline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55) 15%,rgba(255,255,255,.55) 85%,transparent);box-shadow:0 0 14px rgba(255,255,255,.35);z-index:1}
+.tiles-keys{position:relative;z-index:1;display:flex}
+.tiles-key{flex:1;text-align:center;padding:9px 0;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:rgba(255,255,255,.75);background:rgba(255,255,255,.05);border-left:1.5px dashed rgba(255,255,255,.08);border-bottom:3px solid rgba(255,255,255,.12);border-radius:0 0 8px 8px;transition:transform .08s,box-shadow .08s,background .08s}
+.tiles-key:first-child{border-left:none}
+.tiles-key.locked{opacity:.25}
+.tiles-key.pressed{transform:translateY(2px);border-bottom-color:transparent;background:rgba(255,77,46,.3);box-shadow:0 0 16px rgba(255,77,46,.45)}
+.tiles-judge{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);text-align:center;z-index:6;pointer-events:none;animation:tilesPop .22s ease-out}
+.tiles-judge-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;color:#fff;text-shadow:0 0 26px rgba(255,255,255,.35)}
+.tiles-judge-pill{display:inline-flex;align-items:center;gap:6px;margin-top:6px;border-radius:999px;padding:5px 15px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff}
+@keyframes tilesPop{0%{transform:translate(-50%,-50%) scale(.6);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.tiles-banner{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:7;padding:8px 20px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12px;letter-spacing:.05em;white-space:nowrap;animation:tilesBannerIn .3s ease-out}
+.tiles-banner.stage{background:rgba(255,77,46,.16);border:1px solid rgba(255,77,46,.5);color:#fff;box-shadow:0 0 20px rgba(255,77,46,.35)}
+.tiles-banner.intense{background:rgba(229,72,77,.2);border:1px solid #E5484D;color:#fff;box-shadow:0 0 24px rgba(229,72,77,.5);animation:tilesBannerIn .3s ease-out,tilesPulse 1s ease-in-out infinite}
+.tiles-banner.success{background:rgba(31,169,113,.18);border:1px solid #1FA971;color:#fff;box-shadow:0 0 20px rgba(31,169,113,.45)}
+@keyframes tilesBannerIn{0%{opacity:0;transform:translate(-50%,-8px)}100%{opacity:1;transform:translate(-50%,0)}}
+@keyframes tilesPulse{0%,100%{box-shadow:0 0 24px rgba(229,72,77,.5)}50%{box-shadow:0 0 34px rgba(229,72,77,.85)}}
+/* MAGIC TILES — écran d'accroche */
+.tiles-intro{position:relative;padding:56px 32px 44px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;overflow:hidden}
+.tiles-intro-deco{position:absolute;width:130px;height:130px;border-radius:26px;z-index:0;pointer-events:none;filter:blur(.3px)}
+.tiles-intro-deco.l{left:-46px;top:22%;background:linear-gradient(160deg,#33291f,#181310);transform:rotate(-9deg)}
+.tiles-intro-deco.r{right:-46px;top:14%;background:linear-gradient(160deg,#FF9868,#FF4D2E);opacity:.92;animation:tilesIntroDecoFloat 4.6s ease-in-out infinite}
+@keyframes tilesIntroDecoFloat{0%,100%{transform:translateY(0) rotate(11deg)}50%{transform:translateY(34px) rotate(-16deg)}}
+.tiles-intro-title{position:relative;z-index:1;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(44px,9vw,100px);line-height:.94;letter-spacing:-.01em;text-transform:uppercase;color:#fff;margin:0;text-shadow:0 0 40px rgba(255,140,90,.5)}
+.tiles-intro-sub{position:relative;z-index:1;color:rgba(255,255,255,.62);font-size:16px;line-height:1.6;max-width:440px;margin:0}
+.tiles-intro-keys{position:relative;z-index:1;display:flex;gap:11px;justify-content:center;margin:6px 0 4px;flex-wrap:wrap}
+.tiles-intro-key{width:56px;height:56px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:19px;color:#fff;text-transform:uppercase;box-shadow:inset 0 -3px 0 rgba(0,0,0,.28),0 4px 12px rgba(0,0,0,.4);background-image:linear-gradient(100deg,var(--dim) 0%,var(--bright) 15%,var(--dim) 30%,var(--bright) 45%,var(--dim) 60%);background-size:300% 100%;animation:tilesIntroFlow 4s linear infinite}
+@keyframes tilesIntroFlow{from{background-position:0% 0%}to{background-position:-300% 0%}}
+@media(max-width:640px){.tiles-intro-key{width:42px;height:42px;font-size:16px;border-radius:12px}.tiles-intro-deco{width:80px;height:80px}}
+@media(prefers-reduced-motion:reduce){.tiles-judge{animation:none}.tiles-banner{animation:none!important}.tiles-tile{transition:none}.tiles-intro-key{animation:none}.tiles-intro-deco.r{animation:none}}
+@media(max-width:640px){.tiles-hud-val{font-size:24px}.tiles-judge-text{font-size:26px}}
 
 /* SIMON DES MOTS */
-.simon-arena{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:28px;max-width:1120px;margin:0 auto;position:relative;min-height:380px}
-.simon-hud{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.simon-arena{background:#16140F;color:#fff;border-radius:24px;padding:28px;max-width:1120px;margin:0 auto;position:relative;min-height:380px;overflow:hidden}
+.simon-arena::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.05) 1.1px,transparent 1.1px);background-size:18px 18px;pointer-events:none;z-index:0}
+.simon-hud{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
 .simon-hearts span{font-size:20px;margin-left:2px}
-.simon-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;min-height:230px;text-align:center}
-.simon-prompt{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;color:var(--muted)}
+.simon-stage{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;min-height:230px;text-align:center}
+.simon-prompt{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;color:rgba(255,255,255,.5)}
 .simon-words{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:760px}
-.simon-word{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:24px;padding:10px 18px;border-radius:12px;background:var(--light);border:1.5px solid var(--border);min-width:48px}
-.simon-word.ok{background:rgba(31,169,113,0.12);border-color:#1FA971;color:#1FA971}
-.simon-word.cur{border-color:var(--accent);background:rgba(255,77,46,0.08);color:var(--txt)}
-.simon-word.todo{color:var(--muted);letter-spacing:.12em}
+.simon-word{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:24px;padding:10px 18px;border-radius:12px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.14);min-width:48px;color:#fff}
+.simon-word.ok{background:rgba(31,169,113,0.18);border-color:#1FA971;color:#1FA971}
+.simon-word.cur{border-color:var(--accent);background:rgba(255,77,46,0.18);color:#fff}
+.simon-word.todo{color:rgba(255,255,255,.35);letter-spacing:.12em}
 .simon-caret{display:inline-block;width:2px;height:1em;background:var(--accent);margin-left:1px;vertical-align:-2px;animation:simonblink 1s steps(2) infinite}
 @keyframes simonblink{50%{opacity:0}}
-.simon-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:14px;max-width:420px;width:100%}
+.simon-bar{position:relative;z-index:1;height:6px;background:rgba(255,255,255,.14);border-radius:3px;overflow:hidden;margin-top:14px;max-width:420px;width:100%}
 .simon-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#ff8a5c);border-radius:3px;transition:width .1s linear}
 @media(prefers-reduced-motion:reduce){.simon-caret{animation:none}.simon-bar-fill{transition:none}.race-car{transition:none}.ttarget-life-fill{transition:none}.game-arena{animation:none!important}}
 
 /* BOSS DE LA SEMAINE */
-.boss-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:28px}
-.boss-meta{display:flex;justify-content:space-between;margin-bottom:18px}
-.boss-meta-lbl{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em}
-.boss-meta-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:18px;color:var(--txt)}
-.boss-text-preview{background:#faf9f5;border:1.5px solid var(--border);border-radius:14px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:15px;line-height:1.7;color:#6b6557;margin-bottom:18px;max-height:140px;overflow:auto}
-.boss-yourbest{background:rgba(255,77,46,0.07);border:1px solid rgba(255,77,46,0.22);border-radius:12px;padding:12px 16px;font-size:14px;color:#7A7365;margin-bottom:20px}
+.boss-card{background:#16140F;color:#fff;border-radius:24px;padding:28px;position:relative;overflow:hidden}
+.boss-card::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.05) 1.1px,transparent 1.1px);background-size:18px 18px;pointer-events:none;z-index:0}
+.boss-meta{position:relative;z-index:1;display:flex;justify-content:space-between;margin-bottom:18px}
+.boss-meta-lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.04em}
+.boss-meta-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:18px;color:#fff}
+.boss-text-preview{position:relative;z-index:1;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.14);border-radius:14px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:15px;line-height:1.7;color:rgba(255,255,255,.55);margin-bottom:18px;max-height:140px;overflow:auto}
+.boss-yourbest{position:relative;z-index:1;background:rgba(255,77,46,0.1);border:1px solid rgba(255,77,46,0.3);border-radius:12px;padding:12px 16px;font-size:14px;color:rgba(255,255,255,.7);margin-bottom:20px}
 .boss-yourbest b{color:var(--accent)}
-.boss-lb-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:17px;margin-bottom:12px}
-.lb-table{display:flex;flex-direction:column;gap:4px}
+.boss-lb-title{position:relative;z-index:1;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:17px;margin-bottom:12px;color:#fff}
+.lb-table{position:relative;z-index:1;display:flex;flex-direction:column;gap:4px}
 .lb-row{display:flex;align-items:center;gap:14px;padding:10px 12px;border-radius:10px;border:1px solid transparent}
-.lb-row:nth-child(odd){background:#faf9f5}
-.lb-row.me{background:rgba(255,77,46,0.08);border-color:rgba(255,77,46,0.3)}
-.lb-rank{width:40px;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--muted);font-size:15px}
-.lb-name{flex:1;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-row:nth-child(odd){background:rgba(255,255,255,.05)}
+.lb-row.me{background:rgba(255,77,46,0.14);border-color:rgba(255,77,46,0.35)}
+.lb-rank{width:40px;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:700;color:rgba(255,255,255,.45);font-size:15px}
+.lb-name{flex:1;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
 .lb-score{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);font-size:15px;flex-shrink:0}
-.lb-sub{color:var(--muted);font-weight:500;font-size:12px}
-.lb-ellipsis{text-align:center;color:var(--muted);font-size:18px;line-height:1;padding:2px}
+.lb-sub{color:rgba(255,255,255,.4);font-weight:500;font-size:12px}
+.lb-ellipsis{text-align:center;color:rgba(255,255,255,.4);font-size:18px;line-height:1;padding:2px}
 
 /* GAZE PLUGIN */
 .gaze-toggle{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap}
@@ -1143,7 +1327,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 /* DUEL 1v1 */
 .duel-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px}
 @media(max-width:580px){.duel-menu-grid{grid-template-columns:1fr}}
-.duel-card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
+.duel-card{position:relative;z-index:1;background:var(--card);color:var(--txt);border:1.5px solid var(--border);border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
 .duel-card-icon{font-size:38px;line-height:1}
 .duel-card h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;margin:0}
 .duel-card p{color:var(--muted);font-size:14px;line-height:1.5;margin:0}
@@ -1591,6 +1775,7 @@ const SOUND_FILES={
   victory:'/sounds/victory.mp3',
   defeat:'/sounds/defeat.mp3',
   countdown:'/sounds/countdown.mp3',
+  life:'/sounds/life.mp3',
 };
 const _soundCache={};
 function isSoundMuted(){try{return localStorage.getItem('kp_sound_muted')==='1';}catch{return false;}}
@@ -1804,6 +1989,7 @@ function completeLogin(d){
   saveSession(d.username, d.plan, d.token, d.id, _mergedData.role||null, d.email, d.displayName, d.institutionName, d.hasClass);
   try{track('login',{method:'password'});}catch{}
   app.stats=_mergedData;
+  _statsLoaded=true; // réponse de login fraîche et authoritative : sûr d'autoriser la sauvegarde
   window._needsOnboarding = !d.onboarding_completed;
   if(!d.onboarding_completed)localStorage.removeItem('klak_ob');else localStorage.setItem('klak_ob','1');
   loginUser(d.username);
@@ -2203,14 +2389,27 @@ async function handlePaymentReturn(){
 /* ── DATA ── */
 let _saveDebounce=null;
 // _statsDirty : true dès qu'une vraie modif locale (jeu, test, leçon…) a eu lieu.
-// On n'écrit JAMAIS au serveur tant que ce drapeau est faux -> impossible d'écraser
-// la progression serveur avec les valeurs par défaut vides du démarrage.
+// _statsLoaded : true seulement une fois la VRAIE progression serveur reçue
+// (login frais, ou réponse de loadProgressFromServer). Tant qu'il est faux,
+// app.stats n'est qu'un squelette vide affiché en attendant le réseau — le
+// flusher DOIT refuser d'écrire, sinon une action rapide (jeu, leçon) juste
+// après un rechargement de page écraserait tout l'historique serveur avec
+// ce squelette avant même qu'il ait eu la chance d'être remplacé par les
+// vraies données. C'est précisément le bug qui a effacé de la progression :
+// _statsDirty passait à true sur le squelette avant l'arrivée de la réponse,
+// ce qui faisait ignorer les données serveur ET renvoyait le squelette.
 let _statsDirty=false;
+let _statsLoaded=false;
 async function flushStats(){
   if(!currentUser||!currentToken||!app.stats||!_statsDirty)return;
+  if(!_statsLoaded){_saveDebounce=setTimeout(flushStats,800);return;} // attend le vrai chargement
   try{
-    await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:app.stats})});
-    _statsDirty=false;
+    const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:app.stats})});
+    // Le serveur peut refuser (409) une écriture qui régresserait la
+    // progression enregistrée — dans ce cas on garde _statsDirty=true pour
+    // réessayer plus tard plutôt que de faire comme si la sauvegarde avait
+    // réussi : mieux vaut retenter indéfiniment que perdre le signal d'échec.
+    if(r.ok)_statsDirty=false;
   }catch{}
 }
 function mergeStats(remote){
@@ -2371,6 +2570,35 @@ const KB=[
   [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'!',s:'§',f:'rp'}]
 ];
 const T4A_KPOS=t4aComputeKpos();
+// Magic Tiles (Visée) : 8 couloirs FIXES, un par doigt hors pouces — Q S D F
+// (main gauche) et J K L M (main droite), la vraie rangée de repos. Chaque
+// colonne correspond toujours à la même touche (comme un vrai piano tiles),
+// pas une lettre aléatoire par couloir.
+const TILES_LANES=[
+  {letter:'q',hand:'l'},{letter:'s',hand:'l'},{letter:'d',hand:'l'},{letter:'f',hand:'l'},
+  {letter:'j',hand:'r'},{letter:'k',hand:'r'},{letter:'l',hand:'r'},{letter:'m',hand:'r'},
+];
+const TILES_HAND_GRADIENT={l:'linear-gradient(160deg,#FF9868,#FF4D2E)',r:'linear-gradient(160deg,#A8493A,#6F2A20)'};
+const TILES_RANKS=['D','C','B','A','S','SS','SSS'];
+const TILES_RANK_SCORE=[0,120,280,480,750,1100,1600];
+// Difficulté progressive : de plus en plus de couloirs s'activent au fil de
+// la partie (indices dans TILES_LANES). Chaque palier ≥1 reçoit, 6s après son
+// début, un "passage intense" de 3.5s (tempo accéléré) — annoncé à l'écran.
+const TILES_SESSION_MS=45000;
+const TILES_STAGES=[
+  {lanes:[3,4],t:0,label:'2 TOUCHES · F · J'},
+  {lanes:[2,3,4,5],t:9000,label:'4 TOUCHES · D F J K'},
+  {lanes:[1,2,3,4,5,6],t:20000,label:'6 TOUCHES · S D F J K L'},
+  {lanes:[0,1,2,3,4,5,6,7],t:32000,label:'8 TOUCHES · CLAVIER COMPLET'},
+];
+// Rampe décorative pour l'écran d'accroche (indépendante des couleurs de jeu
+// TILES_HAND_GRADIENT) : sombre à gauche, incandescente au centre-droit. Chaque
+// touche anime son propre dégradé (dim→bright) pour un effet de lumière qui
+// se balade en continu, décalé touche par touche.
+const TILES_INTRO_KEY_RAMP=[
+  ['#1a1512','#3c2e22'],['#33221a','#6b3d26'],['#55261a','#9c4023'],['#7c2e1c','#d1521f'],
+  ['#9c3a1c','#ff6a30'],['#b8451f','#ff8348'],['#b8451f','#ff9455'],['#6f2c1c','#c85a2e'],
+];
 const PASSAGES=["le matin, la lumière douce traverse les rideaux et réveille doucement la maison encore endormie sous un ciel calme et clair.", "le petit renard roux traverse le champ gelé, observe les oiseaux au loin, puis disparaît derrière la vieille grange en bois.", "la pluie tombe sur les toits de la vieille ville, les rues brillent sous les lampadaires et un chat traverse sans bruit la place déserte.", "le train file à travers la campagne verte, les collines défilent derrière la vitre et le voyageur sourit en pensant au bord de mer qui l'attend.", "en automne, les feuilles rousses tombent une à une sur le chemin de terre, formant un tapis doré que le vent balaie doucement.", "la neige recouvre les toits du village et étouffe les bruits de la rue, laissant place à un silence blanc et paisible.", "au bord du lac, les roseaux ploient sous la brise tandis qu'un héron immobile guette patiemment le passage d'un poisson.", "le soleil se couche lentement derrière les montagnes, teintant le ciel d'orange et de rose avant que la nuit ne tombe.", "un orage gronde au loin, les nuages s'assombrissent et les premières gouttes viennent frapper les vitres de la cuisine.", "dans la forêt humide, la mousse recouvre les pierres et l'odeur de terre mouillée se mêle à celle des feuilles pourries.", "le vent d'hiver siffle entre les branches nues des arbres, faisant claquer les volets de la vieille ferme abandonnée.", "les vagues viennent mourir sur le sable fin, laissant derrière elles des coquillages que les enfants ramassent avec joie.", "au printemps, les premières fleurs percent la terre encore froide et annoncent le retour des beaux jours pour tous.", "la brume matinale enveloppe la vallée, cachant les sommets et donnant au paysage une allure mystérieuse et calme.", "un arc-en-ciel apparaît après l'averse, dessinant ses couleurs vives au-dessus des champs encore luisants de pluie.", "les étoiles scintillent dans le ciel dégagé de la montagne, loin des lumières de la ville qui les cachent d'habitude.", "le ruisseau serpente entre les rochers, son eau claire reflétant les branches des saules penchés au-dessus de lui.", "la chaleur de l'été rend l'air épais et immobile, poussant chacun à chercher l'ombre fraîche des grands platanes.", "un vol d'oies sauvages traverse le ciel gris de novembre, formant un grand triangle qui s'éloigne vers le sud.", "la rosée du matin perle sur les toiles d'araignée tendues entre les herbes hautes du jardin encore silencieux.", "le petit chat gris se glisse entre les pots de fleurs, curieux de découvrir ce qui se cache derrière la haie du voisin.", "un troupeau de moutons traverse lentement la route de campagne, guidé par un vieux berger et son chien fidèle.", "les hirondelles reviennent chaque printemps construire leur nid sous le toit de la vieille maison familiale.", "le hérisson sort de sa cachette à la tombée de la nuit pour chercher quelques insectes dans l'herbe humide.", "dans l'étable, les vaches ruminent tranquillement pendant que le fermier prépare le foin pour l'hiver prochain.", "un écureuil bondit de branche en branche, cherchant les noisettes qu'il a cachées un peu partout dans le parc.", "le chien attend patiemment devant la porte, la queue frétillante, guettant le retour de son maître chaque soir.", "les abeilles butinent les fleurs du jardin, transportant le pollen d'une plante à l'autre sous le soleil de juin.", "un cerf traverse la clairière au petit matin, immobile un instant avant de disparaître dans les fourrés épais.", "les poules picorent dans la cour de la ferme, tandis que le coq surveille attentivement les alentours du poulailler.", "le dauphin saute hors de l'eau près du bateau, ravissant les touristes venus observer la vie marine côtière.", "un papillon multicolore se pose délicatement sur une fleur, restant immobile quelques secondes avant de repartir.", "les chevaux galopent dans le pré, profitant des premiers rayons du soleil après une longue nuit d'hiver.", "le lapin détale à travers le potager dès qu'il entend le moindre bruit venant de la maison voisine.", "les grenouilles chantent près de l'étang, créant un concert nocturne qui accompagne les longues soirées d'été.", "le café fume doucement sur la table de la cuisine pendant que la radio annonce les nouvelles du matin.", "chaque dimanche, la famille se retrouve autour d'un grand repas préparé avec soin par les grands-parents.", "la lessive sèche sur le fil tendu entre deux arbres, se balançant doucement au rythme léger du vent.", "après le dîner, les enfants rangent leurs jouets pendant que les parents discutent tranquillement au salon.", "le réveil sonne trop tôt ce matin-là, et il faut se dépêcher pour ne pas rater le bus habituel.", "la vieille horloge du couloir sonne midi, rappelant à chacun qu'il est temps de passer à table.", "un livre oublié traîne sur la table basse, marque-page glissé entre deux pages depuis plusieurs jours déjà.", "la maison sent bon le pain frais, tout juste sorti du four que la grand-mère surveille avec attention.", "le chat s'installe confortablement sur le canapé, roulé en boule près de la fenêtre baignée de soleil.", "chaque soir, avant de dormir, les enfants demandent une histoire que leur mère raconte avec plaisir.", "la boîte aux lettres déborde de publicités, cachant presque la lettre attendue depuis plusieurs semaines.", "le grenier renferme de vieilles photographies jaunies qui racontent l'histoire de plusieurs générations.", "le jardin réclame quelques soins avant l'arrivée du printemps : tailler les rosiers, retourner la terre.", "une odeur de gâteau au chocolat envahit la maison, annonçant l'anniversaire tant attendu par les enfants.", "le samedi matin, le marché du village s'anime tôt avec les cris joyeux des commerçants installant leurs étals.", "la clé tourne difficilement dans la serrure de la vieille porte, usée par des années d'ouverture quotidienne.", "les volets claquent doucement sous la brise, rappelant qu'il faudrait les réparer avant l'hiver prochain.", "un plateau de fruits frais trône sur la table, prêt à être partagé après le repas de midi.", "la cave garde une fraîcheur agréable même pendant les journées les plus chaudes de l'été.", "le linge propre s'empile sur le lit, attendant d'être plié avant que la soirée ne commence.", "le professeur explique lentement la leçon du jour pendant que les élèves prennent des notes attentivement.", "chaque exercice de dactylographie demande de la patience, mais les progrès arrivent plus vite qu'on ne le pense.", "apprendre à taper vite ressemble à une course : au début chaque mot compte, puis le rythme s'installe naturellement.", "la bibliothèque de l'école reste ouverte tard le soir pour permettre aux élèves de réviser avant les examens.", "un cahier neuf sent toujours particulièrement bon, avec ses pages blanches encore vierges de toute écriture.", "la cloche sonne la fin des cours, libérant dans la cour une foule d'élèves pressés de rentrer chez eux.", "chaque champion a commencé débutant : la vraie différence se joue dans la régularité et le plaisir de progresser.", "le tableau noir se remplit peu à peu de formules que les élèves recopient avec application dans leur cahier.", "réviser régulièrement, même quelques minutes chaque jour, aide bien plus qu'une longue session juste avant l'examen.", "la salle informatique bourdonne du bruit des claviers pendant que chacun termine son exercice de frappe.", "un élève lève la main timidement pour poser une question sur l'exercice qu'il n'a pas bien compris.", "la rentrée approche et il faut déjà préparer le nouveau cartable ainsi que les fournitures scolaires.", "progresser demande de la constance : mieux vaut s'entraîner quinze minutes chaque jour qu'une heure une seule fois.", "le dictionnaire posé sur le bureau permet de vérifier l'orthographe des mots les plus difficiles à retenir.", "chaque niveau franchi apporte une nouvelle confiance, poussant l'élève à viser encore un peu plus haut.", "le bureau reste silencieux tôt le matin, avant que les collègues n'arrivent un à un pour commencer la journée.", "un rapport urgent doit être terminé avant midi, ce qui pousse chacun à taper plus vite que d'habitude.", "la réunion s'éternise autour de la table, tandis que certains prennent des notes sur leur ordinateur portable.", "écrire vite, c'est surtout écrire juste : vise la précision avant la vitesse, et la cadence viendra naturellement.", "le téléphone sonne sans arrêt ce matin-là, interrompant sans cesse la rédaction du courrier important.", "chaque employé dispose désormais d'un poste équipé d'un clavier confortable pour limiter la fatigue des mains.", "la pause déjeuner permet à toute l'équipe de se retrouver autour d'un café loin des écrans lumineux.", "un nouveau logiciel de gestion vient d'être installé, obligeant chacun à apprendre de nouvelles habitudes.", "le responsable relit attentivement chaque document avant de l'envoyer aux clients pour validation finale.", "taper un courrier professionnel demande autant de clarté que de rapidité pour convaincre le destinataire.", "les dossiers s'empilent sur le bureau, mais un peu d'organisation permet toujours d'y voir plus clair.", "le télétravail change les habitudes : certains préfèrent désormais travailler tôt le matin dans le calme.", "la présentation de fin d'année demande plusieurs jours de préparation minutieuse avant d'être enfin prête.", "un simple courriel bien tapé peut parfois éviter des heures de discussion inutile entre collègues.", "chaque projet avance étape par étape, et la patience finit toujours par porter ses fruits au bureau.", "le coureur accélère dans la dernière ligne droite, puisant dans ses dernières forces pour franchir la ligne.", "chaque samedi matin, le club de football se retrouve sur le terrain pour un entraînement intensif.", "la piscine municipale accueille de nombreux nageurs dès l'ouverture, profitant du calme avant la foule.", "un match de tennis serré tient les spectateurs en haleine jusqu'au tout dernier point de la rencontre.", "grimper en montagne demande autant d'endurance que de concentration pour ne jamais perdre l'équilibre.", "le vélo reste le moyen préféré des habitants pour se déplacer dans les petites rues du centre-ville.", "une partie d'échecs peut durer des heures, chaque joueur réfléchissant longuement avant de bouger une pièce.", "le groupe de randonneurs s'arrête au sommet pour admirer le paysage avant de redescendre lentement.", "la salle de danse résonne de musique joyeuse pendant que les élèves répètent leur chorégraphie du spectacle.", "jouer aux cartes en famille reste une tradition du dimanche soir, entre rires et petites disputes amicales.", "le pêcheur attend patiemment sur la rive, sa ligne tendue vers l'eau calme du fleuve tranquille.", "chaque compétition de dactylographie attire des passionnés venus mesurer leur vitesse face à d'autres joueurs.", "la course cycliste traverse plusieurs villages avant d'arriver enfin dans la ville qui accueille l'arrivée.", "le yoga du matin aide à retrouver calme et concentration avant de commencer une longue journée chargée.", "un tournoi de basket réunit chaque été les équipes des quartiers voisins autour d'une compétition amicale.", "la gare grouille de voyageurs pressés, valises à la main, cherchant le quai de leur prochain train.", "le tramway glisse silencieusement le long des avenues, s'arrêtant à chaque station pour laisser monter les passagers.", "un vieux pont de pierre relie les deux rives de la rivière, offrant une vue magnifique sur la vallée.", "la ville s'éveille doucement, les commerces ouvrent leurs volets et les premiers passants arpentent les trottoirs.", "un long voyage en voiture traverse plusieurs régions, chacune offrant des paysages différents et surprenants.", "le port bruisse d'activité dès l'aube, entre pêcheurs qui rentrent et bateaux qui se préparent à partir.", "les ruelles étroites du centre historique cachent de petites boutiques que seuls les habitués connaissent vraiment.", "l'avion survole les nuages, offrant aux passagers une vue imprenable sur les montagnes enneigées en contrebas.", "chaque quartier de la capitale possède son propre caractère, entre marchés animés et places tranquilles.", "le bateau quitte lentement le port, laissant derrière lui une traînée blanche sur l'eau bleue et calme.", "visiter une nouvelle ville demande de se perdre un peu, loin des itinéraires trop connus des guides.", "la place centrale se remplit chaque soir de terrasses animées où les gens discutent jusque tard.", "un long chemin de montagne mène jusqu'au village perché, accessible seulement à pied ou à vélo.", "le métro traverse la ville sous terre, transportant chaque jour des milliers de passagers pressés.", "les phares du bord de mer guident encore aujourd'hui les bateaux perdus dans la brume nocturne.", "la soupe mijote doucement sur le feu, embaumant toute la cuisine d'une odeur chaude et réconfortante.", "préparer une tarte demande du temps, mais le résultat récompense toujours les efforts fournis en cuisine.", "le pain croustillant sort du four juste à temps pour accompagner le repas du soir en famille.", "chaque marché propose des légumes frais cueillis le matin même dans les fermes des environs.", "la recette de grand-mère se transmet depuis plusieurs générations, gardée précieusement dans un vieux carnet.", "un plat mijoté toute la journée développe des saveurs bien plus riches qu'une cuisson rapide.", "la table du dîner s'orne d'une nappe blanche, préparée avec soin pour un repas de fête.", "couper les légumes finement demande de l'entraînement, mais le geste devient vite naturel avec la pratique.", "le café du matin accompagne toujours une lecture rapide du journal avant de partir travailler.", "préparer un repas simple mais soigné reste souvent plus satisfaisant qu'une recette compliquée et longue.", "la boulangerie du coin ouvre tôt chaque matin pour proposer croissants et pains frais aux habitants.", "une salade colorée réunit tomates, concombres et herbes fraîches directement cueillies dans le jardin.", "taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides.", "un clavier bien positionné évite les douleurs aux poignets lors de longues sessions de frappe quotidienne.", "la précision compte autant que la vitesse : mieux vaut taper juste plutôt que corriger sans cesse.", "apprendre la position des doigts sur la rangée de base constitue la première étape vers une frappe rapide.", "chaque exercice répété renforce la mémoire des doigts, rendant les mouvements de plus en plus naturels.", "un ordinateur récent facilite grandement le travail quotidien, à condition de savoir l'utiliser efficacement.", "la disposition du clavier belge diffère légèrement du clavier français, ce qui surprend parfois les débutants.", "suivre sa progression au fil des semaines motive à continuer, même quand les résultats semblent lents.", "un bon éclairage aide à mieux voir l'écran sans fatiguer les yeux pendant une longue session de travail.", "la régularité prime sur l'intensité : dix minutes chaque jour valent mieux qu'une heure une fois par semaine.", "maîtriser son clavier permet d'écrire ses idées presque aussi vite qu'on les pense, sans y réfléchir.", "chaque touche du clavier correspond à un doigt précis, une règle simple qui change tout une fois assimilée.", "les jeux de frappe rendent l'entraînement plus amusant tout en améliorant discrètement la vitesse et la précision.", "garder le dos droit et les poignets détendus améliore grandement le confort pendant les longues séances de frappe.", "apprendre à taper à dix doigts change durablement la façon de travailler devant un ordinateur au quotidien.", "la patience d'aujourd'hui prépare l'aisance de demain : avance avec calme, précision et constance chaque jour.", "les petites habitudes répétées chaque jour finissent toujours par produire de grands changements avec le temps.", "il vaut mieux avancer lentement mais sûrement que de se précipiter et abandonner après quelques essais.", "chaque erreur apprend quelque chose de nouveau, à condition de prendre le temps de la comprendre vraiment.", "se fixer un petit objectif chaque semaine aide à garder la motivation sur le long terme.", "la persévérance finit toujours par payer, même quand les progrès semblent invisibles au jour le jour.", "prendre le temps de bien faire les choses évite souvent d'avoir à les recommencer plus tard.", "comparer ses résultats d'une semaine à l'autre montre des progrès qu'on ne remarque pas au quotidien.", "apprendre une nouvelle compétence demande du temps, mais chaque effort investi finit par porter ses fruits.", "garder une attitude positive face aux difficultés aide à surmonter plus facilement les obstacles du quotidien.", "fixer des objectifs clairs et atteignables rend le chemin vers la réussite beaucoup plus motivant.", "le calme et la concentration valent souvent mieux que la précipitation pour réussir une tâche difficile.", "chaque jour offre une nouvelle occasion de progresser un peu, même par de tout petits pas.", "accepter ses erreurs sans se décourager reste la meilleure façon d'apprendre durablement quelque chose de nouveau.", "la confiance en soi se construit progressivement, à force de petites réussites accumulées au fil du temps.", "les grands-parents racontent souvent des histoires anciennes que les petits-enfants écoutent avec grand intérêt.", "un simple appel téléphonique suffit parfois à réchauffer l'âme d'une personne qui se sentait seule.", "retrouver de vieux amis après plusieurs années procure une joie difficile à décrire avec des mots.", "les enfants grandissent si vite que chaque moment partagé avec eux mérite d'être pleinement savouré.", "un simple sourire échangé dans la rue peut parfois illuminer toute une journée compliquée.", "écrire une lettre à un proche demande plus de temps qu'un message, mais elle touche davantage.", "les repas de famille rassemblent plusieurs générations autour d'une même table, entre rires et souvenirs partagés.", "apprendre à écouter vraiment quelqu'un reste l'une des compétences les plus précieuses dans une relation.", "un anniversaire fêté simplement, entourée des siens, vaut souvent bien plus qu'une grande célébration.", "partager un projet avec un ami renforce souvent une amitié bien plus qu'une simple conversation."];
 const CURRICULUM=[
   /* ── MODULE 1 : touches de repos ─────────────────────────────────────────── */
@@ -3257,23 +3485,23 @@ const GCINE_CATS=[
 ];
 const GCINE_GAMES=[
   {key:'frappe',icon:'target',name:'Frappe-mots',desc:"Des mots tombent du ciel : tape-les avant qu'ils touchent le sol. Vitesse et réactivité.",expert:false,category:'vitesse'},
-  {key:'sprint',icon:'flag',name:'Le Sprint',desc:"30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace : chaque seconde compte.",expert:true,category:'vitesse'},
-  {key:'course',icon:'raceCar',name:'Course de dactylo',desc:"Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !",expert:true,category:'vitesse'},
-  {key:'ghost',icon:'ghost',name:'Contre ton fantôme',desc:"Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !",expert:true,category:'vitesse'},
+  {key:'sprint',icon:'flag',name:'Le Sprint',desc:"30 secondes, texte infini. Tape le plus de caractères corrects possible. Pas de backspace : chaque seconde compte.",expert:false,category:'vitesse'},
+  {key:'course',icon:'raceCar',name:'Course de dactylo',desc:"Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !",expert:false,category:'vitesse'},
+  {key:'ghost',icon:'ghost',name:'Contre ton fantôme',desc:"Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !",expert:false,category:'vitesse'},
   {key:'tireur',icon:'crosshair',name:"Tireur d'élite",desc:"Tape chaque mot sans la moindre faute. Une seule erreur et la cible est ratée : la précision avant tout.",expert:false,category:'precision'},
   {key:'souris',icon:'mouse',name:'Précision souris',desc:"12 niveaux qui montent en difficulté : viser, cliquer, glisser-déposer, puis le clavier (ZQSD) en renfort.",expert:false,category:'precision'},
   {key:'sourisSolo',icon:'target',name:'Cible unique',desc:"Une lettre, un rythme : repère la cible et tape sa lettre avant qu'elle ne disparaisse. Pure réaction clavier.",expert:false,category:'precision'},
   {key:'sourisGrid',icon:'grid',name:'Grille réflexe',desc:"9 cases, une s'allume : tape sa lettre avant les pièges qui s'allument aussi.",expert:false,category:'precision'},
-  {key:'sourisWaves',icon:'flag',name:'Vagues & Boss',desc:"4 vagues, une règle différente à chaque fois, puis un mot-boss pour finir.",expert:false,category:'precision'},
-  {key:'sourisHybrid',icon:'hand',name:'Duo souris + clavier',desc:"Vise à la souris, valide au clavier — une main sur chaque, une lettre à la fois.",expert:false,category:'precision'},
-  {key:'sourisTiles',icon:'layers',name:'Magic Tiles',desc:"4 couloirs qui défilent en rythme : souris et clavier pour ne rien laisser filer.",expert:false,category:'precision'},
+  {key:'sourisWaves',icon:'flag',name:'Vagues & Boss',desc:"4 vagues, une règle différente à chaque fois, puis un mot-boss pour finir.",expert:true,category:'precision'},
+  {key:'sourisHybrid',icon:'hand',name:'Duo souris + clavier',desc:"Vise à la souris, valide au clavier — une main sur chaque, une lettre à la fois.",expert:true,category:'precision'},
+  {key:'sourisTiles',icon:'layers',name:'Magic Tiles',desc:"8 couloirs, ta rangée de repos QSDF JKLM : tape ou tiens la touche avant la ligne.",expert:false,category:'precision'},
   {key:'sourisDuo2',icon:'swords',name:'Double piste',desc:"Les deux mains sollicitées en même temps. Le plus exigeant des jeux de précision.",expert:false,category:'precision',locked:a=>!a._sourisDuo2Unlocked(),lockedTag:'3 pistes à bronze+ requises'},
   {key:'simon',icon:'brain',name:'Simon des mots',desc:"Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.",expert:false,category:'memoire'},
   {key:'clavier',icon:'keyboard',name:'Clavier vide',desc:"Le clavier est totalement vide : replace chaque lettre au bon endroit, de mémoire. Chrono lancé, chaque erreur compte.",expert:false,category:'memoire'},
   {key:'duel',icon:'swords',name:'Duel 1v1',desc:"Défie un ami en temps réel sur le même texte. Partage un lien, comptez 3-2-1, et que le plus rapide gagne !",expert:false,category:'multi'},
   {key:'royale',icon:'gamepad',name:'Battle Royale',desc:"Jusqu'à 50 joueurs, un seul texte, un seul survivant. Le mode multijoueur le plus ambitieux de KeyPace arrive bientôt.",expert:false,category:'multi',comingSoon:true},
 ];
-const GCINE_BOSS={key:'boss',icon:'trophy',name:'Boss de la semaine',desc:"Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !",expert:true};
+const GCINE_BOSS={key:'boss',icon:'trophy',name:'Boss de la semaine',desc:"Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !",expert:false};
 const CLAVIER_ROWS=['AZERTYUIOP'.split(''),'QSDFGHJKLM'.split(''),'WXCVBN'.split('')];
 // Les 7 jeux ex-Visée partagent un seul state (this.souris) et un seul rendu/
 // routeur clavier (renderSouris/sourisKey), qui dispatchent déjà sur
@@ -4177,16 +4405,15 @@ const app={
   // boxes: [{label, value, unit?, color?, accent?}] · record: texte du bandeau 🏆 si présent
   _gameResult({icon,title,record,boxes,extra,bestLine,primaryLabel,primaryOnClick,secondaryLabel,secondaryOnClick}){
     const boxesHtml=(boxes||[]).map(b=>`<div class="stat-box"><div class="stat-label">${b.label}</div><div class="stat-val${b.accent?' acc':''}" style="font-size:36px${b.color?';color:'+b.color:''}">${b.value}${b.unit?'<span class="stat-unit"> '+b.unit+'</span>':''}</div></div>`).join('');
-    // Fond clair auto-porté (au lieu de dépendre du fond du conteneur parent) :
-    // ce même composant doit rester lisible aussi bien sur l'arène claire
-    // (Sprint/Course/Simon/Boss/Duel) que sur l'arène sombre (Tireur/Frappe-mots).
-    return `<div class="sprint-result" style="background:var(--card);border-radius:20px;padding:28px 24px;box-shadow:0 20px 50px rgba(0,0,0,0.25)">
+    // Contenu directement intégré à l'arène sombre (pas de carte flottante) :
+    // tous les jeux partagent désormais le même habillage sombre.
+    return `<div class="sprint-result">
       ${icon?`<div style="font-size:44px;line-height:1;margin-bottom:6px">${icon}</div>`:''}
       <h2>${title}</h2>
       ${record?`<div class="sprint-record show">🏆 ${record}</div>`:''}
       <div class="sprint-result-grid">${boxesHtml}</div>
       ${extra?`<div style="margin-bottom:20px">${extra}</div>`:''}
-      ${bestLine?`<p style="font-size:14px;color:var(--muted);margin-bottom:20px">${bestLine}</p>`:''}
+      ${bestLine?`<p style="font-size:14px;color:rgba(255,255,255,.55);margin-bottom:20px">${bestLine}</p>`:''}
       <div style="display:flex;gap:12px;justify-content:center">
         <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="${primaryOnClick}">${primaryLabel||'Rejouer'}</button>
         <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="${secondaryOnClick||'app.exitActiveGame()'}">${secondaryLabel||'← Jeux'}</button>
@@ -4211,6 +4438,15 @@ const app={
     return `<div class="race-track">${lanes.map(l=>`<div class="race-lane${l.you?' you':''}">
       <div class="race-lane-name">${l.you?'Toi':(l.namePrefix===false?l.name:l.emoji+' '+l.name)}</div>
       <div class="race-strip"><div class="race-car" style="left:${Math.round((l.prog||0)*100)}%">${l.emoji}</div></div>
+    </div>`).join('')}</div>`;
+  },
+  // Variante arène sombre dédiée à Course de dactylo (voir .course-* dans le CSS) —
+  // copie volontaire de _raceLanesHTML plutôt qu'un paramètre, pour ne rien changer
+  // au rendu partagé de Fantôme/Duel.
+  _courseLanesHTML(lanes){
+    return `<div class="course-track">${lanes.map(l=>`<div class="course-lane${l.you?' you':''}${l.finishFlash?' finish-flash':''}">
+      <div class="course-lane-name">${l.you?'TOI':l.name.toUpperCase()+(l.wpm?' · '+l.wpm:'')}${l.finishFlash?' 🏁':''}</div>
+      <div class="course-strip"><div class="course-car" style="left:${Math.round((l.prog||0)*100)}%"></div></div>
     </div>`).join('')}</div>`;
   },
   // Compte à rebours 3-2-1-GO avant le départ — même template pour Course et
@@ -4250,7 +4486,6 @@ const app={
   /* ── SPRINT ── */
   startSprint(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startSprint());return;}
-    if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
     this.stopSprint();this.stopGame();
     this.activeGame='sprint';
     const text=genSprintText();
@@ -4330,9 +4565,13 @@ const app={
     const progressPct=s?Math.round(100*(30-timeLeft)/30):0;
 
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Le Sprint',ICONS.flag,'expert')}
+      ${this._gameHeader('Le Sprint',ICONS.flag,'free')}
       <div class="sprint-arena">
-        ${isOver?`
+        ${isIdle?`
+          <div class="gidle"><h2 class="gidle-title">Le Sprint<span class="dot"> .</span></h2><p>30 secondes, texte infini. Pas de retour arrière : chaque seconde compte.${best>0?`<br>Record : <b style="color:var(--accent)">${best} mpm</b>`:''}</p>
+            <button class="btn-primary" autofocus onclick="app.startSprint()">Lancer le Sprint ▸</button>
+            <div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>
+        `:isOver?`
           ${this._gameResult({
             title:wpm>=50?'Impressionnant !':wpm>=35?'Excellent !':wpm>=20?'Bien joué !':'Continue !',
             record:(isRecord||isFirstRecord)?'Nouveau record personnel !':null,
@@ -4347,21 +4586,21 @@ const app={
         `:`
           <div class="sprint-hud">
             <div>
-              <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">TEMPS</div>
+              <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px">TEMPS</div>
               <div class="sprint-timer${timeLeft<=10?' low':''}">${String(timeLeft).padStart(2,'0')}</div>
             </div>
             <div class="sprint-score-wrap">
               <div class="sprint-score-label">VITESSE</div>
-              <div class="sprint-score-val">${wpm}<span style="font-size:16px;color:var(--muted);font-weight:500"> mpm</span></div>
+              <div class="sprint-score-val">${wpm}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> mpm</span></div>
             </div>
           </div>
           <div class="sprint-progress"><div class="sprint-progress-fill" style="width:${progressPct}%"></div></div>
-          <div class="sprint-text-box" tabindex="0">${s?textHTML:'<span style="color:var(--muted)">Prêt…</span>'}</div>
-          <div class="sprint-hint">${!s||!s.started?'Commence à taper : le chrono démarre automatiquement.':errors>0?`<span style="color:var(--danger)">${errors} erreur${errors>1?'s':''}</span> · ${correct} corrects`:`${correct} caractères corrects`}</div>
-          <div style="display:flex;gap:12px;justify-content:center">
-            ${!s?`<button class="btn-primary" onclick="app.startSprint()">Lancer le Sprint ▸</button>`:`<button class="btn-sm btn-dark" onclick="app.startSprint()">↻ Recommencer</button>`}
+          <div class="sprint-text-box" tabindex="0">${textHTML}</div>
+          <div class="sprint-hint">${!s.started?'Commence à taper : le chrono démarre automatiquement.':errors>0?`<span style="color:var(--danger)">${errors} erreur${errors>1?'s':''}</span> · ${correct} corrects`:`${correct} caractères corrects`}</div>
+          <div style="display:flex;gap:12px;justify-content:center;position:relative;z-index:1">
+            <button class="btn-sm btn-dark" onclick="app.startSprint()">↻ Recommencer</button>
           </div>
-          ${best>0?`<p style="text-align:center;font-size:13px;color:var(--muted);margin-top:12px">Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best} mpm</b></p>`:''}
+          ${best>0?`<p style="position:relative;z-index:1;text-align:center;font-size:13px;color:rgba(255,255,255,.5);margin-top:12px">Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best} mpm</b></p>`:''}
         `}
       </div>
     </div>`;
@@ -5508,7 +5747,7 @@ const app={
     if(track==='grid')return this._sourisGridKey(e);
     if(track==='waves')return this._sourisWavesKey(e);
     if(track==='hybrid')return this._sourisHybridKey(e);
-    if(track==='tiles')return this._sourisTilesKey(e);
+    // 'tiles' : écouteurs keydown/keyup dédiés (tenues de touche), rien à faire ici.
     if(track==='duo2')return this._sourisDuo2Key(e);
     // 'mouse' : géré par son propre listener ZQSD, rien à faire ici.
   },
@@ -5542,18 +5781,23 @@ const app={
   _sourisRenderBrief(){
     const s=this.souris, l=this._sourisLevels[s.lvl-1];
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+      <div style="max-width:900px;margin:0 auto;padding:0 24px">
         <button onclick="app.souris={phase:'mouseMenu'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Niveaux</button>
-        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
-          <div style="font-size:52px">${l.icon}</div>
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Niveau ${l.n} — ${l.name}</h2>
-          <div style="background:rgba(255,77,46,.14);border:1px solid rgba(255,77,46,.3);border-radius:12px;padding:9px 16px;font-size:13px;font-weight:700;color:#FF9478">NOUVEAU : ${this._esc(l.newThing)}</div>
-          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">${l.brief}</p>
-          <div style="display:flex;gap:26px;margin-top:4px">
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${l.bronze} · 🥈${l.silver} · 🥇${l.gold}</div></div>
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">${'♥'.repeat(s.lives||3)}</div></div>
+        <div class="game-arena" style="height:auto;padding:0">
+          <div class="gsouris-intro">
+            <div class="gsouris-intro-ring a"></div>
+            <div class="gsouris-intro-ring b"></div>
+            <div class="gsouris-intro-kicker">Précision souris</div>
+            <h2 class="gsouris-intro-title">${this._esc(l.name)}</h2>
+            <p class="gsouris-intro-sub">${l.brief}</p>
+            <div class="gsouris-intro-chips">
+              <div class="gsouris-intro-chip accent">${l.dur||30} secondes</div>
+              <div class="gsouris-intro-chip">${s.lives||3} vies</div>
+              <div class="gsouris-intro-chip">Or à ${l.gold} pts</div>
+            </div>
+            <button class="btn-primary" autofocus onclick="app.startSouris()">Entrer dans la salle ›</button>
+            <div class="gidle-espace">OU APPUIE SUR ESPACE</div>
           </div>
-          <button class="game-play-btn" style="margin-top:8px" onclick="app.startSouris()">Commencer</button>
         </div>
       </div>
     </div>`;
@@ -5588,7 +5832,7 @@ const app={
 
   _sourisRenderArena(){
     const s=this.souris, l=this._sourisLevels[s.lvl-1], cap=this._sourisCaps(s.lvl);
-    const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
+    const lives=[0,1,2].map(i=>`<span class="gsouris-life${i<s.lives?' on':''}"></span>`).join('');
     const sec=Math.ceil((s.tLeft||0)/1000);
     const tpct=Math.max(0,Math.min(100,(s.tLeft||0)/((l.dur||30)*1000)*100));
     const gpct=(v)=>Math.min(100,v/l.gold*100);
@@ -5596,7 +5840,8 @@ const app={
     const tier=this._sourisTier(l,s.score);
     const barCol=tier==='gold'?'#FFD84D':tier==='silver'?'#C0C7D0':tier==='bronze'?'#CD7F44':'var(--accent)';
     const mark=(v,col)=>`<div style="position:absolute;left:${gpct(v)}%;top:-3px;bottom:-3px;width:2px;background:${col}"></div>`;
-    const hint=cap.pads?'Z Q S D pour entrer dans les cercles verts':cap.move&&cap.click?'Z Q S D pour bouger · clique les cibles et leurs cœurs':cap.move?'Z Q S D pour bouger':cap.sort3?'Trie chaque forme dans sa couleur':cap.drag?'Attrape et dépose dans la bonne zone':cap.bonus?'Attrape les bonus… ou reste sur les vertes ?':cap.disguise?'Méfie-toi : certains rouges se déguisent en orange':cap.traps?'Vertes oui, rouges non · vise le cœur':cap.core?'Vise le cœur doré : 3 pts, 5 d’affilée = +1 ♥':cap.click?'Clique les cibles':'Survole les cibles un instant';
+    const hint=cap.pads?'Z Q S D pour entrer dans les cercles verts':cap.move&&cap.click?'Z Q S D pour bouger · clique les cibles et leurs cœurs':cap.move?'Z Q S D pour bouger':cap.sort3?'Trie chaque forme dans sa couleur':cap.drag?'Attrape et dépose dans la bonne zone':cap.bonus?'Attrape les bonus… ou reste sur les vertes ?':cap.disguise?'Méfie-toi : certains rouges se déguisent en orange':cap.traps?'Vertes oui, rouges non · vise le cœur':cap.core?'Vise le cœur doré : 3 pts, 5 d’affilée = +1 ♥':cap.click?'Clique les cibles':'Maintiens la cible';
+    const acc=(s.hit+s.miss)?Math.round(100*s.hit/(s.hit+s.miss)):100;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:auto;padding:16px 20px 20px;display:flex;flex-direction:column;cursor:${cap.click||cap.drag?'crosshair':'default'}">
@@ -5611,12 +5856,21 @@ const app={
             </div>
             <div style="display:flex;align-items:center;gap:12px">
               <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:${sec<=5?'#E5484D':'#fff'};min-width:42px;text-align:right">${sec}s</div>
-              <div style="display:flex;gap:1px">${hearts}</div>
+              <div style="display:flex;gap:4px">${lives}</div>
             </div>
           </div>
           <div style="position:relative;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin:10px 0 10px;overflow:hidden"><div style="height:100%;width:${tpct}%;background:${sec<=5?'#E5484D':'rgba(255,255,255,.4)'};transition:width .05s linear"></div></div>
-          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.55);margin-bottom:8px">${l.name} — ${this._esc(hint)}</div>
+          <div class="gsouris-section"><span>${this._esc(l.name.toUpperCase())} · ${this._esc(hint.toUpperCase())}</span></div>
           <div id="souris-arena" style="position:relative;flex:1;min-height:300px;user-select:none"></div>
+          <div class="gsouris-footer">
+            <div><span class="gsouris-stat-label">PRÉCISION</span><span class="gsouris-stat-val">${acc}%</span></div>
+            <div><span class="gsouris-stat-label">TEMPS DE RÉACTION</span><span class="gsouris-stat-val">${s.lastReaction?s.lastReaction+'ms':'–'}</span></div>
+            <div><span class="gsouris-stat-label">SÉRIE</span><span class="gsouris-stat-val accent">${s.streak||0}</span></div>
+            <div class="gsouris-footer-right">
+              <span class="gsouris-gold-left">${Math.max(0,l.gold-s.score)} PTS DE L'OR</span>
+              <button class="gsouris-replay" onclick="app.startSouris()">↺ Rejouer</button>
+            </div>
+          </div>
         </div>
         <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.stopSouris();app.souris={phase:'mouseMenu'};app.renderSouris()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
@@ -5631,7 +5885,7 @@ const app={
   startSouris(){
     const s=this.souris, l=this._sourisLevels[s.lvl-1];
     this.stopSouris();
-    Object.assign(s,{phase:'play',score:0,lives:3,hit:0,miss:0,t0:Date.now(),targets:[],drag:null,tick:0,streak:0,cores:0,regen:0,hazards:[],tLeft:(l.dur||30)*1000,mult:1,multUntil:0});
+    Object.assign(s,{phase:'play',score:0,lives:3,hit:0,miss:0,t0:Date.now(),targets:[],drag:null,tick:0,streak:0,cores:0,regen:0,hazards:[],tLeft:(l.dur||30)*1000,mult:1,multUntil:0,lastReaction:0});
     const c=this._sourisCaps(s.lvl);
     if(c.move||c.pads){
       s.player={x:50,y:50};
@@ -5670,8 +5924,13 @@ const app={
         if(!s.drag)return;
         const t=s.drag;t.grabbed=false;s.drag=null;
         const z=this._sourisZoneAt(t.x,t.y);
-        if(z===t.color){s.score++;s.hit++;s.targets=s.targets.filter(x=>x!==t);playSound('hit');this._sourisFlash('#1FA971');}
-        else{s.miss++;s.score=Math.max(0,s.score-1);playSound('miss');this._sourisFlash('#E5484D');t.x=t.hx;t.y=t.hy;}
+        if(z===t.color){
+          s.score++;s.hit++;s.streak=(s.streak||0)+1;s.lastReaction=Date.now()-t.born;
+          s.targets=s.targets.filter(x=>x!==t);playSound('hit');this._sourisFlash('#1FA971');
+        } else {
+          s.miss++;s.streak=0;s.score=Math.max(0,s.score-1);
+          playSound('miss');this._sourisFlash('#E5484D');t.x=t.hx;t.y=t.hy;
+        }
       };
     }
   },
@@ -5715,6 +5974,7 @@ const app={
     const core=!!c.core&&this._sourisInCore(t,s.mx,s.my);
     s.score+=(core?3:1)*mult;
     s.hit++;playSound('hit');
+    s.lastReaction=Date.now()-t.born;
     if(core){
       s.streak=(s.streak||0)+1;
       s.cores=(s.cores||0)+1;
@@ -5722,8 +5982,13 @@ const app={
         s.lives++;s.regen=(s.regen||0)+1;
         this._sourisFlash('#FFD84D');this._sourisRegenPop();
       }else this._sourisFlash('#FFD84D');
-    }else{
+    }else if(c.core){
+      // Niveaux à cœur : seul un cœur enchaîne la série, un bord la casse.
       s.streak=0;
+      this._sourisFlash('#1FA971');
+    }else{
+      // Niveaux sans cœur (Clic, etc.) : chaque cible réussie enchaîne.
+      s.streak=(s.streak||0)+1;
       this._sourisFlash('#1FA971');
     }
     s.targets=s.targets.filter(x=>x!==t);
@@ -5736,25 +6001,19 @@ const app={
     return Math.sqrt(dx*dx+dy*dy)<=t.r*frac;
   },
 
+  // Déclaratif (comme _sourisHoverPop) : _sourisPaint() réécrit tout le
+  // canevas à chaque tick, donc un nœud ajouté ici disparaîtrait avant même
+  // sa transition CSS. On stocke l'état, _sourisPaint() dessine la position/
+  // opacité courantes à partir de `until`.
   _sourisPop(txt,color){
-    const a=this._sourisArena;if(!a)return;
-    const d=document.createElement('div');
-    d.textContent=txt;
-    d.style.cssText='position:absolute;left:'+(this.souris.mx||50)+'%;top:'+(this.souris.my||50)+'%;transform:translate(-50%,-50%);color:'+color+';font-family:JetBrains Mono,monospace;font-weight:800;font-size:22px;text-shadow:0 3px 12px rgba(0,0,0,.6);pointer-events:none;z-index:6;transition:all .6s ease-out';
-    a.appendChild(d);
-    setTimeout(()=>{d.style.top=(this.souris.my-12||38)+'%';d.style.opacity='0';},30);
-    setTimeout(()=>{d.remove();},640);
+    const s=this.souris;
+    s.pop={txt,color,x:s.mx||50,y:s.my||50,born:Date.now(),until:Date.now()+640};
   },
 
   // Le cœur : tiers central du rayon (aire ~11% du disque) — il faut vraiment viser.
   _sourisRegenPop(){
-    const a=this._sourisArena;if(!a)return;
-    const d=document.createElement('div');
-    d.textContent='+1 ♥';
-    d.style.cssText='position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);color:#FFD84D;font-family:JetBrains Mono,monospace;font-weight:800;font-size:34px;text-shadow:0 4px 18px rgba(0,0,0,.6);pointer-events:none;z-index:5;transition:all .7s ease-out';
-    a.appendChild(d);
-    setTimeout(()=>{d.style.top='24%';d.style.opacity='0';},30);
-    setTimeout(()=>{d.remove();},760);
+    const s=this.souris;
+    s.regenPop={born:Date.now(),until:Date.now()+760};
   },
 
   _sourisFlash(color){
@@ -5844,6 +6103,12 @@ const app={
       s.targets.push({x,y,r:4.4,born:Date.now(),hover:0,...k});
       return;
     }
+    // Niveau survol : une cible bonus dorée, verrouillage éclair, ×2 pts 5s.
+    if(c.hover&&Math.random()<.1&&!(s.targets||[]).some(t=>t.bonus)){
+      const{x,y}=this._sourisFreeSpot([10,90],[12,88],5.2);
+      s.targets.push({x,y,r:5.2,bonus:'points',color:'#FFD84D',icon:'×2',label:'×2 RAPIDE',born:Date.now(),life:2600,hover:0});
+      return;
+    }
     const bad=!!c.traps&&Math.random()<(c.fast?.34:.3);
     const base=c.fast?rnd(2.6,4.0):rnd(3.4,5.4);
     const r=c.hover?7:base;
@@ -5871,16 +6136,34 @@ const app={
     const rate=c.hover?14:c.pads?26:(c.move?12:10);
     if((s.targets||[]).length<maxT&&s.tick%rate===0)this._sourisSpawn();
 
-    // Niveau survol : rester sur la cible la valide
+    // Niveau survol : rester sur la cible la valide. Le temps de verrouillage
+    // se resserre avec la série (800ms → plancher 400ms) : récompense les
+    // séries en demandant plus de précision de tenue, jamais plus vite que
+    // ce plancher pour rester jouable.
     if(c.hover){
       const t=this._sourisAt(s.mx,s.my);
       (s.targets||[]).forEach(x=>{if(x!==t)x.hover=0;});
       if(t){
+        if(!t._firstHoverAt)t._firstHoverAt=now;
         t.hover+=50;
-        if(t.hover>=800){
-          s.score++;s.hit++;
+        const req=t.bonus?Math.max(200,this._sourisHoverReq(s)/2):this._sourisHoverReq(s);
+        if(t.hover>=req){
           s.targets=s.targets.filter(x=>x!==t);
-          playSound('hit');this._sourisFlash('#1FA971');
+          s.lastReaction=t._firstHoverAt-t.born;
+          if(t.bonus){
+            s.mult=2;s.multUntil=now+5000;s.hit++;
+            playSound('hit');this._sourisFlash('#FFD84D');
+            this._sourisHoverPop('BONUS','×2 · 5s',true);
+          } else {
+            const mult=(s.mult&&now<s.multUntil)?s.mult:1;
+            const core=this._sourisHoverInCore(t,s.mx,s.my);
+            const pts=(core?3:1)*mult;
+            s.score+=pts;s.hit++;
+            if(core)s.cores=(s.cores||0)+1;
+            s.streak=(s.streak||0)+1;
+            playSound('hit');this._sourisFlash(core?'#FFD84D':'#1FA971');
+            this._sourisHoverPop('TOUCHÉ','+'+pts+' · SÉRIE '+s.streak,false);
+          }
           this._sourisCheck();
         }
       }
@@ -5890,12 +6173,13 @@ const app={
     if(c.drag){
       const gone=(s.targets||[]).filter(t=>now-t.born>8000&&t!==s.drag);
       if(gone.length)playSound('miss');
-      gone.forEach(()=>{s.miss++;this._sourisLoseLife();});
+      gone.forEach(()=>{s.miss++;s.streak=0;this._sourisLoseLife();});
       s.targets=(s.targets||[]).filter(t=>!(now-t.born>8000&&t!==s.drag));
     }
-    // Expiration : laisser filer une cible utile coûte une vie
+    // Expiration : laisser filer une cible utile coûte une vie. Une cible
+    // bonus n'est jamais punitive — la rater ne coûte ni vie ni série.
     if(!c.drag){
-      const gone=(s.targets||[]).filter(t=>now-t.born>t.life&&!t.bad);
+      const gone=(s.targets||[]).filter(t=>now-t.born>t.life&&!t.bad&&!t.bonus);
       if(gone.length)playSound('miss');
       gone.forEach(()=>{
         s.miss++;s.streak=0;
@@ -5920,9 +6204,11 @@ const app={
       (s.targets||[]).forEach(t=>{
         const dx=(t.x-p.x)*1.6, dy=t.y-p.y;
         if(Math.sqrt(dx*dx+dy*dy)<t.r){
+          if(!t._enteredAt)t._enteredAt=now;
           t.hover+=50;
           if(t.hover>=400){
-            s.score++;s.hit++;
+            s.score++;s.hit++;s.streak=(s.streak||0)+1;
+            s.lastReaction=t._enteredAt-t.born;
             s.targets=s.targets.filter(x=>x!==t);
             playSound('hit');this._sourisFlash('#1FA971');
             this._sourisCheck();
@@ -5965,7 +6251,28 @@ const app={
       });
     }
 
-    if(s.phase==='play')this._sourisPaint();
+    // Rendu complet (pas juste le canevas des cibles) : le score, le chrono,
+    // la barre de progression et les vies doivent bouger en direct pendant
+    // la partie, pas seulement à l'écran de fin.
+    if(s.phase==='play')this._sourisRenderArena();
+  },
+
+  _sourisHoverReq(s){return Math.max(400,800-(s.streak||0)*40);},
+
+  // Vrai si le curseur est resté dans le petit disque blanc central au
+  // moment du verrouillage : ×3 points, comme le cœur de cible du niveau 3.
+  _sourisHoverInCore(t,x,y){
+    const dx=(t.x-x)*1.6, dy=t.y-y;
+    return Math.sqrt(dx*dx+dy*dy)<=t.r*0.12;
+  },
+
+  // État déclaratif (comme les autres jeux de cette session) : le canevas
+  // est réécrit en entier à chaque tick, donc un nœud DOM ajouté ici serait
+  // effacé au tick suivant. On stocke plutôt le popup dans l'état et
+  // _sourisPaint() le dessine tant que `until` n'est pas dépassé.
+  _sourisHoverPop(title,sub,isBonus){
+    const s=this.souris;
+    s.judge={title,sub,isBonus,x:s.mx||50,y:s.my||50,until:Date.now()+650};
   },
 
   _sourisPaint(){
@@ -5974,6 +6281,13 @@ const app={
     const c=this._sourisCaps(s.lvl);
     const now=Date.now();
     let html='';
+    if(c.hover){
+      html+=`<div class="gsouris-reticle">
+        <div class="gsouris-reticle-dash"></div>
+        <span class="gsouris-chevron up"></span><span class="gsouris-chevron down"></span>
+        <span class="gsouris-chevron left"></span><span class="gsouris-chevron right"></span>
+      </div>`;
+    }
     if(c.drag){
       const zones=c.sort3
         ?[['#1FA971','VERTE',0,33.3],['#3B82F6','BLEUE',33.3,66.6],['#E5722B','ORANGE',66.6,100]]
@@ -5989,7 +6303,7 @@ const app={
       const age=now-t.born;
       if(c.drag){
         const sz=t.r*2;
-        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${t.color};border-radius:${t.shape==='circle'?'50%':'8px'};box-shadow:0 6px 18px rgba(0,0,0,.4)${t.grabbed?';outline:3px solid #fff':''};cursor:${t.grabbed?'grabbing':'grab'}"></div>`;
+        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:linear-gradient(160deg,${t.color},${t.color}cc);border-radius:${t.shape==='circle'?'50%':'8px'};box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),0 6px 18px rgba(0,0,0,.4)${t.grabbed?';outline:3px solid #fff':''};cursor:${t.grabbed?'grabbing':'grab'}"></div>`;
         return;
       }
       if(t.pad){
@@ -6002,17 +6316,48 @@ const app={
         const pulse=0.85+0.15*Math.sin(now/90);
         html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${t.r*2}%;aspect-ratio:1;transform:translate(-50%,-50%) scale(${pulse});border-radius:50%;background:${t.color};box-shadow:0 0 22px ${t.color};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;border:2px solid #fff">${t.icon}</div>`;
         html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${t.r*2.6}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2px solid ${t.color};opacity:${left*.6};pointer-events:none"></div>`;
+        if(t.label)html+=`<div class="gsouris-bonus-label" style="left:${t.x}%;top:${t.y+t.r*1.15}%">${t.label}</div>`;
+        return;
+      }
+      if(c.hover){
+        // Cible "réticule" à cercles concentriques : l'anneau de progression
+        // se remplit (conic-gradient) jusqu'au temps de verrouillage requis,
+        // masqué au centre par le cœur plein pour ne garder que l'anneau.
+        const req=this._sourisHoverReq(s);
+        const pct=Math.min(100,Math.round((t.hover/req)*100));
+        html+=`<div class="gsouris-target" style="left:${t.x}%;top:${t.y}%;width:${t.r*2}%">
+          <div class="gsouris-target-ring"></div>
+          <div class="gsouris-target-prog" style="background:conic-gradient(#fff ${pct}%,transparent 0)"></div>
+          <div class="gsouris-target-core"></div>
+          <div class="gsouris-target-dot"></div>
+          ${t.hover>0?`<div class="gsouris-target-lock">VERROUILLAGE ${(req/1000).toFixed(1)}s</div>`:''}
+        </div>`;
         return;
       }
       const left=Math.max(0,1-age/t.life);
-      const sz=t.r*2*(c.hover?1:(.55+left*.45));
+      const sz=t.r*2*(.55+left*.45);
       const col=t.bad?(t.disguised?'#D98A3D':'#E5484D'):'#1FA971';
+      const grad=t.bad?(t.disguised?'radial-gradient(circle at 35% 30%,#F0BE7E,#D98A3D 70%)':'radial-gradient(circle at 35% 30%,#F28B8B,#E5484D 70%)'):'radial-gradient(circle at 35% 30%,#4EE0A0,#1FA971 70%)';
       const mark=t.bad&&!t.disguised?'✕':'';
-      const ring=c.hover&&t.hover>0?`<div style="position:absolute;inset:-6px;border-radius:50%;border:3px solid #fff;opacity:${t.hover/800}"></div>`:'';
       const frac=c.smaller?0.26:0.30;
       const core=(c.core&&!t.bad)?`<div style="position:absolute;left:50%;top:50%;width:${frac*2*100}%;height:${frac*2*100}%;transform:translate(-50%,-50%);border-radius:50%;background:#FFD84D;box-shadow:0 0 8px #FFD84D"></div>`:'';
-      html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${col};border-radius:50%;box-shadow:0 0 ${t.bad?'20':'16'}px ${col}88;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${mark}${core}${ring}</div>`;
+      html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${grad};border-radius:50%;box-shadow:inset 0 -2px 0 rgba(0,0,0,.15),0 0 ${t.bad?'20':'16'}px ${col}88;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${mark}${core}</div>`;
     });
+    if(c.hover&&s.judge&&s.judge.until>now){
+      const j=s.judge;
+      html+=`<div class="gsouris-judge" style="left:${j.x}%;top:${j.y}%">
+        <div class="gsouris-judge-text">${j.title}</div>
+        <div class="gsouris-judge-pill${j.isBonus?' bonus':''}">${j.sub}</div>
+      </div>`;
+    }
+    if(s.pop&&s.pop.until>now){
+      const p=s.pop, frac=Math.max(0,Math.min(1,(now-p.born)/(p.until-p.born)));
+      html+=`<div style="position:absolute;left:${p.x}%;top:${p.y-frac*12}%;transform:translate(-50%,-50%);color:${p.color};font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;text-shadow:0 3px 12px rgba(0,0,0,.6);opacity:${1-frac};pointer-events:none;z-index:6">${p.txt}</div>`;
+    }
+    if(s.regenPop&&s.regenPop.until>now){
+      const p=s.regenPop, frac=Math.max(0,Math.min(1,(now-p.born)/(p.until-p.born)));
+      html+=`<div style="position:absolute;left:50%;top:${38-frac*14}%;transform:translate(-50%,-50%);color:#FFD84D;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:34px;text-shadow:0 4px 18px rgba(0,0,0,.6);opacity:${1-frac};pointer-events:none;z-index:5">+1 ♥</div>`;
+    }
     if(c.move||c.pads){
       html+=`<div style="position:absolute;left:${s.player.x}%;top:${s.player.y}%;width:5%;aspect-ratio:1;transform:translate(-50%,-50%);background:#fff;border-radius:50%;box-shadow:0 0 14px rgba(255,255,255,.7);opacity:${s._inv?.4:1};display:flex;align-items:center;justify-content:center;font-size:12px">🙂</div>`;
     }
@@ -6020,9 +6365,11 @@ const app={
       html+=`<div style="position:absolute;left:12px;top:10px;background:#3B82F6;color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:14px;font-family:JetBrains Mono,monospace">×${s.mult} ${Math.ceil((s.multUntil-now)/1000)}s</div>`;
     }
     if(c.core&&(s.streak||0)>0){
+      // Le compte de série est déjà affiché dans le pied de partie ; ces
+      // points ne montrent que la progression fine vers le prochain +1 ♥.
       const dots=[0,1,2,3,4].map(i=>`<span style="width:7px;height:7px;border-radius:50%;background:${i<(s.streak%5||5)?'#FFD84D':'rgba(255,255,255,.2)'}"></span>`).join('');
       html+=`<div style="position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);padding:6px 12px;border-radius:20px">
-        <span style="font-size:11px;font-weight:700;color:#FFD84D;letter-spacing:.04em">SÉRIE</span>${dots}
+        ${dots}
         ${s.lives>=3?'<span style="font-size:10px;color:rgba(255,255,255,.45)">vies au max</span>':'<span style="font-size:10px;color:rgba(255,255,255,.6)">5 = +1 ♥</span>'}
       </div>`;
     }
@@ -6632,107 +6979,183 @@ const app={
 
   /* ═══════════════════════════════════════════════════════════════
      VISÉE — MAGIC TILES (piste "tiles")
-     4 couloirs qui défilent en rythme : 2 couloirs clic souris, 2
-     couloirs lettre clavier. Jugement parfait/bien/raté à la ligne de
-     frappe. Le tempo (BPM) monte tous les 10 combos.
+     8 couloirs fixes Q S D F | J K L M (rangée de repos hors pouces).
+     Écouteurs keydown/keyup dédiés (comme la piste "mouse") pour gérer
+     les tuiles longues à tenir, en plus des tuiles courtes à taper.
+     Score × multiplicateur de combo, rang de morceau D→SSS en HUD.
      ═══════════════════════════════════════════════════════════════ */
-  _sourisTilesLanes:[{type:'click'},{type:'click'},{type:'key'},{type:'key'}],
+  _sourisTilesLanes:TILES_LANES,
   _sourisTilesHitLineY:82,
+  _sourisTilesRank(score){
+    let i=0;for(;i<TILES_RANK_SCORE.length-1&&score>=TILES_RANK_SCORE[i+1];i++);
+    const cur=TILES_RANK_SCORE[i],next=TILES_RANK_SCORE[i+1];
+    const pct=next?Math.min(100,Math.round(100*(score-cur)/(next-cur))):100;
+    return {label:TILES_RANKS[i],next:TILES_RANKS[i+1]||null,pct};
+  },
   _sourisTilesBrief(){
+    const best=this.stats&&this.stats.sourisTilesBest;
+    const keysHtml=TILES_LANES.map((l,i)=>`<div class="tiles-intro-key" style="--dim:${TILES_INTRO_KEY_RAMP[i][0]};--bright:${TILES_INTRO_KEY_RAMP[i][1]};animation-delay:${(i*-0.35).toFixed(2)}s">${l.letter}</div>`).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+      <div style="max-width:900px;margin:0 auto;padding:0 24px">
         <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
-        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
-          <div style="color:var(--accent)">${ICONS.layers}</div>
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Magic Tiles</h2>
-          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:440px;margin:0">4 couloirs qui défilent en rythme jusqu'à la ligne : <b>clique</b> les 2 de gauche, <b>tape la lettre</b> des 2 de droite. Le tempo accélère avec ton combo.</p>
-          <div style="display:flex;gap:26px;margin-top:4px">
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${this._sourisTiers.tiles.bronze} · 🥈${this._sourisTiers.tiles.silver} · 🥇${this._sourisTiers.tiles.gold}</div></div>
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">♥♥♥</div></div>
+        <div class="game-arena" style="height:auto;padding:0">
+          <div class="tiles-intro">
+            <div class="tiles-intro-deco l"></div>
+            <div class="tiles-intro-deco r"></div>
+            <h2 class="tiles-intro-title">Magic Tiles</h2>
+            <p class="tiles-intro-sub">Tape la tuile pile sur la ligne. Ne rate aucun temps.${best?'<br><span style="opacity:.7">Record : <b style="color:var(--accent);opacity:1">'+best.score+' pts</b></span>':''}</p>
+            <div class="tiles-intro-keys">${keysHtml}</div>
+            <button class="btn-primary" autofocus onclick="app._sourisTilesStart()">Lancer le morceau ›</button>
+            <div class="gidle-espace">OU APPUIE SUR ESPACE</div>
           </div>
-          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisTilesStart()">Commencer</button>
         </div>
       </div>
     </div>`;
   },
+  _sourisTilesStageIdx(elapsed){
+    let idx=0;for(let i=TILES_STAGES.length-1;i>=0;i--){if(elapsed>=TILES_STAGES[i].t){idx=i;break;}}
+    return idx;
+  },
   _sourisTilesStart(){
     this.stopSouris();
     this.souris={phase:'play',track:'tiles',score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,
-      bpm:100,tiles:[null,null,null,null],spawnAcc:0,sessionLeft:45000};
+      bpm:100,tiles:Array(8).fill(null),spawnAcc:0,sessionLeft:TILES_SESSION_MS,judge:null,
+      stageIdx:0,banner:{text:TILES_STAGES[0].label,kind:'stage',until:Date.now()+2200},
+      intenseActive:false,intenseLostLife:false};
+    this._sourisKeys={};TILES_LANES.forEach(l=>this._sourisKeys[l.letter]=false);
+    this._sourisKeyH=(e)=>{
+      const k=(e.key||'').toLowerCase();
+      if(!(k in this._sourisKeys)||this._sourisKeys[k])return; // touche déjà tenue : ignore la répétition auto
+      this._sourisKeys[k]=true;
+      e.preventDefault();
+      this._sourisTilesPress(k);
+      this.renderSouris();
+    };
+    this._sourisKeyUpH=(e)=>{
+      const k=(e.key||'').toLowerCase();
+      if(!(k in this._sourisKeys))return;
+      this._sourisKeys[k]=false;
+      this._sourisTilesRelease(k);
+      this.renderSouris();
+    };
+    window.addEventListener('keydown',this._sourisKeyH);
+    window.addEventListener('keyup',this._sourisKeyUpH);
     this.renderSouris();
     this._sourisLoop=setInterval(()=>this._sourisTilesTick(),50);
   },
-  _sourisTilesJudge(t){
+  _sourisTilesJudgeDist(t){
     const dist=Math.abs(t.y-this._sourisTilesHitLineY);
     if(dist<=6)return'perfect';
     if(dist<=16)return'good';
     return'bad';
   },
-  _sourisTilesPopJudge(laneIdx,j){
-    const a=document.getElementById('souris-arena');if(!a)return;
-    const label=j==='perfect'?'PARFAIT':'BIEN';
-    const col=j==='perfect'?'#FFD84D':'#1FA971';
-    const d=document.createElement('div');
-    d.textContent=label;
-    d.style.cssText=`position:absolute;left:${(laneIdx+0.5)*25}%;top:${this._sourisTilesHitLineY}%;transform:translate(-50%,-50%);color:${col};font-family:'JetBrains Mono',monospace;font-weight:800;font-size:14px;pointer-events:none;z-index:6;transition:all .5s ease-out`;
-    a.appendChild(d);
-    setTimeout(()=>{d.style.top=(this._sourisTilesHitLineY-12)+'%';d.style.opacity='0';},20);
-    setTimeout(()=>{d.remove();},520);
+  _sourisTilesMiss(){
+    const s=this.souris;
+    s.misses++;s.combo=0;s.lives--;
+    playSound('miss');this._flashArena('#E5484D');
+    s.judge={text:'RATÉ',pts:null,multi:null,kind:'bad',until:Date.now()+550};
+    if(s.intenseActive)s.intenseLostLife=true;
+    if(s.lives<=0){this._sourisTilesEnd();return true;}
+    return false;
   },
-  _sourisTilesResolve(laneIdx){
-    const s=this.souris;if(!s||s.phase!=='play')return;
-    const t=s.tiles[laneIdx];
-    if(!t)return;
-    const j=this._sourisTilesJudge(t);
-    s.tiles[laneIdx]=null;
+  _sourisTilesApply(j){
+    const s=this.souris;
     if(j==='bad'){
-      s.misses++;s.combo=0;s.lives--;
-      playSound('miss');this._flashArena('#E5484D');
-      if(s.lives<=0){this._sourisTilesEnd();return;}
+      if(this._sourisTilesMiss())return;
     } else {
-      const pts=j==='perfect'?3:1;
+      const multi=1+Math.min(3,Math.floor(s.combo/10));
+      const pts=(j==='perfect'?3:1)*multi;
       s.score+=pts;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
       if(s.combo>0&&s.combo%10===0)s.bpm=Math.min(170,s.bpm+10);
       playSound('hit');this._flashArena(j==='perfect'?'#FFD84D':'#1FA971');
-      this._sourisTilesPopJudge(laneIdx,j);
+      s.judge={text:j==='perfect'?'PARFAIT':'BIEN',pts,multi,kind:'good',until:Date.now()+550};
     }
     this.renderSouris();
   },
-  _sourisTilesKey(e){
-    const k=(e._composedKey||e.key||'').toLowerCase();
-    if(k.length!==1)return;
-    const s=this.souris;
-    const laneIdx=s.tiles.findIndex((t,i)=>t&&this._sourisTilesLanes[i].type==='key'&&t.letter===k);
-    if(laneIdx<0)return;
-    e.preventDefault();
-    this._sourisTilesResolve(laneIdx);
+  _sourisTilesPress(k){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    const laneIdx=TILES_LANES.findIndex(l=>l.letter===k);
+    const t=s.tiles[laneIdx];
+    if(!t||t.holding)return;
+    if(t.bonus){
+      s.tiles[laneIdx]=null;
+      s.lives=Math.min(3,s.lives+1);s.score+=15;
+      playSound('life');this._flashArena('#FFD84D');
+      s.judge={text:'+1 VIE',pts:15,multi:null,kind:'bonus',until:Date.now()+650};
+      return;
+    }
+    if(t.long){
+      if(t.y<this._sourisTilesHitLineY-16)return; // trop tôt : pas de pénalité, on peut réessayer
+      t.holding=true;t.holdStart=Date.now();
+      return;
+    }
+    s.tiles[laneIdx]=null;
+    this._sourisTilesApply(this._sourisTilesJudgeDist(t));
+  },
+  _sourisTilesRelease(k){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    const laneIdx=TILES_LANES.findIndex(l=>l.letter===k);
+    const t=s.tiles[laneIdx];
+    if(!t||!t.holding)return;
+    const held=Date.now()-t.holdStart;
+    s.tiles[laneIdx]=null;
+    this._sourisTilesApply(held>=t.holdDur?'perfect':'bad');
   },
   _sourisTilesTick(){
     const s=this.souris;if(!s||s.phase!=='play')return;
     s.sessionLeft-=50;
     if(s.sessionLeft<=0){this._sourisTilesEnd();return;}
     const now=Date.now();
-    for(let i=0;i<4;i++){
+    const elapsed=TILES_SESSION_MS-s.sessionLeft;
+    // palier de difficulté : de plus en plus de couloirs actifs
+    const idx=this._sourisTilesStageIdx(elapsed);
+    if(idx>s.stageIdx){
+      s.stageIdx=idx;
+      s.banner={text:TILES_STAGES[idx].label,kind:'stage',until:now+2200};
+      playSound('levelup');
+    }
+    // passage intense : une fenêtre par palier ≥1, tempo accéléré
+    const intenseStart=s.stageIdx>=1?TILES_STAGES[s.stageIdx].t+6000:-1;
+    const intenseEnd=intenseStart+3500;
+    const wasIntense=s.intenseActive;
+    s.intenseActive=intenseStart>=0&&elapsed>=intenseStart&&elapsed<intenseEnd;
+    if(s.intenseActive&&!wasIntense){s.banner={text:'PASSAGE INTENSE !',kind:'intense',until:now+1800};s.intenseLostLife=false;}
+    if(wasIntense&&!s.intenseActive&&!s.intenseLostLife){s.score+=20;s.banner={text:'SECTION RÉUSSIE · +20',kind:'success',until:now+1800};playSound('record');}
+    for(let i=0;i<8;i++){
       const t=s.tiles[i];if(!t)continue;
+      if(t.holding){
+        if(now-t.holdStart>=t.holdDur){s.tiles[i]=null;this._sourisTilesApply('perfect');}
+        continue;
+      }
       t.y=(now-t.born)/t.dur*100;
-      if(t.y>=100){
-        s.tiles[i]=null;s.misses++;s.combo=0;s.lives--;
-        playSound('miss');this._flashArena('#E5484D');
-        if(s.lives<=0){this._sourisTilesEnd();return;}
+      const missAt=t.long?this._sourisTilesHitLineY+16:100;
+      if(t.y>=missAt){
+        s.tiles[i]=null;
+        if(t.bonus)continue; // bonus optionnelle : aucune pénalité si ratée
+        if(this._sourisTilesMiss())return;
       }
     }
     if(s.phase!=='play')return;
     s.spawnAcc+=50;
-    const interval=60000/s.bpm;
+    const effBpm=s.bpm*(s.intenseActive?1.35:1);
+    const interval=60000/effBpm;
     if(s.spawnAcc>=interval){
       s.spawnAcc=0;
-      const free=[0,1,2,3].filter(i=>!s.tiles[i]);
-      if(free.length){
-        const i=free[Math.floor(Math.random()*free.length)];
-        const dur=Math.max(900,60000/s.bpm*4);
-        const pool=this._sourisLetterPool();
-        const letter=this._sourisTilesLanes[i].type==='key'?pool[Math.floor(Math.random()*pool.length)]:null;
-        s.tiles[i]={y:0,born:now,dur,letter};
+      const activeLanes=TILES_STAGES[s.stageIdx].lanes;
+      const inactiveFree=[0,1,2,3,4,5,6,7].filter(i=>!activeLanes.includes(i)&&!s.tiles[i]);
+      const wantBonus=s.lives<3&&inactiveFree.length&&Math.random()<0.16;
+      if(wantBonus){
+        const i=inactiveFree[Math.floor(Math.random()*inactiveFree.length)];
+        const dur=Math.max(1300,60000/effBpm*5);
+        s.tiles[i]={y:0,born:now,dur,letter:TILES_LANES[i].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:true};
+      } else {
+        const free=activeLanes.filter(i=>!s.tiles[i]);
+        if(free.length){
+          const i=free[Math.floor(Math.random()*free.length)];
+          const dur=Math.max(900,60000/effBpm*4);
+          const long=Math.random()<0.18;
+          s.tiles[i]={y:0,born:now,dur,letter:TILES_LANES[i].letter,long,holding:false,holdStart:0,holdDur:500+Math.random()*300,bonus:false};
+        }
       }
     }
     this.renderSouris();
@@ -6754,29 +7177,59 @@ const app={
   },
   _sourisTilesArena(){
     const s=this.souris;
-    const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
-    const lanesHtml=this._sourisTilesLanes.map((lane,i)=>{
+    const rank=this._sourisTilesRank(s.score);
+    const hasLong=s.tiles.some(t=>t&&t.long&&!t.holding);
+    const activeLanes=TILES_STAGES[s.stageIdx].lanes;
+    const lanesHtml=TILES_LANES.map((lane,i)=>{
       const t=s.tiles[i];
-      const grad=lane.type==='click'?'linear-gradient(160deg,#FF7A5C,#FF4D2E)':'linear-gradient(160deg,#3DC98A,#1FA971)';
-      const tileHtml=t?`<div style="position:absolute;left:6%;right:6%;top:${t.y}%;height:34px;transform:translateY(-50%);border-radius:9px;background:${grad};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:15px;box-shadow:0 4px 12px rgba(0,0,0,.35)">${lane.type==='click'?ICONS.mouse:t.letter}</div>`:'';
-      return `<div onclick="${lane.type==='click'?'app._sourisTilesResolve('+i+')':''}" style="position:relative;flex:1;border-left:${i>0?'1.5px dashed rgba(255,255,255,.1)':'none'};cursor:${lane.type==='click'?'pointer':'default'}">${tileHtml}</div>`;
+      let tileHtml='';
+      if(t){
+        const h=t.long?64:(t.bonus?38:34);
+        const y=t.holding?this._sourisTilesHitLineY:t.y;
+        const bg=t.bonus?'':`background:${TILES_HAND_GRADIENT[lane.hand]};`;
+        tileHtml=`<div class="tiles-tile${t.holding?' holding':''}${t.bonus?' bonus':''}" style="top:${y}%;height:${h}px;transform:translateY(-50%);${bg}">${t.bonus?'♥':lane.letter}</div>`;
+      }
+      return `<div class="tiles-lane">${tileHtml}</div>`;
+    }).join('');
+    const judge=s.judge&&s.judge.until>Date.now()?s.judge:null;
+    const judgeHtml=judge?`<div class="tiles-judge">
+      <div class="tiles-judge-text">${judge.text}</div>
+      ${judge.pts?`<div class="tiles-judge-pill" style="background:${judge.kind==='bonus'?'rgba(255,216,77,.9)':'rgba(255,77,46,.85)'};color:${judge.kind==='bonus'?'#16140F':'#fff'}">+${judge.pts}${judge.multi>1?` · MULTI ×${judge.multi}`:''}</div>`:''}
+    </div>`:'';
+    const banner=s.banner&&s.banner.until>Date.now()?s.banner:null;
+    const bannerHtml=banner?`<div class="tiles-banner ${banner.kind}">${banner.text}</div>`:'';
+    const keysHtml=TILES_LANES.map((l,i)=>{
+      const locked=!activeLanes.includes(i);
+      const pressed=this._sourisKeys&&this._sourisKeys[l.letter];
+      return `<div class="tiles-key${locked?' locked':''}${pressed?' pressed':''}">${l.letter}</div>`;
     }).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:640px;margin:0 auto;padding:0 24px">
-        <div class="game-arena" style="height:auto;padding:16px 20px 20px;display:flex;flex-direction:column">
-          <div class="game-hud">
-            <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
-            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.5)">${s.bpm} BPM${s.combo>1?' · ×'+s.combo:''}</div>
-            <div style="display:flex;gap:1px">${hearts}</div>
-          </div>
-          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin:6px 0 10px">Agis quand la tuile touche la ligne</div>
-          <div id="souris-arena" style="flex:1;min-height:300px;display:flex;position:relative;overflow:hidden">
-            ${lanesHtml}
-            <div style="position:absolute;left:0;right:0;top:${this._sourisTilesHitLineY}%;height:2px;background:rgba(255,255,255,.4)"></div>
-            <div style="position:absolute;left:0;right:0;bottom:10px;display:flex;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-align:center">
-              <div style="flex:1">CLIC</div><div style="flex:1">CLIC</div><div style="flex:1">LETTRE</div><div style="flex:1">LETTRE</div>
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <div class="game-arena" style="padding:16px 20px 20px;display:flex;flex-direction:column">
+          <div class="tiles-hud">
+            <div><div class="tiles-hud-label">SCORE</div><div class="tiles-hud-val">${s.score}</div></div>
+            <div class="tiles-rank">
+              <div class="tiles-hud-label">RANG DU MORCEAU</div>
+              <div class="tiles-rank-row">
+                <span class="tiles-rank-cur">${rank.label}</span>
+                <div class="tiles-rank-bar"><div class="tiles-rank-bar-fill" style="width:${rank.pct}%"></div></div>
+                <span class="tiles-rank-next">${rank.next||'MAX'}</span>
+              </div>
             </div>
+            <div style="text-align:right"><div class="tiles-hud-label">COMBO</div><div class="tiles-hud-val sec">${s.combo}<span style="font-size:14px"> ✱</span></div></div>
           </div>
+          <div class="tiles-meta">
+            <div class="tiles-bpm${s.intenseActive?' hot':''}">${Math.round(s.bpm*(s.intenseActive?1.35:1))} BPM${s.intenseActive?' · INTENSE':''}</div>
+            <div class="tiles-hearts">${[0,1,2].map(i=>`<span style="color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('')}</div>
+          </div>
+          <div class="tiles-board">
+            ${lanesHtml}
+            <div class="tiles-hitline" style="top:${this._sourisTilesHitLineY}%"></div>
+            ${bannerHtml}
+            ${judgeHtml}
+          </div>
+          <div class="tiles-keys">${keysHtml}</div>
+          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin-top:10px">${hasLong?'TUILE LONGUE · MAINTIENS LA TOUCHE':'Frappe la lettre avant la ligne'}</div>
         </div>
         <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
@@ -7179,25 +7632,21 @@ const app={
   selectGame(which){
     if(which==='sprint'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sprint'));return;}
-      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='sprint';this.sprint=null;this.renderGames();
     } else if(which==='tireur'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('tireur'));return;}
       this.activeGame='tireur';this.tireur=null;this.renderGames();
     } else if(which==='course'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('course'));return;}
-      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='course';this.course=null;this.renderGames();
     } else if(which==='ghost'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('ghost'));return;}
-      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='ghost';this.ghost=null;this.renderGames();
     } else if(which==='simon'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('simon'));return;}
       this.activeGame='simon';this.simon=null;this.renderGames();
     } else if(which==='boss'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('boss'));return;}
-      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='boss';this.boss=null;this.startBossLoop();this.bossLoad();
     } else if(which==='duel'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('duel'));return;}
@@ -7213,9 +7662,11 @@ const app={
       this.activeGame='sourisGrid';this.souris={phase:'brief',track:'grid'};this.renderGames();
     } else if(which==='sourisWaves'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisWaves'));return;}
+      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='sourisWaves';this.souris={phase:'brief',track:'waves'};this.renderGames();
     } else if(which==='sourisHybrid'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisHybrid'));return;}
+      if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
       this.activeGame='sourisHybrid';this.souris={phase:'brief',track:'hybrid'};this.renderGames();
     } else if(which==='sourisTiles'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisTiles'));return;}
@@ -7261,8 +7712,8 @@ const app={
     const elapsed=g&&g.startTime?Math.round((Date.now()-g.startTime)/1000):0;
     const elapsedStr=elapsed>=60?`${Math.floor(elapsed/60)}m${elapsed%60}s`:`${elapsed}s`;
     const tierHistHTML=(g&&g.tierHistory&&g.tierHistory.length)?g.tierHistory.map(t=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:rgba(255,255,255,0.06);border-radius:8px;gap:16px"><span style="font-size:13px;font-weight:700;color:var(--accent)">${t.label}</span><span style="font-size:12px;color:rgba(255,255,255,0.4)">${t.score} pts</span></div>`).join(''):'';
-    const tierExtra=`<div style="background:rgba(0,0,0,.04);border-radius:10px;padding:10px;text-align:center;margin-bottom:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:2px">PALIER ATTEINT</div><div style="font-size:18px;font-weight:700;color:var(--accent)">${tier.label}</div></div>`
-      +(tierHistHTML?`<div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Paliers franchis</div>${tierHistHTML.replace(/rgba\(255,255,255,0\.06\)/g,'var(--light)').replace(/rgba\(255,255,255,0\.4\)/g,'var(--muted)')}</div>`:'');
+    const tierExtra=`<div style="background:rgba(255,255,255,.06);border-radius:10px;padding:10px;text-align:center;margin-bottom:8px"><div style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:2px">PALIER ATTEINT</div><div style="font-size:18px;font-weight:700;color:var(--accent)">${tier.label}</div></div>`
+      +(tierHistHTML?`<div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Paliers franchis</div>${tierHistHTML}</div>`:'');
     const isRecord=!!(g&&g._isRecord);
     const gameOverOverlay=`<div class="game-overlay">${this._gameResult({
       title:isRecord?'Nouveau record !':'Fin de partie',
@@ -7282,9 +7733,10 @@ const app={
       sub:i===0?'départ':t.score+' pts',
       state:i<bestTierIdx?'done':i===bestTierIdx?'current':'locked',
     }));
-    const idleOverlay=`<div class="game-overlay"><h2>Frappe-mots</h2><p style="margin-bottom:6px">Mots qui tombent, doigts qui dansent.<br>Meilleur : <b style="color:#fff">${best} pts</b></p>
+    const idleOverlay=`<div class="game-overlay"><h2 class="gidle-title">Frappe-mots<span class="dot"> .</span></h2><p style="margin-bottom:6px">Mots qui tombent, doigts qui dansent.<br>Meilleur : <b style="color:#fff">${best} pts</b></p>
       ${this._tierRoadmap(roadmapItems)}
-      <button class="game-play-btn" onclick="app.startGame()" style="margin-top:4px">Jouer ▸</button></div>`;
+      <button class="game-play-btn" autofocus onclick="app.startGame()" style="margin-top:4px">Jouer ▸</button>
+      <div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`;
     const guestOverlay=`<div class="game-overlay"><h2>Frappe-mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
     // Countdown/tierBanner are body-injected : no overlay needed here
     const overlay=!currentUser?guestOverlay:gameIdle?idleOverlay:gameOver?gameOverOverlay:'';
@@ -7425,16 +7877,17 @@ const app={
         {label:'Mots moyens',sub:'cibles 7-13',state:'upcoming'},
         {label:'Mots difficiles',sub:'cibles 14-20',state:'upcoming'},
       ]);
-      overlay=`<div class="game-overlay"><h2>Tireur d'élite</h2><p style="margin-bottom:6px">Tape chaque mot sans la moindre faute.<br>Une erreur = cible ratée.${best?'<br>Record : <b style="color:#fff">'+best.precision+'% de précision</b>':''}</p>
+      overlay=`<div class="game-overlay"><h2 class="gidle-title">Tireur d'élite<span class="dot"> .</span></h2><p style="margin-bottom:6px">Tape chaque mot sans la moindre faute.<br>Une erreur = cible ratée.${best?'<br>Record : <b style="color:#fff">'+best.precision+'% de précision</b>':''}</p>
         ${tireurRoadmap}
-        <button class="game-play-btn" onclick="app.startTireur()" style="margin-top:4px">Jouer ▸</button></div>`;
+        <button class="game-play-btn" autofocus onclick="app.startTireur()" style="margin-top:4px">Jouer ▸</button>
+        <div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`;
     } else if(over){
       const prec=t._precision,wpm=t._wpm;
       const badge=prec>=90?"Tireur d'élite !":prec>=70?'Belle précision !':prec>=50?'Continue !':'Vise mieux !';
       const uniqMissed=[...new Set(t.missed)];
       const topKeys=Object.keys(t.errKeys).sort((a,b)=>t.errKeys[b]-t.errKeys[a]).slice(0,5);
       const extraHtml=(uniqMissed.length?`<div style="text-align:center;margin-bottom:12px"><div style="color:var(--muted);font-size:12px;font-weight:700;margin-bottom:6px;letter-spacing:.04em">MOTS RATÉS</div><div class="tireur-chips">${uniqMissed.slice(0,12).map(w=>`<span class="tireur-chip">${w}</span>`).join('')}</div></div>`:'<p style="color:var(--success);font-weight:700;text-align:center">Sans faute !</p>')
-        +(topKeys.length?`<div style="color:var(--muted);font-size:12px;text-align:center">Touches à surveiller : ${topKeys.map(k=>`<b style="color:var(--txt)">${k===' '?'espace':k}</b>`).join(' · ')}</div>`:'');
+        +(topKeys.length?`<div style="color:var(--muted);font-size:12px;text-align:center">Touches à surveiller : ${topKeys.map(k=>`<b style="color:#fff">${k===' '?'espace':k}</b>`).join(' · ')}</div>`:'');
       overlay=`<div class="game-overlay">${this._gameResult({
         title:badge,
         record:t._isRecord?'Nouveau record de précision !':null,
@@ -7464,15 +7917,23 @@ const app={
   },
 
   /* ── COURSE DE DACTYLO ── */
+  // Vitesse des bots calée sur le record du joueur (au lieu de 30/50/72 mpm
+  // fixes) : un débutant a une vraie chance, un joueur avancé garde un défi.
+  // Sans record encore, on garde les valeurs d'origine pour la 1ʳᵉ course.
+  _courseAdaptiveBots(){
+    const best=this.stats&&this.stats.courseBest&&this.stats.courseBest.wpm;
+    if(!best)return COURSE_BOTS;
+    const scale=[0.55,0.85,1.2],floor=[16,26,38];
+    return COURSE_BOTS.map((b,i)=>({...b,wpm:Math.round(Math.max(floor[i],best*scale[i]))}));
+  },
   startCourse(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startCourse());return;}
-    if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
     this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();
     this.activeGame='course';this._courseRec=false;
     const text=RACE_TEXTS[Math.floor(Math.random()*RACE_TEXTS.length)];
     this.course={on:true,over:false,text,typed:[],correct:0,keystrokes:0,
       raceStarted:false,startAt:Date.now()+3000,startTime:0,endTime:0,finished:false,
-      bots:COURSE_BOTS.map(b=>({...b,prog:0,finished:false,finishTime:0,_jit:0.85+Math.random()*0.3})),rank:0};
+      bots:this._courseAdaptiveBots().map(b=>({...b,prog:0,finished:false,finishTime:0,_jit:0.85+Math.random()*0.3,_ahead:null})),rank:0};
     this.renderCurrent();
     this._courseLoop=setInterval(()=>this.courseTick(),100);
   },
@@ -7488,7 +7949,19 @@ const app={
       if(b.finished)return;
       const frac=(b.wpm*5/600)/c.text.length*b._jit; // fraction de texte par 100 ms
       b.prog=Math.min(1,b.prog+frac);
-      if(b.prog>=1){b.finished=true;b.finishTime=now-c.startTime;}
+      if(b.prog>=1){b.finished=true;b.finishTime=now-c.startTime;b._flashUntil=now+700;}
+    });
+    // Dépassement franchi ce tick (dans un sens ou l'autre) : son + toast.
+    // b._ahead mémorise l'état précédent pour détecter le franchissement,
+    // que ce soit le bot qui avance ou le joueur qui vient de taper juste.
+    const playerProg=this._courseCorrectPrefix()/c.text.length;
+    c.bots.forEach(b=>{
+      const ahead=playerProg>b.prog;
+      if(b._ahead!=null&&b._ahead!==ahead){
+        playSound(ahead?'hit':'miss');
+        c._toast={text:ahead?`Tu dépasses ${b.name} !`:`${b.name} te dépasse !`,pos:ahead,until:Date.now()+1400};
+      }
+      b._ahead=ahead;
     });
     this.renderCurrent();
   },
@@ -7503,10 +7976,12 @@ const app={
     if(i>=c.text.length)return;
     c.keystrokes++;
     if(k===c.text[i])c.correct++;
+    else c._shakeUntil=Date.now()+300; // faute : petit tremblement de la boîte de texte
     c.typed.push(k);
     if(c.typed.length===c.text.length&&this._courseCorrectPrefix()===c.text.length){
       c.finished=true;c.endTime=Date.now();c.on=false;c.over=true;
       c.rank=1+c.bots.filter(b=>b.finished).length;
+      c._playerFlashUntil=Date.now()+700;
       this.stopCourse();this.afterCourse();
     }
     this.renderCurrent();
@@ -7535,25 +8010,31 @@ const app={
     const liveWpm=c&&c.raceStarted?Math.round((prefix/5)/elapsedMin):0;
     const liveAcc=c&&c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     // pistes
-    const lanes=c?[{name:'Toi',emoji:'🏎️',prog:playerProg,color:'var(--accent)',you:true},...c.bots]:[];
-    const lanesHTML=this._raceLanesHTML(lanes);
+    const lanes=c?[{name:'Toi',emoji:'🏎️',prog:playerProg,color:'var(--accent)',you:true,finishFlash:!!(c._playerFlashUntil&&c._playerFlashUntil>Date.now())},...c.bots.map(b=>({...b,finishFlash:!!(b._flashUntil&&b._flashUntil>Date.now())}))]:[];
+    const lanesHTML=this._courseLanesHTML(lanes);
     // texte
     let textHTML='';
     if(c){
-      let word=[];const flushWord=()=>{if(word.length){textHTML+='<span class="race-word">'+word.join('')+'</span>';word=[];}};
+      let word=[];const flushWord=()=>{if(word.length){textHTML+='<span class="course-word">'+word.join('')+'</span>';word=[];}};
       c.text.split('').forEach((ch,i)=>{
-        let cls='sprint-todo';
-        if(i<c.typed.length)cls=c.typed[i]===ch?'sprint-ok':'sprint-wrong';
-        else if(i===c.typed.length)cls='sprint-cur';
-        if(ch===' '){flushWord();textHTML+=`<span class="${cls} race-space"> </span>`;}
+        let cls='course-todo';
+        if(i<c.typed.length)cls=c.typed[i]===ch?'course-ok':'course-wrong';
+        else if(i===c.typed.length)cls='course-cur';
+        // Étincelle sur le dernier caractère juste validé : la classe est
+        // réinsérée à chaque rendu, donc son animation CSS se relance seule.
+        if(cls==='course-ok'&&i===c.typed.length-1)cls+=' spark';
+        if(ch===' '){flushWord();textHTML+=`<span class="${cls} course-space"> </span>`;}
         else word.push(`<span class="${cls}">${ch}</span>`);
       });flushWord();
     }
+    const toastHTML=(c&&c._toast&&c._toast.until>Date.now())?`<div class="course-toast ${c._toast.pos?'pos':'neg'}">${c._toast.text}</div>`:'';
+    const shaking=!!(c&&c._shakeUntil&&c._shakeUntil>Date.now());
     let overlay='';
     if(IS_TOUCH_ONLY()&&idle){
-      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>La Course de dactylo se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+      overlay=`<div class="course-overlay"><h2>⌨️ Clavier requis</h2><p>La Course de dactylo se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
     } else if(c&&!c.raceStarted){
-      overlay=`<div class="race-overlay">${this._raceCountdownHTML(c.startAt)}</div>`;
+      const cd=Math.max(0,Math.ceil((c.startAt-Date.now())/1000));
+      overlay=`<div class="course-overlay"><div class="course-count">${cd>0?cd:'GO !'}</div><p>Prépare tes doigts…</p></div>`;
     }
     const result=over?this._gameResult({
       icon:c.rank===1?'🥇':c.rank===2?'🥈':c.rank===3?'🥉':'🏁',
@@ -7568,17 +8049,18 @@ const app={
       primaryLabel:'Rejouer',primaryOnClick:'app.startCourse()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Course de dactylo',ICONS.raceCar,'expert')}
-      <div class="sprint-arena" style="position:relative">
-        ${idle&&!IS_TOUCH_ONLY()?`<div class="sprint-result"><h2 style="margin-bottom:12px">Prêt à courir ?</h2><p style="color:var(--muted);font-size:15px;margin-bottom:20px">Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary" onclick="app.startCourse()">Lancer la course ▸</button></div>`:''}
+      ${this._gameHeader('Course de dactylo',ICONS.raceCar,'free')}
+      <div class="course-arena">
+        ${idle&&!IS_TOUCH_ONLY()?`<div class="course-idle"><h2>Course de dactylo<span class="dot"> .</span></h2><p>Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary course-cta" autofocus onclick="app.startCourse()">Lancer la course ▸</button><div class="course-espace">OU APPUIE SUR ESPACE</div></div>`:''}
         ${c?`
-          <div class="sprint-hud">
-            <div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:var(--muted);font-weight:500"> mpm</span></div></div>
-            <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">PRÉCISION</div><div class="sprint-score-val" style="color:var(--txt)">${liveAcc}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div></div>
+          <div class="course-hud">
+            <div><div class="course-stat-label">VITESSE</div><div class="course-stat-val">${liveWpm}<span class="course-stat-unit"> mpm</span></div></div>
+            <div style="text-align:right"><div class="course-stat-label">PRÉCISION</div><div class="course-stat-val sec">${liveAcc}<span class="course-stat-unit"> %</span></div></div>
           </div>
+          ${toastHTML}
           ${lanesHTML}
-          ${over?'':`<div class="race-text-box">${textHTML}</div>`}
-          ${over?'':`<div class="sprint-hint">${c.raceStarted?'Corrige tes fautes (retour arrière) pour continuer à avancer.':'La course démarre dans un instant…'}</div>`}
+          ${over?'':`<div class="course-textbox${shaking?' shake':''}">${textHTML}</div>`}
+          ${over?'':`<div class="course-hint"><span>${c.raceStarted?'Corrige tes fautes (retour arrière) pour continuer à avancer.':'La course démarre dans un instant…'}</span><button class="course-restart" onclick="app.startCourse()">↺ Rejouer</button></div>`}
           ${result}
           ${overlay}
         `:''}
@@ -7596,7 +8078,6 @@ const app={
      sur exactement le même texte. */
   startGhost(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startGhost());return;}
-    if(getUserPlan()!=='expert'){openModal('upgrade-modal');return;}
     this.stopGame();this.stopSprint();this.stopTireur();this.stopCourse();this.stopGhost();
     this.activeGame='ghost';
     this.ghost={on:true,over:false,text:GHOST_TEXT,typed:[],correct:0,keystrokes:0,
@@ -7680,11 +8161,13 @@ const app={
     const liveAcc=c&&c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     const ghostElapsed=c&&c.raceStarted?Date.now()-c.startTime:0;
     const ghostProg=c&&best?(c.ghostFinished?1:this._ghostProgAt(best.timeline,ghostElapsed)):0;
+    // Mêmes capsules à traînée que Course de dactylo (_courseLanesHTML),
+    // toujours 2 pistes ici : toi et ton fantôme.
     const lanes=c?[
-      {name:'Toi',emoji:'🏎️',prog:playerProg,you:true},
-      ...(best?[{name:'Ton fantôme',emoji:'👻',prog:ghostProg,namePrefix:false}]:[]),
+      {name:'Toi',prog:playerProg,you:true},
+      ...(best?[{name:'Ton fantôme',prog:ghostProg}]:[]),
     ]:[];
-    const lanesHTML=this._raceLanesHTML(lanes);
+    const lanesHTML=this._courseLanesHTML(lanes);
     let textHTML='';
     if(c){
       let word=[];const flushWord=()=>{if(word.length){textHTML+='<span class="race-word">'+word.join('')+'</span>';word=[];}};
@@ -7714,13 +8197,13 @@ const app={
       primaryLabel:'Rejouer',primaryOnClick:'app.startGhost()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Contre ton fantôme',ICONS.ghost,'expert')}
+      ${this._gameHeader('Contre ton fantôme',ICONS.ghost,'free')}
       <div class="sprint-arena" style="position:relative">
-        ${idle&&!IS_TOUCH_ONLY()?`<div class="sprint-result"><h2 style="margin-bottom:12px">Prêt à courir ?</h2><p style="color:var(--muted);font-size:15px;margin-bottom:20px">${best?'Bats ton meilleur temps sur ce texte : ton fantôme court à ton propre rythme précédent.':'Ta toute première course sur ce texte : elle enregistrera ton fantôme pour la prochaine fois.'}${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary" onclick="app.startGhost()">Lancer la course ▸</button></div>`:''}
+        ${idle&&!IS_TOUCH_ONLY()?`<div class="gidle"><h2 class="gidle-title">Contre ton fantôme<span class="dot"> .</span></h2><p>${best?'Bats ton meilleur temps sur ce texte : ton fantôme court à ton propre rythme précédent.':'Ta toute première course sur ce texte : elle enregistrera ton fantôme pour la prochaine fois.'}${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary" autofocus onclick="app.startGhost()">Lancer la course ▸</button><div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`:''}
         ${c?`
           <div class="sprint-hud">
-            <div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:var(--muted);font-weight:500"> mpm</span></div></div>
-            <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px">PRÉCISION</div><div class="sprint-score-val" style="color:var(--txt)">${liveAcc}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div></div>
+            <div><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> mpm</span></div></div>
+            <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px">PRÉCISION</div><div class="sprint-score-val sec">${liveAcc}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> %</span></div></div>
           </div>
           ${lanesHTML}
           ${over?'':`<div class="race-text-box">${textHTML}</div>`}
@@ -7818,7 +8301,7 @@ const app={
     const over=!!(s&&s.over),idle=!s||(!s.on&&!s.over);
     const best=currentUser&&this.stats&&this.stats.simonBest?this.stats.simonBest:null;
     const reduce=PREFERS_REDUCED_MOTION();
-    const hearts=[0,1,2].map(i=>`<span style="color:${s&&i<s.lives?'var(--accent)':'var(--border)'}">♥</span>`).join('');
+    const hearts=[0,1,2].map(i=>`<span style="color:${s&&i<s.lives?'var(--accent)':'rgba(255,255,255,.15)'}">♥</span>`).join('');
     let stage='';
     if(s&&s.phase==='show'){
       const rem=Math.max(0,s.showUntil-Date.now());
@@ -7845,7 +8328,7 @@ const app={
     } else if(!currentUser){
       overlay=`<div class="race-overlay"><h2>Simon des mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="btn-primary" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
     } else if(idle){
-      overlay=`<div class="race-overlay"><h2>Simon des mots</h2><p>Mémorise une séquence de mots puis retape-la. Elle s'allonge à chaque réussite.${best?'<br>Record : <b style="color:var(--accent)">'+best.score+' pts</b> (séquence de '+best.maxSeq+')':''}</p><button class="btn-primary" onclick="app.startSimon()">Jouer ▸</button></div>`;
+      overlay=`<div class="race-overlay"><h2 class="gidle-title">Simon des mots<span class="dot"> .</span></h2><p>Mémorise une séquence de mots puis retape-la. Elle s'allonge à chaque réussite.${best?'<br>Record : <b style="color:var(--accent)">'+best.score+' pts</b> (séquence de '+best.maxSeq+')':''}</p><button class="btn-primary" autofocus onclick="app.startSimon()">Jouer ▸</button><div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`;
     } else if(over){
       const badge=s.maxSeq>=8?'Mémoire d\'éléphant !':s.maxSeq>=5?'Excellente mémoire !':s.maxSeq>=3?'Bien joué !':'Continue !';
       overlay=`<div class="race-overlay">${this._gameResult({
@@ -7864,7 +8347,7 @@ const app={
       <div class="simon-arena">
         <div class="simon-hud">
           <div style="display:flex;gap:22px;align-items:flex-end">
-            <div><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em">NIVEAU</div><div class="sprint-score-val" style="color:var(--txt)">${s?s.maxSeq+ (s.over?0:1):1}</div></div>
+            <div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.04em">NIVEAU</div><div class="sprint-score-val sec">${s?s.maxSeq+ (s.over?0:1):1}</div></div>
             <div><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em">SCORE</div><div class="sprint-score-val">${s?s.score:0}</div></div>
           </div>
           <div class="simon-hearts">${hearts}</div>
@@ -7914,13 +8397,13 @@ const app={
       <div class="simon-arena">
         <div class="simon-hud">
           <div style="display:flex;gap:22px;align-items:flex-end">
-            <div><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em">PLACÉES</div><div class="sprint-score-val" style="color:var(--txt)">${doneCount} / ${total}</div></div>
-            <div><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em">TEMPS</div><div class="sprint-score-val">${elapsedNow}s</div></div>
-            <div><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em">ERREURS</div><div class="sprint-score-val" style="color:${c.mistakes?'var(--accent)':'var(--txt)'}">${c.mistakes}</div></div>
+            <div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.04em">PLACÉES</div><div class="sprint-score-val sec">${doneCount} / ${total}</div></div>
+            <div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.04em">TEMPS</div><div class="sprint-score-val">${elapsedNow}s</div></div>
+            <div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.04em">ERREURS</div><div class="sprint-score-val${c.mistakes?'':' sec'}">${c.mistakes}</div></div>
           </div>
         </div>
         <div class="clavier-stage">
-          <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:18px">Clique une lettre en bas, puis clique la touche vide où elle se trouve sur un vrai clavier AZERTY.</p>
+          <p style="position:relative;z-index:1;font-size:13px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:18px">Clique une lettre en bas, puis clique la touche vide où elle se trouve sur un vrai clavier AZERTY.</p>
           <div class="clavier-board">${rowsHTML}</div>
           <div class="clavier-bank">${bankHTML}</div>
         </div>
@@ -8079,7 +8562,7 @@ const app={
   },
   renderBoss(){
     const b=this.boss;
-    const head=this._gameHeader('Boss de la semaine',ICONS.trophy,'expert');
+    const head=this._gameHeader('Boss de la semaine',ICONS.trophy,'free');
     let body='';
     if(!b||b.phase==='loading'){
       body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Chargement du défi…</div></div>`;
@@ -8114,8 +8597,8 @@ const app={
       const pct=Math.round(100*prefix/b.text.length);
       body=`<div class="boss-card">
         <div class="sprint-hud">
-          <div><div style="font-size:12px;font-weight:700;color:var(--muted)">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:var(--muted);font-weight:500"> mpm</span></div></div>
-          <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:var(--muted)">PRÉCISION</div><div class="sprint-score-val" style="color:var(--txt)">${liveAcc}<span style="font-size:16px;color:var(--muted);font-weight:500"> %</span></div></div>
+          <div><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4)">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> mpm</span></div></div>
+          <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4)">PRÉCISION</div><div class="sprint-score-val sec">${liveAcc}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> %</span></div></div>
         </div>
         <div class="sprint-progress"><div class="sprint-progress-fill" style="width:${pct}%"></div></div>
         <div class="race-text-box">${textHTML}</div>
@@ -8412,7 +8895,7 @@ const app={
       } else {
         body=`<div class="boss-card" style="text-align:center">
           <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px">Duel rejoint !</h2>
-          <p style="color:var(--muted);font-size:15px;margin-bottom:18px">Tu affrontes <b style="color:var(--txt)">${d.hostLabel||'l\'hôte'}</b>.</p>
+          <p style="color:var(--muted);font-size:15px;margin-bottom:18px">Tu affrontes <b style="color:#fff">${d.hostLabel||'l\'hôte'}</b>.</p>
           <div class="duel-status">${d.oppLeft?'<span style="color:var(--danger);font-weight:600">● Ton adversaire a quitté le lobby</span>':'<span class="duel-wait">● En attente du lancement par l\'hôte…</span>'}</div>
         </div>`;
       }
@@ -11069,6 +11552,7 @@ async function handleSSOReturn(){
     saveSession(d.username,d.plan,d.token,d.id,_mergedData.role||null,d.email,d.displayName,d.institutionName,d.hasClass);
     try{track('login',{method:'oauth'});}catch{}
     app.stats=_mergedData;
+    _statsLoaded=true; // réponse de login fraîche et authoritative : sûr d'autoriser la sauvegarde
     window._needsOnboarding = !d.onboarding_completed;
     if(!d.onboarding_completed)localStorage.removeItem('klak_ob');else localStorage.setItem('klak_ob','1');
     closeModal('auth-modal');
@@ -11077,21 +11561,36 @@ async function handleSSOReturn(){
   }catch(e){openAuth('login');setTimeout(()=>showAuthError('La connexion a échoué, réessaie.'),120);}
 }
 
-async function loadProgressFromServer(){
+// Charge la vraie progression serveur pour remplacer le squelette vide posé
+// au démarrage. Contrairement à l'ancienne version, on fait TOUJOURS confiance
+// aux données serveur dès qu'elles arrivent (jamais l'inverse) : le pire cas
+// possible est de perdre une modif locale survenue dans la poignée de
+// centaines de ms avant la réponse, bien préférable à écraser tout
+// l'historique du serveur avec le squelette. En cas d'échec réseau, on
+// réessaie plusieurs fois avant d'abandonner — et si on abandonne, on laisse
+// _statsLoaded à false pour le reste de la session : impossible d'écrire
+// quoi que ce soit tant que la vraie progression n'a jamais pu être
+// confirmée, plutôt que de risquer de sauvegarder un squelette.
+async function loadProgressFromServer(attempt){
+  attempt=attempt||0;
   if(!currentUser||!currentToken)return;
   try{
     const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+    if(!r.ok)throw new Error('http '+r.status);
     const d=await r.json();
     if(d){
-      // Si l'utilisateur a déjà modifié ses stats localement pendant le chargement
-      // (ex. il a fini un jeu avant que le serveur réponde), on ne les écrase PAS :
-      // on garde la version locale et on la renvoie au serveur.
-      if(d.data&&!_statsDirty)app.stats=mergeStats(d.data);
+      if(d.data)app.stats=mergeStats(d.data);
+      _statsLoaded=true;
       const _s=JSON.parse(localStorage.getItem('klak_session')||'{}');let _changed=false;if(d.id&&!currentUserId){currentUserId=d.id;_s.userId=d.id;_changed=true;}if(app.stats&&app.stats.role&&_s.role!==app.stats.role){_s.role=app.stats.role||null;_changed=true;}if(_changed)localStorage.setItem('klak_session',JSON.stringify(_s));
       updateNavUser();app.renderCurrent();if(isAdmin())app.loadAdmin();else if(isTeacher())app.loadEtab();
-      if(_statsDirty)flushStats(); // persister les modifs locales faites avant le chargement
+      if(_statsDirty)flushStats(); // persiste une éventuelle modif locale, maintenant en toute sécurité sur la base réelle
     }
-  }catch{}
+  }catch(e){
+    if(attempt<3){setTimeout(()=>loadProgressFromServer(attempt+1),1000*Math.pow(2,attempt));}
+    // Après 3 essais, on abandonne pour cette session : _statsLoaded reste
+    // false, donc flushStats() continuera de refuser d'écrire — aucune perte
+    // de données possible, seulement une session sans sauvegarde serveur.
+  }
 }
 loadSession();
 if(currentUser){
