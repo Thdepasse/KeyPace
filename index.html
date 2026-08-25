@@ -9292,8 +9292,8 @@ const app={
   </div>
   <!-- HERO -->
   <div class="etab-hero" style="text-align:center;padding:60px 0 52px">
-    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,77,46,.1);color:${A};font-size:13px;font-weight:700;padding:6px 14px;border-radius:20px;margin-bottom:22px;letter-spacing:.02em">
-      ${ICONS.gradCap} Écoles · Universités · Centres de formation
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:${A};font-weight:700;margin-bottom:16px">
+      Écoles · Universités · Centres de formation
     </div>
     <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:clamp(30px,5vw,56px);line-height:1.08;letter-spacing:-.02em;margin:0 0 20px;max-width:820px;margin-left:auto;margin-right:auto">
       Vos élèves tapent encore avec deux doigts.<br><span style="color:${A}">Il est temps de changer ça.</span>
@@ -9318,7 +9318,7 @@ const app={
       <p style="color:var(--muted);font-size:15px;line-height:1.7;margin:0 0 14px">Un élève qui tape à 15 mots/min met 4× plus de temps à rédiger un devoir. Cette friction invisible plombe la concentration, la qualité des écrits et la confiance en soi.</p>
       <p style="color:var(--muted);font-size:15px;line-height:1.7;margin:0">La frappe ne s'apprend pas naturellement : elle demande une progression structurée, des exercices répétés et du feedback immédiat. C'est exactement ce que fait KeyPace.</p>
     </div>
-    <div class="etab-avant-apres" style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8">
+    <div class="etab-avant-apres" style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;font-size:14px;line-height:1.8">
       <div style="color:var(--muted);margin-bottom:14px;font-size:11px;font-weight:700;letter-spacing:.06em">AVANT KEYPACE</div>
       ${avantItems.map(([ic,t])=>`<div style="display:flex;gap:10px;padding:3px 0"><span>${ic}</span><span style="color:var(--muted)">${t}</span></div>`).join('')}
       <div style="border-top:1px solid var(--border);margin:14px 0"></div>
@@ -9369,14 +9369,14 @@ const app={
     </div>
   </div>
   <!-- POUR LES ÉLÈVES -->
-  <div class="etab-student-section" style="background:linear-gradient(135deg,rgba(255,77,46,.07),rgba(124,58,237,.05));border:1px solid rgba(255,77,46,.15);border-radius:24px;padding:48px 40px;margin-bottom:72px">
+  <div class="etab-student-section" style="background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 40px;margin-bottom:72px">
     <div style="text-align:center;margin-bottom:36px">
       <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:10px">POUR LES ÉLÈVES</div>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,32px);margin:0 0 12px">Une expérience qui donne envie de progresser</h2>
       <p style="color:var(--muted);font-size:15px;max-width:500px;margin:0 auto">Pas un simple exercice scolaire : un vrai produit avec des jeux, des défis et une progression visible qui accroche les élèves.</p>
     </div>
     <div class="etab-student-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
-      ${studentFeats.map(([ic,t,d])=>`<div style="background:rgba(255,255,255,.7);border:1px solid rgba(255,77,46,.12);border-radius:16px;padding:20px"><div style="font-size:26px;margin-bottom:10px;color:var(--accent)">${ic}</div><div style="font-weight:700;font-size:14px;margin-bottom:6px">${t}</div><div style="color:var(--muted);font-size:13px;line-height:1.5">${d}</div></div>`).join('')}
+      ${studentFeats.map(([ic,t,d])=>`<div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:20px"><div style="font-size:26px;margin-bottom:10px;color:var(--accent)">${ic}</div><div style="font-weight:700;font-size:14px;margin-bottom:6px">${t}</div><div style="color:var(--muted);font-size:13px;line-height:1.5">${d}</div></div>`).join('')}
     </div>
   </div>
   <!-- FAQ -->
@@ -9387,17 +9387,12 @@ const app={
     </div>
   </div>
   <!-- CTA FINAL -->
-  <div class="etab-cta" style="text-align:center;background:${A};border-radius:28px;padding:56px 40px;color:#fff;position:relative;overflow:hidden">
-    <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%"></div>
-    <div style="position:absolute;bottom:-60px;left:-30px;width:250px;height:250px;background:rgba(0,0,0,.06);border-radius:50%"></div>
-    <div style="position:relative;z-index:1">
-      <div style="font-size:52px;margin-bottom:16px;color:#fff">${ICONS.gradCap}</div>
-      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:clamp(22px,4vw,38px);margin:0 0 14px;line-height:1.1">Prêt à équiper votre établissement ?</h2>
-      <p style="font-size:16px;opacity:.9;max-width:480px;margin:0 auto 32px;line-height:1.5">Contactez-nous pour une démonstration gratuite ou pour obtenir un devis. Mise en place en moins d'une heure.</p>
-      <div class="etab-cta-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-        <button onclick="openModal('school-modal')" style="background:#fff;color:${A};border:none;border-radius:14px;padding:16px 32px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Demander une démo gratuite →</button>
-        <button onclick="go('lessons')" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:14px;padding:16px 24px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Essayer les cours gratuitement</button>
-      </div>
+  <div class="etab-cta" style="text-align:center;background:linear-gradient(135deg,#FFEDE8,#FFF6F2);border:1px solid var(--border);border-radius:22px;padding:48px 40px">
+    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(22px,4vw,34px);margin:0 0 14px;line-height:1.1">Prêt à équiper votre établissement ?</h2>
+    <p style="color:var(--muted);font-size:16px;max-width:480px;margin:0 auto 28px;line-height:1.5">Contactez-nous pour une démonstration gratuite ou pour obtenir un devis. Mise en place en moins d'une heure.</p>
+    <div class="etab-cta-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button onclick="openModal('school-modal')" style="background:${A};color:#fff;border:none;border-radius:14px;padding:16px 32px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px -8px ${A};transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Demander une démo gratuite →</button>
+      <button onclick="go('lessons')" style="background:var(--card);color:var(--txt);border:1.5px solid var(--border);border-radius:14px;padding:16px 24px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Essayer les cours gratuitement</button>
     </div>
   </div>
 </div>`;
