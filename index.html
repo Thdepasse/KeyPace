@@ -649,6 +649,95 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .hint-txt._nudge{color:var(--accent);font-weight:600;animation:hintPulse 1.4s ease-in-out infinite;will-change:transform}
 @keyframes hintPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 @media (prefers-reduced-motion:reduce){.hint-txt._nudge{animation:none}}
+
+/* TEST 4a — refonte page Test : onde de choc */
+.t4a-wrap{padding:14px 14px 32px}
+.t4a-frame{position:relative;min-height:calc(100vh - 190px);background:transparent;cursor:text;display:flex;flex-direction:column}
+.t4a-halo{position:absolute;inset:0;pointer-events:none;z-index:1;transition:background .35s}
+.t4a-progress{position:absolute;left:0;top:0;height:4px;background:linear-gradient(90deg,#ffb08c,#ff4a1c);z-index:8;transition:width .14s linear;width:0%}
+.t4a-head{position:relative;z-index:6;display:flex;align-items:flex-start;justify-content:space-between;gap:26px;padding:30px 40px 0;flex-wrap:wrap}
+.t4a-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:42px;letter-spacing:-.03em;color:#15130f;line-height:1.1;margin:0}
+.t4a-subtitle{font-size:15px;color:#8a857c;margin:5px 0 0}
+.t4a-actions{display:flex;align-items:center;gap:11px;flex-shrink:0;flex-wrap:wrap}
+.t4a-btn-ghost{display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:600;color:#15130f;background:#fff;border:1px solid #e6e1d8;padding:12px 18px;border-radius:12px;cursor:pointer;font-family:inherit;transition:border-color .2s}
+.t4a-btn-ghost:hover{border-color:#15130f}
+.t4a-btn-dark{font-size:14px;font-weight:700;color:#fff;background:#15130f;border:none;padding:12px 22px;border-radius:12px;cursor:pointer;font-family:inherit;transition:background .2s}
+.t4a-btn-dark:hover{background:#ff4a1c}
+.t4a-btn-eye{display:inline-flex;align-items:center;gap:9px;cursor:pointer;font-size:14px;font-weight:600;padding:12px 18px;border-radius:12px;background:#fff;color:#ff4a1c;border:1px solid #f6cabb;transition:all .2s;font-family:inherit}
+.t4a-btn-eye.on{background:#ff4a1c;color:#fff;border-color:#ff4a1c;box-shadow:0 10px 24px rgba(255,74,28,.28)}
+.t4a-eyebanner{position:relative;z-index:6;display:none;align-items:center;justify-content:space-between;gap:14px;margin:18px 40px 0;padding:12px 18px;border-radius:13px;background:#fff4f0;border:1px solid #f6cabb;color:#c9350d;font-size:13px}
+.t4a-eyebanner.on{display:flex}
+.t4a-eyebanner-cam{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;flex-shrink:0}
+.t4a-stats{position:relative;z-index:6;display:flex;gap:14px;padding:22px 40px 0;flex-wrap:wrap}
+.t4a-stat{flex:1;min-width:150px;background:#fff;border:1px solid #ece8e0;border-radius:14px;padding:13px 17px;display:flex;flex-direction:column;gap:6px}
+.t4a-stat-speed{border-color:rgba(255,74,28,.32);box-shadow:0 10px 26px rgba(255,74,28,.09);flex-direction:row;align-items:flex-end;justify-content:space-between;gap:10px}
+.t4a-stat-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;color:#a9a29a}
+.t4a-stat-speed .t4a-stat-label{color:#ff4a1c}
+.t4a-stat-val{font-weight:800;font-size:32px;line-height:1;color:#15130f;font-variant-numeric:tabular-nums}
+.t4a-stat-sub{font-size:12px;color:#a9a29a}
+.t4a-record{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#159c78;margin-top:2px}
+.t4a-odo{display:flex;height:38px;overflow:hidden}
+.t4a-odo-col{width:24px;height:38px;overflow:hidden;position:relative}
+.t4a-odo-roll{position:absolute;left:0;right:0;top:0;transition:transform .45s cubic-bezier(.2,.9,.25,1)}
+.t4a-odo-d{height:38px;line-height:38px;text-align:center;font-weight:800;font-size:38px;letter-spacing:-.05em;color:#ff4a1c;font-variant-numeric:tabular-nums}
+.t4a-spark{display:flex;align-items:flex-end;gap:3px;height:26px;flex-shrink:0}
+.t4a-spark-bar{width:4px;border-radius:2px;background:#f0ebe2;transition:height .3s}
+.t4a-textwrap{position:relative;z-index:6;padding:18px 40px 0;display:flex;flex-direction:column;align-items:center}
+.t4a-textbox{width:100%;background:#fff;border:1px solid #ece8e0;border-radius:20px;padding:26px 30px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:2px 14px;font-family:'JetBrains Mono',monospace;font-size:min(28px,2.6vw);line-height:1.6}
+.t4a-word{display:inline-flex;white-space:nowrap;border-radius:7px;padding:1px 5px;transition:background .18s,opacity .3s}
+.t4a-word.active{background:rgba(255,74,28,.07)}
+.t4a-word.done{opacity:.4}
+.t4a-ch{border-radius:3px;transition:color .15s,background .15s}
+.t4a-ch.ok{color:#15130f}
+.t4a-ch.wrong{color:#ff2d55;background:rgba(255,45,85,.12)}
+.t4a-ch.cur{background:#ff4a1c;color:#fff;position:relative}
+.t4a-ch.cur::after{content:'';position:absolute;right:-1px;top:3px;bottom:3px;width:2px;background:#fff;animation:t4aBlink 1s steps(1) infinite}
+.t4a-ch.todo{color:#c9c3b9}
+.t4a-hint{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;margin-top:12px;color:#ff4a1c;min-height:16px}
+.t4a-hint.done{color:#159c78}
+.t4a-hint.idle{animation:t4aBlinkHint 1.4s steps(1) infinite}
+@media (prefers-reduced-motion:reduce){.t4a-hint.idle{animation:none}.t4a-ch.cur::after{animation:none}}
+@keyframes t4aBlink{0%,49%{opacity:1}50%,100%{opacity:.12}}
+@keyframes t4aBlinkHint{0%,49%{opacity:1}50%,100%{opacity:.35}}
+
+.t4a-stage{position:relative;z-index:6;margin-top:10px;padding:6px 0 28px;perspective:1100px;background:transparent;display:flex;justify-content:center;overflow:hidden}
+.t4a-plane{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;transform:rotateX(22deg) scale(.88);transform-style:preserve-3d;transform-origin:50% 80%}
+.t4a-row{display:flex;gap:10px;transform-style:preserve-3d}
+.t4a-key{position:relative;width:76px;height:80px;transform-style:preserve-3d;transform:translateZ(16px);transition:transform .18s ease-out}
+.t4a-key.next{transform:translateZ(42px)}
+.t4a-key-base{position:absolute;inset:-1px;border-radius:15px;background:#ded8ce;transform:translateZ(-24px)}
+.t4a-key-face{position:absolute;inset:0;border-radius:14px;background:linear-gradient(170deg,#ffffff,#f7f4ee);border:1px solid #e8e3da;box-shadow:inset 0 1px 0 rgba(255,255,255,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:background .2s,box-shadow .2s,border-color .2s}
+.t4a-key.next .t4a-key-face{background:linear-gradient(160deg,#ff7a4d,#ff4a1c 70%);border-color:rgba(255,140,100,.9);box-shadow:0 0 34px rgba(255,74,28,.36),inset 0 2px 0 rgba(255,255,255,.5)}
+.t4a-key-main{font-family:'JetBrains Mono',monospace;font-size:25px;font-weight:500;color:#15130f;line-height:1}
+.t4a-key.next .t4a-key-main{color:#fff}
+.t4a-key-sub{font-family:'JetBrains Mono',monospace;font-size:14px;color:#a9a29a;line-height:1;min-height:14px}
+.t4a-key.next .t4a-key-sub{color:rgba(255,255,255,.85)}
+.t4a-key-bar{position:absolute;left:14px;right:14px;bottom:7px;height:4px;border-radius:2px;opacity:.9}
+.t4a-key.next .t4a-key-bar{background:rgba(255,255,255,.85)!important;opacity:1}
+.t4a-spacewrap{position:relative;width:796px;max-width:80vw;height:70px;margin-top:4px;transform-style:preserve-3d;transform:translateZ(16px);transition:transform .18s ease-out}
+.t4a-spacewrap.next{transform:translateZ(42px)}
+.t4a-space-base{position:absolute;inset:-1px;border-radius:15px;background:#ded8ce;transform:translateZ(-24px)}
+.t4a-space{position:absolute;inset:0;border-radius:14px;background:linear-gradient(170deg,#ffffff,#f7f4ee);border:1px solid #e8e3da;box-shadow:inset 0 1px 0 rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:.22em;color:#8a857c;transition:background .2s,box-shadow .2s,border-color .2s}
+.t4a-spacewrap.next .t4a-space{background:linear-gradient(160deg,#ff7a4d,#ff4a1c 70%);border-color:rgba(255,140,100,.9);box-shadow:0 0 34px rgba(255,74,28,.36),inset 0 2px 0 rgba(255,255,255,.5);color:#fff}
+
+.t4a-fx-ripple{position:absolute;left:50%;top:50%;width:58px;height:58px;border-radius:50%;pointer-events:none;opacity:0}
+.t4a-fx-letter{position:absolute;left:50%;top:50%;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:30px;pointer-events:none;white-space:pre;opacity:0}
+@keyframes t4aRipple{0%{transform:translate(-50%,-50%) scale(.2);opacity:.55}100%{transform:translate(-50%,-50%) scale(3.4);opacity:0}}
+@keyframes t4aLetterUp{0%{transform:translate(-50%,-50%) scale(.7);opacity:0}18%{opacity:1}100%{transform:translate(-50%,-260px) scale(1.5);opacity:0}}
+
+.t4a-hint._nudge{color:#ff4a1c;font-weight:700;animation:t4aBlinkHint 1.4s steps(1) infinite,hintPulse 1.4s ease-in-out infinite}
+@media(max-width:1300px){
+  .t4a-plane{transform:rotateX(22deg) scale(.74)}
+  .t4a-stage{padding:14px 0 20px}
+}
+@media(max-width:900px){
+  .t4a-head{padding:22px 22px 0}
+  .t4a-stats{padding:18px 22px 0}
+  .t4a-textwrap{padding:14px 22px 0}
+  .t4a-eyebanner{margin:14px 22px 0}
+  .t4a-plane{transform:rotateX(22deg) scale(.56)}
+}
+
 .lesson-tip{background:#FFF8F0;border:1.5px solid #FFDCC0;border-radius:14px;padding:14px 18px;margin-bottom:16px;font-size:14px;line-height:1.6;color:#5C4A30;display:flex;gap:12px;align-items:flex-start}
 .lesson-tip-icon{font-size:20px;flex-shrink:0;margin-top:1px}
 .intro-screen{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:16px;max-width:680px;margin-left:auto;margin-right:auto}
@@ -2263,12 +2352,25 @@ function maybeConvNudge(v){
 /* ── CURRICULUM ── */
 const FINGERS={lp:'#B7AE9E',lr:'#79C56A',lm:'#E8C13B',li:'#EE6B5E',ri:'#A77BD6',rm:'#E8C13B',rr:'#79C56A',rp:'#B7AE9E',th:'#BCB3A2'};
 const FINGER_LABEL={p:'auriculaire',r:'annulaire',m:'majeur',i:'index'};
+/* Positions des touches pour l'onde de choc / lettre qui décolle (page Test 4a) */
+const T4A_KW=86,T4A_RH=92,T4A_SPACE_Y=183;
+function t4aComputeKpos(){
+  const m={};
+  const cy=((KB.length-1)/2)*T4A_RH;
+  KB.forEach((row,r)=>{
+    const n=row.length;
+    row.forEach((k,i)=>{m[k.l.toLowerCase()]={x:Math.round((i-(n-1)/2)*T4A_KW),y:Math.round(r*T4A_RH-cy)};});
+  });
+  m[' ']={x:0,y:T4A_SPACE_Y};
+  return m;
+}
 const KB=[
   [{l:'1',s:'&',f:'lp'},{l:'2',s:'é',f:'lr'},{l:'3',s:'"',f:'lm'},{l:'4',s:"'",f:'li'},{l:'5',s:'(',f:'li'},{l:'6',s:'-',f:'ri'},{l:'7',s:'è',f:'ri'},{l:'8',s:'_',f:'rm'},{l:'9',s:'ç',f:'rr'},{l:'0',s:'à',f:'rp'}],
   [{l:'A',f:'lp'},{l:'Z',f:'lr'},{l:'E',f:'lm'},{l:'R',f:'li'},{l:'T',f:'li'},{l:'Y',f:'ri'},{l:'U',f:'ri'},{l:'I',f:'rm'},{l:'O',f:'rr'},{l:'P',f:'rp'}],
   [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
   [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'!',s:'§',f:'rp'}]
 ];
+const T4A_KPOS=t4aComputeKpos();
 const PASSAGES=["le matin, la lumière douce traverse les rideaux et réveille doucement la maison encore endormie sous un ciel calme et clair.", "le petit renard roux traverse le champ gelé, observe les oiseaux au loin, puis disparaît derrière la vieille grange en bois.", "la pluie tombe sur les toits de la vieille ville, les rues brillent sous les lampadaires et un chat traverse sans bruit la place déserte.", "le train file à travers la campagne verte, les collines défilent derrière la vitre et le voyageur sourit en pensant au bord de mer qui l'attend.", "en automne, les feuilles rousses tombent une à une sur le chemin de terre, formant un tapis doré que le vent balaie doucement.", "la neige recouvre les toits du village et étouffe les bruits de la rue, laissant place à un silence blanc et paisible.", "au bord du lac, les roseaux ploient sous la brise tandis qu'un héron immobile guette patiemment le passage d'un poisson.", "le soleil se couche lentement derrière les montagnes, teintant le ciel d'orange et de rose avant que la nuit ne tombe.", "un orage gronde au loin, les nuages s'assombrissent et les premières gouttes viennent frapper les vitres de la cuisine.", "dans la forêt humide, la mousse recouvre les pierres et l'odeur de terre mouillée se mêle à celle des feuilles pourries.", "le vent d'hiver siffle entre les branches nues des arbres, faisant claquer les volets de la vieille ferme abandonnée.", "les vagues viennent mourir sur le sable fin, laissant derrière elles des coquillages que les enfants ramassent avec joie.", "au printemps, les premières fleurs percent la terre encore froide et annoncent le retour des beaux jours pour tous.", "la brume matinale enveloppe la vallée, cachant les sommets et donnant au paysage une allure mystérieuse et calme.", "un arc-en-ciel apparaît après l'averse, dessinant ses couleurs vives au-dessus des champs encore luisants de pluie.", "les étoiles scintillent dans le ciel dégagé de la montagne, loin des lumières de la ville qui les cachent d'habitude.", "le ruisseau serpente entre les rochers, son eau claire reflétant les branches des saules penchés au-dessus de lui.", "la chaleur de l'été rend l'air épais et immobile, poussant chacun à chercher l'ombre fraîche des grands platanes.", "un vol d'oies sauvages traverse le ciel gris de novembre, formant un grand triangle qui s'éloigne vers le sud.", "la rosée du matin perle sur les toiles d'araignée tendues entre les herbes hautes du jardin encore silencieux.", "le petit chat gris se glisse entre les pots de fleurs, curieux de découvrir ce qui se cache derrière la haie du voisin.", "un troupeau de moutons traverse lentement la route de campagne, guidé par un vieux berger et son chien fidèle.", "les hirondelles reviennent chaque printemps construire leur nid sous le toit de la vieille maison familiale.", "le hérisson sort de sa cachette à la tombée de la nuit pour chercher quelques insectes dans l'herbe humide.", "dans l'étable, les vaches ruminent tranquillement pendant que le fermier prépare le foin pour l'hiver prochain.", "un écureuil bondit de branche en branche, cherchant les noisettes qu'il a cachées un peu partout dans le parc.", "le chien attend patiemment devant la porte, la queue frétillante, guettant le retour de son maître chaque soir.", "les abeilles butinent les fleurs du jardin, transportant le pollen d'une plante à l'autre sous le soleil de juin.", "un cerf traverse la clairière au petit matin, immobile un instant avant de disparaître dans les fourrés épais.", "les poules picorent dans la cour de la ferme, tandis que le coq surveille attentivement les alentours du poulailler.", "le dauphin saute hors de l'eau près du bateau, ravissant les touristes venus observer la vie marine côtière.", "un papillon multicolore se pose délicatement sur une fleur, restant immobile quelques secondes avant de repartir.", "les chevaux galopent dans le pré, profitant des premiers rayons du soleil après une longue nuit d'hiver.", "le lapin détale à travers le potager dès qu'il entend le moindre bruit venant de la maison voisine.", "les grenouilles chantent près de l'étang, créant un concert nocturne qui accompagne les longues soirées d'été.", "le café fume doucement sur la table de la cuisine pendant que la radio annonce les nouvelles du matin.", "chaque dimanche, la famille se retrouve autour d'un grand repas préparé avec soin par les grands-parents.", "la lessive sèche sur le fil tendu entre deux arbres, se balançant doucement au rythme léger du vent.", "après le dîner, les enfants rangent leurs jouets pendant que les parents discutent tranquillement au salon.", "le réveil sonne trop tôt ce matin-là, et il faut se dépêcher pour ne pas rater le bus habituel.", "la vieille horloge du couloir sonne midi, rappelant à chacun qu'il est temps de passer à table.", "un livre oublié traîne sur la table basse, marque-page glissé entre deux pages depuis plusieurs jours déjà.", "la maison sent bon le pain frais, tout juste sorti du four que la grand-mère surveille avec attention.", "le chat s'installe confortablement sur le canapé, roulé en boule près de la fenêtre baignée de soleil.", "chaque soir, avant de dormir, les enfants demandent une histoire que leur mère raconte avec plaisir.", "la boîte aux lettres déborde de publicités, cachant presque la lettre attendue depuis plusieurs semaines.", "le grenier renferme de vieilles photographies jaunies qui racontent l'histoire de plusieurs générations.", "le jardin réclame quelques soins avant l'arrivée du printemps : tailler les rosiers, retourner la terre.", "une odeur de gâteau au chocolat envahit la maison, annonçant l'anniversaire tant attendu par les enfants.", "le samedi matin, le marché du village s'anime tôt avec les cris joyeux des commerçants installant leurs étals.", "la clé tourne difficilement dans la serrure de la vieille porte, usée par des années d'ouverture quotidienne.", "les volets claquent doucement sous la brise, rappelant qu'il faudrait les réparer avant l'hiver prochain.", "un plateau de fruits frais trône sur la table, prêt à être partagé après le repas de midi.", "la cave garde une fraîcheur agréable même pendant les journées les plus chaudes de l'été.", "le linge propre s'empile sur le lit, attendant d'être plié avant que la soirée ne commence.", "le professeur explique lentement la leçon du jour pendant que les élèves prennent des notes attentivement.", "chaque exercice de dactylographie demande de la patience, mais les progrès arrivent plus vite qu'on ne le pense.", "apprendre à taper vite ressemble à une course : au début chaque mot compte, puis le rythme s'installe naturellement.", "la bibliothèque de l'école reste ouverte tard le soir pour permettre aux élèves de réviser avant les examens.", "un cahier neuf sent toujours particulièrement bon, avec ses pages blanches encore vierges de toute écriture.", "la cloche sonne la fin des cours, libérant dans la cour une foule d'élèves pressés de rentrer chez eux.", "chaque champion a commencé débutant : la vraie différence se joue dans la régularité et le plaisir de progresser.", "le tableau noir se remplit peu à peu de formules que les élèves recopient avec application dans leur cahier.", "réviser régulièrement, même quelques minutes chaque jour, aide bien plus qu'une longue session juste avant l'examen.", "la salle informatique bourdonne du bruit des claviers pendant que chacun termine son exercice de frappe.", "un élève lève la main timidement pour poser une question sur l'exercice qu'il n'a pas bien compris.", "la rentrée approche et il faut déjà préparer le nouveau cartable ainsi que les fournitures scolaires.", "progresser demande de la constance : mieux vaut s'entraîner quinze minutes chaque jour qu'une heure une seule fois.", "le dictionnaire posé sur le bureau permet de vérifier l'orthographe des mots les plus difficiles à retenir.", "chaque niveau franchi apporte une nouvelle confiance, poussant l'élève à viser encore un peu plus haut.", "le bureau reste silencieux tôt le matin, avant que les collègues n'arrivent un à un pour commencer la journée.", "un rapport urgent doit être terminé avant midi, ce qui pousse chacun à taper plus vite que d'habitude.", "la réunion s'éternise autour de la table, tandis que certains prennent des notes sur leur ordinateur portable.", "écrire vite, c'est surtout écrire juste : vise la précision avant la vitesse, et la cadence viendra naturellement.", "le téléphone sonne sans arrêt ce matin-là, interrompant sans cesse la rédaction du courrier important.", "chaque employé dispose désormais d'un poste équipé d'un clavier confortable pour limiter la fatigue des mains.", "la pause déjeuner permet à toute l'équipe de se retrouver autour d'un café loin des écrans lumineux.", "un nouveau logiciel de gestion vient d'être installé, obligeant chacun à apprendre de nouvelles habitudes.", "le responsable relit attentivement chaque document avant de l'envoyer aux clients pour validation finale.", "taper un courrier professionnel demande autant de clarté que de rapidité pour convaincre le destinataire.", "les dossiers s'empilent sur le bureau, mais un peu d'organisation permet toujours d'y voir plus clair.", "le télétravail change les habitudes : certains préfèrent désormais travailler tôt le matin dans le calme.", "la présentation de fin d'année demande plusieurs jours de préparation minutieuse avant d'être enfin prête.", "un simple courriel bien tapé peut parfois éviter des heures de discussion inutile entre collègues.", "chaque projet avance étape par étape, et la patience finit toujours par porter ses fruits au bureau.", "le coureur accélère dans la dernière ligne droite, puisant dans ses dernières forces pour franchir la ligne.", "chaque samedi matin, le club de football se retrouve sur le terrain pour un entraînement intensif.", "la piscine municipale accueille de nombreux nageurs dès l'ouverture, profitant du calme avant la foule.", "un match de tennis serré tient les spectateurs en haleine jusqu'au tout dernier point de la rencontre.", "grimper en montagne demande autant d'endurance que de concentration pour ne jamais perdre l'équilibre.", "le vélo reste le moyen préféré des habitants pour se déplacer dans les petites rues du centre-ville.", "une partie d'échecs peut durer des heures, chaque joueur réfléchissant longuement avant de bouger une pièce.", "le groupe de randonneurs s'arrête au sommet pour admirer le paysage avant de redescendre lentement.", "la salle de danse résonne de musique joyeuse pendant que les élèves répètent leur chorégraphie du spectacle.", "jouer aux cartes en famille reste une tradition du dimanche soir, entre rires et petites disputes amicales.", "le pêcheur attend patiemment sur la rive, sa ligne tendue vers l'eau calme du fleuve tranquille.", "chaque compétition de dactylographie attire des passionnés venus mesurer leur vitesse face à d'autres joueurs.", "la course cycliste traverse plusieurs villages avant d'arriver enfin dans la ville qui accueille l'arrivée.", "le yoga du matin aide à retrouver calme et concentration avant de commencer une longue journée chargée.", "un tournoi de basket réunit chaque été les équipes des quartiers voisins autour d'une compétition amicale.", "la gare grouille de voyageurs pressés, valises à la main, cherchant le quai de leur prochain train.", "le tramway glisse silencieusement le long des avenues, s'arrêtant à chaque station pour laisser monter les passagers.", "un vieux pont de pierre relie les deux rives de la rivière, offrant une vue magnifique sur la vallée.", "la ville s'éveille doucement, les commerces ouvrent leurs volets et les premiers passants arpentent les trottoirs.", "un long voyage en voiture traverse plusieurs régions, chacune offrant des paysages différents et surprenants.", "le port bruisse d'activité dès l'aube, entre pêcheurs qui rentrent et bateaux qui se préparent à partir.", "les ruelles étroites du centre historique cachent de petites boutiques que seuls les habitués connaissent vraiment.", "l'avion survole les nuages, offrant aux passagers une vue imprenable sur les montagnes enneigées en contrebas.", "chaque quartier de la capitale possède son propre caractère, entre marchés animés et places tranquilles.", "le bateau quitte lentement le port, laissant derrière lui une traînée blanche sur l'eau bleue et calme.", "visiter une nouvelle ville demande de se perdre un peu, loin des itinéraires trop connus des guides.", "la place centrale se remplit chaque soir de terrasses animées où les gens discutent jusque tard.", "un long chemin de montagne mène jusqu'au village perché, accessible seulement à pied ou à vélo.", "le métro traverse la ville sous terre, transportant chaque jour des milliers de passagers pressés.", "les phares du bord de mer guident encore aujourd'hui les bateaux perdus dans la brume nocturne.", "la soupe mijote doucement sur le feu, embaumant toute la cuisine d'une odeur chaude et réconfortante.", "préparer une tarte demande du temps, mais le résultat récompense toujours les efforts fournis en cuisine.", "le pain croustillant sort du four juste à temps pour accompagner le repas du soir en famille.", "chaque marché propose des légumes frais cueillis le matin même dans les fermes des environs.", "la recette de grand-mère se transmet depuis plusieurs générations, gardée précieusement dans un vieux carnet.", "un plat mijoté toute la journée développe des saveurs bien plus riches qu'une cuisson rapide.", "la table du dîner s'orne d'une nappe blanche, préparée avec soin pour un repas de fête.", "couper les légumes finement demande de l'entraînement, mais le geste devient vite naturel avec la pratique.", "le café du matin accompagne toujours une lecture rapide du journal avant de partir travailler.", "préparer un repas simple mais soigné reste souvent plus satisfaisant qu'une recette compliquée et longue.", "la boulangerie du coin ouvre tôt chaque matin pour proposer croissants et pains frais aux habitants.", "une salade colorée réunit tomates, concombres et herbes fraîches directement cueillies dans le jardin.", "taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides.", "un clavier bien positionné évite les douleurs aux poignets lors de longues sessions de frappe quotidienne.", "la précision compte autant que la vitesse : mieux vaut taper juste plutôt que corriger sans cesse.", "apprendre la position des doigts sur la rangée de base constitue la première étape vers une frappe rapide.", "chaque exercice répété renforce la mémoire des doigts, rendant les mouvements de plus en plus naturels.", "un ordinateur récent facilite grandement le travail quotidien, à condition de savoir l'utiliser efficacement.", "la disposition du clavier belge diffère légèrement du clavier français, ce qui surprend parfois les débutants.", "suivre sa progression au fil des semaines motive à continuer, même quand les résultats semblent lents.", "un bon éclairage aide à mieux voir l'écran sans fatiguer les yeux pendant une longue session de travail.", "la régularité prime sur l'intensité : dix minutes chaque jour valent mieux qu'une heure une fois par semaine.", "maîtriser son clavier permet d'écrire ses idées presque aussi vite qu'on les pense, sans y réfléchir.", "chaque touche du clavier correspond à un doigt précis, une règle simple qui change tout une fois assimilée.", "les jeux de frappe rendent l'entraînement plus amusant tout en améliorant discrètement la vitesse et la précision.", "garder le dos droit et les poignets détendus améliore grandement le confort pendant les longues séances de frappe.", "apprendre à taper à dix doigts change durablement la façon de travailler devant un ordinateur au quotidien.", "la patience d'aujourd'hui prépare l'aisance de demain : avance avec calme, précision et constance chaque jour.", "les petites habitudes répétées chaque jour finissent toujours par produire de grands changements avec le temps.", "il vaut mieux avancer lentement mais sûrement que de se précipiter et abandonner après quelques essais.", "chaque erreur apprend quelque chose de nouveau, à condition de prendre le temps de la comprendre vraiment.", "se fixer un petit objectif chaque semaine aide à garder la motivation sur le long terme.", "la persévérance finit toujours par payer, même quand les progrès semblent invisibles au jour le jour.", "prendre le temps de bien faire les choses évite souvent d'avoir à les recommencer plus tard.", "comparer ses résultats d'une semaine à l'autre montre des progrès qu'on ne remarque pas au quotidien.", "apprendre une nouvelle compétence demande du temps, mais chaque effort investi finit par porter ses fruits.", "garder une attitude positive face aux difficultés aide à surmonter plus facilement les obstacles du quotidien.", "fixer des objectifs clairs et atteignables rend le chemin vers la réussite beaucoup plus motivant.", "le calme et la concentration valent souvent mieux que la précipitation pour réussir une tâche difficile.", "chaque jour offre une nouvelle occasion de progresser un peu, même par de tout petits pas.", "accepter ses erreurs sans se décourager reste la meilleure façon d'apprendre durablement quelque chose de nouveau.", "la confiance en soi se construit progressivement, à force de petites réussites accumulées au fil du temps.", "les grands-parents racontent souvent des histoires anciennes que les petits-enfants écoutent avec grand intérêt.", "un simple appel téléphonique suffit parfois à réchauffer l'âme d'une personne qui se sentait seule.", "retrouver de vieux amis après plusieurs années procure une joie difficile à décrire avec des mots.", "les enfants grandissent si vite que chaque moment partagé avec eux mérite d'être pleinement savouré.", "un simple sourire échangé dans la rue peut parfois illuminer toute une journée compliquée.", "écrire une lettre à un proche demande plus de temps qu'un message, mais elle touche davantage.", "les repas de famille rassemblent plusieurs générations autour d'une même table, entre rires et souvenirs partagés.", "apprendre à écouter vraiment quelqu'un reste l'une des compétences les plus précieuses dans une relation.", "un anniversaire fêté simplement, entourée des siens, vaut souvent bien plus qu'une grande célébration.", "partager un projet avec un ami renforce souvent une amitié bien plus qu'une simple conversation."];
 const CURRICULUM=[
   /* ── MODULE 1 : touches de repos ─────────────────────────────────────────── */
@@ -3723,7 +3825,7 @@ const app={
     if(nx)this.tryStartLesson(nx.id);
   },
 
-  startTimer(){if(this._timer)return;this._timer=setInterval(()=>{this.now=Date.now();this._patchTypingStats();},150);},
+  startTimer(){if(this._timer)return;this._timer=setInterval(()=>{this.now=Date.now();if(this._isPlainTest())this._patchTest4a();else this._patchTypingStats();},150);},
   stopTimer(){if(this._timer){clearInterval(this._timer);this._timer=null;}},
 
   keyMatches(key,ch){if(ch==null)return false;const low=ch.toLowerCase();if(key.l.toLowerCase()===low)return true;if(key.s&&key.s===ch)return true;return false;},
@@ -3770,6 +3872,7 @@ const app={
     const _ok=(k===expected);
     if(_ok){s.typed[s.idx]='c';s.correct++;}else{s.typed[s.idx]='w';}
     this._recordKey(expected,_ok);
+    if(this._isPlainTest())this._t4aFx(k,_ok);
     // Lier la frappe à l'état du regard à cet instant précis
     if(this._gaze.active){
       const g=this._gaze;
@@ -3782,7 +3885,7 @@ const app={
     }
     s.idx++;
     if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats(s);const res=this.computeResult(s);if(currentUser){const _pr=s.mode==='lesson'?this.lessonRec(s.lessonId).bestWpm||0:Math.max(0,...(this.stats?.tests||[]).map(t=>t.wpm));s._prevBestWpm=_pr;}try{if(s.mode==='test'&&!s.cert)track('speed_test_completed',{wpm:res.wpm,acc:res.acc,loggedIn:!!currentUser});}catch{}this.recordResult(s.mode,res,s.lessonId,s._gazeStats);if(!currentUser&&s.mode==='test')this._markGuestTest(res.wpm,res.acc);this.renderCurrent();if(s.mode==='lesson'&&!s.cert)celebrateLesson(this.lessonById(s.lessonId),res);if(s.mode==='test'&&!s.cert){if(!currentUser)maybeConvGuest(res);else maybeConvUpsell(res);}if(s.cert)this._finishCertExam(s,res);return;}
-    this._patchTypingBox();
+    if(this._isPlainTest())this._patchTest4a();else this._patchTypingBox();
   },
   computeResult(s){
     const mins=Math.max((s.endTime-s.startTime)/60000,1/600);
@@ -4601,9 +4704,13 @@ const app={
     // Visiteur ayant déjà fait son test du jour : on bloque un NOUVEAU test,
     // mais on laisse s'afficher le résultat de celui qu'il vient de terminer.
     if(!this._canGuestTest()&&!(this.sess&&this.sess.finished)){this._renderDailyLimit();return;}
+    if(this._isPlainTest()){this._renderTest4a();_arm();return;}
     this._renderTypingInto('page-test');
     _arm();
   },
+  // Le "vrai" test de vitesse (mode='test', hors devoir/certification/dictée) a
+  // sa propre mise en scène (design 4a) ; devoirs/certifications gardent l'ancien rendu.
+  _isPlainTest(){const s=this.sess;return !!(s&&s.mode==='test'&&!s.custom&&!s.cert&&!s.vocal);},
 
   _renderDailyLimit(){
     const g=this._guestTest()||{};
@@ -4862,7 +4969,7 @@ const app={
 
   _clearNudge(){
     if(this._nudgeTimer){clearTimeout(this._nudgeTimer);this._nudgeTimer=null;}
-    const h=document.querySelector('.hint-txt');
+    const h=document.querySelector('.hint-txt,.t4a-hint');
     if(h)h.classList.remove('_nudge');
   },
 
@@ -4871,9 +4978,280 @@ const app={
     this._nudgeTimer=setTimeout(()=>{
       const s=this.sess;
       if(s&&s.started)return;
-      const h=document.querySelector('.hint-txt');
+      const h=document.querySelector('.hint-txt,.t4a-hint');
       if(h)h.classList.add('_nudge');
     },1500);
+  },
+
+  /* ── TEST 4a : onde de choc ── */
+  _t4aWpm(s){
+    if(!s.started)return 0;
+    const end=s.finished?s.endTime:(this.now||Date.now());
+    const mins=Math.max((end-s.startTime)/60000,1/600);
+    return Math.round((s.correct/5)/mins);
+  },
+  _t4aOdoHTML(v){
+    const str=String(Math.max(0,Math.min(999,v)));
+    const pad=str.length<2?'0'+str:str;
+    return pad.split('').map((ch,ci)=>{
+      const digits=Array.from({length:10},(_,d)=>`<div class="t4a-odo-d">${d}</div>`).join('');
+      return `<div class="t4a-odo-col"><div class="t4a-odo-roll" id="t4a-odo-roll-${ci}" style="transform:translateY(-${parseInt(ch,10)*38}px)">${digits}</div></div>`;
+    }).join('');
+  },
+  _t4aUpdateOdo(v){
+    const el=document.getElementById('t4a-odo');if(!el)return;
+    const str=String(Math.max(0,Math.min(999,v)));
+    const pad=str.length<2?'0'+str:str;
+    const cols=el.querySelectorAll('.t4a-odo-roll');
+    if(cols.length!==pad.length){el.innerHTML=this._t4aOdoHTML(v);return;}
+    pad.split('').forEach((ch,i)=>{cols[i].style.transform='translateY(-'+(parseInt(ch,10)*38)+'px)';});
+  },
+  _t4aSparkHTML(){
+    const hist=(this._t4a&&this._t4a.hist)||[];
+    const mx=Math.max(40,...hist);
+    return Array.from({length:18},(_,i)=>{
+      const v=hist[hist.length-18+i];
+      const h=v==null?3:Math.max(3,Math.round((v/mx)*26));
+      const bg=v==null?'#f0ebe2':'#ff4a1c';
+      const op=v==null?1:(0.4+0.6*(i/18));
+      return `<div class="t4a-spark-bar" style="height:${h}px;background:${bg};opacity:${op}"></div>`;
+    }).join('');
+  },
+  _t4aUpdateSpark(){
+    const el=document.getElementById('t4a-spark');if(!el)return;
+    el.innerHTML=this._t4aSparkHTML();
+  },
+  _t4aUpdateHalo(){
+    const el=document.getElementById('t4a-halo');if(!el)return;
+    const now=this.now||Date.now();
+    const heat=Math.max(0,1-(now-((this._t4a&&this._t4a.lastKeyAt)||0))/900);
+    const alpha=(0.04+heat*0.13).toFixed(3);
+    el.style.background='radial-gradient(1150px 640px at 50% 94%,rgba(255,74,28,'+alpha+'),transparent 68%)';
+  },
+  // Onde + lettre qui décolle depuis la touche réellement pressée (juste ou fausse) — 8 emplacements réutilisés en tourniquet.
+  _t4aFx(ch,ok){
+    const pos=T4A_KPOS[ch.toLowerCase()];if(!pos)return;
+    const t=this._t4a;if(!t)return;
+    const slot=t.fxSeq%8;t.fxSeq++;
+    const col=ok?'255,74,28':'255,45,85';
+    const rEl=document.getElementById('t4a-fx-r'+slot),lEl=document.getElementById('t4a-fx-l'+slot);
+    if(!rEl||!lEl)return;
+    rEl.style.animation='none';lEl.style.animation='none';
+    rEl.style.left='calc(50% + '+pos.x+'px)';rEl.style.top='calc(50% + '+pos.y+'px)';
+    rEl.style.border='2px solid rgba('+col+',.8)';
+    rEl.style.background='radial-gradient(closest-side,rgba('+col+',.22),transparent)';
+    lEl.style.left='calc(50% + '+pos.x+'px)';lEl.style.top='calc(50% + '+pos.y+'px)';
+    lEl.style.color='rgb('+col+')';
+    lEl.style.textShadow='0 8px 24px rgba('+col+',.35)';
+    lEl.textContent=ch===' '?'␣':ch;
+    void rEl.offsetWidth;void lEl.offsetWidth; // force le reflow pour pouvoir relancer l'animation sur le même emplacement
+    rEl.style.animation='t4aRipple .85s ease-out forwards';
+    lEl.style.animation='t4aLetterUp 1s cubic-bezier(.2,.7,.3,1) forwards';
+  },
+  // Défi entre amis (bannière avant test / comparaison + partage après) — même logique que l'ancien rendu, juste repositionnée hors du cadre.
+  _t4aChallenge(s,finished){
+    const ch=this._challenge;
+    const banner=(ch&&!finished)?`<div style="background:linear-gradient(135deg,rgba(255,77,46,.12),rgba(255,77,46,.03));border:1.5px solid rgba(255,77,46,.3);border-radius:16px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:24px">🏁</div>
+        <div style="flex:1;min-width:180px"><div style="font-weight:800;font-size:15px">${ch.name} te défie !</div><div style="font-size:13px;color:var(--muted)">Son score : <b style="color:var(--accent)">${ch.wpm} mpm</b>${ch.acc?' · '+ch.acc+'% de précision':''}. À toi de faire mieux.</div></div>
+      </div>`:'';
+    let result='';
+    if(finished){
+      const res=this.computeResult(s);
+      let vs='';
+      if(ch){
+        const won=res.wpm>ch.wpm,tie=res.wpm===ch.wpm;
+        vs=`<div style="background:${won?'rgba(31,169,113,.1)':tie?'var(--light)':'rgba(255,77,46,.08)'};border-radius:14px;padding:14px 16px;margin-bottom:16px">
+            <div style="font-size:16px;font-weight:800;margin-bottom:4px">${won?'🏆 Tu bats '+ch.name+' !':tie?'🤝 Égalité avec '+ch.name:'😤 '+ch.name+' te devance'}</div>
+            <div style="font-size:13.5px;color:var(--muted)">Toi <b style="color:var(--txt)">${res.wpm} mpm</b> · ${ch.name} <b style="color:var(--txt)">${ch.wpm} mpm</b></div>
+          </div>`;
+      }
+      result=`<div style="max-width:1120px;margin:20px auto 0;background:#fff;border:1px solid #ece8e0;border-radius:16px;padding:20px 24px">
+        ${vs}
+        <div style="font-size:15px;font-weight:800;margin-bottom:4px">🏁 Défie tes amis</div>
+        <div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">Envoie-leur ton score : le lien leur débloque un test pour te battre. Pour continuer le duel, <b>demande-leur de te renvoyer leur score</b> — chaque lien reçu te redonne un test.</div>
+        ${this._challengeForm(res.wpm,res.acc)}
+      </div>`;
+    }
+    return{banner,result};
+  },
+  _renderTest4a(){
+    const s=this.sess;
+    if(!this._t4a||this._t4a.forSess!==s){
+      this._t4a={forSess:s,hist:[],lastHistAt:0,fxSeq:0,lastKeyAt:0,glances:0,_prevGazeOn:null};
+    }
+    const T=s.text;
+    const next=!s.finished?T[s.idx]:null;
+    const eyeOn=!!this._gaze.enabled;
+    const now=this.now||Date.now();
+
+    // Texte à taper, découpé en mots insécables puis en caractères colorés
+    let wordsHTML='';{
+      let word=[];const words=[];
+      for(let i=0;i<T.length;i++){
+        if(T[i]===' '){if(word.length)words.push(word);word=[];continue;}
+        word.push(i);
+      }
+      if(word.length)words.push(word);
+      wordsHTML=words.map(w=>{
+        const first=w[0],last=w[w.length-1];
+        const active=s.idx>=first&&s.idx<=last,done=s.idx>last;
+        const chars=w.map(i=>{
+          const typed=i<s.idx,wrong=typed&&s.typed[i]==='w',isCur=i===s.idx;
+          const cls='t4a-ch '+(isCur?'cur':wrong?'wrong':typed?'ok':'todo');
+          return `<span class="${cls}" data-i="${i}">${this._esc(T[i])}</span>`;
+        }).join('');
+        return `<span class="t4a-word${active?' active':''}${done?' done':''}" data-first="${first}" data-last="${last}">${chars}</span>`;
+      }).join('');
+    }
+
+    // Clavier en volume : 4 rangées + barre d'espace
+    const keysHTML=KB.map(row=>`<div class="t4a-row">${row.map(k=>{
+      const on=next!=null&&this.keyMatches(k,next);
+      const col=FINGERS[k.f]||'';
+      return `<div class="t4a-key${on?' next':''}" data-l="${k.l.toLowerCase()}" data-s="${k.s||''}">
+        <div class="t4a-key-base"></div>
+        <div class="t4a-key-face">
+          <div class="t4a-key-main">${k.l.toLowerCase()}</div>
+          <div class="t4a-key-sub">${k.s||''}</div>
+          <div class="t4a-key-bar" style="background:${col}"></div>
+        </div>
+      </div>`;
+    }).join('')}</div>`).join('');
+    const spaceOn=next===' ';
+    const fxHTML=Array.from({length:8},(_,i)=>`<div class="t4a-fx-ripple" id="t4a-fx-r${i}"></div>`).join('')
+      +Array.from({length:8},(_,i)=>`<div class="t4a-fx-letter" id="t4a-fx-l${i}"></div>`).join('');
+
+    const wpm=this._t4aWpm(s);
+    const acc=s.keystrokes?Math.round(100*s.correct/s.keystrokes):100;
+    const err=s.keystrokes-s.correct;
+    const elapsed=s.started?((s.finished?s.endTime:now)-s.startTime)/1000:0;
+    const prog=Math.round(100*s.idx/T.length);
+    const pb=currentUser&&this.stats?Math.max(0,...(this.stats.tests||[]).map(t=>t.wpm)):0;
+    const beating=!!(pb&&s.started&&!s.finished&&wpm>pb);
+
+    const hintText=s.finished?`Terminé — ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé — garde le rythme':'Commence à taper pour démarrer le chrono…';
+    const hintCls='t4a-hint'+(s.finished?' done':!s.started?' idle':'');
+
+    const chal=this._t4aChallenge(s,!!s.finished);
+
+    document.getElementById('page-test').innerHTML=`<div class="t4a-wrap">
+      ${chal.banner}
+      <div class="t4a-frame" id="t4a-frame">
+        <div class="t4a-halo" id="t4a-halo"></div>
+        <div class="t4a-progress" id="t4a-progress" style="width:${prog}%"></div>
+        <div class="t4a-head">
+          <div>
+            <h1 class="t4a-title">Test de vitesse</h1>
+            <p class="t4a-subtitle">Tape le texte ci-dessous le plus vite et juste possible.</p>
+          </div>
+          <div class="t4a-actions">
+            <button class="t4a-btn-ghost" onclick="app.newPassage()">↻ Autre texte</button>
+            <button class="t4a-btn-dark" onclick="app.restart()">Recommencer</button>
+            <button class="t4a-btn-eye${eyeOn?' on':''}" onclick="app.gazeToggle()">◉ ${eyeOn?'Traqueur des yeux actif':'Activer traqueur des yeux'}</button>
+          </div>
+        </div>
+        <div class="t4a-eyebanner${eyeOn?' on':''}" id="t4a-eyebanner">
+          <div>Traqueur des yeux actif — <span id="t4a-glances">${this._t4a.glances}</span> coup d'œil vers le clavier détecté${this._t4a.glances===1?'':'s'}.</div>
+          <div class="t4a-eyebanner-cam">CAMÉRA · ${this._gaze.permError?'ERREUR':'OK'}</div>
+        </div>
+        <div class="t4a-stats">
+          <div class="t4a-stat t4a-stat-speed">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div class="t4a-stat-label">VITESSE</div>
+              <div class="t4a-odo" id="t4a-odo">${this._t4aOdoHTML(wpm)}</div>
+              <div class="t4a-stat-sub">mots / min${beating?` <span class="t4a-record">🏆 record !</span>`:''}</div>
+            </div>
+            <div class="t4a-spark" id="t4a-spark">${this._t4aSparkHTML()}</div>
+          </div>
+          <div class="t4a-stat"><div class="t4a-stat-label">PRÉCISION</div><div class="t4a-stat-val" id="t4a-acc">${s.idx?acc+'%':'—'}</div><div class="t4a-stat-sub" id="t4a-accmeta">${err} faute${err===1?'':'s'}</div></div>
+          <div class="t4a-stat"><div class="t4a-stat-label">TEMPS</div><div class="t4a-stat-val" id="t4a-time">${elapsed.toFixed(1)}s</div><div class="t4a-stat-sub" id="t4a-timemeta">${s.finished?'test terminé':'en cours'}</div></div>
+          <div class="t4a-stat"><div class="t4a-stat-label">PROGRESSION</div><div class="t4a-stat-val" id="t4a-prog">${prog}%</div><div class="t4a-stat-sub" id="t4a-progmeta">${s.idx} / ${T.length} car.</div></div>
+        </div>
+        <div class="t4a-textwrap">
+          <div class="t4a-textbox" id="t4a-textbox">${wordsHTML}</div>
+          <div class="${hintCls}" id="t4a-hint">${hintText}</div>
+        </div>
+        <div class="t4a-stage">
+          <div class="t4a-plane" id="t4a-plane">
+            ${keysHTML}
+            <div class="t4a-spacewrap${spaceOn?' next':''}" id="t4a-spacewrap">
+              <div class="t4a-space-base"></div>
+              <div class="t4a-space">espace</div>
+            </div>
+            ${fxHTML}
+          </div>
+        </div>
+      </div>
+      ${chal.result}
+    </div>`;
+    this._t4aUpdateHalo();
+  },
+  _patchTest4a(){
+    const s=this.sess;if(!s)return;
+    const t=this._t4a;if(!t||t.forSess!==s){this._renderTest4a();return;}
+    const now=this.now||Date.now();
+    if(s.started&&!s.finished&&now-(t.lastHistAt||0)>=420){
+      t.hist.push(this._t4aWpm(s));if(t.hist.length>30)t.hist.shift();t.lastHistAt=now;
+    }
+    // Compteur de coups d'œil vers le clavier (transition regard-écran → hors écran)
+    if(this._gaze.active&&this._gaze.samples.length){
+      const last=this._gaze.samples[this._gaze.samples.length-1];
+      if(t._prevGazeOn===1&&last===0)t.glances++;
+      t._prevGazeOn=last;
+    }
+    const wpm=this._t4aWpm(s);
+    const acc=s.keystrokes?Math.round(100*s.correct/s.keystrokes):100;
+    const err=s.keystrokes-s.correct;
+    const elapsed=s.started?((s.finished?s.endTime:now)-s.startTime)/1000:0;
+    const prog=Math.round(100*s.idx/s.text.length);
+    const pb=currentUser&&this.stats?Math.max(0,...(this.stats.tests||[]).map(x=>x.wpm)):0;
+    const beating=!!(pb&&s.started&&!s.finished&&wpm>pb);
+
+    this._t4aUpdateOdo(wpm);
+    this._t4aUpdateSpark();
+    this._t4aUpdateHalo();
+
+    const $=id=>document.getElementById(id);
+    const speedSub=$('t4a-odo')&&$('t4a-odo').parentElement.querySelector('.t4a-stat-sub');
+    if(speedSub)speedSub.innerHTML='mots / min'+(beating?` <span class="t4a-record">🏆 record !</span>`:'');
+    const accEl=$('t4a-acc');if(accEl)accEl.textContent=s.idx?acc+'%':'—';
+    const accMetaEl=$('t4a-accmeta');if(accMetaEl)accMetaEl.textContent=err+' faute'+(err===1?'':'s');
+    const timeEl=$('t4a-time');if(timeEl)timeEl.textContent=elapsed.toFixed(1)+'s';
+    const timeMetaEl=$('t4a-timemeta');if(timeMetaEl)timeMetaEl.textContent=s.finished?'test terminé':'en cours';
+    const progEl=$('t4a-prog');if(progEl)progEl.textContent=prog+'%';
+    const progMetaEl=$('t4a-progmeta');if(progMetaEl)progMetaEl.textContent=s.idx+' / '+s.text.length+' car.';
+    const barEl=$('t4a-progress');if(barEl)barEl.style.width=prog+'%';
+    const glancesEl=$('t4a-glances');if(glancesEl)glancesEl.textContent=t.glances;
+
+    document.querySelectorAll('#t4a-textbox .t4a-ch').forEach(el=>{
+      const i=+el.dataset.i;
+      const typed=i<s.idx,wrong=typed&&s.typed[i]==='w',isCur=i===s.idx;
+      const cls='t4a-ch '+(isCur?'cur':wrong?'wrong':typed?'ok':'todo');
+      if(el.className!==cls)el.className=cls;
+    });
+    document.querySelectorAll('#t4a-textbox .t4a-word').forEach(w=>{
+      const first=+w.dataset.first,last=+w.dataset.last;
+      w.classList.toggle('active',s.idx>=first&&s.idx<=last);
+      w.classList.toggle('done',s.idx>last);
+    });
+
+    const next=!s.finished?s.text[s.idx]:null;
+    const low=next?next.toLowerCase():null;
+    document.querySelectorAll('#t4a-plane .t4a-key').forEach(el=>{
+      const on=!!low&&(el.dataset.l===low||(el.dataset.s&&el.dataset.s===next));
+      if(el.classList.contains('next')!==on)el.classList.toggle('next',on);
+    });
+    const spaceWrapEl=$('t4a-spacewrap');
+    if(spaceWrapEl)spaceWrapEl.classList.toggle('next',next===' ');
+
+    const hintEl=$('t4a-hint');
+    if(hintEl){
+      const txt=s.finished?`Terminé — ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé — garde le rythme':'Commence à taper pour démarrer le chrono…';
+      if(hintEl.textContent!==txt)hintEl.textContent=txt;
+      hintEl.classList.toggle('done',!!s.finished);
+      hintEl.classList.toggle('idle',!s.started&&!s.finished);
+    }
   },
 
   /* ── LESSONS ── */
