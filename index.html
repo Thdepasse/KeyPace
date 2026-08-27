@@ -6498,12 +6498,14 @@ const app={
     const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        ${this._gameResult({
-          icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
-          boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
-          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisGridStart()',
-        })}
+        <div class="game-arena" style="height:auto;padding:28px 20px">
+          ${this._gameResult({
+            icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
+            record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+            boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
+            primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisGridStart()',
+          })}
+        </div>
       </div>
     </div>`;
   },
@@ -6669,12 +6671,14 @@ const app={
     const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        ${this._gameResult({
-          icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
-          boxes:[{label:'Score',value:s.score,accent:true},{label:'Visée',value:s._avgAim,unit:'ms'},{label:'Frappe',value:s._acc,unit:'%'}],
-          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisHybridStart()',
-        })}
+        <div class="game-arena" style="height:auto;padding:28px 20px">
+          ${this._gameResult({
+            icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
+            record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+            boxes:[{label:'Score',value:s.score,accent:true},{label:'Visée',value:s._avgAim,unit:'ms'},{label:'Frappe',value:s._acc,unit:'%'}],
+            primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisHybridStart()',
+          })}
+        </div>
       </div>
     </div>`;
   },
@@ -6942,12 +6946,14 @@ const app={
     const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        ${this._gameResult({
-          icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-          record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
-          boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
-          primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisTilesStart()',
-        })}
+        <div class="game-arena" style="height:auto;padding:28px 20px">
+          ${this._gameResult({
+            icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
+            record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+            boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
+            primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisTilesStart()',
+          })}
+        </div>
       </div>
     </div>`;
   },
