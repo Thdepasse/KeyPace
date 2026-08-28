@@ -34,8 +34,8 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="KeyPace : apprends à taper vite sur clavier AZERTY">
-<meta property="og:locale" content="fr_FR">
-<meta property="og:locale:alternate" content="fr_BE">
+<meta property="og:locale" content="fr_BE">
+<meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:site_name" content="KeyPace">
 
 <!-- Twitter Card -->
@@ -249,52 +249,7 @@
   "url": "https://keypace.be",
   "inLanguage": "fr",
   "description": "KeyPace, application de dactylographie AZERTY gratuite en français : 65 leçons progressives, test de vitesse, jeux de frappe et certification de niveau.",
-  "publisher": { "@type": "Organization", "name": "KeyPace", "url": "https://keypace.be" },
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": {
-      "@type": "EntryPoint",
-      "urlTemplate": "https://keypace.be/?q={search_term_string}"
-    },
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
-
-<!-- Course -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Course",
-  "name": "Cours de dactylographie AZERTY",
-  "description": "Cours en ligne pour apprendre à taper à dix doigts sans regarder le clavier sur disposition AZERTY : 65 leçons progressives, test de vitesse en mots par minute et jeux de frappe. En français, dans le navigateur.",
-  "url": "https://keypace.be/cours-dactylographie",
-  "inLanguage": "fr",
-  "provider": {
-    "@type": "Organization",
-    "name": "KeyPace",
-    "url": "https://keypace.be",
-    "sameAs": "https://keypace.be"
-  },
-  "teaches": [
-    "Frappe à dix doigts",
-    "Position des doigts sur le clavier AZERTY",
-    "Taper sans regarder le clavier",
-    "Augmenter sa vitesse de frappe"
-  ],
-  "educationalLevel": "Débutant à avancé",
-  "isAccessibleForFree": true,
-  "offers": [
-    { "@type": "Offer", "category": "Free", "price": "0", "priceCurrency": "EUR", "name": "Gratuit : 10 leçons + test de vitesse" },
-    { "@type": "Offer", "category": "Subscription", "price": "4.99", "priceCurrency": "EUR", "name": "Expert : 65 leçons, jeux et suivi complet" }
-  ],
-  "hasCourseInstance": {
-    "@type": "CourseInstance",
-    "courseMode": "online",
-    "courseWorkload": "PT20M",
-    "inLanguage": "fr",
-    "instructor": { "@type": "Organization", "name": "KeyPace" }
-  }
+  "publisher": { "@type": "Organization", "name": "KeyPace", "url": "https://keypace.be" }
 }
 </script>
 
@@ -378,7 +333,7 @@ ul,ol{list-style-position:inside}
   .home-mobile-cta{display:block}
   .hero-btns .btn-secondary:not(.home-hero-secondary){display:none}
   .hero-btns{flex-direction:column;gap:10px}
-  .hero-btns .btn-primary{width:100%;padding:15px;font-size:16px;border-radius:14px;text-align:center}
+  .hero-btns .btn-primary{width:100%;padding:15px;font-size:19px;border-radius:14px;text-align:center}
   .hero-btns .home-hero-secondary{width:100%;padding:12px;font-size:15px;border-radius:14px;text-align:center;background:none;border:1.5px solid var(--border);color:var(--txt);font-weight:600;cursor:pointer;font-family:inherit}
   /* ── Etablissement mobile ── */
   .etab-wrap{padding:0 16px 60px!important}
@@ -543,12 +498,12 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .nav-upgrade-btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:6px 12px;font-size:13px;font-weight:700;box-shadow:0 4px 10px rgba(255,77,46,0.22)}
 
 /* COMMON */
-.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:13px;padding:15px 26px;font-weight:700;font-size:17px;box-shadow:0 8px 20px rgba(255,77,46,0.3)}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:13px;padding:15px 26px;font-weight:700;font-size:19px;box-shadow:0 8px 20px rgba(255,77,46,0.3)}
 .btn-secondary{background:var(--card);color:var(--txt);border:1px solid var(--border);border-radius:13px;padding:15px 26px;font-weight:700;font-size:17px}
-.btn-sm{padding:9px 14px;border-radius:10px;font-size:14px;font-weight:600;border:none}
+.btn-sm{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 14px;border-radius:10px;font-size:14px;font-weight:600;border:none}
 .btn-outline{background:var(--card);border:1px solid var(--border);color:var(--txt)}
 .btn-dark{background:var(--txt);color:#fff}
-.btn-quit{background:var(--light);border:1px solid var(--border);border-radius:10px;padding:7px 13px;font-family:inherit;font-size:13px;font-weight:700;color:var(--txt);cursor:pointer;flex-shrink:0}
+.btn-quit{display:inline-flex;align-items:center;justify-content:center;min-height:44px;background:var(--light);border:1px solid var(--border);border-radius:10px;padding:7px 13px;font-family:inherit;font-size:13px;font-weight:700;color:var(--txt);cursor:pointer;flex-shrink:0}
 .btn-quit:hover{background:var(--border)}
 
 /* HOME */
@@ -1731,6 +1686,8 @@ footer{border-top:1px solid var(--border);margin-top:10px}
     <div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <a href="/a-propos" style="color:inherit;text-decoration:none;transition:color .15s" onmouseenter="this.style.color='var(--txt)'" onmouseleave="this.style.color='var(--muted)'">À propos</a>
       <a href="/guide" style="color:inherit;text-decoration:none;transition:color .15s" onmouseenter="this.style.color='var(--txt)'" onmouseleave="this.style.color='var(--muted)'">Guides</a>
+      <a href="/comparatif" style="color:inherit;text-decoration:none;transition:color .15s" onmouseenter="this.style.color='var(--txt)'" onmouseleave="this.style.color='var(--muted)'">Comparatif</a>
+      <a href="/ebook-gratuit-dactylographie" style="color:inherit;text-decoration:none;transition:color .15s" onmouseenter="this.style.color='var(--txt)'" onmouseleave="this.style.color='var(--muted)'">E-book gratuit</a>
       <a href="/conditions" style="color:inherit;text-decoration:none;transition:color .15s" onmouseenter="this.style.color='var(--txt)'" onmouseleave="this.style.color='var(--muted)'">Conditions d'utilisation</a>
       <a href="/cgv" style="color:inherit;text-decoration:none;transition:color .15s" onmouseenter="this.style.color='var(--txt)'" onmouseleave="this.style.color='var(--muted)'">CGV</a>
       <a href="/confidentialite" style="color:inherit;text-decoration:none;transition:color .15s" onmouseenter="this.style.color='var(--txt)'" onmouseleave="this.style.color='var(--muted)'">Confidentialité</a>
@@ -4809,7 +4766,7 @@ const app={
             :`<button class="btn-primary" onclick="go('lessons')">Reprendre les cours →</button>`}
           </div>
         </div>
-        <div class="hero-kb">${kbHtml}</div>
+        <div class="hero-kb" aria-hidden="true">${kbHtml}</div>
       </div>
 
       ${!isGuest?'':`
@@ -4839,7 +4796,7 @@ const app={
       <div class="home-kb-color">
         <div class="home-kb-color-title">Un doigt, une couleur</div>
         <div class="home-kb-color-sub">Chaque touche a la couleur du doigt qui la presse. Tu mémorises sans regarder.</div>
-        <div class="home-kb-color-row">${kbColorHtml}</div>
+        <div class="home-kb-color-row" aria-hidden="true">${kbColorHtml}</div>
       </div>
 
       <div class="home-mobile-cta">

@@ -39,7 +39,8 @@
   "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://keypace.be/" },
-    { "@type": "ListItem", "position": 2, "name": "Apprendre à écrire sur un ordinateur", "item": "https://keypace.be/guide/apprendre-a-ecrire-sur-un-ordinateur" }
+    { "@type": "ListItem", "position": 2, "name": "Guide", "item": "https://keypace.be/guide" },
+    { "@type": "ListItem", "position": 3, "name": "Apprendre à écrire sur un ordinateur", "item": "https://keypace.be/guide/apprendre-a-ecrire-sur-un-ordinateur" }
   ]
 }
 </script>
@@ -57,7 +58,7 @@
     "logo": { "@type": "ImageObject", "url": "https://keypace.be/favicon-32.png" }
   },
   "datePublished": "2026-08-02",
-  "dateModified": "2026-08-02",
+  "dateModified": "2026-08-28",
   "mainEntityOfPage": { "@type": "WebPage", "@id": "https://keypace.be/guide/apprendre-a-ecrire-sur-un-ordinateur" },
   "inLanguage": "fr"
 }
@@ -102,6 +103,11 @@
       "@type": "Question",
       "name": "Combien de temps faut-il pour taper sans regarder le clavier ?",
       "acceptedAnswer": { "@type": "Answer", "text": "La plupart des débutants qui pratiquent 15 à 20 minutes par jour tapent sans regarder le clavier en 4 à 8 semaines, et atteignent environ 40 mots par minute après trois mois." }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment taper le symbole @ (arobase) sur un ordinateur ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sur clavier AZERTY français : AltGr + à (la touche du 0). Sur clavier AZERTY belge : AltGr + é (la touche du 2). Le détail complet, avec les autres symboles comme $ ou #, est dans le guide dédié." }
     }
   ]
 }
@@ -119,7 +125,7 @@
   .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:19px;color:var(--txt)}
   .logo .k{width:29px;height:29px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;box-shadow:0 4px 10px rgba(255,77,46,.4)}
   .nav .sp{flex:1}
-  .btn{display:inline-block;background:var(--accent);color:#fff;font-weight:700;padding:11px 20px;border-radius:12px;box-shadow:0 8px 20px -8px var(--accent)}
+  .btn{display:inline-block;background:var(--accent);color:#fff;font-weight:700;font-size:19px;padding:11px 20px;border-radius:12px;box-shadow:0 8px 20px -8px var(--accent)}
   .btn:hover{text-decoration:none;transform:translateY(-1px);transition:.15s}
   .btn.ghost{background:var(--card);color:var(--txt);border:1px solid var(--border);box-shadow:none}
   .crumb{font-size:13px;color:var(--muted);padding:18px 0 0}
@@ -228,7 +234,7 @@
 
 <div class="wrap">
   <nav class="crumb" aria-label="Fil d'Ariane">
-    <a href="/">Accueil</a> › <span>Apprendre à écrire sur un ordinateur</span>
+    <a href="/">Accueil</a> › <a href="/guide">Guide</a> › <span>Apprendre à écrire sur un ordinateur</span>
   </nav>
 
   <div class="hero">
@@ -392,6 +398,7 @@
       <a href="/guide/metiers-vitesse-de-frappe"><div class="k">Guide</div><div class="t">Métiers où la vitesse de frappe fait la différence</div></a>
       <a href="/guide/raccourcis-clavier-mac"><div class="k">Guide</div><div class="t">Raccourcis clavier Mac</div></a>
       <a href="/guide/raccourcis-clavier-windows"><div class="k">Guide</div><div class="t">Raccourcis clavier Windows</div></a>
+      <a href="/guide/taper-arobase-symboles-azerty"><div class="k">Guide</div><div class="t">Taper @ et les symboles sur AZERTY</div></a>
     </div>
   </section>
 
@@ -413,6 +420,10 @@
       <summary>Combien de temps faut-il pour taper sans regarder le clavier ?</summary>
       <p>La plupart des débutants qui pratiquent 15 à 20 minutes par jour tapent sans regarder le clavier en 4 à 8 semaines, et atteignent environ 40 mots par minute après trois mois.</p>
     </details>
+    <details>
+      <summary>Comment taper le symbole @ (arobase) sur un ordinateur ?</summary>
+      <p>Sur clavier AZERTY français : AltGr + à (la touche du 0). Sur clavier AZERTY belge : AltGr + é (la touche du 2). Le détail complet, avec les autres symboles comme $ ou #, est dans le guide <a href="/guide/taper-arobase-symboles-azerty">taper @ et les symboles sur AZERTY</a>.</p>
+    </details>
   </section>
 
   <div class="final-cta">
@@ -427,6 +438,8 @@
     <a class="logo" href="/" style="font-size:16px"><span class="k" style="width:24px;height:24px;font-size:13px">K</span> KeyPace</a>
     <span class="sp" style="flex:1"></span>
     <a href="/guide">Guides</a>
+    <a href="/comparatif">Comparatif</a>
+    <a href="/ebook-gratuit-dactylographie">E-book gratuit</a>
     <a href="/conditions">Conditions</a>
     <a href="/confidentialite">Confidentialité</a>
     <a href="/cookies">Cookies</a>
