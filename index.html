@@ -6892,27 +6892,50 @@ const app={
     const b=best[prev.id];
     return !!(b&&b.tier);
   },
+  // Barre de progression vers le prochain palier médaille d'une carte de
+  // morceau. thresholds vient de _sourisTilesTiersFor, qui a besoin d'une
+  // durée : avant d'avoir jamais joué le morceau, on n'a pas encore mesuré
+  // sa durée réelle (ça n'arrive qu'au premier lancement) — on utilise donc
+  // la durée réelle du fichier (mesurée une fois pour toutes) en repli.
+  _sourisTilesProgressBar(thresholds,best){
+    const tierOrder=['bronze','silver','gold'];
+    const medalIcon={bronze:'🥉',silver:'🥈',gold:'🥇'};
+    const curIdx=best?tierOrder.indexOf(best.tier):-1;
+    const nextTier=tierOrder[curIdx+1];
+    const curScore=best?best.score:0;
+    const prevThreshold=curIdx>=0?thresholds[tierOrder[curIdx]]:0;
+    const pct=nextTier?Math.max(0,Math.min(100,Math.round(100*(curScore-prevThreshold)/(thresholds[nextTier]-prevThreshold)))):100;
+    return `<span style="display:flex;align-items:center;gap:8px;width:100%">
+        <span class="tiles-rank-bar" style="width:auto;flex:1"><span class="tiles-rank-bar-fill" style="display:block;width:${pct}%"></span></span>
+        <span style="font-size:10.5px;color:rgba(255,255,255,.4);font-family:'JetBrains Mono',monospace;white-space:nowrap;flex-shrink:0">${nextTier?`${medalIcon[nextTier]} dans ${Math.max(0,thresholds[nextTier]-curScore)} pts`:'🏆 or atteint'}</span>
+      </span>`;
+  },
   _sourisTilesSelect(){
     const bestRaw=(this.stats&&this.stats.sourisTilesBest)||{};
     const best=typeof bestRaw.score==='number'?{}:bestRaw; // ignore l'ancien format plat (un seul best global)
+    const estDurMs={facile:185391,difficile:165303,extreme:162926}; // durées réelles des 3 fichiers, mesurées une fois
     const keysHtml=TILES_LANES.map((l,i)=>`<div class="tiles-intro-key" style="animation-delay:${(i*-0.4).toFixed(2)}s">${l.letter}</div>`).join('');
     const songsHtml=TILES_SONGS.map((song,idx)=>{
       const b=best[song.id];
       const unlocked=this._sourisTilesUnlocked(best,idx);
-      const inner=`<span>
-          <span style="display:block;font-weight:700;font-size:15.5px">${unlocked?song.title:'🔒 '+song.title}</span>
-          <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">${unlocked?`${song.artist} · ${song.bpm} BPM`:`Termine « ${TILES_SONGS[idx-1].title} » pour débloquer`}</span>
-        </span>
-        <span style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-          ${b?`<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(255,255,255,.5)">${b.score} pts</span>`:''}
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;padding:4px 10px;border-radius:999px;background:${song.diffColor}22;color:${song.diffColor};border:1px solid ${song.diffColor}55">${song.diffLabel.toUpperCase()}</span>
+      const topRow=`<span style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:14px">
+          <span>
+            <span style="display:block;font-weight:700;font-size:15.5px">${unlocked?song.title:'🔒 '+song.title}</span>
+            <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">${unlocked?`${song.artist} · ${song.bpm} BPM`:`Termine « ${TILES_SONGS[idx-1].title} » pour débloquer`}</span>
+          </span>
+          <span style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+            ${b?`<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(255,255,255,.5)">${b.score} pts</span>`:''}
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;padding:4px 10px;border-radius:999px;background:${song.diffColor}22;color:${song.diffColor};border:1px solid ${song.diffColor}55">${song.diffLabel.toUpperCase()}</span>
+          </span>
         </span>`;
+      const progressRow=unlocked?this._sourisTilesProgressBar(this._sourisTilesTiersFor(song,estDurMs[song.id]||180000),b):'';
+      const inner=`<span style="display:flex;flex-direction:column;gap:8px;width:100%">${topRow}${progressRow}</span>`;
       const delay=`style="animation-delay:${(idx*0.08).toFixed(2)}s"`;
       if(!unlocked)return `<div class="tiles-song-card locked" ${delay}>${inner}</div>`;
       return `<button class="tiles-song-card" ${delay} onclick="app._sourisTilesStart('${song.id}')">${inner}<span class="tiles-song-chevron">▸</span></button>`;
     }).join('');
     const freeBest=best.libre;
-    const freeHtml=`<button class="tiles-song-card free" style="animation-delay:${(TILES_SONGS.length*0.08).toFixed(2)}s" onclick="app._sourisTilesStart('libre')">
+    const freeTop=`<span style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:14px">
         <span>
           <span style="display:block;font-weight:700;font-size:15.5px">🎲 Mode libre</span>
           <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">Sans musique, sans fin : le tempo grimpe tant que tu tiens le combo</span>
@@ -6920,6 +6943,9 @@ const app={
         <span style="display:flex;align-items:center;gap:10px;flex-shrink:0">
           ${freeBest?`<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(255,255,255,.5)">${freeBest.score} pts</span>`:''}
         </span>
+      </span>`;
+    const freeHtml=`<button class="tiles-song-card free" style="animation-delay:${(TILES_SONGS.length*0.08).toFixed(2)}s" onclick="app._sourisTilesStart('libre')">
+        <span style="display:flex;flex-direction:column;gap:8px;width:100%">${freeTop}${this._sourisTilesProgressBar(this._sourisTiers.tiles,freeBest)}</span>
         <span class="tiles-song-chevron">▸</span>
       </button>`;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
@@ -6980,7 +7006,7 @@ const app={
     this.souris={phase:'play',track:'tiles',songId:'libre',durMs:Infinity,stages:TILES_FREE_STAGES,lanes,
       score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,bpm:100,
       tiles:Array(lanes.length).fill(null),spawnAcc:0,judge:null,playStartWall:Date.now(),
-      stageIdx:0,banner:{text:TILES_FREE_STAGES[0].label,kind:'stage',until:Date.now()+2200},
+      stageIdx:0,banner:null,startAt:Date.now()+2600,
       intenseActive:false,intenseLostLife:false};
     this._sourisTilesBindKeys();
     this.renderSouris();
@@ -7010,11 +7036,10 @@ const app={
       this.souris={phase:'play',track:'tiles',songId:song.id,durMs,stages,lanes,
         score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,
         tiles:Array(lanes.length).fill(null),spawnAcc:0,judge:null,playStartWall:Date.now(),
-        stageIdx:0,banner:{text:stages[0].label,kind:'stage',until:Date.now()+2200},
+        stageIdx:0,banner:null,startAt:Date.now()+2600,
         intenseActive:false,intenseLostLife:false};
       this._sourisTilesBindKeys();
-      audio.currentTime=(song.offsetMs||0)/1000;
-      audio.play().catch(()=>{}); // lecture bloquée (politique navigateur) : le chart continue sur son horloge interne
+      audio.currentTime=(song.offsetMs||0)/1000; // la lecture démarre au son du "GO !", pas maintenant
       this.renderSouris();
       this._sourisLoop=setInterval(()=>this._sourisTilesTick(),50);
     };
@@ -7023,6 +7048,20 @@ const app={
       audio.addEventListener('loadedmetadata',begin,{once:true});
       audio.addEventListener('error',begin,{once:true}); // fichier manquant/bloqué : démarre quand même sur une durée par défaut
     }
+  },
+  // Le plateau se re-rend en entier à chaque tick (50ms) : une animation CSS
+  // n'a jamais le temps de jouer (l'élément est détruit avant). En calculant
+  // ici la progression à partir d'un vrai timestamp de départ, chaque rendu
+  // peint directement la bonne image de la transition — ça fonctionne avec
+  // ce re-rendu permanent au lieu de lutter contre lui.
+  _sourisTilesPop(startedAt,durMs=180){
+    const p=Math.min(1,Math.max(0,(Date.now()-(startedAt||0))/durMs));
+    return 1-Math.pow(1-p,3); // ease-out cubic
+  },
+  _sourisLerpHex(a,b,p){
+    const pa=parseInt(a.slice(1),16),pb=parseInt(b.slice(1),16);
+    const ch=(shift)=>Math.round((pa>>shift&255)+((pb>>shift&255)-(pa>>shift&255))*p);
+    return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
   },
   _sourisTilesJudgeDist(t){
     const dist=Math.abs(t.y-this._sourisTilesHitLineY);
@@ -7033,8 +7072,9 @@ const app={
   _sourisTilesMiss(){
     const s=this.souris;
     s.misses++;s.combo=0;s.lives--;
+    s.lifeLostAt=Date.now();s.lifeLostIdx=s.lives; // le cœur qui vient de s'éteindre
     playSound('miss');this._flashArena('#E5484D');
-    s.judge={text:'RATÉ',pts:null,multi:null,kind:'bad',until:Date.now()+550};
+    s.judge={text:'RATÉ',pts:null,multi:null,kind:'bad',start:Date.now(),until:Date.now()+550};
     if(s.intenseActive)s.intenseLostLife=true;
     if(s.lives<=0){this._sourisTilesEnd();return true;}
     return false;
@@ -7052,9 +7092,9 @@ const app={
       if(s.songId==='libre'&&s.combo>0&&s.combo%10===0)s.bpm=Math.min(170,(s.bpm||100)+10);
       // le multiplicateur de score grimpe tous les 10 combos, quel que soit
       // le mode : un petit repère visuel pour que ça se sente vraiment
-      if(s.combo>0&&s.combo%10===0)s.banner={text:`COMBO ×${1+Math.min(3,Math.floor(s.combo/10))} !`,kind:'success',until:Date.now()+1400};
+      if(s.combo>0&&s.combo%10===0)s.banner={text:`COMBO ×${1+Math.min(3,Math.floor(s.combo/10))} !`,kind:'success',start:Date.now(),until:Date.now()+1400};
       playSound('hit',{pitch:1+Math.min(.5,s.combo*.015)});this._flashArena(j==='perfect'?'#FFD84D':'#1FA971'); // le son grimpe légèrement avec le combo
-      s.judge={text:label||(j==='perfect'?'PARFAIT':'BIEN'),pts,multi,kind:'good',tier:j,until:Date.now()+550};
+      s.judge={text:label||(j==='perfect'?'PARFAIT':'BIEN'),pts,multi,kind:'good',tier:j,start:Date.now(),until:Date.now()+550};
     }
     this.renderSouris();
   },
@@ -7078,9 +7118,11 @@ const app={
     }
     if(t.bonus){
       s.tiles[laneIdx]=null;
+      const prevLives=s.lives;
       s.lives=Math.min(3,s.lives+1);s.score+=15;
+      if(s.lives>prevLives){s.lifeGainedAt=Date.now();s.lifeGainedIdx=prevLives;} // le cœur qui vient de s'allumer
       playSound('life');this._flashArena('#FFD84D');
-      s.judge={text:'+1 VIE',pts:15,multi:null,kind:'bonus',until:Date.now()+650};
+      s.judge={text:'+1 VIE',pts:15,multi:null,kind:'bonus',start:Date.now(),until:Date.now()+650};
       return;
     }
     if(t.chordId){
@@ -7092,7 +7134,7 @@ const app={
       }
       const partner=s.tiles[partnerIdx];
       if(!partner.chordHit){
-        t.chordHit=true;t.chordArmY=t.y;
+        t.chordHit=true;t.chordArmY=t.y;t.chordArmedAt=Date.now();
         this._flashArena('#FFD84D');
         return; // armé : on attend l'autre main
       }
@@ -7133,6 +7175,14 @@ const app={
   },
   _sourisTilesTick(){
     const s=this.souris;if(!s||s.phase!=='play')return;
+    if(s.startAt){
+      if(Date.now()<s.startAt){this.renderSouris();return;} // compte à rebours en cours
+      // le compte à rebours vient de se terminer : démarrage réel du morceau
+      s.startAt=null;
+      s.playStartWall=Date.now();
+      s.banner={text:s.stages[0].label,kind:'stage',start:Date.now(),until:Date.now()+2200};
+      if(this._sourisAudio)this._sourisAudio.play().catch(()=>{}); // lecture bloquée (politique navigateur) : le chart continue sur son horloge interne
+    }
     const audio=this._sourisAudio;
     const now=Date.now();
     // lecture audio bloquée (politique autoplay du navigateur) : bascule sur
@@ -7147,7 +7197,7 @@ const app={
     const idx=this._sourisTilesStageIdx(s.stages,elapsed);
     if(idx>s.stageIdx){
       s.stageIdx=idx;
-      s.banner={text:s.stages[idx].label,kind:'stage',until:now+2200};
+      s.banner={text:s.stages[idx].label,kind:'stage',start:now,until:now+2200};
       playSound('levelup');
     }
     // passage intense : calé sur le vrai pic d'énergie du morceau (song._peakMs,
@@ -7159,8 +7209,8 @@ const app={
     const intenseEnd=intenseStart+3500;
     const wasIntense=s.intenseActive;
     s.intenseActive=intenseStart>=0&&elapsed>=intenseStart&&elapsed<intenseEnd;
-    if(s.intenseActive&&!wasIntense){s.banner={text:'⚡ PASSAGE INTENSE ⚡',kind:'intense',until:now+1800};s.intenseLostLife=false;}
-    if(wasIntense&&!s.intenseActive&&!s.intenseLostLife){s.score+=20;s.banner={text:'SECTION RÉUSSIE · +20',kind:'success',until:now+1800};playSound('record');}
+    if(s.intenseActive&&!wasIntense){s.banner={text:'⚡ PASSAGE INTENSE ⚡',kind:'intense',start:now,until:now+1800};s.intenseLostLife=false;}
+    if(wasIntense&&!s.intenseActive&&!s.intenseLostLife){s.score+=20;s.banner={text:'SECTION RÉUSSIE · +20',kind:'success',start:now,until:now+1800};playSound('record');}
     for(let i=0;i<s.lanes.length;i++){
       const t=s.tiles[i];if(!t)continue;
       if(t.holding){
@@ -7174,7 +7224,7 @@ const app={
         if(t.bonus)continue; // bonus optionnelle : aucune pénalité si ratée
         if(t.trap){ // laissée passer sans la taper : c'était le but
           s.score+=5;
-          s.judge={text:'ÉVITÉ',pts:5,multi:null,kind:'bonus',until:now+550};
+          s.judge={text:'ÉVITÉ',pts:5,multi:null,kind:'bonus',start:now,until:now+550};
           this.renderSouris();
           continue;
         }
@@ -7248,7 +7298,21 @@ const app={
     if(s.phase==='select')return this._sourisTilesSelect();
     if(s.phase==='loading')return this._sourisTilesLoading();
     if(s.phase==='end')return this._sourisTilesEndScreen();
+    if(s.phase==='play'&&s.startAt&&Date.now()<s.startAt)return this._sourisTilesCountdown();
     this._sourisTilesArena();
+  },
+  _sourisTilesCountdown(){
+    const s=this.souris;
+    const cd=Math.max(0,Math.ceil((s.startAt-Date.now())/1000));
+    if(cd!==s._lastCd){s._lastCd=cd;playSound('countdown');}
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:760px;margin:0 auto;padding:0 24px">
+        <div class="game-arena" style="height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+          <div class="race-count">${cd>0?cd:'GO !'}</div>
+          <p style="color:rgba(255,255,255,.5);font-size:14px">Prépare tes doigts…</p>
+        </div>
+      </div>
+    </div>`;
   },
   _sourisTilesArena(){
     const s=this.souris;
@@ -7270,23 +7334,46 @@ const app={
         const cls=[t.holding?'holding':'',t.bonus?'bonus':'',t.trap?'trap':'',t.trill?'trill':'',t.chordId?'chord':'',(t.chordId&&t.chordHit)?'chord-armed':''].filter(Boolean).join(' ');
         const label=t.bonus?'♥':(t.trap?'✕':lane.letter);
         const trillDots=t.trill?`<div class="tiles-trill-dots">${Array.from({length:t.trillNeed}).map((_,n)=>`<span class="${n<t.trillHits?'done':''}"></span>`).join('')}</div>`:'';
-        tileHtml=`<div class="tiles-tile${cls?' '+cls:''}" style="top:${y}%;height:${h}px;transform:translateY(-50%);${bg}">${label}${trillDots}</div>`;
+        // accord armé (une main posée, on attend l'autre) : lueur qui respire
+        // vraiment, calculée depuis chordArmedAt plutôt qu'une animation CSS
+        // qui n'aurait pas le temps de jouer entre deux rendus
+        const armPulse=(t.chordId&&t.chordHit)?0.5+0.5*Math.sin((Date.now()-(t.chordArmedAt||0))/150):0;
+        const armGlow=(t.chordId&&t.chordHit)?`;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 0 2px #fff,0 0 ${(14+12*armPulse).toFixed(0)}px rgba(255,255,255,${(0.4+0.35*armPulse).toFixed(2)})`:'';
+        tileHtml=`<div class="tiles-tile${cls?' '+cls:''}" style="top:${y}%;height:${h}px;transform:translateY(-50%);${bg}${armGlow}">${label}${trillDots}</div>`;
       }
       return `<div class="tiles-lane">${tileHtml}</div>`;
     }).join('');
     const judge=s.judge&&s.judge.until>Date.now()?s.judge:null;
     const judgeCls=judge?(judge.kind==='bonus'?'bonus':judge.kind==='bad'?'bad':judge.tier==='perfect'?'perfect':'good'):'';
     const judgeGold=judge&&(judge.kind==='bonus'||judge.tier==='perfect');
-    const judgeHtml=judge?`<div class="tiles-judge ${judgeCls}">
+    const judgePop=judge?this._sourisTilesPop(judge.start):0;
+    const judgeHtml=judge?`<div class="tiles-judge ${judgeCls}" style="opacity:${judgePop};transform:translate(-50%,-50%) scale(${(0.6+0.4*judgePop).toFixed(3)})">
       <div class="tiles-judge-text">${judge.text}</div>
       ${judge.pts?`<div class="tiles-judge-pill" style="background:${judgeGold?'rgba(255,216,77,.9)':'rgba(31,169,113,.88)'};color:${judgeGold?'#16140F':'#fff'}">+${judge.pts}${judge.multi>1?` · MULTI ×${judge.multi}`:''}</div>`:''}
     </div>`:'';
     const banner=s.banner&&s.banner.until>Date.now()?s.banner:null;
-    const bannerHtml=banner?`<div class="tiles-banner ${banner.kind}">${banner.text}</div>`:'';
+    const bannerPop=banner?this._sourisTilesPop(banner.start):0;
+    const bannerHtml=banner?`<div class="tiles-banner ${banner.kind}" style="opacity:${bannerPop};transform:translate(-50%,0) scale(${(0.75+0.25*bannerPop).toFixed(3)})">${banner.text}</div>`:'';
     const keysHtml=s.lanes.map((l,i)=>{
       const locked=!activeLanes.includes(i);
       const pressed=this._sourisKeys&&this._sourisKeys[l.letter];
       return `<div class="tiles-key${locked?' locked':''}${pressed?' pressed':''}">${l.letter}</div>`;
+    }).join('');
+    const heartsNow=Date.now();
+    const heartsHtml=[0,1,2].map(i=>{
+      const filled=i<s.lives;
+      let color=filled?'#FF4D2E':'rgba(255,255,255,0.18)';
+      let transform='';
+      if(s.lifeLostIdx===i&&s.lifeLostAt&&heartsNow-s.lifeLostAt<420){
+        const p=(heartsNow-s.lifeLostAt)/420;
+        color=this._sourisLerpHex('#E5484D','#484138',p); // rouge vif → gris éteint (proche du rgba(255,255,255,.18) sur ce fond sombre)
+        transform=`translateX(${(Math.sin((heartsNow-s.lifeLostAt)/28)*5*(1-p)).toFixed(1)}px)`;
+      } else if(s.lifeGainedIdx===i&&s.lifeGainedAt&&heartsNow-s.lifeGainedAt<420){
+        const p=(heartsNow-s.lifeGainedAt)/420;
+        color=this._sourisLerpHex('#FFD84D','#FF4D2E',p);
+        transform=`scale(${(1+0.6*(1-p)).toFixed(2)})`;
+      }
+      return `<span style="color:${color};display:inline-block${transform?`;transform:${transform}`:''}">♥</span>`;
     }).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
@@ -7305,7 +7392,7 @@ const app={
           </div>
           <div class="tiles-meta">
             <div class="tiles-bpm${s.intenseActive?' hot':''}">${isFree?'Mode libre':song.title} · ${Math.round((isFree?s.bpm:song.bpm)*(s.intenseActive?1.35:1))} BPM${s.intenseActive?' · INTENSE':''}</div>
-            <div class="tiles-hearts">${[0,1,2].map(i=>`<span style="color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('')}</div>
+            <div class="tiles-hearts">${heartsHtml}</div>
           </div>
           <div class="tiles-board">
             ${lanesHtml}
