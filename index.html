@@ -2582,12 +2582,27 @@ const TILES_RANK_SCORE=[0,120,280,480,750,1100,1600];
 // Difficulté progressive : de plus en plus de couloirs s'activent au fil de
 // la partie (indices dans TILES_LANES). Chaque palier ≥1 reçoit, 6s après son
 // début, un "passage intense" de 3.5s (tempo accéléré) — annoncé à l'écran.
-const TILES_SESSION_MS=45000;
-const TILES_STAGES=[
-  {lanes:[3,4],t:0,label:'2 TOUCHES · F · J'},
-  {lanes:[2,3,4,5],t:9000,label:'4 TOUCHES · D F J K'},
-  {lanes:[1,2,3,4,5,6],t:20000,label:'6 TOUCHES · S D F J K L'},
-  {lanes:[0,1,2,3,4,5,6,7],t:32000,label:'8 TOUCHES · CLAVIER COMPLET'},
+// Paliers de difficulté exprimés en proportion de la durée du morceau (et non
+// plus en millisecondes fixes) : ratios repris de l'ancien script à session
+// unique de 45s (0 / 9000 / 20000 / 32000 ms), pour garder la même courbe de
+// difficulté quel que soit le morceau choisi.
+const TILES_STAGE_DEFS=[
+  {lanes:[3,4],ratio:0,label:'2 TOUCHES · F · J'},
+  {lanes:[2,3,4,5],ratio:0.2,label:'4 TOUCHES · D F J K'},
+  {lanes:[1,2,3,4,5,6],ratio:0.444,label:'6 TOUCHES · S D F J K L'},
+  {lanes:[0,1,2,3,4,5,6,7],ratio:0.711,label:'8 TOUCHES · CLAVIER COMPLET'},
+];
+// Morceaux jouables (vocabulaire volontairement distinct de "piste", déjà pris
+// par les 3 variantes de Précision souris grid/hybrid/tiles — voir
+// _sourisTrackBestField). Le tempo est celui, réel, du morceau : contrairement
+// à l'ancien mode procédural, il n'accélère plus avec le combo.
+// offsetMs : décalage fin (ms) si le premier temps fort n'est pas exactement à
+// 0 (silence d'intro) — à ajuster à l'oreille si le chart tombe en avance/retard,
+// personne ne l'a encore playtesté au casque.
+const TILES_SONGS=[
+  {id:'facile',title:'I can see you all',artist:'ThisIsBeatKitchen',bpm:90,file:'/sounds/tiles-facile-90bpm.mp3',diffLabel:'Facile',diffColor:'#1FA971',offsetMs:0},
+  {id:'difficile',title:'Flashbacks',artist:'ThisIsBeatKitchen',bpm:120,file:'/sounds/tiles-difficile-120bpm.mp3',diffLabel:'Difficile',diffColor:'#FF8A5C',offsetMs:0},
+  {id:'extreme',title:'Sell your Soul',artist:'ThisIsBeatKitchen',bpm:140,file:'/sounds/tiles-extreme-140bpm.mp3',diffLabel:'Extrême',diffColor:'#E5484D',offsetMs:0},
 ];
 // Rampe décorative pour l'écran d'accroche (indépendante des couleurs de jeu
 // TILES_HAND_GRADIENT) : sombre à gauche, incandescente au centre-droit. Chaque
@@ -5670,14 +5685,26 @@ const app={
   // Point d'entrée commun aux 3 pistes à session unique en fin de partie :
   // palier médaille + meilleur score, son+confettis, sauvegarde. Chaque
   // piste appelle ceci puis affiche son propre écran de fin.
-  _sourisFinishTrack(trackId,{score,thresholds,extra}){
+  // subId : identifiant de morceau (Magic Tiles a plusieurs morceaux jouables,
+  // chacun avec son propre meilleur score) — absent pour grid/hybrid, qui
+  // gardent un best unique comme avant.
+  _sourisFinishTrack(trackId,{score,thresholds,extra,subId}){
     const field=this._sourisTrackBestField(trackId);
     const tier=score>=thresholds.gold?'gold':score>=thresholds.silver?'silver':score>=thresholds.bronze?'bronze':null;
     const prevRank={bronze:1,silver:2,gold:3};
-    const prev=this.stats[field];
+    let prev,setBest;
+    if(subId){
+      if(this.stats[field]&&typeof this.stats[field].score==='number')this.stats[field]={}; // migration : ancien format plat (un seul best, pas encore par morceau)
+      this.stats[field]=this.stats[field]||{};
+      prev=this.stats[field][subId];
+      setBest=(v)=>{this.stats[field][subId]=v;};
+    } else {
+      prev=this.stats[field];
+      setBest=(v)=>{this.stats[field]=v;};
+    }
     const isNewBest=tier&&(!prev||(prevRank[tier]||0)>(prevRank[prev.tier]||0)||(tier===prev.tier&&score>prev.score));
-    if(isNewBest)this.stats[field]=Object.assign({score,tier,date:Date.now()},extra||{});
-    try{track('game_completed',{game:'souris',mode:trackId,score,tier:tier||null});}catch{}
+    if(isNewBest)setBest(Object.assign({score,tier,date:Date.now()},extra||{}));
+    try{track('game_completed',{game:'souris',mode:trackId,song:subId||null,score,tier:tier||null});}catch{}
     saveStats(this.stats);
     if(isNewBest)this._celebrateGame(null,prev?'record':'levelup');
     return {tier,isNewBest};
@@ -5701,6 +5728,7 @@ const app={
     if(this._sourisLoop){clearInterval(this._sourisLoop);this._sourisLoop=null;}
     if(this._sourisKeyH){window.removeEventListener('keydown',this._sourisKeyH);window.removeEventListener('keyup',this._sourisKeyUpH);this._sourisKeyH=null;this._sourisKeyUpH=null;}
     this._sourisKeys=null;
+    if(this._sourisAudio){this._sourisAudio.pause();this._sourisAudio=null;}
   },
 
   /* ── Rendu ──────────────────────────────────────────────────── */
@@ -6501,7 +6529,7 @@ const app={
         <div class="game-arena" style="height:auto;padding:28px 20px">
           ${this._gameResult({
             icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-            record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+            record:r.isNewBest?'Nouveau record sur cette piste !':null,
             boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
             primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisGridStart()',
           })}
@@ -6674,7 +6702,7 @@ const app={
         <div class="game-arena" style="height:auto;padding:28px 20px">
           ${this._gameResult({
             icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-            record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+            record:r.isNewBest?'Nouveau record sur cette piste !':null,
             boxes:[{label:'Score',value:s.score,accent:true},{label:'Visée',value:s._avgAim,unit:'ms'},{label:'Frappe',value:s._acc,unit:'%'}],
             primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisHybridStart()',
           })}
@@ -6698,9 +6726,34 @@ const app={
     const pct=next?Math.min(100,Math.round(100*(score-cur)/(next-cur))):100;
     return {label:TILES_RANKS[i],next:TILES_RANKS[i+1]||null,pct};
   },
-  _sourisTilesBrief(){
-    const best=this.stats&&this.stats.sourisTilesBest;
+  // Score de référence (bronze/silver/gold) calé à l'origine sur la session
+  // procédurale à 45s/100-170 BPM (_sourisTiers.tiles) : mis à l'échelle par
+  // morceau selon sa durée et son tempo réels. Estimation grossière tant que
+  // personne n'a playtesté chaque morceau au clavier — à réajuster ensuite.
+  _sourisTilesTiersFor(song,durMs){
+    const base=this._sourisTiers.tiles;
+    const factor=Math.max(0.3,(durMs/45000)*(song.bpm/120));
+    return {bronze:Math.round(base.bronze*factor),silver:Math.round(base.silver*factor),gold:Math.round(base.gold*factor)};
+  },
+  _sourisTilesStagesForDur(durMs){
+    return TILES_STAGE_DEFS.map(d=>({lanes:d.lanes,label:d.label,t:Math.round(d.ratio*durMs)}));
+  },
+  _sourisTilesSelect(){
+    const best=(this.stats&&this.stats.sourisTilesBest)||{};
     const keysHtml=TILES_LANES.map((l,i)=>`<div class="tiles-intro-key" style="--dim:${TILES_INTRO_KEY_RAMP[i][0]};--bright:${TILES_INTRO_KEY_RAMP[i][1]};animation-delay:${(i*-0.35).toFixed(2)}s">${l.letter}</div>`).join('');
+    const songsHtml=TILES_SONGS.map(song=>{
+      const b=best&&typeof best.score==='number'?null:best[song.id]; // ignore l'ancien format plat (un seul best global)
+      return `<button onclick="app._sourisTilesStart('${song.id}')" style="text-align:left;width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;font-family:inherit;color:#fff;margin-bottom:10px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
+        <span>
+          <span style="display:block;font-weight:700;font-size:15.5px">${song.title}</span>
+          <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">${song.artist} · ${song.bpm} BPM</span>
+        </span>
+        <span style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+          ${b?`<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(255,255,255,.5)">${b.score} pts</span>`:''}
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;padding:4px 10px;border-radius:999px;background:${song.diffColor}22;color:${song.diffColor};border:1px solid ${song.diffColor}55">${song.diffLabel.toUpperCase()}</span>
+        </span>
+      </button>`;
+    }).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:900px;margin:0 auto;padding:0 24px">
         <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
@@ -6709,45 +6762,73 @@ const app={
             <div class="tiles-intro-deco l"></div>
             <div class="tiles-intro-deco r"></div>
             <h2 class="tiles-intro-title">Magic Tiles</h2>
-            <p class="tiles-intro-sub">Tape la tuile pile sur la ligne. Ne rate aucun temps.${best?'<br><span style="opacity:.7">Record : <b style="color:var(--accent);opacity:1">'+best.score+' pts</b></span>':''}</p>
+            <p class="tiles-intro-sub">Choisis un morceau. Tape la tuile pile sur la ligne, ne rate aucun temps.</p>
             <div class="tiles-intro-keys">${keysHtml}</div>
-            <button class="btn-primary" autofocus onclick="app._sourisTilesStart()">Lancer le morceau ›</button>
-            <div class="gidle-espace">OU APPUIE SUR ESPACE</div>
+            <div style="width:100%;max-width:440px;margin-top:8px">${songsHtml}</div>
           </div>
         </div>
       </div>
     </div>`;
   },
-  _sourisTilesStageIdx(elapsed){
-    let idx=0;for(let i=TILES_STAGES.length-1;i>=0;i--){if(elapsed>=TILES_STAGES[i].t){idx=i;break;}}
+  _sourisTilesLoading(){
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:520px;margin:80px auto;text-align:center">
+        <div style="color:var(--muted);font-size:14px;margin-bottom:14px">Chargement du morceau…</div>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted)">← Jeux</button>
+      </div>
+    </div>`;
+  },
+  _sourisTilesStageIdx(stages,elapsed){
+    let idx=0;for(let i=stages.length-1;i>=0;i--){if(elapsed>=stages[i].t){idx=i;break;}}
     return idx;
   },
-  _sourisTilesStart(){
+  _sourisTilesStart(songId){
     this.stopSouris();
-    this.souris={phase:'play',track:'tiles',score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,
-      bpm:100,tiles:Array(8).fill(null),spawnAcc:0,sessionLeft:TILES_SESSION_MS,judge:null,
-      stageIdx:0,banner:{text:TILES_STAGES[0].label,kind:'stage',until:Date.now()+2200},
-      intenseActive:false,intenseLostLife:false};
-    this._sourisKeys={};TILES_LANES.forEach(l=>this._sourisKeys[l.letter]=false);
-    this._sourisKeyH=(e)=>{
-      const k=(e.key||'').toLowerCase();
-      if(!(k in this._sourisKeys)||this._sourisKeys[k])return; // touche déjà tenue : ignore la répétition auto
-      this._sourisKeys[k]=true;
-      e.preventDefault();
-      this._sourisTilesPress(k);
-      this.renderSouris();
-    };
-    this._sourisKeyUpH=(e)=>{
-      const k=(e.key||'').toLowerCase();
-      if(!(k in this._sourisKeys))return;
-      this._sourisKeys[k]=false;
-      this._sourisTilesRelease(k);
-      this.renderSouris();
-    };
-    window.addEventListener('keydown',this._sourisKeyH);
-    window.addEventListener('keyup',this._sourisKeyUpH);
+    const song=TILES_SONGS.find(x=>x.id===songId)||TILES_SONGS[0];
+    const audio=new Audio(song.file);
+    audio.preload='auto';
+    audio.volume=isSoundMuted()?0:0.35;
+    audio.muted=isSoundMuted();
+    this._sourisAudio=audio;
+    this.souris={phase:'loading',track:'tiles',songId:song.id};
     this.renderSouris();
-    this._sourisLoop=setInterval(()=>this._sourisTilesTick(),50);
+    const begin=()=>{
+      if(this._sourisAudio!==audio)return; // partie quittée pendant le chargement
+      const durMs=Math.max(10000,(isFinite(audio.duration)&&audio.duration>0?audio.duration*1000:180000)-(song.offsetMs||0));
+      const stages=this._sourisTilesStagesForDur(durMs);
+      this.souris={phase:'play',track:'tiles',songId:song.id,durMs,stages,
+        score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,
+        tiles:Array(8).fill(null),spawnAcc:0,judge:null,playStartWall:Date.now(),
+        stageIdx:0,banner:{text:stages[0].label,kind:'stage',until:Date.now()+2200},
+        intenseActive:false,intenseLostLife:false};
+      this._sourisKeys={};TILES_LANES.forEach(l=>this._sourisKeys[l.letter]=false);
+      this._sourisKeyH=(e)=>{
+        const k=(e.key||'').toLowerCase();
+        if(!(k in this._sourisKeys)||this._sourisKeys[k])return; // touche déjà tenue : ignore la répétition auto
+        this._sourisKeys[k]=true;
+        e.preventDefault();
+        this._sourisTilesPress(k);
+        this.renderSouris();
+      };
+      this._sourisKeyUpH=(e)=>{
+        const k=(e.key||'').toLowerCase();
+        if(!(k in this._sourisKeys))return;
+        this._sourisKeys[k]=false;
+        this._sourisTilesRelease(k);
+        this.renderSouris();
+      };
+      window.addEventListener('keydown',this._sourisKeyH);
+      window.addEventListener('keyup',this._sourisKeyUpH);
+      audio.currentTime=(song.offsetMs||0)/1000;
+      audio.play().catch(()=>{}); // lecture bloquée (politique navigateur) : le chart continue sur son horloge interne
+      this.renderSouris();
+      this._sourisLoop=setInterval(()=>this._sourisTilesTick(),50);
+    };
+    if(audio.readyState>=1)begin();
+    else{
+      audio.addEventListener('loadedmetadata',begin,{once:true});
+      audio.addEventListener('error',begin,{once:true}); // fichier manquant/bloqué : démarre quand même sur une durée par défaut
+    }
   },
   _sourisTilesJudgeDist(t){
     const dist=Math.abs(t.y-this._sourisTilesHitLineY);
@@ -6772,7 +6853,6 @@ const app={
       const multi=1+Math.min(3,Math.floor(s.combo/10));
       const pts=(j==='perfect'?3:1)*multi;
       s.score+=pts;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
-      if(s.combo>0&&s.combo%10===0)s.bpm=Math.min(170,s.bpm+10);
       playSound('hit');this._flashArena(j==='perfect'?'#FFD84D':'#1FA971');
       s.judge={text:j==='perfect'?'PARFAIT':'BIEN',pts,multi,kind:'good',until:Date.now()+550};
     }
@@ -6809,19 +6889,23 @@ const app={
   },
   _sourisTilesTick(){
     const s=this.souris;if(!s||s.phase!=='play')return;
-    s.sessionLeft-=50;
-    if(s.sessionLeft<=0){this._sourisTilesEnd();return;}
+    const audio=this._sourisAudio;
     const now=Date.now();
-    const elapsed=TILES_SESSION_MS-s.sessionLeft;
-    // palier de difficulté : de plus en plus de couloirs actifs
-    const idx=this._sourisTilesStageIdx(elapsed);
+    // lecture audio bloquée (politique autoplay du navigateur) : bascule sur
+    // une horloge murale pour que le morceau progresse quand même
+    const elapsed=(audio&&!audio.paused&&!audio.ended)?audio.currentTime*1000:now-s.playStartWall;
+    if(elapsed>=s.durMs-30||(audio&&audio.ended)){this._sourisTilesEnd();return;}
+    const song=TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0];
+    // palier de difficulté : de plus en plus de couloirs actifs (calé sur la
+    // position réelle de lecture du morceau, pas sur une horloge indépendante)
+    const idx=this._sourisTilesStageIdx(s.stages,elapsed);
     if(idx>s.stageIdx){
       s.stageIdx=idx;
-      s.banner={text:TILES_STAGES[idx].label,kind:'stage',until:now+2200};
+      s.banner={text:s.stages[idx].label,kind:'stage',until:now+2200};
       playSound('levelup');
     }
     // passage intense : une fenêtre par palier ≥1, tempo accéléré
-    const intenseStart=s.stageIdx>=1?TILES_STAGES[s.stageIdx].t+6000:-1;
+    const intenseStart=s.stageIdx>=1?s.stages[s.stageIdx].t+6000:-1;
     const intenseEnd=intenseStart+3500;
     const wasIntense=s.intenseActive;
     s.intenseActive=intenseStart>=0&&elapsed>=intenseStart&&elapsed<intenseEnd;
@@ -6833,7 +6917,7 @@ const app={
         if(now-t.holdStart>=t.holdDur){s.tiles[i]=null;this._sourisTilesApply('perfect');}
         continue;
       }
-      t.y=(now-t.born)/t.dur*100;
+      t.y=(elapsed-t.born)/t.dur*100;
       const missAt=t.long?this._sourisTilesHitLineY+16:100;
       if(t.y>=missAt){
         s.tiles[i]=null;
@@ -6843,49 +6927,52 @@ const app={
     }
     if(s.phase!=='play')return;
     s.spawnAcc+=50;
-    const effBpm=s.bpm*(s.intenseActive?1.35:1);
+    const effBpm=song.bpm*(s.intenseActive?1.35:1);
     const interval=60000/effBpm;
     if(s.spawnAcc>=interval){
       s.spawnAcc=0;
-      const activeLanes=TILES_STAGES[s.stageIdx].lanes;
+      const activeLanes=s.stages[s.stageIdx].lanes;
       const inactiveFree=[0,1,2,3,4,5,6,7].filter(i=>!activeLanes.includes(i)&&!s.tiles[i]);
       const wantBonus=s.lives<3&&inactiveFree.length&&Math.random()<0.16;
       if(wantBonus){
         const i=inactiveFree[Math.floor(Math.random()*inactiveFree.length)];
         const dur=Math.max(1300,60000/effBpm*5);
-        s.tiles[i]={y:0,born:now,dur,letter:TILES_LANES[i].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:true};
+        s.tiles[i]={y:0,born:elapsed,dur,letter:TILES_LANES[i].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:true};
       } else {
         const free=activeLanes.filter(i=>!s.tiles[i]);
         if(free.length){
           const i=free[Math.floor(Math.random()*free.length)];
           const dur=Math.max(900,60000/effBpm*4);
           const long=Math.random()<0.18;
-          s.tiles[i]={y:0,born:now,dur,letter:TILES_LANES[i].letter,long,holding:false,holdStart:0,holdDur:500+Math.random()*300,bonus:false};
+          s.tiles[i]={y:0,born:elapsed,dur,letter:TILES_LANES[i].letter,long,holding:false,holdStart:0,holdDur:500+Math.random()*300,bonus:false};
         }
       }
     }
     this.renderSouris();
   },
   _sourisTilesEnd(){
-    if(this.souris.phase==='end')return;
-    this.stopSouris();
+    if(!this.souris||this.souris.phase==='end')return;
     const s=this.souris;
+    const song=TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0];
     const acc=(s.hits+s.misses)?Math.round(100*s.hits/(s.hits+s.misses)):0;
-    const res=this._sourisFinishTrack('tiles',{score:s.score,thresholds:this._sourisTiers.tiles,extra:{combo:s.bestCombo},sessionResult:{hits:s.hits,combo:s.bestCombo}});
+    const res=this._sourisFinishTrack('tiles',{score:s.score,thresholds:this._sourisTilesTiersFor(song,s.durMs),extra:{combo:s.bestCombo},subId:s.songId});
+    this.stopSouris();
     s.phase='end';s._result=res;s._acc=acc;
     this.renderSouris();
   },
   _sourisTilesRender(){
     const s=this.souris;
-    if(s.phase==='brief')return this._sourisTilesBrief();
+    if(s.phase==='select')return this._sourisTilesSelect();
+    if(s.phase==='loading')return this._sourisTilesLoading();
     if(s.phase==='end')return this._sourisTilesEndScreen();
     this._sourisTilesArena();
   },
   _sourisTilesArena(){
     const s=this.souris;
+    const song=TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0];
     const rank=this._sourisTilesRank(s.score);
     const hasLong=s.tiles.some(t=>t&&t.long&&!t.holding);
-    const activeLanes=TILES_STAGES[s.stageIdx].lanes;
+    const activeLanes=s.stages[s.stageIdx].lanes;
     const lanesHtml=TILES_LANES.map((lane,i)=>{
       const t=s.tiles[i];
       let tileHtml='';
@@ -6925,7 +7012,7 @@ const app={
             <div style="text-align:right"><div class="tiles-hud-label">COMBO</div><div class="tiles-hud-val sec">${s.combo}<span style="font-size:14px"> ✱</span></div></div>
           </div>
           <div class="tiles-meta">
-            <div class="tiles-bpm${s.intenseActive?' hot':''}">${Math.round(s.bpm*(s.intenseActive?1.35:1))} BPM${s.intenseActive?' · INTENSE':''}</div>
+            <div class="tiles-bpm${s.intenseActive?' hot':''}">${song.title} · ${Math.round(song.bpm*(s.intenseActive?1.35:1))} BPM${s.intenseActive?' · INTENSE':''}</div>
             <div class="tiles-hearts">${[0,1,2].map(i=>`<span style="color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('')}</div>
           </div>
           <div class="tiles-board">
@@ -6943,15 +7030,17 @@ const app={
   },
   _sourisTilesEndScreen(){
     const s=this.souris,r=s._result;
+    const song=TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0];
     const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:auto;padding:28px 20px">
           ${this._gameResult({
             icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-            record:r.isNewBest?'Nouveau record sur cette piste !':(r.missionJustDone?'Mission du jour terminée !':(r.badge?'Badge débloqué : '+r.badge.label:(r.skin?'Skin débloqué : '+r.skin.label:null))),
+            record:r.isNewBest?`Nouveau record sur ${song.title} !`:null,
             boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
-            primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisTilesStart()',
+            primaryLabel:'Rejouer ▸',primaryOnClick:`app._sourisTilesStart('${song.id}')`,
+            secondaryLabel:'Autre morceau',secondaryOnClick:`app.souris={phase:'select',track:'tiles'};app.renderSouris()`,
           })}
         </div>
       </div>
@@ -7244,7 +7333,7 @@ const app={
       this.activeGame='sourisHybrid';this.souris={phase:'brief',track:'hybrid'};this.renderGames();
     } else if(which==='sourisTiles'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sourisTiles'));return;}
-      this.activeGame='sourisTiles';this.souris={phase:'brief',track:'tiles'};this.renderGames();
+      this.activeGame='sourisTiles';this.souris={phase:'select',track:'tiles'};this.renderGames();
     } else if(which==='clavier'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('clavier'));return;}
       this.activeGame='clavier';this.clavier=null;this.renderGames();
