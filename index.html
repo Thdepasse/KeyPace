@@ -1209,6 +1209,13 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .tiles-tile::after{content:'';position:absolute;left:8%;right:8%;top:3px;height:30%;border-radius:6px;background:linear-gradient(rgba(255,255,255,.35),transparent)}
 .tiles-tile.holding{box-shadow:0 0 0 2px #fff,inset 0 -3px 0 rgba(0,0,0,.25),0 0 20px rgba(255,255,255,.5);transition:none}
 .tiles-tile.bonus{background:linear-gradient(160deg,#FFE27A,#F4B400)!important;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),0 0 22px rgba(255,216,77,.65)}
+.tiles-tile.trap{background:repeating-linear-gradient(135deg,#2a1510,#2a1510 6px,#4a201a 6px,#4a201a 12px)!important;border:1.5px dashed #E5484D;box-shadow:inset 0 -3px 0 rgba(0,0,0,.3),0 0 16px rgba(229,72,77,.3);color:#E5484D}
+.tiles-tile.trill{background:linear-gradient(160deg,#B98CFF,#7C3AED)!important;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 20px rgba(124,58,237,.55)}
+.tiles-tile.trill .tiles-trill-dots{position:absolute;bottom:4px;left:0;right:0;display:flex;justify-content:center;gap:3px}
+.tiles-tile.trill .tiles-trill-dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.35)}
+.tiles-tile.trill .tiles-trill-dots span.done{background:#fff}
+.tiles-tile.chord{box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 0 2px #FFD84D,0 0 18px rgba(255,216,77,.4)}
+.tiles-tile.chord.chord-armed{box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 0 2px #fff,0 0 22px rgba(255,255,255,.6)}
 .tiles-hitline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55) 15%,rgba(255,255,255,.55) 85%,transparent);box-shadow:0 0 14px rgba(255,255,255,.35);z-index:1}
 .tiles-keys{position:relative;z-index:1;display:flex}
 .tiles-key{flex:1;text-align:center;padding:9px 0;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:rgba(255,255,255,.75);background:rgba(255,255,255,.05);border-left:1.5px dashed rgba(255,255,255,.08);border-bottom:3px solid rgba(255,255,255,.12);border-radius:0 0 8px 8px;transition:transform .08s,box-shadow .08s,background .08s}
@@ -6762,7 +6769,7 @@ const app={
             <div class="tiles-intro-deco l"></div>
             <div class="tiles-intro-deco r"></div>
             <h2 class="tiles-intro-title">Magic Tiles</h2>
-            <p class="tiles-intro-sub">Choisis un morceau. Tape la tuile pile sur la ligne, ne rate aucun temps.</p>
+            <p class="tiles-intro-sub">Choisis un morceau. Tape la tuile pile sur la ligne, ne rate aucun temps.<br><span style="opacity:.7;font-size:14px">Au fil du morceau : tuiles à deux mains, trilles à répéter, pièges (✕) à laisser passer.</span></p>
             <div class="tiles-intro-keys">${keysHtml}</div>
             <div style="width:100%;max-width:440px;margin-top:8px">${songsHtml}</div>
           </div>
@@ -6845,7 +6852,7 @@ const app={
     if(s.lives<=0){this._sourisTilesEnd();return true;}
     return false;
   },
-  _sourisTilesApply(j){
+  _sourisTilesApply(j,label){
     const s=this.souris;
     if(j==='bad'){
       if(this._sourisTilesMiss())return;
@@ -6854,20 +6861,64 @@ const app={
       const pts=(j==='perfect'?3:1)*multi;
       s.score+=pts;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
       playSound('hit');this._flashArena(j==='perfect'?'#FFD84D':'#1FA971');
-      s.judge={text:j==='perfect'?'PARFAIT':'BIEN',pts,multi,kind:'good',until:Date.now()+550};
+      s.judge={text:label||(j==='perfect'?'PARFAIT':'BIEN'),pts,multi,kind:'good',until:Date.now()+550};
     }
     this.renderSouris();
+  },
+  // Accord : deux tuiles liées par chordId (une par main). La première touche
+  // pressée s'"arme" (chordHit) sans se résoudre ; la résolution (jugement =
+  // le pire des deux timings) n'a lieu qu'au second appui. Si l'une des deux
+  // tombe sans être complétée, l'autre est silencieusement effacée (une seule
+  // vie perdue pour tout l'accord, pas deux).
+  _sourisTilesChordPartnerIdx(s,t){
+    return s.tiles.findIndex(x=>x&&x!==t&&x.chordId===t.chordId);
   },
   _sourisTilesPress(k){
     const s=this.souris;if(!s||s.phase!=='play')return;
     const laneIdx=TILES_LANES.findIndex(l=>l.letter===k);
     const t=s.tiles[laneIdx];
     if(!t||t.holding)return;
+    if(t.trap){
+      s.tiles[laneIdx]=null;
+      this._sourisTilesApply('bad'); // touche piège : ne fallait pas la taper
+      return;
+    }
     if(t.bonus){
       s.tiles[laneIdx]=null;
       s.lives=Math.min(3,s.lives+1);s.score+=15;
       playSound('life');this._flashArena('#FFD84D');
       s.judge={text:'+1 VIE',pts:15,multi:null,kind:'bonus',until:Date.now()+650};
+      return;
+    }
+    if(t.chordId){
+      const partnerIdx=this._sourisTilesChordPartnerIdx(s,t);
+      if(partnerIdx<0){ // partenaire déjà résolu/raté : accord cassé
+        s.tiles[laneIdx]=null;
+        this._sourisTilesApply('bad');
+        return;
+      }
+      const partner=s.tiles[partnerIdx];
+      if(!partner.chordHit){
+        t.chordHit=true;t.chordArmY=t.y;
+        this._flashArena('#FFD84D');
+        return; // armé : on attend l'autre main
+      }
+      const j1=this._sourisTilesJudgeDist({y:partner.chordArmY});
+      const j2=this._sourisTilesJudgeDist(t);
+      const rank={bad:0,good:1,perfect:2};
+      const worst=rank[j1]<=rank[j2]?j1:j2;
+      s.tiles[laneIdx]=null;s.tiles[partnerIdx]=null;
+      this._sourisTilesApply(worst,worst==='bad'?undefined:'ACCORD !');
+      return;
+    }
+    if(t.trill){
+      t.trillHits++;
+      if(t.trillHits>=t.trillNeed){
+        s.tiles[laneIdx]=null;
+        this._sourisTilesApply('perfect','TRILLE !');
+      } else {
+        playSound('hit');this._flashArena('#B98CFF');
+      }
       return;
     }
     if(t.long){
@@ -6922,6 +6973,16 @@ const app={
       if(t.y>=missAt){
         s.tiles[i]=null;
         if(t.bonus)continue; // bonus optionnelle : aucune pénalité si ratée
+        if(t.trap){ // laissée passer sans la taper : c'était le but
+          s.score+=5;
+          s.judge={text:'ÉVITÉ',pts:5,multi:null,kind:'bonus',until:now+550};
+          this.renderSouris();
+          continue;
+        }
+        if(t.chordId){ // accord cassé : efface le partenaire sans double pénalité
+          const partnerIdx=this._sourisTilesChordPartnerIdx(s,t);
+          if(partnerIdx>=0)s.tiles[partnerIdx]=null;
+        }
         if(this._sourisTilesMiss())return;
       }
     }
@@ -6941,10 +7002,30 @@ const app={
       } else {
         const free=activeLanes.filter(i=>!s.tiles[i]);
         if(free.length){
-          const i=free[Math.floor(Math.random()*free.length)];
           const dur=Math.max(900,60000/effBpm*4);
-          const long=Math.random()<0.18;
-          s.tiles[i]={y:0,born:elapsed,dur,letter:TILES_LANES[i].letter,long,holding:false,holdStart:0,holdDur:500+Math.random()*300,bonus:false};
+          // Accord/trille/piège réservés à partir du 2e palier (≥4 touches) :
+          // le tout premier échauffement à 2 touches reste des tuiles simples.
+          const roll=s.stageIdx>=1?Math.random():1;
+          const freeL=free.filter(i=>TILES_LANES[i].hand==='l');
+          const freeR=free.filter(i=>TILES_LANES[i].hand==='r');
+          if(roll<0.08&&freeL.length&&freeR.length){
+            const i1=freeL[Math.floor(Math.random()*freeL.length)];
+            const i2=freeR[Math.floor(Math.random()*freeR.length)];
+            const cdur=Math.max(1100,dur*1.15);
+            const chordId=`${now}-${i1}-${i2}`;
+            s.tiles[i1]={y:0,born:elapsed,dur:cdur,letter:TILES_LANES[i1].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,chordId,chordHit:false,chordArmY:0};
+            s.tiles[i2]={y:0,born:elapsed,dur:cdur,letter:TILES_LANES[i2].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,chordId,chordHit:false,chordArmY:0};
+          } else if(roll<0.08+0.12){
+            const i=free[Math.floor(Math.random()*free.length)];
+            s.tiles[i]={y:0,born:elapsed,dur:dur*1.7,letter:TILES_LANES[i].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,trill:true,trillHits:0,trillNeed:3+Math.floor(Math.random()*2)};
+          } else if(roll<0.08+0.12+0.1){
+            const i=free[Math.floor(Math.random()*free.length)];
+            s.tiles[i]={y:0,born:elapsed,dur,letter:TILES_LANES[i].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,trap:true};
+          } else {
+            const i=free[Math.floor(Math.random()*free.length)];
+            const long=Math.random()<0.18;
+            s.tiles[i]={y:0,born:elapsed,dur,letter:TILES_LANES[i].letter,long,holding:false,holdStart:0,holdDur:500+Math.random()*300,bonus:false};
+          }
         }
       }
     }
@@ -6972,15 +7053,21 @@ const app={
     const song=TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0];
     const rank=this._sourisTilesRank(s.score);
     const hasLong=s.tiles.some(t=>t&&t.long&&!t.holding);
+    const hasTrap=s.tiles.some(t=>t&&t.trap);
+    const hasTrill=s.tiles.some(t=>t&&t.trill);
+    const hasChord=s.tiles.some(t=>t&&t.chordId);
     const activeLanes=s.stages[s.stageIdx].lanes;
     const lanesHtml=TILES_LANES.map((lane,i)=>{
       const t=s.tiles[i];
       let tileHtml='';
       if(t){
-        const h=t.long?64:(t.bonus?38:34);
+        const h=t.long?64:(t.bonus?38:(t.trill?44:34));
         const y=t.holding?this._sourisTilesHitLineY:t.y;
-        const bg=t.bonus?'':`background:${TILES_HAND_GRADIENT[lane.hand]};`;
-        tileHtml=`<div class="tiles-tile${t.holding?' holding':''}${t.bonus?' bonus':''}" style="top:${y}%;height:${h}px;transform:translateY(-50%);${bg}">${t.bonus?'♥':lane.letter}</div>`;
+        const bg=(t.bonus||t.trap||t.trill)?'':`background:${TILES_HAND_GRADIENT[lane.hand]};`;
+        const cls=[t.holding?'holding':'',t.bonus?'bonus':'',t.trap?'trap':'',t.trill?'trill':'',t.chordId?'chord':'',(t.chordId&&t.chordHit)?'chord-armed':''].filter(Boolean).join(' ');
+        const label=t.bonus?'♥':(t.trap?'✕':lane.letter);
+        const trillDots=t.trill?`<div class="tiles-trill-dots">${Array.from({length:t.trillNeed}).map((_,n)=>`<span class="${n<t.trillHits?'done':''}"></span>`).join('')}</div>`:'';
+        tileHtml=`<div class="tiles-tile${cls?' '+cls:''}" style="top:${y}%;height:${h}px;transform:translateY(-50%);${bg}">${label}${trillDots}</div>`;
       }
       return `<div class="tiles-lane">${tileHtml}</div>`;
     }).join('');
@@ -7022,7 +7109,7 @@ const app={
             ${judgeHtml}
           </div>
           <div class="tiles-keys">${keysHtml}</div>
-          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin-top:10px">${hasLong?'TUILE LONGUE · MAINTIENS LA TOUCHE':'Frappe la lettre avant la ligne'}</div>
+          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin-top:10px">${hasLong?'TUILE LONGUE · MAINTIENS LA TOUCHE':hasChord?'ACCORD · LES DEUX TOUCHES ENSEMBLE':hasTrill?'TRILLE · TAPE PLUSIEURS FOIS DE SUITE':hasTrap?'TUILE PIÈGE (✕) · NE LA TAPE PAS':'Frappe la lettre avant la ligne'}</div>
         </div>
         <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">quitter</button></div>
       </div>
