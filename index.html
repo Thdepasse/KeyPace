@@ -1222,10 +1222,17 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .tiles-key:first-child{border-left:none}
 .tiles-key.locked{opacity:.25}
 .tiles-key.pressed{transform:translateY(2px);border-bottom-color:transparent;background:rgba(255,77,46,.3);box-shadow:0 0 16px rgba(255,77,46,.45)}
-.tiles-judge{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);text-align:center;z-index:6;pointer-events:none;animation:tilesPop .22s ease-out}
+/* Même contrainte que les bannières (re-rendu complet du plateau à chaque
+   tick de 50ms) : une animation d'entrée n'a jamais le temps de jouer, donc
+   pas d'animation ici — l'impact vient de la couleur par palier de réussite,
+   reprenant le langage déjà utilisé par les flashs d'arène (or=parfait,
+   vert=bien) au lieu du même orange générique pour toute réussite. */
+.tiles-judge{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);text-align:center;z-index:6;pointer-events:none}
 .tiles-judge-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;color:#fff;text-shadow:0 0 26px rgba(255,255,255,.35)}
+.tiles-judge.perfect .tiles-judge-text,.tiles-judge.bonus .tiles-judge-text{color:#FFD84D;text-shadow:0 0 32px rgba(255,216,77,.65)}
+.tiles-judge.good .tiles-judge-text{color:#4ADE95;text-shadow:0 0 28px rgba(31,169,113,.55)}
+.tiles-judge.bad .tiles-judge-text{color:rgba(255,255,255,.5);text-shadow:none;font-size:27px}
 .tiles-judge-pill{display:inline-flex;align-items:center;gap:6px;margin-top:6px;border-radius:999px;padding:5px 15px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff}
-@keyframes tilesPop{0%{transform:translate(-50%,-50%) scale(.6);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
 /* Le plateau entier se re-rend à chaque tick (50ms), donc cet élément est
    recréé en continu tant qu'une bannière est affichée : une animation
    d'entrée/pulsation n'a jamais le temps de jouer, elle reste bloquée sur
@@ -1261,7 +1268,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
   87.5%{background-color:#FF7A5C}
 }
 @media(max-width:640px){.tiles-intro-key{width:42px;height:42px;font-size:16px;border-radius:12px}.tiles-intro-deco{width:80px;height:80px}}
-@media(prefers-reduced-motion:reduce){.tiles-judge{animation:none}.tiles-tile{transition:none}.tiles-intro-key{animation:none;background-color:#FF4D2E}.tiles-intro-deco.r{animation:none}}
+@media(prefers-reduced-motion:reduce){.tiles-tile{transition:none}.tiles-intro-key{animation:none;background-color:#FF4D2E}.tiles-intro-deco.r{animation:none}}
 .tiles-loading-dots{display:flex;gap:9px;justify-content:center}
 .tiles-loading-dot{width:11px;height:11px;border-radius:50%;animation:tilesIntroChase .8s linear infinite}
 @media(prefers-reduced-motion:reduce){.tiles-loading-dot{animation:none;background-color:#FF4D2E}}
@@ -1839,7 +1846,7 @@ function _synthTone(ctx,{freq,start,dur,type='sine',gain=0.2,freqEnd}){
   osc.start(start);osc.stop(start+dur+0.03);
 }
 const SYNTH_SOUNDS={
-  hit(ctx){const t=ctx.currentTime;_synthTone(ctx,{freq:880,freqEnd:1200,dur:0.09,type:'sine',gain:0.22,start:t});},
+  hit(ctx,{pitch=1}={}){const t=ctx.currentTime;_synthTone(ctx,{freq:880*pitch,freqEnd:1200*pitch,dur:0.09,type:'sine',gain:0.22,start:t});},
   miss(ctx){const t=ctx.currentTime;_synthTone(ctx,{freq:190,freqEnd:130,dur:0.15,type:'sine',gain:0.16,start:t});},
   life(ctx){const t=ctx.currentTime;_synthTone(ctx,{freq:660,dur:0.14,type:'triangle',gain:0.2,start:t});_synthTone(ctx,{freq:990,dur:0.2,type:'triangle',gain:0.2,start:t+0.09});},
   victory(ctx){const t=ctx.currentTime;[523.25,659.25,783.99,1046.5].forEach((f,i)=>_synthTone(ctx,{freq:f,dur:0.24,type:'triangle',gain:0.2,start:t+i*0.11}));},
@@ -1875,11 +1882,11 @@ function analyzeSongPeak(song){
 // le morceau qui joue, et inversement.
 function isMusicMuted(){try{return localStorage.getItem('kp_music_muted')==='1';}catch{return false;}}
 function setMusicMuted(v){try{localStorage.setItem('kp_music_muted',v?'1':'0');}catch{}}
-function playSound(name){
+function playSound(name,opts){
   if(isSoundMuted())return;
   if(SYNTH_SOUNDS[name]){
     const ctx=_getAudioCtx();
-    if(ctx){try{SYNTH_SOUNDS[name](ctx);}catch{}}
+    if(ctx){try{SYNTH_SOUNDS[name](ctx,opts||{});}catch{}}
     return;
   }
   const src=SOUND_FILES[name];if(!src)return;
@@ -4539,6 +4546,30 @@ const app={
       </div>
     </div>`;
   },
+  // Anime les .stat-val d'un écran de résultat de 0 jusqu'à leur valeur
+  // affichée (déjà dans le DOM), sans toucher au <span class="stat-unit">
+  // imbriqué. Contrairement au plateau de jeu, cet écran ne se re-rend pas
+  // en boucle : l'animation a vraiment le temps de jouer jusqu'au bout.
+  // prefixes[i] : préfixe non-numérique à préserver (ex. '×' pour un combo).
+  _animateStatCountUp(containerSelector,prefixes){
+    if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+    const container=document.querySelector(containerSelector);if(!container)return;
+    [...container.querySelectorAll('.stat-val')].forEach((el,i)=>{
+      const numNode=[...el.childNodes].find(n=>n.nodeType===3);
+      if(!numNode)return;
+      const prefix=(prefixes&&prefixes[i])||'';
+      const target=parseInt(numNode.data.slice(prefix.length),10);
+      if(!isFinite(target))return;
+      const dur=650,start=performance.now();
+      const tick=(now)=>{
+        const p=Math.min(1,(now-start)/dur);
+        const eased=1-Math.pow(1-p,3);
+        numNode.data=prefix+Math.round(target*eased);
+        if(p<1)requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+  },
   // Feuille de route façon Visée (paliers avec icône/cadenas + progression) —
   // habillage visuel uniquement, appliqué à Frappe-mots qui n'avait qu'une
   // rangée de pastilles plates pour représenter ses paliers.
@@ -7019,8 +7050,8 @@ const app={
       // mode libre uniquement : le tempo grimpe avec le combo (les morceaux
       // réels gardent leur BPM fixe, celui de l'audio)
       if(s.songId==='libre'&&s.combo>0&&s.combo%10===0)s.bpm=Math.min(170,(s.bpm||100)+10);
-      playSound('hit');this._flashArena(j==='perfect'?'#FFD84D':'#1FA971');
-      s.judge={text:label||(j==='perfect'?'PARFAIT':'BIEN'),pts,multi,kind:'good',until:Date.now()+550};
+      playSound('hit',{pitch:1+Math.min(.5,s.combo*.015)});this._flashArena(j==='perfect'?'#FFD84D':'#1FA971'); // le son grimpe légèrement avec le combo
+      s.judge={text:label||(j==='perfect'?'PARFAIT':'BIEN'),pts,multi,kind:'good',tier:j,until:Date.now()+550};
     }
     this.renderSouris();
   },
@@ -7076,7 +7107,7 @@ const app={
         s.tiles[laneIdx]=null;
         this._sourisTilesApply('perfect','TRILLE !');
       } else {
-        playSound('hit');this._flashArena('#B98CFF');
+        playSound('hit',{pitch:1+t.trillHits*.08});this._flashArena('#B98CFF'); // chaque frappe du trille monte un peu plus haut
       }
       return;
     }
@@ -7241,9 +7272,11 @@ const app={
       return `<div class="tiles-lane">${tileHtml}</div>`;
     }).join('');
     const judge=s.judge&&s.judge.until>Date.now()?s.judge:null;
-    const judgeHtml=judge?`<div class="tiles-judge">
+    const judgeCls=judge?(judge.kind==='bonus'?'bonus':judge.kind==='bad'?'bad':judge.tier==='perfect'?'perfect':'good'):'';
+    const judgeGold=judge&&(judge.kind==='bonus'||judge.tier==='perfect');
+    const judgeHtml=judge?`<div class="tiles-judge ${judgeCls}">
       <div class="tiles-judge-text">${judge.text}</div>
-      ${judge.pts?`<div class="tiles-judge-pill" style="background:${judge.kind==='bonus'?'rgba(255,216,77,.9)':'rgba(255,77,46,.85)'};color:${judge.kind==='bonus'?'#16140F':'#fff'}">+${judge.pts}${judge.multi>1?` · MULTI ×${judge.multi}`:''}</div>`:''}
+      ${judge.pts?`<div class="tiles-judge-pill" style="background:${judgeGold?'rgba(255,216,77,.9)':'rgba(31,169,113,.88)'};color:${judgeGold?'#16140F':'#fff'}">+${judge.pts}${judge.multi>1?` · MULTI ×${judge.multi}`:''}</div>`:''}
     </div>`:'';
     const banner=s.banner&&s.banner.until>Date.now()?s.banner:null;
     const bannerHtml=banner?`<div class="tiles-banner ${banner.kind}">${banner.text}</div>`:'';
@@ -7295,13 +7328,14 @@ const app={
       <span style="font-weight:800;font-size:19px;color:var(--accent)">${rank.label}</span>
       ${!isFree?`<span style="font-size:11px;font-weight:700;letter-spacing:.06em;padding:3px 10px;border-radius:999px;background:${song.diffColor}22;color:${song.diffColor};border:1px solid ${song.diffColor}55">${song.diffLabel.toUpperCase()}</span>`:''}
     </div>`;
+    const accColor=s._acc>=95?'#FFD84D':s._acc>=80?'#1FA971':undefined;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:auto;padding:28px 20px">
           ${this._gameResult({
             icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
             record:r.isNewBest?(isFree?'Nouveau record en mode libre !':`Nouveau record sur ${song.title} !`):null,
-            boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
+            boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%',color:accColor}],
             extra,
             primaryLabel:'Rejouer ▸',primaryOnClick:`app._sourisTilesStart('${s.songId}')`,
             secondaryLabel:'Autre morceau',secondaryOnClick:`app.souris={phase:'select',track:'tiles'};app.renderSouris()`,
@@ -7309,6 +7343,7 @@ const app={
         </div>
       </div>
     </div>`;
+    this._animateStatCountUp('.game-arena',['','×','']);
   },
 
   renderGames(){
