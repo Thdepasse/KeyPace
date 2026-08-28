@@ -53,6 +53,31 @@ function safeEqual(a, b) {
   return crypto.timingSafeEqual(bufA, bufB);
 }
 
+// Anti-bruteforce sur ADMIN_KEY — suivi par IP dans `admin_key_attempts`,
+// table déjà utilisée par api/institutions.js pour ce même secret partagé
+// (mêmes tentatives, même verrou, peu importe quel endpoint est visé).
+// Avant ça, ce endpoint n'avait aucune limite de tentatives : la comparaison
+// en temps constant protège contre le timing, pas contre le bruteforce brut.
+function clientIp(req) {
+  const xff = req.headers['x-forwarded-for'];
+  if (xff) return String(xff).split(',')[0].trim();
+  return (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+async function adminKeyLockState(ip) {
+  const r = await sb(`/admin_key_attempts?ip=eq.${encodeURIComponent(ip)}&select=id,failed_attempts,locked_until`);
+  return (r.data && r.data[0]) || null;
+}
+async function recordAdminKeyFailure(existing, ip) {
+  const attempts = (existing ? existing.failed_attempts : 0) + 1;
+  const patch = { ip, failed_attempts: attempts };
+  if (attempts >= 5) { patch.locked_until = new Date(Date.now() + 30 * 60 * 1000).toISOString(); patch.failed_attempts = 0; }
+  if (existing) await sb(`/admin_key_attempts?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  else await sb('/admin_key_attempts', { method: 'POST', body: JSON.stringify(patch) });
+}
+async function clearAdminKeyFailures(existing) {
+  if (existing && existing.failed_attempts) await sb(`/admin_key_attempts?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify({ failed_attempts: 0 }) });
+}
+
 // Aucun appelant légitime cross-origin n'existe pour cette API (le frontend
 // ne l'appelle qu'en same-origin) : seules les URLs du projet lui-même sont
 // autorisées, la variante preview ayant un préfixe aléatoire par déploiement.
@@ -392,7 +417,7 @@ async function clientsList(req, res) {
   return res.json({ items: r.data || [] });
 }
 
-const CLIENT_FIELDS = ['prospect_id', 'school_name', 'contact_name', 'contact_email', 'contact_phone', 'city', 'seats', 'annual_price', 'contract_start_date', 'renewal_date', 'status', 'notes'];
+const CLIENT_FIELDS = ['prospect_id', 'school_name', 'contact_name', 'contact_email', 'contact_phone', 'city', 'seats', 'annual_price', 'contract_start_date', 'renewal_date', 'status', 'notes', 'owner'];
 
 async function clientCreate(req, res) {
   const { school_name } = req.body || {};
@@ -615,13 +640,18 @@ async function addNote(req, res) {
 }
 
 const STATUS_LABELS_FR = { a_contacter: 'À contacter', envoye: 'Envoyé', relance: 'Relancé', repondu: 'Répondu', en_negociation: 'Négociation', signe: 'Signé', perdu: 'Perdu' };
-const PROSPECT_FIELD_LABELS = { school_name: 'École', contact_name: 'Contact', contact_email: 'Email', contact_phone: 'Téléphone', city: 'Ville', notes: 'Notes', meeting_at: 'Rendez-vous', estimated_students: 'Effectif estimé', estimated_students_source: 'Source effectif' };
+const PROSPECT_FIELD_LABELS = {
+  school_name: 'École', contact_name: 'Contact', contact_email: 'Email', contact_phone: 'Téléphone', city: 'Ville',
+  notes: 'Notes', meeting_at: 'Rendez-vous', estimated_students: 'Effectif estimé', estimated_students_source: 'Source effectif',
+  owner: 'Responsable', source: 'Source du lead', lost_reason: 'Raison de la perte', estimated_value: 'Valeur estimée',
+  contact_name_2: 'Contact 2', contact_email_2: 'Email 2', contact_phone_2: 'Téléphone 2',
+};
 const EVENT_FIELD_LABELS = { title: 'Titre', content_type: 'Type', account: 'Compte', caption: 'Texte du post', scheduled_date: 'Date planifiée', link: 'Lien', notes: 'Notes' };
 const CONTENT_STATUS_LABELS_FR = { idee: 'Idée', a_faire: 'À faire', pret: 'Prêt', publie: 'Publié' };
 const DEV_FIELD_LABELS = { title: 'Titre', description: 'Description', item_type: 'Type', priority: 'Priorité', dev_owner: 'Développeur' };
 const DEV_STATUS_LABELS_FR = { backlog: 'Backlog', a_faire: 'À faire', en_cours: 'En cours', fait: 'Fait' };
 const COMPETITOR_FIELD_LABELS = { name: 'Nom', url: 'URL', strengths: 'Forces', weaknesses: 'Faiblesses', estimated_revenue: 'CA estimé', notes: 'Notes' };
-const CLIENT_FIELD_LABELS = { school_name: 'École', contact_name: 'Contact', contact_email: 'Email', contact_phone: 'Téléphone', city: 'Ville', seats: 'Sièges', annual_price: 'Montant annuel', contract_start_date: 'Début du contrat', renewal_date: 'Renouvellement', status: 'Statut', notes: 'Notes' };
+const CLIENT_FIELD_LABELS = { school_name: 'École', contact_name: 'Contact', contact_email: 'Email', contact_phone: 'Téléphone', city: 'Ville', seats: 'Sièges', annual_price: 'Montant annuel', contract_start_date: 'Début du contrat', renewal_date: 'Renouvellement', status: 'Statut', notes: 'Notes', owner: 'Responsable' };
 
 // ─── Prospection écoles ───────────────────────────────────────────
 async function prospectsList(req, res) {
@@ -651,7 +681,11 @@ async function dismissDuplicate(req, res) {
 }
 
 async function prospectCreate(req, res) {
-  const { school_name, contact_name, contact_email, contact_phone, city, notes, status, meeting_at, estimated_students, estimated_students_source } = req.body || {};
+  const {
+    school_name, contact_name, contact_email, contact_phone, city, notes, status, meeting_at,
+    estimated_students, estimated_students_source, owner, source, estimated_value, lost_reason,
+    contact_name_2, contact_email_2, contact_phone_2,
+  } = req.body || {};
   if (!school_name) return res.status(400).json({ error: "Nom d'école manquant." });
   const r = await sb('/school_prospects', {
     method: 'POST',
@@ -666,6 +700,13 @@ async function prospectCreate(req, res) {
       meeting_at: meeting_at || null,
       estimated_students: estimated_students || null,
       estimated_students_source: estimated_students_source || null,
+      owner: owner || null,
+      source: source || null,
+      estimated_value: estimated_value || null,
+      lost_reason: lost_reason || null,
+      contact_name_2: contact_name_2 || null,
+      contact_email_2: contact_email_2 || null,
+      contact_phone_2: contact_phone_2 || null,
     }),
   });
   if (!r.ok) return res.status(500).json({ error: 'Erreur création prospect.' });
@@ -673,7 +714,11 @@ async function prospectCreate(req, res) {
   return res.status(201).json(r.data[0]);
 }
 
-const PROSPECT_FIELDS = ['school_name', 'contact_name', 'contact_email', 'contact_phone', 'city', 'notes', 'status', 'meeting_at', 'estimated_students', 'estimated_students_source'];
+const PROSPECT_FIELDS = [
+  'school_name', 'contact_name', 'contact_email', 'contact_phone', 'city', 'notes', 'status', 'meeting_at',
+  'estimated_students', 'estimated_students_source', 'owner', 'source', 'lost_reason', 'estimated_value',
+  'contact_name_2', 'contact_email_2', 'contact_phone_2',
+];
 
 // Automatisation : une école qui signe mérite d'être annoncée. Crée une idée
 // de contenu prête à planifier dans le calendrier marketing, best-effort (un
@@ -722,7 +767,7 @@ async function prospectUpdate(req, res) {
 
 // Transition de statut : programme automatiquement la relance suivante.
 async function prospectLogContact(req, res) {
-  const { id, status } = req.body || {};
+  const { id, status, lost_reason } = req.body || {};
   if (!id || !status) return res.status(400).json({ error: 'id ou status manquant.' });
   if (!(status in FOLLOWUP_DAYS)) return res.status(400).json({ error: 'Statut inconnu.' });
   const beforeR = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}&select=status,school_name`);
@@ -735,11 +780,16 @@ async function prospectLogContact(req, res) {
     next_followup_at: computeNextFollowup(status, now),
     updated_at: new Date(now).toISOString(),
   };
+  // Raison de la perte : demandée côté front au moment du passage en 'perdu'
+  // (voir logContact dans index.html) — sert à analyser pourquoi les deals
+  // échouent, pas juste à en compter le nombre.
+  if (status === 'perdu' && lost_reason) patch.lost_reason = lost_reason;
   const r = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) });
   if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Erreur mise à jour du statut.' });
   if (oldStatus !== status) {
     await logActivity('prospect', id, 'status_changed', `${STATUS_LABELS_FR[oldStatus] || oldStatus || '—'} → ${STATUS_LABELS_FR[status] || status}`);
     if (status === 'signe') await autoCreateSignedContentIdea(r.data[0].school_name, id);
+    if (status === 'perdu' && lost_reason) await logActivity('prospect', id, 'note', `Raison de la perte : ${lost_reason}`);
   }
   return res.json(r.data[0]);
 }
@@ -967,6 +1017,7 @@ async function syncZimbra(req, res) {
           contact_email: action.contact_email,
           status: 'a_contacter',
           notes: action.notes,
+          source: 'zimbra_auto',
         }),
       });
       if (r.ok && r.data && r.data[0]) {
@@ -1031,10 +1082,19 @@ module.exports = async function handler(req, res) {
   }
 
   if (!ADMIN_KEY) return res.status(500).json({ error: 'Dashboard indisponible : ADMIN_KEY absente côté serveur.' });
+  const ip = clientIp(req);
+  const lockState = await adminKeyLockState(ip);
+  if (lockState && lockState.locked_until && new Date(lockState.locked_until) > new Date()) {
+    return res.status(429).json({ error: 'Trop de tentatives. Réessaie plus tard.' });
+  }
   // .trim() : tolère un espace ou un retour à la ligne collé par erreur en
   // copiant la valeur (fréquent depuis l'UI Vercel ou un gestionnaire de mots de passe).
   const providedKey = String(req.headers['x-admin-key'] || '').trim();
-  if (!safeEqual(providedKey, String(ADMIN_KEY).trim())) return res.status(401).json({ error: 'Non autorisé.' });
+  if (!safeEqual(providedKey, String(ADMIN_KEY).trim())) {
+    await recordAdminKeyFailure(lockState, ip);
+    return res.status(401).json({ error: 'Non autorisé.' });
+  }
+  await clearAdminKeyFailures(lockState);
 
   const action = req.method === 'GET' ? queryParam(req, 'action') : (req.body || {}).action;
   try {

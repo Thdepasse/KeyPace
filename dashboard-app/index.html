@@ -389,6 +389,26 @@
           </div>
           <input id="p-students" placeholder="Effectif estimé (ex. ~1000 élèves)">
           <input id="p-students-source" placeholder="Source (ex. Wikipédia, site officiel, non trouvé)">
+          <select id="p-owner">
+            <option value="">Responsable —</option>
+            <option value="theo">Théo</option>
+            <option value="vincent">Vincent</option>
+          </select>
+          <input id="p-source" list="p-source-options" placeholder="Source du lead (ex. prospection à froid)">
+          <datalist id="p-source-options">
+            <option value="Prospection à froid">
+            <option value="Recommandation">
+            <option value="Salon / événement">
+            <option value="Site web / inbound">
+          </datalist>
+          <input id="p-value" type="number" min="0" step="0.01" placeholder="Valeur annuelle estimée (€)">
+          <input id="p-lost-reason" placeholder="Raison de la perte (si le dossier est perdu)">
+        </div>
+        <div class="form-grid" style="margin-top:10px">
+          <div style="grid-column:1/-1;font-size:12px;color:var(--muted);font-weight:700">Second contact (optionnel)</div>
+          <input id="p-contact-2" placeholder="Nom du 2e contact">
+          <input id="p-email-2" type="email" placeholder="Email du 2e contact">
+          <input id="p-phone-2" placeholder="Téléphone du 2e contact">
         </div>
         <textarea id="p-notes" placeholder="Notes" style="margin-top:10px"></textarea>
         <div class="form-actions">
@@ -421,7 +441,10 @@
 
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
         <input id="prospect-search" type="search" placeholder="Rechercher (école, ville, contact, email...)" oninput="window.__duplicateGroupFilter=null;renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
-        <div style="display:flex;align-items:center;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--muted);cursor:pointer">
+            <input type="checkbox" id="filter-auto-only" onchange="renderProspects()"> À vérifier (détecté auto)
+          </label>
           <div class="view-toggle" id="prospects-view-toggle">
             <button class="view-toggle-btn" id="prospects-view-btn-table" onclick="setProspectsView('table')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg> Tableau</button>
             <button class="view-toggle-btn" id="prospects-view-btn-kanban" onclick="setProspectsView('kanban')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="4" height="16" rx="1"/><rect x="17" y="4" width="4" height="16" rx="1"/></svg> Kanban</button>
@@ -436,12 +459,13 @@
         </div>
       </div>
       <div id="duplicate-filter-note"></div>
+      <div id="pipeline-value-summary" class="muted" style="font-size:12.5px;margin-bottom:8px"></div>
 
       <div class="table-wrap" id="prospects-table-wrap">
         <table class="prospects">
           <thead>
             <tr>
-              <th>École</th><th>Ville</th><th>Contact</th><th>Statut</th><th>Dernier contact</th><th>Relance</th><th>Actions</th>
+              <th>École</th><th>Ville</th><th>Contact</th><th>Statut</th><th>Valeur est.</th><th>Dernier contact</th><th>Relance</th><th>Actions</th>
             </tr>
           </thead>
           <tbody id="prospects-body"></tbody>
@@ -482,6 +506,11 @@
             <option value="active" selected>Active</option>
             <option value="annule">Annulée / non renouvelée</option>
           </select>
+          <select id="c-owner">
+            <option value="">Responsable —</option>
+            <option value="theo">Théo</option>
+            <option value="vincent">Vincent</option>
+          </select>
         </div>
         <textarea id="c-notes" placeholder="Notes" style="margin-top:10px"></textarea>
         <div class="form-actions">
@@ -502,7 +531,7 @@
       <div class="table-wrap">
         <table class="prospects">
           <thead>
-            <tr><th>École</th><th>Sièges</th><th>Montant annuel</th><th>Renouvellement</th><th>Statut</th><th>Actions</th></tr>
+            <tr><th>École</th><th>Sièges</th><th>Montant annuel</th><th>Renouvellement</th><th>Statut</th><th>Responsable</th><th>Actions</th></tr>
           </thead>
           <tbody id="clients-body"></tbody>
         </table>
@@ -838,6 +867,12 @@
 const KEY_STORAGE = 'kp_dashboard_key';
 const STATUS_LABELS = { a_contacter:'À contacter', envoye:'Envoyé', relance:'Relancé', repondu:'Répondu', en_negociation:'Négociation', signe:'Signé', perdu:'Perdu' };
 const STATUS_FLOW = ['a_contacter','envoye','relance','repondu','en_negociation','signe','perdu'];
+const OWNER_LABELS = { theo:'Théo', vincent:'Vincent' };
+// Seule 'zimbra_auto' est une valeur posée par le système (voir syncZimbra
+// côté serveur) ; toute autre valeur de `source` est du texte libre saisi
+// manuellement et s'affiche telle quelle (voir sourceLabel ci-dessous).
+const SOURCE_LABELS = { zimbra_auto: 'Détecté automatiquement (Zimbra)' };
+function sourceLabel(source){ return source ? (SOURCE_LABELS[source] || source) : ''; }
 let calMonth = new Date();
 
 function adminKey(){ return localStorage.getItem(KEY_STORAGE) || ''; }
@@ -1172,9 +1207,11 @@ function fmtDate(iso){ if (!iso) return '—'; return new Date(iso).toLocaleDate
 
 function filterProspects(list){
   if (window.__duplicateGroupFilter) return list.filter(p => window.__duplicateGroupFilter.has(p.id));
+  let out = list;
+  if (document.getElementById('filter-auto-only').checked) out = out.filter(p => p.source === 'zimbra_auto');
   const q = document.getElementById('prospect-search').value.trim().toLowerCase();
-  if (!q) return list;
-  return list.filter(p => [p.school_name, p.city, p.contact_name, p.contact_email, p.contact_phone, p.notes]
+  if (!q) return out;
+  return out.filter(p => [p.school_name, p.city, p.contact_name, p.contact_email, p.contact_phone, p.notes]
     .some(field => (field || '').toLowerCase().includes(q)));
 }
 
@@ -1298,17 +1335,24 @@ function renderProspects(){
     document.getElementById('duplicate-filter-note').innerHTML = window.__duplicateGroupFilter
       ? `<p class="muted" style="font-size:12.5px;margin:0 0 8px">Affichage limité à ce doublon — <a href="#" onclick="clearDuplicateGroupFilter();return false">✕ voir tous les dossiers</a></p>`
       : '';
+    const openPipelineValue = view
+      .filter(p => p.status !== 'signe' && p.status !== 'perdu' && p.estimated_value)
+      .reduce((sum, p) => sum + Number(p.estimated_value), 0);
+    document.getElementById('pipeline-value-summary').textContent = openPipelineValue
+      ? `Valeur estimée du pipeline ouvert (affiché) : ${openPipelineValue.toLocaleString('fr-BE')} €`
+      : '';
     const dupIds = window.__duplicateIds || new Set();
     document.getElementById('prospects-body').innerHTML = view.length ? view.map(p => `
       <tr${dupIds.has(p.id) ? ' style="background:#FFFBEF"' : ''}>
-        <td><strong>${p.school_name}</strong>${dupIds.has(p.id) ? ' <span class="badge" style="background:#FFF3CD;color:#8A6D1D" title="Un autre dossier a un nom d\'école identique ou très proche"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> doublon possible</span>' : ''}${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
+        <td><strong>${p.school_name}</strong>${dupIds.has(p.id) ? ' <span class="badge" style="background:#FFF3CD;color:#8A6D1D" title="Un autre dossier a un nom d\'école identique ou très proche"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> doublon possible</span>' : ''}${p.source === 'zimbra_auto' ? ' <span class="badge" style="background:#E7E9FF;color:#3A3EAD" title="Créé automatiquement par la synchro emails — à vérifier">🤖 à vérifier</span>' : ''}${p.owner ? ` <span class="badge" style="background:var(--light);color:var(--muted)">${OWNER_LABELS[p.owner]}</span>` : ''}${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
         <td>${p.city || '—'}${p.estimated_students ? `<div class="muted" style="font-size:12px" title="${escHtml(p.estimated_students_source || '')}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5A4.5 4.5 0 0 1 7 14h4a4.5 4.5 0 0 1 4.5 4.5V20"/><circle cx="17" cy="8" r="3"/><path d="M17.5 14.3a4.5 4.5 0 0 1 3.9 4.5V20"/></svg> ${escHtml(p.estimated_students)}</div>` : ''}</td>
         <td>${p.contact_name || '—'}${p.contact_email ? `<div class="muted" style="font-size:12px">${p.contact_email}</div>` : ''}</td>
         <td><span class="badge badge-${p.status}" title="Cliquer pour changer le statut" onclick="openStatusPicker(event,'${p.id}','${p.status}')">${STATUS_LABELS[p.status]}</span></td>
+        <td>${p.estimated_value != null ? Number(p.estimated_value).toLocaleString('fr-BE') + ' €' : '—'}</td>
         <td>${fmtDate(p.last_contact_at)}</td>
         <td>${fmtDate(p.next_followup_at)}</td>
         <td><div class="actions"><button class="btn small ghost" onclick="openFollowupMessage('${p.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> Message</button><button class="btn small ghost" onclick="editProspect('${p.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
-      </tr>`).join('') : `<tr><td colspan="7" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
+      </tr>`).join('') : `<tr><td colspan="8" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
     renderProspectsKanban(view, dupIds);
   } catch (e) { console.error(e); }
 }
@@ -1323,8 +1367,8 @@ function renderProspectsKanban(view, dupIds){
       <div class="kanban-col-body" ondragover="allowDrop(event)" ondrop="dropOnStatusColumn(event,'${status}')">
         ${byStatus[status].map(p => `
           <div class="kanban-card" draggable="true" ondragstart="dragStart(event,'${p.id}')" onclick="editProspect('${p.id}')">
-            <span class="kc-title">${escHtml(p.school_name)}${dupIds && dupIds.has(p.id) ? ' <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>' : ''}</span>
-            <span class="kc-meta">${escHtml(p.city || '')}${p.city && p.contact_name ? ' · ' : ''}${escHtml(p.contact_name || '')}</span>
+            <span class="kc-title">${escHtml(p.school_name)}${dupIds && dupIds.has(p.id) ? ' <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>' : ''}${p.source === 'zimbra_auto' ? ' 🤖' : ''}</span>
+            <span class="kc-meta">${escHtml(p.city || '')}${p.city && p.contact_name ? ' · ' : ''}${escHtml(p.contact_name || '')}${p.owner ? ` · ${OWNER_LABELS[p.owner]}` : ''}</span>
             ${p.meeting_at ? `<div class="kc-meta"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg> ${fmtDate(p.meeting_at)}</div>` : ''}
             <div class="kc-actions" onclick="event.stopPropagation()">
               <button onclick="openFollowupMessage('${p.id}')" title="Message"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></button>
@@ -1347,26 +1391,30 @@ async function dropOnStatusColumn(ev, status){
 // ─── Bibliothèque de templates d'emails (prospection/suivi/réponse) ───────
 // Chaque template sait se choisir par défaut selon le statut du dossier, mais
 // reste sélectionnable manuellement — jamais de page blanche avant d'écrire.
+// build(greeting, school, signature) reçoit la signature déjà résolue (voir
+// buildEmailFromTemplate) plutôt qu'un nom codé en dur — avant, chaque
+// template signait toujours "Théo", même quand c'est Vincent qui suit le
+// dossier (dossier assigné via le champ Responsable de la fiche).
 const EMAIL_TEMPLATES = [
   {
     key: 'premier_contact', label: 'Premier contact', statuses: ['a_contacter'],
-    build: (greeting, school) => `${greeting},\n\nJe me permets de vous contacter au sujet de KeyPace, notre plateforme de dactylographie AZERTY pensée pour les établissements scolaires (65 leçons progressives, suivi de progression par élève, mise en place en quelques minutes).\n\nSeriez-vous disponible pour un bref échange cette semaine à propos d'une licence pour ${school} ?\n\nBien cordialement,\nThéo — KeyPace`,
+    build: (greeting, school, signature) => `${greeting},\n\nJe me permets de vous contacter au sujet de KeyPace, notre plateforme de dactylographie AZERTY pensée pour les établissements scolaires (65 leçons progressives, suivi de progression par élève, mise en place en quelques minutes).\n\nSeriez-vous disponible pour un bref échange cette semaine à propos d'une licence pour ${school} ?\n\nBien cordialement,\n${signature}`,
   },
   {
     key: 'relance', label: 'Relance (pas de réponse)', statuses: ['envoye', 'relance'],
-    build: (greeting, school) => `${greeting},\n\nJe me permets de revenir vers vous suite à mon précédent message concernant KeyPace pour ${school}. Restez-vous intéressé·e par une présentation rapide de la plateforme ?\n\nBien cordialement,\nThéo — KeyPace`,
+    build: (greeting, school, signature) => `${greeting},\n\nJe me permets de revenir vers vous suite à mon précédent message concernant KeyPace pour ${school}. Restez-vous intéressé·e par une présentation rapide de la plateforme ?\n\nBien cordialement,\n${signature}`,
   },
   {
     key: 'reponse_objection', label: 'Réponse à une question / objection', statuses: ['repondu', 'en_negociation'],
-    build: (greeting, school) => `${greeting},\n\nJe reviens vers vous suite à notre échange au sujet de KeyPace pour ${school}. Avez-vous besoin d'informations complémentaires de mon côté pour avancer ?\n\nBien cordialement,\nThéo — KeyPace`,
+    build: (greeting, school, signature) => `${greeting},\n\nJe reviens vers vous suite à notre échange au sujet de KeyPace pour ${school}. Avez-vous besoin d'informations complémentaires de mon côté pour avancer ?\n\nBien cordialement,\n${signature}`,
   },
   {
     key: 'apres_rdv', label: 'Suivi après un rendez-vous', statuses: [],
-    build: (greeting, school) => `${greeting},\n\nMerci pour votre temps lors de notre échange à propos de KeyPace pour ${school}. Comme convenu, je reste disponible pour toute question complémentaire, et je peux vous transmettre un accès test si c'est utile.\n\nBien cordialement,\nThéo — KeyPace`,
+    build: (greeting, school, signature) => `${greeting},\n\nMerci pour votre temps lors de notre échange à propos de KeyPace pour ${school}. Comme convenu, je reste disponible pour toute question complémentaire, et je peux vous transmettre un accès test si c'est utile.\n\nBien cordialement,\n${signature}`,
   },
   {
     key: 'remerciement_signature', label: 'Remerciement après signature', statuses: ['signe'],
-    build: (greeting, school) => `${greeting},\n\nUn grand merci pour votre confiance ! La licence KeyPace pour ${school} est maintenant active — je reviens vers vous très vite avec les accès et les prochaines étapes pour la mise en place.\n\nBien cordialement,\nThéo — KeyPace`,
+    build: (greeting, school, signature) => `${greeting},\n\nUn grand merci pour votre confiance ! La licence KeyPace pour ${school} est maintenant active — je reviens vers vous très vite avec les accès et les prochaines étapes pour la mise en place.\n\nBien cordialement,\n${signature}`,
   },
 ];
 document.getElementById('followup-msg-template').innerHTML = EMAIL_TEMPLATES.map(t => `<option value="${t.key}">${t.label}</option>`).join('');
@@ -1380,7 +1428,8 @@ function buildEmailFromTemplate(key, p){
   const tpl = EMAIL_TEMPLATES.find(t => t.key === key) || EMAIL_TEMPLATES[0];
   const contact = (p.contact_name || '').trim().split(' ')[0];
   const greeting = contact ? `Bonjour ${contact}` : 'Bonjour';
-  return tpl.build(greeting, p.school_name);
+  const signature = OWNER_LABELS[p.owner] ? `${OWNER_LABELS[p.owner]} — KeyPace` : "L'équipe KeyPace";
+  return tpl.build(greeting, p.school_name, signature);
 }
 
 function switchFollowupTemplate(){
@@ -1436,31 +1485,37 @@ function openStatusPicker(ev, id, current){
   select.focus();
 }
 
-// Dédoublonnage : même contact_email (ou même school_name si pas d'email),
-// on garde la fiche la plus récemment mise à jour.
-function dedupeProspects(list){
-  const byKey = new Map();
-  for (const p of list) {
-    const key = (p.contact_email || p.school_name || '').trim().toLowerCase();
-    if (!key) continue;
-    const existing = byKey.get(key);
-    if (!existing || new Date(p.updated_at) > new Date(existing.updated_at)) byKey.set(key, p);
-  }
-  return [...byKey.values()];
-}
-
 function csvCell(v){
   const s = v == null ? '' : String(v);
   return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 }
 
-const CSV_COLS = ['school_name','city','contact_name','contact_email','contact_phone','status','last_contact_at','next_followup_at','estimated_students','estimated_students_source','notes'];
-const CSV_LABELS = ['École','Ville','Contact','Email','Téléphone','Statut','Dernier contact','Relance prévue','Notes'];
+// CSV_COLS et CSV_LABELS DOIVENT rester de la même longueur, dans le même
+// ordre — sinon la ligne d'en-tête ne correspond plus aux colonnes de données
+// (bug corrigé le 28/08/2026 : il manquait 2 libellés, ce qui décalait tout
+// à partir de "Effectif estimé" et pouvait corrompre les données en cas de
+// réimport d'un export). Les valeurs affichées passent par cellValue()
+// ci-dessous pour les champs qui ont un libellé (statut, responsable, source)
+// plutôt que leur valeur brute en base.
+const CSV_COLS = ['school_name','city','contact_name','contact_email','contact_phone','owner','source','status','last_contact_at','next_followup_at','estimated_students','estimated_students_source','estimated_value','notes'];
+const CSV_LABELS = ['École','Ville','Contact','Email','Téléphone','Responsable','Source','Statut','Dernier contact','Relance prévue','Effectif estimé','Source effectif','Valeur estimée (€)','Notes'];
 
+function cellValue(p, col){
+  if (col === 'status') return STATUS_LABELS[p.status] || p.status;
+  if (col === 'owner') return OWNER_LABELS[p.owner] || p.owner;
+  if (col === 'source') return sourceLabel(p.source);
+  return p[col];
+}
+
+// Exporte tel quel window.__prospects (pas de dédoublonnage silencieux ici :
+// avant, un filtre caché différent de celui affiché à l'écran faisait sortir
+// moins de lignes que ce que montrait le tableau, sans prévenir personne. Le
+// dédoublonnage visible et volontaire se fait via la bannière "doublons
+// potentiels" — voir renderDuplicatesCallout — avant d'exporter si besoin.
 function exportProspectsCSV(){
-  const list = dedupeProspects(window.__prospects || []);
+  const list = window.__prospects || [];
   if (!list.length) return;
-  const rows = [CSV_LABELS.join(','), ...list.map(p => CSV_COLS.map(c => csvCell(c === 'status' ? STATUS_LABELS[p[c]] : p[c])).join(','))];
+  const rows = [CSV_LABELS.join(','), ...list.map(p => CSV_COLS.map(c => csvCell(cellValue(p, c))).join(','))];
   const blob = new Blob(['﻿' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1534,8 +1589,9 @@ function renderClientsTable(items){
       <td>${c.annual_price != null ? Number(c.annual_price).toLocaleString('fr-BE') + ' €' : '—'}</td>
       <td>${renewalBadgeHtml(c)}</td>
       <td>${CLIENT_STATUS_LABELS[c.status] || c.status}</td>
+      <td>${OWNER_LABELS[c.owner] || '—'}</td>
       <td><div class="actions"><button class="btn small ghost" onclick="editClient('${c.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button><button class="btn small danger" onclick="deleteClient('${c.id}')">Suppr.</button></div></td>
-    </tr>`).join('') : `<tr><td colspan="6" class="empty-msg">Aucune école cliente pour l'instant.</td></tr>`;
+    </tr>`).join('') : `<tr><td colspan="7" class="empty-msg">Aucune école cliente pour l'instant.</td></tr>`;
 }
 
 function openClientForm(prefill){
@@ -1543,6 +1599,7 @@ function openClientForm(prefill){
   ['c-school','c-contact','c-email','c-phone','c-city','c-seats','c-price','c-start','c-renewal','c-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('c-prospect-id').value = '';
   document.getElementById('c-status').value = 'active';
+  document.getElementById('c-owner').value = '';
   if (prefill) {
     document.getElementById('c-school').value = prefill.school_name || '';
     document.getElementById('c-contact').value = prefill.contact_name || '';
@@ -1550,6 +1607,7 @@ function openClientForm(prefill){
     document.getElementById('c-phone').value = prefill.contact_phone || '';
     document.getElementById('c-city').value = prefill.city || '';
     document.getElementById('c-prospect-id').value = prefill.id || '';
+    document.getElementById('c-owner').value = prefill.owner || '';
   }
   document.getElementById('client-form-title').textContent = 'Nouvelle école cliente';
   document.getElementById('client-delete-btn').style.display = 'none';
@@ -1577,6 +1635,7 @@ function editClient(id){
   document.getElementById('c-start').value = c.contract_start_date || '';
   document.getElementById('c-renewal').value = c.renewal_date || '';
   document.getElementById('c-status').value = c.status || 'active';
+  document.getElementById('c-owner').value = c.owner || '';
   document.getElementById('c-prospect-id').value = c.prospect_id || '';
   document.getElementById('client-form-title').textContent = `Modifier « ${c.school_name} »`;
   document.getElementById('client-delete-btn').style.display = 'inline-flex';
@@ -1605,6 +1664,7 @@ async function saveClient(){
     contract_start_date: document.getElementById('c-start').value || null,
     renewal_date: document.getElementById('c-renewal').value || null,
     status: document.getElementById('c-status').value,
+    owner: document.getElementById('c-owner').value || null,
     notes: document.getElementById('c-notes').value.trim(),
   };
   if (!editingClientId) body.prospect_id = document.getElementById('c-prospect-id').value || null;
@@ -2202,7 +2262,8 @@ async function addContentNote(){
 
 function openAddForm(){
   editingProspectId = null;
-  ['p-school','p-contact','p-email','p-phone','p-city','p-notes','p-meeting','p-students','p-students-source'].forEach(id => document.getElementById(id).value = '');
+  ['p-school','p-contact','p-email','p-phone','p-city','p-notes','p-meeting','p-students','p-students-source',
+   'p-owner','p-source','p-value','p-lost-reason','p-contact-2','p-email-2','p-phone-2'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('prospect-form-title').textContent = 'Nouvelle école';
   document.getElementById('prospect-save-btn').textContent = 'Enregistrer';
   document.getElementById('prospect-history').style.display = 'none';
@@ -2225,6 +2286,13 @@ function editProspect(id){
   document.getElementById('p-meeting').value = toDatetimeLocalValue(p.meeting_at);
   document.getElementById('p-students').value = p.estimated_students || '';
   document.getElementById('p-students-source').value = p.estimated_students_source || '';
+  document.getElementById('p-owner').value = p.owner || '';
+  document.getElementById('p-source').value = p.source || '';
+  document.getElementById('p-value').value = p.estimated_value ?? '';
+  document.getElementById('p-lost-reason').value = p.lost_reason || '';
+  document.getElementById('p-contact-2').value = p.contact_name_2 || '';
+  document.getElementById('p-email-2').value = p.contact_email_2 || '';
+  document.getElementById('p-phone-2').value = p.contact_phone_2 || '';
   document.getElementById('p-notes').value = p.notes || '';
   document.getElementById('prospect-form-title').textContent = `Modifier « ${p.school_name} »`;
   document.getElementById('prospect-save-btn').textContent = 'Enregistrer les modifications';
@@ -2246,6 +2314,13 @@ async function saveProspect(){
     meeting_at: document.getElementById('p-meeting').value ? new Date(document.getElementById('p-meeting').value).toISOString() : null,
     estimated_students: document.getElementById('p-students').value.trim(),
     estimated_students_source: document.getElementById('p-students-source').value.trim(),
+    owner: document.getElementById('p-owner').value || null,
+    source: document.getElementById('p-source').value.trim() || null,
+    estimated_value: document.getElementById('p-value').value ? Number(document.getElementById('p-value').value) : null,
+    lost_reason: document.getElementById('p-lost-reason').value.trim(),
+    contact_name_2: document.getElementById('p-contact-2').value.trim(),
+    contact_email_2: document.getElementById('p-email-2').value.trim(),
+    contact_phone_2: document.getElementById('p-phone-2').value.trim(),
     notes: document.getElementById('p-notes').value.trim(),
   };
   if (editingProspectId) await api('update-prospect', { method:'POST', body: { id: editingProspectId, ...body } });
@@ -2287,10 +2362,16 @@ const CSV_HEADER_SYNONYMS = {
   contact_name: ['contact', 'contact_name'],
   contact_email: ['email', 'contact_email'],
   contact_phone: ['téléphone', 'telephone', 'contact_phone'],
+  owner: ['responsable', 'owner'],
+  source: ['source'],
   status: ['statut', 'status'],
+  estimated_students: ['effectif estimé', 'effectif estime', 'estimated_students'],
+  estimated_students_source: ['source effectif', 'estimated_students_source'],
+  estimated_value: ['valeur estimée (€)', 'valeur estimee (€)', 'valeur estimee', 'estimated_value'],
   notes: ['notes'],
 };
 const STATUS_LABEL_TO_KEY = Object.fromEntries(Object.entries(STATUS_LABELS).map(([k, v]) => [v.toLowerCase(), k]));
+const OWNER_LABEL_TO_KEY = Object.fromEntries(Object.entries(OWNER_LABELS).map(([k, v]) => [v.toLowerCase(), k]));
 
 function resolveStatus(raw){
   const s = (raw || '').trim().toLowerCase();
@@ -2298,6 +2379,23 @@ function resolveStatus(raw){
   if (STATUS_LABEL_TO_KEY[s]) return STATUS_LABEL_TO_KEY[s];
   if (STATUS_FLOW.includes(s)) return s;
   return undefined;
+}
+
+function resolveOwner(raw){
+  const s = (raw || '').trim().toLowerCase();
+  if (!s) return undefined;
+  if (OWNER_LABEL_TO_KEY[s]) return OWNER_LABEL_TO_KEY[s];
+  if (s === 'theo' || s === 'vincent') return s;
+  return undefined;
+}
+
+// Accepte "1200", "1200,50" (virgule fr) ou "1 200,50 €" — undefined si rien
+// d'exploitable, pour ne pas écraser une valeur existante par 0 à l'import.
+function resolveMoney(raw){
+  const cleaned = (raw || '').replace(/[€\s]/g, '').replace(',', '.');
+  if (!cleaned) return undefined;
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : undefined;
 }
 
 async function handleCSVImport(ev){
@@ -2337,6 +2435,11 @@ async function handleCSVImport(ev){
       contact_phone: get('contact_phone'),
       notes: get('notes'),
       status: resolveStatus(get('status')),
+      owner: resolveOwner(get('owner')),
+      source: get('source') || undefined,
+      estimated_students: get('estimated_students') || undefined,
+      estimated_students_source: get('estimated_students_source') || undefined,
+      estimated_value: resolveMoney(get('estimated_value')),
     };
     const existing = email ? existingByEmail.get(email.toLowerCase()) : null;
     if (existing) { await api('update-prospect', { method:'POST', body: { id: existing.id, ...body } }); updated++; }
@@ -2350,7 +2453,11 @@ async function handleCSVImport(ev){
 }
 
 async function logContact(id, status){
-  await api('log-contact', { method:'POST', body: { id, status } });
+  let lost_reason;
+  if (status === 'perdu') {
+    lost_reason = window.prompt('Raison de la perte (optionnel, laisser vide si non applicable) :', '') || undefined;
+  }
+  await api('log-contact', { method:'POST', body: { id, status, lost_reason } });
   loadProspects();
   loadKpis();
 }

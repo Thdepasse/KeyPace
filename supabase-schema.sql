@@ -621,10 +621,14 @@ alter table users
 --   tout le monde d'un coup au déploiement — l'expiration s'applique de
 --   façon croissante, à chaque nouvelle émission de session_token (login,
 --   reset de mot de passe, changement de mot de passe, SSO).
--- admin_key_attempts : anti-bruteforce sur ADMIN_KEY (bootstrap établissement,
---   api/institutions.js) — suivi par IP puisque cette clé ne correspond à
---   aucun compte utilisateur. Avant ça, la clé était essayable en boucle
---   sans aucun frein applicatif.
+-- admin_key_attempts : anti-bruteforce sur ADMIN_KEY — suivi par IP puisque
+--   cette clé ne correspond à aucun compte utilisateur. Avant ça, la clé
+--   était essayable en boucle sans aucun frein applicatif. Partagée par les
+--   DEUX endpoints qui vérifient ce même secret : api/institutions.js
+--   (bootstrap établissement) et dashboard-app/api/dashboard.js (mini-CRM
+--   interne, ajouté le 28/08/2026 suite à l'audit CRM — avant ça, ce second
+--   endpoint n'avait aucune limite de tentatives alors qu'il protège les
+--   mêmes données que ce secret est censé garder fermées).
 -- ───────────────────────────────────────────────────────────────
 alter table users
   add column if not exists session_expires_at timestamptz;
@@ -654,6 +658,44 @@ alter table admin_key_attempts enable row level security;
 alter table users
   add column if not exists last_seen_at timestamptz,
   add column if not exists deletion_warned_at timestamptz;
+
+-- ───────────────────────────────────────────────────────────────
+-- Prospection écoles / écoles clientes — suite à l'audit du mini-CRM
+-- (28/08/2026) : aucune fiche n'indiquait qui la suit, pourquoi un dossier
+-- était perdu, ni sa valeur avant signature ; un seul contact par école ne
+-- suffit pas dès qu'il y a un décideur et un interlocuteur opérationnel.
+-- ───────────────────────────────────────────────────────────────
+-- Qui suit le dossier (les deux fondateurs prospectent en parallèle) —
+-- nullable : un dossier pas encore repris n'a pas encore de responsable.
+alter table school_prospects add column if not exists owner text;
+alter table school_prospects drop constraint if exists school_prospects_owner_check;
+alter table school_prospects add constraint school_prospects_owner_check
+  check (owner is null or owner in ('theo', 'vincent'));
+
+-- Canal d'origine du prospect (saisi manuellement — ex. "prospection à
+-- froid", "salon" — ou 'zimbra_auto' quand la fiche est créée automatiquement
+-- par la synchro emails, voir syncZimbra dans dashboard-app/api/dashboard.js).
+alter table school_prospects add column if not exists source text;
+
+-- Renseignée quand le statut passe à 'perdu' — sert à analyser pourquoi les
+-- deals échouent (prix, concurrent, timing...), pas juste à compter combien.
+alter table school_prospects add column if not exists lost_reason text;
+
+-- Valeur annuelle estimée du deal en pipeline, avant signature — distincte de
+-- client_schools.annual_price qui est le montant réellement contractualisé.
+alter table school_prospects add column if not exists estimated_value numeric;
+
+-- Second contact (ex. direction + professeur référent) : les deux mêmes
+-- champs que le contact principal, dupliqués plutôt qu'une table de contacts
+-- séparée — un seul dossier a rarement plus de deux interlocuteurs utiles.
+alter table school_prospects add column if not exists contact_name_2 text;
+alter table school_prospects add column if not exists contact_email_2 text;
+alter table school_prospects add column if not exists contact_phone_2 text;
+
+alter table client_schools add column if not exists owner text;
+alter table client_schools drop constraint if exists client_schools_owner_check;
+alter table client_schools add constraint client_schools_owner_check
+  check (owner is null or owner in ('theo', 'vincent'));
 
 -- ───────────────────────────────────────────────────────────────
 -- Policies RLS explicites (août 2026)

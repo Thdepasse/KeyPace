@@ -134,20 +134,58 @@ function normalizeSchoolName(name) {
     .trim();
 }
 
-// Regroupe les prospects dont le nom d'école normalisé est identique (doublon
-// probable, ex. "École du Centre" / "école du centre" / "Ecole du Centre !").
-// Ne renvoie que les groupes d'au moins 2 dossiers ; ignore les noms vides.
+function normalizeEmail(email) {
+  return String(email || '').trim().toLowerCase();
+}
+
+// Garde uniquement les chiffres et un éventuel '+' initial, pour comparer des
+// numéros écrits différemment (espaces, points, tirets). Rejette les valeurs
+// trop courtes pour éviter un faux positif sur un numéro tronqué/partiel.
+function normalizePhone(phone) {
+  const digits = String(phone || '').replace(/[^\d+]/g, '');
+  return digits.length >= 6 ? digits : '';
+}
+
+// Regroupe les prospects qui partagent un signal fort de doublon : même nom
+// d'école normalisé (accents/casse/ponctuation ignorés), même email de
+// contact, ou même téléphone de contact — un nom différent (faute de frappe,
+// sigle) n'empêche plus de détecter le doublon si l'email ou le téléphone
+// correspond. Transitif (union-find) : si A~B par le nom et B~C par l'email,
+// A/B/C finissent dans le même groupe. Ne renvoie que les groupes d'au moins
+// 2 dossiers ; ignore les valeurs vides (jamais de faux groupe sur "").
 function findDuplicateProspects(prospects) {
-  const groups = new Map();
-  for (const p of prospects) {
-    const key = normalizeSchoolName(p.school_name);
-    if (!key) continue;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(p);
+  const parent = prospects.map((_, i) => i);
+  function find(x) { while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; }
+  function union(a, b) { const ra = find(a), rb = find(b); if (ra !== rb) parent[ra] = rb; }
+
+  function unionBySignal(keyFn) {
+    const byKey = new Map();
+    prospects.forEach((p, i) => {
+      const key = keyFn(p);
+      if (!key) return;
+      if (!byKey.has(key)) byKey.set(key, i);
+      else union(byKey.get(key), i);
+    });
   }
-  return [...groups.entries()]
-    .filter(([, group]) => group.length >= 2)
-    .map(([key, group]) => ({ key, prospects: group }));
+
+  unionBySignal((p) => normalizeSchoolName(p.school_name));
+  unionBySignal((p) => normalizeEmail(p.contact_email));
+  unionBySignal((p) => normalizePhone(p.contact_phone));
+
+  const components = new Map();
+  prospects.forEach((p, i) => {
+    const root = find(i);
+    if (!components.has(root)) components.set(root, []);
+    components.get(root).push(p);
+  });
+
+  return [...components.values()]
+    .filter((group) => group.length >= 2)
+    // Clé stable tant que la composition du groupe ne change pas (utilisée
+    // pour "pas un doublon", voir dismiss-duplicate dans dashboard.js) — ne
+    // dépend plus uniquement du nom, donc valable même quand le doublon n'a
+    // été détecté que par email/téléphone.
+    .map((group) => ({ key: 'grp:' + group.map((p) => p.id).sort().join(','), prospects: group }));
 }
 
 // Résumé lisible des champs modifiés entre l'état avant (`before`, ligne
@@ -219,6 +257,6 @@ function checklistItemStatus(lastCheckedAt, frequencyDays, now) {
 module.exports = {
   FOLLOWUP_DAYS, computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement,
   dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange,
-  normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings,
-  excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals,
+  normalizeSchoolName, normalizeEmail, normalizePhone, findDuplicateProspects, diffSummary, severelyOverdueFollowups,
+  upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals,
 };

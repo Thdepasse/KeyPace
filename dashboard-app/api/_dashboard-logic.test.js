@@ -2,7 +2,7 @@
 // Lancer : node --test api/_dashboard-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals } = require('./_dashboard-logic');
+const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, normalizePhone, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals } = require('./_dashboard-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -152,6 +152,42 @@ test('findDuplicateProspects : aucun groupe si tous les noms sont distincts, ign
     { id: 4, school_name: null },
   ]);
   assert.deepEqual(groups, []);
+});
+
+test('findDuplicateProspects : détecte un doublon par email même si le nom d\'école diffère', () => {
+  const groups = findDuplicateProspects([
+    { id: 1, school_name: 'Institut Saint-Louis', contact_email: 'Directeur@Ecole.be' },
+    { id: 2, school_name: 'ISL', contact_email: 'directeur@ecole.be' },
+    { id: 3, school_name: 'Institut B', contact_email: 'autre@ecole.be' },
+  ]);
+  assert.equal(groups.length, 1);
+  assert.deepEqual(groups[0].prospects.map((p) => p.id), [1, 2]);
+});
+
+test('findDuplicateProspects : détecte un doublon par téléphone (formats différents), ignore les numéros trop courts', () => {
+  const groups = findDuplicateProspects([
+    { id: 1, school_name: 'École A', contact_phone: '+32 81 12 34 56' },
+    { id: 2, school_name: 'École B', contact_phone: '+32-81-12.34.56' },
+    { id: 3, school_name: 'École C', contact_phone: '123' },
+  ]);
+  assert.equal(groups.length, 1);
+  assert.deepEqual(groups[0].prospects.map((p) => p.id), [1, 2]);
+});
+
+test('findDuplicateProspects : transitif — deux paires reliées par des signaux différents fusionnent en un seul groupe', () => {
+  const groups = findDuplicateProspects([
+    { id: 1, school_name: 'École du Parc', contact_email: 'a@ecole.be' },
+    { id: 2, school_name: 'ecole du parc', contact_email: 'b@ecole.be' }, // relié à 1 par le nom
+    { id: 3, school_name: 'Autre nom', contact_email: 'b@ecole.be' }, // relié à 2 par l'email
+  ]);
+  assert.equal(groups.length, 1);
+  assert.deepEqual(groups[0].prospects.map((p) => p.id), [1, 2, 3]);
+});
+
+test('normalizePhone : garde chiffres et + initial, rejette les valeurs trop courtes', () => {
+  assert.equal(normalizePhone('+32 (0)81 12-34.56'), '+32081123456');
+  assert.equal(normalizePhone('123'), '');
+  assert.equal(normalizePhone(null), '');
 });
 
 const PROSPECT_LABELS = { city: 'Ville', status: 'Statut', notes: 'Notes' };
