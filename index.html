@@ -7050,6 +7050,9 @@ const app={
       // mode libre uniquement : le tempo grimpe avec le combo (les morceaux
       // réels gardent leur BPM fixe, celui de l'audio)
       if(s.songId==='libre'&&s.combo>0&&s.combo%10===0)s.bpm=Math.min(170,(s.bpm||100)+10);
+      // le multiplicateur de score grimpe tous les 10 combos, quel que soit
+      // le mode : un petit repère visuel pour que ça se sente vraiment
+      if(s.combo>0&&s.combo%10===0)s.banner={text:`COMBO ×${1+Math.min(3,Math.floor(s.combo/10))} !`,kind:'success',until:Date.now()+1400};
       playSound('hit',{pitch:1+Math.min(.5,s.combo*.015)});this._flashArena(j==='perfect'?'#FFD84D':'#1FA971'); // le son grimpe légèrement avec le combo
       s.judge={text:label||(j==='perfect'?'PARFAIT':'BIEN'),pts,multi,kind:'good',tier:j,until:Date.now()+550};
     }
