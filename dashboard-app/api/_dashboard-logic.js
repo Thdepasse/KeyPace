@@ -36,6 +36,77 @@ function nextStatusOnOutboundContact(status) {
   return status === 'a_contacter' ? 'envoye' : 'relance';
 }
 
+// Premier nombre trouvé dans un texte libre type "~1000 élèves (secondaire)"
+// -> 1000. Best-effort : ce champ n'a jamais été pensé pour être calculé,
+// donc si rien n'est trouvé on ne devine pas un chiffre.
+function estimatedStudentsCount(text) {
+  const match = String(text || '').match(/\d+/);
+  return match ? Number(match[0]) : null;
+}
+
+// Renvoie le score du premier palier atteint (thresholds triés du plus haut
+// au plus bas, dernier palier à min:0 pour toujours matcher).
+function bucketScore(value, thresholds) {
+  for (const [min, score] of thresholds) if (value >= min) return score;
+  return 0;
+}
+
+const VALUE_THRESHOLDS = [[6000, 70], [3000, 60], [1500, 50], [500, 35], [0, 20]];
+const STUDENTS_THRESHOLDS = [[1500, 65], [700, 55], [300, 40], [100, 25], [0, 10]];
+// Au-delà de 150 jours sans premier contact, la bonification d'ancienneté
+// n'augmente plus — au-delà d'un certain point, "encore plus vieux" n'ajoute
+// rien à l'urgence de traiter le dossier.
+const STALENESS_CAP_DAYS = 150;
+
+// Score 0-100 pour trier les dossiers "à contacter" jamais touchés : lequel
+// attaquer en premier parmi des centaines qui attendent. Combine la valeur
+// potentielle du deal (estimated_value si renseigné, sinon un proxy par
+// paliers sur l'effectif élèves en texte libre — jamais les deux à la fois,
+// la valeur estimée étant un jugement humain plus fiable) et une
+// bonification d'ancienneté plafonnée pour qu'un dossier oublié depuis
+// longtemps finisse par remonter avant un tout juste ajouté.
+// Volontairement AUCUNE pondération région/ville : aucune donnée de
+// priorité territoriale n'existe dans la base, en inventer une serait une
+// préférence fabriquée plutôt que réelle. La ville reste filtrable pour un
+// jugement humain (voir filterProspects côté front).
+function computeProspectPriority(prospect, now) {
+  let potential = 0;
+  if (prospect.estimated_value) {
+    potential = bucketScore(Number(prospect.estimated_value), VALUE_THRESHOLDS);
+  } else {
+    const students = estimatedStudentsCount(prospect.estimated_students);
+    if (students != null) potential = bucketScore(students, STUDENTS_THRESHOLDS);
+  }
+
+  let staleness = 0;
+  if (!prospect.last_contact_at && prospect.created_at) {
+    const days = Math.min(Math.floor((now - new Date(prospect.created_at).getTime()) / DAY_MS), STALENESS_CAP_DAYS);
+    staleness = Math.min(30, Math.floor(Math.max(days, 0) / 5));
+  }
+
+  return Math.min(100, potential + staleness);
+}
+
+// Probabilités de closing par statut : des hypothèses documentées et
+// ajustables ici, pas une mesure — sert à projeter le pipeline OUVERT en
+// revenu prévisionnel. 'signe' n'y figure pas (déjà du revenu réalisé, voir
+// client_schools.annual_price) ni 'perdu' (clos, 0% par définition).
+const PIPELINE_STAGE_PROBABILITY = {
+  a_contacter: 0.05,
+  envoye: 0.10,
+  relance: 0.12,
+  repondu: 0.25,
+  en_negociation: 0.55,
+};
+
+function weightedPipelineValue(prospects) {
+  return prospects.reduce((sum, p) => {
+    const prob = PIPELINE_STAGE_PROBABILITY[p.status];
+    if (!prob || !p.estimated_value) return sum;
+    return sum + Number(p.estimated_value) * prob;
+  }, 0);
+}
+
 // Acquisition & conversion à partir de la table `users` (id, plan, created_at).
 function summarizeAcquisition(users, now) {
   const total = users.length;
@@ -271,6 +342,7 @@ function checklistItemStatus(lastCheckedAt, frequencyDays, now) {
 
 module.exports = {
   FOLLOWUP_DAYS, computeNextFollowup, ADVANCED_STATUSES, nextStatusOnOutboundContact,
+  estimatedStudentsCount, computeProspectPriority, PIPELINE_STAGE_PROBABILITY, weightedPipelineValue,
   summarizeAcquisition, summarizeB2B, summarizeEngagement,
   dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange,
   normalizeSchoolName, normalizeEmail, normalizePhone, findDuplicateProspects, diffSummary, severelyOverdueFollowups,

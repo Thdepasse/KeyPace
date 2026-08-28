@@ -5,7 +5,7 @@
 // Accès protégé par le header x-admin-key (secret ADMIN_KEY propre à ce
 // projet — pas de comptes individuels).
 const crypto = require('crypto');
-const { computeNextFollowup, nextStatusOnOutboundContact, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals, FOLLOWUP_DAYS } = require('./_dashboard-logic');
+const { computeNextFollowup, nextStatusOnOutboundContact, computeProspectPriority, weightedPipelineValue, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals, FOLLOWUP_DAYS } = require('./_dashboard-logic');
 const { classifyMessage } = require('./_zimbra-match');
 const { fetchRecentMessages, sendMessage } = require('./_zimbra-soap');
 const { fetchGA4Traffic, fetchGA4TrafficBreakdown } = require('./_ga4');
@@ -651,10 +651,18 @@ async function activityLogList(req, res) {
   return res.json({ items: r.data || [] });
 }
 
+// `kind` distingue un appel ou un RDV noté depuis la fiche d'une simple note
+// libre (voir les boutons "+ Appel"/"+ RDV" dans index.html) — même
+// mécanique de journalisation, juste une action différente dans
+// activity_log, pour un fil d'activité qui distingue vraiment les types
+// d'échange plutôt que tout mélanger sous "note".
+const NOTE_KINDS = new Set(['note', 'appel', 'rdv']);
+
 async function addNote(req, res) {
-  const { entity_type, entity_id, note } = req.body || {};
+  const { entity_type, entity_id, note, kind } = req.body || {};
   if (!entity_type || !entity_id || !note) return res.status(400).json({ error: 'Champs manquants.' });
-  await logActivity(entity_type, entity_id, 'note', String(note).trim().slice(0, 2000));
+  const action = kind && NOTE_KINDS.has(kind) ? kind : 'note';
+  await logActivity(entity_type, entity_id, action, String(note).trim().slice(0, 2000));
   return res.json({ ok: true });
 }
 
@@ -662,9 +670,10 @@ const STATUS_LABELS_FR = { a_contacter: 'À contacter', envoye: 'Envoyé', relan
 const PROSPECT_FIELD_LABELS = {
   school_name: 'École', contact_name: 'Contact', contact_email: 'Email', contact_phone: 'Téléphone', city: 'Ville',
   notes: 'Notes', meeting_at: 'Rendez-vous', estimated_students: 'Effectif estimé', estimated_students_source: 'Source effectif',
-  owner: 'Responsable', source: 'Source du lead', lost_reason: 'Raison de la perte', estimated_value: 'Valeur estimée',
-  contact_name_2: 'Contact 2', contact_email_2: 'Email 2', contact_phone_2: 'Téléphone 2',
+  owner: 'Responsable', source: 'Source du lead', lost_reason: 'Raison de la perte', lost_reason_category: 'Motif de perte',
+  estimated_value: 'Valeur estimée', contact_name_2: 'Contact 2', contact_email_2: 'Email 2', contact_phone_2: 'Téléphone 2',
 };
+const LOST_REASON_CATEGORY_LABELS_FR = { prix: 'Prix', concurrent: 'Concurrent', timing: 'Timing', pas_de_budget: 'Pas de budget', sans_retour: 'Sans retour', autre: 'Autre' };
 const EVENT_FIELD_LABELS = { title: 'Titre', content_type: 'Type', account: 'Compte', caption: 'Texte du post', scheduled_date: 'Date planifiée', link: 'Lien', notes: 'Notes' };
 const CONTENT_STATUS_LABELS_FR = { idee: 'Idée', a_faire: 'À faire', pret: 'Prêt', publie: 'Publié' };
 const DEV_FIELD_LABELS = { title: 'Titre', description: 'Description', item_type: 'Type', priority: 'Priorité', dev_owner: 'Développeur' };
@@ -680,11 +689,13 @@ async function prospectsList(req, res) {
     sb('/dismissed_duplicates?select=dedup_key'),
   ]);
   if (!r.ok) return res.status(500).json({ error: 'Erreur récupération prospects.' });
+  const now = Date.now();
+  const items = (r.data || []).map((p) => ({ ...p, priority: computeProspectPriority(p, now) }));
   const lastSyncAt = (lastSyncR.ok && lastSyncR.data && lastSyncR.data[0] && lastSyncR.data[0].processed_at) || null;
   const dismissedKeys = (dismissedR.data || []).map((d) => d.dedup_key);
-  const duplicateGroups = excludeDismissedDuplicates(findDuplicateProspects(r.data || []), dismissedKeys)
+  const duplicateGroups = excludeDismissedDuplicates(findDuplicateProspects(items), dismissedKeys)
     .map((g) => ({ key: g.key, ids: g.prospects.map((p) => p.id) }));
-  return res.json({ items: r.data || [], lastSyncAt, duplicateGroups });
+  return res.json({ items, lastSyncAt, duplicateGroups, weightedPipelineValue: weightedPipelineValue(items) });
 }
 
 async function dismissDuplicate(req, res) {
@@ -735,7 +746,7 @@ async function prospectCreate(req, res) {
 
 const PROSPECT_FIELDS = [
   'school_name', 'contact_name', 'contact_email', 'contact_phone', 'city', 'notes', 'status', 'meeting_at',
-  'estimated_students', 'estimated_students_source', 'owner', 'source', 'lost_reason', 'estimated_value',
+  'estimated_students', 'estimated_students_source', 'owner', 'source', 'lost_reason', 'lost_reason_category', 'estimated_value',
   'contact_name_2', 'contact_email_2', 'contact_phone_2',
 ];
 
@@ -786,7 +797,7 @@ async function prospectUpdate(req, res) {
 
 // Transition de statut : programme automatiquement la relance suivante.
 async function prospectLogContact(req, res) {
-  const { id, status, lost_reason } = req.body || {};
+  const { id, status, lost_reason, lost_reason_category } = req.body || {};
   if (!id || !status) return res.status(400).json({ error: 'id ou status manquant.' });
   if (!(status in FOLLOWUP_DAYS)) return res.status(400).json({ error: 'Statut inconnu.' });
   const beforeR = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}&select=status,school_name`);
@@ -799,16 +810,21 @@ async function prospectLogContact(req, res) {
     next_followup_at: computeNextFollowup(status, now),
     updated_at: new Date(now).toISOString(),
   };
-  // Raison de la perte : demandée côté front au moment du passage en 'perdu'
-  // (voir logContact dans index.html) — sert à analyser pourquoi les deals
-  // échouent, pas juste à en compter le nombre.
+  // Raison (et catégorie) de la perte : demandées côté front au moment du
+  // passage en 'perdu' (voir logContact dans index.html) — la catégorie
+  // s'agrège proprement (voir prospectsList), la raison libre garde la
+  // nuance exacte.
   if (status === 'perdu' && lost_reason) patch.lost_reason = lost_reason;
+  if (status === 'perdu' && lost_reason_category) patch.lost_reason_category = lost_reason_category;
   const r = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) });
   if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Erreur mise à jour du statut.' });
   if (oldStatus !== status) {
     await logActivity('prospect', id, 'status_changed', `${STATUS_LABELS_FR[oldStatus] || oldStatus || '—'} → ${STATUS_LABELS_FR[status] || status}`);
     if (status === 'signe') await autoCreateSignedContentIdea(r.data[0].school_name, id);
-    if (status === 'perdu' && lost_reason) await logActivity('prospect', id, 'note', `Raison de la perte : ${lost_reason}`);
+    if (status === 'perdu' && lost_reason) {
+      const categoryLabel = lost_reason_category ? LOST_REASON_CATEGORY_LABELS_FR[lost_reason_category] || lost_reason_category : null;
+      await logActivity('prospect', id, 'note', `Raison de la perte${categoryLabel ? ` (${categoryLabel})` : ''} : ${lost_reason}`);
+    }
   }
   return res.json(r.data[0]);
 }

@@ -2,7 +2,7 @@
 // Lancer : node --test api/_dashboard-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { computeNextFollowup, nextStatusOnOutboundContact, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, normalizePhone, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals } = require('./_dashboard-logic');
+const { computeNextFollowup, nextStatusOnOutboundContact, computeProspectPriority, weightedPipelineValue, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, normalizePhone, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals } = require('./_dashboard-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -294,4 +294,42 @@ test('checklistItemStatus : vérifié il y a plus longtemps que la fréquence =>
 test('checklistItemStatus : sans fréquence définie, jamais en retard même vieux', () => {
   const checkedAt = new Date(NOW - 500 * DAY).toISOString();
   assert.deepEqual(checklistItemStatus(checkedAt, null, NOW), { overdue: false, daysSinceCheck: 500 });
+});
+
+test('computeProspectPriority : la valeur estimée prime sur le proxy effectif quand les deux sont présents', () => {
+  const withValueOnly = { estimated_value: 8000, created_at: new Date(NOW).toISOString() };
+  const withStudentsOnly = { estimated_students: '~50 élèves', created_at: new Date(NOW).toISOString() };
+  const withBoth = { estimated_value: 8000, estimated_students: '~50 élèves', created_at: new Date(NOW).toISOString() };
+  assert.equal(computeProspectPriority(withBoth, NOW), computeProspectPriority(withValueOnly, NOW));
+  assert.notEqual(computeProspectPriority(withBoth, NOW), computeProspectPriority(withStudentsOnly, NOW));
+});
+
+test('computeProspectPriority : sans aucun signal de potentiel, seule l\'ancienneté joue', () => {
+  const fresh = { created_at: new Date(NOW).toISOString() };
+  const old = { created_at: new Date(NOW - 100 * DAY).toISOString() };
+  assert.equal(computeProspectPriority(fresh, NOW), 0);
+  assert.ok(computeProspectPriority(old, NOW) > 0);
+});
+
+test('computeProspectPriority : un dossier déjà contacté n\'accumule plus de bonification d\'ancienneté', () => {
+  const contacted = { created_at: new Date(NOW - 100 * DAY).toISOString(), last_contact_at: new Date(NOW - 1 * DAY).toISOString() };
+  assert.equal(computeProspectPriority(contacted, NOW), 0);
+});
+
+test('computeProspectPriority : la bonification d\'ancienneté est plafonnée, jamais négative, score jamais > 100', () => {
+  const veryOld = { estimated_value: 50000, created_at: new Date(NOW - 10000 * DAY).toISOString() };
+  const score = computeProspectPriority(veryOld, NOW);
+  assert.ok(score <= 100);
+  assert.ok(score >= 0);
+});
+
+test('weightedPipelineValue : pondère par la probabilité du statut, ignore signé/perdu et les valeurs manquantes', () => {
+  const prospects = [
+    { status: 'en_negociation', estimated_value: 1000 }, // 550
+    { status: 'a_contacter', estimated_value: 1000 }, // 50
+    { status: 'signe', estimated_value: 5000 }, // exclu (déjà réalisé)
+    { status: 'perdu', estimated_value: 5000 }, // exclu (clos)
+    { status: 'envoye', estimated_value: null }, // exclu (pas de valeur)
+  ];
+  assert.equal(weightedPipelineValue(prospects), 600);
 });

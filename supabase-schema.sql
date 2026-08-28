@@ -709,6 +709,22 @@ alter table activity_log add constraint activity_log_action_check
   check (action in ('created', 'updated', 'status_changed', 'note', 'email'));
 
 -- ───────────────────────────────────────────────────────────────
+-- Refonte CRM (REFONTE-CRM.md, palier 2) : fil d'activité typé (un appel ou
+-- un RDV noté depuis la fiche n'est plus qu'une "note" indifférenciée, voir
+-- addNote dans dashboard-app/api/dashboard.js) + catégorie de perte agrégable
+-- (un `lost_reason` en texte libre ne se compte pas de façon fiable : "prix"
+-- et "trop cher" resteraient deux motifs distincts).
+-- ───────────────────────────────────────────────────────────────
+alter table activity_log drop constraint if exists activity_log_action_check;
+alter table activity_log add constraint activity_log_action_check
+  check (action in ('created', 'updated', 'status_changed', 'note', 'email', 'appel', 'rdv'));
+
+alter table school_prospects add column if not exists lost_reason_category text;
+alter table school_prospects drop constraint if exists school_prospects_lost_reason_category_check;
+alter table school_prospects add constraint school_prospects_lost_reason_category_check
+  check (lost_reason_category is null or lost_reason_category in ('prix', 'concurrent', 'timing', 'pas_de_budget', 'sans_retour', 'autre'));
+
+-- ───────────────────────────────────────────────────────────────
 -- Policies RLS explicites (août 2026)
 -- Chaque table listée ci-dessus avait RLS activée mais AUCUNE policy
 -- écrite — ça bloque déjà tout accès pour la clé anonyme (deny-by-default

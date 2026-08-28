@@ -198,7 +198,7 @@
   .platform-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;background:var(--border);color:var(--txt);margin-right:4px}
   .history-section{border-top:1px solid var(--border);margin-top:16px;padding-top:14px}
   .history-section h4{margin:0 0 10px;font-size:13px;font-weight:800}
-  .history-add{display:flex;gap:8px;margin-bottom:10px}
+  .history-add{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
   .history-add input{flex:1;font-size:13px}
   .history-list{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
   .history-item{padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px;line-height:1.5}
@@ -420,8 +420,10 @@
         <div id="prospect-history" class="history-section" style="display:none">
           <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
           <div class="history-add">
-            <input id="prospect-note-input" placeholder="Ajouter une note...">
-            <button class="btn small ghost" style="width:auto" onclick="addProspectNote()">Ajouter</button>
+            <input id="prospect-note-input" placeholder="Ajouter une note, un appel ou un RDV...">
+            <button class="btn small ghost" style="width:auto" onclick="addProspectNote('note')">+ Note</button>
+            <button class="btn small ghost" style="width:auto" onclick="addProspectNote('appel')">+ Appel</button>
+            <button class="btn small ghost" style="width:auto" onclick="addProspectNote('rdv')">+ RDV</button>
           </div>
           <div id="prospect-history-list" class="history-list"></div>
         </div>
@@ -444,6 +446,23 @@
         </div>
       </div>
 
+      <div class="panel" id="lost-reason-panel" style="display:none;margin-bottom:16px">
+        <h3 style="margin:0 0 10px">Pourquoi ce dossier est-il perdu ?</h3>
+        <select id="lost-reason-category" style="margin-bottom:10px">
+          <option value="prix">Prix</option>
+          <option value="concurrent">Concurrent</option>
+          <option value="timing">Timing</option>
+          <option value="pas_de_budget">Pas de budget</option>
+          <option value="sans_retour">Sans retour</option>
+          <option value="autre">Autre</option>
+        </select>
+        <input id="lost-reason-detail" placeholder="Précision (optionnel)">
+        <div class="form-actions">
+          <button class="btn" onclick="confirmLostReason()">Confirmer la perte</button>
+          <button class="btn ghost" onclick="cancelLostReason()">Annuler</button>
+        </div>
+      </div>
+
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
         <input id="prospect-search" type="search" placeholder="Rechercher (école, ville, contact, email...)" oninput="window.__duplicateGroupFilter=null;renderProspects()" style="max-width:320px;font-size:13px;padding:7px 10px">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -460,8 +479,22 @@
             <option value="ecole">Trier par école (A-Z)</option>
             <option value="statut">Trier par statut</option>
             <option value="recent">Trier par ajout (récent)</option>
+            <option value="priorite">Trier par priorité (à contacter)</option>
           </select>
         </div>
+      </div>
+      <div id="prospect-quick-views" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)">
+          Vous êtes :
+          <select id="current-user-select" onchange="localStorage.setItem('kp_current_user', this.value)" style="font-size:12.5px;padding:5px 8px;width:auto">
+            <option value="">—</option>
+            <option value="theo">Théo</option>
+            <option value="vincent">Vincent</option>
+          </select>
+        </label>
+        <button class="btn ghost small" style="width:auto" onclick="applyQuickView('mine')">Mes dossiers</button>
+        <button class="btn ghost small" style="width:auto" onclick="applyQuickView('week')">Cette semaine</button>
+        <button class="btn ghost small" style="width:auto" onclick="applyQuickView('negotiation')">Négociation</button>
       </div>
       <div id="prospect-filters" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
         <select id="filter-status" onchange="renderProspects()" style="font-size:12.5px;padding:6px 10px;width:auto">
@@ -493,6 +526,7 @@
       </div>
       <div id="duplicate-filter-note"></div>
       <div id="pipeline-value-summary" class="muted" style="font-size:12.5px;margin-bottom:8px"></div>
+      <div id="lost-reasons-summary" class="muted" style="font-size:12.5px;margin-bottom:8px"></div>
 
       <div id="bulk-actions-bar" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:9px 14px;margin-bottom:10px">
         <strong id="bulk-actions-count" style="font-size:13px"></strong>
@@ -512,6 +546,7 @@
           <option value="vincent">Vincent</option>
           <option value="__none__">Non assigné</option>
         </select>
+        <button class="btn ghost small" style="width:auto" onclick="bulkSendFirstContact()" title="Envoie le modèle « Premier contact », personnalisé par école, à chaque dossier sélectionné qui a un email">✉ Premier contact (lot)</button>
         <button class="btn ghost small" style="width:auto" onclick="exportProspectsCSV(true)">Exporter la sélection</button>
         <button class="btn ghost small" style="width:auto" onclick="clearProspectSelection()">✕ Désélectionner</button>
         <span id="bulk-actions-progress" class="muted" style="font-size:12px"></span>
@@ -522,7 +557,7 @@
           <thead>
             <tr>
               <th style="width:28px"><input type="checkbox" id="select-all-prospects" onchange="toggleSelectAllProspects(this.checked)"></th>
-              <th>École</th><th>Ville</th><th>Contact</th><th>Statut</th><th>Valeur est.</th><th>Dernier contact</th><th>Relance</th><th>Actions</th>
+              <th>École</th><th>Ville</th><th>Contact</th><th>Statut</th><th title="Dossiers « à contacter » uniquement — voir computeProspectPriority">Priorité</th><th>Valeur est.</th><th>Dernier contact</th><th>Relance</th><th>Actions</th>
             </tr>
           </thead>
           <tbody id="prospects-body"></tbody>
@@ -578,8 +613,10 @@
         <div id="client-history" class="history-section" style="display:none">
           <h4><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Historique</h4>
           <div class="history-add">
-            <input id="client-note-input" placeholder="Ajouter une note...">
-            <button class="btn small ghost" style="width:auto" onclick="addClientNote()">Ajouter</button>
+            <input id="client-note-input" placeholder="Ajouter une note, un appel ou un RDV...">
+            <button class="btn small ghost" style="width:auto" onclick="addClientNote('note')">+ Note</button>
+            <button class="btn small ghost" style="width:auto" onclick="addClientNote('appel')">+ Appel</button>
+            <button class="btn small ghost" style="width:auto" onclick="addClientNote('rdv')">+ RDV</button>
           </div>
           <div id="client-history-list" class="history-list"></div>
         </div>
@@ -930,6 +967,7 @@ const OWNER_LABELS = { theo:'Théo', vincent:'Vincent' };
 // manuellement et s'affiche telle quelle (voir sourceLabel ci-dessous).
 const SOURCE_LABELS = { zimbra_auto: 'Détecté automatiquement (Zimbra)' };
 function sourceLabel(source){ return source ? (SOURCE_LABELS[source] || source) : ''; }
+const LOST_REASON_CATEGORY_LABELS = { prix: 'Prix', concurrent: 'Concurrent', timing: 'Timing', pas_de_budget: 'Pas de budget', sans_retour: 'Sans retour', autre: 'Autre' };
 let calMonth = new Date();
 
 function adminKey(){ return localStorage.getItem(KEY_STORAGE) || ''; }
@@ -1057,6 +1095,7 @@ function switchTab(name){
 }
 
 function boot(){
+  document.getElementById('current-user-select').value = localStorage.getItem('kp_current_user') || '';
   loadKpis();
   loadTrafficDetail();
   setProspectsView(prospectsView);
@@ -1297,6 +1336,26 @@ function resetProspectFilters(){
   document.getElementById('filter-auto-only').checked = false;
   document.getElementById('prospect-search').value = '';
   window.__duplicateGroupFilter = null;
+  window.__quickViewDueSoon = false;
+  renderProspects();
+}
+
+// Vues rapides : préréglages des filtres déjà construits ci-dessus plutôt
+// qu'un mécanisme de sauvegarde séparé — "Mes dossiers" a besoin de savoir
+// qui utilise l'outil (sélecteur "Vous êtes", pure préférence locale par
+// navigateur, pas une authentification : l'ADMIN_KEY reste la seule vraie
+// barrière d'accès).
+function applyQuickView(view){
+  resetProspectFilters();
+  if (view === 'mine') {
+    const me = localStorage.getItem('kp_current_user') || '';
+    if (me) document.getElementById('filter-owner').value = me;
+    else { showToast('Choisis d\'abord « Vous êtes » ci-dessus'); return; }
+  } else if (view === 'week') {
+    window.__quickViewDueSoon = true;
+  } else if (view === 'negotiation') {
+    document.getElementById('filter-status').value = 'en_negociation';
+  }
   renderProspects();
 }
 
@@ -1321,6 +1380,11 @@ function filterProspects(list){
     out = out.filter(p => !p.last_contact_at || new Date(p.last_contact_at).getTime() <= threshold);
   }
 
+  if (window.__quickViewDueSoon) {
+    const limit = Date.now() + 7 * 24 * 60 * 60 * 1000;
+    out = out.filter(p => p.next_followup_at && new Date(p.next_followup_at).getTime() <= limit);
+  }
+
   const q = document.getElementById('prospect-search').value.trim().toLowerCase();
   if (!q) return out;
   return out.filter(p => [p.school_name, p.city, p.contact_name, p.contact_email, p.contact_phone, p.notes]
@@ -1334,14 +1398,16 @@ function sortProspects(list){
   else if (mode === 'ecole') sorted.sort((a, b) => (a.school_name || '').localeCompare(b.school_name || '', 'fr'));
   else if (mode === 'statut') sorted.sort((a, b) => STATUS_FLOW.indexOf(a.status) - STATUS_FLOW.indexOf(b.status));
   else if (mode === 'recent') sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  else if (mode === 'priorite') sorted.sort((a, b) => (b.priority || 0) - (a.priority || 0));
   // 'relance' : on garde l'ordre déjà renvoyé par l'API (relances dues en premier)
   return sorted;
 }
 
 async function loadProspects(){
   try {
-    const { items: list, lastSyncAt, duplicateGroups } = await api('prospects');
+    const { items: list, lastSyncAt, duplicateGroups, weightedPipelineValue } = await api('prospects');
     window.__prospects = list;
+    window.__weightedPipelineValue = weightedPipelineValue || 0;
     populateCityFilter(list);
     document.getElementById('last-sync').textContent = lastSyncAt
       ? `Dernière sync : ${fmtDate(lastSyncAt)}`
@@ -1465,9 +1531,25 @@ function renderProspects(){
     const openPipelineValue = view
       .filter(p => p.status !== 'signe' && p.status !== 'perdu' && p.estimated_value)
       .reduce((sum, p) => sum + Number(p.estimated_value), 0);
+    const weighted = Math.round(window.__weightedPipelineValue || 0);
+    // Le pondéré porte sur TOUT le pipeline ouvert (hypothèses de probabilité
+    // par statut, voir PIPELINE_STAGE_PROBABILITY côté serveur) — pas
+    // seulement ce qui est affiché après recherche/filtres, contrairement à
+    // la somme brute juste au-dessus.
     document.getElementById('pipeline-value-summary').textContent = openPipelineValue
-      ? `Valeur estimée du pipeline ouvert (affiché) : ${openPipelineValue.toLocaleString('fr-BE')} €`
+      ? `Valeur estimée du pipeline ouvert (affiché) : ${openPipelineValue.toLocaleString('fr-BE')} € · pondéré (tout le pipeline, hypothèses de probabilité) : ${weighted.toLocaleString('fr-BE')} €`
       : '';
+
+    const lost = (window.__prospects || []).filter(p => p.status === 'perdu' && p.lost_reason_category);
+    if (lost.length) {
+      const counts = {};
+      lost.forEach(p => { counts[p.lost_reason_category] = (counts[p.lost_reason_category] || 0) + 1; });
+      const parts = Object.entries(counts).sort((a, b) => b[1] - a[1])
+        .map(([cat, n]) => `${LOST_REASON_CATEGORY_LABELS[cat] || cat} (${n})`);
+      document.getElementById('lost-reasons-summary').textContent = `Motifs de perte : ${parts.join(' · ')}`;
+    } else {
+      document.getElementById('lost-reasons-summary').textContent = '';
+    }
     const dupIds = window.__duplicateIds || new Set();
     document.getElementById('prospects-body').innerHTML = view.length ? view.map(p => `
       <tr${dupIds.has(p.id) ? ' style="background:#FFFBEF"' : ''}>
@@ -1476,11 +1558,12 @@ function renderProspects(){
         <td>${p.city || '—'}${p.estimated_students ? `<div class="muted" style="font-size:12px" title="${escHtml(p.estimated_students_source || '')}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5A4.5 4.5 0 0 1 7 14h4a4.5 4.5 0 0 1 4.5 4.5V20"/><circle cx="17" cy="8" r="3"/><path d="M17.5 14.3a4.5 4.5 0 0 1 3.9 4.5V20"/></svg> ${escHtml(p.estimated_students)}</div>` : ''}</td>
         <td>${p.contact_name || '—'}${p.contact_email ? `<div class="muted" style="font-size:12px">${p.contact_email}</div>` : ''}</td>
         <td><span class="badge badge-${p.status}" title="Cliquer pour changer le statut" onclick="openStatusPicker(event,'${p.id}','${p.status}')">${STATUS_LABELS[p.status]}</span></td>
+        <td>${p.status === 'a_contacter' ? `<span class="mono" title="Score de priorité (0-100) : valeur potentielle du deal + ancienneté sans premier contact">${p.priority ?? 0}</span>` : '—'}</td>
         <td>${p.estimated_value != null ? Number(p.estimated_value).toLocaleString('fr-BE') + ' €' : '—'}</td>
         <td>${fmtDate(p.last_contact_at)}</td>
         <td>${fmtDate(p.next_followup_at)}</td>
         <td><div class="actions"><button class="btn small ghost" onclick="openFollowupMessage('${p.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> Message</button><button class="btn small ghost" onclick="editProspect('${p.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
-      </tr>`).join('') : `<tr><td colspan="9" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
+      </tr>`).join('') : `<tr><td colspan="10" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
     renderProspectsKanban(view, dupIds);
     updateBulkActionsBar(view);
   } catch (e) { console.error(e); }
@@ -1556,6 +1639,33 @@ async function bulkAssignOwner(ownerValue){
   progressEl.textContent = fail ? `${ok} mis à jour, ${fail} échec${fail > 1 ? 's' : ''}.` : '';
   showToast(`${ok} dossier${ok > 1 ? 's' : ''} assigné${ok > 1 ? 's' : ''}${owner ? ` à ${OWNER_LABELS[owner]}` : ' (non assigné)'}`);
   loadProspects();
+}
+
+// Premier contact par lot : sur la sélection, génère un email personnalisé
+// par école à partir du même modèle "premier contact" que le panneau de
+// message (fusion école + effectif), et l'envoie via la même action tracée
+// que l'envoi individuel. Concurrence plus faible (3) que les autres actions
+// groupées : chaque envoi passe par une authentification Zimbra, pas juste
+// un PATCH Supabase.
+async function bulkSendFirstContact(){
+  const ids = [...selectedProspectIds];
+  const candidates = (window.__prospects || []).filter(p => ids.includes(p.id) && p.contact_email);
+  const skipped = ids.length - candidates.length;
+  if (!candidates.length) { showToast("Aucun dossier sélectionné n'a d'email de contact"); return; }
+  if (!confirm(`Envoyer un premier contact personnalisé à ${candidates.length} école${candidates.length > 1 ? 's' : ''} ?${skipped ? ` (${skipped} ignoré${skipped > 1 ? 's' : ''}, sans email)` : ''}`)) return;
+  const progressEl = document.getElementById('bulk-actions-progress');
+  let done = 0;
+  const { ok, fail } = await runWithConcurrency(candidates, 3, async (p) => {
+    const subject = buildSubjectFromTemplate('premier_contact', p);
+    const text = buildEmailFromTemplate('premier_contact', p);
+    await api('send-followup-email', { method: 'POST', body: { id: p.id, subject, text } });
+    done++;
+    progressEl.textContent = `${done}/${candidates.length} envoyé${done > 1 ? 's' : ''}…`;
+  });
+  progressEl.textContent = fail ? `${ok} envoyé${ok > 1 ? 's' : ''}, ${fail} échec${fail > 1 ? 's' : ''}.` : '';
+  showToast(`${ok} email${ok > 1 ? 's' : ''} envoyé${ok > 1 ? 's' : ''}`);
+  loadProspects();
+  loadKpis();
 }
 
 // ─── Vue Kanban (pipeline de prospection) ──────────────────────────
@@ -1930,11 +2040,11 @@ async function deleteClient(id){
   loadClients();
 }
 
-async function addClientNote(){
+async function addClientNote(kind){
   const input = document.getElementById('client-note-input');
   const note = input.value.trim();
   if (!note || !editingClientId) return;
-  await api('add-note', { method:'POST', body: { entity_type:'client_school', entity_id: editingClientId, note } });
+  await api('add-note', { method:'POST', body: { entity_type:'client_school', entity_id: editingClientId, note, kind } });
   input.value = '';
   renderActivityLog('client_school', editingClientId, 'client-history-list');
 }
@@ -2474,7 +2584,7 @@ async function addCompetitorNote(){
 
 // ─── Historique par élément (prospect ou contenu) ─────────────────
 // Générique : réutilisé par le formulaire prospect et le formulaire contenu.
-const ACTIVITY_ICONS = { created: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg>', updated: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>', status_changed: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg>', note: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg>', email: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>' };
+const ACTIVITY_ICONS = { created: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg>', updated: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>', status_changed: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg>', note: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg>', email: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>', appel: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4a1 1 0 0 1 1-1h2.2a1 1 0 0 1 1 .8l1 4a1 1 0 0 1-.5 1.1L7 10a12 12 0 0 0 7 7l1.1-1.7a1 1 0 0 1 1.1-.5l4 1a1 1 0 0 1 .8 1V20a1 1 0 0 1-1 1h-1C10.5 21 3 13.5 3 5V4z"/></svg>', rdv: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>' };
 
 async function renderActivityLog(entityType, entityId, listElId){
   const el = document.getElementById(listElId);
@@ -2489,11 +2599,11 @@ async function renderActivityLog(entityType, entityId, listElId){
   }
 }
 
-async function addProspectNote(){
+async function addProspectNote(kind){
   const input = document.getElementById('prospect-note-input');
   const note = input.value.trim();
   if (!note || !editingProspectId) return;
-  await api('add-note', { method:'POST', body: { entity_type:'prospect', entity_id: editingProspectId, note } });
+  await api('add-note', { method:'POST', body: { entity_type:'prospect', entity_id: editingProspectId, note, kind } });
   input.value = '';
   renderActivityLog('prospect', editingProspectId, 'prospect-history-list');
 }
@@ -2511,6 +2621,7 @@ function openAddForm(){
   editingProspectId = null;
   ['p-school','p-contact','p-email','p-phone','p-city','p-notes','p-meeting','p-students','p-students-source',
    'p-owner','p-source','p-value','p-lost-reason','p-contact-2','p-email-2','p-phone-2'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('p-owner').value = localStorage.getItem('kp_current_user') || '';
   document.getElementById('prospect-form-title').textContent = 'Nouvelle école';
   document.getElementById('prospect-save-btn').textContent = 'Enregistrer';
   document.getElementById('prospect-history').style.display = 'none';
@@ -2699,14 +2810,41 @@ async function handleCSVImport(ev){
   loadKpis();
 }
 
+// Passer en "perdu" ouvre le panneau de motif au lieu d'appeler l'API tout
+// de suite (voir confirmLostReason/cancelLostReason) : le statut n'est
+// changé qu'après confirmation, jamais avant, sinon annuler le panneau
+// laisserait un dossier "perdu" sans raison ni retour en arrière possible.
+let __pendingLostReasonId = null;
+
 async function logContact(id, status){
-  let lost_reason;
   if (status === 'perdu') {
-    lost_reason = window.prompt('Raison de la perte (optionnel, laisser vide si non applicable) :', '') || undefined;
+    __pendingLostReasonId = id;
+    document.getElementById('lost-reason-category').value = 'prix';
+    document.getElementById('lost-reason-detail').value = '';
+    document.getElementById('lost-reason-panel').style.display = 'block';
+    return;
   }
-  await api('log-contact', { method:'POST', body: { id, status, lost_reason } });
+  await api('log-contact', { method:'POST', body: { id, status } });
   loadProspects();
   loadKpis();
+}
+
+async function confirmLostReason(){
+  const id = __pendingLostReasonId;
+  if (!id) return;
+  const lost_reason_category = document.getElementById('lost-reason-category').value;
+  const detail = document.getElementById('lost-reason-detail').value.trim();
+  const lost_reason = detail || LOST_REASON_CATEGORY_LABELS[lost_reason_category];
+  document.getElementById('lost-reason-panel').style.display = 'none';
+  __pendingLostReasonId = null;
+  await api('log-contact', { method:'POST', body: { id, status: 'perdu', lost_reason, lost_reason_category } });
+  loadProspects();
+  loadKpis();
+}
+
+function cancelLostReason(){
+  __pendingLostReasonId = null;
+  document.getElementById('lost-reason-panel').style.display = 'none';
 }
 
 async function deleteProspect(id){
