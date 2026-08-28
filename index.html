@@ -1785,6 +1785,11 @@ const SOUND_FILES={
 const _soundCache={};
 function isSoundMuted(){try{return localStorage.getItem('kp_sound_muted')==='1';}catch{return false;}}
 function setSoundMuted(v){try{localStorage.setItem('kp_sound_muted',v?'1':'0');}catch{}}
+// Musique de fond (Magic Tiles) : réglage distinct des effets sonores
+// ci-dessus — couper les bruitages (hit/miss) ne doit pas forcément couper
+// le morceau qui joue, et inversement.
+function isMusicMuted(){try{return localStorage.getItem('kp_music_muted')==='1';}catch{return false;}}
+function setMusicMuted(v){try{localStorage.setItem('kp_music_muted',v?'1':'0');}catch{}}
 function playSound(name){
   if(isSoundMuted())return;
   const src=SOUND_FILES[name];if(!src)return;
@@ -6745,21 +6750,32 @@ const app={
   _sourisTilesStagesForDur(durMs){
     return TILES_STAGE_DEFS.map(d=>({lanes:d.lanes,label:d.label,t:Math.round(d.ratio*durMs)}));
   },
+  // Un morceau se débloque en atteignant au moins un palier médaille sur le
+  // précédent (score par morceau déjà suivi dans stats.sourisTilesBest) — le
+  // premier morceau est toujours ouvert.
+  _sourisTilesUnlocked(best,idx){
+    if(idx<=0)return true;
+    const prev=TILES_SONGS[idx-1];
+    const b=best[prev.id];
+    return !!(b&&b.tier);
+  },
   _sourisTilesSelect(){
-    const best=(this.stats&&this.stats.sourisTilesBest)||{};
+    const bestRaw=(this.stats&&this.stats.sourisTilesBest)||{};
+    const best=typeof bestRaw.score==='number'?{}:bestRaw; // ignore l'ancien format plat (un seul best global)
     const keysHtml=TILES_LANES.map((l,i)=>`<div class="tiles-intro-key" style="--dim:${TILES_INTRO_KEY_RAMP[i][0]};--bright:${TILES_INTRO_KEY_RAMP[i][1]};animation-delay:${(i*-0.35).toFixed(2)}s">${l.letter}</div>`).join('');
-    const songsHtml=TILES_SONGS.map(song=>{
-      const b=best&&typeof best.score==='number'?null:best[song.id]; // ignore l'ancien format plat (un seul best global)
-      return `<button onclick="app._sourisTilesStart('${song.id}')" style="text-align:left;width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;font-family:inherit;color:#fff;margin-bottom:10px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
-        <span>
-          <span style="display:block;font-weight:700;font-size:15.5px">${song.title}</span>
-          <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">${song.artist} · ${song.bpm} BPM</span>
+    const songsHtml=TILES_SONGS.map((song,idx)=>{
+      const b=best[song.id];
+      const unlocked=this._sourisTilesUnlocked(best,idx);
+      const inner=`<span>
+          <span style="display:block;font-weight:700;font-size:15.5px">${unlocked?song.title:'🔒 '+song.title}</span>
+          <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">${unlocked?`${song.artist} · ${song.bpm} BPM`:`Termine « ${TILES_SONGS[idx-1].title} » pour débloquer`}</span>
         </span>
         <span style="display:flex;align-items:center;gap:10px;flex-shrink:0">
           ${b?`<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(255,255,255,.5)">${b.score} pts</span>`:''}
           <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;padding:4px 10px;border-radius:999px;background:${song.diffColor}22;color:${song.diffColor};border:1px solid ${song.diffColor}55">${song.diffLabel.toUpperCase()}</span>
-        </span>
-      </button>`;
+        </span>`;
+      if(!unlocked)return `<div style="text-align:left;width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:rgba(255,255,255,.5);margin-bottom:10px;opacity:.7">${inner}</div>`;
+      return `<button onclick="app._sourisTilesStart('${song.id}')" style="text-align:left;width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;font-family:inherit;color:#fff;margin-bottom:10px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">${inner}</button>`;
     }).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:900px;margin:0 auto;padding:0 24px">
@@ -6790,12 +6806,16 @@ const app={
     return idx;
   },
   _sourisTilesStart(songId){
+    const idx=TILES_SONGS.findIndex(x=>x.id===songId);
+    const bestRaw=(this.stats&&this.stats.sourisTilesBest)||{};
+    const bestGuard=typeof bestRaw.score==='number'?{}:bestRaw;
+    if(idx>0&&!this._sourisTilesUnlocked(bestGuard,idx))return; // verrouillé : ignore un appel direct
     this.stopSouris();
     const song=TILES_SONGS.find(x=>x.id===songId)||TILES_SONGS[0];
     const audio=new Audio(song.file);
     audio.preload='auto';
-    audio.volume=isSoundMuted()?0:0.35;
-    audio.muted=isSoundMuted();
+    audio.volume=isMusicMuted()?0:0.35;
+    audio.muted=isMusicMuted();
     this._sourisAudio=audio;
     this.souris={phase:'loading',track:'tiles',songId:song.id};
     this.renderSouris();
@@ -8605,6 +8625,14 @@ const app={
           </div>
           <button class="settings-btn" id="sound-toggle-btn" onclick="app.toggleSound()">${isSoundMuted()?'Activer':'Désactiver'}</button>
         </div>
+        <div class="settings-row" style="margin-top:10px">
+          <div class="settings-row-info">
+            <strong>Musique (Magic Tiles)</strong>
+            <span>Le morceau qui joue en fond pendant la partie, indépendant des bruitages ci-dessus</span>
+          </div>
+          <button class="settings-btn" id="music-toggle-btn" onclick="app.toggleMusic()">${isMusicMuted()?'Activer':'Désactiver'}</button>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px">Musiques : ${[...new Set(TILES_SONGS.map(s=>s.artist))].join(', ')} (Pixabay Content License, usage libre)</div>
       </div>
       <div class="settings-section">
         <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.user}</span> Profil</div>
@@ -8709,6 +8737,15 @@ const app={
     const btn=document.getElementById('sound-toggle-btn');
     if(btn)btn.textContent=isSoundMuted()?'Activer':'Désactiver';
     if(!isSoundMuted())playSound('hit'); // aperçu immédiat au moment d'activer
+  },
+  toggleMusic(){
+    setMusicMuted(!isMusicMuted());
+    const btn=document.getElementById('music-toggle-btn');
+    if(btn)btn.textContent=isMusicMuted()?'Activer':'Désactiver';
+    if(this._sourisAudio){ // applique tout de suite si un morceau tourne déjà
+      this._sourisAudio.muted=isMusicMuted();
+      if(!isMusicMuted())this._sourisAudio.volume=0.35;
+    }
   },
   async openBillingPortal(btn){
     if(!currentToken)return;
