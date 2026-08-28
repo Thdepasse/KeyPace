@@ -1226,12 +1226,16 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .tiles-judge-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;color:#fff;text-shadow:0 0 26px rgba(255,255,255,.35)}
 .tiles-judge-pill{display:inline-flex;align-items:center;gap:6px;margin-top:6px;border-radius:999px;padding:5px 15px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff}
 @keyframes tilesPop{0%{transform:translate(-50%,-50%) scale(.6);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
-.tiles-banner{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:7;padding:8px 20px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12px;letter-spacing:.05em;white-space:nowrap;animation:tilesBannerIn .3s ease-out}
-.tiles-banner.stage{background:rgba(255,77,46,.16);border:1px solid rgba(255,77,46,.5);color:#fff;box-shadow:0 0 20px rgba(255,77,46,.35)}
-.tiles-banner.intense{background:rgba(229,72,77,.2);border:1px solid #E5484D;color:#fff;box-shadow:0 0 24px rgba(229,72,77,.5);animation:tilesBannerIn .3s ease-out,tilesPulse 1s ease-in-out infinite}
-.tiles-banner.success{background:rgba(31,169,113,.18);border:1px solid #1FA971;color:#fff;box-shadow:0 0 20px rgba(31,169,113,.45)}
-@keyframes tilesBannerIn{0%{opacity:0;transform:translate(-50%,-8px)}100%{opacity:1;transform:translate(-50%,0)}}
-@keyframes tilesPulse{0%,100%{box-shadow:0 0 24px rgba(229,72,77,.5)}50%{box-shadow:0 0 34px rgba(229,72,77,.85)}}
+/* Le plateau entier se re-rend à chaque tick (50ms), donc cet élément est
+   recréé en continu tant qu'une bannière est affichée : une animation
+   d'entrée/pulsation n'a jamais le temps de jouer, elle reste bloquée sur
+   son tout premier instant. L'impact vient donc du style statique, pas du
+   mouvement — d'où des bannières nettement plus marquées les unes des
+   autres plutôt que de compter sur une transition qui ne se voit pas. */
+.tiles-banner{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:7;padding:9px 22px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12.5px;letter-spacing:.05em;white-space:nowrap}
+.tiles-banner.stage{background:rgba(255,77,46,.18);border:1.5px solid rgba(255,77,46,.55);color:#fff;box-shadow:0 0 20px rgba(255,77,46,.4)}
+.tiles-banner.intense{background:rgba(229,72,77,.32);border:2px solid #FF6B5C;color:#fff;box-shadow:0 0 12px rgba(229,72,77,.5),0 0 36px rgba(229,72,77,.75),inset 0 0 14px rgba(255,255,255,.12);font-size:14.5px;letter-spacing:.1em;padding:10px 26px}
+.tiles-banner.success{background:rgba(31,169,113,.24);border:1.5px solid #1FA971;color:#fff;box-shadow:0 0 14px rgba(31,169,113,.4),0 0 30px rgba(31,169,113,.5)}
 /* MAGIC TILES — écran d'accroche */
 .tiles-intro{position:relative;padding:56px 32px 44px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;overflow:hidden}
 .tiles-intro-deco{position:absolute;width:130px;height:130px;border-radius:26px;z-index:0;pointer-events:none;filter:blur(.3px)}
@@ -1257,10 +1261,19 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
   87.5%{background-color:#FF7A5C}
 }
 @media(max-width:640px){.tiles-intro-key{width:42px;height:42px;font-size:16px;border-radius:12px}.tiles-intro-deco{width:80px;height:80px}}
-@media(prefers-reduced-motion:reduce){.tiles-judge{animation:none}.tiles-banner{animation:none!important}.tiles-tile{transition:none}.tiles-intro-key{animation:none;background-color:#FF4D2E}.tiles-intro-deco.r{animation:none}}
+@media(prefers-reduced-motion:reduce){.tiles-judge{animation:none}.tiles-tile{transition:none}.tiles-intro-key{animation:none;background-color:#FF4D2E}.tiles-intro-deco.r{animation:none}}
 .tiles-loading-dots{display:flex;gap:9px;justify-content:center}
 .tiles-loading-dot{width:11px;height:11px;border-radius:50%;animation:tilesIntroChase .8s linear infinite}
 @media(prefers-reduced-motion:reduce){.tiles-loading-dot{animation:none;background-color:#FF4D2E}}
+.tiles-song-card{--rest-opacity:1;position:relative;text-align:left;width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;font-family:inherit;color:#fff;margin-bottom:10px;transition:background .15s,transform .15s;opacity:0;animation:tilesCardIn .4s ease-out forwards}
+.tiles-song-card:hover{background:rgba(255,255,255,.08);transform:translateX(3px)}
+.tiles-song-card.locked{--rest-opacity:.65;border-style:solid;border-color:rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:rgba(255,255,255,.5);cursor:default}
+.tiles-song-card.locked:hover{background:rgba(255,255,255,.02);transform:none}
+.tiles-song-card.free{border-style:dashed;border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.02);margin-top:14px}
+.tiles-song-chevron{font-size:16px;color:rgba(255,255,255,.3);transition:transform .15s,color .15s;flex-shrink:0}
+.tiles-song-card:hover .tiles-song-chevron{color:var(--accent);transform:translateX(3px)}
+@keyframes tilesCardIn{from{opacity:0;transform:translateY(10px)}to{opacity:var(--rest-opacity);transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.tiles-song-card{animation:none;opacity:var(--rest-opacity)}.tiles-song-card:hover{transform:none}.tiles-song-card:hover .tiles-song-chevron{transform:none}}
 @media(max-width:640px){.tiles-hud-val{font-size:24px}.tiles-judge-text{font-size:26px}}
 
 /* SIMON DES MOTS */
@@ -6863,11 +6876,12 @@ const app={
           ${b?`<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(255,255,255,.5)">${b.score} pts</span>`:''}
           <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;padding:4px 10px;border-radius:999px;background:${song.diffColor}22;color:${song.diffColor};border:1px solid ${song.diffColor}55">${song.diffLabel.toUpperCase()}</span>
         </span>`;
-      if(!unlocked)return `<div style="text-align:left;width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:rgba(255,255,255,.5);margin-bottom:10px;opacity:.7">${inner}</div>`;
-      return `<button onclick="app._sourisTilesStart('${song.id}')" style="text-align:left;width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;font-family:inherit;color:#fff;margin-bottom:10px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">${inner}</button>`;
+      const delay=`style="animation-delay:${(idx*0.08).toFixed(2)}s"`;
+      if(!unlocked)return `<div class="tiles-song-card locked" ${delay}>${inner}</div>`;
+      return `<button class="tiles-song-card" ${delay} onclick="app._sourisTilesStart('${song.id}')">${inner}<span class="tiles-song-chevron">▸</span></button>`;
     }).join('');
     const freeBest=best.libre;
-    const freeHtml=`<button onclick="app._sourisTilesStart('libre')" style="text-align:left;width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:14px;border:1px dashed rgba(255,255,255,.18);background:rgba(255,255,255,.02);cursor:pointer;font-family:inherit;color:#fff;margin-top:14px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.02)'">
+    const freeHtml=`<button class="tiles-song-card free" style="animation-delay:${(TILES_SONGS.length*0.08).toFixed(2)}s" onclick="app._sourisTilesStart('libre')">
         <span>
           <span style="display:block;font-weight:700;font-size:15.5px">🎲 Mode libre</span>
           <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">Sans musique, sans fin : le tempo grimpe tant que tu tiens le combo</span>
@@ -6875,6 +6889,7 @@ const app={
         <span style="display:flex;align-items:center;gap:10px;flex-shrink:0">
           ${freeBest?`<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(255,255,255,.5)">${freeBest.score} pts</span>`:''}
         </span>
+        <span class="tiles-song-chevron">▸</span>
       </button>`;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:900px;margin:0 auto;padding:0 24px">
@@ -7110,7 +7125,7 @@ const app={
     const intenseEnd=intenseStart+3500;
     const wasIntense=s.intenseActive;
     s.intenseActive=intenseStart>=0&&elapsed>=intenseStart&&elapsed<intenseEnd;
-    if(s.intenseActive&&!wasIntense){s.banner={text:'PASSAGE INTENSE !',kind:'intense',until:now+1800};s.intenseLostLife=false;}
+    if(s.intenseActive&&!wasIntense){s.banner={text:'⚡ PASSAGE INTENSE ⚡',kind:'intense',until:now+1800};s.intenseLostLife=false;}
     if(wasIntense&&!s.intenseActive&&!s.intenseLostLife){s.score+=20;s.banner={text:'SECTION RÉUSSIE · +20',kind:'success',until:now+1800};playSound('record');}
     for(let i=0;i<s.lanes.length;i++){
       const t=s.tiles[i];if(!t)continue;
@@ -7274,6 +7289,12 @@ const app={
     const isFree=s.songId==='libre';
     const song=isFree?null:(TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0]);
     const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
+    const rank=this._sourisTilesRank(s.score);
+    const extra=`<div style="display:flex;align-items:center;justify-content:center;gap:10px;font-family:'JetBrains Mono',monospace">
+      <span style="font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase">Rang du morceau</span>
+      <span style="font-weight:800;font-size:19px;color:var(--accent)">${rank.label}</span>
+      ${!isFree?`<span style="font-size:11px;font-weight:700;letter-spacing:.06em;padding:3px 10px;border-radius:999px;background:${song.diffColor}22;color:${song.diffColor};border:1px solid ${song.diffColor}55">${song.diffLabel.toUpperCase()}</span>`:''}
+    </div>`;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:auto;padding:28px 20px">
@@ -7281,6 +7302,7 @@ const app={
             icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
             record:r.isNewBest?(isFree?'Nouveau record en mode libre !':`Nouveau record sur ${song.title} !`):null,
             boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
+            extra,
             primaryLabel:'Rejouer ▸',primaryOnClick:`app._sourisTilesStart('${s.songId}')`,
             secondaryLabel:'Autre morceau',secondaryOnClick:`app.souris={phase:'select',track:'tiles'};app.renderSouris()`,
           })}
