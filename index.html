@@ -2616,6 +2616,12 @@ const TILES_SONGS=[
   {id:'difficile',title:'Flashbacks',artist:'ThisIsBeatKitchen',bpm:120,file:'/sounds/tiles-difficile-120bpm.mp3',diffLabel:'Difficile',diffColor:'#FF8A5C',offsetMs:0},
   {id:'extreme',title:'Sell your Soul',artist:'ThisIsBeatKitchen',bpm:140,file:'/sounds/tiles-extreme-140bpm.mp3',diffLabel:'Extrême',diffColor:'#E5484D',offsetMs:0},
 ];
+// Mode libre : l'ancien système procédural (sans musique, durée infinie, BPM
+// qui grimpe avec le combo au lieu d'être calé sur un morceau réel) — gardé
+// comme option distincte plutôt que jeté. Paliers aux mêmes seuils absolus
+// qu'avant l'introduction des morceaux (0/9000/20000/32000 ms), puisqu'il n'y
+// a plus de durée totale sur laquelle calculer des proportions.
+const TILES_FREE_STAGES=TILES_STAGE_DEFS.map((d,i)=>({lanes:d.lanes,label:d.label,t:[0,9000,20000,32000][i]}));
 // Rampe décorative pour l'écran d'accroche (indépendante des couleurs de jeu
 // TILES_HAND_GRADIENT) : sombre à gauche, incandescente au centre-droit. Chaque
 // touche anime son propre dégradé (dim→bright) pour un effet de lumière qui
@@ -6777,6 +6783,16 @@ const app={
       if(!unlocked)return `<div style="text-align:left;width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:rgba(255,255,255,.5);margin-bottom:10px;opacity:.7">${inner}</div>`;
       return `<button onclick="app._sourisTilesStart('${song.id}')" style="text-align:left;width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;font-family:inherit;color:#fff;margin-bottom:10px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">${inner}</button>`;
     }).join('');
+    const freeBest=best.libre;
+    const freeHtml=`<button onclick="app._sourisTilesStart('libre')" style="text-align:left;width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 18px;border-radius:14px;border:1px dashed rgba(255,255,255,.18);background:rgba(255,255,255,.02);cursor:pointer;font-family:inherit;color:#fff;margin-top:14px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.02)'">
+        <span>
+          <span style="display:block;font-weight:700;font-size:15.5px">🎲 Mode libre</span>
+          <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">Sans musique, sans fin : le tempo grimpe tant que tu tiens le combo</span>
+        </span>
+        <span style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+          ${freeBest?`<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(255,255,255,.5)">${freeBest.score} pts</span>`:''}
+        </span>
+      </button>`;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:900px;margin:0 auto;padding:0 24px">
         <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
@@ -6787,7 +6803,7 @@ const app={
             <h2 class="tiles-intro-title">Magic Tiles</h2>
             <p class="tiles-intro-sub">Choisis un morceau. Tape la tuile pile sur la ligne, ne rate aucun temps.<br><span style="opacity:.7;font-size:14px">Au fil du morceau : tuiles à deux mains, trilles à répéter, pièges (✕) à laisser passer.</span></p>
             <div class="tiles-intro-keys">${keysHtml}</div>
-            <div style="width:100%;max-width:440px;margin-top:8px">${songsHtml}</div>
+            <div style="width:100%;max-width:440px;margin-top:8px">${songsHtml}${freeHtml}</div>
           </div>
         </div>
       </div>
@@ -6805,7 +6821,40 @@ const app={
     let idx=0;for(let i=stages.length-1;i>=0;i--){if(elapsed>=stages[i].t){idx=i;break;}}
     return idx;
   },
+  _sourisTilesBindKeys(){
+    this._sourisKeys={};TILES_LANES.forEach(l=>this._sourisKeys[l.letter]=false);
+    this._sourisKeyH=(e)=>{
+      const k=(e.key||'').toLowerCase();
+      if(!(k in this._sourisKeys)||this._sourisKeys[k])return; // touche déjà tenue : ignore la répétition auto
+      this._sourisKeys[k]=true;
+      e.preventDefault();
+      this._sourisTilesPress(k);
+      this.renderSouris();
+    };
+    this._sourisKeyUpH=(e)=>{
+      const k=(e.key||'').toLowerCase();
+      if(!(k in this._sourisKeys))return;
+      this._sourisKeys[k]=false;
+      this._sourisTilesRelease(k);
+      this.renderSouris();
+    };
+    window.addEventListener('keydown',this._sourisKeyH);
+    window.addEventListener('keyup',this._sourisKeyUpH);
+  },
+  // Mode libre : pas d'audio à charger, pas de durée totale — démarre direct.
+  _sourisTilesStartFree(){
+    this.stopSouris();
+    this.souris={phase:'play',track:'tiles',songId:'libre',durMs:Infinity,stages:TILES_FREE_STAGES,
+      score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,bpm:100,
+      tiles:Array(8).fill(null),spawnAcc:0,judge:null,playStartWall:Date.now(),
+      stageIdx:0,banner:{text:TILES_FREE_STAGES[0].label,kind:'stage',until:Date.now()+2200},
+      intenseActive:false,intenseLostLife:false};
+    this._sourisTilesBindKeys();
+    this.renderSouris();
+    this._sourisLoop=setInterval(()=>this._sourisTilesTick(),50);
+  },
   _sourisTilesStart(songId){
+    if(songId==='libre'){this._sourisTilesStartFree();return;}
     const idx=TILES_SONGS.findIndex(x=>x.id===songId);
     const bestRaw=(this.stats&&this.stats.sourisTilesBest)||{};
     const bestGuard=typeof bestRaw.score==='number'?{}:bestRaw;
@@ -6828,24 +6877,7 @@ const app={
         tiles:Array(8).fill(null),spawnAcc:0,judge:null,playStartWall:Date.now(),
         stageIdx:0,banner:{text:stages[0].label,kind:'stage',until:Date.now()+2200},
         intenseActive:false,intenseLostLife:false};
-      this._sourisKeys={};TILES_LANES.forEach(l=>this._sourisKeys[l.letter]=false);
-      this._sourisKeyH=(e)=>{
-        const k=(e.key||'').toLowerCase();
-        if(!(k in this._sourisKeys)||this._sourisKeys[k])return; // touche déjà tenue : ignore la répétition auto
-        this._sourisKeys[k]=true;
-        e.preventDefault();
-        this._sourisTilesPress(k);
-        this.renderSouris();
-      };
-      this._sourisKeyUpH=(e)=>{
-        const k=(e.key||'').toLowerCase();
-        if(!(k in this._sourisKeys))return;
-        this._sourisKeys[k]=false;
-        this._sourisTilesRelease(k);
-        this.renderSouris();
-      };
-      window.addEventListener('keydown',this._sourisKeyH);
-      window.addEventListener('keyup',this._sourisKeyUpH);
+      this._sourisTilesBindKeys();
       audio.currentTime=(song.offsetMs||0)/1000;
       audio.play().catch(()=>{}); // lecture bloquée (politique navigateur) : le chart continue sur son horloge interne
       this.renderSouris();
@@ -6880,6 +6912,9 @@ const app={
       const multi=1+Math.min(3,Math.floor(s.combo/10));
       const pts=(j==='perfect'?3:1)*multi;
       s.score+=pts;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
+      // mode libre uniquement : le tempo grimpe avec le combo (les morceaux
+      // réels gardent leur BPM fixe, celui de l'audio)
+      if(s.songId==='libre'&&s.combo>0&&s.combo%10===0)s.bpm=Math.min(170,(s.bpm||100)+10);
       playSound('hit');this._flashArena(j==='perfect'?'#FFD84D':'#1FA971');
       s.judge={text:label||(j==='perfect'?'PARFAIT':'BIEN'),pts,multi,kind:'good',until:Date.now()+550};
     }
@@ -6966,7 +7001,8 @@ const app={
     // une horloge murale pour que le morceau progresse quand même
     const elapsed=(audio&&!audio.paused&&!audio.ended)?audio.currentTime*1000:now-s.playStartWall;
     if(elapsed>=s.durMs-30||(audio&&audio.ended)){this._sourisTilesEnd();return;}
-    const song=TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0];
+    const isFree=s.songId==='libre';
+    const bpm=isFree?(s.bpm||100):(TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0]).bpm;
     // palier de difficulté : de plus en plus de couloirs actifs (calé sur la
     // position réelle de lecture du morceau, pas sur une horloge indépendante)
     const idx=this._sourisTilesStageIdx(s.stages,elapsed);
@@ -7008,7 +7044,7 @@ const app={
     }
     if(s.phase!=='play')return;
     s.spawnAcc+=50;
-    const effBpm=song.bpm*(s.intenseActive?1.35:1);
+    const effBpm=bpm*(s.intenseActive?1.35:1);
     const interval=60000/effBpm;
     if(s.spawnAcc>=interval){
       s.spawnAcc=0;
@@ -7054,9 +7090,11 @@ const app={
   _sourisTilesEnd(){
     if(!this.souris||this.souris.phase==='end')return;
     const s=this.souris;
-    const song=TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0];
+    const isFree=s.songId==='libre';
+    const song=isFree?null:(TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0]);
     const acc=(s.hits+s.misses)?Math.round(100*s.hits/(s.hits+s.misses)):0;
-    const res=this._sourisFinishTrack('tiles',{score:s.score,thresholds:this._sourisTilesTiersFor(song,s.durMs),extra:{combo:s.bestCombo},subId:s.songId});
+    const thresholds=isFree?this._sourisTiers.tiles:this._sourisTilesTiersFor(song,s.durMs);
+    const res=this._sourisFinishTrack('tiles',{score:s.score,thresholds,extra:{combo:s.bestCombo},subId:s.songId});
     this.stopSouris();
     s.phase='end';s._result=res;s._acc=acc;
     this.renderSouris();
@@ -7070,7 +7108,8 @@ const app={
   },
   _sourisTilesArena(){
     const s=this.souris;
-    const song=TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0];
+    const isFree=s.songId==='libre';
+    const song=isFree?null:(TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0]);
     const rank=this._sourisTilesRank(s.score);
     const hasLong=s.tiles.some(t=>t&&t.long&&!t.holding);
     const hasTrap=s.tiles.some(t=>t&&t.trap);
@@ -7119,7 +7158,7 @@ const app={
             <div style="text-align:right"><div class="tiles-hud-label">COMBO</div><div class="tiles-hud-val sec">${s.combo}<span style="font-size:14px"> ✱</span></div></div>
           </div>
           <div class="tiles-meta">
-            <div class="tiles-bpm${s.intenseActive?' hot':''}">${song.title} · ${Math.round(song.bpm*(s.intenseActive?1.35:1))} BPM${s.intenseActive?' · INTENSE':''}</div>
+            <div class="tiles-bpm${s.intenseActive?' hot':''}">${isFree?'Mode libre':song.title} · ${Math.round((isFree?s.bpm:song.bpm)*(s.intenseActive?1.35:1))} BPM${s.intenseActive?' · INTENSE':''}</div>
             <div class="tiles-hearts">${[0,1,2].map(i=>`<span style="color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('')}</div>
           </div>
           <div class="tiles-board">
@@ -7137,16 +7176,17 @@ const app={
   },
   _sourisTilesEndScreen(){
     const s=this.souris,r=s._result;
-    const song=TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0];
+    const isFree=s.songId==='libre';
+    const song=isFree?null:(TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0]);
     const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:auto;padding:28px 20px">
           ${this._gameResult({
             icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-            record:r.isNewBest?`Nouveau record sur ${song.title} !`:null,
+            record:r.isNewBest?(isFree?'Nouveau record en mode libre !':`Nouveau record sur ${song.title} !`):null,
             boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
-            primaryLabel:'Rejouer ▸',primaryOnClick:`app._sourisTilesStart('${song.id}')`,
+            primaryLabel:'Rejouer ▸',primaryOnClick:`app._sourisTilesStart('${s.songId}')`,
             secondaryLabel:'Autre morceau',secondaryOnClick:`app.souris={phase:'select',track:'tiles'};app.renderSouris()`,
           })}
         </div>
