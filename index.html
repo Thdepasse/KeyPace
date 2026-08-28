@@ -1214,6 +1214,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .tiles-tile.trill .tiles-trill-dots{position:absolute;bottom:4px;left:0;right:0;display:flex;justify-content:center;gap:3px}
 .tiles-tile.trill .tiles-trill-dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.35)}
 .tiles-tile.trill .tiles-trill-dots span.done{background:#fff}
+.tiles-hold-icon{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:11px;opacity:.75;line-height:1}
 .tiles-tile.chord{box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 0 2px #FFD84D,0 0 18px rgba(255,216,77,.4)}
 .tiles-tile.chord.chord-armed{box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 0 2px #fff,0 0 22px rgba(255,255,255,.6)}
 .tiles-hitline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55) 15%,rgba(255,255,255,.55) 85%,transparent);box-shadow:0 0 14px rgba(255,255,255,.35);z-index:1}
@@ -2685,16 +2686,30 @@ const T4A_KPOS=t4aComputeKpos();
 // (main gauche) et J K L M (main droite), la vraie rangée de repos. Chaque
 // colonne correspond toujours à la même touche (comme un vrai piano tiles),
 // pas une lettre aléatoire par couloir.
+// Chaque touche a désormais sa propre teinte (avant : une seule couleur par
+// main, les 4 touches de chaque main étaient indiscernables l'une de
+// l'autre) — dégradé de plus en plus clair de l'auriculaire vers l'index,
+// pour que la couleur seule aide à repérer le couloir sans lire la lettre.
 const TILES_LANES=[
-  {letter:'q',hand:'l'},{letter:'s',hand:'l'},{letter:'d',hand:'l'},{letter:'f',hand:'l'},
-  {letter:'j',hand:'r'},{letter:'k',hand:'r'},{letter:'l',hand:'r'},{letter:'m',hand:'r'},
+  {letter:'q',hand:'l',bg:'linear-gradient(160deg,#FFB088,#FF7A45)'},
+  {letter:'s',hand:'l',bg:'linear-gradient(160deg,#FFA068,#FF6A35)'},
+  {letter:'d',hand:'l',bg:'linear-gradient(160deg,#FF9060,#FF5A2E)'},
+  {letter:'f',hand:'l',bg:'linear-gradient(160deg,#FF9868,#FF4D2E)'},
+  {letter:'j',hand:'r',bg:'linear-gradient(160deg,#A8493A,#6F2A20)'},
+  {letter:'k',hand:'r',bg:'linear-gradient(160deg,#9C4030,#63241C)'},
+  {letter:'l',hand:'r',bg:'linear-gradient(160deg,#8F3828,#572018)'},
+  {letter:'m',hand:'r',bg:'linear-gradient(160deg,#823024,#4B1C14)'},
 ];
 // Couloirs étendus (réservés au morceau "Extrême" et au Mode libre, en tout
 // dernier palier) : la rangée du dessus, directement au-dessus des 4 doigts
 // centraux (index/majeur), les plus faciles à atteindre sans lever la main —
 // R/E prolongent F/D à gauche, U/I prolongent J/K à droite.
-const TILES_EXPERT_LANES=[{letter:'r',hand:'l'},{letter:'e',hand:'l'},{letter:'u',hand:'r'},{letter:'i',hand:'r'}];
-const TILES_HAND_GRADIENT={l:'linear-gradient(160deg,#FF9868,#FF4D2E)',r:'linear-gradient(160deg,#A8493A,#6F2A20)'};
+const TILES_EXPERT_LANES=[
+  {letter:'r',hand:'l',bg:'linear-gradient(160deg,#FFC29E,#FF8A5C)'},
+  {letter:'e',hand:'l',bg:'linear-gradient(160deg,#FFB48E,#FF7A4C)'},
+  {letter:'u',hand:'r',bg:'linear-gradient(160deg,#B85242,#7A3020)'},
+  {letter:'i',hand:'r',bg:'linear-gradient(160deg,#AC4A38,#6E2818)'},
+];
 const TILES_RANKS=['D','C','B','A','S','SS','SSS'];
 const TILES_RANK_SCORE=[0,120,280,480,750,1100,1600];
 // Difficulté progressive : de plus en plus de couloirs s'activent au fil de
@@ -5876,6 +5891,7 @@ const app={
     if(this._sourisKeyH){window.removeEventListener('keydown',this._sourisKeyH);window.removeEventListener('keyup',this._sourisKeyUpH);this._sourisKeyH=null;this._sourisKeyUpH=null;}
     this._sourisKeys=null;
     if(this._sourisAudio){this._sourisAudio.pause();this._sourisAudio=null;}
+    if(this._tutorialKeyH){window.removeEventListener('keydown',this._tutorialKeyH);this._tutorialKeyH=null;}
   },
 
   /* ── Rendu ──────────────────────────────────────────────────── */
@@ -6954,7 +6970,10 @@ const app={
       </button>`;
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:900px;margin:0 auto;padding:0 24px">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 0 18px">
+          <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
+          <button onclick="app._sourisTilesShowGlossary()" title="Comment jouer" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);width:28px;height:28px;border-radius:50%;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:rgba(255,255,255,.75);display:flex;align-items:center;justify-content:center">?</button>
+        </div>
         <div class="game-arena" style="height:auto;padding:0">
           <div class="tiles-intro">
             <div class="tiles-intro-deco l"></div>
@@ -6967,6 +6986,36 @@ const app={
         </div>
       </div>
     </div>`;
+  },
+  _sourisTilesShowGlossary(){
+    if(document.getElementById('tiles-glossary-overlay'))return;
+    const rows=[
+      {label:'Tuile normale',demo:`<div class="tiles-tile" style="position:static;width:44px;height:34px;background:linear-gradient(160deg,#FFB088,#FF7A45)">Q</div>`,txt:'Tape la touche pile quand la tuile touche la ligne.'},
+      {label:'Tuile longue',demo:`<div class="tiles-tile" style="position:static;width:44px;height:64px;background:linear-gradient(160deg,#FFB088,#FF7A45)"><div class="tiles-hold-icon" style="position:static;margin-top:6px">▼</div></div>`,txt:'Maintiens la touche enfoncée jusqu’à la fin de la tuile.'},
+      {label:'Bonus ♥',demo:`<div class="tiles-tile bonus" style="position:static;width:44px;height:38px">♥</div>`,txt:'Tape-la pour regagner une vie. La rater ne pénalise pas.'},
+      {label:'Piège ✕',demo:`<div class="tiles-tile trap" style="position:static;width:44px;height:34px">✕</div>`,txt:'Ne la tape pas : laisse-la passer sans rien faire.'},
+      {label:'Trille',demo:`<div class="tiles-tile trill" style="position:static;width:44px;height:44px">Q</div>`,txt:'Retape la même touche plusieurs fois de suite, rapidement.'},
+      {label:'Accord',demo:`<div class="tiles-tile chord" style="position:static;width:44px;height:34px;background:linear-gradient(160deg,#FFB088,#FF7A45)">Q</div>`,txt:'Deux tuiles à la même hauteur : tape les deux touches ensemble.'},
+    ];
+    const rowsHtml=rows.map(r=>`<div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)">
+        <div style="flex-shrink:0;width:44px;display:flex;justify-content:center">${r.demo}</div>
+        <div><div style="font-weight:700;font-size:14.5px;color:#fff">${r.label}</div><div style="font-size:13px;color:rgba(255,255,255,.55);margin-top:2px">${r.txt}</div></div>
+      </div>`).join('');
+    const div=document.createElement('div');
+    div.id='tiles-glossary-overlay';
+    div.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;display:flex;align-items:center;justify-content:center;padding:24px';
+    div.onclick=(e)=>{if(e.target===div)this._sourisTilesCloseGlossary();};
+    div.innerHTML=`<div style="background:#1A1712;border:1px solid rgba(255,255,255,.12);border-radius:20px;max-width:440px;width:100%;max-height:82vh;overflow-y:auto;padding:26px 28px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <h3 style="margin:0;font-size:19px;font-weight:800;color:#fff">Les tuiles</h3>
+          <button onclick="app._sourisTilesCloseGlossary()" style="background:rgba(255,255,255,.08);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;color:rgba(255,255,255,.75);font-size:13px;font-weight:700">✕</button>
+        </div>
+        <div>${rowsHtml}</div>
+      </div>`;
+    document.body.appendChild(div);
+  },
+  _sourisTilesCloseGlossary(){
+    document.querySelectorAll('#tiles-glossary-overlay').forEach(el=>el.remove());
   },
   _sourisTilesLoading(){
     const dots=[0,1,2,3].map(i=>`<span class="tiles-loading-dot" style="animation-delay:${(i*-0.2).toFixed(2)}s"></span>`).join('');
@@ -7005,18 +7054,73 @@ const app={
   // Mode libre : pas d'audio à charger, pas de durée totale — démarre direct.
   // Palier expert (couloirs étendus) toujours disponible, vu l'absence de fin.
   _sourisTilesStartFree(){
+    if(!this.stats.sourisTilesTutorialSeen){this._sourisTilesTutorial(()=>this._sourisTilesStartFree());return;}
     this.stopSouris();
     const lanes=TILES_LANES.concat(TILES_EXPERT_LANES);
     this.souris={phase:'play',track:'tiles',songId:'libre',durMs:Infinity,stages:TILES_FREE_STAGES,lanes,
       score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,bpm:100,
       tiles:Array(lanes.length).fill(null),spawnAcc:0,judge:null,playStartWall:Date.now(),
-      stageIdx:0,banner:null,startAt:Date.now()+2600,
+      stageIdx:0,banner:null,startAt:Date.now()+2600,seenTypes:{},
       intenseActive:false,intenseLostLife:false};
     this._sourisTilesBindKeys();
     this.renderSouris();
     this._sourisLoop=setInterval(()=>this._sourisTilesTick(),50);
   },
+  // Prise en main très courte (une seule tuile à taper "sur la ligne"),
+  // affichée avant la toute première partie jamais lancée — le reste des
+  // mécaniques (accord/trille/piège) s'explique en jeu à leur première
+  // apparition (_sourisTilesAnnounce), pas ici : un seul concept à la fois.
+  _sourisTilesTutorial(onDone){
+    this.stopSouris();
+    this.souris={phase:'tutorial',track:'tiles',onDone,done:false,
+      msg:'Tape la touche F quand la tuile touche la ligne',
+      tileBorn:Date.now(),tileDur:2600};
+    this._tutorialKeyH=(e)=>{
+      const s=this.souris;
+      if(!s||s.phase!=='tutorial'||s.done)return;
+      if((e.key||'').toLowerCase()!=='f')return;
+      e.preventDefault();
+      const y=(Date.now()-s.tileBorn)/s.tileDur*100;
+      if(Math.abs(y-this._sourisTilesHitLineY)>22)return; // trop tôt/tard : on laisse retomber, pas de blocage
+      s.done=true;
+      clearInterval(this._sourisLoop);this._sourisLoop=null;
+      playSound('hit');
+      this.renderSouris();
+      setTimeout(()=>this._sourisTilesTutorialFinish(),900);
+    };
+    window.addEventListener('keydown',this._tutorialKeyH);
+    this.renderSouris();
+    this._sourisLoop=setInterval(()=>{
+      const s=this.souris;if(!s||s.phase!=='tutorial'||s.done)return;
+      if(Date.now()-s.tileBorn>=s.tileDur)s.tileBorn=Date.now(); // ratée : relance sans pénalité
+      this.renderSouris();
+    },50);
+  },
+  _sourisTilesTutorialFinish(){
+    this.stats.sourisTilesTutorialSeen=true;saveStats(this.stats);
+    const onDone=this.souris&&this.souris.onDone;
+    this.stopSouris();this.souris=null;
+    if(onDone)onDone();
+  },
+  _sourisTilesTutorialScreen(){
+    const s=this.souris;
+    const y=s.done?this._sourisTilesHitLineY:(Date.now()-s.tileBorn)/s.tileDur*100;
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:420px;margin:60px auto;padding:0 24px;text-align:center">
+        <div class="game-arena" style="padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:16px">
+          <div style="font-size:14px;color:rgba(255,255,255,.75);min-height:20px">${s.done?'Voilà l\'idée ! ✓':s.msg}</div>
+          <div style="position:relative;width:100px;height:220px;background:rgba(255,255,255,.03);border-radius:14px;overflow:hidden">
+            ${!s.done?`<div class="tiles-tile" style="left:8px;right:8px;top:${y}%;height:34px;transform:translateY(-50%);background:${TILES_LANES[3].bg}">F</div>`:''}
+            <div class="tiles-hitline" style="top:${this._sourisTilesHitLineY}%"></div>
+          </div>
+          <div class="tiles-key" style="width:60px">f</div>
+          <button onclick="app._sourisTilesTutorialFinish()" style="background:none;border:none;color:var(--muted);font-size:12.5px;cursor:pointer;text-decoration:underline">Passer</button>
+        </div>
+      </div>
+    </div>`;
+  },
   _sourisTilesStart(songId){
+    if(!this.stats.sourisTilesTutorialSeen){this._sourisTilesTutorial(()=>this._sourisTilesStart(songId));return;}
     if(songId==='libre'){this._sourisTilesStartFree();return;}
     const idx=TILES_SONGS.findIndex(x=>x.id===songId);
     const bestRaw=(this.stats&&this.stats.sourisTilesBest)||{};
@@ -7040,7 +7144,7 @@ const app={
       this.souris={phase:'play',track:'tiles',songId:song.id,durMs,stages,lanes,
         score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,
         tiles:Array(lanes.length).fill(null),spawnAcc:0,judge:null,playStartWall:Date.now(),
-        stageIdx:0,banner:null,startAt:Date.now()+2600,
+        stageIdx:0,banner:null,startAt:Date.now()+2600,seenTypes:{},
         intenseActive:false,intenseLostLife:false};
       this._sourisTilesBindKeys();
       audio.currentTime=(song.offsetMs||0)/1000; // la lecture démarre au son du "GO !", pas maintenant
@@ -7067,17 +7171,61 @@ const app={
     const ch=(shift)=>Math.round((pa>>shift&255)+((pb>>shift&255)-(pa>>shift&255))*p);
     return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
   },
+  _sourisHexA(hex,alpha){
+    const n=parseInt(hex.slice(1),16);
+    return `rgba(${n>>16&255},${n>>8&255},${n&255},${Math.max(0,alpha).toFixed(2)})`;
+  },
+  // _flashArena (utilisé par Grille/Visée souris) mute directement le DOM,
+  // mais Magic Tiles l'appelle toujours juste avant un renderSouris() dans
+  // la même exécution synchrone : le navigateur ne peint jamais la frame
+  // intermédiaire, la bordure ne s'est donc jamais réellement vue. Ici on
+  // stocke plutôt le flash sur l'état et on le peint depuis un timestamp,
+  // comme le popup de jugement et les bannières.
+  _sourisTilesFlash(color){
+    this.souris.flash={color,start:Date.now()};
+  },
   _sourisTilesJudgeDist(t){
     const dist=Math.abs(t.y-this._sourisTilesHitLineY);
     if(dist<=6)return'perfect';
     if(dist<=16)return'good';
     return'bad';
   },
+  // Historique des 10 dernières frappes jugées (hit/miss), utilisé pour
+  // moduler la fréquence des tuiles spéciales à la difficulté réelle du
+  // joueur plutôt qu'au seul palier de temps — voir _sourisTilesSpecialBudget.
+  _sourisTilesTrackResult(s,ok){
+    s.recentResults=(s.recentResults||[]);
+    s.recentResults.push(ok);
+    if(s.recentResults.length>10)s.recentResults.shift();
+  },
+  // Budget total de chance de tuile spéciale (accord+trille+piège) pour ce
+  // tick : grimpe par palier (échauffement en douceur) au lieu d'un seuil
+  // fixe dès le 2e palier, puis ajusté ±40% selon la réussite récente du
+  // joueur (10 dernières frappes) — moins de tuiles spéciales s'il galère
+  // vraiment, un peu plus s'il enchaîne, sans jamais dépasser un plafond.
+  _sourisTilesSpecialBudget(s){
+    const byStage=[0,0.10,0.20,0.30,0.35][Math.min(s.stageIdx,4)];
+    if(byStage<=0)return 0;
+    const recent=s.recentResults||[];
+    const acc=recent.length?recent.filter(Boolean).length/recent.length:0.85;
+    const adapt=acc>=0.9?1.15:acc>=0.7?1:acc>=0.5?0.8:0.6;
+    return Math.min(0.45,byStage*adapt);
+  },
+  // Bannière pédagogique affichée une seule fois par partie, la toute
+  // première fois qu'un type de tuile apparaît — plutôt qu'un unique indice
+  // texte permanent en bas du plateau (facile à ne jamais remarquer, loin
+  // du regard qui suit les tuiles qui tombent).
+  _sourisTilesAnnounce(s,type,text,now){
+    if(s.seenTypes&&s.seenTypes[type])return;
+    if(s.seenTypes)s.seenTypes[type]=true;
+    s.banner={text,kind:'stage',start:now,until:now+2600};
+  },
   _sourisTilesMiss(){
     const s=this.souris;
     s.misses++;s.combo=0;s.lives--;
+    this._sourisTilesTrackResult(s,false);
     s.lifeLostAt=Date.now();s.lifeLostIdx=s.lives; // le cœur qui vient de s'éteindre
-    playSound('miss');this._flashArena('#E5484D');
+    playSound('miss');this._sourisTilesFlash('#E5484D');
     s.judge={text:'RATÉ',pts:null,multi:null,kind:'bad',start:Date.now(),until:Date.now()+550};
     if(s.intenseActive)s.intenseLostLife=true;
     if(s.lives<=0){this._sourisTilesEnd();return true;}
@@ -7088,6 +7236,7 @@ const app={
     if(j==='bad'){
       if(this._sourisTilesMiss())return;
     } else {
+      this._sourisTilesTrackResult(s,true);
       const multi=1+Math.min(3,Math.floor(s.combo/10));
       const pts=(j==='perfect'?3:1)*multi;
       s.score+=pts;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
@@ -7097,7 +7246,7 @@ const app={
       // le multiplicateur de score grimpe tous les 10 combos, quel que soit
       // le mode : un petit repère visuel pour que ça se sente vraiment
       if(s.combo>0&&s.combo%10===0)s.banner={text:`COMBO ×${1+Math.min(3,Math.floor(s.combo/10))} !`,kind:'success',start:Date.now(),until:Date.now()+1400};
-      playSound('hit',{pitch:1+Math.min(.5,s.combo*.015)});this._flashArena(j==='perfect'?'#FFD84D':'#1FA971'); // le son grimpe légèrement avec le combo
+      playSound('hit',{pitch:1+Math.min(.5,s.combo*.015)});this._sourisTilesFlash(j==='perfect'?'#FFD84D':'#1FA971'); // le son grimpe légèrement avec le combo
       s.judge={text:label||(j==='perfect'?'PARFAIT':'BIEN'),pts,multi,kind:'good',tier:j,start:Date.now(),until:Date.now()+550};
     }
     this.renderSouris();
@@ -7125,7 +7274,7 @@ const app={
       const prevLives=s.lives;
       s.lives=Math.min(3,s.lives+1);s.score+=15;
       if(s.lives>prevLives){s.lifeGainedAt=Date.now();s.lifeGainedIdx=prevLives;} // le cœur qui vient de s'allumer
-      playSound('life');this._flashArena('#FFD84D');
+      playSound('life');this._sourisTilesFlash('#FFD84D');
       s.judge={text:'+1 VIE',pts:15,multi:null,kind:'bonus',start:Date.now(),until:Date.now()+650};
       return;
     }
@@ -7139,7 +7288,7 @@ const app={
       const partner=s.tiles[partnerIdx];
       if(!partner.chordHit){
         t.chordHit=true;t.chordArmY=t.y;t.chordArmedAt=Date.now();
-        this._flashArena('#FFD84D');
+        this._sourisTilesFlash('#FFD84D');
         return; // armé : on attend l'autre main
       }
       const j1=this._sourisTilesJudgeDist({y:partner.chordArmY});
@@ -7156,7 +7305,7 @@ const app={
         s.tiles[laneIdx]=null;
         this._sourisTilesApply('perfect','TRILLE !');
       } else {
-        playSound('hit',{pitch:1+t.trillHits*.08});this._flashArena('#B98CFF'); // chaque frappe du trille monte un peu plus haut
+        playSound('hit',{pitch:1+t.trillHits*.08});this._sourisTilesFlash('#B98CFF'); // chaque frappe du trille monte un peu plus haut
       }
       return;
     }
@@ -7257,28 +7406,38 @@ const app={
         const free=activeLanes.filter(i=>!s.tiles[i]);
         if(free.length){
           const dur=Math.max(900,60000/effBpm*4);
-          // Accord/trille/piège réservés à partir du 2e palier (≥4 touches) :
-          // le tout premier échauffement à 2 touches reste des tuiles simples.
-          const roll=s.stageIdx>=1?Math.random():1;
+          // Accord/trille/piège : budget total progressif par palier, ajusté à
+          // la réussite récente (voir _sourisTilesSpecialBudget), réparti dans
+          // les mêmes proportions qu'à l'origine entre les 3 types.
+          const budget=this._sourisTilesSpecialBudget(s);
+          const roll=Math.random();
+          const pChord=budget*0.267,pTrill=budget*0.4,pTrap=budget*0.333;
           const freeL=free.filter(i=>s.lanes[i].hand==='l');
           const freeR=free.filter(i=>s.lanes[i].hand==='r');
-          if(roll<0.08&&freeL.length&&freeR.length){
+          if(roll<pChord&&freeL.length&&freeR.length){
             const i1=freeL[Math.floor(Math.random()*freeL.length)];
             const i2=freeR[Math.floor(Math.random()*freeR.length)];
             const cdur=Math.max(1100,dur*1.15);
             const chordId=`${now}-${i1}-${i2}`;
             s.tiles[i1]={y:0,born:elapsed,dur:cdur,letter:s.lanes[i1].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,chordId,chordHit:false,chordArmY:0};
             s.tiles[i2]={y:0,born:elapsed,dur:cdur,letter:s.lanes[i2].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,chordId,chordHit:false,chordArmY:0};
-          } else if(roll<0.08+0.12){
+            this._sourisTilesAnnounce(s,'chord','🤝 ACCORD · les 2 touches ENSEMBLE',now);
+          } else if(roll<pChord+pTrill){
             const i=free[Math.floor(Math.random()*free.length)];
-            s.tiles[i]={y:0,born:elapsed,dur:dur*1.7,letter:s.lanes[i].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,trill:true,trillHits:0,trillNeed:3+Math.floor(Math.random()*2)};
-          } else if(roll<0.08+0.12+0.1){
+            // 2 frappes au tout premier palier où le trille apparaît, jusqu'à
+            // 4 en fin de morceau — une vraie mise en jambe, pas un mur d'un coup.
+            const trillNeed=Math.min(4,2+Math.max(0,s.stageIdx-1));
+            s.tiles[i]={y:0,born:elapsed,dur:dur*1.7,letter:s.lanes[i].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,trill:true,trillHits:0,trillNeed};
+            this._sourisTilesAnnounce(s,'trill','🎯 TRILLE · tape plusieurs fois de suite',now);
+          } else if(roll<pChord+pTrill+pTrap){
             const i=free[Math.floor(Math.random()*free.length)];
             s.tiles[i]={y:0,born:elapsed,dur,letter:s.lanes[i].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,trap:true};
+            this._sourisTilesAnnounce(s,'trap','✕ PIÈGE · ne la tape pas, laisse-la passer',now);
           } else {
             const i=free[Math.floor(Math.random()*free.length)];
             const long=Math.random()<0.18;
             s.tiles[i]={y:0,born:elapsed,dur,letter:s.lanes[i].letter,long,holding:false,holdStart:0,holdDur:500+Math.random()*300,bonus:false};
+            if(long)this._sourisTilesAnnounce(s,'long','▼ TUILE LONGUE · maintiens la touche',now);
           }
         }
       }
@@ -7300,6 +7459,7 @@ const app={
   _sourisTilesRender(){
     const s=this.souris;
     if(s.phase==='select')return this._sourisTilesSelect();
+    if(s.phase==='tutorial')return this._sourisTilesTutorialScreen();
     if(s.phase==='loading')return this._sourisTilesLoading();
     if(s.phase==='end')return this._sourisTilesEndScreen();
     if(s.phase==='play'&&s.startAt&&Date.now()<s.startAt)return this._sourisTilesCountdown();
@@ -7334,16 +7494,26 @@ const app={
       if(t){
         const h=t.long?64:(t.bonus?38:(t.trill?44:34));
         const y=t.holding?this._sourisTilesHitLineY:t.y;
-        const bg=(t.bonus||t.trap||t.trill)?'':`background:${TILES_HAND_GRADIENT[lane.hand]};`;
+        const bg=(t.bonus||t.trap||t.trill)?'':`background:${lane.bg};`;
         const cls=[t.holding?'holding':'',t.bonus?'bonus':'',t.trap?'trap':'',t.trill?'trill':'',t.chordId?'chord':'',(t.chordId&&t.chordHit)?'chord-armed':''].filter(Boolean).join(' ');
         const label=t.bonus?'♥':(t.trap?'✕':lane.letter);
+        const holdIcon=t.long&&!t.holding?'<div class="tiles-hold-icon">▼</div>':'';
         const trillDots=t.trill?`<div class="tiles-trill-dots">${Array.from({length:t.trillNeed}).map((_,n)=>`<span class="${n<t.trillHits?'done':''}"></span>`).join('')}</div>`:'';
         // accord armé (une main posée, on attend l'autre) : lueur qui respire
         // vraiment, calculée depuis chordArmedAt plutôt qu'une animation CSS
         // qui n'aurait pas le temps de jouer entre deux rendus
         const armPulse=(t.chordId&&t.chordHit)?0.5+0.5*Math.sin((Date.now()-(t.chordArmedAt||0))/150):0;
-        const armGlow=(t.chordId&&t.chordHit)?`;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 0 2px #fff,0 0 ${(14+12*armPulse).toFixed(0)}px rgba(255,255,255,${(0.4+0.35*armPulse).toFixed(2)})`:'';
-        tileHtml=`<div class="tiles-tile${cls?' '+cls:''}" style="top:${y}%;height:${h}px;transform:translateY(-50%);${bg}${armGlow}">${label}${trillDots}</div>`;
+        let glow='';
+        if(t.chordId&&t.chordHit){
+          glow=`;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 0 2px #fff,0 0 ${(14+12*armPulse).toFixed(0)}px rgba(255,255,255,${(0.4+0.35*armPulse).toFixed(2)})`;
+        } else if(!t.holding&&!t.trap){
+          // lueur qui grandit dans les ~20 derniers % avant la ligne de
+          // frappe : un vrai repère de timing plutôt qu'une tuile identique
+          // du haut jusqu'en bas du plateau
+          const prox=Math.max(0,1-Math.abs(this._sourisTilesHitLineY-t.y)/22);
+          if(prox>0.04)glow=`;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 4px 14px rgba(0,0,0,.4),0 0 ${(4+18*prox).toFixed(0)}px rgba(255,255,255,${(0.12+0.38*prox).toFixed(2)})`;
+        }
+        tileHtml=`<div class="tiles-tile${cls?' '+cls:''}" style="top:${y}%;height:${h}px;transform:translateY(-50%);${bg}${glow}">${label}${holdIcon}${trillDots}</div>`;
       }
       return `<div class="tiles-lane">${tileHtml}</div>`;
     }).join('');
@@ -7358,6 +7528,8 @@ const app={
     const banner=s.banner&&s.banner.until>Date.now()?s.banner:null;
     const bannerPop=banner?this._sourisTilesPop(banner.start):0;
     const bannerHtml=banner?`<div class="tiles-banner ${banner.kind}" style="opacity:${bannerPop};transform:translate(-50%,0) scale(${(0.75+0.25*bannerPop).toFixed(3)})">${banner.text}</div>`:'';
+    const flashOpacity=s.flash?Math.max(0,1-(Date.now()-s.flash.start)/220):0;
+    const flashStyle=flashOpacity>0.02?`;box-shadow:inset 0 0 0 3px ${this._sourisHexA(s.flash.color,flashOpacity)}`:'';
     const keysHtml=s.lanes.map((l,i)=>{
       const locked=!activeLanes.includes(i);
       const pressed=this._sourisKeys&&this._sourisKeys[l.letter];
@@ -7381,7 +7553,7 @@ const app={
     }).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <div class="game-arena" style="padding:16px 20px 20px;display:flex;flex-direction:column">
+        <div class="game-arena" style="padding:16px 20px 20px;display:flex;flex-direction:column${flashStyle}">
           <div class="tiles-hud">
             <div><div class="tiles-hud-label">SCORE</div><div class="tiles-hud-val">${s.score}</div></div>
             <div class="tiles-rank">
