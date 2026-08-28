@@ -698,6 +698,17 @@ alter table client_schools add constraint client_schools_owner_check
   check (owner is null or owner in ('theo', 'vincent'));
 
 -- ───────────────────────────────────────────────────────────────
+-- Refonte CRM (REFONTE-CRM.md, palier 1) : l'email de relance peut
+-- désormais être envoyé et tracé directement depuis la fiche (voir
+-- sendFollowupEmail dans dashboard-app/api/dashboard.js), plutôt qu'un
+-- copier-coller manuel vers le client mail. `email` s'ajoute aux actions
+-- déjà journalisées dans activity_log.
+-- ───────────────────────────────────────────────────────────────
+alter table activity_log drop constraint if exists activity_log_action_check;
+alter table activity_log add constraint activity_log_action_check
+  check (action in ('created', 'updated', 'status_changed', 'note', 'email'));
+
+-- ───────────────────────────────────────────────────────────────
 -- Policies RLS explicites (août 2026)
 -- Chaque table listée ci-dessus avait RLS activée mais AUCUNE policy
 -- écrite — ça bloque déjà tout accès pour la clé anonyme (deny-by-default

@@ -1,5 +1,6 @@
 // Logique pure (sans I/O) de classification des emails Zimbra pour la
-// prospection écoles. Testable avec `node --test`. Aucune dépendance.
+// prospection écoles. Testable avec `node --test`.
+const { nextStatusOnOutboundContact } = require('./_dashboard-logic');
 
 const FREE_MAIL_DOMAINS = new Set([
   'gmail.com', 'hotmail.com', 'outlook.com', 'live.com', 'yahoo.com',
@@ -14,7 +15,6 @@ const SCHOOL_KEYWORDS = [
 ];
 
 const CLOSED_STATUSES = new Set(['signe', 'perdu']);
-const ADVANCED_STATUSES = new Set(['en_negociation', 'signe', 'perdu']);
 
 function domainOf(email) {
   const at = (email || '').lastIndexOf('@');
@@ -59,8 +59,8 @@ function classifyMessage(message, prospects, now) {
   if (direction === 'out') {
     const match = findProspectByEmail(prospects, to);
     if (!match) return null;
-    if (ADVANCED_STATUSES.has(match.status)) return null;
-    const nextStatus = match.status === 'a_contacter' ? 'envoye' : 'relance';
+    const nextStatus = nextStatusOnOutboundContact(match.status);
+    if (!nextStatus) return null;
     return { type: 'update-status', prospectId: match.id, status: nextStatus };
   }
 

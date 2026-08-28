@@ -85,4 +85,29 @@ async function fetchRecentMessages({ host, user, password }, sinceDate) {
   return [...inbox.map(normalize('in')), ...sent.map(normalize('out'))];
 }
 
-module.exports = { fetchRecentMessages };
+// Envoie un email via Zimbra (SendMsgRequest, urn:zimbraMail) plutôt qu'un
+// relais SMTP direct : même transport HTTPS déjà utilisé pour lire (donc pas
+// exposé au blocage OVH des ports IMAP/SMTP bruts depuis une IP Vercel), et
+// Zimbra classe lui-même une copie dans "Envoyés" — pas besoin de la
+// déposer nous-mêmes. Retourne l'id du message envoyé (à consigner dans
+// zimbra_sync_log côté appelant pour que le cron du lendemain ne le
+// retraite pas une seconde fois).
+async function sendMessage({ host, user, password }, { to, subject, text }) {
+  const authToken = await authenticate(host, user, password);
+  const body = {
+    SendMsgRequest: {
+      _jsns: 'urn:zimbraMail',
+      m: {
+        e: [{ t: 't', a: to }],
+        su: { _content: subject },
+        mp: { ct: 'text/plain', content: { _content: text } },
+      },
+    },
+  };
+  const res = await soapCall(host, body, authToken);
+  const sent = res.SendMsgResponse && res.SendMsgResponse.m && res.SendMsgResponse.m[0];
+  if (!sent || !sent.id) throw new Error("Envoi Zimbra : réponse sans identifiant de message.");
+  return { messageId: String(sent.id) };
+}
+
+module.exports = { fetchRecentMessages, sendMessage };

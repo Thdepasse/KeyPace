@@ -5,9 +5,9 @@
 // Accès protégé par le header x-admin-key (secret ADMIN_KEY propre à ce
 // projet — pas de comptes individuels).
 const crypto = require('crypto');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals, FOLLOWUP_DAYS } = require('./_dashboard-logic');
+const { computeNextFollowup, nextStatusOnOutboundContact, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, contentGapsThisWeek, thisWeekRange, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals, FOLLOWUP_DAYS } = require('./_dashboard-logic');
 const { classifyMessage } = require('./_zimbra-match');
-const { fetchRecentMessages } = require('./_zimbra-soap');
+const { fetchRecentMessages, sendMessage } = require('./_zimbra-soap');
 const { fetchGA4Traffic, fetchGA4TrafficBreakdown } = require('./_ga4');
 const { findPlace, fetchPlaceReviews } = require('./_google-places');
 
@@ -122,45 +122,64 @@ async function trafficDetail(req, res) {
   }
 }
 
+// Chacune des neuf sources est indépendante des huit autres : une panne ou
+// un raté ponctuel sur UNE table (ex. reviews) ne doit jamais empêcher
+// d'afficher les huit autres, ni (voir pingAdminKey ci-dessous et
+// tryUnlock()/boot() côté front) être confondu avec une clé invalide. Avant
+// ce correctif, `kpis()` renvoyait un 500 générique dès qu'une seule requête
+// échouait, ce qui déconnectait l'utilisateur avec "Clé invalide." même
+// quand la clé était la bonne. Chaque source dégradée renvoie [] plutôt que
+// de faire échouer tout l'appel ; `degraded` liste ce qui n'a pas pu charger,
+// pour un signal discret côté UI plutôt qu'un blocage total.
 async function kpis(req, res) {
   const now = Date.now();
   const week = thisWeekRange(now);
-  const [usersR, instR, prospR, progR, certR, wsR, reviewsPendingR, calendarWeekR, clientsR, traffic] = await Promise.all([
-    sb('/users?select=plan,created_at'),
-    sb('/institutions?select=seat_count'),
-    sb('/school_prospects?select=id,school_name,status,next_followup_at,meeting_at'),
-    sb('/progress?select=updated_at'),
-    sb('/certificates?select=id'),
-    sb('/weekly_scores?select=id'),
-    sb('/reviews?select=id&status=eq.pending'),
-    sb(`/content_calendar?select=scheduled_date&scheduled_date=gte.${week.start}&scheduled_date=lte.${week.end}`),
-    sb('/client_schools?select=id,school_name,status,renewal_date'),
+  const sources = {
+    users: () => sb('/users?select=plan,created_at'),
+    institutions: () => sb('/institutions?select=seat_count'),
+    prospects: () => sb('/school_prospects?select=id,school_name,status,next_followup_at,meeting_at'),
+    progress: () => sb('/progress?select=updated_at'),
+    certificates: () => sb('/certificates?select=id'),
+    weeklyScores: () => sb('/weekly_scores?select=id'),
+    reviewsPending: () => sb('/reviews?select=id&status=eq.pending'),
+    calendarWeek: () => sb(`/content_calendar?select=scheduled_date&scheduled_date=gte.${week.start}&scheduled_date=lte.${week.end}`),
+    clients: () => sb('/client_schools?select=id,school_name,status,renewal_date'),
+  };
+  const keys = Object.keys(sources);
+  const [results, traffic] = await Promise.all([
+    Promise.all(keys.map((k) => sources[k]().catch((e) => ({ ok: false, error: e })))),
     fetchTrafficSafe(),
   ]);
-  if (!usersR.ok || !instR.ok || !prospR.ok || !progR.ok || !certR.ok || !wsR.ok || !reviewsPendingR.ok || !calendarWeekR.ok || !clientsR.ok) {
-    return res.status(500).json({ error: 'Erreur récupération KPI.' });
-  }
-  const acquisition = summarizeAcquisition(usersR.data || [], now);
-  const scheduledDates = (calendarWeekR.data || []).map((c) => c.scheduled_date);
-  const prospects = prospR.data || [];
+  const degraded = [];
+  const data = {};
+  keys.forEach((k, i) => {
+    const r = results[i];
+    if (!r.ok) degraded.push(k);
+    data[k] = (r.ok && r.data) || [];
+  });
+
+  const acquisition = summarizeAcquisition(data.users, now);
+  const scheduledDates = data.calendarWeek.map((c) => c.scheduled_date);
+  const prospects = data.prospects;
   return res.json({
+    degraded,
     acquisition: {
       ...acquisition,
       traffic,
       conversionToSignup30d: traffic && !traffic.error ? trafficConversionRate(acquisition.signups30d, traffic.visitors30d) : null,
     },
-    b2b: summarizeB2B(instR.data || [], prospects, now),
-    engagement: summarizeEngagement(progR.data || [], certR.data || [], wsR.data || [], now),
+    b2b: summarizeB2B(data.institutions, prospects, now),
+    engagement: summarizeEngagement(data.progress, data.certificates, data.weeklyScores, now),
     trend: {
-      signups: dailySignups(usersR.data || [], now, 30),
-      lastActive: dailyLastActive(progR.data || [], now, 30),
+      signups: dailySignups(data.users, now, 30),
+      lastActive: dailyLastActive(data.progress, now, 30),
     },
     brief: {
-      reviewsPending: (reviewsPendingR.data || []).length,
+      reviewsPending: data.reviewsPending.length,
       ...contentGapsThisWeek(scheduledDates, now),
       overdueFollowups: severelyOverdueFollowups(prospects, now).map((p) => ({ id: p.id, school_name: p.school_name, next_followup_at: p.next_followup_at })),
       upcomingMeetings: upcomingMeetings(prospects, now).map((p) => ({ id: p.id, school_name: p.school_name, meeting_at: p.meeting_at })),
-      upcomingRenewals: upcomingRenewals(clientsR.data || [], now).map((c) => ({ id: c.id, school_name: c.school_name, renewal_date: c.renewal_date })),
+      upcomingRenewals: upcomingRenewals(data.clients, now).map((c) => ({ id: c.id, school_name: c.school_name, renewal_date: c.renewal_date })),
     },
   });
 }
@@ -958,18 +977,26 @@ async function syncGoogleReviews(req, res) {
 // jour/crée les prospects en conséquence. zimbra_sync_log évite de retraiter
 // un message déjà vu. Appelée par le cron quotidien et par le bouton
 // "Sync maintenant" (deux points d'entrée, voir le handler plus bas).
-async function syncZimbra(req, res) {
-  // Nom de variable conservé (ZIMBRA_IMAP_HOST) pour ne pas redemander à
-  // l'utilisateur de reconfigurer Vercel : elle contient juste le nom
-  // d'hôte (ex. zimbra1.mail.ovh.net), utilisé ici en HTTPS vers /service/soap.
+// Nom de variable conservé (ZIMBRA_IMAP_HOST) pour ne pas redemander à
+// l'utilisateur de reconfigurer Vercel : elle contient juste le nom d'hôte
+// (ex. zimbra1.mail.ovh.net), utilisé en HTTPS vers /service/soap aussi bien
+// pour lire (syncZimbra) que pour envoyer (sendFollowupEmail).
+function zimbraCreds() {
   const host = process.env.ZIMBRA_IMAP_HOST;
   const user = process.env.ZIMBRA_USER;
   const password = process.env.ZIMBRA_APP_PASSWORD;
-  if (!host || !user || !password) {
+  if (!host || !user || !password) return null;
+  return { host, user, password };
+}
+
+async function syncZimbra(req, res) {
+  const creds = zimbraCreds();
+  if (!creds) {
     return res.status(500).json({
       error: 'Sync Zimbra indisponible : ZIMBRA_IMAP_HOST, ZIMBRA_USER et ZIMBRA_APP_PASSWORD doivent être configurés.',
     });
   }
+  const { host, user, password } = creds;
 
   const sinceDate = new Date(Date.now() - ZIMBRA_SYNC_WINDOW_DAYS * 24 * 60 * 60 * 1000);
   let messages;
@@ -1041,6 +1068,113 @@ async function syncZimbra(req, res) {
   return res.json({ checked: messages.length, skipped: messages.length - fresh.length, updated, created });
 }
 
+// ─── Envoi tracé d'une relance (bouton "Envoyer" du panneau de message) ───
+// Remplace le copier-coller manuel vers le client mail : le texte a déjà été
+// composé et éventuellement retouché côté front (voir buildEmailFromTemplate
+// dans index.html), ici on l'envoie réellement via Zimbra et on avance le
+// dossier avec la même règle qu'un envoi détecté par la synchro quotidienne.
+async function sendFollowupEmail(req, res) {
+  const { id, subject, text } = req.body || {};
+  if (!id || !subject || !text) return res.status(400).json({ error: 'id, objet ou texte manquant.' });
+  const creds = zimbraCreds();
+  if (!creds) {
+    return res.status(500).json({
+      error: 'Envoi indisponible : ZIMBRA_IMAP_HOST, ZIMBRA_USER et ZIMBRA_APP_PASSWORD doivent être configurés.',
+    });
+  }
+  const prospectR = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}&select=*`);
+  const prospect = prospectR.data && prospectR.data[0];
+  if (!prospect) return res.status(404).json({ error: 'Prospect introuvable.' });
+  if (!prospect.contact_email) return res.status(400).json({ error: "Ce dossier n'a pas d'email de contact." });
+
+  let sent;
+  try {
+    sent = await sendMessage(creds, { to: prospect.contact_email, subject, text });
+  } catch (e) {
+    console.error('sendFollowupEmail: envoi Zimbra échoué:', e);
+    return res.status(502).json({ error: 'Envoi impossible : ' + e.message });
+  }
+
+  const now = Date.now();
+  const nextStatus = nextStatusOnOutboundContact(prospect.status);
+  const patch = { last_contact_at: new Date(now).toISOString(), updated_at: new Date(now).toISOString() };
+  if (nextStatus) {
+    patch.status = nextStatus;
+    patch.next_followup_at = computeNextFollowup(nextStatus, now);
+  }
+  const r = await sb(`/school_prospects?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  if (!r.ok || !r.data || !r.data.length) return res.status(500).json({ error: 'Email envoyé mais mise à jour du dossier impossible.' });
+
+  // Best-effort : un échec ici ne doit jamais laisser croire que l'email
+  // n'est pas parti (il l'est) — juste que le prochain sync Zimbra pourrait
+  // reclasser ce même message une seconde fois.
+  await sb('/zimbra_sync_log?on_conflict=message_id', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=ignore-duplicates,return=minimal' },
+    body: JSON.stringify([{ message_id: sent.messageId, prospect_id: id, direction: 'out' }]),
+  }).catch((e) => console.error('sendFollowupEmail: log zimbra_sync_log échoué:', e));
+
+  if (nextStatus && nextStatus !== prospect.status) {
+    await logActivity('prospect', id, 'status_changed', `${STATUS_LABELS_FR[prospect.status] || prospect.status} → ${STATUS_LABELS_FR[nextStatus] || nextStatus}`);
+  }
+  await logActivity('prospect', id, 'email', `Email envoyé : ${subject}`);
+  return res.json(r.data[0]);
+}
+
+// ─── Fusion de doublons (bannière "doublons potentiels") ──────────────────
+// Contrairement à la simple suppression de la fiche redondante (qui existait
+// déjà), reporte d'abord ses notes et son historique sur la fiche conservée,
+// pour ne rien perdre de ce qui avait déjà été noté sur le dossier fusionné.
+async function mergeProspects(req, res) {
+  const { keepId, mergeIds } = req.body || {};
+  if (!keepId || !Array.isArray(mergeIds) || !mergeIds.length) {
+    return res.status(400).json({ error: 'keepId ou mergeIds manquant.' });
+  }
+  const keepR = await sb(`/school_prospects?id=eq.${encodeURIComponent(keepId)}&select=*`);
+  const keep = keepR.data && keepR.data[0];
+  if (!keep) return res.status(404).json({ error: 'Fiche à conserver introuvable.' });
+
+  let mergedNotes = keep.notes || '';
+  for (const mergeId of mergeIds) {
+    if (mergeId === keepId) continue;
+    const mergedR = await sb(`/school_prospects?id=eq.${encodeURIComponent(mergeId)}&select=*`);
+    const merged = mergedR.data && mergedR.data[0];
+    if (!merged) continue;
+
+    if (merged.notes && merged.notes.trim() && merged.notes.trim() !== mergedNotes.trim()) {
+      mergedNotes = mergedNotes
+        ? `${mergedNotes}\n\n[Fusionné depuis « ${merged.school_name} »] ${merged.notes.trim()}`
+        : merged.notes.trim();
+    }
+
+    await sb(`/activity_log?entity_type=eq.prospect&entity_id=eq.${encodeURIComponent(mergeId)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ entity_id: keepId }),
+    });
+
+    await sb(`/school_prospects?id=eq.${encodeURIComponent(mergeId)}`, { method: 'DELETE' });
+    await logActivity('prospect', keepId, 'note', `Fiche fusionnée : « ${merged.school_name} » (dossier supprimé, notes et historique reportés ici).`);
+  }
+
+  if (mergedNotes !== (keep.notes || '')) {
+    await sb(`/school_prospects?id=eq.${encodeURIComponent(keepId)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ notes: mergedNotes, updated_at: new Date().toISOString() }),
+    });
+  }
+  return res.json({ ok: true });
+}
+
+// ─── Vérification légère de la clé (jauge du portail + démarrage) ─────────
+// Contrairement à kpis(), qui agrège neuf tables et peut échouer sur une
+// seule sans rapport avec la validité de la clé, cette action ne fait aucune
+// requête de données : elle sert uniquement à confirmer que l'ADMIN_KEY
+// fourni est le bon, sans jamais pouvoir être confondue avec un problème de
+// données (voir aussi le fix de kpis() plus haut).
+async function pingAdminKey(req, res) {
+  return res.json({ ok: true });
+}
+
 module.exports = async function handler(req, res) {
   const origin = req.headers.origin;
   if (isAllowedOrigin(origin)) {
@@ -1100,6 +1234,7 @@ module.exports = async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       switch (action) {
+        case 'ping': return await pingAdminKey(req, res);
         case 'kpis': return await kpis(req, res);
         case 'traffic-detail': return await trafficDetail(req, res);
         case 'prospects': return await prospectsList(req, res);
@@ -1126,6 +1261,8 @@ module.exports = async function handler(req, res) {
         case 'log-contact': return await prospectLogContact(req, res);
         case 'delete-prospect': return await prospectDelete(req, res);
         case 'dismiss-duplicate': return await dismissDuplicate(req, res);
+        case 'merge-prospects': return await mergeProspects(req, res);
+        case 'send-followup-email': return await sendFollowupEmail(req, res);
         case 'create-event': return await eventCreate(req, res);
         case 'update-event': return await eventUpdate(req, res);
         case 'delete-event': return await eventDelete(req, res);

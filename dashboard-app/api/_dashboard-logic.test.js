@@ -2,7 +2,7 @@
 // Lancer : node --test api/_dashboard-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, normalizePhone, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals } = require('./_dashboard-logic');
+const { computeNextFollowup, nextStatusOnOutboundContact, summarizeAcquisition, summarizeB2B, summarizeEngagement, dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange, normalizeSchoolName, normalizePhone, findDuplicateProspects, diffSummary, severelyOverdueFollowups, upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals } = require('./_dashboard-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -21,6 +21,22 @@ test('computeNextFollowup : aucune relance pour un dossier clos ou pas encore co
   assert.equal(computeNextFollowup('signe', NOW), null);
   assert.equal(computeNextFollowup('perdu', NOW), null);
   assert.equal(computeNextFollowup('a_contacter', NOW), null);
+});
+
+test('nextStatusOnOutboundContact : premier envoi à un dossier "à contacter" => envoye', () => {
+  assert.equal(nextStatusOnOutboundContact('a_contacter'), 'envoye');
+});
+
+test('nextStatusOnOutboundContact : tout autre statut ouvert => relance', () => {
+  assert.equal(nextStatusOnOutboundContact('envoye'), 'relance');
+  assert.equal(nextStatusOnOutboundContact('relance'), 'relance');
+  assert.equal(nextStatusOnOutboundContact('repondu'), 'relance');
+});
+
+test('nextStatusOnOutboundContact : ne rétrograde jamais un dossier avancé', () => {
+  assert.equal(nextStatusOnOutboundContact('en_negociation'), null);
+  assert.equal(nextStatusOnOutboundContact('signe'), null);
+  assert.equal(nextStatusOnOutboundContact('perdu'), null);
 });
 
 test('summarizeAcquisition : comptages et taux de conversion', () => {

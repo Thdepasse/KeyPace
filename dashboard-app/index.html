@@ -284,6 +284,8 @@
     <section id="kpi-section" class="tab-panel">
       <h2><span class="sec-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,17 9,11 13,15 21,6"/><polyline points="14,6 21,6 21,13"/></svg></span>KPI de croissance</h2>
 
+      <div id="kpi-degraded-note" style="display:none;margin-bottom:12px;font-size:12px;color:var(--muted)"></div>
+
       <div class="callout" id="daily-brief" style="display:none">
         <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="#FF4D2E"/></svg> Brief du jour</h3>
         <div id="daily-brief-items"></div>
@@ -432,9 +434,12 @@
       <div class="panel" id="followup-msg-panel" style="display:none;margin-bottom:16px">
         <h3 id="followup-msg-title" style="margin:0 0 10px">Message de relance</h3>
         <select id="followup-msg-template" onchange="switchFollowupTemplate()" style="margin-bottom:10px;font-size:13px;padding:7px 10px"></select>
+        <input id="followup-msg-subject" placeholder="Objet" style="margin-bottom:10px">
         <textarea id="followup-msg-text" style="min-height:150px"></textarea>
+        <div id="followup-msg-result" style="margin-top:8px"></div>
         <div class="form-actions">
-          <button class="btn" id="followup-msg-copy-btn" onclick="copyFollowupMessage()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg> Copier</button>
+          <button class="btn" id="followup-msg-send-btn" onclick="sendFollowupMessage()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> Envoyer</button>
+          <button class="btn ghost" id="followup-msg-copy-btn" onclick="copyFollowupMessage()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg> Copier</button>
           <button class="btn ghost" onclick="closeFollowupMessage()">Fermer</button>
         </div>
       </div>
@@ -458,13 +463,65 @@
           </select>
         </div>
       </div>
+      <div id="prospect-filters" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <select id="filter-status" onchange="renderProspects()" style="font-size:12.5px;padding:6px 10px;width:auto">
+          <option value="">Tous les statuts</option>
+          <option value="a_contacter">À contacter</option>
+          <option value="envoye">Envoyé</option>
+          <option value="relance">Relancé</option>
+          <option value="repondu">Répondu</option>
+          <option value="en_negociation">Négociation</option>
+          <option value="signe">Signé</option>
+          <option value="perdu">Perdu</option>
+        </select>
+        <select id="filter-city" onchange="renderProspects()" style="font-size:12.5px;padding:6px 10px;width:auto">
+          <option value="">Toutes les villes</option>
+        </select>
+        <select id="filter-owner" onchange="renderProspects()" style="font-size:12.5px;padding:6px 10px;width:auto">
+          <option value="">Tous les responsables</option>
+          <option value="theo">Théo</option>
+          <option value="vincent">Vincent</option>
+          <option value="none">Non assigné</option>
+        </select>
+        <select id="filter-stale" onchange="renderProspects()" style="font-size:12.5px;padding:6px 10px;width:auto">
+          <option value="">Peu importe la date de contact</option>
+          <option value="7">Sans contact depuis 7j+</option>
+          <option value="14">Sans contact depuis 14j+</option>
+          <option value="30">Sans contact depuis 30j+</option>
+        </select>
+        <button class="btn ghost small" onclick="resetProspectFilters()" style="width:auto">✕ Réinitialiser les filtres</button>
+      </div>
       <div id="duplicate-filter-note"></div>
       <div id="pipeline-value-summary" class="muted" style="font-size:12.5px;margin-bottom:8px"></div>
+
+      <div id="bulk-actions-bar" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:9px 14px;margin-bottom:10px">
+        <strong id="bulk-actions-count" style="font-size:13px"></strong>
+        <select id="bulk-status-select" onchange="bulkChangeStatus(this.value); this.value=''" style="width:auto;font-size:12.5px;padding:6px 10px">
+          <option value="">Changer le statut…</option>
+          <option value="a_contacter">À contacter</option>
+          <option value="envoye">Envoyé</option>
+          <option value="relance">Relancé</option>
+          <option value="repondu">Répondu</option>
+          <option value="en_negociation">Négociation</option>
+          <option value="signe">Signé</option>
+          <option value="perdu">Perdu</option>
+        </select>
+        <select id="bulk-owner-select" onchange="bulkAssignOwner(this.value); this.value=''" style="width:auto;font-size:12.5px;padding:6px 10px">
+          <option value="">Assigner à…</option>
+          <option value="theo">Théo</option>
+          <option value="vincent">Vincent</option>
+          <option value="__none__">Non assigné</option>
+        </select>
+        <button class="btn ghost small" style="width:auto" onclick="exportProspectsCSV(true)">Exporter la sélection</button>
+        <button class="btn ghost small" style="width:auto" onclick="clearProspectSelection()">✕ Désélectionner</button>
+        <span id="bulk-actions-progress" class="muted" style="font-size:12px"></span>
+      </div>
 
       <div class="table-wrap" id="prospects-table-wrap">
         <table class="prospects">
           <thead>
             <tr>
+              <th style="width:28px"><input type="checkbox" id="select-all-prospects" onchange="toggleSelectAllProspects(this.checked)"></th>
               <th>École</th><th>Ville</th><th>Contact</th><th>Statut</th><th>Valeur est.</th><th>Dernier contact</th><th>Relance</th><th>Actions</th>
             </tr>
           </thead>
@@ -897,7 +954,11 @@ async function tryUnlock(){
   if (!key) return;
   localStorage.setItem(KEY_STORAGE, key);
   try {
-    await api('kpis');
+    // 'ping' plutôt que 'kpis' : ne dépend d'aucune des neuf tables agrégées
+    // par le tableau de bord, donc un raté sur l'une d'elles ne peut plus se
+    // faire passer pour une clé invalide (voir le correctif de kpis()
+    // côté serveur).
+    await api('ping');
     document.getElementById('gate').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     boot();
@@ -1111,9 +1172,21 @@ function renderWinsTicker(a, e){
   document.getElementById('wins-ticker').innerHTML = wins.map(w => `<div class="win-chip">${w.ic} ${w.label}</div>`).join('');
 }
 
+const KPI_SOURCE_LABELS = {
+  users: 'inscrits', institutions: 'établissements', prospects: 'prospects', progress: 'activité',
+  certificates: 'certificats', weeklyScores: 'défi hebdo', reviewsPending: 'avis', calendarWeek: 'calendrier', clients: 'écoles clientes',
+};
+
 async function loadKpis(){
   try {
-    const { acquisition: a, b2b: b, engagement: e, trend, brief } = await api('kpis');
+    const { acquisition: a, b2b: b, engagement: e, trend, brief, degraded } = await api('kpis');
+    const noteEl = document.getElementById('kpi-degraded-note');
+    if (degraded && degraded.length) {
+      noteEl.style.display = 'block';
+      noteEl.textContent = `Chargement partiel : ${degraded.map(k => KPI_SOURCE_LABELS[k] || k).join(', ')} indisponible(s) pour l'instant, le reste des KPI est à jour.`;
+    } else {
+      noteEl.style.display = 'none';
+    }
     renderDailyBrief(b, brief);
     renderWinsTicker(a, e);
     document.getElementById('kpi-acquisition').innerHTML =
@@ -1205,10 +1278,49 @@ function renderTrendChart(trend){
 // ─── Prospection écoles ──────────────────────────────
 function fmtDate(iso){ if (!iso) return '—'; return new Date(iso).toLocaleDateString('fr-BE', { day:'2-digit', month:'2-digit', year:'numeric' }); }
 
+// Remplit le menu Ville à partir des valeurs réellement présentes dans les
+// dossiers (recalculé à chaque chargement, pas à chaque frappe) — conserve
+// la sélection en cours si elle existe toujours.
+function populateCityFilter(list){
+  const select = document.getElementById('filter-city');
+  const current = select.value;
+  const cities = [...new Set(list.map(p => (p.city || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr'));
+  select.innerHTML = `<option value="">Toutes les villes</option>` + cities.map(c => `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join('');
+  if (cities.includes(current)) select.value = current;
+}
+
+function resetProspectFilters(){
+  document.getElementById('filter-status').value = '';
+  document.getElementById('filter-city').value = '';
+  document.getElementById('filter-owner').value = '';
+  document.getElementById('filter-stale').value = '';
+  document.getElementById('filter-auto-only').checked = false;
+  document.getElementById('prospect-search').value = '';
+  window.__duplicateGroupFilter = null;
+  renderProspects();
+}
+
 function filterProspects(list){
   if (window.__duplicateGroupFilter) return list.filter(p => window.__duplicateGroupFilter.has(p.id));
   let out = list;
   if (document.getElementById('filter-auto-only').checked) out = out.filter(p => p.source === 'zimbra_auto');
+
+  const status = document.getElementById('filter-status').value;
+  if (status) out = out.filter(p => p.status === status);
+
+  const city = document.getElementById('filter-city').value;
+  if (city) out = out.filter(p => (p.city || '') === city);
+
+  const owner = document.getElementById('filter-owner').value;
+  if (owner === 'none') out = out.filter(p => !p.owner);
+  else if (owner) out = out.filter(p => p.owner === owner);
+
+  const staleDays = Number(document.getElementById('filter-stale').value) || 0;
+  if (staleDays) {
+    const threshold = Date.now() - staleDays * 24 * 60 * 60 * 1000;
+    out = out.filter(p => !p.last_contact_at || new Date(p.last_contact_at).getTime() <= threshold);
+  }
+
   const q = document.getElementById('prospect-search').value.trim().toLowerCase();
   if (!q) return out;
   return out.filter(p => [p.school_name, p.city, p.contact_name, p.contact_email, p.contact_phone, p.notes]
@@ -1230,6 +1342,7 @@ async function loadProspects(){
   try {
     const { items: list, lastSyncAt, duplicateGroups } = await api('prospects');
     window.__prospects = list;
+    populateCityFilter(list);
     document.getElementById('last-sync').textContent = lastSyncAt
       ? `Dernière sync : ${fmtDate(lastSyncAt)}`
       : 'Jamais synchronisé';
@@ -1293,11 +1406,25 @@ function renderDuplicatesCallout(list, duplicateGroups){
         </div>
         <div class="dup-group-actions">
           <button class="btn ghost small" style="width:auto" onclick='dismissDuplicateGroup(${JSON.stringify(g.key)});event.stopPropagation()'>✓ Pas un doublon</button>
+          ${group.map(p => `<button class="btn small ghost" style="width:auto" title="Garde cette fiche, reporte les notes et l'historique des autres, puis les supprime" onclick='mergeDuplicateGroup("${p.id}", ${JSON.stringify(g.ids)});event.stopPropagation()'><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v9a3 3 0 0 0 3 3h5"/><path d="M13 12l3 3-3 3"/><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M6 8.5V15.5"/></svg> Garder « ${escHtml(p.school_name)} »</button>`).join('')}
           ${group.map(p => `<button class="btn small danger" style="width:auto" onclick="deleteProspect('${p.id}');event.stopPropagation()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg> Suppr. ${escHtml(p.school_name)}</button>`).join('')}
         </div>
       </div>`;
     }).join('')}
   </div>`;
+}
+
+// "Garder celle-ci" : reporte les notes et l'historique des autres fiches du
+// groupe sur keepId avant de les supprimer (voir mergeProspects côté
+// serveur) — contrairement à "Suppr." qui perd tout, sans confirmation.
+async function mergeDuplicateGroup(keepId, allIds){
+  const mergeIds = allIds.filter(id => id !== keepId);
+  if (!mergeIds.length) return;
+  if (!confirm(`Fusionner ${mergeIds.length} fiche${mergeIds.length > 1 ? 's' : ''} dans celle conservée ? Les notes et l'historique seront reportés, les autres fiches seront supprimées définitivement.`)) return;
+  await api('merge-prospects', { method: 'POST', body: { keepId, mergeIds } });
+  showToast('Fiches fusionnées');
+  loadProspects();
+  loadKpis();
 }
 
 async function dismissDuplicateGroup(key){
@@ -1344,6 +1471,7 @@ function renderProspects(){
     const dupIds = window.__duplicateIds || new Set();
     document.getElementById('prospects-body').innerHTML = view.length ? view.map(p => `
       <tr${dupIds.has(p.id) ? ' style="background:#FFFBEF"' : ''}>
+        <td><input type="checkbox" ${selectedProspectIds.has(p.id) ? 'checked' : ''} onchange="toggleProspectSelection('${p.id}', this.checked)"></td>
         <td><strong>${p.school_name}</strong>${dupIds.has(p.id) ? ' <span class="badge" style="background:#FFF3CD;color:#8A6D1D" title="Un autre dossier a un nom d\'école identique ou très proche"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg> doublon possible</span>' : ''}${p.source === 'zimbra_auto' ? ' <span class="badge" style="background:#E7E9FF;color:#3A3EAD" title="Créé automatiquement par la synchro emails — à vérifier">🤖 à vérifier</span>' : ''}${p.owner ? ` <span class="badge" style="background:var(--light);color:var(--muted)">${OWNER_LABELS[p.owner]}</span>` : ''}${p.notes ? `<div class="muted" style="font-size:12px">${p.notes}</div>` : ''}</td>
         <td>${p.city || '—'}${p.estimated_students ? `<div class="muted" style="font-size:12px" title="${escHtml(p.estimated_students_source || '')}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5A4.5 4.5 0 0 1 7 14h4a4.5 4.5 0 0 1 4.5 4.5V20"/><circle cx="17" cy="8" r="3"/><path d="M17.5 14.3a4.5 4.5 0 0 1 3.9 4.5V20"/></svg> ${escHtml(p.estimated_students)}</div>` : ''}</td>
         <td>${p.contact_name || '—'}${p.contact_email ? `<div class="muted" style="font-size:12px">${p.contact_email}</div>` : ''}</td>
@@ -1352,9 +1480,82 @@ function renderProspects(){
         <td>${fmtDate(p.last_contact_at)}</td>
         <td>${fmtDate(p.next_followup_at)}</td>
         <td><div class="actions"><button class="btn small ghost" onclick="openFollowupMessage('${p.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> Message</button><button class="btn small ghost" onclick="editProspect('${p.id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg> Éditer</button><button class="btn small danger" onclick="deleteProspect('${p.id}')">Suppr.</button></div></td>
-      </tr>`).join('') : `<tr><td colspan="8" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
+      </tr>`).join('') : `<tr><td colspan="9" class="empty-msg">${list.length ? 'Aucun résultat pour cette recherche.' : "Aucune école en prospection pour l'instant."}</td></tr>`;
     renderProspectsKanban(view, dupIds);
+    updateBulkActionsBar(view);
   } catch (e) { console.error(e); }
+}
+
+// ─── Sélection multiple + actions groupées ─────────────────────────
+let selectedProspectIds = new Set();
+
+// Exécute `worker` sur chaque item avec au plus `limit` appels en vol à la
+// fois (pas un par un strictement séquentiel, pas non plus tout d'un coup) —
+// réutilisé par les actions groupées et par le premier contact par lot.
+async function runWithConcurrency(items, limit, worker){
+  let ok = 0, fail = 0, i = 0;
+  async function next(){
+    while (i < items.length) {
+      const item = items[i++];
+      try { await worker(item); ok++; } catch (e) { fail++; }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, next));
+  return { ok, fail };
+}
+
+function toggleProspectSelection(id, checked){
+  if (checked) selectedProspectIds.add(id); else selectedProspectIds.delete(id);
+  updateBulkActionsBar(sortProspects(filterProspects(window.__prospects || [])));
+}
+
+// Sélectionne/désélectionne uniquement les dossiers actuellement affichés
+// (après recherche/filtres), pas tout le pipeline en une fois.
+function toggleSelectAllProspects(checked){
+  const view = sortProspects(filterProspects(window.__prospects || []));
+  view.forEach(p => { if (checked) selectedProspectIds.add(p.id); else selectedProspectIds.delete(p.id); });
+  renderProspects();
+}
+
+function clearProspectSelection(){
+  selectedProspectIds.clear();
+  renderProspects();
+}
+
+function updateBulkActionsBar(view){
+  const visibleIds = new Set(view.map(p => p.id));
+  // Une sélection sur un dossier qui sort de la vue (changement de filtre)
+  // ne compte plus dans le total affiché, mais reste sélectionnée si l'on
+  // revient dessus — évite les surprises de type "ça a désélectionné tout".
+  const count = [...selectedProspectIds].filter(id => visibleIds.has(id)).length;
+  const bar = document.getElementById('bulk-actions-bar');
+  bar.style.display = count ? 'flex' : 'none';
+  if (count) document.getElementById('bulk-actions-count').textContent = `${count} sélectionné${count > 1 ? 's' : ''}`;
+  document.getElementById('select-all-prospects').checked = view.length > 0 && view.every(p => selectedProspectIds.has(p.id));
+}
+
+async function bulkChangeStatus(status){
+  if (!status || !selectedProspectIds.size) return;
+  const ids = [...selectedProspectIds];
+  const progressEl = document.getElementById('bulk-actions-progress');
+  progressEl.textContent = `Mise à jour de ${ids.length} dossier${ids.length > 1 ? 's' : ''}…`;
+  const { ok, fail } = await runWithConcurrency(ids, 5, (id) => api('log-contact', { method: 'POST', body: { id, status } }));
+  progressEl.textContent = fail ? `${ok} mis à jour, ${fail} échec${fail > 1 ? 's' : ''}.` : '';
+  showToast(`${ok} dossier${ok > 1 ? 's' : ''} passé${ok > 1 ? 's' : ''} à « ${STATUS_LABELS[status]} »`);
+  loadProspects();
+  loadKpis();
+}
+
+async function bulkAssignOwner(ownerValue){
+  if (!ownerValue || !selectedProspectIds.size) return;
+  const owner = ownerValue === '__none__' ? null : ownerValue;
+  const ids = [...selectedProspectIds];
+  const progressEl = document.getElementById('bulk-actions-progress');
+  progressEl.textContent = `Attribution en cours pour ${ids.length} dossier${ids.length > 1 ? 's' : ''}…`;
+  const { ok, fail } = await runWithConcurrency(ids, 5, (id) => api('update-prospect', { method: 'POST', body: { id, owner } }));
+  progressEl.textContent = fail ? `${ok} mis à jour, ${fail} échec${fail > 1 ? 's' : ''}.` : '';
+  showToast(`${ok} dossier${ok > 1 ? 's' : ''} assigné${ok > 1 ? 's' : ''}${owner ? ` à ${OWNER_LABELS[owner]}` : ' (non assigné)'}`);
+  loadProspects();
 }
 
 // ─── Vue Kanban (pipeline de prospection) ──────────────────────────
@@ -1398,22 +1599,27 @@ async function dropOnStatusColumn(ev, status){
 const EMAIL_TEMPLATES = [
   {
     key: 'premier_contact', label: 'Premier contact', statuses: ['a_contacter'],
+    subject: (school) => `KeyPace pour ${school}`,
     build: (greeting, school, signature) => `${greeting},\n\nJe me permets de vous contacter au sujet de KeyPace, notre plateforme de dactylographie AZERTY pensée pour les établissements scolaires (65 leçons progressives, suivi de progression par élève, mise en place en quelques minutes).\n\nSeriez-vous disponible pour un bref échange cette semaine à propos d'une licence pour ${school} ?\n\nBien cordialement,\n${signature}`,
   },
   {
     key: 'relance', label: 'Relance (pas de réponse)', statuses: ['envoye', 'relance'],
+    subject: (school) => `Relance : KeyPace pour ${school}`,
     build: (greeting, school, signature) => `${greeting},\n\nJe me permets de revenir vers vous suite à mon précédent message concernant KeyPace pour ${school}. Restez-vous intéressé·e par une présentation rapide de la plateforme ?\n\nBien cordialement,\n${signature}`,
   },
   {
     key: 'reponse_objection', label: 'Réponse à une question / objection', statuses: ['repondu', 'en_negociation'],
+    subject: (school) => `Re : KeyPace pour ${school}`,
     build: (greeting, school, signature) => `${greeting},\n\nJe reviens vers vous suite à notre échange au sujet de KeyPace pour ${school}. Avez-vous besoin d'informations complémentaires de mon côté pour avancer ?\n\nBien cordialement,\n${signature}`,
   },
   {
     key: 'apres_rdv', label: 'Suivi après un rendez-vous', statuses: [],
+    subject: (school) => `Suite à notre échange : KeyPace pour ${school}`,
     build: (greeting, school, signature) => `${greeting},\n\nMerci pour votre temps lors de notre échange à propos de KeyPace pour ${school}. Comme convenu, je reste disponible pour toute question complémentaire, et je peux vous transmettre un accès test si c'est utile.\n\nBien cordialement,\n${signature}`,
   },
   {
     key: 'remerciement_signature', label: 'Remerciement après signature', statuses: ['signe'],
+    subject: (school) => `Bienvenue chez KeyPace, ${school} !`,
     build: (greeting, school, signature) => `${greeting},\n\nUn grand merci pour votre confiance ! La licence KeyPace pour ${school} est maintenant active — je reviens vers vous très vite avec les accès et les prochaines étapes pour la mise en place.\n\nBien cordialement,\n${signature}`,
   },
 ];
@@ -1432,10 +1638,17 @@ function buildEmailFromTemplate(key, p){
   return tpl.build(greeting, p.school_name, signature);
 }
 
+function buildSubjectFromTemplate(key, p){
+  const tpl = EMAIL_TEMPLATES.find(t => t.key === key) || EMAIL_TEMPLATES[0];
+  return tpl.subject(p.school_name);
+}
+
 function switchFollowupTemplate(){
   const p = (window.__prospects || []).find(x => x.id === window.__followupProspectId);
   if (!p) return;
-  document.getElementById('followup-msg-text').value = buildEmailFromTemplate(document.getElementById('followup-msg-template').value, p);
+  const key = document.getElementById('followup-msg-template').value;
+  document.getElementById('followup-msg-subject').value = buildSubjectFromTemplate(key, p);
+  document.getElementById('followup-msg-text').value = buildEmailFromTemplate(key, p);
 }
 
 function openFollowupMessage(id){
@@ -1443,14 +1656,47 @@ function openFollowupMessage(id){
   if (!p) return;
   window.__followupProspectId = id;
   document.getElementById('followup-msg-title').textContent = `Message pour ${p.school_name}`;
+  document.getElementById('followup-msg-result').innerHTML = '';
   const key = defaultTemplateKeyFor(p.status);
   document.getElementById('followup-msg-template').value = key;
+  document.getElementById('followup-msg-subject').value = buildSubjectFromTemplate(key, p);
   document.getElementById('followup-msg-text').value = buildEmailFromTemplate(key, p);
   document.getElementById('followup-msg-panel').style.display = 'block';
 }
 
 function closeFollowupMessage(){
   document.getElementById('followup-msg-panel').style.display = 'none';
+}
+
+async function sendFollowupMessage(){
+  const id = window.__followupProspectId;
+  const p = (window.__prospects || []).find(x => x.id === id);
+  if (!p) return;
+  if (!p.contact_email) {
+    document.getElementById('followup-msg-result').innerHTML = `<div class="callout" style="background:#FBE7E5;border-color:#F3C7C1">Ce dossier n'a pas d'email de contact.</div>`;
+    return;
+  }
+  const subject = document.getElementById('followup-msg-subject').value.trim();
+  const text = document.getElementById('followup-msg-text').value.trim();
+  if (!subject || !text) return;
+  if (!confirm(`Envoyer cet email à ${p.contact_email} (${p.school_name}) ?`)) return;
+  const btn = document.getElementById('followup-msg-send-btn');
+  btn.disabled = true;
+  const original = btn.innerHTML;
+  btn.textContent = 'Envoi…';
+  try {
+    await api('send-followup-email', { method: 'POST', body: { id, subject, text } });
+    document.getElementById('followup-msg-result').innerHTML = `<div class="callout empty">Email envoyé à ${escHtml(p.contact_email)}.</div>`;
+    showToast('Email envoyé');
+    loadProspects();
+    loadKpis();
+    if (editingProspectId === id) renderActivityLog('prospect', id, 'prospect-history-list');
+  } catch (e) {
+    document.getElementById('followup-msg-result').innerHTML = `<div class="callout" style="background:#FBE7E5;border-color:#F3C7C1">${escHtml(e.message)}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
 }
 
 async function copyFollowupMessage(){
@@ -1512,8 +1758,9 @@ function cellValue(p, col){
 // moins de lignes que ce que montrait le tableau, sans prévenir personne. Le
 // dédoublonnage visible et volontaire se fait via la bannière "doublons
 // potentiels" — voir renderDuplicatesCallout — avant d'exporter si besoin.
-function exportProspectsCSV(){
-  const list = window.__prospects || [];
+function exportProspectsCSV(selectedOnly){
+  let list = window.__prospects || [];
+  if (selectedOnly) list = list.filter(p => selectedProspectIds.has(p.id));
   if (!list.length) return;
   const rows = [CSV_LABELS.join(','), ...list.map(p => CSV_COLS.map(c => csvCell(cellValue(p, c))).join(','))];
   const blob = new Blob(['﻿' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
@@ -2227,7 +2474,7 @@ async function addCompetitorNote(){
 
 // ─── Historique par élément (prospect ou contenu) ─────────────────
 // Générique : réutilisé par le formulaire prospect et le formulaire contenu.
-const ACTIVITY_ICONS = { created: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg>', updated: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>', status_changed: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg>', note: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg>' };
+const ACTIVITY_ICONS = { created: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/></svg>', updated: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>', status_changed: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M5.5 9a7 7 0 0 1 12-3.5L20 8"/><path d="M18.5 15a7 7 0 0 1-12 3.5L4 16"/></svg>', note: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4V4z"/></svg>', email: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#FF4D2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>' };
 
 async function renderActivityLog(entityType, entityId, listElId){
   const el = document.getElementById(listElId);
@@ -2860,13 +3107,22 @@ async function syncGoogleReviews(){
 
 // ─── Démarrage ─────────────────────────────────────────
 if (adminKey()) {
-  api('kpis').then(() => {
+  api('ping').then(() => {
     document.getElementById('gate').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     boot();
   }).catch(() => { localStorage.removeItem(KEY_STORAGE); });
 }
 document.getElementById('gate-key').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+
+// Cmd/Ctrl+K : va directement à la recherche universelle déjà indexée
+// (globalSearchIndex()) plutôt que de forcer à attraper la souris.
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    document.getElementById('global-search-input').focus();
+  }
+});
 </script>
 
 </body>

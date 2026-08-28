@@ -21,6 +21,21 @@ function computeNextFollowup(status, now) {
   return new Date(now + days * DAY_MS).toISOString();
 }
 
+// Un dossier déjà avancé n'est jamais rétrogradé par un simple email sortant
+// (négociation en cours, déjà signé, déjà perdu) : le statut n'a alors pas à
+// bouger, peu importe combien d'échanges suivent encore.
+const ADVANCED_STATUSES = new Set(['en_negociation', 'signe', 'perdu']);
+
+// Statut suivant après un email envoyé à ce prospect, que ce soit une
+// relance manuelle depuis l'outil ou un email sortant détecté dans le
+// dossier "Envoyés" par la synchro Zimbra (voir classifyMessage dans
+// _zimbra-match.js, qui réutilise cette même règle). `null` => ne rien
+// changer.
+function nextStatusOnOutboundContact(status) {
+  if (ADVANCED_STATUSES.has(status)) return null;
+  return status === 'a_contacter' ? 'envoye' : 'relance';
+}
+
 // Acquisition & conversion à partir de la table `users` (id, plan, created_at).
 function summarizeAcquisition(users, now) {
   const total = users.length;
@@ -255,7 +270,8 @@ function checklistItemStatus(lastCheckedAt, frequencyDays, now) {
 }
 
 module.exports = {
-  FOLLOWUP_DAYS, computeNextFollowup, summarizeAcquisition, summarizeB2B, summarizeEngagement,
+  FOLLOWUP_DAYS, computeNextFollowup, ADVANCED_STATUSES, nextStatusOnOutboundContact,
+  summarizeAcquisition, summarizeB2B, summarizeEngagement,
   dailySignups, dailyLastActive, trafficConversionRate, remainingDaysThisWeek, contentGapsThisWeek, thisWeekRange,
   normalizeSchoolName, normalizeEmail, normalizePhone, findDuplicateProspects, diffSummary, severelyOverdueFollowups,
   upcomingMeetings, excludeDismissedDuplicates, checklistItemStatus, upcomingRenewals,
