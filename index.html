@@ -2141,9 +2141,9 @@ const OB_STEPS_ELEVE=[
   {sel:'#nav-avatar',  label:'Tes paramètres',    title:'Compte',  desc:'Accède à tes paramètres, réinitialise ton mot de passe ou retrouve ce guide via "Revoir le tutoriel".'},
 ];
 const OB_STEPS_PROF=[
-  {sel:'#nav-home',    label:'Ton tableau de bord', title:'Accueil',           desc:'Vue d\'ensemble : nombre d\'élèves, vitesse moyenne, activité récente sur tes classes.'},
-  {sel:'#nav-classes', label:'Gérer tes classes',   title:'Gestion de classes', desc:'Crée une classe, invite tes élèves par lien, assigne des devoirs et suis la progression de chacun.'},
-  {sel:'#nav-avatar',  label:'Tes paramètres',      title:'Compte',            desc:'Accède à tes paramètres, réinitialise ton mot de passe ou retrouve ce guide via "Revoir le tutoriel".'},
+  {sel:'#nav-home',            label:'Ton tableau de bord', title:'Accueil',            desc:'Vue d\'ensemble : nombre d\'élèves, vitesse moyenne, activité récente sur tes classes.'},
+  {sel:'#classes-create-btn',  label:'Ta première classe',  title:'Gestion de classes', desc:'Crée une classe pour obtenir un code à partager avec tes élèves. Une fois la classe créée, tu pourras aussi importer une liste par CSV et assigner des devoirs.', nav:'classes'},
+  {sel:'#nav-avatar',          label:'Tes paramètres',      title:'Compte',            desc:'Accède à tes paramètres, réinitialise ton mot de passe ou retrouve ce guide via "Revoir le tutoriel".'},
 ];
 let _obStep=0;
 let _obPrevEl=null;
@@ -2162,7 +2162,6 @@ function obRender(){
 
   const step=_obList[_obStep];
   const total=_obList.length;
-  const el=document.querySelector(step.sel);
 
   // Textes
   document.getElementById('ob-tt-label').textContent=step.label;
@@ -2171,12 +2170,19 @@ function obRender(){
   document.getElementById('ob-tt-counter').textContent=(_obStep+1)+' / '+total;
   document.getElementById('ob-btn-next').textContent=_obStep===total-1?'Terminer ✓':'Suivant →';
 
+  // Certaines étapes ne peuvent être montrées que sur une autre page (ex.
+  // le bouton "+ Nouvelle classe" n'existe que sur la vue "classes") :
+  // on y navigue d'abord, puis on positionne une fois le rendu à jour.
+  if(step.nav&&typeof app!=='undefined'&&app.view!==step.nav){go(step.nav);setTimeout(()=>obPosition(step),60);}
+  else obPosition(step);
+}
+function obPosition(step){
+  const el=document.querySelector(step.sel);
   if(!el)return;
 
   // Highlight de l'élément ciblé
   el.classList.add('ob-highlight');
   _obPrevEl=el;
-
 
   // Positionner le tooltip sous l'élément
   const rect=el.getBoundingClientRect();
@@ -4020,6 +4026,32 @@ const app={
   },
 
   /* ── PROF : copies rendues ───────────────────────────────────── */
+
+  async viewAssignmentDetail(assignmentId){
+    const overlay=createOverlay(true);
+    overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:26px;max-width:460px;width:100%;max-height:80vh;overflow-y:auto">
+      <div style="padding:40px 0;text-align:center;color:var(--muted)">Chargement…</div>
+    </div>`;
+    let d;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-detail',token:currentToken,assignmentId})});
+      d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+    }catch(e){
+      overlay.querySelector('div').innerHTML=`<div style="padding:20px 0;text-align:center;color:var(--muted)">${this._esc(e.message||'Erreur de chargement.')}</div>`;
+      return;
+    }
+    overlay.querySelector('div').innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h2 style="margin:0;font-size:17px;font-family:'Bricolage Grotesque',sans-serif">${this._esc(d.assignment.title)}</h2>
+        <button onclick="this.closest('[style*=fixed]')._close()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
+      </div>
+      ${d.rows.map(row=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border)">
+        <div style="flex:1;font-size:13.5px;font-weight:600">${this._esc(row.username)}</div>
+        <span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;color:${row.done?'var(--success)':'var(--muted)'};background:${row.done?'rgba(31,169,113,.1)':'var(--light)'}">${row.done?'✓ fait':'pas encore'}</span>
+      </div>`).join('')}
+    `;
+  },
 
   async viewEssays(assignmentId){
     const ov=document.createElement('div');
@@ -10497,10 +10529,20 @@ const app={
       <div class="stats-header" style="padding-bottom:32px">
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
           <div><h1 style="margin-bottom:4px">Gestion de classes</h1><p style="margin:0">Suis les performances de tes élèves par classe. <a href="#" onclick="event.preventDefault();app.viewArchivedClasses()" style="color:var(--muted);text-decoration:underline">Classes archivées</a></p></div>
-          <button class="btn-primary" style="padding:10px 20px;font-size:14px;white-space:nowrap" onclick="app.createClass()">+ Nouvelle classe</button>
+          <button id="classes-create-btn" class="btn-primary" style="padding:10px 20px;font-size:14px;white-space:nowrap" onclick="app.createClass()">+ Nouvelle classe</button>
         </div>
       </div>
       <div style="max-width:900px;padding-bottom:60px">
+        ${(!isAdmin()&&etab.institution)?(()=>{
+          const inst=etab.institution;
+          const left=inst.seatCount!=null?inst.seatCount-inst.seatsUsed:null;
+          const soon=inst.licenseExpiresAt&&(new Date(inst.licenseExpiresAt)-Date.now())<30*86400000;
+          return `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)">
+            <span>${ICONS.school} <b style="color:var(--txt)">${this._esc(inst.name)}</b></span>
+            ${inst.seatCount!=null?`<span>${inst.seatsUsed}/${inst.seatCount} places utilisées${left!=null&&left<=3?` <b style="color:var(--warning)">(${left} restante${left!==1?'s':''})</b>`:''}</span>`:''}
+            ${inst.licenseExpiresAt?`<span${soon?` style="color:var(--warning);font-weight:700"`:''}>Licence jusqu'au ${new Date(inst.licenseExpiresAt).toLocaleDateString('fr-FR')}</span>`:''}
+          </div>`;
+        })():''}
         ${classes.length===0?`
           <div style="text-align:center;padding:80px 20px;color:var(--muted)">
             <div style="font-size:52px;margin-bottom:16px;color:var(--accent)">${ICONS.school}</div>
@@ -10628,6 +10670,7 @@ const app={
     let asg=[];
     try{const ar=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-list',token:currentToken,classId:id})});if(ar.ok)asg=(await ar.json()).assignments||[];}catch{}
     if(this._classesSub!=='class'||this._classViewingId!==id)return;
+    this._classAsg=asg;
     const asgHtml=`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)">
         <div style="font-size:15px;font-weight:700">Devoirs</div>
@@ -10642,7 +10685,8 @@ const app={
             <div style="font-size:13px;font-weight:700;color:${pct>=100?'var(--success)':'var(--txt)'}">${a.doneCount}/${a.total} terminé${a.doneCount>1?'s':''}</div>
             <div style="height:6px;background:var(--light);border-radius:4px;margin-top:5px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct>=100?'var(--success)':'var(--accent)'}"></div></div>
           </div>
-          ${a.mode==='essay'?`<button onclick="app.viewEssays('${a.id}')" style="background:var(--light);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--txt);white-space:nowrap;margin-right:4px"><span style="color:var(--accent)">${ICONS.fileText}</span> Voir les copies</button>`:''}
+          ${a.mode==='essay'?`<button onclick="app.viewEssays('${a.id}')" style="background:var(--light);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--txt);white-space:nowrap;margin-right:4px"><span style="color:var(--accent)">${ICONS.fileText}</span> Voir les copies</button>`:`<button onclick="app.viewAssignmentDetail('${a.id}')" style="background:var(--light);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--txt);white-space:nowrap;margin-right:4px"><span style="color:var(--accent)">${ICONS.fileText}</span> Voir le détail</button>`}
+          <button onclick="app.editAssignment('${a.id}','${d.id}')" title="Modifier" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;opacity:.6;margin-right:2px" onmouseenter="this.style.opacity='1';this.style.color='var(--accent)'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">${ICONS.pencil}</button>
           <button onclick="app.deleteAssignment('${a.id}','${d.id}')" title="Supprimer" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;opacity:.6" onmouseenter="this.style.opacity='1';this.style.color='var(--danger)'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
         </div>`;
       }).join('')}
@@ -10693,7 +10737,7 @@ const app={
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">ÉLÈVE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">VITESSE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">PRÉCISION</div>
-              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">TESTS</div>
+              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center" title="Leçons et tests de vitesse confondus">SESSIONS</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:right">DERNIÈRE ACTIVITÉ</div>
               <div></div>
             </div>
@@ -11019,6 +11063,74 @@ const app={
     }catch{btn.disabled=false;btn.textContent='Assigner le devoir';fail('Erreur réseau.');}
   },
 
+  editAssignment(id,classId){
+    const a=(this._classAsg||[]).find(x=>x.id===id);
+    if(!a)return;
+    const fld='width:100%;margin:6px 0 14px;padding:10px 13px;border:1.5px solid var(--border);border-radius:11px;font:inherit;font-size:14px;background:var(--card);box-sizing:border-box;color:var(--txt)';
+    const lbl='display:block;font-size:12px;font-weight:700;color:var(--muted)';
+    const isEssay=a.mode==='essay';
+    const isCustom=!!a.customText;
+    const overlay=createOverlay(true);
+    overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:26px;max-width:460px;width:100%;max-height:86vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h2 style="margin:0;font-size:17px;font-family:'Bricolage Grotesque',sans-serif">Modifier le devoir</h2>
+        <button onclick="this.closest('[style*=fixed]')._close()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
+      </div>
+      <label style="${lbl}">Titre</label>
+      <input id="ea-title" value="${this._esc(a.title)}" style="${fld}">
+      ${isEssay?`
+        <label style="${lbl}">Consignes</label>
+        <textarea id="ea-brief" rows="3" style="${fld};resize:vertical;min-height:60px;line-height:1.5">${this._esc(a.essayBrief||'')}</textarea>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1"><label style="${lbl}">Minimum de mots</label><input id="ea-min" type="number" min="1" value="${a.minWords||''}" style="${fld}"></div>
+          <div style="flex:1"><label style="${lbl}">Maximum de mots</label><input id="ea-max" type="number" min="1" value="${a.maxWords||''}" style="${fld}"></div>
+        </div>
+      `:isCustom?`
+        <label style="${lbl}">Texte à taper</label>
+        <textarea id="ea-text" rows="4" style="${fld};resize:vertical;min-height:90px;line-height:1.5">${this._esc(a.customText||'')}</textarea>
+        <label style="${lbl}">Objectif de vitesse (mpm, optionnel)</label>
+        <input id="ea-wpm" type="number" min="1" value="${a.targetWpm||''}" style="${fld}">
+      `:!a.lessonId?`
+        <label style="${lbl}">Objectif de vitesse (mpm)</label>
+        <input id="ea-wpm" type="number" min="1" value="${a.targetWpm||''}" style="${fld}">
+      `:''}
+      <label style="${lbl}">Échéance (optionnel)</label>
+      <input id="ea-due" type="date" value="${a.dueDate||''}" style="${fld}">
+      <div id="ea-err" style="color:var(--danger);font-size:13px;margin:0 0 10px;display:none"></div>
+      <button id="ea-save" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer">Enregistrer</button>
+    </div>`;
+    const err=overlay.querySelector('#ea-err');
+    const fail=(m)=>{err.textContent=m;err.style.display='block';};
+    overlay.querySelector('#ea-save').onclick=async()=>{
+      const btn=overlay.querySelector('#ea-save');
+      const title=overlay.querySelector('#ea-title').value.trim();
+      const due=overlay.querySelector('#ea-due').value;
+      if(!title)return fail('Donne un titre au devoir.');
+      const body={action:'assignment-update',token:currentToken,assignmentId:id,title,dueDate:due||null};
+      if(isEssay){
+        body.essayBrief=overlay.querySelector('#ea-brief').value.trim();
+        body.minWords=overlay.querySelector('#ea-min').value||null;
+        body.maxWords=overlay.querySelector('#ea-max').value||null;
+        if(body.minWords&&body.maxWords&&parseInt(body.minWords,10)>parseInt(body.maxWords,10))return fail('Le minimum de mots dépasse le maximum.');
+      }else if(isCustom){
+        const text=overlay.querySelector('#ea-text').value.trim();
+        if(!text)return fail('Saisis le texte à taper.');
+        body.customText=text;
+        body.targetWpm=overlay.querySelector('#ea-wpm').value||null;
+      }else if(!a.lessonId){
+        body.targetWpm=overlay.querySelector('#ea-wpm').value||null;
+      }
+      btn.disabled=true;btn.textContent='…';
+      try{
+        const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+        const d=await r.json();
+        if(!r.ok){btn.disabled=false;btn.textContent='Enregistrer';return fail(d.error||'Erreur.');}
+        overlay._close();
+        this.viewClass(classId);
+      }catch{btn.disabled=false;btn.textContent='Enregistrer';fail('Erreur réseau.');}
+    };
+  },
+
   async deleteAssignment(id,classId){
     if(!await confirmModal({icon:ICONS.fileText,title:'Supprimer ce devoir ?',body:'Cette action est définitive. Les copies déjà rendues seront perdues.',confirmText:'Supprimer',danger:true}))return;
     try{await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-delete',token:currentToken,assignmentId:id})});}catch{}
@@ -11114,7 +11226,7 @@ const app={
     const s=d.summary||{};
     const f=this._sdFilter||'all';
     const allHist=d.history||[];
-    const hist=(f==='all'?allHist:allHist.filter(t=>f==='lesson'?t.mode==='lesson':(t.mode==='test'||!t.mode))).slice(-20);
+    const hist=(f==='all'?allHist:allHist.filter(t=>f==='lesson'?t.mode==='lesson':(t.mode==='test'||!t.mode))).slice(-30);
     const accColor=s.avgAcc!=null&&s.avgAcc>=90?'var(--success)':(s.avgAcc!=null&&s.avgAcc<75?'var(--danger)':'var(--txt)');
     const last=s.daysSinceActive==null?'jamais':s.daysSinceActive===0?"aujourd'hui":s.daysSinceActive===1?'hier':'il y a '+s.daysSinceActive+' j';
     const card=(label,val,unit,valColor)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">${label}</div><div style="font-size:26px;font-weight:800;color:${valColor||'var(--txt)'}">${val}<span style="font-size:13px;color:var(--muted);font-weight:500">${unit||''}</span></div></div>`;
@@ -11146,16 +11258,24 @@ const app={
         </div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 22px;margin-bottom:20px">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-            <div style="font-size:13px;font-weight:700">Évolution de la vitesse <span style="font-weight:500;color:var(--muted)">(20 derniers)</span></div>
+            <div style="font-size:13px;font-weight:700">Évolution de la vitesse <span style="font-weight:500;color:var(--muted)">(30 derniers)</span></div>
             ${fbtn('all','Tous')}${fbtn('test','Test de vitesse')}${fbtn('lesson','Cours')}
           </div>
           <div style="display:flex;align-items:flex-end;gap:5px;height:140px">${bars}</div>
         </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 22px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 22px;margin-bottom:${(d.essays&&d.essays.length)?'20px':'0'}">
           <div style="font-size:13px;font-weight:700;margin-bottom:4px"><span style="color:var(--accent)">${ICONS.keyboard}</span> Touches à travailler</div>
           <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Taux de fautes par touche, sur l'ensemble de ses frappes.</div>
           ${this._keyHeatmap(d.keyStats)}
         </div>
+        ${(d.essays&&d.essays.length)?`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden">
+          <div style="font-size:13px;font-weight:700;padding:16px 22px 10px"><span style="color:var(--accent)">${ICONS.fileText}</span> Essais rendus</div>
+          ${d.essays.map(e=>`<div onclick="app.viewEssays('${e.assignmentId}')" style="display:flex;align-items:center;gap:12px;padding:12px 22px;border-top:1px solid var(--border);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background=''">
+            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px">${this._esc(e.title)}</div><div style="font-size:11.5px;color:var(--muted);margin-top:2px">${e.words} mots · ${new Date(e.updatedAt).toLocaleDateString('fr-FR')}</div></div>
+            ${e.graded?`<span style="font-size:10.5px;font-weight:700;color:var(--success);background:rgba(31,169,113,.1);padding:2px 8px;border-radius:99px">✓ noté</span>`:''}
+            <div style="color:var(--muted);font-size:14px">›</div>
+          </div>`).join('')}
+        </div>`:''}
       </div></div>`;
   },
 
@@ -11467,10 +11587,27 @@ function go(view){closeNavMenu();app.renderView(view);}
 
 // Petit modal de saisie stylé, remplace les prompt() natifs (créer/rejoindre
 // une classe) qui détonnaient visuellement avec le reste du produit.
+// Fond + fermeture (Échap ou clic en dehors) communs à toutes les modales
+// construites à la main (import CSV, rejoindre par code, confirmations...) —
+// le contenu reste propre à chaque appelant, seule la coquille est partagée.
+// onClose est appelé une seule fois, quelle que soit la façon dont la modale
+// se ferme (bouton, Échap, clic sur le fond).
+function createOverlay(padded,onClose){
+  const overlay=document.createElement('div');
+  overlay.style.cssText=`position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center${padded===false?'':';padding:20px'}`;
+  document.body.appendChild(overlay);
+  let closed=false;
+  function onKey(e){if(e.key==='Escape')close();}
+  function close(){if(closed)return;closed=true;overlay.remove();document.removeEventListener('keydown',onKey);if(onClose)onClose();}
+  document.addEventListener('keydown',onKey);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)close();});
+  overlay._close=close;
+  return overlay;
+}
 function confirmModal({icon,title,body,confirmText='Confirmer',cancelText='Annuler',danger=false}){
   return new Promise(resolve=>{
-    const overlay=document.createElement('div');
-    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
+    let result=false;
+    const overlay=createOverlay(true,()=>resolve(result));
     overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:100%;text-align:center">
       ${icon?`<div style="font-size:40px;margin-bottom:12px;color:${danger?'var(--danger)':'var(--accent)'}">${icon}</div>`:''}
       <h2 style="margin:0 0 10px;font-size:19px;font-family:'Bricolage Grotesque',sans-serif">${title}</h2>
@@ -11480,18 +11617,14 @@ function confirmModal({icon,title,body,confirmText='Confirmer',cancelText='Annul
         <button id="cm-cancel" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px;cursor:pointer;width:100%">${cancelText}</button>
       </div>
     </div>`;
-    document.body.appendChild(overlay);
-    function close(v){overlay.remove();document.removeEventListener('keydown',onKey);resolve(v);}
-    function onKey(e){if(e.key==='Escape')close(false);}
-    document.addEventListener('keydown',onKey);
-    overlay.querySelector('#cm-cancel').onclick=()=>close(false);
-    overlay.querySelector('#cm-confirm').onclick=()=>close(true);
+    overlay.querySelector('#cm-cancel').onclick=()=>overlay._close();
+    overlay.querySelector('#cm-confirm').onclick=()=>{result=true;overlay._close();};
   });
 }
 function promptModal({icon,title,placeholder,confirmText,value}){
   return new Promise(resolve=>{
-    const overlay=document.createElement('div');
-    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
+    let result=null;
+    const overlay=createOverlay(true,()=>resolve(result));
     overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:100%;text-align:center">
       <div style="font-size:40px;margin-bottom:12px;color:var(--accent)">${icon}</div>
       <h2 style="margin:0 0 16px;font-size:20px;font-family:'Bricolage Grotesque',sans-serif">${title}</h2>
@@ -11502,18 +11635,16 @@ function promptModal({icon,title,placeholder,confirmText,value}){
         <button id="pm-cancel" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px;cursor:pointer;width:100%">Annuler</button>
       </div>
     </div>`;
-    document.body.appendChild(overlay);
     const input=overlay.querySelector('#pm-input');
     const err=overlay.querySelector('#pm-error');
     setTimeout(()=>{input.focus();input.select();},50);
-    function close(val){overlay.remove();resolve(val);}
-    overlay.querySelector('#pm-cancel').onclick=()=>close(null);
+    overlay.querySelector('#pm-cancel').onclick=()=>overlay._close();
     overlay.querySelector('#pm-confirm').onclick=()=>{
       const v=input.value.trim();
       if(!v){err.textContent='Ce champ est requis.';err.style.display='block';return;}
-      close(v);
+      result=v;overlay._close();
     };
-    input.addEventListener('keydown',e=>{if(e.key==='Enter')overlay.querySelector('#pm-confirm').click();if(e.key==='Escape')close(null);});
+    input.addEventListener('keydown',e=>{if(e.key==='Enter')overlay.querySelector('#pm-confirm').click();});
   });
 }
 
@@ -11522,12 +11653,11 @@ function promptModal({icon,title,placeholder,confirmText,value}){
 // directement à la classe ; le mot de passe temporaire de chacun n'est
 // affiché qu'une fois, au prof de le communiquer.
 function openImportModal(classId){
-  const overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
+  const overlay=createOverlay(true);
   overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:86vh;overflow-y:auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
       <h2 style="margin:0;font-size:19px;font-family:'Bricolage Grotesque',sans-serif"><span style="color:var(--accent)">${ICONS.clipboard}</span> Importer des élèves</h2>
-      <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
+      <button onclick="this.closest('[style*=fixed]')._close()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
     </div>
     <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Un élève par ligne : <code>nom_utilisateur,email</code> (email optionnel). Un compte est créé pour chacun et ajouté directement à la classe. Maximum 200 lignes par import ; au-delà, refais un second import pour le reste.</p>
     <textarea id="imp-csv" placeholder="marie.dupont,marie@ecole.be&#10;lucas92" style="width:100%;min-height:140px;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--txt);outline:none;box-sizing:border-box;resize:vertical"></textarea>
@@ -11535,7 +11665,6 @@ function openImportModal(classId){
     <button id="imp-submit" style="width:100%;margin-top:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer">Importer</button>
     <div id="imp-results" style="margin-top:16px"></div>
   </div>`;
-  document.body.appendChild(overlay);
   document.getElementById('imp-submit').addEventListener('click',()=>app.submitImport(classId));
 }
 
@@ -11543,19 +11672,17 @@ async function startClassJoin(code){
   if(!code)return;
   if(!currentUser){openAuth('login','Connecte-toi avec ton adresse scolaire pour rejoindre la classe.',()=>startClassJoin(code));return;}
   if(!currentToken)return;
-  const overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center';
+  const overlay=createOverlay(false);
   overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:90%;text-align:center">
     <div style="font-size:40px;margin-bottom:12px;color:var(--accent)">${ICONS.school}</div>
     <h2 style="margin:0 0 8px;font-size:20px">Rejoindre une classe</h2>
     <p style="color:var(--muted);font-size:14px;margin:0 0 24px" id="cj-name">Vérification du code « ${code} »…</p>
     <div id="cj-actions" style="display:none;gap:10px;flex-direction:column">
       <button id="cj-confirm" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;width:100%">Rejoindre la classe</button>
-      <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px;cursor:pointer;width:100%">Annuler</button>
+      <button onclick="this.closest('[style*=fixed]')._close()" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px;cursor:pointer;width:100%">Annuler</button>
     </div>
     <div id="cj-error" style="color:#E5484D;font-size:13px;margin-top:12px;display:none"></div>
   </div>`;
-  document.body.appendChild(overlay);
   try{
     const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join-code',token:currentToken,code,preview:true})});
     const d=await r.json();
@@ -11567,7 +11694,7 @@ async function startClassJoin(code){
       const r2=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join-code',token:currentToken,code})});
       const d2=await r2.json();
       if(!r2.ok){b.disabled=false;b.textContent='Rejoindre la classe';const e=document.getElementById('cj-error');e.textContent=d2.error||'Erreur.';e.style.display='block';return;}
-      overlay.querySelector('div').innerHTML=`<div style="font-size:40px;margin-bottom:12px">✓</div><h2 style="margin:0 0 8px">Tu as rejoint la classe « ${d2.className} » !</h2><p style="color:var(--muted);font-size:14px;margin:0 0 24px">Ta progression sera visible par ton professeur.</p><button onclick="this.closest('[style*=fixed]').remove()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer">Continuer</button>`;
+      overlay.querySelector('div').innerHTML=`<div style="font-size:40px;margin-bottom:12px">✓</div><h2 style="margin:0 0 8px">Tu as rejoint la classe « ${d2.className} » !</h2><p style="color:var(--muted);font-size:14px;margin:0 0 24px">Ta progression sera visible par ton professeur.</p><button onclick="this.closest('[style*=fixed]')._close()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer">Continuer</button>`;
       app._myClasses=null;if(app.view==='classes'&&!isTeacher())app.renderStudentClasses();
     };
   }catch{document.getElementById('cj-name').textContent='Erreur réseau.';}

@@ -106,7 +106,26 @@ async function teacherOverview(req, res) {
   const clsR = await sb(`/classes?${filter}&archived=eq.false&select=*&order=created_at.asc`);
   if (!clsR.ok || !Array.isArray(clsR.data)) throw new Error('classes ' + clsR.status + ': ' + JSON.stringify(clsR.data));
 
-  return res.json(await buildOverview(clsR.data, Date.now()));
+  const overview = await buildOverview(clsR.data, Date.now());
+
+  // Un prof (pas seulement l'admin établissement) doit pouvoir voir les
+  // places restantes et l'échéance de licence, sans quoi il ne le découvre
+  // qu'au moment où un import CSV ou une inscription échoue.
+  if (user.institution_id) {
+    const instR = await sb(`/institutions?id=eq.${user.institution_id}&select=name,seat_count,license_expires_at`);
+    const institution = instR.data && instR.data[0];
+    if (institution) {
+      const seatsUsedR = await sb(`/users?institution_id=eq.${user.institution_id}&role=eq.eleve&archived=eq.false&select=id`);
+      overview.institution = {
+        name: institution.name,
+        seatCount: institution.seat_count,
+        seatsUsed: Array.isArray(seatsUsedR.data) ? seatsUsedR.data.length : 0,
+        licenseExpiresAt: institution.license_expires_at,
+      };
+    }
+  }
+
+  return res.json(overview);
 }
 
 async function classCreate(req, res) {
@@ -347,12 +366,31 @@ async function studentDetail(req, res) {
   const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(studentId)}&select=data`);
   const data = (pr.data && pr.data[0] && pr.data[0].data) || {};
   const tests = Array.isArray(data.tests) ? data.tests : [];
+  // Essais rendus par cet élève dans cette classe — pour y accéder directement
+  // depuis sa fiche, sans devoir se souvenir de quel devoir il s'agissait.
+  const classAsgR = await sb(`/assignments?class_id=eq.${cls.id}&mode=eq.essay&select=id,title`);
+  const classEssays = Array.isArray(classAsgR.data) ? classAsgR.data : [];
+  const titleById = {};
+  classEssays.forEach((a) => { titleById[a.id] = a.title; });
+  let essays = [];
+  if (classEssays.length) {
+    const ids = classEssays.map((a) => a.id).join(',');
+    const essaysR = await sb(`/essay_submissions?student_id=eq.${encodeURIComponent(studentId)}&assignment_id=in.(${ids})&select=assignment_id,word_count,updated_at,teacher_comment,teacher_grade`);
+    essays = (Array.isArray(essaysR.data) ? essaysR.data : []).map((s) => ({
+      assignmentId: s.assignment_id,
+      title: titleById[s.assignment_id] || '',
+      words: s.word_count,
+      updatedAt: s.updated_at,
+      graded: !!(s.teacher_comment || s.teacher_grade),
+    })).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  }
   return res.json({
     username: m.users ? m.users.username : '?',
     joinedAt: m.joined_at,
     summary: studentSummary(data, Date.now()),
     history: tests.slice(-30),
     keyStats: data.keyStats || null,
+    essays,
   });
 }
 
@@ -494,11 +532,71 @@ async function assignmentList(req, res) {
     customText: a.custom_text || null,
     mode: a.mode || null,
     audioUrl: a.audio_url || null,
+    essayType: a.essay_type || null,
+    essayBrief: a.essay_brief || null,
+    minWords: a.min_words || null,
+    maxWords: a.max_words || null,
     createdAt: a.created_at,
     total: members.length,
     doneCount: members.filter((m) => assignmentDone(pmap[m.student_id] || {}, a)).length,
   }));
   return res.json({ assignments: out });
+}
+
+// Détail par élève d'un devoir NON-essai (les essais ont déjà essayList/essayDetail,
+// avec les signaux anti-triche en plus) — qui a fait le devoir, qui non.
+async function assignmentDetail(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const aR = await sb(`/assignments?id=eq.${encodeURIComponent(req.body.assignmentId)}&select=*`);
+  const a = aR.data && aR.data[0];
+  if (!a) return res.status(404).json({ error: 'Devoir introuvable.' });
+  const { cls, error, status } = await loadClassForManage(user, a.class_id);
+  if (error) return res.status(status).json({ error });
+  const members = await membersOf(cls.id);
+  const pmap = await fetchProgressMap(members.map((m) => m.student_id));
+  const rows = members
+    .map((m) => ({ studentId: m.student_id, username: m.username, done: assignmentDone(pmap[m.student_id] || {}, a) }))
+    .sort((x, y) => Number(x.done) - Number(y.done) || x.username.localeCompare(y.username));
+  return res.json({
+    assignment: { id: a.id, title: a.title, targetWpm: a.target_wpm, dueDate: a.due_date },
+    rows,
+  });
+}
+
+// Modifie un devoir existant (titre, échéance, et les champs propres à son
+// mode déjà fixé à la création) — sans passer par supprimer + retaper.
+// Le mode/type n'est volontairement pas modifiable : un devoir essai garde
+// son essay_type, un devoir texte/leçon garde son lessonId. Si le type lui-
+// même est à revoir, supprimer et recréer reste la bonne solution.
+async function assignmentUpdate(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const aR = await sb(`/assignments?id=eq.${encodeURIComponent(req.body.assignmentId)}&select=*`);
+  const a = aR.data && aR.data[0];
+  if (!a) return res.status(404).json({ error: 'Devoir introuvable.' });
+  const { error, status } = await loadClassForManage(user, a.class_id);
+  if (error) return res.status(status).json({ error });
+
+  const title = (req.body.title || '').trim();
+  if (!title) return res.status(400).json({ error: 'Titre requis.' });
+  const row = { title, due_date: req.body.dueDate || null };
+
+  if (a.mode === 'essay') {
+    const ev = validateEssayBrief({ essayType: a.essay_type, essayBrief: req.body.essayBrief, minWords: req.body.minWords, maxWords: req.body.maxWords });
+    if (!ev.ok) return res.status(400).json({ error: ev.error });
+    Object.assign(row, ev.value);
+  } else if (a.custom_text) {
+    const customText = (req.body.customText || '').trim();
+    if (!customText) return res.status(400).json({ error: 'Saisis le texte à taper.' });
+    row.custom_text = customText;
+    row.target_wpm = req.body.targetWpm ? parseInt(req.body.targetWpm, 10) : null;
+  } else {
+    row.target_wpm = req.body.targetWpm ? parseInt(req.body.targetWpm, 10) : null;
+  }
+
+  await sb(`/assignments?id=eq.${a.id}`, { method: 'PATCH', body: JSON.stringify(row) });
+  return res.json({ ok: true });
 }
 
 async function assignmentDelete(req, res) {
@@ -1104,6 +1202,8 @@ module.exports = async function handler(req, res) {
       case 'my-classes': return await myClasses(req, res);
       case 'assignment-create': return await assignmentCreate(req, res);
       case 'assignment-list': return await assignmentList(req, res);
+      case 'assignment-detail': return await assignmentDetail(req, res);
+      case 'assignment-update': return await assignmentUpdate(req, res);
       case 'assignment-delete': return await assignmentDelete(req, res);
       case 'my-assignments': return await myAssignments(req, res);
       case 'audio-upload': return await audioUpload(req, res);
