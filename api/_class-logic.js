@@ -3,6 +3,28 @@
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
+// Série de jours consécutifs avec au moins un test — même algorithme que la
+// page "Mes progrès" de l'élève (index.html, calcul client), mais en UTC
+// plutôt qu'en fuseau local du navigateur : ça peut décaler le résultat d'un
+// jour pile à la frontière minuit pour un élève hors UTC, acceptable pour un
+// indicateur secondaire affiché au prof (l'élève voit sa propre série exacte
+// ailleurs).
+function computeStreak(tests, now) {
+  const dset = new Set(tests.map((t) => {
+    const d = new Date(t.t);
+    return d.getUTCFullYear() + '-' + d.getUTCMonth() + '-' + d.getUTCDate();
+  }));
+  let streak = 0;
+  const cur = new Date(now);
+  for (let i = 0; i < 60; i++) {
+    const k = cur.getUTCFullYear() + '-' + cur.getUTCMonth() + '-' + cur.getUTCDate();
+    if (dset.has(k)) { streak++; cur.setUTCDate(cur.getUTCDate() - 1); }
+    else if (i === 0) { cur.setUTCDate(cur.getUTCDate() - 1); }
+    else break;
+  }
+  return streak;
+}
+
 // Résumé des stats d'un élève à partir de son progress.data (jsonb) brut.
 function studentSummary(data, now) {
   const d = data || {};
@@ -21,6 +43,7 @@ function studentSummary(data, now) {
     clearedLessons,
     lastTest,
     daysSinceActive,
+    streak: computeStreak(tests, now),
   };
 }
 
@@ -56,6 +79,40 @@ function detectAlerts(students, now, { stuckMinSessions = 5 } = {}) {
     }
   }
   return { inactive, stuck };
+}
+
+// Miroir de CURRICULUM (index.html) : quel module regroupe chaque leçon.
+// Garder les deux synchronisés — même précédent que ESSAY_TYPES ci-dessous,
+// pour la même raison (le contenu des leçons ne vit que côté client, seul le
+// regroupement par module doit être connu du serveur pour agréger par classe).
+const MODULE_NAMES = ['1. Position de base', '2. Rangée du haut', '3. Rangée du bas', '4. Construire des phrases', '5. Majuscules', '6. Ponctuation complète', '7. Accents directs AZERTY', '8. Accents circonflexes', '9. Tréma et ligatures', '10. Chiffres', '11. Symboles courants', '12. Symboles avancés', '13. Vitesse et fluidité'];
+const LESSON_MODULE = {"r1":0,"r2":0,"r3":0,"r4":0,"r5":0,"r6":0,"h1":1,"h2":1,"h3":1,"h4":1,"h5":1,"h6":1,"b1":2,"b2":2,"b3":2,"b4":2,"b5":2,"b6":2,"w1":3,"w2":3,"w3":3,"w4":3,"w5":3,"maj1":4,"maj2":4,"maj3":4,"maj4":4,"pon1":5,"pon2":5,"pon3":5,"pon4":5,"pon5":5,"pon6":5,"acc1":6,"acc2":6,"acc3":6,"acc4":6,"acc5":6,"cir1":7,"cir2":7,"cir3":7,"cir4":7,"tre1":8,"tre2":8,"tre3":8,"num1":9,"num2":9,"num3":9,"num4":9,"num5":9,"num6":9,"sym1":10,"sym2":10,"sym3":10,"sym4":10,"sym5":10,"sym6":11,"sym7":11,"sym8":11,"sym9":11,"flu1":12,"flu2":12,"flu3":12,"flu4":12,"flu5":12,"flu6":12};
+
+// Maîtrise par module pour une classe : pour chaque module, répartit les
+// élèves en maîtrisé (toutes les leçons du module validées) / en cours (au
+// moins une, pas toutes) / pas commencé, plus un % moyen de complétion.
+// studentsLessonsData : liste de `lessons` bruts (progress.data.lessons par élève).
+function moduleMastery(studentsLessonsData) {
+  const totalLessonsInModule = MODULE_NAMES.map(() => 0);
+  Object.values(LESSON_MODULE).forEach((mi) => { totalLessonsInModule[mi]++; });
+  return MODULE_NAMES.map((name, mi) => {
+    const total = totalLessonsInModule[mi] || 1;
+    let mastered = 0, inProgress = 0, behind = 0, pctSum = 0;
+    for (const lessons of studentsLessonsData) {
+      const l = lessons && typeof lessons === 'object' ? lessons : {};
+      let cleared = 0;
+      for (const [lid, m] of Object.entries(LESSON_MODULE)) {
+        if (m === mi && l[lid] && l[lid].cleared) cleared++;
+      }
+      const pct = cleared / total;
+      pctSum += pct;
+      if (cleared === 0) behind++;
+      else if (cleared >= total) mastered++;
+      else inProgress++;
+    }
+    const n = studentsLessonsData.length || 1;
+    return { name, mastered, inProgress, behind, avgPct: Math.round((pctSum / n) * 100) };
+  });
 }
 
 // Série d'activité jour par jour (par défaut 7 jours), du plus ancien au plus récent.
@@ -328,4 +385,5 @@ function sanitizeEssayStats(raw) {
 }
 
 module.exports = { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
-  ESSAY_TYPES, essayTypeDef, countWords, essayWordCount, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats };
+  ESSAY_TYPES, essayTypeDef, countWords, essayWordCount, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
+  moduleMastery, MODULE_NAMES };

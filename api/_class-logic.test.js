@@ -2,7 +2,7 @@
 // Lancer : node --test api/_class-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary } = require('./_class-logic');
+const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary, moduleMastery, MODULE_NAMES } = require('./_class-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -62,6 +62,37 @@ test('dailySeries : répartit les sessions par jour sur 7 jours (ancien -> réce
   assert.equal(series[6].avgWpm, 45); // (40+50)/2
   assert.equal(series[4].sessions, 1); // il y a 2 jours : 1 session
   assert.equal(series.reduce((a, b) => a + b.sessions, 0), 3); // le test à -10j est exclu
+});
+
+test('studentSummary : série de jours consécutifs (streak)', () => {
+  const tests = [
+    { t: NOW, wpm: 40, acc: 90 },
+    { t: NOW - DAY, wpm: 35, acc: 88 },
+    { t: NOW - 2 * DAY, wpm: 30, acc: 85 },
+    { t: NOW - 5 * DAY, wpm: 20, acc: 80 }, // trop loin, hors de la série
+  ];
+  assert.equal(studentSummary({ tests }, NOW).streak, 3);
+});
+
+test('studentSummary : streak à 0 si le dernier test remonte à plusieurs jours', () => {
+  const tests = [{ t: NOW - 3 * DAY, wpm: 20, acc: 80 }];
+  assert.equal(studentSummary({ tests }, NOW).streak, 0);
+});
+
+test('moduleMastery : répartit les élèves par module (maîtrisé / en cours / pas commencé)', () => {
+  const students = [
+    { r1: { cleared: true }, r2: { cleared: true }, r3: { cleared: true }, r4: { cleared: true }, r5: { cleared: true }, r6: { cleared: true } }, // module 0 maîtrisé
+    { r1: { cleared: true }, r2: { cleared: true } }, // module 0 en cours
+    {}, // module 0 pas commencé
+  ];
+  const modules = moduleMastery(students);
+  assert.equal(modules.length, MODULE_NAMES.length);
+  const first = modules[0];
+  assert.equal(first.name, MODULE_NAMES[0]);
+  assert.equal(first.mastered, 1);
+  assert.equal(first.inProgress, 1);
+  assert.equal(first.behind, 1);
+  assert.equal(first.avgPct, 44); // (100 + 33.33 + 0) / 3 arrondi
 });
 
 test('canActAsTeacher : prof et admin oui, élève non', () => {

@@ -5119,12 +5119,31 @@ const app={
             <div style="padding:6px 4px">${classRows}</div>
           </div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 20px">
-            <div style="font-size:15px;font-weight:700;margin-bottom:6px">Alertes actionnables</div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:6px">Aujourd'hui</div>
+            <div id="today-devoirs"><div style="padding:10px 0;color:var(--muted);font-size:13px">Vérification des devoirs…</div></div>
             ${alertsHtml}
           </div>
         </div>
       </div>`;
+    this._loadTeacherToday();
   },
+
+  async _loadTeacherToday(){
+    let d;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'teacher-today',token:currentToken})});
+      if(!r.ok)return;
+      d=await r.json();
+    }catch{return;}
+    const el=document.getElementById('today-devoirs');
+    if(!el||this.view!=='home')return; // la page a changé entre-temps
+    const rows=[
+      ...d.ungradedItems.map(x=>`<div onclick="app.viewEssays('${x.assignmentId}')" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--txt)">${this._esc(x.title)}</div><div style="font-size:12px;color:var(--muted)">${this._esc(x.className)}</div></div><span style="font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px;background:rgba(255,77,46,0.1);color:var(--accent);white-space:nowrap">${x.count} à noter</span></div>`),
+      ...d.notSubmitted.map(x=>`<div onclick="app.viewClass('${this._classIdOf(x.className)||''}')" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--txt)">${this._esc(x.title)}</div><div style="font-size:12px;color:var(--muted)">${this._esc(x.className)}</div></div><span style="font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px;background:var(--light);color:var(--muted);white-space:nowrap">${x.missing} pas rendu${x.missing!==1?'s':''}</span></div>`),
+    ];
+    el.innerHTML=rows.length?rows.join(''):`<div style="padding:10px 0 16px;color:var(--muted);font-size:13px">Rien à corriger, tous les devoirs sont à jour.</div>`;
+  },
+  _classIdOf(name){return ((this.etab&&this.etab.classes)||[]).find(c=>c.name===name)?.id;},
 
   /* ── TYPING ── */
   renderTyping(){
@@ -10671,6 +10690,57 @@ const app={
     try{const ar=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-list',token:currentToken,classId:id})});if(ar.ok)asg=(await ar.json()).assignments||[];}catch{}
     if(this._classesSub!=='class'||this._classViewingId!==id)return;
     this._classAsg=asg;
+    const modules=d.modules||[];
+    const nStu=students.length||1;
+    const pathHtml=modules.length?`<div style="display:flex;gap:0;overflow-x:auto;padding:8px 2px 6px">
+      ${modules.map((m,i)=>{
+        const pct=m.avgPct;
+        const locked=pct===0;
+        const ringColor=pct>=100?'var(--success)':pct>0?'var(--warning)':'var(--border)';
+        const prevReached=i===0||modules[i-1].avgPct>0;
+        return `<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:86px;position:relative">
+          ${i>0?`<div style="position:absolute;top:23px;left:-43px;width:86px;height:2px;background:${prevReached?'var(--accent)':'var(--border)'};z-index:0"></div>`:''}
+          <div style="width:48px;height:48px;border-radius:50%;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;background:conic-gradient(${ringColor} ${Math.max(pct,pct>0?6:0)}%, var(--border) 0);flex-shrink:0">
+            <div style="width:39px;height:39px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center">
+              ${locked?`<span style="color:var(--muted);font-size:15px">${ICONS.lock}</span>`:pct>=100?`<span style="color:var(--success);font-size:17px;font-weight:800">✓</span>`:`<span style="font-size:11px;font-weight:700;color:var(--warning);font-family:'JetBrains Mono',monospace">${pct}%</span>`}
+            </div>
+          </div>
+          <div style="font-size:11px;text-align:center;margin-top:8px;font-weight:600;line-height:1.3;color:var(--txt)">${this._esc(m.name.replace(/^\d+\.\s*/,''))}</div>
+          <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:1px">${pct>=100?'Maîtrisé':pct>0?'En cours':'À venir'}</div>
+        </div>`;
+      }).join('')}
+    </div>`:'';
+    const skillBarsHtml=modules.filter(m=>m.avgPct>0).map(m=>{
+      const mPct=m.mastered/nStu*100,pPct=m.inProgress/nStu*100,bPct=m.behind/nStu*100;
+      return `<div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:13.5px;font-weight:600">${this._esc(m.name.replace(/^\d+\.\s*/,''))}</span>
+          <span style="font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace">${m.mastered} · ${m.inProgress} · ${m.behind}</span>
+        </div>
+        <div style="height:7px;border-radius:4px;background:var(--light);overflow:hidden;display:flex">
+          <span style="display:block;width:${mPct}%;background:var(--success)"></span>
+          <span style="display:block;width:${pPct}%;background:var(--warning)"></span>
+          <span style="display:block;width:${bPct}%;background:var(--danger);opacity:.6"></span>
+        </div>
+      </div>`;
+    }).join('');
+    const weak=d.weakestModule;
+    const skillsCard=modules.length?`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 22px;margin-bottom:24px">
+      <div style="font-size:15px;font-weight:700;margin-bottom:2px">Parcours de compétences</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:6px">Maîtrise moyenne de la classe, module par module.</div>
+      ${pathHtml}
+      ${skillBarsHtml?`<div style="margin-top:18px;padding-top:18px;border-top:1px solid var(--border)">
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px">Répartition par module <span style="font-family:'JetBrains Mono',monospace">(maîtrisé · en cours · pas commencé)</span></div>
+        ${skillBarsHtml}
+      </div>`:''}
+      ${weak?`<div style="margin-top:18px;background:var(--light);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:11px;font-weight:700;color:var(--warning);letter-spacing:.05em;margin-bottom:3px">POINT FAIBLE COLLECTIF</div>
+          <div style="font-size:13.5px">« ${this._esc(weak.name.replace(/^\d+\.\s*/,''))} » est en retard sur le reste de la classe <span style="color:var(--muted)">(${weak.avgPct}% de maîtrise en moyenne)</span>.</div>
+        </div>
+        <button onclick="app.openAssignModal('${d.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap">Assigner un exercice ciblé</button>
+      </div>`:''}
+    </div>`:'';
     const asgHtml=`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)">
         <div style="font-size:15px;font-weight:700">Devoirs</div>
@@ -10721,6 +10791,7 @@ const app={
           <button onclick="openImportModal('${d.id}')" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt);white-space:nowrap;flex-shrink:0"><span style="color:var(--accent)">${ICONS.clipboard}</span> Importer un CSV</button>
         </div>
 
+        ${skillsCard}
         ${asgHtml}
 
         ${students.length===0?`
@@ -10733,11 +10804,12 @@ const app={
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
             <div style="overflow-x:auto">
             <div style="min-width:600px">
-            <div style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px 16px;padding:10px 20px;border-bottom:1px solid var(--border)">
+            <div style="display:grid;grid-template-columns:1fr 90px 90px 70px 60px 120px 16px;padding:10px 20px;border-bottom:1px solid var(--border)">
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">ÉLÈVE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">VITESSE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">PRÉCISION</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center" title="Leçons et tests de vitesse confondus">SESSIONS</div>
+              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center" title="Jours consécutifs avec au moins un test">SÉRIE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:right">DERNIÈRE ACTIVITÉ</div>
               <div></div>
             </div>
@@ -10746,11 +10818,12 @@ const app={
               const accColor=st.avgAcc==null?'var(--muted)':st.avgAcc>=95?'var(--success)':st.avgAcc>=80?'var(--txt)':'var(--danger)';
               const last=st.daysSinceActive==null?'jamais':st.daysSinceActive===0?"aujourd'hui":st.daysSinceActive===1?'hier':'il y a '+st.daysSinceActive+' j';
               const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'var(--warning)':'var(--muted)';
-              return`<div onclick="app.viewStudent('${d.id}','${st.studentId}')" style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px 16px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
+              return`<div onclick="app.viewStudent('${d.id}','${st.studentId}')" style="display:grid;grid-template-columns:1fr 90px 90px 70px 60px 120px 16px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
                 <div><div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">${st.username}${st.alertStuck?`<span style="font-size:10.5px;font-weight:700;color:var(--danger);background:rgba(229,72,77,0.1);padding:1px 7px;border-radius:99px">⚠ bloqué</span>`:st.alertInactive?`<span style="font-size:10.5px;font-weight:700;color:var(--warning);background:rgba(229,114,43,0.1);padding:1px 7px;border-radius:99px">⚠ inactif</span>`:''}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${st.clearedLessons} leçon${st.clearedLessons!==1?'s':''} validée${st.clearedLessons!==1?'s':''}</div></div>
                 <div style="text-align:center;font-size:16px;font-weight:800;color:${wpmColor}">${st.avgWpm!=null?st.avgWpm:'-'}</div>
                 <div style="text-align:center;font-size:16px;font-weight:800;color:${accColor}">${st.avgAcc!=null?st.avgAcc+'%':'-'}</div>
                 <div style="text-align:center;font-size:14px;color:var(--muted);font-weight:600">${st.sessions||'-'}</div>
+                <div style="text-align:center;font-size:13px;font-weight:700;color:${st.streak?'var(--accent)':'var(--muted)'};display:flex;align-items:center;justify-content:center;gap:3px">${st.streak?ICONS.flame:''}${st.streak||'-'}</div>
                 <div style="text-align:right;font-size:13px;font-weight:600;color:${lastColor}">${last}</div>
                 <div style="text-align:right;color:var(--muted);font-size:14px">›</div>
               </div>`;

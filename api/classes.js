@@ -1,7 +1,8 @@
 // API établissement (Phase 0) : routeur d'actions sur les tables classes/class_members.
 // Tout passe par la clé service (RLS deny-anon). Logique pure dans _class-logic.
 const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary,
-  essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats } = require('./_class-logic');
+  essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
+  moduleMastery } = require('./_class-logic');
 const { hashPassword } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
 
@@ -224,7 +225,16 @@ async function classDetail(req, res) {
     }))
     // Élèves à surveiller en premier (bloqué avant inactif), le reste garde son ordre.
     .sort((a, b) => alertRank(a) - alertRank(b));
-  return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now) });
+
+  // Maîtrise par module (curriculum) sur l'ensemble de la classe, et le
+  // "point faible collectif" — le module le moins maîtrisé parmi ceux que la
+  // classe a réellement entamés (on exclut les modules à 0%, pas encore
+  // atteints, qui ne sont pas un point faible mais juste "pas encore vu").
+  const modules = moduleMastery(datas.map((d) => d.lessons));
+  const started = modules.filter((m) => m.avgPct > 0 && m.avgPct < 100);
+  const weakest = started.length ? started.reduce((a, b) => (b.avgPct < a.avgPct ? b : a)) : null;
+
+  return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now), modules, weakestModule: weakest });
 }
 function alertRank(s) { return s.alertStuck ? 0 : s.alertInactive ? 1 : 2; }
 
@@ -541,6 +551,53 @@ async function assignmentList(req, res) {
     doneCount: members.filter((m) => assignmentDone(pmap[m.student_id] || {}, a)).length,
   }));
   return res.json({ assignments: out });
+}
+
+// "Aujourd'hui" : ce qui mérite l'attention du prof, agrégé sur toutes ses
+// classes (les alertes inactif/bloqué existent déjà par classe côté client
+// via teacher-overview — pas besoin de les recalculer ici, seulement ce qui
+// concerne les devoirs : copies non notées et élèves n'ayant pas rendu).
+async function teacherToday(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  const filter = user.role === 'admin' && user.institution_id
+    ? `institution_id=eq.${user.institution_id}`
+    : `teacher_id=eq.${user.id}`;
+  const clsR = await sb(`/classes?${filter}&archived=eq.false&select=id,name`);
+  const classes = Array.isArray(clsR.data) ? clsR.data : [];
+
+  const notSubmitted = [];
+  const ungradedItems = [];
+  let ungradedCount = 0;
+
+  for (const cls of classes) {
+    const members = await membersOf(cls.id);
+    if (!members.length) continue;
+    const total = members.length;
+    const aR = await sb(`/assignments?class_id=eq.${cls.id}&select=*`);
+    const assignments = Array.isArray(aR.data) ? aR.data : [];
+    if (!assignments.length) continue;
+    let pmap = null;
+    for (const a of assignments) {
+      if (a.mode === 'essay') {
+        const sR = await sb(`/essay_submissions?assignment_id=eq.${a.id}&select=teacher_comment,teacher_grade`);
+        const subs = Array.isArray(sR.data) ? sR.data : [];
+        const ungraded = subs.filter((s) => !s.teacher_comment && !s.teacher_grade).length;
+        if (ungraded > 0) { ungradedItems.push({ assignmentId: a.id, title: a.title, className: cls.name, count: ungraded }); ungradedCount += ungraded; }
+        const missing = total - subs.length;
+        if (missing > 0) notSubmitted.push({ assignmentId: a.id, title: a.title, className: cls.name, missing });
+      } else {
+        if (!pmap) pmap = await fetchProgressMap(members.map((m) => m.student_id));
+        const doneCount = members.filter((m) => assignmentDone(pmap[m.student_id] || {}, a)).length;
+        const missing = total - doneCount;
+        if (missing > 0) notSubmitted.push({ assignmentId: a.id, title: a.title, className: cls.name, missing });
+      }
+    }
+  }
+  notSubmitted.sort((a, b) => b.missing - a.missing);
+  ungradedItems.sort((a, b) => b.count - a.count);
+  return res.json({ ungradedCount, ungradedItems: ungradedItems.slice(0, 6), notSubmitted: notSubmitted.slice(0, 6) });
 }
 
 // Détail par élève d'un devoir NON-essai (les essais ont déjà essayList/essayDetail,
@@ -1189,6 +1246,7 @@ module.exports = async function handler(req, res) {
   try {
     switch (action) {
       case 'teacher-overview': return await teacherOverview(req, res);
+      case 'teacher-today': return await teacherToday(req, res);
       case 'class-create': return await classCreate(req, res);
       case 'class-rename': return await classRename(req, res);
       case 'class-archive': return await classArchive(req, res);
