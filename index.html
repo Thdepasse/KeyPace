@@ -259,7 +259,7 @@
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA;--danger:#E5484D;--success:#1FA971}
+:root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA;--danger:#E5484D;--success:#1FA971;--warning:#E5722B}
 body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',Arial,sans-serif;color:var(--txt);min-height:100vh;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 /* ── Célébration de fin de leçon : clavier popup, les touches travaillées explosent ── */
 .cel-overlay{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(22,20,15,.5);backdrop-filter:blur(6px);animation:cel-fade .25s ease}
@@ -3921,6 +3921,10 @@ const app={
       ${fields}
       <div id="essay-err" style="color:#E5484D;font-size:13px;margin:0 0 12px;display:none"></div>
       ${sub?`<div style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Dernier envoi : ${new Date(sub.updatedAt).toLocaleString('fr-FR')} · ${sub.words} mots. Tu peux corriger et renvoyer.</div>`:''}
+      ${sub&&(sub.teacherComment||sub.teacherGrade)?`<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;padding:14px 16px;margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">RETOUR DU PROF${sub.teacherGrade?' · '+this._esc(sub.teacherGrade):''}</div>
+        ${sub.teacherComment?`<div style="font-size:14px;line-height:1.65;white-space:pre-wrap">${this._esc(sub.teacherComment)}</div>`:''}
+      </div>`:''}
       <div style="position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 22%);padding:18px 0 0;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
         <div id="essay-count" style="font-size:13px;font-weight:700;color:var(--muted);font-family:'JetBrains Mono',monospace"></div>
         <div style="flex:1"></div>
@@ -4035,8 +4039,12 @@ const app={
     }
     const a=d.assignment;
     const def=this._essayTypes[a.essayType]||this._essayTypes.note;
-    const badge=(s)=>s==='high'?'<span style="font-size:11px;font-weight:700;color:#E5484D;background:rgba(229,72,77,.1);padding:3px 8px;border-radius:6px;white-space:nowrap">⚠ à vérifier</span>'
-      :s==='low'?'<span style="font-size:11px;font-weight:700;color:#E5722B;background:rgba(229,114,43,.1);padding:3px 8px;border-radius:6px;white-space:nowrap">à regarder</span>':'';
+    const badge=(r)=>{
+      const why=(r.flags||[]).map(f=>f.label).join(' · ');
+      if(r.suspicion==='high')return `<span title="${this._esc(why)}" style="font-size:11px;font-weight:700;color:#E5484D;background:rgba(229,72,77,.1);padding:3px 8px;border-radius:6px;white-space:nowrap;cursor:help">⚠ à vérifier</span>`;
+      if(r.suspicion==='low')return `<span title="${this._esc(why)}" style="font-size:11px;font-weight:700;color:#E5722B;background:rgba(229,114,43,.1);padding:3px 8px;border-radius:6px;white-space:nowrap;cursor:help">à regarder</span>`;
+      return '';
+    };
     ov.innerHTML=`<div style="max-width:900px;margin:0 auto;padding:28px 20px 80px">
       <button onclick="app.closeEssays()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 16px;display:flex;align-items:center;gap:5px">‹ Retour à la classe</button>
       <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:8px">
@@ -4051,10 +4059,10 @@ const app={
         ${d.rows.map(r=>r.submitted?`
           <div onclick="app.viewEssayDetail('${a.id}','${r.studentId}')" style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background=''">
             <div style="flex:1;min-width:0">
-              <div style="font-weight:600;font-size:14px">${this._esc(r.username)}</div>
+              <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">${this._esc(r.username)}${r.hasFeedback?'<span style="font-size:10.5px;font-weight:700;color:var(--success);background:rgba(31,169,113,.1);padding:1px 7px;border-radius:99px">✓ noté</span>':''}</div>
               <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${r.words} mots · ${new Date(r.updatedAt).toLocaleDateString('fr-FR')}</div>
             </div>
-            ${badge(r.suspicion)}
+            ${badge(r)}
             <div style="color:var(--muted);font-size:14px">›</div>
           </div>`:`
           <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);opacity:.55">
@@ -4106,8 +4114,32 @@ const app={
       }).join('')}
 
       <button onclick="app._essayCopy('${assignmentId}','${studentId}')" style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px 18px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)">${ICONS.clipboard} Copier le texte</button>
+
+      <div style="margin-top:28px;padding-top:22px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:10px">RETOUR À L'ÉLÈVE</div>
+        <input id="essay-fb-grade" placeholder="Note (optionnel), ex. 15/20" value="${this._esc(s.teacherGrade||'')}" style="width:180px;margin-bottom:10px;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font:inherit;font-size:13px;background:var(--card);box-sizing:border-box;color:var(--txt)">
+        <textarea id="essay-fb-comment" rows="3" placeholder="Un commentaire pour l'élève…" style="width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font:inherit;font-size:13.5px;background:var(--card);box-sizing:border-box;color:var(--txt);resize:vertical;min-height:70px;line-height:1.5">${this._esc(s.teacherComment||'')}</textarea>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+          <button onclick="app._essaySaveFeedback('${assignmentId}','${studentId}')" id="essay-fb-save" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 18px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">Enregistrer</button>
+          <span id="essay-fb-status" style="font-size:12.5px;color:var(--muted)"></span>
+        </div>
+      </div>
     </div>`;
     this._essayLast=d;
+  },
+
+  async _essaySaveFeedback(assignmentId,studentId){
+    const btn=document.getElementById('essay-fb-save');
+    const statusEl=document.getElementById('essay-fb-status');
+    const grade=document.getElementById('essay-fb-grade').value;
+    const comment=document.getElementById('essay-fb-comment').value;
+    btn.disabled=true;btn.textContent='…';
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'essay-feedback',token:currentToken,assignmentId,studentId,grade,comment})});
+      if(!r.ok){const d=await r.json();statusEl.textContent=d.error||'Erreur.';statusEl.style.color='#E5484D';return;}
+      statusEl.textContent='✓ Enregistré';statusEl.style.color='var(--muted)';
+    }catch{statusEl.textContent='Erreur réseau.';statusEl.style.color='#E5484D';}
+    finally{btn.disabled=false;btn.textContent='Enregistrer';}
   },
 
   _essayCopy(){
@@ -10464,7 +10496,7 @@ const app={
     document.getElementById('page-classes').innerHTML=`<div class="stats-section">
       <div class="stats-header" style="padding-bottom:32px">
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
-          <div><h1 style="margin-bottom:4px">Gestion de classes</h1><p style="margin:0">Suis les performances de tes élèves par classe.</p></div>
+          <div><h1 style="margin-bottom:4px">Gestion de classes</h1><p style="margin:0">Suis les performances de tes élèves par classe. <a href="#" onclick="event.preventDefault();app.viewArchivedClasses()" style="color:var(--muted);text-decoration:underline">Classes archivées</a></p></div>
           <button class="btn-primary" style="padding:10px 20px;font-size:14px;white-space:nowrap" onclick="app.createClass()">+ Nouvelle classe</button>
         </div>
       </div>
@@ -10512,12 +10544,56 @@ const app={
     }catch{alert('Erreur réseau.');}
   },
 
+  async renameClass(id,currentName){
+    const name=await promptModal({icon:ICONS.pencil,title:'Renommer la classe',placeholder:currentName,value:currentName,confirmText:'Renommer'});
+    if(!name||name.trim()===currentName)return;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-rename',token:currentToken,classId:id,name:name.trim()})});
+      if(!r.ok){const d=await r.json();alert(d.error||'Erreur.');return;}
+      await this.loadEtab(true);
+      if(this._classesSub==='class'&&this._classViewingId===id)this.viewClass(id);
+    }catch{alert('Erreur réseau.');}
+  },
+
   async deleteClass(id){
     const cls=((this.etab&&this.etab.classes)||[]).find(c=>c.id===id);
     const name=cls?cls.name:'';
-    if(!confirm('Archiver la classe « '+name+' » ? Les élèves ne pourront plus la rejoindre.'))return;
+    if(!await confirmModal({icon:ICONS.school,title:'Archiver la classe ?',body:'Les élèves de « '+name+' » ne pourront plus la rejoindre, mais tu pourras la restaurer à tout moment depuis « Classes archivées ».',confirmText:'Archiver',danger:true}))return;
     try{
       await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-archive',token:currentToken,classId:id})});
+      await this.loadEtab(true);
+      this.renderClasses();
+    }catch{alert('Erreur réseau.');}
+  },
+
+  async viewArchivedClasses(){
+    const pageId='page-classes';
+    document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
+    let classes=[];
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'archived-classes',token:currentToken})});
+      const d=await r.json();
+      if(r.ok)classes=d.classes||[];
+    }catch{}
+    document.getElementById(pageId).innerHTML=`<div class="stats-section">
+      <div class="stats-header" style="padding-bottom:24px">
+        <button onclick="app.renderClasses()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Retour aux classes</button>
+        <h1 style="margin-bottom:4px">Classes archivées</h1><p style="margin:0">Une classe archivée n'est plus visible ni rejoignable par tes élèves, mais rien n'est perdu.</p>
+      </div>
+      <div style="max-width:900px;padding-bottom:60px">
+        ${classes.length===0?`<div style="text-align:center;padding:60px 20px;color:var(--muted)">Aucune classe archivée.</div>`:`<div style="display:flex;flex-direction:column;gap:10px">
+          ${classes.map(c=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:14px">
+            <div style="flex:1;font-size:15px;font-weight:700;color:var(--txt)">${this._esc(c.name)}</div>
+            <button onclick="app.restoreClass('${c.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer">Restaurer</button>
+          </div>`).join('')}
+        </div>`}
+      </div></div>`;
+  },
+
+  async restoreClass(id){
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-restore',token:currentToken,classId:id})});
+      if(!r.ok){const d=await r.json();alert(d.error||'Erreur.');return;}
       await this.loadEtab(true);
       this.renderClasses();
     }catch{alert('Erreur réseau.');}
@@ -10563,11 +10639,11 @@ const app={
         return`<div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border)">
           <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.targetWpm?('Objectif '+a.targetWpm+' mpm · '):''}${due?('Échéance '+due):'Sans échéance'}</div></div>
           <div style="min-width:130px;text-align:right">
-            <div style="font-size:13px;font-weight:700;color:${pct>=100?'#1FA971':'var(--txt)'}">${a.doneCount}/${a.total} terminé${a.doneCount>1?'s':''}</div>
-            <div style="height:6px;background:var(--light);border-radius:4px;margin-top:5px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct>=100?'#1FA971':'var(--accent)'}"></div></div>
+            <div style="font-size:13px;font-weight:700;color:${pct>=100?'var(--success)':'var(--txt)'}">${a.doneCount}/${a.total} terminé${a.doneCount>1?'s':''}</div>
+            <div style="height:6px;background:var(--light);border-radius:4px;margin-top:5px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct>=100?'var(--success)':'var(--accent)'}"></div></div>
           </div>
           ${a.mode==='essay'?`<button onclick="app.viewEssays('${a.id}')" style="background:var(--light);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--txt);white-space:nowrap;margin-right:4px"><span style="color:var(--accent)">${ICONS.fileText}</span> Voir les copies</button>`:''}
-          <button onclick="app.deleteAssignment('${a.id}','${d.id}')" title="Supprimer" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;opacity:.6" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
+          <button onclick="app.deleteAssignment('${a.id}','${d.id}')" title="Supprimer" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;opacity:.6" onmouseenter="this.style.opacity='1';this.style.color='var(--danger)'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
         </div>`;
       }).join('')}
     </div>`;
@@ -10575,7 +10651,7 @@ const app={
       <div class="stats-header" style="padding-bottom:24px">
         <button onclick="app.backFromClass()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">${isAdmin()?'‹ Retour':'← Toutes les classes'}</button>
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
-          <div><h1 style="margin-bottom:4px">${d.name}</h1><p style="margin:0">${students.length} élève${students.length!==1?'s':''}</p></div>
+          <div><h1 style="margin-bottom:4px;display:flex;align-items:center;gap:10px">${d.name}<button onclick="app.renameClass('${d.id}','${this._esc(d.name).replace(/'/g,"\\'")}')" title="Renommer la classe" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:2px" onmouseenter="this.style.color='var(--accent)'" onmouseleave="this.style.color='var(--muted)'">${ICONS.pencil}</button></h1><p style="margin:0">${students.length} élève${students.length!==1?'s':''}</p></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button onclick="app.exportClassCSV()" ${students.length?'':'disabled'} style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:${students.length?'pointer':'not-allowed'};color:var(--txt);opacity:${students.length?'1':'.5'}">⬇ CSV</button>
             <button onclick="app.exportClassPDF()" ${students.length?'':'disabled'} style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:${students.length?'pointer':'not-allowed'};color:var(--txt);opacity:${students.length?'1':'.5'}">⬇ PDF</button>
@@ -10625,9 +10701,9 @@ const app={
               const wpmColor=st.avgWpm==null?'var(--muted)':st.avgWpm>=50?'var(--success)':st.avgWpm>=30?'var(--txt)':'var(--danger)';
               const accColor=st.avgAcc==null?'var(--muted)':st.avgAcc>=95?'var(--success)':st.avgAcc>=80?'var(--txt)':'var(--danger)';
               const last=st.daysSinceActive==null?'jamais':st.daysSinceActive===0?"aujourd'hui":st.daysSinceActive===1?'hier':'il y a '+st.daysSinceActive+' j';
-              const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'#E5722B':'var(--muted)';
+              const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'var(--warning)':'var(--muted)';
               return`<div onclick="app.viewStudent('${d.id}','${st.studentId}')" style="display:grid;grid-template-columns:1fr 90px 90px 70px 120px 16px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
-                <div><div style="font-weight:600;font-size:14px">${st.username}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${st.clearedLessons} leçon${st.clearedLessons!==1?'s':''} validée${st.clearedLessons!==1?'s':''}</div></div>
+                <div><div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">${st.username}${st.alertStuck?`<span style="font-size:10.5px;font-weight:700;color:var(--danger);background:rgba(229,72,77,0.1);padding:1px 7px;border-radius:99px">⚠ bloqué</span>`:st.alertInactive?`<span style="font-size:10.5px;font-weight:700;color:var(--warning);background:rgba(229,114,43,0.1);padding:1px 7px;border-radius:99px">⚠ inactif</span>`:''}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${st.clearedLessons} leçon${st.clearedLessons!==1?'s':''} validée${st.clearedLessons!==1?'s':''}</div></div>
                 <div style="text-align:center;font-size:16px;font-weight:800;color:${wpmColor}">${st.avgWpm!=null?st.avgWpm:'-'}</div>
                 <div style="text-align:center;font-size:16px;font-weight:800;color:${accColor}">${st.avgAcc!=null?st.avgAcc+'%':'-'}</div>
                 <div style="text-align:center;font-size:14px;color:var(--muted);font-weight:600">${st.sessions||'-'}</div>
@@ -10657,6 +10733,7 @@ const app={
     errEl.style.display='none';
     const lines=ta.value.split('\n').map(l=>l.trim()).filter(Boolean);
     if(!lines.length){errEl.textContent='Colle au moins une ligne.';errEl.style.display='block';return;}
+    if(lines.length>200){errEl.textContent=`${lines.length} lignes collées, mais 200 maximum par import. Retire les lignes en trop et refais un second import pour le reste.`;errEl.style.display='block';return;}
     const students=lines.map(l=>{const [username,email]=l.split(',').map(s=>(s||'').trim());return{username,email};});
     btn.disabled=true;btn.textContent='Import en cours…';
     try{
@@ -10667,6 +10744,7 @@ const app={
       const rest=d.results.filter(x=>x.status!=='created');
       const list=created.map(x=>x.username+' / '+x.tempPassword).join('\n');
       resEl.innerHTML=`
+        ${d.truncatedCount?`<div style="background:var(--light);border-radius:10px;padding:10px 12px;font-size:12.5px;margin-bottom:10px">⚠ ${d.truncatedCount} ligne${d.truncatedCount!==1?'s':''} au-delà de la 200e n'${d.truncatedCount!==1?'ont':'a'} pas été importée${d.truncatedCount!==1?'s':''}. Refais un import avec le reste.</div>`:''}
         <div style="font-size:13px;font-weight:700;margin-bottom:8px">${created.length} compte${created.length!==1?'s':''} créé${created.length!==1?'s':''}${rest.length?(' · '+rest.length+' ignoré'+(rest.length!==1?'s':'')):''}</div>
         ${created.length?`<div style="background:var(--light);border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;white-space:pre-wrap;max-height:160px;overflow-y:auto">${this._esc(list)}</div>
         <button id="imp-copy-list" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:9px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer">Copier la liste (identifiant / mot de passe)</button>
@@ -10854,6 +10932,24 @@ const app={
     if(type==='essay')app._asgEssayTypeChange();
   },
 
+  // Upload l'enregistrement en attente (this._asgRecBlob), si besoin — partagé
+  // entre le devoir classique en mode Vocal et l'essai de type Transcription,
+  // qui utilisent tous les deux le même enregistreur.
+  async _asgUploadPendingAudio(){
+    if(this._asgAudioUrl)return{ok:true,url:this._asgAudioUrl};
+    if(!this._asgRecBlob)return{ok:true,url:null};
+    try{
+      const ab=await this._asgRecBlob.arrayBuffer();
+      const b64=btoa(String.fromCharCode(...new Uint8Array(ab)));
+      const upR=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'audio-upload',token:currentToken,audioBase64:b64,mimeType:this._asgRecBlob.type||'audio/webm',prevPath:this._asgPrevStoragePath||null})});
+      const upD=await upR.json();
+      if(!upR.ok)return{ok:false,error:upD.error||'Erreur upload audio.'};
+      this._asgAudioUrl=upD.audioUrl;
+      this._asgPrevStoragePath=upD.storagePath;
+      return{ok:true,url:this._asgAudioUrl};
+    }catch{return{ok:false,error:'Erreur réseau lors de l\'upload audio.'};}
+  },
+
   async createAssignment(classId){
     const type=document.getElementById('asg-type').value;
     const wpm=document.getElementById('asg-wpm').value;
@@ -10878,16 +10974,9 @@ const app={
     let audioUrl=this._asgAudioUrl||null;
     if(mode==='vocal'&&this._asgRecBlob&&!audioUrl){
       btn.textContent='Upload audio…';
-      try{
-        const ab=await this._asgRecBlob.arrayBuffer();
-        const b64=btoa(String.fromCharCode(...new Uint8Array(ab)));
-        const upR=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'audio-upload',token:currentToken,audioBase64:b64,mimeType:this._asgRecBlob.type||'audio/webm',prevPath:this._asgPrevStoragePath||null})});
-        const upD=await upR.json();
-        if(!upR.ok){btn.disabled=false;btn.textContent='Assigner';fail(upD.error||'Erreur upload audio.');return;}
-        audioUrl=upD.audioUrl;
-        this._asgAudioUrl=audioUrl;
-        this._asgPrevStoragePath=upD.storagePath;
-      }catch{btn.disabled=false;btn.textContent='Assigner';fail('Erreur réseau lors de l\'upload audio.');return;}
+      const up=await this._asgUploadPendingAudio();
+      if(!up.ok){btn.disabled=false;btn.textContent='Assigner';fail(up.error);return;}
+      audioUrl=up.url;
       btn.textContent='…';
     }
     try{
@@ -10908,11 +10997,20 @@ const app={
     if(!title)return fail('Donne un titre au devoir.');
     if(min&&max&&parseInt(min,10)>parseInt(max,10))return fail('Le minimum de mots dépasse le maximum.');
     const btn=document.getElementById('asg-save');btn.disabled=true;btn.textContent='…';
+    // Upload audio si un enregistrement est en attente (type Transcription).
+    let audioUrl=this._asgAudioUrl||null;
+    if(essayType==='transcription'&&this._asgRecBlob&&!audioUrl){
+      btn.textContent='Upload audio…';
+      const up=await this._asgUploadPendingAudio();
+      if(!up.ok){btn.disabled=false;btn.textContent='Assigner le devoir';return fail(up.error);}
+      audioUrl=up.url;
+      btn.textContent='…';
+    }
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
         action:'assignment-create',token:currentToken,classId,title,mode:'essay',
         essayType,essayBrief:brief||null,minWords:min||null,maxWords:max||null,
-        dueDate:due||null,audioUrl:this._asgAudioUrl||null,
+        dueDate:due||null,audioUrl,
       })});
       const d=await r.json();
       if(!r.ok){btn.disabled=false;btn.textContent='Assigner le devoir';return fail(d.error||'Erreur.');}
@@ -10922,7 +11020,7 @@ const app={
   },
 
   async deleteAssignment(id,classId){
-    if(!confirm('Supprimer ce devoir ?'))return;
+    if(!await confirmModal({icon:ICONS.fileText,title:'Supprimer ce devoir ?',body:'Cette action est définitive. Les copies déjà rendues seront perdues.',confirmText:'Supprimer',danger:true}))return;
     try{await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-delete',token:currentToken,assignmentId:id})});}catch{}
     this.viewClass(classId);
   },
@@ -10989,7 +11087,7 @@ const app={
 
   async adminDeleteStudent(studentId){
     const name=(this._sd&&this._sd.username)||'cet élève';
-    if(!confirm('Supprimer définitivement '+name+' et toutes ses données ? Cette action est irréversible (RGPD).'))return;
+    if(!await confirmModal({icon:ICONS.shield,title:'Supprimer cet élève ?',body:'Supprime définitivement '+name+' et toutes ses données. Cette action est irréversible (RGPD).',confirmText:'Supprimer définitivement',danger:true}))return;
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'admin-delete-student',token:currentToken,studentId})});
       const d=await r.json();
@@ -11000,6 +11098,16 @@ const app={
     }catch(e){alert(e.message||'Suppression impossible.');}
   },
 
+  async removeStudentFromClass(classId,studentId,name){
+    if(!await confirmModal({icon:ICONS.user,title:'Retirer de la classe ?',body:'Retire '+name+' de cette classe. Son compte et sa progression restent intacts : il pourra rejoindre à nouveau avec le code de classe.',confirmText:'Retirer'}))return;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-remove-student',token:currentToken,classId,studentId})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+      this.viewClass(classId);
+    }catch(e){alert(e.message||'Erreur réseau.');}
+  },
+
   _renderSD(){
     const pageId='page-classes';
     const d=this._sd;if(!d)return;
@@ -11007,7 +11115,7 @@ const app={
     const f=this._sdFilter||'all';
     const allHist=d.history||[];
     const hist=(f==='all'?allHist:allHist.filter(t=>f==='lesson'?t.mode==='lesson':(t.mode==='test'||!t.mode))).slice(-20);
-    const accColor=s.avgAcc!=null&&s.avgAcc>=90?'#1FA971':(s.avgAcc!=null&&s.avgAcc<75?'#E5484D':'var(--txt)');
+    const accColor=s.avgAcc!=null&&s.avgAcc>=90?'var(--success)':(s.avgAcc!=null&&s.avgAcc<75?'var(--danger)':'var(--txt)');
     const last=s.daysSinceActive==null?'jamais':s.daysSinceActive===0?"aujourd'hui":s.daysSinceActive===1?'hier':'il y a '+s.daysSinceActive+' j';
     const card=(label,val,unit,valColor)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">${label}</div><div style="font-size:26px;font-weight:800;color:${valColor||'var(--txt)'}">${val}<span style="font-size:13px;color:var(--muted);font-weight:500">${unit||''}</span></div></div>`;
     const maxW=Math.max(20,...hist.map(t=>t.wpm||0));
@@ -11027,7 +11135,7 @@ const app={
         <button onclick="app.viewClass('${d.classId}')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Retour à la classe</button>
         <h1 style="margin-bottom:4px">${d.username}</h1>
         <p style="margin:0">Inscrit le ${d.joinedAt?new Date(d.joinedAt).toLocaleDateString('fr-FR'):'-'} · dernière activité : ${last}</p>
-        ${isAdmin()?`<button onclick="app.adminDeleteStudent('${d.studentId}')" style="margin-top:12px;background:none;border:1px solid #E5484D;color:#E5484D;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Supprimer cet élève (RGPD)</button>`:''}
+        ${isAdmin()?`<button onclick="app.adminDeleteStudent('${d.studentId}')" style="margin-top:12px;background:none;border:1px solid var(--danger);color:var(--danger);border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Supprimer cet élève (RGPD)</button>`:`<button onclick="app.removeStudentFromClass('${d.classId}','${d.studentId}','${this._esc(d.username).replace(/'/g,"\\'")}')" style="margin-top:12px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Retirer de la classe</button>`}
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px">
@@ -11306,14 +11414,14 @@ const app={
   },
 
   async revokeInvite(id){
-    if(!confirm('Révoquer cette invitation ? Le lien ne fonctionnera plus.'))return;
+    if(!await confirmModal({icon:ICONS.key,title:'Révoquer cette invitation ?',body:'Le lien ne fonctionnera plus.',confirmText:'Révoquer',danger:true}))return;
     try{await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'prof-invite-revoke',token:currentToken,inviteId:id})});}catch{}
     this.renderInstitution();
   },
 
   async archiveProf(profId){
     const p=((this.admin&&this.admin.profs)||[]).find(x=>x.profId===profId);
-    if(!confirm('Retirer '+((p&&p.username)||'ce professeur')+' de ton établissement ? Ses classes seront conservées mais il n\'apparaîtra plus ici.'))return;
+    if(!await confirmModal({icon:ICONS.user,title:'Retirer ce professeur ?',body:'Retire '+((p&&p.username)||'ce professeur')+' de ton établissement. Ses classes seront conservées mais il n\'apparaîtra plus ici.',confirmText:'Retirer',danger:true}))return;
     try{await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'prof-archive',token:currentToken,profId})});}catch{}
     await this.loadAdmin(true);
     this.renderInstitution();
@@ -11356,65 +11464,38 @@ function handleDuelReturn(){
 
 /* ── INIT ── */
 function go(view){closeNavMenu();app.renderView(view);}
-async function handleClassJoin(){
-  const joinParam=new URLSearchParams(location.search).get('join');
-  if(!joinParam)return;
-  // Nettoyer l'URL
-  history.replaceState(null,'',location.pathname);
-  const parts=joinParam.split('_');
-  if(parts.length<3)return;
-  const teacherUserId=parts[0];
-  const classIdx=parseInt(parts[1]);
-  const inviteToken=parts.slice(2).join('_');
-  // Afficher la modale de confirmation (avec connexion si nécessaire)
-  const doJoin=async()=>{
-    if(!currentToken){return;}
-    const overlay=document.createElement('div');
-    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center';
-    overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:90%;text-align:center">
-      <div style="font-size:40px;margin-bottom:12px;color:var(--accent)">${ICONS.school}</div>
-      <h2 style="margin:0 0 8px;font-size:20px">Rejoindre une classe</h2>
-      <p style="color:var(--muted);font-size:14px;margin:0 0 24px" id="join-class-name">Vérification en cours…</p>
-      <div id="join-actions" style="display:none;gap:10px;flex-direction:column">
-        <button id="join-confirm-btn" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;width:100%">Rejoindre la classe</button>
-        <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px;cursor:pointer;width:100%">Annuler</button>
-      </div>
-      <div id="join-error" style="color:#E5484D;font-size:13px;margin-top:12px;display:none"></div>
-    </div>`;
-    document.body.appendChild(overlay);
-    // Vérifier le lien
-    try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join',studentToken:currentToken,teacherUserId,classIdx,inviteToken,preview:true})});
-      const d=await r.json();
-      if(!r.ok){document.getElementById('join-class-name').textContent=d.error||'Lien invalide.';document.getElementById('join-error').style.display='block';return;}
-      document.getElementById('join-class-name').textContent=`Tu vas rejoindre la classe "${d.className}".`;
-      const actions=document.getElementById('join-actions');actions.style.display='flex';
-      document.getElementById('join-confirm-btn').onclick=async()=>{
-        const btn=document.getElementById('join-confirm-btn');btn.disabled=true;btn.textContent='En cours…';
-        const r2=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'join',studentToken:currentToken,teacherUserId,classIdx,inviteToken})});
-        const d2=await r2.json();
-        if(!r2.ok){btn.disabled=false;btn.textContent='Rejoindre';document.getElementById('join-error').textContent=d2.error||'Erreur.';document.getElementById('join-error').style.display='block';return;}
-        overlay.querySelector('div').innerHTML=`<div style="font-size:40px;margin-bottom:12px">✓</div><h2 style="margin:0 0 8px">Tu as rejoint la classe !</h2><p style="color:var(--muted);font-size:14px;margin:0 0 24px">Ta progression sera visible par ton professeur.</p><button onclick="this.closest('[style*=fixed]').remove()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer">Continuer</button>`;
-      };
-    }catch{document.getElementById('join-class-name').textContent='Erreur réseau.';document.getElementById('join-error').style.display='block';}
-  };
-  if(currentUser){doJoin();}
-  else{
-    // Demander connexion d'abord, puis rejoindre
-    openAuth('login','Connecte-toi pour rejoindre la classe.',()=>{doJoin();});
-  }
-}
 
 // Petit modal de saisie stylé, remplace les prompt() natifs (créer/rejoindre
 // une classe) qui détonnaient visuellement avec le reste du produit.
-function promptModal({icon,title,placeholder,confirmText}){
+function confirmModal({icon,title,body,confirmText='Confirmer',cancelText='Annuler',danger=false}){
+  return new Promise(resolve=>{
+    const overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
+    overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:100%;text-align:center">
+      ${icon?`<div style="font-size:40px;margin-bottom:12px;color:${danger?'var(--danger)':'var(--accent)'}">${icon}</div>`:''}
+      <h2 style="margin:0 0 10px;font-size:19px;font-family:'Bricolage Grotesque',sans-serif">${title}</h2>
+      <p style="margin:0 0 22px;font-size:14px;color:var(--muted);line-height:1.55">${body}</p>
+      <div style="display:flex;gap:10px;flex-direction:column">
+        <button id="cm-confirm" style="background:${danger?'var(--danger)':'var(--accent)'};color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;width:100%">${confirmText}</button>
+        <button id="cm-cancel" style="background:none;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px;cursor:pointer;width:100%">${cancelText}</button>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    function close(v){overlay.remove();document.removeEventListener('keydown',onKey);resolve(v);}
+    function onKey(e){if(e.key==='Escape')close(false);}
+    document.addEventListener('keydown',onKey);
+    overlay.querySelector('#cm-cancel').onclick=()=>close(false);
+    overlay.querySelector('#cm-confirm').onclick=()=>close(true);
+  });
+}
+function promptModal({icon,title,placeholder,confirmText,value}){
   return new Promise(resolve=>{
     const overlay=document.createElement('div');
     overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
     overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:100%;text-align:center">
       <div style="font-size:40px;margin-bottom:12px;color:var(--accent)">${icon}</div>
       <h2 style="margin:0 0 16px;font-size:20px;font-family:'Bricolage Grotesque',sans-serif">${title}</h2>
-      <input id="pm-input" type="text" placeholder="${placeholder}" autocomplete="off" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--txt);outline:none;box-sizing:border-box;text-align:center;margin-bottom:8px">
+      <input id="pm-input" type="text" placeholder="${placeholder||''}" value="${value?String(value).replace(/"/g,'&quot;'):''}" autocomplete="off" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:11px;font-size:15px;font-family:inherit;background:var(--bg);color:var(--txt);outline:none;box-sizing:border-box;text-align:center;margin-bottom:8px">
       <div id="pm-error" style="color:#E5484D;font-size:13px;margin-bottom:8px;display:none"></div>
       <div style="display:flex;gap:10px;flex-direction:column;margin-top:8px">
         <button id="pm-confirm" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;width:100%">${confirmText}</button>
@@ -11424,7 +11505,7 @@ function promptModal({icon,title,placeholder,confirmText}){
     document.body.appendChild(overlay);
     const input=overlay.querySelector('#pm-input');
     const err=overlay.querySelector('#pm-error');
-    setTimeout(()=>input.focus(),50);
+    setTimeout(()=>{input.focus();input.select();},50);
     function close(val){overlay.remove();resolve(val);}
     overlay.querySelector('#pm-cancel').onclick=()=>close(null);
     overlay.querySelector('#pm-confirm').onclick=()=>{
@@ -11448,7 +11529,7 @@ function openImportModal(classId){
       <h2 style="margin:0;font-size:19px;font-family:'Bricolage Grotesque',sans-serif"><span style="color:var(--accent)">${ICONS.clipboard}</span> Importer des élèves</h2>
       <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
     </div>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Un élève par ligne : <code>nom_utilisateur,email</code> (email optionnel). Un compte est créé pour chacun et ajouté directement à la classe.</p>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Un élève par ligne : <code>nom_utilisateur,email</code> (email optionnel). Un compte est créé pour chacun et ajouté directement à la classe. Maximum 200 lignes par import ; au-delà, refais un second import pour le reste.</p>
     <textarea id="imp-csv" placeholder="marie.dupont,marie@ecole.be&#10;lucas92" style="width:100%;min-height:140px;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--txt);outline:none;box-sizing:border-box;resize:vertical"></textarea>
     <div id="imp-error" style="color:#E5484D;font-size:13px;margin-top:8px;display:none"></div>
     <button id="imp-submit" style="width:100%;margin-top:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer">Importer</button>
@@ -11636,7 +11717,6 @@ handleDuelReturn();
 // Réinitialisation de mot de passe via lien email (?reset=TOKEN)
 (()=>{const p=new URLSearchParams(window.location.search);const rt=p.get('reset');if(rt)setTimeout(()=>app.showResetPasswordModal(rt),300);})();
 loadProgressFromServer();
-handleClassJoin();
 handleClassCodeJoin();
 handleProfInvite();
 handleSSOReturn();

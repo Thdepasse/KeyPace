@@ -156,6 +156,29 @@ async function classArchive(req, res) {
   return res.json({ ok: true });
 }
 
+// Une classe archivée n'est qu'un simple drapeau (voir classArchive) : la
+// restaurer est donc juste l'inverse, pas une vraie suppression à annuler.
+async function classRestore(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const { cls, error, status } = await loadClassForManage(user, req.body.classId);
+  if (error) return res.status(status).json({ error });
+  await sb(`/classes?id=eq.${cls.id}`, { method: 'PATCH', body: JSON.stringify({ archived: false }) });
+  return res.json({ ok: true });
+}
+
+async function archivedClasses(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  const filter = user.role === 'admin' && user.institution_id
+    ? `institution_id=eq.${user.institution_id}`
+    : `teacher_id=eq.${user.id}`;
+  const clsR = await sb(`/classes?${filter}&archived=eq.true&select=id,name&order=created_at.desc`);
+  const classes = Array.isArray(clsR.data) ? clsR.data : [];
+  return res.json({ classes });
+}
+
 async function classDetail(req, res) {
   const user = await userFromToken(req.body.token);
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
@@ -165,8 +188,39 @@ async function classDetail(req, res) {
   const pmap = await fetchProgressMap(members.map((m) => m.student_id));
   const now = Date.now();
   const datas = members.map((m) => pmap[m.student_id] || {});
-  const students = members.map((m, i) => ({ studentId: m.student_id, username: m.username, joinedAt: m.joined_at, ...studentSummary(datas[i], now) }));
+  // Mêmes alertes "inactif"/"bloqué" que le tableau de bord et la vue admin —
+  // pour que le prof les voie aussi dans la liste de ses propres élèves, pas
+  // seulement à l'accueil.
+  const { inactive, stuck } = detectAlerts(members.map((m, i) => ({ username: m.username, data: datas[i] })), now);
+  const inactiveNames = new Set(inactive.map((a) => a.username));
+  const stuckNames = new Set(stuck.map((a) => a.username));
+  const students = members
+    .map((m, i) => ({
+      studentId: m.student_id,
+      username: m.username,
+      joinedAt: m.joined_at,
+      ...studentSummary(datas[i], now),
+      alertInactive: inactiveNames.has(m.username),
+      alertStuck: stuckNames.has(m.username),
+    }))
+    // Élèves à surveiller en premier (bloqué avant inactif), le reste garde son ordre.
+    .sort((a, b) => alertRank(a) - alertRank(b));
   return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now) });
+}
+function alertRank(s) { return s.alertStuck ? 0 : s.alertInactive ? 1 : 2; }
+
+// Retire un élève de SA classe (désinscription), sans toucher à son compte ni
+// à sa progression — contrairement à adminDeleteStudent (réservé aux admins),
+// qui supprime le compte entier. L'élève peut revenir avec le code de classe.
+async function classRemoveStudent(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const { cls, error, status } = await loadClassForManage(user, req.body.classId);
+  if (error) return res.status(status).json({ error });
+  const studentId = req.body.studentId;
+  if (!studentId) return res.status(400).json({ error: 'Élève manquant.' });
+  await sb(`/class_members?class_id=eq.${cls.id}&student_id=eq.${encodeURIComponent(studentId)}`, { method: 'DELETE' });
+  return res.json({ ok: true });
 }
 
 // Import CSV : jusqu'ici les élèves devaient s'inscrire un par un via lien
@@ -181,7 +235,9 @@ async function bulkImportStudents(req, res) {
   const { cls, error, status } = await loadClassForManage(user, req.body.classId);
   if (error) return res.status(status).json({ error });
 
-  const rows = Array.isArray(req.body.students) ? req.body.students.slice(0, 200) : [];
+  const allRows = Array.isArray(req.body.students) ? req.body.students : [];
+  const rows = allRows.slice(0, 200);
+  const truncatedCount = allRows.length - rows.length;
   if (!rows.length) return res.status(400).json({ error: 'Aucun élève à importer.' });
 
   let institution = null;
@@ -273,7 +329,7 @@ async function bulkImportStudents(req, res) {
     }
   }
 
-  return res.json({ results });
+  return res.json({ results, truncatedCount });
 }
 
 /* ── Détail d'un élève (pour le prof qui gère la classe) ── */
@@ -358,6 +414,12 @@ async function myClasses(req, res) {
 // ou, pour un test libre avec objectif, s'il a un test atteignant la vitesse demandée.
 function assignmentDone(data, a) {
   const d = data || {};
+  // Essai (rédaction) : fait dès que essaySubmit() a écrit son propre marqueur.
+  // custom_text est toujours null pour ce type, donc ce cas doit être vérifié
+  // avant la branche "texte personnalisé" ci-dessous.
+  if (a.essay_type) {
+    return !!(d.assignmentsDone || {})[a.id];
+  }
   // Texte personnalisé : fait dès que l'élève a complété CE devoir (clé = id), avec
   // l'objectif vitesse atteint le cas échéant.
   if (a.custom_text) {
@@ -898,14 +960,17 @@ async function essayMine(req, res) {
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
   const { a, error, status } = await loadEssayForStudent(user, req.body.assignmentId);
   if (error) return res.status(status).json({ error });
-  const sR = await sb(`/essay_submissions?assignment_id=eq.${a.id}&student_id=eq.${encodeURIComponent(user.id)}&select=content,word_count,updated_at`);
+  const sR = await sb(`/essay_submissions?assignment_id=eq.${a.id}&student_id=eq.${encodeURIComponent(user.id)}&select=content,word_count,updated_at,teacher_comment,teacher_grade`);
   const s = sR.data && sR.data[0];
   return res.json({
     assignment: {
       id: a.id, title: a.title, essayType: a.essay_type, essayBrief: a.essay_brief,
       minWords: a.min_words, maxWords: a.max_words, dueDate: a.due_date, audioUrl: a.audio_url || null,
     },
-    submission: s ? { content: s.content || {}, words: s.word_count, updatedAt: s.updated_at } : null,
+    submission: s ? {
+      content: s.content || {}, words: s.word_count, updatedAt: s.updated_at,
+      teacherComment: s.teacher_comment || null, teacherGrade: s.teacher_grade || null,
+    } : null,
   });
 }
 
@@ -921,7 +986,7 @@ async function essayList(req, res) {
   if (error) return res.status(status).json({ error });
 
   const members = await membersOf(cls.id);
-  const sR = await sb(`/essay_submissions?assignment_id=eq.${a.id}&select=student_id,word_count,keystroke_stats,updated_at`);
+  const sR = await sb(`/essay_submissions?assignment_id=eq.${a.id}&select=student_id,word_count,keystroke_stats,updated_at,teacher_comment,teacher_grade`);
   const subs = {};
   (sR.data || []).forEach((s) => { subs[s.student_id] = s; });
   const pmap = await fetchProgressMap(members.map((m) => m.student_id));
@@ -936,6 +1001,7 @@ async function essayList(req, res) {
       studentId: m.student_id, username: m.username, submitted: true,
       words: s.word_count, updatedAt: s.updated_at,
       suspicion: sig.suspicion, flags: sig.flags,
+      hasFeedback: !!(s.teacher_comment || s.teacher_grade),
     };
   });
   rows.sort((x, y) => Number(y.submitted) - Number(x.submitted) || x.username.localeCompare(y.username));
@@ -984,10 +1050,34 @@ async function essayDetail(req, res) {
       words: s.word_count,
       submittedAt: s.submitted_at,
       updatedAt: s.updated_at,
+      teacherComment: s.teacher_comment || null,
+      teacherGrade: s.teacher_grade || null,
     },
     signals: sig,
     baselineWpm: baseline,
   });
+}
+
+// Prof : enregistre une note et/ou un commentaire sur une copie déjà rendue.
+async function essayFeedback(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  const aR = await sb(`/assignments?id=eq.${encodeURIComponent(req.body.assignmentId)}&select=class_id`);
+  const a = aR.data && aR.data[0];
+  if (!a) return res.status(404).json({ error: 'Devoir introuvable.' });
+  const { error, status } = await loadClassForManage(user, a.class_id);
+  if (error) return res.status(status).json({ error });
+  const studentId = req.body.studentId;
+  if (!studentId) return res.status(400).json({ error: 'Élève manquant.' });
+  const comment = (req.body.comment || '').trim().slice(0, 4000) || null;
+  const grade = (req.body.grade || '').trim().slice(0, 20) || null;
+  const r = await sb(`/essay_submissions?assignment_id=eq.${encodeURIComponent(req.body.assignmentId)}&student_id=eq.${encodeURIComponent(studentId)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ teacher_comment: comment, teacher_grade: grade }),
+  });
+  if (!r.ok) return res.status(500).json({ error: 'Enregistrement impossible.' });
+  return res.json({ ok: true });
 }
 
 module.exports = async function handler(req, res) {
@@ -1004,8 +1094,11 @@ module.exports = async function handler(req, res) {
       case 'class-create': return await classCreate(req, res);
       case 'class-rename': return await classRename(req, res);
       case 'class-archive': return await classArchive(req, res);
+      case 'class-restore': return await classRestore(req, res);
+      case 'archived-classes': return await archivedClasses(req, res);
       case 'class-detail': return await classDetail(req, res);
       case 'bulk-import-students': return await bulkImportStudents(req, res);
+      case 'class-remove-student': return await classRemoveStudent(req, res);
       case 'student-detail': return await studentDetail(req, res);
       case 'join-code': return await joinByCode(req, res);
       case 'my-classes': return await myClasses(req, res);
@@ -1019,6 +1112,7 @@ module.exports = async function handler(req, res) {
       case 'essay-mine': return await essayMine(req, res);
       case 'essay-list': return await essayList(req, res);
       case 'essay-detail': return await essayDetail(req, res);
+      case 'essay-feedback': return await essayFeedback(req, res);
       case 'migrate-self': return await migrateSelf(req, res);
       // établissement (role admin)
       case 'admin-overview': return await adminOverview(req, res);

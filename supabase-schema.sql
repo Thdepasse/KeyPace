@@ -762,3 +762,14 @@ create policy "no_anon_access" on zimbra_sync_log for all to anon using (false) 
 create policy "no_anon_access" on reviews for all to anon using (false) with check (false);
 create policy "no_anon_access" on analytics_events for all to anon using (false) with check (false);
 create policy "no_anon_access" on admin_key_attempts for all to anon using (false) with check (false);
+
+-- ───────────────────────────────────────────────────────────────
+-- Retour du prof sur une copie d'essai (audit comptes prof, 28 août 2026)
+-- Jusqu'ici essayDetail() était strictement en lecture pour le prof : aucun
+-- moyen d'envoyer une note ou un commentaire à l'élève sur son rendu. Les
+-- deux champs sont volontairement du texte libre (pas de contrainte
+-- numérique sur la note) pour rester compatibles avec n'importe quel barème
+-- (points, lettres, mention...).
+-- ───────────────────────────────────────────────────────────────
+alter table essay_submissions add column if not exists teacher_comment text;
+alter table essay_submissions add column if not exists teacher_grade text;
