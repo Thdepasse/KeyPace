@@ -337,9 +337,9 @@ ul,ol{list-style-position:inside}
   .hero-btns .home-hero-secondary{width:100%;padding:12px;font-size:15px;border-radius:14px;text-align:center;background:none;border:1.5px solid var(--border);color:var(--txt);font-weight:600;cursor:pointer;font-family:inherit}
   /* ── Etablissement mobile ── */
   .etab-wrap{padding:0 16px 60px!important}
-  .etab-hero{padding:32px 0 28px!important}
+  .etab-hero{padding:32px 0 28px!important;text-align:center!important}
   .etab-hero-grid{grid-template-columns:1fr!important;text-align:center!important}
-  .etab-hero h1{font-size:24px!important;line-height:1.15!important}
+  .etab-hero h1{font-size:24px!important;line-height:1.15!important;max-width:none!important}
   .etab-hero p{font-size:15px!important;margin-bottom:20px!important;margin-left:auto!important;margin-right:auto!important}
   .etab-hero-btns{flex-direction:column!important;gap:10px!important;justify-content:center!important}
   .etab-hero-btns button{width:100%!important;padding:14px 20px!important;font-size:15px!important}
@@ -347,8 +347,6 @@ ul,ol{list-style-position:inside}
   .etab-hero-visual img{height:160px!important}
   .etab-levels{margin-bottom:40px!important}
   .etab-levels-grid{grid-template-columns:1fr!important;gap:10px!important}
-  .etab-problem{grid-template-columns:1fr!important;gap:20px!important;margin-bottom:44px!important}
-  .etab-avant-apres{font-family:inherit!important;font-size:14px!important;padding:20px!important}
   .etab-section-mb{margin-bottom:44px!important}
   .etab-features-grid{grid-template-columns:1fr!important;gap:10px!important}
   .etab-parcours-card{grid-template-columns:1fr!important;gap:0!important;padding:24px 18px!important;margin-bottom:36px!important}
@@ -10024,20 +10022,6 @@ const app={
       [ICONS.bookOpen,'Secondaire',"Le socle de la frappe au clavier pour aborder sereinement les évaluations et les travaux plus longs."],
       [ICONS.school,'Supérieur',"De la prise de notes en amphi aux mémoires : une frappe rapide et fiable pour tout le cursus."],
     ];
-    const avantItems=[
-      ['✕',"frappe à 2 index, regard sur le clavier"],
-      ['✕',"rédactions bâclées par manque de temps"],
-      ['✕',"fatigue cognitive liée à l'effort de frappe"],
-      ['✕',"aucun suivi possible pour l'enseignant"],
-      ['✕',"TBI et logiciels lourds à installer"],
-    ];
-    const apresItems=[
-      ['✓',"frappe à 10 doigts, regard sur l'écran"],
-      ['✓',"rédactions plus longues et mieux construites"],
-      ['✓',"toute l'énergie cognitive pour le fond"],
-      ['✓',"tableau de bord élève par élève en temps réel"],
-      ['✓',"100% web, aucune installation, aucun IT"],
-    ];
     const features=[
       [ICONS.barChart,'Suivi individuel en temps réel',"Vitesse (mots/min), précision, leçons validées, temps d'inactivité : tout est visible d'un coup d'œil pour chaque élève."],
       [ICONS.pencil,'Devoirs assignables en 3 clics',"Leçon du parcours, test de vitesse libre, texte personnalisé ou dictée vocale : choisissez, ciblez, envoyez."],
@@ -10088,23 +10072,23 @@ const app={
   </div>
   <!-- HERO -->
   <div class="etab-hero" style="padding:60px 0 52px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:${A};font-weight:700;margin-bottom:16px">
+      Écoles · Universités · Centres de formation
+    </div>
+    <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:clamp(30px,4.2vw,52px);line-height:1.1;letter-spacing:-.02em;margin:0 0 32px;max-width:920px">
+      La plateforme qui apprend à vos élèves à taper au clavier, <span style="color:${A}">du primaire au supérieur.</span>
+    </h1>
     <div class="etab-hero-grid" style="display:grid;grid-template-columns:1.15fr 0.85fr;gap:32px;align-items:center">
       <div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:${A};font-weight:700;margin-bottom:16px">
-          Écoles · Universités · Centres de formation
-        </div>
-        <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:clamp(30px,3.4vw,46px);line-height:1.15;letter-spacing:-.02em;margin:0 0 20px;max-width:600px">
-          La plateforme qui apprend à vos élèves à taper au clavier, <span style="color:${A}">du primaire au supérieur.</span>
-        </h1>
         <p style="font-size:18px;color:var(--muted);max-width:560px;margin:0 0 20px;line-height:1.6">
           KeyPace est la plateforme de dactylographie pensée pour les établissements francophones : pédagogie progressive, tableau de bord enseignant et devoirs assignables en quelques clics.
         </p>
         <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,77,46,.08);border:1px solid rgba(255,77,46,.25);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;color:${A};margin-bottom:28px">
           <span style="display:flex">${ICONS.award}</span> Éligible à la subvention MANOLO · Fédération Wallonie-Bruxelles
         </div>
-        <div class="etab-hero-btns" style="display:flex;gap:12px;flex-wrap:wrap">
-          <button onclick="openModal('school-modal')" style="background:${A};color:#fff;border:none;border-radius:14px;padding:16px 32px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(255,77,46,.35);transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Demander une démo gratuite →</button>
-          <button onclick="go('lessons')" style="background:var(--card);color:var(--txt);border:1.5px solid var(--border);border-radius:14px;padding:16px 28px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Tester les cours maintenant</button>
+        <div class="etab-hero-btns" style="display:flex;gap:12px;flex-wrap:nowrap">
+          <button onclick="openModal('school-modal')" style="background:${A};color:#fff;border:none;border-radius:14px;padding:16px 32px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(255,77,46,.35);transition:transform .15s;white-space:nowrap" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Demander une démo gratuite →</button>
+          <button onclick="go('lessons')" style="background:var(--card);color:var(--txt);border:1.5px solid var(--border);border-radius:14px;padding:16px 28px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s;white-space:nowrap" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Tester les cours maintenant</button>
         </div>
       </div>
       <div class="etab-hero-visual" style="position:relative;display:flex;justify-content:center">
@@ -10122,22 +10106,6 @@ const app={
     </div>
     <div class="etab-levels-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
       ${levels.map(([ic,t,d])=>`<div class="etab-level-card" onclick="openSchoolModal('${t}')"><div class="etab-level-card-icon">${ic}</div><div class="etab-level-card-title">${t}</div><div class="etab-level-card-desc">${d}</div><div class="etab-level-card-link">En savoir plus →</div></div>`).join('')}
-    </div>
-  </div>
-  <!-- PROBLÈME -->
-  <div class="etab-problem etab-section-mb" style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-bottom:80px">
-    <div>
-      <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:12px">LE PROBLÈME</div>
-      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,32px);line-height:1.15;margin:0 0 18px">Chaque heure de cours perdue à taper lentement ne se rattrape pas</h2>
-      <p style="color:var(--muted);font-size:15px;line-height:1.7;margin:0 0 14px">Un élève qui tape à 15 mots/min met 4× plus de temps à rédiger un devoir. Cette friction invisible plombe la concentration, la qualité des écrits et la confiance en soi.</p>
-      <p style="color:var(--muted);font-size:15px;line-height:1.7;margin:0">La frappe ne s'apprend pas naturellement : elle demande une progression structurée, des exercices répétés et du feedback immédiat. C'est exactement ce que fait KeyPace.</p>
-    </div>
-    <div class="etab-avant-apres" style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;font-size:14px;line-height:1.8">
-      <div style="color:var(--muted);margin-bottom:14px;font-size:11px;font-weight:700;letter-spacing:.06em">AVANT KEYPACE</div>
-      ${avantItems.map(([ic,t])=>`<div style="display:flex;gap:10px;padding:3px 0"><span>${ic}</span><span style="color:var(--muted)">${t}</span></div>`).join('')}
-      <div style="border-top:1px solid var(--border);margin:14px 0"></div>
-      <div style="color:${A};margin-bottom:14px;font-size:11px;font-weight:700;letter-spacing:.06em">AVEC KEYPACE</div>
-      ${apresItems.map(([ic,t])=>`<div style="display:flex;gap:10px;padding:3px 0"><span>${ic}</span><span>${t}</span></div>`).join('')}
     </div>
   </div>
   <!-- FEATURES PROF -->
