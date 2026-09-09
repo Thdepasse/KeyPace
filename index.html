@@ -255,8 +255,8 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet"></noscript>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA;--danger:#E5484D;--success:#1FA971;--warning:#E5722B}
@@ -639,10 +639,16 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .t4a-wrap{padding:14px 14px 32px}
 .t4a-frame{position:relative;min-height:calc(100vh - 190px);background:transparent;cursor:text;display:flex;flex-direction:column}
 .t4a-halo{position:absolute;inset:0;pointer-events:none;z-index:1;transition:background .35s}
-.t4a-progress{position:absolute;left:0;top:0;height:4px;background:linear-gradient(90deg,#ffb08c,#ff4a1c);z-index:8;transition:width .14s linear;width:0%}
-.t4a-head{position:relative;z-index:6;display:flex;align-items:flex-start;justify-content:space-between;gap:26px;padding:18px 40px 0;flex-wrap:wrap}
-.t4a-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:42px;letter-spacing:-.03em;color:#15130f;line-height:1.1;margin:0}
-.t4a-subtitle{font-size:15px;color:#8a857c;margin:5px 0 0}
+.t4a-head{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:26px;padding:26px 40px 0;flex-wrap:wrap}
+.t4a-hero-copy{flex:1;min-width:280px}
+.t4a-eyebrow{margin:0 0 12px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.t4a-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,4vw,50px);letter-spacing:-.03em;color:#15130f;line-height:1.08;margin:0}
+.t4a-title-accent{color:var(--accent)}
+.t4a-subtitle{font-size:18px;line-height:1.65;color:#8a857c;margin:16px 0 0;max-width:46ch}
+.t4a-hero-img{flex-shrink:0;height:clamp(150px,18vw,210px);width:auto;display:block;animation:t4aBob 3.2s ease-in-out 4}
+@media(prefers-reduced-motion:reduce){.t4a-hero-img{animation:none}}
+@keyframes t4aBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.t4a-actionsrow{position:relative;z-index:6;display:flex;justify-content:flex-end;padding:18px 40px 0}
 .t4a-actions{display:flex;align-items:center;gap:11px;flex-shrink:0;flex-wrap:wrap}
 .t4a-btn-ghost{display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:600;color:#15130f;background:#fff;border:1px solid #e6e1d8;padding:12px 18px;border-radius:12px;cursor:pointer;font-family:inherit;transition:border-color .2s}
 .t4a-btn-ghost:hover{border-color:#15130f}
@@ -654,41 +660,43 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .t4a-eyebanner.on{display:flex}
 .t4a-eyebanner-cam{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;flex-shrink:0}
 .t4a-stats{position:relative;z-index:6;display:flex;gap:14px;padding:14px 40px 0;flex-wrap:wrap}
-.t4a-stat{flex:1;min-width:150px;background:#fff;border:1px solid #ece8e0;border-radius:14px;padding:13px 17px;display:flex;flex-direction:column;gap:6px}
-.t4a-stat-speed{border-color:rgba(255,74,28,.32);box-shadow:0 10px 26px rgba(255,74,28,.09);flex-direction:row;align-items:flex-end;justify-content:space-between;gap:10px}
+.t4a-stat{flex:1;min-width:150px;background:#fff;border:1px solid #ece8e0;border-radius:18px;padding:16px 19px;display:flex;flex-direction:column;gap:6px}
 .t4a-stat-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;color:#a9a29a}
-.t4a-stat-speed .t4a-stat-label{color:#ff4a1c}
 .t4a-stat-val{font-weight:800;font-size:32px;line-height:1;color:#15130f;font-variant-numeric:tabular-nums}
 .t4a-stat-sub{font-size:12px;color:#a9a29a}
 .t4a-record{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#159c78;margin-top:2px}
-.t4a-odo{display:flex;height:38px;overflow:hidden}
-.t4a-odo-col{width:24px;height:38px;overflow:hidden;position:relative}
+.t4a-odo{display:flex;height:32px;overflow:hidden}
+.t4a-odo-col{width:19px;height:32px;overflow:hidden;position:relative}
 .t4a-odo-roll{position:absolute;left:0;right:0;top:0;transition:transform .45s cubic-bezier(.2,.9,.25,1)}
 .t4a-odo.calm .t4a-odo-roll{transition:none} /* pendant la frappe : le chiffre change sans l'animation de défilement, moins distrayant du coin de l'œil */
-.t4a-odo-d{height:38px;line-height:38px;text-align:center;font-weight:800;font-size:38px;letter-spacing:-.05em;color:#ff4a1c;font-variant-numeric:tabular-nums}
-.t4a-spark{display:flex;align-items:flex-end;gap:3px;height:26px;flex-shrink:0}
+.t4a-odo-d{height:32px;line-height:32px;text-align:center;font-weight:800;font-size:32px;letter-spacing:-.03em;color:#ff4a1c;font-variant-numeric:tabular-nums}
+.t4a-spark{display:none}
 .t4a-spark-bar{width:4px;border-radius:2px;background:#f0ebe2;transition:height .3s}
 .t4a-textwrap{position:relative;z-index:6;padding:12px 40px 0;display:flex;flex-direction:column;align-items:center}
-.t4a-textbox{width:100%;background:#fff;border:1px solid #ece8e0;border-radius:20px;padding:20px 26px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:2px 3px;font-family:'JetBrains Mono',monospace;font-size:min(26px,2.4vw);line-height:1.5}
+.t4a-card{width:100%;background:#fff;border:1px solid #ece8e0;border-radius:20px;padding:22px 26px}
+.t4a-card-head{display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:20px}
+.t4a-counter{font-size:15px;font-weight:500;color:#8a857c}
+.t4a-textbox{width:100%;display:flex;flex-wrap:wrap;align-content:flex-start;gap:2px 3px;font-family:'JetBrains Mono',monospace;font-size:min(26px,2.4vw);line-height:1.5}
 .t4a-word{display:inline-flex;white-space:nowrap;border-radius:7px;padding:1px 5px;transition:background .18s,opacity .3s}
 .t4a-word.active{background:rgba(255,74,28,.07)}
 .t4a-word.done{opacity:.4}
-.t4a-ch{border-radius:3px;transition:color .15s,background .15s}
+.t4a-ch{border-radius:4px;border-bottom:3px solid transparent;transition:color .15s,background .15s,border-color .15s}
 .t4a-ch.ok{color:#15130f}
 .t4a-ch.wrong{color:#ff2d55;background:rgba(255,45,85,.12)}
-.t4a-ch.cur{background:#ff4a1c;color:#fff;position:relative}
-.t4a-ch.cur::after{content:'';position:absolute;right:-1px;top:3px;bottom:3px;width:2px;background:#fff;animation:t4aBlink 1s steps(1) infinite}
+.t4a-ch.cur{background:#ffe6dc;color:#15130f;border-bottom-color:#ff4a1c;animation:t4aPop 1.1s ease-in-out infinite}
 .t4a-ch.todo{color:#5f594d}
+@keyframes t4aPop{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
 /* Marque de l'espace : rendu comme un vrai caractère (et non plus juste l'écart entre mots),
    pour que le curseur clignotant ne disparaisse jamais quand la prochaine touche à taper est la
-   barre d'espace. Invisible au repos (juste l'écart entre les mots, comme avant) : seul l'état
-   "cur" (c'est là, maintenant) reprend le même remplissage orange + curseur que les lettres. */
-.t4a-ch.space{display:inline-block;width:15px;vertical-align:middle}
+   barre d'espace. Le point médian (réglage "Espaces visibles") est optionnel ; l'état "cur"
+   (c'est là, maintenant) reprend toujours le même remplissage orange + curseur que les lettres. */
+.t4a-ch.space{display:inline-block;width:15px;vertical-align:middle;text-align:center}
+.t4a-ch.space.todo{color:#c9c2b6}
 .t4a-ch.space.cur{border-radius:4px}
-.t4a-hint{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;margin-top:6px;color:#ff4a1c;min-height:16px}
-.t4a-hint.done{color:#159c78}
+.t4a-hint{display:inline-flex;align-items:center;font-family:inherit;font-size:14px;font-weight:600;color:#15130f;background:#fff1eb;border:1px solid #ffd3c2;border-radius:14px;padding:9px 16px}
+.t4a-hint.done{background:#e9f7f1;border-color:#bfe8d7;color:#159c78}
 .t4a-hint.idle{animation:t4aBlinkHint 1.4s steps(1) infinite}
-@media (prefers-reduced-motion:reduce){.t4a-hint.idle{animation:none}.t4a-ch.cur::after{animation:none}}
+@media (prefers-reduced-motion:reduce){.t4a-hint.idle{animation:none}.t4a-ch.cur{animation:none}}
 @keyframes t4aBlink{0%,49%{opacity:1}50%,100%{opacity:.12}}
 @keyframes t4aBlinkHint{0%,49%{opacity:1}50%,100%{opacity:.35}}
 
@@ -718,11 +726,39 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 @keyframes t4aLetterUp{0%{transform:translate(-50%,-50%) scale(.7);opacity:0}18%{opacity:1}100%{transform:translate(-50%,-260px) scale(1.5);opacity:0}}
 
 .t4a-hint._nudge{color:#ff4a1c;font-weight:700;animation:t4aBlinkHint 1.4s steps(1) infinite,hintPulse 1.4s ease-in-out infinite}
+
+.t4a-textbox.big{font-size:min(38px,3.4vw);line-height:1.65}
+.t4a-textbox.font-access{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:.01em}
+
+.t4a-progressbar{position:relative;z-index:6;margin:20px 40px 0;height:10px;border-radius:999px;background:#ece8e0;overflow:hidden}
+.t4a-progressbar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#ff8a66,#ff4a1c);transition:width .12s linear}
+
+.t4a-prefs-card{position:relative;z-index:6;margin:18px 40px 26px;background:#fff;border:1px solid #ece8e0;border-radius:18px;padding:22px 24px}
+.t4a-prefs-title{margin:0 0 14px;font-size:15px;font-weight:700;color:#4a423c}
+.t4a-prefs{display:flex;flex-wrap:wrap;gap:9px}
+.t4a-pref-btn{font-family:inherit;font-size:13px;font-weight:600;color:#15130f;background:#fff;border:1px solid #e6e1d8;padding:9px 14px;border-radius:11px;cursor:pointer;transition:all .2s}
+.t4a-pref-btn.on{background:#fff4f0;border-color:#ff4a1c;color:#c9350d}
+
+.t4a-aftertest{max-width:1120px;margin:30px auto 0;padding:0 40px}
+.t4a-aftertest-eyebrow{margin:0 0 10px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.t4a-aftertest-title{margin:0 0 18px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;letter-spacing:-.02em;color:#15130f}
+
+.t4a-cta-banner{background:#fffdfb;border-top:1px solid #efe7df;margin:34px -14px -32px;padding:40px 26px}
+.t4a-cta-inner{max-width:1120px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:22px}
+.t4a-cta-inner h2{margin:0 0 8px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;letter-spacing:-.02em;color:#15130f}
+.t4a-cta-inner p{margin:0;font-size:16px;color:#8a857c}
+.t4a-cta-right{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.t4a-cta-right img{height:120px;width:auto;display:block}
+
 @media(max-width:900px){
   .t4a-head{padding:22px 22px 0}
+  .t4a-actionsrow{padding:14px 22px 0}
   .t4a-stats{padding:18px 22px 0}
   .t4a-textwrap{padding:14px 22px 0}
   .t4a-eyebanner{margin:14px 22px 0}
+  .t4a-progressbar{margin:14px 22px 0}
+  .t4a-prefs-card{margin:14px 22px 20px}
+  .t4a-aftertest{padding:0 22px}
 }
 @media(max-width:700px){
   .t4a-plane{transform:rotateX(22deg) scale(.82)}
@@ -5218,6 +5254,21 @@ const app={
   // sa propre mise en scène (design 4a) ; devoirs/certifications gardent l'ancien rendu.
   _isPlainTest(){const s=this.sess;return !!(s&&s.mode==='test'&&!s.custom&&!s.cert&&!s.vocal);},
 
+  // Réglages d'affichage du test (espaces visibles, grand texte, police accessible,
+  // clavier à l'écran) : rangés à part du sess (qui est recréé à chaque "Recommencer"/
+  // "Autre texte"), et persistés en localStorage pour survivre aussi aux rechargements.
+  _t4aPrefs(){
+    if(!this.__t4aPrefs){
+      const p={spaces:true,big:false,font:'mono',kb:true};
+      try{const raw=localStorage.getItem('kp_test_prefs');if(raw)Object.assign(p,JSON.parse(raw));}catch{}
+      this.__t4aPrefs=p;
+    }
+    return this.__t4aPrefs;
+  },
+  _t4aSavePrefs(){try{localStorage.setItem('kp_test_prefs',JSON.stringify(this.__t4aPrefs));}catch{}},
+  _t4aToggle(key){const p=this._t4aPrefs();p[key]=!p[key];this._t4aSavePrefs();this._renderTest4a();},
+  _t4aToggleFont(){const p=this._t4aPrefs();p.font=p.font==='mono'?'atkinson':'mono';this._t4aSavePrefs();this._renderTest4a();},
+
   _renderDailyLimit(){
     const g=this._guestTest()||{};
     const score=g.w?`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;margin:0 auto 22px;max-width:340px">
@@ -5501,7 +5552,7 @@ const app={
     const pad=str.length<2?'0'+str:str;
     return pad.split('').map((ch,ci)=>{
       const digits=Array.from({length:10},(_,d)=>`<div class="t4a-odo-d">${d}</div>`).join('');
-      return `<div class="t4a-odo-col"><div class="t4a-odo-roll" id="t4a-odo-roll-${ci}" style="transform:translateY(-${parseInt(ch,10)*38}px)">${digits}</div></div>`;
+      return `<div class="t4a-odo-col"><div class="t4a-odo-roll" id="t4a-odo-roll-${ci}" style="transform:translateY(-${parseInt(ch,10)*32}px)">${digits}</div></div>`;
     }).join('');
   },
   _t4aUpdateOdo(v){
@@ -5510,7 +5561,7 @@ const app={
     const pad=str.length<2?'0'+str:str;
     const cols=el.querySelectorAll('.t4a-odo-roll');
     if(cols.length!==pad.length){el.innerHTML=this._t4aOdoHTML(v);return;}
-    pad.split('').forEach((ch,i)=>{cols[i].style.transform='translateY(-'+(parseInt(ch,10)*38)+'px)';});
+    pad.split('').forEach((ch,i)=>{cols[i].style.transform='translateY(-'+(parseInt(ch,10)*32)+'px)';});
   },
   _t4aSparkHTML(){
     const hist=(this._t4a&&this._t4a.hist)||[];
@@ -5590,6 +5641,7 @@ const app={
     const next=!s.finished?T[s.idx]:null;
     const eyeOn=!!this._gaze.enabled;
     const now=this.now||Date.now();
+    const prefs=this._t4aPrefs();
 
     // Texte à taper, découpé en mots insécables puis en caractères colorés.
     // Les espaces sont rendus comme de vrais éléments (parts de type 'space'),
@@ -5610,7 +5662,7 @@ const app={
       wordsHTML=parts.map(p=>{
         if(p.type==='space'){
           const {cls}=charSpan(p.i);
-          return `<span class="${cls} space" data-i="${p.i}" data-sp="1"> </span>`;
+          return `<span class="${cls} space" data-i="${p.i}" data-sp="1">${prefs.spaces?'·':' '}</span>`;
         }
         const w=p.idxs;
         const first=w[0],last=w[w.length-1];
@@ -5648,21 +5700,25 @@ const app={
     const pb=currentUser&&this.stats?Math.max(0,...(this.stats.tests||[]).map(t=>t.wpm)):0;
     const beating=!!(pb&&s.started&&!s.finished&&wpm>pb);
 
-    const hintText=s.finished?`Terminé : ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé, garde le rythme':'Commence à taper pour démarrer le chrono…';
+    const hintText=s.finished?`Terminé : ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé, garde le rythme':'Commence à taper : le chrono démarre tout seul.';
     const hintCls='t4a-hint'+(s.finished?' done':!s.started?' idle':'');
 
     const chal=this._t4aChallenge(s,!!s.finished);
+    const textboxCls='t4a-textbox'+(prefs.big?' big':'')+(prefs.font==='atkinson'?' font-access':'');
 
     document.getElementById('page-test').innerHTML=`<div class="t4a-wrap">
       ${chal.banner}
       <div class="t4a-frame" id="t4a-frame">
         <div class="t4a-halo" id="t4a-halo"></div>
-        <div class="t4a-progress" id="t4a-progress" style="width:${prog}%"></div>
         <div class="t4a-head">
-          <div>
-            <h1 class="t4a-title">Test de vitesse</h1>
-            <p class="t4a-subtitle">Tape le texte ci-dessous le plus vite et juste possible.</p>
+          <div class="t4a-hero-copy">
+            <p class="t4a-eyebrow">Défi n° 1 — le test de vitesse</p>
+            <h1 class="t4a-title">Tape la phrase, découvre <span class="t4a-title-accent">ta vitesse.</span></h1>
+            <p class="t4a-subtitle">Le chrono démarre tout seul dès que tu commences à taper. À la fin, tu découvres ta vitesse, ta précision et ton badge.</p>
           </div>
+          <img class="t4a-hero-img" src="/images/keypace-mascot-idea.webp" width="234" height="282" alt="" loading="eager" decoding="async">
+        </div>
+        <div class="t4a-actionsrow">
           <div class="t4a-actions">
             <button class="t4a-btn-ghost" onclick="app.newPassage()">↻ Autre texte</button>
             <button class="t4a-btn-dark" onclick="app.restart()">Recommencer</button>
@@ -5687,10 +5743,18 @@ const app={
           <div class="t4a-stat"><div class="t4a-stat-label">PROGRESSION</div><div class="t4a-stat-val" id="t4a-prog">${prog}%</div><div class="t4a-stat-sub" id="t4a-progmeta">${s.idx} / ${T.length} car.</div></div>
         </div>
         <div class="t4a-textwrap">
-          <div class="t4a-textbox" id="t4a-textbox">${wordsHTML}</div>
-          <div class="${hintCls}" id="t4a-hint">${hintText}</div>
+          <div class="t4a-card">
+            <div class="t4a-card-head">
+              <div class="${hintCls}" id="t4a-hint">${hintText}</div>
+              <div class="t4a-counter" id="t4a-counter">${s.idx} / ${T.length} caractères</div>
+            </div>
+            <div class="${textboxCls}" id="t4a-textbox">${wordsHTML}</div>
+          </div>
         </div>
-        <div class="t4a-stage">
+        <div class="t4a-progressbar" id="t4a-track">
+          <div class="t4a-progressbar-fill" id="t4a-track-bar" style="width:${prog}%"></div>
+        </div>
+        ${prefs.kb?`<div class="t4a-stage">
           <div class="t4a-plane" id="t4a-plane">
             ${keysHTML}
             <div class="t4a-spacewrap${spaceOn?' next':''}" id="t4a-spacewrap">
@@ -5699,9 +5763,39 @@ const app={
             </div>
             ${fxHTML}
           </div>
+        </div>`:''}
+        <div class="t4a-prefs-card">
+          <p class="t4a-prefs-title">Règle l'affichage comme tu veux</p>
+          <div class="t4a-prefs">
+            <button type="button" class="t4a-pref-btn${prefs.spaces?' on':''}" onclick="app._t4aToggle('spaces')">Espaces visibles&nbsp;: ${prefs.spaces?'oui':'non'}</button>
+            <button type="button" class="t4a-pref-btn${prefs.big?' on':''}" onclick="app._t4aToggle('big')">Très grand texte&nbsp;: ${prefs.big?'oui':'non'}</button>
+            <button type="button" class="t4a-pref-btn${prefs.font==='atkinson'?' on':''}" onclick="app._t4aToggleFont()">Police&nbsp;: ${prefs.font==='atkinson'?'Lecture facile':'Standard'}</button>
+            <button type="button" class="t4a-pref-btn${prefs.kb?' on':''}" onclick="app._t4aToggle('kb')">Clavier à l'écran&nbsp;: ${prefs.kb?'oui':'non'}</button>
+          </div>
         </div>
       </div>
       ${chal.result}
+      ${!currentUser?`<div class="t4a-aftertest">
+        <p class="t4a-aftertest-eyebrow">Après le test</p>
+        <h2 class="t4a-aftertest-title">Ce que tu débloques avec ton compte</h2>
+        <div class="features-grid" style="grid-template-columns:repeat(3,1fr);max-width:none;padding:0;margin:0">
+          <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.bookOpen}</div><h3>65 leçons, 5 minutes chacune</h3><p>Tu commences par 8 touches, puis les accents, les chiffres et les symboles.</p></div>
+          <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.gamepad}</div><h3>8+ jeux pour s'entraîner</h3><p>Frappe-mots, Le Sprint et d'autres défis : précision, mémoire et vitesse.</p></div>
+          <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.trendUp}</div><h3>Tes progrès enregistrés</h3><p>Chaque défi réussi fait monter ta courbe de vitesse et de précision.</p></div>
+        </div>
+      </div>
+      <div class="t4a-cta-banner">
+        <div class="t4a-cta-inner">
+          <div>
+            <h2>Prêt pour le défi n° 2&nbsp;?</h2>
+            <p>10 leçons offertes, test illimité, rien à installer.</p>
+          </div>
+          <div class="t4a-cta-right">
+            <img src="/images/keypace-mascot-cheer.webp" width="282" height="303" alt="" loading="lazy" decoding="async">
+            <button class="btn-primary" onclick="openAuth('register')">Créer mon compte gratuit →</button>
+          </div>
+        </div>
+      </div>`:''}
     </div>`;
     this._t4aUpdateHalo();
   },
@@ -5741,7 +5835,8 @@ const app={
     const timeMetaEl=$('t4a-timemeta');if(timeMetaEl)timeMetaEl.textContent=s.finished?'test terminé':'en cours';
     const progEl=$('t4a-prog');if(progEl)progEl.textContent=prog+'%';
     const progMetaEl=$('t4a-progmeta');if(progMetaEl)progMetaEl.textContent=s.idx+' / '+s.text.length+' car.';
-    const barEl=$('t4a-progress');if(barEl)barEl.style.width=prog+'%';
+    const counterEl=$('t4a-counter');if(counterEl)counterEl.textContent=s.idx+' / '+s.text.length+' caractères';
+    const trackBarEl=$('t4a-track-bar');if(trackBarEl)trackBarEl.style.width=prog+'%';
     const glancesEl=$('t4a-glances');if(glancesEl)glancesEl.textContent=t.glances;
 
     document.querySelectorAll('#t4a-textbox .t4a-ch').forEach(el=>{
@@ -5767,7 +5862,7 @@ const app={
 
     const hintEl=$('t4a-hint');
     if(hintEl){
-      const txt=s.finished?`Terminé : ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé, garde le rythme':'Commence à taper pour démarrer le chrono…';
+      const txt=s.finished?`Terminé : ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé, garde le rythme':'Commence à taper : le chrono démarre tout seul.';
       if(hintEl.textContent!==txt)hintEl.textContent=txt;
       hintEl.classList.toggle('done',!!s.finished);
       hintEl.classList.toggle('idle',!s.started&&!s.finished);
