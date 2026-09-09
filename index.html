@@ -4913,8 +4913,7 @@ const app={
           <p>La bonne position et les bons réflexes appris en jouant. Tu taperas bientôt sans même y penser.</p>
           <div class="hero-btns">
             ${isGuest?`<button class="btn-primary" onclick="openAuth('register')">Commencer gratuitement →</button>
-            <button class="btn-secondary home-hero-secondary" onclick="go('test')">Tester ma vitesse</button>`
-            :`<button class="btn-primary" onclick="go('lessons')">Reprendre les cours →</button>`}
+            <button class="btn-secondary home-hero-secondary" onclick="go('test')">Tester ma vitesse</button>`:''}
           </div>
         </div>
         <div class="hero-mascots" aria-hidden="true">
@@ -4925,6 +4924,24 @@ const app={
           </div>
         </div>
       </div>
+
+      ${isGuest?'':`
+      <div class="school-banner">
+        <div class="school-banner-inner">
+          <div class="school-banner-content">
+            <span class="school-banner-badge">${ICONS.zap} Te revoilà</span>
+            <h2>Prêt à reprendre ?</h2>
+            <p>Continue là où tu t'es arrêté : chaque leçon ne prend que quelques minutes.</p>
+            <div class="school-banner-actions">
+              <button class="school-banner-btn" onclick="go('lessons')">Reprendre les cours →</button>
+            </div>
+          </div>
+          <div class="school-banner-visual" aria-hidden="true">
+            <img src="/images/keypace-mascot-cheer.webp" width="282" height="303" alt="" loading="lazy" decoding="async" style="height:150px;width:auto;filter:drop-shadow(0 10px 20px rgba(0,0,0,.22))">
+          </div>
+        </div>
+      </div>
+      `}
 
       ${!isGuest?'':`
       <div class="home-feat-grid">
