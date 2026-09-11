@@ -5,6 +5,21 @@ const { sb, getCurrentChallenge, computeScore } = require('./_boss-shared');
 const { DUEL_TEXTS, userFromToken, generateRoomCode } = require('./_duel-shared');
 const { setCorsOrigin } = require('./_cors');
 
+// Garde-fou de plausibilité (Boss + Duel) : ni le wpm/la précision déclarés,
+// ni un score, ne prouvent qu'une partie a réellement été jouée — un simple
+// appel direct à cette API peut fabriquer n'importe quel résultat. Sans
+// preuve de frappe réelle (hors périmètre ici, ce serait une refonte), on se
+// contente de rejeter les cas grossiers : le temps déclaré ne peut pas être
+// plus court que le temps minimum physiquement nécessaire pour taper le
+// texte de l'épreuve, même à une vitesse largement au-delà des records
+// humains réels (~220 mpm) — la marge (300 mpm) est volontairement large
+// pour ne jamais pénaliser un joueur rapide mais honnête.
+const MAX_PLAUSIBLE_WPM = 300;
+function minPlausibleMs(textLength) {
+  if (!textLength || textLength <= 0) return 0;
+  return Math.round(textLength / ((MAX_PLAUSIBLE_WPM * 5) / 60000));
+}
+
 module.exports = async function handler(req, res) {
   setCorsOrigin(req, res);
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -33,7 +48,7 @@ module.exports = async function handler(req, res) {
         return res.json({ id: ch.id, isoWeek: ch.iso_week, text: ch.text, startsAt: ch.starts_at, endsAt: ch.ends_at, secondsLeft });
       }
       case 'boss-submit': {
-        const { token, wpm, accuracy } = body;
+        const { token, wpm, accuracy, timeMs } = body;
         if (!token) return res.status(400).json({ error: 'Token manquant.' });
         const ur = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username,display_name,plan`);
         const user = ur.data && ur.data[0];
@@ -42,6 +57,10 @@ module.exports = async function handler(req, res) {
         const displayName = user.display_name || user.username;
         const ch = await getCurrentChallenge();
         if (!ch) return res.status(500).json({ error: 'Défi indisponible.' });
+        const minMs = minPlausibleMs((ch.text || '').length);
+        if (minMs > 0 && Number(timeMs) < minMs) {
+          return res.status(400).json({ error: 'Résultat incohérent avec la longueur du texte (temps trop court).' });
+        }
         const score = computeScore(wpm, accuracy);
         const w = Math.max(0, Math.min(220, Math.round(Number(wpm) || 0)));
         const a = Math.max(0, Math.min(100, Math.round(Number(accuracy) || 0)));
@@ -120,7 +139,12 @@ module.exports = async function handler(req, res) {
         const rr = await sb(`/duel_rooms?id=eq.${encodeURIComponent(roomId)}&select=*`);
         const room = rr.data && rr.data[0];
         if (!room) return res.status(404).json({ error: 'Ce duel n\'existe pas ou a expiré.' });
-        if (room.status === 'done') return res.status(409).json({ error: 'Ce duel est déjà terminé.' });
+        // Comme duel-join-code (qui filtre déjà status=eq.lobby) : une salle qui
+        // court ou est terminée ne peut plus être rejointe. Sans ce garde, un
+        // deuxième compte connaissant le roomId pouvait rejoindre en pleine
+        // course et écraser guest_user_id/guest_label, volant la place du vrai
+        // second joueur juste avant de soumettre un résultat à sa place.
+        if (room.status !== 'lobby') return res.status(409).json({ error: 'Ce duel a déjà commencé ou est terminé.' });
         const isHost = room.host_user_id === user.id;
         let hostLabel = null;
         if (room.host_user_id) {
@@ -148,15 +172,35 @@ module.exports = async function handler(req, res) {
       case 'duel-finish': {
         const { token, roomId, role, wpm, accuracy, timeMs, finished } = body;
         if (!roomId || !role) return res.status(400).json({ error: 'Paramètres manquants.' });
+        if (role !== 'host' && role !== 'guest') return res.status(400).json({ error: 'Rôle invalide.' });
         const user = await userFromToken(token);
         if (!user) return res.status(401).json({ error: 'Session invalide.' });
         const rr = await sb(`/duel_rooms?id=eq.${encodeURIComponent(roomId)}&select=*`);
         const room = rr.data && rr.data[0];
         if (!room) return res.status(404).json({ error: 'Duel introuvable.' });
+        // Vérifie que l'appelant est bien le joueur qu'il prétend être (host ou
+        // guest de CETTE salle précise) — sans ça, n'importe quel compte
+        // connaissant juste le roomId (récupérable via Realtime ou le code à 6
+        // caractères) pouvait soumettre un résultat pour host OU guest sans
+        // participer au duel, y compris un faux résultat gagnant posté avant
+        // que le vrai joueur ne termine (le garde anti-doublon ci-dessous ne
+        // vérifiait qu'un rôle déjà pris, pas l'identité du joueur).
+        const expectedUserId = role === 'host' ? room.host_user_id : room.guest_user_id;
+        if (!expectedUserId || expectedUserId !== user.id) {
+          return res.status(403).json({ error: 'Tu n\'es pas ce joueur dans ce duel.' });
+        }
         const w = Math.max(0, Math.min(220, Math.round(Number(wpm) || 0)));
         const a = Math.max(0, Math.min(100, Math.round(Number(accuracy) || 0)));
         const t = Math.max(0, Math.round(Number(timeMs) || 0));
-        const existing = await sb(`/duel_results?room_id=eq.${encodeURIComponent(roomId)}&role=eq.${role}&select=id`);
+        // Ne s'applique qu'à un résultat déclaré "terminé" : un abandon/forfait
+        // (finished=false) n'a rien à voir avec le temps réel de frappe.
+        if (finished) {
+          const minMs = minPlausibleMs((room.text || '').length);
+          if (minMs > 0 && t < minMs) {
+            return res.status(400).json({ error: 'Résultat incohérent avec la longueur du texte (temps trop court).' });
+          }
+        }
+        const existing = await sb(`/duel_results?room_id=eq.${encodeURIComponent(roomId)}&role=eq.${encodeURIComponent(role)}&select=id`);
         if (!(existing.data && existing.data[0])) {
           await sb(`/duel_results`, { method: 'POST', body: JSON.stringify({ room_id: roomId, user_id: user.id, role, wpm: w, accuracy: a, finished: !!finished, time_ms: t }) });
         }

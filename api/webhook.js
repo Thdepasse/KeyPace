@@ -89,10 +89,21 @@ module.exports = async function handler(req, res) {
       const sub = event.data.object;
       if (sub.status === 'active' || sub.status === 'trialing') {
         await setPlan(sub.customer, 'expert');
-      } else if (sub.status === 'canceled' || sub.status === 'unpaid') {
+      } else if (sub.status === 'canceled' || sub.status === 'unpaid' || sub.status === 'incomplete_expired' || sub.status === 'paused') {
         await setPlan(sub.customer, 'free');
       }
-      // 'past_due' : Stripe relance la carte automatiquement, on ne coupe pas
+      // 'past_due' : Stripe relance la carte automatiquement, on ne coupe pas.
+      // 'incomplete' (paiement/3DS pas encore confirmé) est volontairement
+      // ignoré ici, PAS rétrogradé : checkout.session.completed vient de
+      // passer le compte en 'expert' quelques instants avant que Stripe
+      // n'émette ce statut transitoire — le rétrograder tout de suite
+      // provoquerait un aller-retour expert→free→expert dès qu'un paiement
+      // 3D Secure classique se confirme en asynchrone. En revanche
+      // 'incomplete_expired' (fenêtre de ~23h expirée sans jamais avoir été
+      // confirmé) est un échec définitif : sans ce cas, un client qui
+      // abandonnait volontairement l'authentification 3DS après le checkout
+      // gardait un accès Expert gratuit et permanent, puisqu'aucun événement
+      // ne faisait jamais repasser son compte en 'free'.
       break;
     }
   }

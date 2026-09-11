@@ -3980,6 +3980,12 @@ const app={
 
   async openEssay(assignmentId){
     if(!currentUser){openAuth('login','Connecte-toi pour faire ce devoir.',()=>this.openEssay(assignmentId));return;}
+    // Garde anti-double-clic (même patron que openSettings()) : sans ça, un
+    // double-clic rapide sur "Rédiger" crée deux overlays superposés (même
+    // id="essay-overlay") — closeEssay() ne retire que le second (this._essayOverlay),
+    // le premier reste accroché au DOM pour toujours et bloque tous les clics
+    // sur le site jusqu'à un rechargement de page complet.
+    if(document.getElementById('essay-overlay'))return;
     const ov=document.createElement('div');
     ov.id='essay-overlay';
     ov.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:3200;overflow-y:auto;animation:settings-fade .18s ease';
@@ -4188,6 +4194,8 @@ const app={
   },
 
   async viewEssays(assignmentId){
+    // Même garde anti-double-clic que openEssay() ci-dessus.
+    if(document.getElementById('essays-overlay'))return;
     const ov=document.createElement('div');
     ov.id='essays-overlay';
     ov.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:3200;overflow-y:auto;animation:settings-fade .18s ease';
@@ -8879,7 +8887,7 @@ const app={
     const prevBestScore=b.lb&&b.lb.me?b.lb.me.score:0;
     b.phase='submitting';this.renderCurrent();
     try{
-      const sub=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-submit',token:currentToken,wpm,accuracy:acc})}).then(r=>r.json());
+      const sub=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-submit',token:currentToken,wpm,accuracy:acc,timeMs:b.endTime-b.startTime})}).then(r=>r.json());
       b._submitErr=sub.error||null;b._serverScore=sub.score;
       try{track('game_completed',{game:'boss',wpm,acc,score:sub.score});}catch{}
       const lb=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-leaderboard',token:currentToken})}).then(r=>r.json());
@@ -10674,14 +10682,25 @@ const app={
     // la page n'était pas rechargée. En laissant `_myClasses` intact (null au
     // départ), un appel ultérieur (une fois le token disponible) réessaiera.
     if(!currentToken)return;
+    // Cliché du token au lancement : si le compte change (déconnexion/reconnexion
+    // rapide) avant que cette requête ne réponde, on abandonne sans écraser
+    // _myClasses/_myAssignments avec les devoirs du compte PRÉCÉDENT sur l'écran
+    // du nouveau compte.
+    const _token=currentToken;
     try{
       const [rc,ra]=await Promise.all([
         fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'my-classes',token:currentToken})}),
         fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'my-assignments',token:currentToken})}),
       ]);
-      this._myClasses=rc.ok?((await rc.json()).classes||[]):[];
-      this._myAssignments=ra.ok?((await ra.json()).assignments||[]):[];
-    }catch{this._myClasses=this._myClasses||[];this._myAssignments=this._myAssignments||[];}
+      const classes=rc.ok?((await rc.json()).classes||[]):[];
+      const assignments=ra.ok?((await ra.json()).assignments||[]):[];
+      if(currentToken!==_token)return;
+      this._myClasses=classes;
+      this._myAssignments=assignments;
+    }catch{
+      if(currentToken!==_token)return;
+      this._myClasses=this._myClasses||[];this._myAssignments=this._myAssignments||[];
+    }
     if(this.view==='classes'&&!isTeacher())this.renderStudentClasses();
   },
 
@@ -11587,15 +11606,23 @@ const app={
     if(!currentToken)return null;
     if(this._etabLoading)return null; // anti ré-entrance : évite la boucle de rendu
     this._etabLoading=true;
+    // Cliché du token : si le compte change (déconnexion/reconnexion rapide,
+    // poste partagé) avant que ces requêtes ne répondent, on abandonne sans
+    // écraser this.etab avec les données d'établissement du compte PRÉCÉDENT
+    // sur l'écran du nouveau compte.
+    const _token=currentToken;
     let failed=false,errMsg='';
     try{
       const mr=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'migrate-self',token:currentToken})});
+      if(currentToken!==_token){this._etabLoading=false;return null;}
       if(mr.ok){const md=await mr.json();if(md&&md.role&&this.stats&&this.stats.role!==md.role){this.stats.role=md.role;const ss=JSON.parse(localStorage.getItem('klak_session')||'{}');ss.role=md.role;localStorage.setItem('klak_session',JSON.stringify(ss));updateNavUser();}}
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'teacher-overview',token:currentToken})});
+      if(currentToken!==_token){this._etabLoading=false;return null;}
       if(r.ok){const data=await r.json();data.loaded=true;this.etab=data;}
       else{failed=true;const d=await r.json().catch(()=>({}));errMsg=d.error||('Erreur '+r.status);}
     }catch(e){failed=true;errMsg='Erreur réseau.';}
     this._etabLoading=false;
+    if(currentToken!==_token)return null;
     if(failed&&(!this.etab||this.etab.error)){this.etab={loaded:true,error:errMsg,classes:[],global:{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null},series:[]};}
     if(this.view==='home')this.renderHome();else if(this.view==='classes')this.renderClasses();
     return this.etab;
@@ -11607,13 +11634,16 @@ const app={
     if(!currentToken)return null;
     if(this._adminLoading)return null;
     this._adminLoading=true;
+    const _token=currentToken; // même garde qu'au-dessus dans loadEtab()
     let failed=false,errMsg='';
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'admin-overview',token:currentToken})});
+      if(currentToken!==_token){this._adminLoading=false;return null;}
       if(r.ok){const data=await r.json();data.loaded=true;this.admin=data;}
       else{failed=true;const d=await r.json().catch(()=>({}));errMsg=d.error||('Erreur '+r.status);}
     }catch(e){failed=true;errMsg='Erreur réseau.';}
     this._adminLoading=false;
+    if(currentToken!==_token)return null;
     if(failed&&(!this.admin||this.admin.error)){this.admin={loaded:true,error:errMsg,institution:null,profs:[],global:{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null},series:[]};}
     if(this.view==='home'&&isAdmin())this._renderHomeAdmin();
     return this.admin;
