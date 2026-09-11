@@ -8066,6 +8066,23 @@ const app={
     };
     setStageTop();
 
+    // Position (en px de défilement) correspondant à la fin de l'intro
+    // cinématique, où le sélecteur de jeu est entièrement révélé.
+    const gcineEndY=()=>{
+      const rect=scroller.getBoundingClientRect();
+      const total=scroller.offsetHeight-stage.offsetHeight;
+      return total>0?window.scrollY+rect.top+total:null;
+    };
+    // Un retour sur "Jeux" (quitter une partie, ou clic nav) reconstruit tout
+    // le HTML et rejoue donc l'intro depuis le début à chaque fois — agaçant
+    // pour qui veut juste enchaîner plusieurs jeux. Elle n'est rejouée en
+    // entier que la toute première fois ce chargement de page ; les retours
+    // suivants sautent directement au sélecteur.
+    if(this._gcineSeen){
+      const y=gcineEndY();
+      if(y!=null)window.scrollTo({top:y,behavior:'instant'});
+    }
+
     const visibleGames=this._gcineVisible||[];
     const GAP=232;
     let idx=Math.min(3,visibleGames.length-1),dragOffset=0;
@@ -8167,13 +8184,36 @@ const app={
     };
     const schedule=()=>{if(rafId==null)rafId=requestAnimationFrame(tick);};
     const onResize=()=>{setStageTop();schedule();};
+
+    // Un simple geste de scroll (une seule impulsion de molette/trackpad)
+    // s'arrête très souvent à mi-transition : le clavier est à moitié délavé
+    // et "Choisis ton jeu" n'est pas encore là, ce qui ressemble à une page
+    // cassée plutôt qu'à une animation. Dès que le scroll s'arrête, on
+    // "aimante" vers le début ou la fin de l'intro, selon le plus proche.
+    let snapTimer=null;
+    const onScrollSnap=()=>{
+      clearTimeout(snapTimer);
+      snapTimer=setTimeout(()=>{
+        const rect=scroller.getBoundingClientRect();
+        const total=scroller.offsetHeight-stage.offsetHeight;
+        if(total<=0)return;
+        const raw=clamp(-rect.top,0,total)/total;
+        if(raw>=0.5)this._gcineSeen=true; // arrivé (ou aimanté) au bout : plus la peine de la rejouer au prochain retour
+        if(raw<=0||raw>=1)return; // déjà à une extrémité, rien à aimanter
+        window.scrollTo({top:window.scrollY+rect.top+(raw<0.5?0:total),behavior:'instant'});
+      },150);
+    };
+
     tick();
     window.addEventListener('scroll',schedule,{passive:true});
+    window.addEventListener('scroll',onScrollSnap,{passive:true});
     window.addEventListener('resize',onResize);
 
     this._gcineTeardown=()=>{
       window.removeEventListener('scroll',schedule);
+      window.removeEventListener('scroll',onScrollSnap);
       window.removeEventListener('resize',onResize);
+      clearTimeout(snapTimer);
       window.removeEventListener('pointermove',onMove);
       window.removeEventListener('pointerup',onUp);
       if(rafId)cancelAnimationFrame(rafId);
