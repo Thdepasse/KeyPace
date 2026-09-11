@@ -35,9 +35,20 @@ async function sb(path, opts = {}) {
   return { ok: r.ok, status: r.status, data: text ? JSON.parse(text) : null };
 }
 
+// x-forwarded-for peut contenir plusieurs IP séparées par des virgules — sur
+// Vercel, le CLIENT contrôle entièrement les valeurs qu'il envoie lui-même
+// dans cet en-tête, et Vercel AJOUTE la vraie IP à la suite plutôt que de la
+// remplacer : lire le PREMIER élément (comme avant) revient à faire confiance
+// à une valeur choisie par l'appelant, qui peut donc se présenter comme une
+// "IP différente" à chaque tentative et contourner entièrement le verrou
+// anti-bruteforce ci-dessous. `x-real-ip` est en revanche posé par Vercel
+// lui-même (non falsifiable par le client) ; à défaut, on prend le DERNIER
+// élément de x-forwarded-for plutôt que le premier.
 function clientIp(req) {
+  const real = req.headers['x-real-ip'];
+  if (real) return String(real).trim();
   const xff = req.headers['x-forwarded-for'];
-  if (xff) return String(xff).split(',')[0].trim();
+  if (xff) { const parts = String(xff).split(',').map((s) => s.trim()).filter(Boolean); if (parts.length) return parts[parts.length - 1]; }
   return (req.socket && req.socket.remoteAddress) || 'unknown';
 }
 
@@ -50,11 +61,29 @@ async function adminKeyLockState(ip) {
   return (r.data && r.data[0]) || null;
 }
 async function recordAdminKeyFailure(existing, ip) {
-  const attempts = (existing ? existing.failed_attempts : 0) + 1;
-  const patch = { ip, failed_attempts: attempts };
-  if (attempts >= 5) { patch.locked_until = new Date(Date.now() + 30 * 60 * 1000).toISOString(); patch.failed_attempts = 0; }
-  if (existing) await sb(`/admin_key_attempts?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
-  else await sb('/admin_key_attempts', { method: 'POST', body: JSON.stringify(patch) });
+  if (!existing) {
+    // Première tentative pour cette IP : POST simple. Une course entre deux
+    // toutes premières tentatives simultanées peut créer deux lignes (pas de
+    // contrainte unique sur `ip` visible ici) — cas rare, sans conséquence
+    // grave (au pire deux compteurs à 1 au lieu d'un à 2), donc non traité par
+    // compare-and-swap comme le cas ci-dessous.
+    await sb('/admin_key_attempts', { method: 'POST', body: JSON.stringify({ ip, failed_attempts: 1 }) });
+    return;
+  }
+  // Incrément par compare-and-swap (même raison que login.js : PostgREST ne
+  // fait pas d'incrément atomique nativement) — sans ça, des tentatives
+  // envoyées en parallèle sur ADMIN_KEY lisent toutes le même compteur avant
+  // qu'aucune n'ait écrit, et le verrou à 5 essais n'est jamais atteint.
+  let base = existing;
+  for (let i = 0; i < 4; i++) {
+    const attempts = (base.failed_attempts || 0) + 1;
+    const patch = { failed_attempts: attempts };
+    if (attempts >= 5) { patch.locked_until = new Date(Date.now() + 30 * 60 * 1000).toISOString(); patch.failed_attempts = 0; }
+    const cas = await sb(`/admin_key_attempts?id=eq.${base.id}&failed_attempts=eq.${base.failed_attempts || 0}`, { method: 'PATCH', body: JSON.stringify(patch) });
+    if (cas.ok && cas.data && cas.data.length) return;
+    const fresh = await sb(`/admin_key_attempts?id=eq.${base.id}&select=id,failed_attempts,locked_until`);
+    base = (fresh.data && fresh.data[0]) || base;
+  }
 }
 async function clearAdminKeyFailures(existing) {
   if (existing && existing.failed_attempts) await sb(`/admin_key_attempts?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify({ failed_attempts: 0 }) });

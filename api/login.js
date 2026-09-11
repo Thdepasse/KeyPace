@@ -493,17 +493,26 @@ module.exports = async function handler(req, res) {
     return res.json({ ok: true });
   }
 
-  // — Connexion par session_token (utilisée après le SSO OAuth)
+  // — Connexion par session_token (utilisée après le SSO OAuth, et pour
+  // rafraîchir les infos de compte affichées dans les réglages).
+  // Rotation systématique du token à chaque appel : après un retour SSO, le
+  // jeton transmis vient de transiter en clair dans l'URL de redirection
+  // (?sso=TOKEN, voir api/oauth.js) — potentiellement loggué côté serveur/CDN
+  // ou visible dans l'historique du navigateur. Il n'a donc qu'une durée de
+  // vie de 2 minutes côté oauth.js ; ce premier appel légitime l'échange
+  // aussitôt contre un nouveau jeton 30 jours qui, lui, ne transite jamais
+  // par une URL. Un lien intercepté après coup est donc inutilisable.
   if (body.action === 'session-login') {
     const { token } = body;
     if (!token) return res.status(400).json({ error: 'Token de session manquant.' });
     const r = await sb(`/users?${sessionFilter(token)}&select=*`);
     const user = r.data && r.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
-    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ last_seen_at: new Date().toISOString(), deletion_warned_at: null }) });
+    const newToken = require('crypto').randomUUID();
+    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ session_token: newToken, session_expires_at: sessionExpiresAt(), last_seen_at: new Date().toISOString(), deletion_warned_at: null }) });
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
     const progress = pr.data && pr.data[0];
-    return res.json({ id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, email: user.email || null, displayName: user.display_name || null, mustChangePassword: !!user.must_change_password, institutionName: await institutionNameFor(user.institution_id), hasClass: await hasAnyClass(user.id), token, data: progress?.data || {} });
+    return res.json({ id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, email: user.email || null, displayName: user.display_name || null, mustChangePassword: !!user.must_change_password, institutionName: await institutionNameFor(user.institution_id), hasClass: await hasAnyClass(user.id), token: newToken, data: progress?.data || {} });
   }
 
   // — Connexion normale
@@ -512,7 +521,10 @@ module.exports = async function handler(req, res) {
 
   const r = await sb(`/users?username=eq.${encodeURIComponent(username)}&select=*`);
   const user = r.data && r.data[0];
-  if (!user) return res.status(401).json({ error: 'Utilisateur introuvable.' });
+  // Message générique dans les deux cas (compte inexistant / mauvais mot de
+  // passe) : des messages distincts permettaient d'énumérer les comptes
+  // existants depuis le formulaire de connexion public.
+  if (!user) return res.status(401).json({ error: 'Identifiants incorrects.' });
 
   // Anti-bruteforce : compte temporairement verrouillé après trop d'échecs.
   if (user.locked_until && new Date(user.locked_until) > new Date()) {
@@ -521,11 +533,24 @@ module.exports = async function handler(req, res) {
 
   const check = verifyPassword(passwordHash, user.password_hash);
   if (!check.ok) {
-    const attempts = (user.failed_attempts || 0) + 1;
-    const patch = { failed_attempts: attempts };
-    if (attempts >= 5) { patch.locked_until = new Date(Date.now() + 15 * 60 * 1000).toISOString(); patch.failed_attempts = 0; }
-    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
-    return res.status(401).json({ error: 'Mot de passe incorrect.' });
+    // Incrément par compare-and-swap : PostgREST n'offre pas nativement un
+    // `failed_attempts = failed_attempts + 1` atomique. Un simple lire-incrémenter-
+    // écrire laisse des tentatives envoyées en parallèle lire toutes le même
+    // compteur avant qu'aucune n'ait écrit — le verrou à 5 essais n'était alors
+    // jamais atteint. On retente en relisant la valeur si quelqu'un d'autre a
+    // écrit entre-temps (la clause `failed_attempts=eq.<valeur lue>` ne
+    // s'applique que si rien n'a changé depuis cette lecture).
+    let base = user;
+    for (let i = 0; i < 4; i++) {
+      const attempts = (base.failed_attempts || 0) + 1;
+      const patch = { failed_attempts: attempts };
+      if (attempts >= 5) { patch.locked_until = new Date(Date.now() + 15 * 60 * 1000).toISOString(); patch.failed_attempts = 0; }
+      const cas = await sb(`/users?id=eq.${user.id}&failed_attempts=eq.${base.failed_attempts || 0}`, { method: 'PATCH', body: JSON.stringify(patch) });
+      if (cas.ok && cas.data && cas.data.length) break;
+      const fresh = await sb(`/users?id=eq.${user.id}&select=failed_attempts,locked_until`);
+      base = (fresh.data && fresh.data[0]) || base;
+    }
+    return res.status(401).json({ error: 'Identifiants incorrects.' });
   }
   if (user.verification_token) return res.status(403).json({ error: 'Confirme ton adresse email avant de te connecter. Vérifie ta boîte mail.', code: 'EMAIL_NOT_VERIFIED' });
 

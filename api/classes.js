@@ -427,10 +427,20 @@ async function joinByCode(req, res) {
   // veut des élèves passe par l'import CSV, qui crée directement leur compte.
   const joinable = cls && cls.institution_id && cls.institution_id === user.institution_id;
   if (!joinable) {
-    const attempts = (user.class_join_failed_attempts || 0) + 1;
-    const patch = { class_join_failed_attempts: attempts };
-    if (attempts >= 5) { patch.class_join_locked_until = new Date(Date.now() + 15 * 60 * 1000).toISOString(); patch.class_join_failed_attempts = 0; }
-    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+    // Incrément par compare-and-swap (même raison qu'ailleurs : PostgREST n'a
+    // pas d'incrément atomique natif) — sans ça, plusieurs tentatives de code
+    // envoyées en parallèle par le même compte lisent toutes le même compteur
+    // avant qu'aucune n'ait écrit, et le verrou à 5 essais n'est jamais atteint.
+    let base = user;
+    for (let i = 0; i < 4; i++) {
+      const attempts = (base.class_join_failed_attempts || 0) + 1;
+      const patch = { class_join_failed_attempts: attempts };
+      if (attempts >= 5) { patch.class_join_locked_until = new Date(Date.now() + 15 * 60 * 1000).toISOString(); patch.class_join_failed_attempts = 0; }
+      const cas = await sb(`/users?id=eq.${user.id}&class_join_failed_attempts=eq.${base.class_join_failed_attempts || 0}`, { method: 'PATCH', body: JSON.stringify(patch) });
+      if (cas.ok && cas.data && cas.data.length) break;
+      const fresh = await sb(`/users?id=eq.${user.id}&select=class_join_failed_attempts,class_join_locked_until`);
+      base = (fresh.data && fresh.data[0]) || base;
+    }
     if (cls && !cls.institution_id) return res.status(403).json({ error: 'Cette classe ne fait pas partie d\'un établissement — elle ne peut pas être rejointe par code.' });
     if (cls) return res.status(403).json({ error: "Ce code appartient à une classe d'un autre établissement que le tien." });
     return res.status(404).json({ error: 'Code de classe invalide.' });

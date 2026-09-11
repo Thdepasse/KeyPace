@@ -113,8 +113,18 @@ async function exchangeCode(provider, code) {
 }
 
 // Extrait email vérifié + nom du claim id_token, selon le provider.
+// Rejette explicitement un email que le provider annonce lui-même comme NON
+// vérifié (claim email_verified===false) : sans ce contrôle, un id_token
+// portant une adresse non confirmée chez Google/Microsoft se liait quand même
+// automatiquement au compte KeyPace existant portant cette adresse
+// (findOrCreateUser ci-dessous), permettant potentiellement une prise de
+// contrôle de compte par un attaquant qui contrôle une adresse non vérifiée.
+// Le claim est parfois absent selon le provider/flux (ex. certains comptes
+// Microsoft personnels) : dans ce cas on ne peut pas trancher ici, donc on ne
+// bloque pas — seul un `false` explicite est rejeté.
 function profileFromClaims(claims) {
   if (!claims) return null;
+  if (claims.email_verified === false || claims.email_verified === 'false') return null;
   const email = (claims.email || claims.preferred_username || claims.upn || '').toLowerCase().trim();
   if (!email || email.indexOf('@') < 0) return null;
   const name = claims.name || claims.given_name || email.split('@')[0];
@@ -125,9 +135,17 @@ function randomHash() {
   return crypto.randomBytes(32).toString('hex'); // password_hash non-null, inutilisable
 }
 
-// Même durée de vie de session que api/login.js (30 jours) — un session_token
-// restait valide indéfiniment jusqu'ici.
-function sessionExpiresAt() { return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); }
+// Le jeton créé ici transite en clair dans l'URL de redirection (?sso=TOKEN)
+// avant que le JS client ne le nettoie — il peut donc atterrir dans des logs
+// serveur/CDN, l'historique du navigateur, ou être partagé par erreur (lien
+// copié-collé) avant même d'être consommé. Comme il n'existe qu'une seule
+// colonne session_token par utilisateur, on lui donne volontairement une
+// durée de vie très courte : la toute première requête légitime du client
+// (action 'sso-finalize', voir api/login.js) l'échange immédiatement contre
+// un vrai jeton 30 jours qui, lui, ne transite jamais par une URL. Une copie
+// interceptée de ce lien devient donc inutilisable après quelques minutes au
+// pire, au lieu de rester valable 30 jours comme avant.
+function shortLivedExpiresAt() { return new Date(Date.now() + 2 * 60 * 1000).toISOString(); }
 
 // Génère un username unique à partir de l'email/nom.
 async function uniqueUsername(seed) {
@@ -170,7 +188,7 @@ async function findOrCreateUser(provider, profile, inviteCtx) {
     // Liaison auto + nouvelle session ; on confirme l'email au passage.
     // Note : une invitation présente ici n'est pas appliquée à un compte déjà
     // existant (même périmètre que register.js, qui ne gère que la création).
-    const patch = { session_token: session, session_expires_at: sessionExpiresAt(), last_seen_at: new Date().toISOString(), deletion_warned_at: null, email_verified: true };
+    const patch = { session_token: session, session_expires_at: shortLivedExpiresAt(), last_seen_at: new Date().toISOString(), deletion_warned_at: null, email_verified: true };
     if (!existing.oauth_provider) patch.oauth_provider = provider;
     if (existing.verification_token) patch.verification_token = null;
     await sb(`/users?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
@@ -203,7 +221,7 @@ async function findOrCreateUser(provider, profile, inviteCtx) {
       password_hash: randomHash(),
       plan: institution ? 'expert' : 'free',
       session_token: session,
-      session_expires_at: sessionExpiresAt(),
+      session_expires_at: shortLivedExpiresAt(),
       email_verified: true,
       verification_token: null,
       oauth_provider: provider,

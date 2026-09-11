@@ -9330,8 +9330,14 @@ const app={
         if(r.ok){
           const d=await r.json();
           currentUser=d.username;currentEmail=d.email||null;currentDisplayName=d.displayName||null;
+          // session-login fait maintenant tourner le token à chaque appel (voir
+          // api/login.js) : sans reprendre d.token ici, currentToken restait
+          // l'ancien jeton, désormais invalidé — toute requête authentifiée
+          // suivante aurait échoué en "Session invalide" jusqu'au prochain login.
+          if(d.token){currentToken=d.token;}
           const s=JSON.parse(localStorage.getItem('klak_session')||'{}');
           s.username=d.username;s.email=currentEmail;s.displayName=currentDisplayName;
+          if(d.token)s.token=d.token;
           localStorage.setItem('klak_session',JSON.stringify(s));
         }
       }catch{}
