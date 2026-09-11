@@ -4106,9 +4106,18 @@ const app={
     }
     this._essayLastKey=now;
     const n=(e.data||'').length;
+    // Un insertText de plus de 2 caractères d'un coup n'est quasiment jamais
+    // une vraie frappe clavier (qui produit un événement par caractère) : la
+    // zone "3 à 30 caractères = compté comme tapé" ci-dessous permettait de
+    // contourner la détection en collant le texte par morceaux de ≤30
+    // caractères via execCommand('insertText',...), qui ne déclenche ni
+    // 'paste' ni 'drop' (donc jamais _essayPaste() ci-dessus) — le signal
+    // remonté au prof restait "aucune suspicion" malgré un texte entièrement
+    // collé. Seuil abaissé à 2 caractères (laisse passer une éventuelle
+    // composition de touche morte à 2 caractères) ; tout insert plus long
+    // compte désormais comme suspect, quelle que soit sa taille.
     if(e.inputType==='insertText'&&n<=2)s.typedChars+=Math.max(1,n);
-    else if(n>30){s.bigInserts++;s.insertedChars+=n;}
-    else if(n>0)s.typedChars+=n;
+    else if(n>0){s.bigInserts++;s.insertedChars+=n;}
     else if(e.inputType&&e.inputType.startsWith('insert'))s.typedChars+=1;
     this._essayUpdateCount();
   },
@@ -8168,6 +8177,14 @@ const app={
     };
   },
   selectGame(which){
+    // Changer de jeu directement (carte -> carte) sans repasser par
+    // exitActiveGame() laissait tourner les timers/boucles/canaux Realtime du
+    // jeu précédent (ex: intervalle de Frappe-mots continuant en fond pendant
+    // une partie de Boss) : mêmes arrêts que exitActiveGame(), sans réinitialiser
+    // activeGame/l'état du nouveau jeu qui va être posé juste après.
+    this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();
+    if(this.duel)this.duelLeave();
+    if(this._clavierFlashT){clearTimeout(this._clavierFlashT);this._clavierFlashT=null;}
     if(which==='sprint'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sprint'));return;}
       this.activeGame='sprint';this.sprint=null;this.renderGames();
@@ -8820,15 +8837,26 @@ const app={
   },1000);},
   stopBoss(){if(this._bossLoop){clearInterval(this._bossLoop);this._bossLoop=null;}},
   async bossLoad(){
+    // Si bossLoad() est ré-appelé (retour rapide sur le jeu, double clic...)
+    // avant que le premier appel n'ait fini ses deux fetch, l'appel le plus
+    // ancien peut résoudre après le plus récent et écraser this.boss avec des
+    // données périmées. On numérote chaque appel et on abandonne le sien dès
+    // qu'un appel plus récent a démarré entre-temps.
+    const seq=(this._bossLoadSeq=(this._bossLoadSeq||0)+1);
     this.boss={phase:'loading'};this.renderCurrent();
     try{
       const ch=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-challenge'})}).then(r=>r.json());
+      if(seq!==this._bossLoadSeq)return;
       if(ch.error)throw new Error(ch.error);
       const lb=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-leaderboard',token:currentToken})}).then(r=>r.json());
+      if(seq!==this._bossLoadSeq)return;
       this.boss={phase:'lobby',challenge:ch,lb,secondsLeft:ch.secondsLeft};
       this._cacheBossBest(lb,ch.isoWeek);
-    }catch(e){this.boss={phase:'error',msg:'Impossible de charger le défi pour le moment. Réessaie plus tard.'};}
-    if(this.activeGame==='boss')this.renderCurrent();
+    }catch(e){
+      if(seq!==this._bossLoadSeq)return;
+      this.boss={phase:'error',msg:'Impossible de charger le défi pour le moment. Réessaie plus tard.'};
+    }
+    if(seq===this._bossLoadSeq&&this.activeGame==='boss')this.renderCurrent();
   },
   // Boss n'a pas de "meilleur score" local (tout vit côté serveur, classement
   // hebdo) — jusqu'ici ça le rendait absent de la page Progrès malgré son
@@ -9006,39 +9034,52 @@ const app={
     return this._duelSbClient;
   },
   async duelCreate(){
+    // Si l'utilisateur quitte le duel (duelLeave, ou selectGame vers un autre
+    // jeu) pendant que ce create/join est encore en vol, this._duelSeq change
+    // et on abandonne avant d'ouvrir un canal Realtime devenu orphelin (fuite
+    // de connexion + risque d'écraser l'état du nouveau jeu sélectionné).
+    const seq=(this._duelSeq=(this._duelSeq||0)+1);
     this.duel={phase:'creating'};this.renderCurrent();
     try{
       const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-create',token:currentToken})}).then(r=>r.json());
+      if(seq!==this._duelSeq)return;
       if(r.error){this.duel={phase:'error',msg:r.error};this.renderCurrent();return;}
       this.duel=this._duelBlank('host',r.roomId,r.roomCode,r.text,r.hostLabel);
-      await this.duelOpenChannel();
+      await this.duelOpenChannel(seq);
+      if(seq!==this._duelSeq)return;
       this.renderCurrent();
-    }catch{this.duel={phase:'error',msg:'Erreur réseau.'};this.renderCurrent();}
+    }catch{if(seq===this._duelSeq){this.duel={phase:'error',msg:'Erreur réseau.'};this.renderCurrent();}}
   },
   async duelJoin(roomId){
+    const seq=(this._duelSeq=(this._duelSeq||0)+1);
     this.activeGame='duel';this.duel={phase:'creating'};this.renderCurrent();
     try{
       const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-join',token:currentToken,roomId})}).then(r=>r.json());
+      if(seq!==this._duelSeq)return;
       if(r.error){this.duel={phase:'error',msg:r.error};this.renderCurrent();return;}
       this.duel=this._duelBlank(r.role,r.roomId,r.roomCode,r.text,r.hostLabel);
       if(r.startAt)this.duel.startAt=new Date(r.startAt).getTime();
-      await this.duelOpenChannel();
+      await this.duelOpenChannel(seq);
+      if(seq!==this._duelSeq)return;
       if(this.duel.startAt&&this.duel.startAt>Date.now())this._duelBeginCountdown();
       this.renderCurrent();
-    }catch{this.duel={phase:'error',msg:'Erreur réseau.'};this.renderCurrent();}
+    }catch{if(seq===this._duelSeq){this.duel={phase:'error',msg:'Erreur réseau.'};this.renderCurrent();}}
   },
   async duelJoinByCode(code){
     if(!code||code.trim().length<6){this.duel={phase:'menu',_codeError:'Saisis un code à 6 caractères.'};this.renderCurrent();return;}
+    const seq=(this._duelSeq=(this._duelSeq||0)+1);
     this.activeGame='duel';this.duel={phase:'creating'};this.renderCurrent();
     try{
       const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-join-code',token:currentToken,code:code.trim().toUpperCase()})}).then(r=>r.json());
+      if(seq!==this._duelSeq)return;
       if(r.error){this.duel={phase:'menu',_codeError:r.error};this.renderCurrent();return;}
       this.duel=this._duelBlank(r.role,r.roomId,r.roomCode,r.text,r.hostLabel);
       if(r.startAt)this.duel.startAt=new Date(r.startAt).getTime();
-      await this.duelOpenChannel();
+      await this.duelOpenChannel(seq);
+      if(seq!==this._duelSeq)return;
       if(this.duel.startAt&&this.duel.startAt>Date.now())this._duelBeginCountdown();
       this.renderCurrent();
-    }catch{this.duel={phase:'menu',_codeError:'Erreur réseau.'};this.renderCurrent();}
+    }catch{if(seq===this._duelSeq){this.duel={phase:'menu',_codeError:'Erreur réseau.'};this.renderCurrent();}}
   },
   _duelBlank(role,roomId,roomCode,text,hostLabel){
     return {phase:'lobby',role,roomId,roomCode,text,hostLabel,oppLabel:null,oppPresent:false,startAt:0,
@@ -9046,10 +9087,14 @@ const app={
       myProg:0,oppProg:0,oppFinished:false,oppForfeit:false,oppWpm:0,oppAcc:0,oppFinishMs:0,
       myWpm:0,myAcc:0,winner:null,_channel:null,_copied:false,_lastSent:0};
   },
-  async duelOpenChannel(){
+  async duelOpenChannel(seq){
     const d=this.duel;let sb;
     try{sb=await this.duelEnsureClient();}
-    catch(e){this.duel={phase:'error',msg:'Le mode temps réel n\'est pas configuré (clé Realtime manquante côté serveur).'};this.renderCurrent();return;}
+    catch(e){if(seq===undefined||seq===this._duelSeq){this.duel={phase:'error',msg:'Le mode temps réel n\'est pas configuré (clé Realtime manquante côté serveur).'};this.renderCurrent();}return;}
+    // L'appelant a pu quitter le duel pendant qu'on attendait le client
+    // Realtime (duelEnsureClient) : ne pas ouvrir un canal pour un duel
+    // abandonné (fuite de connexion Supabase Realtime).
+    if(seq!==undefined&&seq!==this._duelSeq)return;
     const ch=sb.channel('duel:'+d.roomId,{config:{presence:{key:currentUser},broadcast:{self:false}}});
     const syncPresence=()=>{
       const d2=this.duel;if(!d2||!d2._channel)return;
@@ -9161,6 +9206,10 @@ const app={
     }
   },
   duelLeave(){
+    // Invalide tout duelCreate()/duelJoin()/duelOpenChannel() encore en vol :
+    // sans ça, un create/join lancé juste avant de quitter peut résoudre après
+    // coup et ouvrir un canal Realtime pour un duel que l'utilisateur a déjà quitté.
+    this._duelSeq=(this._duelSeq||0)+1;
     if(this._duelLoop){clearInterval(this._duelLoop);this._duelLoop=null;}
     if(this.duel&&this.duel._channel){try{this.duel._channel.unsubscribe();}catch{} try{this._duelSbClient&&this._duelSbClient.removeChannel(this.duel._channel);}catch{}}
     this.duel=null;
@@ -9174,22 +9223,27 @@ const app={
   },
   async _duelMaybeRematch(){
     const d=this.duel;if(!d||!d._myRematch||!d._oppRematch||d.role!=='host')return;
+    const seq=(this._duelSeq=(this._duelSeq||0)+1);
     d._rematchLoading=true;this.renderCurrent();
     try{
       const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-create',token:currentToken})}).then(r=>r.json());
+      if(seq!==this._duelSeq)return;
       if(r.error||!r.roomId){d._rematchLoading=false;d._rematchError=r.error||'Erreur.';this.renderCurrent();return;}
       if(d._channel)d._channel.send({type:'broadcast',event:'rematch-go',payload:{roomId:r.roomId,roomCode:r.roomCode,text:r.text,hostLabel:r.hostLabel}}).catch(()=>{});
       if(d._channel){try{d._channel.unsubscribe();}catch{} try{this._duelSbClient&&this._duelSbClient.removeChannel(d._channel);}catch{}}
       this.duel=this._duelBlank('host',r.roomId,r.roomCode,r.text,r.hostLabel);
-      await this.duelOpenChannel();
+      await this.duelOpenChannel(seq);
+      if(seq!==this._duelSeq)return;
       this.renderCurrent();
-    }catch{d._rematchLoading=false;d._rematchError='Erreur réseau.';this.renderCurrent();}
+    }catch{if(seq===this._duelSeq){d._rematchLoading=false;d._rematchError='Erreur réseau.';this.renderCurrent();}}
   },
   async _duelRematchGo(roomId,roomCode,text,hostLabel){
     const d=this.duel;if(!d)return;
+    const seq=(this._duelSeq=(this._duelSeq||0)+1);
     if(d._channel){try{d._channel.unsubscribe();}catch{} try{this._duelSbClient&&this._duelSbClient.removeChannel(d._channel);}catch{}}
     this.duel=this._duelBlank('guest',roomId,roomCode,text,hostLabel);
-    await this.duelOpenChannel();
+    await this.duelOpenChannel(seq);
+    if(seq!==this._duelSeq)return;
     this.renderCurrent();
   },
   _duelLanesHTML(){

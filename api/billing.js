@@ -101,6 +101,20 @@ module.exports = async function handler(req, res) {
   }
 
   // action === 'checkout'
+  // Garde anti-double-abonnement : rien n'empêchait deux onglets/sessions du
+  // même compte de créer chacun une session Stripe Checkout valide, menant à
+  // deux abonnements distincts (double facturation) si les deux étaient
+  // menés à terme. On vérifie directement auprès de Stripe (pas seulement
+  // notre colonne `plan`, qui peut être en retard tant que le webhook n'est
+  // pas encore passé) qu'aucun abonnement actif/en essai n'existe déjà pour
+  // ce client avant d'en proposer un nouveau.
+  if (user.stripe_customer_id) {
+    const existingSubs = await stripe.subscriptions.list({ customer: user.stripe_customer_id, status: 'all', limit: 10 });
+    const alreadyActive = (existingSubs.data || []).some((s) => s.status === 'active' || s.status === 'trialing');
+    if (alreadyActive) {
+      return res.status(409).json({ error: 'Tu as déjà un abonnement Expert actif. Gère-le depuis "Gérer mon abonnement".' });
+    }
+  }
   let customerId = user.stripe_customer_id;
   if (!customerId) {
     const customer = await stripe.customers.create({

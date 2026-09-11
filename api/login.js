@@ -18,6 +18,16 @@ function sessionExpiresAt() { return new Date(Date.now() + SESSION_TTL_MS).toISO
 function sessionFilter(token) {
   return `session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})`;
 }
+// Postgres compare `username=eq.` de façon sensible à la casse : un simple
+// eq. laissait passer un changement de nom vers une casse différente d'un nom
+// déjà pris (ex: "Theo" existant, renommage vers "theo" accepté), créant deux
+// comptes qui se ressemblent. ILIKE sans caractère générique fait un match
+// exact insensible à la casse ; `%`, `_` et `\` sont échappés car ILIKE les
+// traite comme des jokers (`_` fait partie des caractères de nom autorisés).
+function usernameEqFilter(name) {
+  const escaped = String(name).replace(/[\\%_]/g, (c) => '\\' + c);
+  return `username=ilike.${encodeURIComponent(escaped)}`;
+}
 
 async function sb(path, opts = {}) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
@@ -386,7 +396,7 @@ module.exports = async function handler(req, res) {
     }
     if (newUsername.toLowerCase() === user.username.toLowerCase()) return res.json({ ok: true, username: user.username });
 
-    const dup = await sb(`/users?username=eq.${encodeURIComponent(newUsername)}&select=id`);
+    const dup = await sb(`/users?${usernameEqFilter(newUsername)}&select=id`);
     if (dup.data && dup.data.length) return res.status(409).json({ error: 'Ce nom est déjà pris.' });
 
     await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ username: newUsername }) });

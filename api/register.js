@@ -8,6 +8,16 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const APP_URL = (process.env.APP_URL || 'https://keypace.be').trim();
 const FROM_EMAIL = process.env.FROM_EMAIL || 'KeyPace <noreply@keypace.be>';
 
+// Postgres compare `username=eq.` de façon sensible à la casse : sans ça,
+// "Theo" et "theo" passent tous les deux le contrôle de doublon et créent deux
+// comptes distincts qui se ressemblent (confusion, usurpation de nom). ILIKE
+// sans caractère générique fait un match exact insensible à la casse ; `%`,
+// `_` et `\` doivent être échappés car ILIKE les traite comme des jokers.
+function usernameEqFilter(name) {
+  const escaped = String(name).replace(/[\\%_]/g, (c) => '\\' + c);
+  return `username=ilike.${encodeURIComponent(escaped)}`;
+}
+
 async function sb(path, opts = {}) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
     ...opts,
@@ -220,7 +230,7 @@ module.exports = async function handler(req, res) {
   const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
   if (!emailRe.test(String(email))) return res.status(400).json({ error: 'Adresse email invalide.' });
 
-  const check = await sb(`/users?username=eq.${encodeURIComponent(username)}&select=id`);
+  const check = await sb(`/users?${usernameEqFilter(username)}&select=id`);
   if (check.data && check.data.length > 0) return res.status(409).json({ error: 'Ce nom est déjà pris.' });
 
   const emailCheck = await sb(`/users?email=eq.${encodeURIComponent(email)}&select=id`);
@@ -323,6 +333,23 @@ module.exports = async function handler(req, res) {
   if (!create.ok) return res.status(500).json({ error: 'Erreur création compte.' });
 
   const user = create.data[0];
+
+  // Re-contrôle des places après création (TOCTOU) : le contrôle plus haut
+  // (avant l'INSERT) n'empêche pas deux inscriptions concurrentes de passer
+  // toutes les deux le contrôle avec 1 seule place restante et de créer 2
+  // comptes pour 1 siège licencié. PostgREST ne permet pas de transaction
+  // atteinte-de-quota côté serveur, donc on recompte après coup et on annule
+  // (supprime) ce compte précis s'il fait dépasser le quota — au pire, en cas
+  // de course serrée, les deux inscriptions concurrentes échouent plutôt que
+  // de dépasser le nombre de places payées.
+  if (institution && !profInvite) {
+    const recheck = await sb(`/users?institution_id=eq.${encodeURIComponent(institution.id)}&role=eq.eleve&select=id`);
+    const seatsNow = recheck.data ? recheck.data.length : 0;
+    if (seatsNow > institution.seat_count) {
+      await sb(`/users?id=eq.${user.id}`, { method: 'DELETE' });
+      return res.status(403).json({ error: 'Plus de places disponibles pour cet établissement.' });
+    }
+  }
 
   // Marque l'invitation (prof ou admin) comme utilisée.
   if (profInvite) {

@@ -1105,15 +1105,26 @@ async function essaySubmit(req, res) {
   if (!r.ok) return res.status(500).json({ error: 'Enregistrement impossible.' });
 
   // Marque le devoir comme fait dans progress.data (cohérent avec assignmentDone).
+  // Écriture par compare-and-swap (sur updated_at) plutôt qu'un simple
+  // lire-modifier-écrire : sans ça, un save-progress du client (déclenché par
+  // la fin d'un autre exercice) arrivé entre notre lecture et notre écriture
+  // était silencieusement écrasé — cette écriture-ci réécrivait tout le blob
+  // `data` à partir d'une version déjà périmée, effaçant la progression que
+  // le client venait d'enregistrer entre-temps. On relit et réessaie si
+  // `updated_at` a changé depuis notre lecture (quelqu'un d'autre a écrit).
   try {
-    const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(user.id)}&select=data`);
-    const data = (pr.data && pr.data[0] && pr.data[0].data) || {};
-    data.assignmentsDone = data.assignmentsDone || {};
-    data.assignmentsDone[a.id] = { t: Date.now(), essay: true, words: v.words };
-    await sb(`/progress?user_id=eq.${encodeURIComponent(user.id)}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ data, updated_at: new Date().toISOString() }),
-    });
+    for (let i = 0; i < 4; i++) {
+      const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(user.id)}&select=data,updated_at`);
+      const row = pr.data && pr.data[0];
+      const data = (row && row.data) || {};
+      data.assignmentsDone = data.assignmentsDone || {};
+      data.assignmentsDone[a.id] = { t: Date.now(), essay: true, words: v.words };
+      const filter = row && row.updated_at
+        ? `/progress?user_id=eq.${encodeURIComponent(user.id)}&updated_at=eq.${encodeURIComponent(row.updated_at)}`
+        : `/progress?user_id=eq.${encodeURIComponent(user.id)}`;
+      const w = await sb(filter, { method: 'PATCH', body: JSON.stringify({ data, updated_at: new Date().toISOString() }) });
+      if (w.ok && w.data && w.data.length) break;
+    }
   } catch { /* le rendu est enregistré : ne pas échouer sur le marqueur */ }
 
   return res.json({ ok: true, words: v.words });

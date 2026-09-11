@@ -58,7 +58,17 @@ function aggregateClass(studentsData, now) {
   const activeThisWeek = sums.filter((s) => s.daysSinceActive != null && s.daysSinceActive < 7).length;
   const withWpm = sums.filter((s) => s.avgWpm != null);
   const withAcc = sums.filter((s) => s.avgAcc != null);
-  const mean = (arr, key) => (arr.length ? Math.round(arr.reduce((a, s) => a + s[key], 0) / arr.length) : null);
+  // Moyenne pondérée par le nombre de tests réellement pris en compte dans la
+  // moyenne de chaque élève (studentSummary ne moyenne que les 10 derniers) :
+  // une simple moyenne des moyennes donnait autant de poids à un élève ayant
+  // fait 1 seul test qu'à un élève assidu en ayant fait 10, biaisant fortement
+  // la moyenne de classe vers les élèves peu actifs.
+  const mean = (arr, key) => {
+    const weight = (s) => Math.min(s.sessions, 10);
+    const totalWeight = arr.reduce((a, s) => a + weight(s), 0);
+    if (!totalWeight) return null;
+    return Math.round(arr.reduce((a, s) => a + s[key] * weight(s), 0) / totalWeight);
+  };
   return {
     total,
     activeThisWeek,
