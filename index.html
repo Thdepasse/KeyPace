@@ -10711,7 +10711,6 @@ const app={
       <div class="stats-header" style="padding-bottom:28px">
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
           <div><h1 style="margin-bottom:4px">Mes classes</h1><p style="margin:0">Les classes que tu as rejointes.</p></div>
-          <button class="btn-primary" style="padding:10px 20px;font-size:14px;white-space:nowrap" onclick="joinClassPrompt()">+ Rejoindre une classe</button>
         </div>
       </div>
       <div style="max-width:760px;padding-bottom:60px">
@@ -10720,8 +10719,7 @@ const app={
           <div style="text-align:center;padding:72px 20px;color:var(--muted)">
             <div style="font-size:48px;margin-bottom:16px;color:var(--accent)">${ICONS.gradCap}</div>
             <div style="font-size:17px;font-weight:700;color:var(--txt);margin-bottom:8px">Tu n'as rejoint aucune classe</div>
-            <div style="font-size:14px;max-width:360px;margin:0 auto 22px;line-height:1.6">${currentInstitutionName?`Ton compte est rattaché à <b style="color:var(--txt)">${this._esc(currentInstitutionName)}</b>, mais il te manque encore une classe.<br>`:''}Demande son code à ton professeur, puis clique sur « Rejoindre une classe » et saisis-le.</div>
-            <button class="btn-primary" style="padding:10px 22px;font-size:14px" onclick="joinClassPrompt()">+ Rejoindre une classe</button>
+            <div style="font-size:14px;max-width:360px;margin:0 auto 22px;line-height:1.6">${currentInstitutionName?`Ton compte est rattaché à <b style="color:var(--txt)">${this._esc(currentInstitutionName)}</b>, mais il te manque encore une classe. `:''}Contacte ton établissement pour être ajouté à une classe.</div>
           </div>
         `:`<div style="display:flex;flex-direction:column;gap:10px">
           ${list.map(c=>{
@@ -10928,7 +10926,6 @@ const app={
     const students=d.students||[];
     const agg=d.agg||{};
     this._classDetail=d;
-    const link=`${location.origin}?classe=${d.inviteCode}`;
     let asg=[];
     try{const ar=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-list',token:currentToken,classId:id})});if(ar.ok)asg=(await ar.json()).assignments||[];}catch{}
     if(this._classesSub!=='class'||this._classViewingId!==id)return;
@@ -11024,16 +11021,6 @@ const app={
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">PRÉCISION MOY.</div><div style="font-size:28px;font-weight:800">${agg.avgAcc!=null?agg.avgAcc:'-'}<span style="font-size:14px;color:var(--muted);font-weight:500">${agg.avgAcc!=null?' %':''}</span></div></div>
         </div>`:''}
 
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,77,46,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">${ICONS.key}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:2px">CODE D'INVITATION</div>
-            <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:.12em;color:var(--accent)">${d.inviteCode}</div>
-          </div>
-          <button id="copy-code-btn" onclick="app.copyClassLink('${link}')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Copier le lien</button>
-          <button onclick="openImportModal('${d.id}')" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt);white-space:nowrap;flex-shrink:0"><span style="color:var(--accent)">${ICONS.clipboard}</span> Importer un CSV</button>
-        </div>
-
         ${skillsCard}
         ${asgHtml}
 
@@ -11041,7 +11028,7 @@ const app={
           <div style="text-align:center;padding:64px 20px;color:var(--muted)">
             <div style="width:60px;height:60px;border-radius:16px;background:var(--light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 16px">${ICONS.user}</div>
             <div style="font-size:16px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun élève encore</div>
-            <div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Partage le code <b style="color:var(--accent);font-family:'JetBrains Mono',monospace">${d.inviteCode}</b> ou le lien. Tes élèves rejoignent la classe en quelques secondes.</div>
+            <div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Contacte ton établissement KeyPace pour ajouter tes élèves à cette classe.</div>
           </div>
         `:`
           <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
