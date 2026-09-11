@@ -2127,6 +2127,10 @@ function completeLogin(d){
   if(d.role)_mergedData.role=d.role;
   saveSession(d.username, d.plan, d.token, d.id, _mergedData.role||null, d.email, d.displayName, d.institutionName, d.hasClass);
   try{track('login',{method:'password'});}catch{}
+  // Repartir sur une base propre : _myClasses/_myAssignments peuvent encore
+  // contenir les devoirs (et leur statut fait/non fait) d'un compte précédent
+  // resté en mémoire dans cet onglet (voir logout()).
+  app._myClasses=null;app._myAssignments=null;
   app.stats=_mergedData;
   _statsLoaded=true; // réponse de login fraîche et authoritative : sûr d'autoriser la sauvegarde
   window._needsOnboarding = !d.onboarding_completed;
@@ -2322,6 +2326,12 @@ function logout(){
   app.stats=null;
   app.etab=null;
   app.admin=null;
+  // _myClasses/_myAssignments n'étaient jamais réinitialisés ici : sur un
+  // changement de compte sans rechargement complet de la page (déconnexion
+  // puis reconnexion avec un autre identifiant dans le même onglet), "Mes
+  // devoirs" pouvait continuer d'afficher les devoirs — et leur statut
+  // "fait"/"non fait" — du compte précédent jusqu'au prochain exercice.
+  app._myClasses=null;app._myAssignments=null;
   app._myCert=undefined;app._certName=null;
   app.stopAll();
   updateNavUser();
