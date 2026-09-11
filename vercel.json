@@ -37,6 +37,7 @@
           { "source": "/guide/raccourcis-clavier-windows", "destination": "/guide/raccourcis-clavier-windows.html" },
           { "source": "/guide", "destination": "/guide/index.html" },
           { "source": "/api/verify-email", "destination": "/api/register" },
+          { "source": "/api/confirm-parent-consent", "destination": "/api/register" },
           { "source": "/((?!api/).*)", "destination": "/index.html" }
     ],
     "crons": [

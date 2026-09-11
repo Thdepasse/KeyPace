@@ -564,6 +564,17 @@ module.exports = async function handler(req, res) {
   }
   if (user.verification_token) return res.status(403).json({ error: 'Confirme ton adresse email avant de te connecter. Vérifie ta boîte mail.', code: 'EMAIL_NOT_VERIFIED' });
 
+  // RGPD mineurs : un compte < 13 ans (hors établissement) reste utilisable
+  // dès l'inscription, mais parent_consent_token (voir api/register.js —
+  // parentConsentEmail / confirmParentConsent) reste non-null tant que le
+  // parent n'a pas confirmé. Passé 30 jours sans confirmation, on suspend la
+  // connexion. Les comptes créés avant l'ajout de cette colonne ont
+  // parent_consent_token=null (jamais émis) et ne sont donc jamais suspendus
+  // rétroactivement.
+  if (user.parent_consent_token && user.created_at && Date.now() - new Date(user.created_at).getTime() > 30 * 24 * 60 * 60 * 1000) {
+    return res.status(403).json({ error: "Compte suspendu : l'accord d'un parent n'a pas été confirmé dans le délai de 30 jours. Contacte contact@keypace.be.", code: 'PARENT_CONSENT_MISSING' });
+  }
+
   const token = require('crypto').randomUUID();
   const patch = { session_token: token, session_expires_at: sessionExpiresAt(), last_seen_at: new Date().toISOString(), deletion_warned_at: null, failed_attempts: 0, locked_until: null };
   if (check.upgrade) patch.password_hash = check.upgrade; // migration SHA-256 brut -> scrypt

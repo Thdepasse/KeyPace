@@ -773,3 +773,19 @@ create policy "no_anon_access" on admin_key_attempts for all to anon using (fals
 -- ───────────────────────────────────────────────────────────────
 alter table essay_submissions add column if not exists teacher_comment text;
 alter table essay_submissions add column if not exists teacher_grade text;
+
+-- ───────────────────────────────────────────────────────────────
+-- Confirmation réelle de l'accord parental pour les < 13 ans (audit RGPD,
+-- 11 sept. 2026). Jusqu'ici l'email d'un parent n'était vérifié qu'au
+-- format (ex: "parent@n'importe-quoi.fr" passait sans que ce parent n'ait
+-- jamais rien confirmé). parent_consent_token est émis à l'inscription et
+-- envoyé par email au parent ; il est mis à null dès que le parent clique
+-- (confirmé) ou reste renseigné si jamais confirmé — c'est ce qui permet de
+-- distinguer un compte "en attente" d'un compte créé avant cette migration
+-- (parent_consent_token restera NULL pour ces derniers, qui ne sont donc
+-- jamais suspendus rétroactivement). Pas de colonne d'expiration dédiée : le
+-- délai de 30 jours se calcule à partir de users.created_at, déjà existant.
+-- ───────────────────────────────────────────────────────────────
+alter table users add column if not exists parent_consent_token text;
+alter table users add column if not exists parent_consent_confirmed_at timestamptz;
+create index if not exists users_parent_consent_token_idx on users(parent_consent_token) where parent_consent_token is not null;
