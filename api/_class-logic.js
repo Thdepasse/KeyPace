@@ -35,7 +35,11 @@ function studentSummary(data, now) {
   const avg = (key) =>
     recent.length ? Math.round(recent.reduce((a, t) => a + (t[key] || 0), 0) / recent.length) : null;
   const clearedLessons = Object.values(lessons).filter((l) => l && l.cleared).length;
-  const daysSinceActive = lastTest != null ? Math.floor((now - lastTest) / (24 * 60 * 60 * 1000)) : null;
+  // Math.max(0, ...) : un test très récent (secondes avant l'appel) peut, avec
+  // un léger décalage d'horloge entre le poste qui a enregistré `t` et celui
+  // qui calcule `now`, produire un écart négatif — Math.floor donnait alors
+  // "-1 j" au lieu de "aujourd'hui" dans le tableau de classe.
+  const daysSinceActive = lastTest != null ? Math.max(0, Math.floor((now - lastTest) / (24 * 60 * 60 * 1000))) : null;
   return {
     sessions: tests.length,
     avgWpm: avg('wpm'),

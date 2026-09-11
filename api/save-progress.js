@@ -52,6 +52,15 @@ module.exports = async function handler(req, res) {
     if (prevLessons > 0 && nextLessons < prevLessons) {
       return res.status(409).json({ error: 'Sauvegarde refusée : régression de progression détectée.' });
     }
+    // Fusionne assignmentsDone plutôt que d'écraser : essaySubmit() (api/classes.js)
+    // pose sa propre marque "devoir fait" directement en base, sans jamais
+    // transiter par le client. Si l'élève enchaîne sur un autre exercice avant
+    // de recharger la page, ce client (qui ignore encore cette marque) écrase
+    // et efface tout le blob `data` en écrivant le sien — le devoir "essai"
+    // redevient alors "non fait" malgré une copie bien rendue et notée.
+    if (prevData.assignmentsDone) {
+      data.assignmentsDone = { ...prevData.assignmentsDone, ...(data.assignmentsDone || {}) };
+    }
   }
 
   // Sinon => écriture en upsert (insère la ligne si elle n'existe pas encore)

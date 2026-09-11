@@ -3755,6 +3755,19 @@ const app={
   },
 
   lessonRec(id){const v=(this.stats&&this.stats.lessons||{})[id];if(!v)return{bestWpm:0,bestErr:null,cleared:false};if(typeof v==='number')return{bestWpm:v,bestErr:null,cleared:true};return v;},
+  // "Record à battre" affiché en fin d'exercice : une leçon se compare à ses
+  // propres tentatives (lessonRec), un devoir "texte perso"/dictée se compare
+  // à ses propres tentatives passées sur CE devoir précis (assignmentId) —
+  // pas au record d'un test de vitesse libre pris dans d'autres conditions
+  // (texte affiché vs dicté à l'oral, longueur différente, etc.), qui n'a
+  // rien de comparable. Seul un test de vitesse libre continue de se comparer
+  // à l'ensemble de ses tests libres passés.
+  _prevBestFor(s){
+    if(s.mode==='lesson')return this.lessonRec(s.lessonId).bestWpm||0;
+    const tests=(this.stats&&this.stats.tests)||[];
+    if(s.custom&&s.assignmentId)return Math.max(0,...tests.filter(t=>t.assignmentId===s.assignmentId).map(t=>t.wpm));
+    return Math.max(0,...tests.filter(t=>!t.assignmentId).map(t=>t.wpm));
+  },
   setGoal(key,delta){
     if(!currentUser)return;
     const g=this.stats.goals;
@@ -4109,6 +4122,17 @@ const app={
       })});
       const d=await r.json();
       if(!r.ok)return fail(d.error||'Erreur.');
+      // Le serveur marque le devoir "fait" dans progress.data (voir essaySubmit
+      // côté API), mais ne renvoie pas la donnée mise à jour ici : sans ça,
+      // this.stats reste en mémoire sans cette marque, et le prochain
+      // enregistrement de progression (leçon, test, dictée...) écrase le
+      // marqueur posé par le serveur avec cette version locale incomplète —
+      // le devoir "essai" redevient alors "non fait" pour l'élève et le prof
+      // malgré une copie bien rendue et notée.
+      if(this.stats){
+        if(!this.stats.assignmentsDone)this.stats.assignmentsDone={};
+        this.stats.assignmentsDone[this._essayData.assignment.id]={t:Date.now(),essay:true,words:d.words};
+      }
       this.closeEssay();
       this._essayToast('✓ Essai rendu ('+d.words+' mots)');
       this.loadMyClasses();
@@ -4368,7 +4392,7 @@ const app={
       }
     }
     s.idx++;
-    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats(s);const res=this.computeResult(s);if(currentUser){const _pr=s.mode==='lesson'?this.lessonRec(s.lessonId).bestWpm||0:Math.max(0,...(this.stats?.tests||[]).map(t=>t.wpm));s._prevBestWpm=_pr;}try{if(s.mode==='test'&&!s.cert)track('speed_test_completed',{wpm:res.wpm,acc:res.acc,loggedIn:!!currentUser});}catch{}this.recordResult(s.mode,res,s.lessonId,s._gazeStats);if(!currentUser&&s.mode==='test')this._markGuestTest(res.wpm,res.acc);this.renderCurrent();if(s.mode==='lesson'&&!s.cert)celebrateLesson(this.lessonById(s.lessonId),res);if(s.mode==='test'&&!s.cert){if(!currentUser)maybeConvGuest(res);else maybeConvUpsell(res);}if(s.cert)this._finishCertExam(s,res);return;}
+    if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats(s);const res=this.computeResult(s);if(currentUser){s._prevBestWpm=this._prevBestFor(s);}try{if(s.mode==='test'&&!s.cert)track('speed_test_completed',{wpm:res.wpm,acc:res.acc,loggedIn:!!currentUser});}catch{}this.recordResult(s.mode,res,s.lessonId,s._gazeStats);if(!currentUser&&s.mode==='test')this._markGuestTest(res.wpm,res.acc);this.renderCurrent();if(s.mode==='lesson'&&!s.cert)celebrateLesson(this.lessonById(s.lessonId),res);if(s.mode==='test'&&!s.cert){if(!currentUser)maybeConvGuest(res);else maybeConvUpsell(res);}if(s.cert)this._finishCertExam(s,res);return;}
     if(this._isPlainTest())this._patchTest4a();else this._patchTypingBox();
   },
   computeResult(s){
@@ -4380,7 +4404,11 @@ const app={
   recordResult(mode,res,lessonId,gazeStats){
     if(!currentUser||!this.stats)return;
     const gazeExtra=gazeStats!=null?{gaze:gazeStats.pct,...(gazeStats.onAcc!=null?{gazeOnAcc:gazeStats.onAcc}:{}),...(gazeStats.offAcc!=null?{gazeOffAcc:gazeStats.offAcc}:{}),...(gazeStats.onWpm!=null?{gazeOnWpm:gazeStats.onWpm}:{}),...(gazeStats.offWpm!=null?{gazeOffWpm:gazeStats.offWpm}:{})}:{};
-    this.stats.tests.push({t:Date.now(),wpm:res.wpm,acc:res.acc,mode,...(lessonId?{lessonId}:{}),...gazeExtra});
+    // assignmentId : permet à _prevBestFor() de comparer un devoir "texte
+    // perso"/dictée à ses propres tentatives passées sur CE devoir, plutôt
+    // qu'au record d'un test de vitesse libre (conditions différentes).
+    const assignmentId=this.sess&&this.sess.custom?this.sess.assignmentId:null;
+    this.stats.tests.push({t:Date.now(),wpm:res.wpm,acc:res.acc,mode,...(lessonId?{lessonId}:{}),...(assignmentId?{assignmentId}:{}),...gazeExtra});
     // Devoir « texte personnalisé » : marque ce devoir comme fait (statut côté prof/élève).
     if(this.sess&&this.sess.assignmentId){
       if(!this.stats.assignmentsDone)this.stats.assignmentsDone={};
@@ -5416,7 +5444,7 @@ const app={
         <div class="stat-box"><div class="stat-label">Progression</div><div class="stat-val">${s&&s.idx>0?progress+'<span class="stat-unit"> %</span>':'·'}</div></div>
         ${(()=>{
           if(!currentUser||!this.stats)return'';
-          const pb=isLesson?this.lessonRec(s?.lessonId).bestWpm||0:Math.max(0,...(this.stats.tests||[]).map(t=>t.wpm));
+          const pb=s?this._prevBestFor(s):0;
           if(!pb)return'';
           const beating=s&&s.started&&liveWpm>pb;
           return`<div class="stat-box" style="border-left:1px solid var(--border)"><div class="stat-label" style="color:${beating?'var(--success)':'var(--muted)'}">Record</div><div class="stat-val" style="font-size:22px;color:${beating?'var(--success)':'var(--muted)'}">${pb}<span class="stat-unit"> mpm</span></div></div>`;
@@ -10618,7 +10646,14 @@ const app={
   },
 
   async loadMyClasses(){
-    if(!currentToken){this._myClasses=[];this._myAssignments=[];return;}
+    // Ne jamais mettre en cache un tableau vide quand le token n'est pas
+    // encore prêt (juste après une connexion) : `renderStudentClasses()`
+    // traite `[]` comme "déjà chargé, rien à afficher" et ne relance jamais
+    // loadMyClasses() derrière. Un compte pourtant bien inscrit à une classe
+    // pouvait ainsi rester bloqué sur "Tu n'as rejoint aucune classe" tant que
+    // la page n'était pas rechargée. En laissant `_myClasses` intact (null au
+    // départ), un appel ultérieur (une fois le token disponible) réessaiera.
+    if(!currentToken)return;
     try{
       const [rc,ra]=await Promise.all([
         fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'my-classes',token:currentToken})}),
@@ -12076,7 +12111,16 @@ async function loadProgressFromServer(attempt){
     if(!r.ok)throw new Error('http '+r.status);
     const d=await r.json();
     if(d){
+      // /api/save-progress (lecture) ne renvoie que le blob progress.data — le
+      // rôle vit dans la table users, pas dans ce blob. mergeStats(d.data) ne
+      // le contient donc jamais : sans le préserver ici, un rechargement de
+      // page effaçait le rôle préchargé par loadSession() (localStorage), et
+      // un compte prof/établissement se retrouvait traité comme un simple
+      // élève (isTeacher()/isAdmin() redevenaient faux) jusqu'à une
+      // reconnexion complète.
+      const _preRole=app.stats&&app.stats.role;
       if(d.data)app.stats=mergeStats(d.data);
+      if(_preRole&&app.stats&&!app.stats.role)app.stats.role=_preRole;
       _statsLoaded=true;
       const _s=JSON.parse(localStorage.getItem('klak_session')||'{}');let _changed=false;if(d.id&&!currentUserId){currentUserId=d.id;_s.userId=d.id;_changed=true;}if(app.stats&&app.stats.role&&_s.role!==app.stats.role){_s.role=app.stats.role||null;_changed=true;}if(_changed)localStorage.setItem('klak_session',JSON.stringify(_s));
       updateNavUser();app.renderCurrent();if(isAdmin())app.loadAdmin();else if(isTeacher())app.loadEtab();
