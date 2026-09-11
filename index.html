@@ -2315,6 +2315,16 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 function logout(){
+  // saveStats() ne sauvegarde jamais tout de suite : elle attend 2 secondes
+  // (débounce) avant d'envoyer la progression au serveur. Un exercice fini
+  // juste avant de cliquer "Déconnexion" n'avait donc pas encore été
+  // sauvegardé : clearSession() efface app.stats juste après, et ce dernier
+  // résultat (leçon, test, devoir…) disparaissait silencieusement, sans
+  // jamais avoir été écrit en base. Même mécanisme que le sendBeacon de
+  // pagehide (fermeture d'onglet), mais manquant ici.
+  if(currentUser&&currentToken&&app.stats&&_statsDirty){
+    try{navigator.sendBeacon('/api/save-progress',new Blob([JSON.stringify({token:currentToken,data:app.stats})],{type:'application/json'}));}catch{}
+  }
   // Invalide le jeton côté serveur (best-effort, pas attendu) — avant, la
   // déconnexion n'effaçait que le localStorage : un jeton intercepté avant
   // le clic restait utilisable indéfiniment malgré la "déconnexion".
