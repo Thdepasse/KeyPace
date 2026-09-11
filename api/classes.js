@@ -232,7 +232,10 @@ async function classDetail(req, res) {
   // atteints, qui ne sont pas un point faible mais juste "pas encore vu").
   const modules = moduleMastery(datas.map((d) => d.lessons));
   const started = modules.filter((m) => m.avgPct > 0 && m.avgPct < 100);
-  const weakest = started.length ? started.reduce((a, b) => (b.avgPct < a.avgPct ? b : a)) : null;
+  // "en retard sur le reste de la classe" n'a de sens que s'il y a au moins un
+  // autre module entamé à comparer : avec un seul module démarré, ce module
+  // EST tout le progrès de la classe, il n'est "en retard" sur rien.
+  const weakest = started.length >= 2 ? started.reduce((a, b) => (b.avgPct < a.avgPct ? b : a)) : null;
 
   return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now), modules, weakestModule: weakest });
 }
@@ -622,8 +625,23 @@ async function assignmentDetail(req, res) {
   if (error) return res.status(status).json({ error });
   const members = await membersOf(cls.id);
   const pmap = await fetchProgressMap(members.map((m) => m.student_id));
+  // La vitesse réellement atteinte est déjà stockée (lessons[].bestWpm ou
+  // assignmentsDone[].wpm) mais n'était jamais renvoyée : le prof voyait
+  // seulement "fait" / "pas encore", jamais si l'objectif de vitesse fixé sur
+  // le devoir était atteint ou juste "rendu" à une vitesse plus basse.
   const rows = members
-    .map((m) => ({ studentId: m.student_id, username: m.username, done: assignmentDone(pmap[m.student_id] || {}, a) }))
+    .map((m) => {
+      const data = pmap[m.student_id] || {};
+      let wpm = null;
+      if (a.lesson_id) {
+        const rec = (data.lessons || {})[a.lesson_id];
+        wpm = rec ? rec.bestWpm : null;
+      } else if (a.custom_text) {
+        const rec = (data.assignmentsDone || {})[a.id];
+        wpm = rec ? rec.wpm : null;
+      }
+      return { studentId: m.student_id, username: m.username, done: assignmentDone(data, a), wpm };
+    })
     .sort((x, y) => Number(x.done) - Number(y.done) || x.username.localeCompare(y.username));
   return res.json({
     assignment: { id: a.id, title: a.title, targetWpm: a.target_wpm, dueDate: a.due_date },
