@@ -45,4 +45,15 @@ function verifyPassword(clientHash, stored) {
   return { ok, upgrade: ok ? hashPassword(input) : null };
 }
 
-module.exports = { hashPassword, verifyPassword };
+// Compare deux chaînes en temps constant (secrets/signatures HMAC — ADMIN_KEY,
+// CRON_SECRET, state OAuth, signature de certificat...). Un simple `!==`
+// laisse fuiter, via le temps de réponse, le nombre de caractères corrects
+// trouvés avant la première différence.
+function safeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
+}
+
+module.exports = { hashPassword, verifyPassword, safeEqual };

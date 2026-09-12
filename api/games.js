@@ -58,7 +58,9 @@ module.exports = async function handler(req, res) {
         const ch = await getCurrentChallenge();
         if (!ch) return res.status(500).json({ error: 'Défi indisponible.' });
         const minMs = minPlausibleMs((ch.text || '').length);
-        if (minMs > 0 && Number(timeMs) < minMs) {
+        // Number(undefined) < minMs vaut NaN < minMs, toujours faux : un
+        // timeMs manquant contournait silencieusement ce garde-fou.
+        if (minMs > 0 && !(Number(timeMs) >= minMs)) {
           return res.status(400).json({ error: 'Résultat incohérent avec la longueur du texte (temps trop court).' });
         }
         const score = computeScore(wpm, accuracy);

@@ -73,8 +73,21 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: 'Session Stripe introuvable.' });
     }
     // Sécurité : la session doit appartenir au client Stripe de cet utilisateur.
-    if (!cs.customer || (user.stripe_customer_id && cs.customer !== user.stripe_customer_id)) {
+    // Ne pas se contenter de sauter ce contrôle quand `user.stripe_customer_id`
+    // est vide (compte n'ayant jamais payé) : ce cas est justement celui d'un
+    // appel direct à /api/billing (action:'verify') avec le session_id d'un
+    // AUTRE compte, sans être jamais passé par 'checkout' — l'ancienne
+    // condition laissait alors passer n'importe quelle session Stripe payée
+    // du site (upgrade gratuit + vol du stripe_customer_id de la victime).
+    if (!cs.customer) {
       return res.status(403).json({ error: 'Session non associée à ce compte.' });
+    }
+    if (cs.customer !== user.stripe_customer_id) {
+      const ownerR = await sb(`/users?stripe_customer_id=eq.${encodeURIComponent(cs.customer)}&select=id`);
+      const owner = ownerR.data && ownerR.data[0];
+      if (!owner || owner.id !== user.id) {
+        return res.status(403).json({ error: 'Session non associée à ce compte.' });
+      }
     }
     const sub = cs.subscription;
     const paid =

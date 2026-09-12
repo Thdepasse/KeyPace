@@ -4,6 +4,7 @@
 const { Resend } = require('resend');
 const crypto = require('crypto');
 const { setCorsOrigin } = require('./_cors');
+const { safeEqual } = require('./_auth');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -11,6 +12,14 @@ const ADMIN_KEY = process.env.ADMIN_KEY;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL || 'KeyPace <noreply@keypace.be>';
 const APP_URL = (process.env.APP_URL || 'https://keypace.be').trim();
+
+// name/email/message du formulaire de contact sont interpolés dans l'email
+// HTML envoyé à contact@keypace.be — sans échappement, un visiteur pouvait
+// injecter des balises dans l'email reçu par l'équipe (même helper que
+// register.js pour le username).
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 
 // Même format que genInviteCode() dans api/classes.js (12 caractères, alphabet sans ambiguïté).
 function genInviteToken() {
@@ -124,7 +133,7 @@ module.exports = async function handler(req, res) {
     if (lockState && lockState.locked_until && new Date(lockState.locked_until) > new Date()) {
       return res.status(429).json({ error: 'Trop de tentatives. Réessaie plus tard.' });
     }
-    if (!ADMIN_KEY || req.headers['x-admin-key'] !== ADMIN_KEY) {
+    if (!ADMIN_KEY || !safeEqual(String(req.headers['x-admin-key'] || ''), ADMIN_KEY)) {
       await recordAdminKeyFailure(lockState, ip);
       return res.status(401).json({ error: 'Non autorisé.' });
     }
@@ -172,6 +181,11 @@ module.exports = async function handler(req, res) {
   if (!name || !email || !count) return res.status(400).json({ error: 'Champs manquants.' });
   if (!RESEND_API_KEY) return res.status(500).json({ error: 'Email non configuré.' });
 
+  const safeName = escapeHtml(name);
+  const safeEmail = escapeHtml(email);
+  const safeCount = escapeHtml(count);
+  const safeMessage = message ? escapeHtml(message).replace(/\n/g, '<br>') : '';
+
   const resend = new Resend(RESEND_API_KEY);
   await resend.emails.send({
     from: FROM_EMAIL,
@@ -194,32 +208,32 @@ module.exports = async function handler(req, res) {
         </td></tr>
         <tr><td style="padding:30px 36px 10px">
           <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#A39C8D;letter-spacing:.06em;text-transform:uppercase">Nouvelle demande de licence</p>
-          <p style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em">${name}</p>
+          <p style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em">${safeName}</p>
         </td></tr>
         <tr><td style="padding:20px 36px">
           <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8F6F1;border-radius:14px;padding:20px 24px">
             <tr><td style="padding:6px 0;border-bottom:1px solid #EDE9E1">
               <span style="font-size:13px;font-weight:700;color:#8A8275">Établissement</span><br>
-              <span style="font-size:15px;font-weight:600;color:#16140F">${name}</span>
+              <span style="font-size:15px;font-weight:600;color:#16140F">${safeName}</span>
             </td></tr>
             <tr><td style="padding:6px 0;border-bottom:1px solid #EDE9E1">
               <span style="font-size:13px;font-weight:700;color:#8A8275">Contact</span><br>
-              <a href="mailto:${email}" style="font-size:15px;font-weight:600;color:#FF4D2E;text-decoration:none">${email}</a>
+              <a href="mailto:${safeEmail}" style="font-size:15px;font-weight:600;color:#FF4D2E;text-decoration:none">${safeEmail}</a>
             </td></tr>
             <tr><td style="padding:6px 0${message ? ';border-bottom:1px solid #EDE9E1' : ''}">
               <span style="font-size:13px;font-weight:700;color:#8A8275">Nombre d'étudiants</span><br>
-              <span style="font-size:15px;font-weight:600;color:#16140F">${count}</span>
+              <span style="font-size:15px;font-weight:600;color:#16140F">${safeCount}</span>
             </td></tr>
             ${message ? `<tr><td style="padding:6px 0">
               <span style="font-size:13px;font-weight:700;color:#8A8275">Message</span><br>
-              <span style="font-size:14px;color:#3A352B;line-height:1.6">${message.replace(/\n/g, '<br>')}</span>
+              <span style="font-size:14px;color:#3A352B;line-height:1.6">${safeMessage}</span>
             </td></tr>` : ''}
           </table>
         </td></tr>
         <tr><td style="padding:0 36px 28px;text-align:center">
-          <a href="mailto:${email}?subject=Re: Licence KeyPace — ${encodeURIComponent(name)}"
+          <a href="mailto:${safeEmail}?subject=Re: Licence KeyPace — ${encodeURIComponent(name)}"
              style="display:inline-block;background:#FF4D2E;color:#fff;text-decoration:none;font-size:14px;font-weight:700;padding:12px 28px;border-radius:11px">
-            Répondre à ${email}
+            Répondre à ${safeEmail}
           </a>
         </td></tr>
         <tr><td style="border-top:1px solid #E7E1D5;padding:18px 36px;text-align:center">

@@ -3,6 +3,7 @@
 // (Google/MS renvoient sur l'URI propre ${APP_URL}/api/oauth avec ?code&state).
 // Le provider est encodé dans le `state` signé (HMAC) => stateless, pas de cookie.
 const crypto = require('crypto');
+const { safeEqual } = require('./_auth');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -65,7 +66,7 @@ function readState(state) {
   if (!state || state.indexOf('.') < 0) return null;
   const [payload, sig] = state.split('.');
   const expected = b64url(crypto.createHmac('sha256', STATE_SECRET).update(payload).digest());
-  if (sig !== expected) return null;
+  if (!safeEqual(sig, expected)) return null;
   let data;
   try { data = JSON.parse(b64urlDecode(payload)); } catch { return null; }
   if (!data || !PROVIDERS[data.p]) return null;
@@ -169,6 +170,12 @@ async function resolveInvite(inviteToken) {
   const instR = await sb(`/institutions?id=eq.${encodeURIComponent(invite.institution_id)}&select=*`);
   const institution = instR.data && instR.data[0];
   if (!institution) return { error: 'invite' };
+  // Licence expirée : même règle que register.js (plus aucune inscription
+  // rattachée possible), qui manquait ici — un compte lié par invitation
+  // prof/admin via SSO obtenait le plan Expert même licence expirée.
+  if (institution.license_expires_at && new Date(institution.license_expires_at) < new Date()) {
+    return { error: 'invite' };
+  }
   return { invite, institution, role: invite.role || 'prof' };
 }
 
@@ -204,6 +211,12 @@ async function findOrCreateUser(provider, profile, inviteCtx) {
     if (domain) {
       const byDomain = await sb(`/institutions?domains=cs.{"${domain}"}&select=*`);
       institution = byDomain.data && byDomain.data[0];
+      // Licence expirée : même règle que register.js/attachByEmailDomain, qui
+      // manquait ici — un compte créé via SSO avec un email au domaine d'un
+      // établissement à licence expirée obtenait quand même le plan Expert.
+      if (institution && institution.license_expires_at && new Date(institution.license_expires_at) < new Date()) {
+        institution = null;
+      }
     }
     if (institution) {
       const seatsR = await sb(`/users?institution_id=eq.${encodeURIComponent(institution.id)}&role=eq.eleve&select=id`);

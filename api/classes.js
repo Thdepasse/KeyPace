@@ -3,7 +3,7 @@
 const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary,
   essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
   moduleMastery } = require('./_class-logic');
-const { hashPassword } = require('./_auth');
+const { hashPassword, safeEqual } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
 
 const crypto = require('crypto');
@@ -13,6 +13,17 @@ const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 // Secret de signature des certificats (réutilise le secret OAuth déjà en place).
 const CERT_SECRET = process.env.OAUTH_STATE_SECRET || process.env.SUPABASE_SECRET_KEY || 'dev-cert';
 const CERT_MIN_WPM = 20, CERT_MIN_ACC = 90, CERT_MIN_GAZE = 90;
+// Longueur de CERT_TEXT (index.html) — garde-fou anti-forge, même principe
+// que minPlausibleMs() dans api/games.js (Boss/Duel) : un appel direct à cet
+// endpoint peut déclarer n'importe quel wpm/acc sans avoir réellement tapé,
+// donc on rejette au moins les résultats incompatibles avec le temps minimum
+// physiquement nécessaire pour taper ce texte, même à une vitesse largement
+// au-delà des records humains réels.
+const CERT_TEXT_LENGTH = 337;
+const CERT_MAX_PLAUSIBLE_WPM = 300;
+function certMinPlausibleMs() {
+  return Math.round(CERT_TEXT_LENGTH / ((CERT_MAX_PLAUSIBLE_WPM * 5) / 60000));
+}
 
 function levelFor(wpm) {
   if (wpm >= 55) return 'Expert';
@@ -958,6 +969,11 @@ async function certExamPass(req, res) {
   if (wpm < CERT_MIN_WPM) return res.status(400).json({ error: `Vitesse insuffisante (${wpm} < ${CERT_MIN_WPM} mpm).`, code: 'WPM' });
   // Borne de plausibilité (anti-forge) : au-delà, la valeur est rejetée.
   if (wpm > 250 || acc > 100 || gaze > 100) return res.status(400).json({ error: 'Valeurs de résultat invalides.', code: 'INVALID' });
+  const minMs = certMinPlausibleMs();
+  const timeMs = Number(req.body.timeMs);
+  if (!Number.isFinite(timeMs) || timeMs < minMs) {
+    return res.status(400).json({ error: 'Résultat incohérent avec la longueur du texte (temps trop court).', code: 'INVALID' });
+  }
 
   const exR = await sb(`/certificates?user_id=eq.${user.id}&select=*`);
   const ex = exR.data && exR.data[0];
@@ -1002,7 +1018,7 @@ async function certVerify(req, res) {
   const c = r.data && r.data[0];
   if (!c) return res.status(404).json({ valid: false, error: 'Certificat introuvable.' });
   const expect = certSign({ code: c.code, userId: c.user_id, w: c.written_wpm, v: c.vocal_wpm, name: c.full_name });
-  if (expect !== c.signature) return res.status(409).json({ valid: false, error: 'Signature invalide : ce certificat a été altéré.' });
+  if (!safeEqual(expect, String(c.signature || ''))) return res.status(409).json({ valid: false, error: 'Signature invalide : ce certificat a été altéré.' });
   return res.json({ valid: true, certificate: certPublic(c) });
 }
 

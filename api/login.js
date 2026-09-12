@@ -1,5 +1,5 @@
 const { Resend } = require('resend');
-const { hashPassword, verifyPassword } = require('./_auth');
+const { hashPassword, verifyPassword, safeEqual } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -199,7 +199,7 @@ const INACTIVITY_WARN_MS = 24 * 30 * 24 * 60 * 60 * 1000; // ~24 mois
 const INACTIVITY_DELETE_GRACE_MS = 30 * 24 * 60 * 60 * 1000; // 30 jours après l'email
 async function retentionSweep(req, res) {
   const secret = process.env.CRON_SECRET;
-  if (!secret || req.headers['authorization'] !== `Bearer ${secret}`) {
+  if (!secret || !safeEqual(String(req.headers['authorization'] || ''), `Bearer ${secret}`)) {
     return res.status(401).json({ error: 'Non autorisé.' });
   }
   const now = Date.now();

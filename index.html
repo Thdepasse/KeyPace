@@ -10665,7 +10665,7 @@ const app={
     const gaze=s._gazeStats?s._gazeStats.pct:0;
     this._certModal(ICONS.clock,'Validation…','Envoi de ton résultat…','');
     try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cert-exam-pass',token:currentToken,mode:s.certMode,wpm:res.wpm,acc:res.acc,gazePct:gaze,fullName:this._certName})});
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cert-exam-pass',token:currentToken,mode:s.certMode,wpm:res.wpm,acc:res.acc,gazePct:gaze,fullName:this._certName,timeMs:s.endTime-s.startTime})});
       const d=await r.json();
       if(!r.ok){this._certModal('✕','Examen non validé',d.error||'Réessaie.',`<button class="btn-primary" style="padding:10px 18px" onclick="app._closeCertModal();app.startCertExam('${s.certMode}')">Réessayer</button><button class="btn-secondary" style="padding:10px 18px" onclick="app._closeCertModal()">Fermer</button>`);return;}
       this._myCert=d.certificate;
