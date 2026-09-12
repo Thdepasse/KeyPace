@@ -10,8 +10,11 @@ const crypto = require('crypto');
 function sha256hex(s) { return crypto.createHash('sha256').update(s, 'utf8').digest('hex'); }
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
-// Secret de signature des certificats (réutilise le secret OAuth déjà en place).
-const CERT_SECRET = process.env.OAUTH_STATE_SECRET || process.env.SUPABASE_SECRET_KEY || 'dev-cert';
+// Secret de signature des certificats (réutilise le secret OAuth déjà en
+// place, OAUTH_STATE_SECRET, configurée sur Vercel). Ne retombe plus sur
+// SUPABASE_SECRET_KEY : cette clé donne un accès total à la base et ne doit
+// pas doubler comme clé HMAC d'un endpoint public (certVerify).
+const CERT_SECRET = process.env.OAUTH_STATE_SECRET || 'dev-cert';
 const CERT_MIN_WPM = 20, CERT_MIN_ACC = 90, CERT_MIN_GAZE = 90;
 // Longueur de CERT_TEXT (index.html) — garde-fou anti-forge, même principe
 // que minPlausibleMs() dans api/games.js (Boss/Duel) : un appel direct à cet
