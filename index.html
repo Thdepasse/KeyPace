@@ -1740,7 +1740,6 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <div id="page-games" style="display:none"></div>
 <div id="page-stats" style="display:none"></div>
 <div id="page-classes" style="display:none"></div>
-<div id="page-etablissement" style="display:none"></div>
 
 <footer>
   <div class="footer-inner">
@@ -1970,13 +1969,6 @@ function loadSession(){
 }
 
 function openModal(id,opts){if(id==='upgrade-modal'&&!(opts&&opts.silent)){try{track('upgrade_wall_shown');}catch{}}document.getElementById(id).classList.add('open');}
-function openSchoolModal(niveau){
-  openModal('school-modal');
-  if(niveau){
-    const msg=document.getElementById('school-message');
-    if(msg && !msg.value)msg.placeholder=`Intéressé par le niveau ${niveau}. Contexte, questions, délai souhaité…`;
-  }
-}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 function openAuth(tab, contextMsg, callback){
@@ -4674,7 +4666,7 @@ const app={
     // Vider les pages avec #tb-scroll pour éviter les IDs dupliqués
     if(v!=='test')document.getElementById('page-test').innerHTML='';
     if(v!=='lessons')document.getElementById('page-lessons').innerHTML='';
-    ['home','test','lessons','games','stats','classes','etablissement'].forEach(p=>{const el=document.getElementById('page-'+p);if(!el)return;if(p===v){el.style.display='block';el.classList.remove('_pgAnim');void el.offsetWidth;el.classList.add('_pgAnim');}else el.style.display='none';});
+    ['home','test','lessons','games','stats','classes'].forEach(p=>{const el=document.getElementById('page-'+p);if(!el)return;if(p===v){el.style.display='block';el.classList.remove('_pgAnim');void el.offsetWidth;el.classList.add('_pgAnim');}else el.style.display='none';});
     ['home','test','lessons','games','stats','classes'].forEach(id=>{const el=document.getElementById('nav-'+id);if(el)el.classList.toggle('active',id===v);});
     window.scrollTo({top:0,behavior:'instant'});
     const _meta={
@@ -4684,7 +4676,6 @@ const app={
       games:['Jeux de dactylographie – KeyPace','Entraînez-vous en vous amusant : Course de dactylo, Simon des mots, Sprint et Boss de la semaine. Progressez sans vous en rendre compte.'],
       stats:['Mes progrès – KeyPace','Suivez votre progression en dactylographie : vitesse (mots/min), précision, série de jours, leçons validées et touches difficiles.'],
       classes:['Ma classe – KeyPace','Gérez vos classes, suivez vos élèves et assignez des devoirs depuis votre tableau de bord KeyPace.'],
-      etablissement:['KeyPace pour les établissements scolaires','Plateforme de dactylographie AZERTY pour écoles, universités et centres de formation. Tableau de bord enseignant, devoirs assignables, 65 leçons progressives.'],
     };
     const [t,d]=_meta[v]||_meta.home;
     document.title=t;
@@ -4701,7 +4692,6 @@ const app={
       case 'games':this.renderGames();break;
       case 'stats':this.renderStats();break;
       case 'classes':isAdmin()?this.renderInstitution():(isTeacher()?this.renderClasses():this.renderStudentClasses());break;
-      case 'etablissement':this.renderEtablissement();break;
     }
   },
 
@@ -5110,7 +5100,7 @@ const app={
             </ul>
             <div class="school-banner-actions">
               <button class="school-banner-btn" onclick="openModal('school-modal')">Demander une licence établissement →</button>
-              <button class="school-banner-link" onclick="go('etablissement')" style="background:none;border:none;cursor:pointer;font-family:inherit">En savoir plus</button>
+              <a class="school-banner-link" href="/ecoles">En savoir plus</a>
             </div>
           </div>
           <div class="school-banner-visual" style="color:#fff" aria-hidden="true">${ICONS.gradCap}</div>
@@ -10298,172 +10288,6 @@ const app={
       </div>
       <div style="background:rgba(31,169,113,.08);border-left:3px solid #1FA971;border-radius:0 10px 10px 0;padding:10px 14px;font-size:14px;color:var(--txt);line-height:1.5"><span style="color:#1FA971">${ICONS.bulb}</span> ${insightText}</div>
     </div>`;
-  },
-
-  /* ── STATS ── */
-  renderEtablissement(){
-    const A='var(--accent)';
-    const levels=[
-      [ICONS.gradCap,'Primaire',"Premiers pas sur le clavier en s'amusant : position des doigts et repères de base, à travers le jeu."],
-      [ICONS.bookOpen,'Secondaire',"Le socle de la frappe au clavier pour aborder sereinement les évaluations et les travaux plus longs."],
-      [ICONS.school,'Supérieur',"De la prise de notes en amphi aux mémoires : une frappe rapide et fiable pour tout le cursus."],
-    ];
-    const features=[
-      [ICONS.barChart,'Suivi individuel en temps réel',"Vitesse (mots/min), précision, leçons validées, temps d'inactivité : tout est visible d'un coup d'œil pour chaque élève."],
-      [ICONS.pencil,'Devoirs assignables en 3 clics',"Leçon du parcours, test de vitesse libre, texte personnalisé ou dictée vocale : choisissez, ciblez, envoyez."],
-      [ICONS.mic,'Dictées avec votre propre voix',"Enregistrez votre voix sur n'importe quel texte. L'élève entend votre audio et tape ce qu'il entend, texte caché."],
-      ['⚠','Alertes automatiques',"KeyPace détecte les élèves bloqués ou inactifs depuis trop longtemps et vous le signale proactivement."],
-      [ICONS.fileText,'Export CSV en un clic',"Extrayez les résultats de toute la classe pour vos bulletins ou rapports pédagogiques."],
-      [ICONS.school,'Multi-classes, multi-profs',"Un compte établissement peut gérer plusieurs classes et plusieurs enseignants indépendants."],
-    ];
-    const _dot=c=>`<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${c};border:1px solid rgba(0,0,0,.08)"></span>`;
-    const modules=[
-      [_dot('#F5A623'),'Position de base','F et J, les repères des index'],
-      [_dot('#4A90D9'),'Rangée du haut','Toutes les lettres fréquentes'],
-      [_dot('#4CAF50'),'Rangée du bas','C, V, N, B et la ponctuation'],
-      [_dot('#F2C94C'),'Accents & circonflexes','é, è, à, â, ê, û, ç et les ligatures'],
-      [_dot('#E5E1D8'),'Chiffres & symboles','Pavé numérique et caractères spéciaux'],
-    ];
-    const eleves=[
-      ['Camille D.','42 mpm','94%','18/65',_dot('#4CAF50')],
-      ['Lucas M.','31 mpm','89%','12/65',_dot('#4CAF50')],
-      ['Inès R.','19 mpm','78%','7/65',_dot('#F2C94C')],
-      ['Tom B.','12 mpm','71%','3/65',_dot('var(--danger)')],
-      ['Sofia L.','38 mpm','91%','15/65',_dot('#4CAF50')],
-    ];
-    const steps=[
-      ['1','Créez votre compte établissement',"Contactez-nous, on configure votre accès en moins d'une heure. Vous recevez un lien d'invitation unique pour votre classe."],
-      ['2','Invitez vos élèves',"Partagez le lien ou le code d'invitation. Chaque élève crée son compte gratuitement et obtient l'accès Expert automatiquement."],
-      ['3','Suivez et guidez',"Assignez des devoirs, suivez la progression en temps réel, identifiez les élèves en difficulté. Tout depuis votre tableau de bord."],
-    ];
-    const studentFeats=[
-      [ICONS.gamepad,'Jeux de frappe compétitifs',"La Course contre des bots, le Simon de la frappe : apprendre sans avoir l'impression de travailler."],
-      [ICONS.trophy,'Certification de niveau',"Un examen officiel KeyPace avec un certificat numérique partageable. Un objectif concret qui motive."],
-      [ICONS.trendUp,'Progrès visibles en temps réel',"Courbes de vitesse, précision par touche, leçons validées : l'élève voit clairement où il en est."],
-      [ICONS.target,'Objectifs personnalisés',"L'enseignant fixe le seuil à atteindre (ex. 30 mpm, max 5 erreurs). L'élève sait exactement ce qu'on attend de lui."],
-    ];
-    const faqs=[
-      ['Quel matériel est nécessaire ?',"N'importe quel ordinateur avec un navigateur web récent (Chrome, Firefox, Edge, Safari). Pas d'application à installer, pas de plugin. Un clavier AZERTY physique est recommandé pour un apprentissage optimal, mais les claviers de laptops suffisent."],
-      ['Combien coûte une licence établissement ?',"Le tarif est établi au cas par cas selon la taille de l'établissement et le nombre de classes. Contactez-nous pour un devis personnalisé : nous proposons des tarifs très accessibles pour le secteur éducatif."],
-      ['Les élèves peuvent-ils utiliser KeyPace depuis chez eux ?',"Oui, 100%. KeyPace est une application web accessible depuis n'importe où. Les élèves s'entraînent autant à la maison qu'en classe, et leur progression est synchronisée."],
-      ['Un élève peut-il rejoindre plusieurs classes ?',"Oui. Un même compte élève peut appartenir à plusieurs classes (utile si un prof de français et un prof d'informatique utilisent KeyPace en parallèle)."],
-      ["Peut-on importer une liste d'élèves ?","Actuellement les élèves s'inscrivent eux-mêmes via un lien d'invitation. L'import CSV est sur notre roadmap. Contactez-nous si c'est un besoin prioritaire."],
-    ];
-    const fld='flex:1;border:1.5px solid var(--border);border-radius:14px;padding:16px 24px;';
-    document.getElementById('page-etablissement').innerHTML=`
-<div class="etab-wrap" style="max-width:1120px;margin:0 auto;padding:0 24px 80px">
-  <!-- BACK -->
-  <div style="padding:20px 0 0">
-    <button onclick="go('home')" style="background:none;border:none;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0">← Retour à l'accueil</button>
-  </div>
-  <!-- HERO -->
-  <div class="etab-hero" style="padding:60px 0 52px">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:${A};font-weight:700;margin-bottom:16px">
-      Écoles · Universités · Centres de formation
-    </div>
-    <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:clamp(30px,4.2vw,52px);line-height:1.1;letter-spacing:-.02em;margin:0 0 32px;max-width:920px">
-      La plateforme qui apprend à vos élèves à taper au clavier, <span style="color:${A}">du primaire au supérieur.</span>
-    </h1>
-    <div class="etab-hero-grid" style="display:grid;grid-template-columns:1.15fr 0.85fr;gap:32px;align-items:center">
-      <div>
-        <p style="font-size:18px;color:var(--muted);max-width:560px;margin:0 0 20px;line-height:1.6">
-          KeyPace est la plateforme de dactylographie pensée pour les établissements francophones : pédagogie progressive, tableau de bord enseignant et devoirs assignables en quelques clics.
-        </p>
-        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,77,46,.08);border:1px solid rgba(255,77,46,.25);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;color:${A};margin-bottom:28px">
-          <span style="display:flex">${ICONS.award}</span> Éligible à la subvention MANOLO · Fédération Wallonie-Bruxelles
-        </div>
-        <div class="etab-hero-btns" style="display:flex;gap:12px;flex-wrap:nowrap">
-          <button onclick="openModal('school-modal')" style="background:${A};color:#fff;border:none;border-radius:14px;padding:16px 32px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(255,77,46,.35);transition:transform .15s;white-space:nowrap" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Demander une démo gratuite →</button>
-          <button onclick="go('lessons')" style="background:var(--card);color:var(--txt);border:1.5px solid var(--border);border-radius:14px;padding:16px 28px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s;white-space:nowrap" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Tester les cours maintenant</button>
-        </div>
-      </div>
-      <div class="etab-hero-visual" style="position:relative;display:flex;justify-content:center">
-        <div style="position:absolute;inset:-18%;background:radial-gradient(closest-side,rgba(255,140,66,.16),rgba(255,140,66,.05) 60%,transparent 75%);border-radius:50%;z-index:0"></div>
-        <img src="/images/keypace-mascot-books.webp" alt="" width="235" height="335" loading="eager" decoding="async" style="position:relative;z-index:1;height:clamp(200px,24vw,300px);width:auto">
-      </div>
-    </div>
-  </div>
-  <!-- NIVEAUX -->
-  <div class="etab-levels" style="margin-bottom:64px">
-    <div style="text-align:center;margin-bottom:28px">
-      <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:10px">POUR CHAQUE NIVEAU</div>
-      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,32px);margin:0 0 12px">Un parcours pensé pour l'âge de vos élèves</h2>
-      <p style="color:var(--muted);font-size:15px;max-width:460px;margin:0 auto">Primaire, secondaire ou supérieur : le contenu, le rythme et le ton s'adaptent.</p>
-    </div>
-    <div class="etab-levels-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
-      ${levels.map(([ic,t,d])=>`<div class="etab-level-card" onclick="openSchoolModal('${t}')"><div class="etab-level-card-icon">${ic}</div><div class="etab-level-card-title">${t}</div><div class="etab-level-card-desc">${d}</div><div class="etab-level-card-link">En savoir plus →</div></div>`).join('')}
-    </div>
-  </div>
-  <!-- FEATURES PROF -->
-  <div class="etab-section-mb" style="margin-bottom:80px">
-    <div style="text-align:center;margin-bottom:40px">
-      <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:10px">POUR LES ENSEIGNANTS</div>
-      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,34px);margin:0 0 12px">Un tableau de bord qui vous fait gagner du temps</h2>
-      <p style="color:var(--muted);font-size:15px;max-width:480px;margin:0 auto">Suivez la progression de chaque élève sans quitter votre navigateur. Assignez des devoirs ciblés en 30 secondes.</p>
-    </div>
-    <div class="etab-features-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
-      ${features.map(([ic,t,d])=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 20px"><div style="font-size:28px;margin-bottom:12px;color:var(--accent)">${ic}</div><div style="font-weight:700;font-size:15px;margin-bottom:7px">${t}</div><div style="color:var(--muted);font-size:13.5px;line-height:1.55">${d}</div></div>`).join('')}
-    </div>
-  </div>
-  <!-- PARCOURS + DASHBOARD MOCK -->
-  <div class="etab-parcours-card" style="background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 40px;margin-bottom:72px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center">
-    <div>
-      <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:12px">NOTRE MÉTHODE</div>
-      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(18px,2.5vw,28px);line-height:1.2;margin:0 0 14px">65 leçons du niveau zéro à la frappe experte</h2>
-      <p style="color:var(--muted);font-size:14px;line-height:1.65;margin:0 0 18px">Une progression pas à pas, pas un exercice unique jeté aux élèves. Chaque leçon introduit 1 ou 2 touches nouvelles et les consolide dans un texte réel en français, jusqu'à l'automatisme.</p>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        ${modules.map(([dot,mod,desc])=>`<div style="display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:10px;padding:10px 14px"><span style="font-size:10px">${dot}</span><div><b style="font-size:13px">${mod}</b> <span style="color:var(--muted);font-size:12px">: ${desc}</span></div></div>`).join('')}
-      </div>
-    </div>
-    <div class="etab-dashboard">
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:20px">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:14px">APERÇU TABLEAU DE BORD</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          ${eleves.map(([n,w,a,l,s])=>`<div style="display:grid;grid-template-columns:1fr auto auto auto auto;align-items:center;gap:10px;font-size:12.5px;padding:7px 10px;background:var(--card);border-radius:8px;border:1px solid var(--border)"><span style="font-weight:600">${n}</span><span style="font-family:'JetBrains Mono',monospace;color:${A}">${w}</span><span style="color:var(--muted)">${a}</span><span style="color:var(--muted)">${l}</span><span>${s}</span></div>`).join('')}
-        </div>
-        <div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:10px;font-size:11px;color:var(--muted);padding:6px 10px;margin-top:4px"><span>Élève</span><span>Vitesse</span><span>Précision</span><span>Leçons</span><span>État</span></div>
-      </div>
-    </div>
-  </div>
-  <!-- MISE EN PLACE -->
-  <div class="etab-section-mb" style="margin-bottom:80px">
-    <div style="text-align:center;margin-bottom:40px">
-      <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:10px">MISE EN PLACE</div>
-      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,34px);margin:0 0 12px">Opérationnel en 5 minutes, sans votre service informatique</h2>
-      <p style="color:var(--muted);font-size:15px;max-width:460px;margin:0 auto">Aucun logiciel à installer, aucun serveur à configurer. Juste un navigateur.</p>
-    </div>
-    <div class="etab-steps" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
-      ${steps.map(([n,t,d])=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px 24px"><div style="width:36px;height:36px;border-radius:50%;background:${A};color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'JetBrains Mono',monospace">${n}</div><div style="font-weight:700;font-size:16px;margin-bottom:8px">${t}</div><div style="color:var(--muted);font-size:13.5px;line-height:1.55">${d}</div></div>`).join('')}
-    </div>
-  </div>
-  <!-- POUR LES ÉLÈVES -->
-  <div class="etab-student-section" style="background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 40px;margin-bottom:72px">
-    <div style="text-align:center;margin-bottom:36px">
-      <div style="font-size:12px;font-weight:700;letter-spacing:.08em;color:${A};margin-bottom:10px">POUR LES ÉLÈVES</div>
-      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,3vw,32px);margin:0 0 12px">Imaginez votre classe, concentrée... et qui s'amuse</h2>
-      <p style="color:var(--muted);font-size:15px;max-width:520px;margin:0 auto">Pendant que vos élèves enchaînent les leçons, ils jouent, relèvent des défis et décrochent un certificat. Vous, vous voyez leur vitesse grimper en temps réel, sans lever le petit doigt.</p>
-    </div>
-    <div class="etab-student-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
-      ${studentFeats.map(([ic,t,d])=>`<div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:20px"><div style="font-size:26px;margin-bottom:10px;color:var(--accent)">${ic}</div><div style="font-weight:700;font-size:14px;margin-bottom:6px">${t}</div><div style="color:var(--muted);font-size:13px;line-height:1.5">${d}</div></div>`).join('')}
-    </div>
-  </div>
-  <!-- FAQ -->
-  <div class="etab-faq" style="max-width:720px;margin:0 auto 72px">
-    <div style="text-align:center;margin-bottom:32px"><h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,2.5vw,30px);margin:0">Questions fréquentes</h2></div>
-    <div style="display:flex;flex-direction:column;gap:2px">
-      ${faqs.map(([q,a],i)=>`<details style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden" ${i===0?'open':''}><summary style="padding:16px 20px;font-weight:700;font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">${q}<span style="color:${A};font-size:18px;flex-shrink:0;margin-left:12px">+</span></summary><div style="padding:0 20px 18px;color:var(--muted);font-size:14px;line-height:1.65">${a}</div></details>`).join('')}
-    </div>
-  </div>
-  <!-- CTA FINAL -->
-  <div class="etab-cta" style="text-align:center;background:linear-gradient(135deg,#FFEDE8,#FFF6F2);border:1px solid var(--border);border-radius:22px;padding:48px 40px">
-    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(22px,4vw,34px);margin:0 0 14px;line-height:1.1">Prêt à équiper votre établissement ?</h2>
-    <p style="color:var(--muted);font-size:16px;max-width:480px;margin:0 auto 28px;line-height:1.5">Contactez-nous pour une démonstration gratuite ou pour obtenir un devis. Mise en place en moins d'une heure.</p>
-    <div class="etab-cta-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <button onclick="openModal('school-modal')" style="background:${A};color:#fff;border:none;border-radius:14px;padding:16px 32px;font:inherit;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px -8px ${A};transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Demander une démo gratuite →</button>
-      <button onclick="go('lessons')" style="background:var(--card);color:var(--txt);border:1.5px solid var(--border);border-radius:14px;padding:16px 24px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:transform .15s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">Essayer les cours gratuitement</button>
-    </div>
-  </div>
-</div>`;
   },
 
   renderStats(){
