@@ -93,14 +93,15 @@
   .btn{display:inline-block;background:var(--accent);color:#fff;font-weight:800;font-size:16px;padding:11px 20px;border-radius:12px;box-shadow:0 8px 20px -8px var(--accent);border:none;cursor:pointer;font-family:inherit;white-space:nowrap}
   .btn:hover{text-decoration:none;transform:translateY(-1px);transition:.15s}
   .btn.ghost{background:var(--card);color:var(--txt);border:1.5px solid var(--border);box-shadow:none}
-  .nav-dd{position:relative;margin-left:10px;display:flex;align-items:center}
-  .nav-dd-label{font-size:15px;font-weight:600;color:var(--txt);padding:7px 10px;border-radius:9px;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
-  .nav-dd-label:hover{background:var(--light);text-decoration:none}
-  .nav-dd-menu{display:none;position:absolute;top:100%;left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:170px;box-shadow:0 12px 32px rgba(0,0,0,.14)}
-  .nav-dd-menu a{display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:var(--txt);text-decoration:none}
-  .nav-dd-menu a:hover{background:var(--light);text-decoration:none}
-  .nav-dd:hover .nav-dd-menu{display:block}
-  @media (max-width:640px){ .nav-dd{display:none} }
+  .nav-links{display:flex;gap:4px;margin-left:14px;align-items:center}
+  .nav-link{position:relative;font-size:15px;font-weight:600;color:var(--txt);padding:7px 12px;border-radius:9px;transition:.15s;text-decoration:none;display:inline-block}
+  .nav-link:hover{background:var(--light);text-decoration:none}
+  .nav-dropdown{position:relative;display:flex;align-items:center}
+  .nav-dropdown-menu{display:none;position:absolute;top:100%;left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:170px;box-shadow:0 12px 32px rgba(0,0,0,.14);z-index:50}
+  .nav-dropdown-menu a{display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:var(--txt);text-decoration:none}
+  .nav-dropdown-menu a:hover{background:var(--light)}
+  .nav-dropdown:hover .nav-dropdown-menu{display:block}
+  @media (max-width:900px){ .nav-links{display:none} }
   .crumb{font-size:13px;color:var(--muted);padding:18px 0 0}
   .crumb a{color:var(--muted)}
   .etab-wrap{max-width:1120px;margin:0 auto;padding:0 24px 80px}
@@ -178,13 +179,20 @@
 <header>
   <div class="nav">
     <a class="logo" href="/"><span class="k">K</span> KeyPace</a>
-    <div class="nav-dd">
-      <a class="nav-dd-label" href="/ecoles">Établissements ▾</a>
-      <div class="nav-dd-menu">
-        <a href="/dactylographie-primaire">Primaire</a>
-        <a href="/dactylographie-secondaire">Secondaire</a>
-        <a href="/dactylographie-superieur">Supérieur</a>
+    <div class="nav-links">
+      <a class="nav-link" href="/">Accueil</a>
+      <div class="nav-dropdown">
+        <a class="nav-link" href="/ecoles">Établissements</a>
+        <div class="nav-dropdown-menu">
+          <a href="/dactylographie-primaire">Primaire</a>
+          <a href="/dactylographie-secondaire">Secondaire</a>
+          <a href="/dactylographie-superieur">Supérieur</a>
+        </div>
       </div>
+      <a class="nav-link" href="/test-vitesse-frappe">Test</a>
+      <a class="nav-link" href="/cours-dactylographie">Cours</a>
+      <a class="nav-link" href="/jeux-dactylo">Jeux</a>
+      <a class="nav-link" href="/">Progrès</a>
     </div>
     <span class="sp"></span>
     <a class="btn" href="/">Ouvrir KeyPace →</a>
