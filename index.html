@@ -12121,13 +12121,20 @@ if(currentUser){
   if(localStorage.getItem('klak_ob')!=='1')setTimeout(obOpen,600);
 }
 app.init();
-go('test');
+{
+  // Arrivée depuis un lien externe pointant vers une vue précise (?view=test|lessons|games|stats|home)
+  const _vp=new URLSearchParams(location.search).get('view');
+  const _validViews=['home','test','lessons','games','stats'];
+  go(_validViews.includes(_vp)?_vp:'test');
+}
 updateNavUser();
 handlePaymentReturn();
 handleVerificationReturn();
 handleDuelReturn();
 // Réinitialisation de mot de passe via lien email (?reset=TOKEN)
 (()=>{const p=new URLSearchParams(window.location.search);const rt=p.get('reset');if(rt)setTimeout(()=>app.showResetPasswordModal(rt),300);})();
+// Ouverture directe de la connexion/inscription depuis un lien externe (?auth=login|register)
+(()=>{const p=new URLSearchParams(window.location.search);const at=p.get('auth');if(at==='login'||at==='register')setTimeout(()=>openAuth(at),300);})();
 loadProgressFromServer();
 handleClassCodeJoin();
 handleProfInvite();
