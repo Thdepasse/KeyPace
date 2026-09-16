@@ -5063,6 +5063,37 @@ const app={
         <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.keyboard}</div><h3>65 leçons et 8+ jeux</h3><p>65 leçons progressives de dactylographie et plus de 8 jeux pour travailler précision, mémoire et vitesse au clavier.</p></div>
       </div>
       `}
+      ${!isGuest?'':`
+      <div class="school-banner">
+        <div class="school-banner-inner">
+          <div class="school-banner-content">
+            <span class="school-banner-badge">${ICONS.gradCap} Écoles · Universités · Centres de formation</span>
+            <h2>Équipez toute votre classe pour taper plus vite</h2>
+            <p>Offrez un accès <strong>Expert</strong> à chacun de vos étudiants : 65 leçons progressives, jeux de frappe et suivi de progression individuel. Tarif établissement avantageux et mise en place en quelques minutes.</p>
+            <ul class="school-banner-feats">
+              <li>Comptes Expert pour tous vos élèves</li>
+              <li>Suivi de progression par étudiant</li>
+              <li>Sans installation, 100% en ligne</li>
+            </ul>
+            <div class="school-banner-actions">
+              <button class="school-banner-btn" onclick="openModal('school-modal')">Demander une licence établissement →</button>
+              <a class="school-banner-link" href="/ecoles">En savoir plus</a>
+            </div>
+          </div>
+          <div class="school-banner-visual" style="color:#fff" aria-hidden="true">${ICONS.gradCap}</div>
+        </div>
+      </div>
+      `}
+
+      <div class="reviews-section" id="home-reviews">
+        <h2>Ce qu'ils en pensent</h2>
+        <div class="reviews-summary"><span class="reviews-skel" style="display:inline-block;width:160px;height:18px;vertical-align:middle"></span></div>
+        <div class="reviews-carousel">
+          <div class="reviews-track"><div class="reviews-grid">${[0,1,2].map(()=>`<div class="review-slide active"><div class="review-card"><div class="reviews-skel" style="width:80px;height:16px;margin-bottom:14px"></div><div class="reviews-skel" style="width:100%;height:14px;margin-bottom:8px"></div><div class="reviews-skel" style="width:88%;height:14px;margin-bottom:14px"></div><div class="reviews-skel" style="width:60px;height:12px"></div></div></div>`).join('')}</div></div>
+        </div>
+        <div class="reviews-cta">Vous voulez vous aussi laisser un avis ? <a href="https://www.google.com/maps/place//data=!4m3!3m2!1s0x6f3215aaace62d5d:0x4a1a6693a216ba34!12e1?source=g.page.m._&laa=merchant-review-solicitation" target="_blank" rel="noopener">Cliquez ici</a></div>
+      </div>
+
       ${getUserPlan()!=='expert'?`<div class="pricing-section">
         <h2>Simple et transparent</h2>
         <p>Commence gratuitement, passe Expert quand tu veux.</p>
@@ -5101,36 +5132,6 @@ const app={
           </div>
         </div>
       </div>`:''}
-      ${!isGuest?'':`
-      <div class="school-banner">
-        <div class="school-banner-inner">
-          <div class="school-banner-content">
-            <span class="school-banner-badge">${ICONS.gradCap} Écoles · Universités · Centres de formation</span>
-            <h2>Équipez toute votre classe pour taper plus vite</h2>
-            <p>Offrez un accès <strong>Expert</strong> à chacun de vos étudiants : 65 leçons progressives, jeux de frappe et suivi de progression individuel. Tarif établissement avantageux et mise en place en quelques minutes.</p>
-            <ul class="school-banner-feats">
-              <li>Comptes Expert pour tous vos élèves</li>
-              <li>Suivi de progression par étudiant</li>
-              <li>Sans installation, 100% en ligne</li>
-            </ul>
-            <div class="school-banner-actions">
-              <button class="school-banner-btn" onclick="openModal('school-modal')">Demander une licence établissement →</button>
-              <a class="school-banner-link" href="/ecoles">En savoir plus</a>
-            </div>
-          </div>
-          <div class="school-banner-visual" style="color:#fff" aria-hidden="true">${ICONS.gradCap}</div>
-        </div>
-      </div>
-      `}
-
-      <div class="reviews-section" id="home-reviews">
-        <h2>Ce qu'ils en pensent</h2>
-        <div class="reviews-summary"><span class="reviews-skel" style="display:inline-block;width:160px;height:18px;vertical-align:middle"></span></div>
-        <div class="reviews-carousel">
-          <div class="reviews-track"><div class="reviews-grid">${[0,1,2].map(()=>`<div class="review-slide active"><div class="review-card"><div class="reviews-skel" style="width:80px;height:16px;margin-bottom:14px"></div><div class="reviews-skel" style="width:100%;height:14px;margin-bottom:8px"></div><div class="reviews-skel" style="width:88%;height:14px;margin-bottom:14px"></div><div class="reviews-skel" style="width:60px;height:12px"></div></div></div>`).join('')}</div></div>
-        </div>
-        <div class="reviews-cta">Vous voulez vous aussi laisser un avis ? <a href="https://www.google.com/maps/place//data=!4m3!3m2!1s0x6f3215aaace62d5d:0x4a1a6693a216ba34!12e1?source=g.page.m._&laa=merchant-review-solicitation" target="_blank" rel="noopener">Cliquez ici</a></div>
-      </div>
 
       <div class="home-faq" style="max-width:1120px;margin:0 auto 72px;padding:0 24px">
         <div style="text-align:center;margin-bottom:32px"><h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,2.5vw,30px);margin:0">Questions fréquentes</h2></div>
