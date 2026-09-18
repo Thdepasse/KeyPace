@@ -7407,14 +7407,54 @@ const app={
     if(!this.stats.sourisTilesTutorialSeen){this._sourisTilesTutorial(()=>this._sourisTilesStartFree());return;}
     this.stopSouris();
     const lanes=TILES_LANES.concat(TILES_EXPERT_LANES);
-    this.souris={phase:'play',track:'tiles',songId:'libre',durMs:Infinity,stages:TILES_FREE_STAGES,lanes,
-      score:0,combo:0,bestCombo:0,lives:4,hits:0,misses:0,bpm:100,
+    this.souris={phase:'brief',track:'tiles',songId:'libre',durMs:Infinity,stages:TILES_FREE_STAGES,lanes,bpm:100};
+    this.renderSouris();
+  },
+  // Lancé par le bouton "Commencer" de l'écran brief (règles + touches de
+  // cette partie) : construit l'état de jeu réel et ne calcule startAt qu'ici,
+  // pour que le compte à rebours ne s'écoule pas pendant la lecture du brief.
+  _sourisTilesBeginPlay(){
+    const s=this.souris;if(!s||s.phase!=='brief')return;
+    const{songId,durMs,stages,lanes,bpm}=s;
+    this.souris={phase:'play',track:'tiles',songId,durMs,stages,lanes,
+      score:0,combo:0,bestCombo:0,lives:4,hits:0,misses:0,
       tiles:Array(lanes.length).fill(null),nextSpawnAt:0,judge:null,playStartWall:Date.now(),
       stageIdx:0,banner:null,startAt:Date.now()+2600,seenTypes:{},
-      intenseActive:false,intenseLostLife:false};
+      intenseActive:false,intenseLostLife:false,...(bpm?{bpm}:{})};
     this._sourisTilesBindKeys();
     this.renderSouris();
     this._sourisLoop=setInterval(()=>this._sourisTilesTick(),50);
+  },
+  _sourisTilesBriefScreen(){
+    const s=this.souris;
+    const isFree=s.songId==='libre';
+    const song=isFree?null:(TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0]);
+    const finalLanes=s.stages[s.stages.length-1].lanes;
+    const lettersHtml=finalLanes.map((laneIdx,i)=>`<div class="tiles-intro-key" style="animation-delay:${(i*-0.4).toFixed(2)}s">${s.lanes[laneIdx].letter}</div>`).join('');
+    const rows=[
+      {label:'Tuile normale',demo:`<div class="tiles-tile" style="position:static;width:40px;height:32px;background:linear-gradient(160deg,#FFB088,#FF7A45)">Q</div>`,txt:'Appuie pile quand elle touche la ligne.'},
+      {label:'Tuile longue',demo:`<div class="tiles-tile" style="position:static;width:40px;height:58px;background:linear-gradient(160deg,#FFB088,#FF7A45)"><div class="tiles-hold-icon" style="position:static;margin-top:5px">▼</div></div>`,txt:'Maintiens la touche enfoncée jusqu’à la fin.'},
+      {label:'Bonus ♥',demo:`<div class="tiles-tile bonus" style="position:static;width:40px;height:34px">♥</div>`,txt:'Appuie pour regagner une vie.'},
+      {label:'Piège ✕',demo:`<div class="tiles-tile trap" style="position:static;width:40px;height:32px">✕</div>`,txt:'N’appuie pas : laisse-la passer.'},
+      {label:'Accord',demo:`<div class="tiles-tile chord" style="position:static;width:40px;height:32px;background:linear-gradient(160deg,#FFB088,#FF7A45)">Q</div>`,txt:'Appuie les deux touches ensemble.'},
+    ];
+    const rowsHtml=rows.map(r=>`<div style="display:flex;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08)">
+        <div style="flex-shrink:0;width:40px;display:flex;justify-content:center">${r.demo}</div>
+        <div><div style="font-weight:700;font-size:13.5px;color:#fff">${r.label}</div><div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:1px">${r.txt}</div></div>
+      </div>`).join('');
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:460px;margin:0 auto;padding:0 24px">
+        <div class="game-arena" style="height:auto;padding:26px 22px">
+          <h2 style="margin:0 0 4px;font-size:21px;font-weight:800;color:#fff;text-align:center">${isFree?'Mode libre':song.title}</h2>
+          <p style="margin:0 0 16px;text-align:center;font-size:13px;color:rgba(255,255,255,.5)">Tape la lettre pile quand la tuile touche la ligne.</p>
+          <div style="text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:8px">TOUCHES DE CETTE PARTIE</div>
+          <div class="tiles-intro-keys" style="margin-bottom:20px">${lettersHtml}</div>
+          <div>${rowsHtml}</div>
+          <button onclick="app._sourisTilesBeginPlay()" style="width:100%;margin-top:20px;padding:13px;border:none;border-radius:12px;background:var(--accent,#FF7A45);color:#fff;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer">Commencer ▸</button>
+          <div style="text-align:center;margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12px;text-decoration:underline">quitter</button></div>
+        </div>
+      </div>
+    </div>`;
   },
   // Prise en main très courte (une seule tuile à taper "sur la ligne"),
   // affichée avant la toute première partie jamais lancée — le reste des
@@ -7491,15 +7531,12 @@ const app={
       const durMs=Math.max(10000,(isFinite(audio.duration)&&audio.duration>0?audio.duration*1000:180000)-(song.offsetMs||0));
       const stages=this._sourisTilesStagesForDur(durMs,song.expert,song.maxStage);
       const lanes=song.expert?TILES_LANES.concat(TILES_EXPERT_LANES):TILES_LANES;
-      this.souris={phase:'play',track:'tiles',songId:song.id,durMs,stages,lanes,
-        score:0,combo:0,bestCombo:0,lives:4,hits:0,misses:0,
-        tiles:Array(lanes.length).fill(null),nextSpawnAt:0,judge:null,playStartWall:Date.now(),
-        stageIdx:0,banner:null,startAt:Date.now()+2600,seenTypes:{},
-        intenseActive:false,intenseLostLife:false};
-      this._sourisTilesBindKeys();
       audio.currentTime=(song.offsetMs||0)/1000; // la lecture démarre au son du "GO !", pas maintenant
+      // Écran "comment jouer" (règles + touches de cette partie) avant le
+      // compte à rebours : startAt n'est calculé qu'au clic sur "Commencer"
+      // dans _sourisTilesBeginPlay, pour ne pas décompter pendant la lecture.
+      this.souris={phase:'brief',track:'tiles',songId:song.id,durMs,stages,lanes};
       this.renderSouris();
-      this._sourisLoop=setInterval(()=>this._sourisTilesTick(),50);
     };
     if(audio.readyState>=1)begin();
     else{
@@ -7835,6 +7872,7 @@ const app={
     if(s.phase==='select')return this._sourisTilesSelect();
     if(s.phase==='tutorial')return this._sourisTilesTutorialScreen();
     if(s.phase==='loading')return this._sourisTilesLoading();
+    if(s.phase==='brief')return this._sourisTilesBriefScreen();
     if(s.phase==='end')return this._sourisTilesEndScreen();
     if(s.phase==='play'&&s.paused)return this._sourisTilesPausedScreen();
     if(s.phase==='play'&&s.startAt&&Date.now()<s.startAt)return this._sourisTilesCountdown();
