@@ -7461,18 +7461,23 @@ const app={
   },
   // Mode libre : pas d'audio à charger, pas de durée totale — démarre direct.
   // Palier expert (couloirs étendus) toujours disponible, vu l'absence de fin.
-  _sourisTilesStartFree(){
-    if(!this.stats.sourisTilesTutorialSeen){this._sourisTilesTutorial(()=>this._sourisTilesStartFree());return;}
+  _sourisTilesStartFree(skipBrief){
+    if(!this.stats.sourisTilesTutorialSeen){this._sourisTilesTutorial(()=>this._sourisTilesStartFree(skipBrief));return;}
     this.stopSouris();
     const lanes=TILES_LANES.concat(TILES_EXPERT_LANES);
     this.souris={phase:'brief',track:'tiles',songId:'libre',durMs:Infinity,stages:TILES_FREE_STAGES,lanes,bpm:100};
-    this.renderSouris();
+    if(skipBrief)this._sourisTilesBeginPlay();else this.renderSouris();
   },
   // Lancé par le bouton "Commencer" de l'écran brief (règles + touches de
   // cette partie) : construit l'état de jeu réel et ne calcule startAt qu'ici,
   // pour que le compte à rebours ne s'écoule pas pendant la lecture du brief.
   _sourisTilesBeginPlay(){
     const s=this.souris;if(!s||s.phase!=='brief')return;
+    // Jeu 100% clavier (comme la Course, le Fantôme et Simon) : sur écran
+    // tactile sans clavier détecté, ne démarre pas une partie injouable —
+    // "Rejouer" saute directement ici sans repasser par _sourisTilesBriefScreen,
+    // donc ce garde-fou doit être vérifié ici aussi, pas seulement à l'écran.
+    if(IS_TOUCH_ONLY()){this.renderSouris();return;}
     const{songId,durMs,stages,lanes,bpm}=s;
     this.souris={phase:'play',track:'tiles',songId,durMs,stages,lanes,
       score:0,combo:0,bestCombo:0,lives:4,hits:0,misses:0,
@@ -7483,8 +7488,28 @@ const app={
     this.renderSouris();
     this._sourisLoop=setInterval(()=>this._sourisTilesTick(),50);
   },
+  // Même garde-fou que la Course, le Fantôme et Simon (voir IS_TOUCH_ONLY) :
+  // Magic Tiles se joue entièrement au clavier physique (touches Q S D F/
+  // J K L M), rien n'y répond au doigt. Sans ce contrôle, un mobile/tablette
+  // sans clavier arrivait jusqu'au compte à rebours puis terminait
+  // automatiquement à 0 point, sans explication. Appelé depuis la prise en
+  // main (premier lancement) et l'écran brief (lancements suivants) : ce
+  // sont les deux portes d'entrée avant qu'une frappe clavier soit exigée.
+  _sourisTilesKbRequiredScreen(){
+    document.getElementById('page-games').innerHTML=`<div class="games-section">
+      <div style="max-width:460px;margin:0 auto;padding:0 24px">
+        <div class="game-arena" style="height:auto;padding:48px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
+          <div style="font-size:40px;line-height:1">⌨️</div>
+          <h2 style="margin:0;font-size:21px;font-weight:800;color:#fff">Clavier requis</h2>
+          <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.6)">Magic Tiles se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p>
+          <button class="res-btn sec" style="flex:none;padding:13px 26px;margin-top:6px" onclick="app.exitActiveGame()">← Jeux</button>
+        </div>
+      </div>
+    </div>`;
+  },
   _sourisTilesBriefScreen(){
     const s=this.souris;
+    if(IS_TOUCH_ONLY())return this._sourisTilesKbRequiredScreen();
     const isFree=s.songId==='libre';
     const song=isFree?null:(TILES_SONGS.find(x=>x.id===s.songId)||TILES_SONGS[0]);
     const finalLanes=s.stages[s.stages.length-1].lanes;
@@ -7519,6 +7544,7 @@ const app={
   // mécaniques (accord/piège) s'explique en jeu à leur première
   // apparition (_sourisTilesAnnounce), pas ici : un seul concept à la fois.
   _sourisTilesTutorial(onDone){
+    if(IS_TOUCH_ONLY()){this.stopSouris();this._sourisTilesKbRequiredScreen();return;}
     this.stopSouris();
     this.souris={phase:'tutorial',track:'tiles',onDone,done:false,
       msg:'Tape la touche F quand la tuile touche la ligne',
@@ -7567,9 +7593,13 @@ const app={
       </div>
     </div>`;
   },
-  _sourisTilesStart(songId){
-    if(!this.stats.sourisTilesTutorialSeen){this._sourisTilesTutorial(()=>this._sourisTilesStart(songId));return;}
-    if(songId==='libre'){this._sourisTilesStartFree();return;}
+  // skipBrief : utilisé par "Rejouer" sur l'écran de fin — le joueur vient de
+  // finir une partie, lui remontrer les règles avant de le laisser rejouer
+  // serait plus frustrant qu'utile. La sélection normale d'un morceau, elle,
+  // passe toujours par le brief.
+  _sourisTilesStart(songId,skipBrief){
+    if(!this.stats.sourisTilesTutorialSeen){this._sourisTilesTutorial(()=>this._sourisTilesStart(songId,skipBrief));return;}
+    if(songId==='libre'){this._sourisTilesStartFree(skipBrief);return;}
     const idx=TILES_SONGS.findIndex(x=>x.id===songId);
     const bestRaw=(this.stats&&this.stats.sourisTilesBest)||{};
     const bestGuard=typeof bestRaw.score==='number'?{}:bestRaw;
@@ -7594,7 +7624,7 @@ const app={
       // compte à rebours : startAt n'est calculé qu'au clic sur "Commencer"
       // dans _sourisTilesBeginPlay, pour ne pas décompter pendant la lecture.
       this.souris={phase:'brief',track:'tiles',songId:song.id,durMs,stages,lanes};
-      this.renderSouris();
+      if(skipBrief)this._sourisTilesBeginPlay();else this.renderSouris();
     };
     if(audio.readyState>=1)begin();
     else{
@@ -8079,10 +8109,11 @@ const app={
             record:r.isNewBest?(isFree?'Nouveau record en mode libre !':`Nouveau record sur ${song.title} !`):null,
             boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%',color:accColor}],
             extra,
-            primaryLabel:'Rejouer ▸',primaryOnClick:`app._sourisTilesStart('${s.songId}')`,
+            primaryLabel:'Rejouer ▸',primaryOnClick:`app._sourisTilesStart('${s.songId}',true)`,
             secondaryLabel:'Autre morceau',secondaryOnClick:`app.souris={phase:'select',track:'tiles'};app.renderSouris()`,
           })}
         </div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">← Jeux</button></div>
       </div>
     </div>`;
     this._animateStatCountUp('.game-arena',['','×','']);
