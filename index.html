@@ -7320,15 +7320,11 @@ const app={
         </div>
       </div>
     </div>`;
-    // Popup "comment jouer" affichée automatiquement une seule fois, à la
-    // toute première visite de cet écran (avant même de choisir un morceau) :
-    // le tutoriel main-sur-clavier (_sourisTilesTutorial) apprend le geste sur
-    // une tuile, mais rien n'expliquait jusqu'ici les tuiles spéciales avant
-    // de tomber dessus en pleine partie.
-    if(!this.stats.sourisTilesGlossaryAutoSeen){
-      this.stats.sourisTilesGlossaryAutoSeen=true;saveStats(this.stats);
-      this._sourisTilesShowGlossary();
-    }
+    // Plus d'auto-ouverture ici : l'écran brief (_sourisTilesBriefScreen),
+    // affiché avant CHAQUE partie juste avant le compte à rebours, couvre déjà
+    // les règles et les types de tuiles avec les touches propres à ce morceau
+    // — un doublon avec cette popup aurait été plus confus qu'utile. Le
+    // bouton "?" reste là pour la rouvrir à la demande.
   },
   _sourisTilesShowGlossary(){
     if(document.getElementById('tiles-glossary-overlay'))return;
@@ -7347,14 +7343,21 @@ const app={
     div.id='tiles-glossary-overlay';
     div.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;display:flex;align-items:center;justify-content:center;padding:24px';
     div.onclick=(e)=>{if(e.target===div)this._sourisTilesCloseGlossary();};
-    div.innerHTML=`<div style="background:#1A1712;border:1px solid rgba(255,255,255,.12);border-radius:20px;max-width:440px;width:100%;max-height:82vh;overflow-y:auto;padding:26px 28px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    // Colonne flex avec en-tête et bouton FIXES et seule la liste des tuiles
+    // défilante au milieu : sur les petites fenêtres, le contenu (intro +
+    // 5 tuiles) peut dépasser 82vh — avec un bloc unique tout scrollable,
+    // le bouton "Compris" finissait hors champ, caché sous le scroll, ce qui
+    // donnait l'impression d'un popup cassé.
+    div.innerHTML=`<div style="background:#1A1712;border:1px solid rgba(255,255,255,.12);border-radius:20px;max-width:440px;width:100%;max-height:82vh;overflow:hidden;display:flex;flex-direction:column;padding:26px 28px 20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0">
           <h3 style="margin:0;font-size:19px;font-weight:800;color:#fff">Comment jouer</h3>
           <button onclick="app._sourisTilesCloseGlossary()" title="Passer" style="background:rgba(255,255,255,.08);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;color:rgba(255,255,255,.75);font-size:13px;font-weight:700;flex-shrink:0">✕</button>
         </div>
-        <p style="margin:0 0 18px;font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.7)">Pose tes doigts sur ta rangée de repos (<b style="color:#fff">Q S D F</b> à gauche, <b style="color:#fff">J K L M</b> à droite). Une tuile tombe dans chaque couloir : tape la lettre correspondante pile quand elle touche la ligne. Au fil du morceau, de nouvelles touches s'ajoutent et des tuiles spéciales apparaissent :</p>
-        <div>${rowsHtml}</div>
-        <button onclick="app._sourisTilesCloseGlossary()" style="width:100%;margin-top:18px;padding:13px;border:none;border-radius:12px;background:var(--accent,#FF7A45);color:#fff;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer">Compris, on y va !</button>
+        <div style="flex:1 1 auto;min-height:0;overflow-y:auto">
+          <p style="margin:0 0 18px;font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.7)">Pose tes doigts sur ta rangée de repos (<b style="color:#fff">Q S D F</b> à gauche, <b style="color:#fff">J K L M</b> à droite). Une tuile tombe dans chaque couloir : tape la lettre correspondante pile quand elle touche la ligne. Au fil du morceau, de nouvelles touches s'ajoutent et des tuiles spéciales apparaissent :</p>
+          <div>${rowsHtml}</div>
+        </div>
+        <button onclick="app._sourisTilesCloseGlossary()" style="width:100%;margin-top:18px;padding:13px;border:none;border-radius:12px;background:var(--accent,#FF7A45);color:#fff;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer;flex-shrink:0">Compris, on y va !</button>
       </div>`;
     document.body.appendChild(div);
   },
