@@ -1202,6 +1202,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .gsouris-judge-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:rgba(255,255,255,.5);text-transform:uppercase}
 .gsouris-judge-pill{display:inline-flex;align-items:center;gap:6px;margin-top:2px;border-radius:999px;padding:5px 14px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff;background:rgba(255,77,46,.9)}
 .gsouris-judge-pill.bonus{background:rgba(255,216,77,.92);color:#16140F}
+.gsouris-judge-pill.bad{background:rgba(229,72,77,.92)}
 @keyframes gsourisPop{0%{transform:translate(-50%,-90%) scale(.7);opacity:0}100%{transform:translate(-50%,-120%) scale(1);opacity:1}}
 /* Pied de partie : stats live + PTS DE L'OR + rejouer */
 .gsouris-footer{position:relative;z-index:1;display:flex;align-items:center;gap:26px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
@@ -6303,12 +6304,17 @@ const app={
               <div class="gsouris-intro-chip">${s.lives||3} vies</div>
               <div class="gsouris-intro-chip">Or à ${l.gold} pts</div>
             </div>
-            <button class="btn-primary" autofocus onclick="app.startSouris()">Entrer dans la salle ›</button>
+            <button class="btn-primary" id="gsouris-brief-go" autofocus onclick="app.startSouris()">Entrer dans la salle ›</button>
             <div class="gidle-espace">OU APPUIE SUR ESPACE</div>
           </div>
         </div>
       </div>
     </div>`;
+    // `autofocus` sur du HTML injecté via innerHTML n'est pas garanti par
+    // tous les navigateurs : sans ce focus explicite, "OU APPUIE SUR ESPACE"
+    // pouvait rester une fausse promesse (rien de focusé = rien n'écoute Espace).
+    const goBtn=document.getElementById('gsouris-brief-go');
+    if(goBtn)goBtn.focus();
   },
 
   _sourisRenderEnd(){
@@ -6435,9 +6441,11 @@ const app={
         if(z===t.color){
           s.score++;s.hit++;s.streak=(s.streak||0)+1;s.lastReaction=Date.now()-t.born;
           s.targets=s.targets.filter(x=>x!==t);playSound('hit');this._sourisFlash('#1FA971');
+          this._sourisJudgePop('TOUCHÉ','+1 · SÉRIE '+s.streak);
         } else {
           s.miss++;s.streak=0;s.score=Math.max(0,s.score-1);
           playSound('miss');this._sourisFlash('#E5484D');t.x=t.hx;t.y=t.hy;
+          this._sourisJudgePop('RATÉ','−1','bad');
         }
       };
     }
@@ -6454,7 +6462,7 @@ const app={
   _sourisZoneAt(x,y){
     if(y<58)return null;
     if(this._sourisCaps(this.souris.lvl).sort3){
-      return x<33.3?'#1FA971':x<66.6?'#3B82F6':'#E5722B';
+      return x<33.3?'#1FA971':x<66.6?'#3B82F6':'#818CF8';
     }
     return x<50?'#1FA971':'#3B82F6';
   },
@@ -6475,12 +6483,14 @@ const app={
       s.miss++;s.streak=0;
       s.score=Math.max(0,s.score-2);
       playSound('miss');this._sourisFlash('#E5484D');
+      this._sourisJudgePop('PIÈGE','−2','bad');
       s.targets=s.targets.filter(x=>x!==t);
       return;
     }
     const mult=(s.mult&&Date.now()<s.multUntil)?s.mult:1;
     const core=!!c.core&&this._sourisInCore(t,s.mx,s.my);
-    s.score+=(core?3:1)*mult;
+    const pts=(core?3:1)*mult;
+    s.score+=pts;
     s.hit++;playSound('hit');
     s.lastReaction=Date.now()-t.born;
     if(core){
@@ -6499,6 +6509,10 @@ const app={
       s.streak=(s.streak||0)+1;
       this._sourisFlash('#1FA971');
     }
+    // Même retour de jugement partout (voir _sourisJudgePop) : avant, cliquer
+    // une cible aux niveaux 2-7/11/12 ne donnait qu'un flash de bordure, sans
+    // le "+1"/"+3" que le niveau 1 affiche déjà au survol.
+    this._sourisJudgePop('TOUCHÉ','+'+pts+' · SÉRIE '+s.streak);
     s.targets=s.targets.filter(x=>x!==t);
   },
 
@@ -6543,7 +6557,6 @@ const app={
     return null;
   },
 
-  _sourisCheck(){ /* le niveau se termine au chrono, pas à un score seuil */ },
 
   _sourisTimeUp(){
     const s=this.souris, l=this._sourisLevels[s.lvl-1];
@@ -6589,7 +6602,7 @@ const app={
     const s=this.souris, c=this._sourisCaps(s.lvl);
     const rnd=(a,b)=>a+Math.random()*(b-a);
     if(c.drag){
-      const palette=c.sort3?['#1FA971','#3B82F6','#E5722B']:['#1FA971','#3B82F6'];
+      const palette=c.sort3?['#1FA971','#3B82F6','#818CF8']:['#1FA971','#3B82F6'];
       const color=palette[Math.floor(Math.random()*palette.length)];
       const{x,y}=this._sourisFreeSpot([12,88],[8,42],4.6);
       s.targets.push({x,y,hx:x,hy:y,r:4.6,color,shape:Math.random()<.5?'circle':'square',born:Date.now()});
@@ -6614,7 +6627,7 @@ const app={
     // Niveau survol : une cible bonus dorée, verrouillage éclair, ×2 pts 5s.
     if(c.hover&&Math.random()<.1&&!(s.targets||[]).some(t=>t.bonus)){
       const{x,y}=this._sourisFreeSpot([10,90],[12,88],5.2);
-      s.targets.push({x,y,r:5.2,bonus:'points',color:'#FFD84D',icon:'×2',label:'×2 RAPIDE',born:Date.now(),life:2600,hover:0});
+      s.targets.push({x,y,r:5.2,bonus:'points',color:'#3B82F6',icon:'×2',label:'×2 RAPIDE',born:Date.now(),life:2600,hover:0});
       return;
     }
     const bad=!!c.traps&&Math.random()<(c.fast?.34:.3);
@@ -6660,8 +6673,8 @@ const app={
           s.lastReaction=t._firstHoverAt-t.born;
           if(t.bonus){
             s.mult=2;s.multUntil=now+5000;s.hit++;
-            playSound('hit');this._sourisFlash('#FFD84D');
-            this._sourisHoverPop('BONUS','×2 · 5s',true);
+            playSound('hit');this._sourisFlash('#3B82F6');
+            this._sourisJudgePop('BONUS','×2 · 5s','bonus');
           } else {
             const mult=(s.mult&&now<s.multUntil)?s.mult:1;
             const core=this._sourisHoverInCore(t,s.mx,s.my);
@@ -6670,9 +6683,8 @@ const app={
             if(core)s.cores=(s.cores||0)+1;
             s.streak=(s.streak||0)+1;
             playSound('hit');this._sourisFlash(core?'#FFD84D':'#1FA971');
-            this._sourisHoverPop('TOUCHÉ','+'+pts+' · SÉRIE '+s.streak,false);
+            this._sourisJudgePop('TOUCHÉ','+'+pts+' · SÉRIE '+s.streak);
           }
-          this._sourisCheck();
         }
       }
     }
@@ -6684,14 +6696,18 @@ const app={
       gone.forEach(()=>{s.miss++;s.streak=0;this._sourisLoseLife();});
       s.targets=(s.targets||[]).filter(t=>!(now-t.born>8000&&t!==s.drag));
     }
-    // Expiration : laisser filer une cible utile coûte une vie. Une cible
-    // bonus n'est jamais punitive — la rater ne coûte ni vie ni série.
+    // Expiration : laisser filer une cible utile coûte une vie — y compris au
+    // niveau 1 (avant : jamais, alors que ses 3 cœurs affichés à l'écran
+    // laissaient croire le contraire). Le clavier (pads, niveau ZQSD) reste
+    // à part : là, c'est les zones dangereuses qui coûtent une vie, pas un
+    // cercle raté. Une cible bonus n'est jamais punitive — la rater ne coûte
+    // ni vie ni série.
     if(!c.drag){
       const gone=(s.targets||[]).filter(t=>now-t.born>t.life&&!t.bad&&!t.bonus);
       if(gone.length)playSound('miss');
       gone.forEach(()=>{
         s.miss++;s.streak=0;
-        if(!c.hover&&!c.pads)this._sourisLoseLife();
+        if(!c.pads)this._sourisLoseLife();
       });
       s.targets=(s.targets||[]).filter(t=>now-t.born<=t.life);
     }
@@ -6719,7 +6735,7 @@ const app={
             s.lastReaction=t._enteredAt-t.born;
             s.targets=s.targets.filter(x=>x!==t);
             playSound('hit');this._sourisFlash('#1FA971');
-            this._sourisCheck();
+            this._sourisJudgePop('TOUCHÉ','+1 · SÉRIE '+s.streak,undefined,t.x,t.y);
           }
         } else t.hover=0;
       });
@@ -6739,6 +6755,7 @@ const app={
           s._inv=true;setTimeout(()=>{s._inv=false;},1400);
           s.score=Math.max(0,s.score-1);s.streak=0;
           playSound('miss');this._sourisFlash('#E5484D');
+          this._sourisJudgePop('ZONE','−1','bad',s.player.x,s.player.y);
         }
       });
     }
@@ -6755,6 +6772,7 @@ const app={
         if(Math.sqrt(dx*dx+dy*dy)<h.r&&!s._inv){
           s._inv=true;setTimeout(()=>{s._inv=false;},1400);
           playSound('miss');this._sourisLoseLife();this._sourisFlash('#E5484D');
+          this._sourisJudgePop('ZONE','−1 ♥','bad',s.player.x,s.player.y);
         }
       });
     }
@@ -6778,9 +6796,14 @@ const app={
   // est réécrit en entier à chaque tick, donc un nœud DOM ajouté ici serait
   // effacé au tick suivant. On stocke plutôt le popup dans l'état et
   // _sourisPaint() le dessine tant que `until` n'est pas dépassé.
-  _sourisHoverPop(title,sub,isBonus){
+  // Popup de jugement partagé par TOUS les niveaux (avant : réservé au
+  // survol, donc cliquer une cible aux niveaux 2-7/11/12 ne donnait aucun
+  // retour à l'écran). kind: undefined (bon)/'bonus'/'bad'. x/y par défaut
+  // au curseur ; passer une position explicite pour les niveaux où le
+  // curseur n'a pas de sens (cercles ZQSD, glisser-déposer raté).
+  _sourisJudgePop(title,sub,kind,x,y){
     const s=this.souris;
-    s.judge={title,sub,isBonus,x:s.mx||50,y:s.my||50,until:Date.now()+650};
+    s.judge={title,sub,kind,x:x??(s.mx||50),y:y??(s.my||50),until:Date.now()+650};
   },
 
   _sourisPaint(){
@@ -6789,16 +6812,17 @@ const app={
     const c=this._sourisCaps(s.lvl);
     const now=Date.now();
     let html='';
-    if(c.hover){
-      html+=`<div class="gsouris-reticle">
-        <div class="gsouris-reticle-dash"></div>
-        <span class="gsouris-chevron up"></span><span class="gsouris-chevron down"></span>
-        <span class="gsouris-chevron left"></span><span class="gsouris-chevron right"></span>
-      </div>`;
-    }
+    // Décor de réticule : avant réservé au survol, ce qui faisait paraître
+    // l'arène "nue" sur tous les autres niveaux — purement décoratif
+    // (pointer-events:none, z-index 0) donc sans risque à afficher partout.
+    html+=`<div class="gsouris-reticle">
+      <div class="gsouris-reticle-dash"></div>
+      <span class="gsouris-chevron up"></span><span class="gsouris-chevron down"></span>
+      <span class="gsouris-chevron left"></span><span class="gsouris-chevron right"></span>
+    </div>`;
     if(c.drag){
       const zones=c.sort3
-        ?[['#1FA971','VERTE',0,33.3],['#3B82F6','BLEUE',33.3,66.6],['#E5722B','ORANGE',66.6,100]]
+        ?[['#1FA971','VERTE',0,33.3],['#3B82F6','BLEUE',33.3,66.6],['#818CF8','INDIGO',66.6,100]]
         :[['#1FA971','VERTE',0,50],['#3B82F6','BLEUE',50,100]];
       zones.forEach(([col,lbl,l,r])=>{
         html+=`<div style="position:absolute;left:${l}%;right:${100-r}%;top:58%;bottom:0;background:${col}1a;border:2px dashed ${col}88;border-radius:12px;margin:5px;display:flex;align-items:center;justify-content:center;color:${col};font-weight:800;font-size:12px;letter-spacing:.05em">${lbl}</div>`;
@@ -6851,11 +6875,11 @@ const app={
       const core=(c.core&&!t.bad)?`<div style="position:absolute;left:50%;top:50%;width:${frac*2*100}%;height:${frac*2*100}%;transform:translate(-50%,-50%);border-radius:50%;background:#FFD84D;box-shadow:0 0 8px #FFD84D"></div>`:'';
       html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${grad};border-radius:50%;box-shadow:inset 0 -2px 0 rgba(0,0,0,.15),0 0 ${t.bad?'20':'16'}px ${col}88;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${mark}${core}</div>`;
     });
-    if(c.hover&&s.judge&&s.judge.until>now){
+    if(s.judge&&s.judge.until>now){
       const j=s.judge;
       html+=`<div class="gsouris-judge" style="left:${j.x}%;top:${j.y}%">
         <div class="gsouris-judge-text">${j.title}</div>
-        <div class="gsouris-judge-pill${j.isBonus?' bonus':''}">${j.sub}</div>
+        <div class="gsouris-judge-pill${j.kind?' '+j.kind:''}">${j.sub}</div>
       </div>`;
     }
     if(s.pop&&s.pop.until>now){
