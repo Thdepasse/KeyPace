@@ -2751,25 +2751,35 @@ const T4A_KPOS=t4aComputeKpos();
 // main, les 4 touches de chaque main étaient indiscernables l'une de
 // l'autre) — dégradé de plus en plus clair de l'auriculaire vers l'index,
 // pour que la couleur seule aide à repérer le couloir sans lire la lettre.
+// bg n'est plus utilisé pour colorer les tuiles qui tombent (voir
+// TILES_NORMAL_BG plus bas) : la couleur d'une tuile reflète maintenant son
+// TYPE (normale/accord en orange, bonus en jaune, piège en rouge rayé), pas
+// sa lettre — hand reste utilisé pour répartir les accords entre les deux
+// mains.
 const TILES_LANES=[
-  {letter:'q',hand:'l',bg:'linear-gradient(160deg,#FFB088,#FF7A45)'},
-  {letter:'s',hand:'l',bg:'linear-gradient(160deg,#FFA068,#FF6A35)'},
-  {letter:'d',hand:'l',bg:'linear-gradient(160deg,#FF9060,#FF5A2E)'},
-  {letter:'f',hand:'l',bg:'linear-gradient(160deg,#FF9868,#FF4D2E)'},
-  {letter:'j',hand:'r',bg:'linear-gradient(160deg,#A8493A,#6F2A20)'},
-  {letter:'k',hand:'r',bg:'linear-gradient(160deg,#9C4030,#63241C)'},
-  {letter:'l',hand:'r',bg:'linear-gradient(160deg,#8F3828,#572018)'},
-  {letter:'m',hand:'r',bg:'linear-gradient(160deg,#823024,#4B1C14)'},
+  {letter:'q',hand:'l'},
+  {letter:'s',hand:'l'},
+  {letter:'d',hand:'l'},
+  {letter:'f',hand:'l'},
+  {letter:'j',hand:'r'},
+  {letter:'k',hand:'r'},
+  {letter:'l',hand:'r'},
+  {letter:'m',hand:'r'},
 ];
+// Couleur unique des tuiles "normales" (appui simple), tuiles longues
+// (maintien) et accords : c'est le TYPE qui donne la couleur, plus la
+// lettre. Bonus (♥) et piège (✕) gardent leur propre couleur via les classes
+// CSS .bonus/.trap (voir _sourisTilesArena).
+const TILES_NORMAL_BG='linear-gradient(160deg,#FFB088,#FF7A45)';
 // Couloirs étendus (réservés au morceau "Extrême" et au Mode libre, en tout
 // dernier palier) : la rangée du dessus, directement au-dessus des 4 doigts
 // centraux (index/majeur), les plus faciles à atteindre sans lever la main —
 // R/E prolongent F/D à gauche, U/I prolongent J/K à droite.
 const TILES_EXPERT_LANES=[
-  {letter:'r',hand:'l',bg:'linear-gradient(160deg,#FFC29E,#FF8A5C)'},
-  {letter:'e',hand:'l',bg:'linear-gradient(160deg,#FFB48E,#FF7A4C)'},
-  {letter:'u',hand:'r',bg:'linear-gradient(160deg,#B85242,#7A3020)'},
-  {letter:'i',hand:'r',bg:'linear-gradient(160deg,#AC4A38,#6E2818)'},
+  {letter:'r',hand:'l'},
+  {letter:'e',hand:'l'},
+  {letter:'u',hand:'r'},
+  {letter:'i',hand:'r'},
 ];
 const TILES_RANKS=['D','C','B','A','S','SS','SSS'];
 const TILES_RANK_SCORE=[0,120,280,480,750,1100,1600];
@@ -7329,11 +7339,11 @@ const app={
   _sourisTilesShowGlossary(){
     if(document.getElementById('tiles-glossary-overlay'))return;
     const rows=[
-      {label:'Tuile normale',demo:`<div class="tiles-tile" style="position:static;width:44px;height:34px;background:linear-gradient(160deg,#FFB088,#FF7A45)">Q</div>`,txt:'Tape la touche pile quand la tuile touche la ligne.'},
-      {label:'Tuile longue',demo:`<div class="tiles-tile" style="position:static;width:44px;height:64px;background:linear-gradient(160deg,#FFB088,#FF7A45)"><div class="tiles-hold-icon" style="position:static;margin-top:6px">▼</div></div>`,txt:'Maintiens la touche enfoncée jusqu’à la fin de la tuile.'},
-      {label:'Bonus ♥',demo:`<div class="tiles-tile bonus" style="position:static;width:44px;height:38px">♥</div>`,txt:'Tape-la pour regagner une vie. La rater ne pénalise pas.'},
-      {label:'Piège ✕',demo:`<div class="tiles-tile trap" style="position:static;width:44px;height:34px">✕</div>`,txt:'Ne la tape pas : laisse-la passer sans rien faire.'},
-      {label:'Accord',demo:`<div class="tiles-tile chord" style="position:static;width:44px;height:34px;background:linear-gradient(160deg,#FFB088,#FF7A45)">Q</div>`,txt:'Deux tuiles à la même hauteur : tape les deux touches ensemble.'},
+      {label:'Tuile normale',demo:`<div class="tiles-tile" style="position:relative;width:44px;height:34px;background:${TILES_NORMAL_BG}">Q</div>`,txt:'Tape la touche pile quand la tuile touche la ligne.'},
+      {label:'Tuile longue',demo:`<div class="tiles-tile" style="position:relative;width:44px;height:64px;background:${TILES_NORMAL_BG}"><div class="tiles-hold-icon" style="position:relative;margin-top:6px">▼</div></div>`,txt:'Maintiens la touche enfoncée jusqu’à la fin de la tuile.'},
+      {label:'Bonus ♥',demo:`<div class="tiles-tile bonus" style="position:relative;width:44px;height:38px">♥</div>`,txt:'Tape-la pour regagner une vie. La rater ne pénalise pas.'},
+      {label:'Piège ✕',demo:`<div class="tiles-tile trap" style="position:relative;width:44px;height:34px">✕</div>`,txt:'Ne la tape pas : laisse-la passer sans rien faire.'},
+      {label:'Accord',demo:`<div class="tiles-tile chord" style="position:relative;width:44px;height:34px;background:${TILES_NORMAL_BG}">Q</div>`,txt:'Deux tuiles à la même hauteur : tape les deux touches ensemble.'},
     ];
     const rowsHtml=rows.map(r=>`<div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)">
         <div style="flex-shrink:0;width:44px;display:flex;justify-content:center">${r.demo}</div>
@@ -7435,11 +7445,11 @@ const app={
     const finalLanes=s.stages[s.stages.length-1].lanes;
     const lettersHtml=finalLanes.map((laneIdx,i)=>`<div class="tiles-intro-key" style="animation-delay:${(i*-0.4).toFixed(2)}s">${s.lanes[laneIdx].letter}</div>`).join('');
     const rows=[
-      {label:'Tuile normale',demo:`<div class="tiles-tile" style="position:static;width:40px;height:32px;background:linear-gradient(160deg,#FFB088,#FF7A45)">Q</div>`,txt:'Appuie pile quand elle touche la ligne.'},
-      {label:'Tuile longue',demo:`<div class="tiles-tile" style="position:static;width:40px;height:58px;background:linear-gradient(160deg,#FFB088,#FF7A45)"><div class="tiles-hold-icon" style="position:static;margin-top:5px">▼</div></div>`,txt:'Maintiens la touche enfoncée jusqu’à la fin.'},
-      {label:'Bonus ♥',demo:`<div class="tiles-tile bonus" style="position:static;width:40px;height:34px">♥</div>`,txt:'Appuie pour regagner une vie.'},
-      {label:'Piège ✕',demo:`<div class="tiles-tile trap" style="position:static;width:40px;height:32px">✕</div>`,txt:'N’appuie pas : laisse-la passer.'},
-      {label:'Accord',demo:`<div class="tiles-tile chord" style="position:static;width:40px;height:32px;background:linear-gradient(160deg,#FFB088,#FF7A45)">Q</div>`,txt:'Appuie les deux touches ensemble.'},
+      {label:'Tuile normale',demo:`<div class="tiles-tile" style="position:relative;width:40px;height:32px;background:${TILES_NORMAL_BG}">Q</div>`,txt:'Appuie pile quand elle touche la ligne.'},
+      {label:'Tuile longue',demo:`<div class="tiles-tile" style="position:relative;width:40px;height:58px;background:${TILES_NORMAL_BG}"><div class="tiles-hold-icon" style="position:relative;margin-top:5px">▼</div></div>`,txt:'Maintiens la touche enfoncée jusqu’à la fin.'},
+      {label:'Bonus ♥',demo:`<div class="tiles-tile bonus" style="position:relative;width:40px;height:34px">♥</div>`,txt:'Appuie pour regagner une vie.'},
+      {label:'Piège ✕',demo:`<div class="tiles-tile trap" style="position:relative;width:40px;height:32px">✕</div>`,txt:'N’appuie pas : laisse-la passer.'},
+      {label:'Accord',demo:`<div class="tiles-tile chord" style="position:relative;width:40px;height:32px;background:${TILES_NORMAL_BG}">Q</div>`,txt:'Appuie les deux touches ensemble.'},
     ];
     const rowsHtml=rows.map(r=>`<div style="display:flex;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08)">
         <div style="flex-shrink:0;width:40px;display:flex;justify-content:center">${r.demo}</div>
@@ -7503,7 +7513,7 @@ const app={
         <div class="game-arena" style="padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:16px">
           <div style="font-size:14px;color:rgba(255,255,255,.75);min-height:20px">${s.done?'Voilà l\'idée ! ✓':s.msg}</div>
           <div style="position:relative;width:100px;height:220px;background:rgba(255,255,255,.03);border-radius:14px;overflow:hidden">
-            ${!s.done?`<div class="tiles-tile" style="left:8px;right:8px;top:${y}%;height:34px;transform:translateY(-50%);background:${TILES_LANES[3].bg}">F</div>`:''}
+            ${!s.done?`<div class="tiles-tile" style="left:8px;right:8px;top:${y}%;height:34px;transform:translateY(-50%);background:${TILES_NORMAL_BG}">F</div>`:''}
             <div class="tiles-hitline" style="top:${this._sourisTilesHitLineY}%"></div>
           </div>
           <div class="tiles-key" style="width:60px">f</div>
@@ -7909,7 +7919,7 @@ const app={
       if(t){
         const h=t.long?64:(t.bonus?38:34);
         const y=t.holding?this._sourisTilesHitLineY:t.y;
-        const bg=(t.bonus||t.trap)?'':`background:${lane.bg};`;
+        const bg=(t.bonus||t.trap)?'':`background:${TILES_NORMAL_BG};`;
         const cls=[t.holding?'holding':'',t.bonus?'bonus':'',t.trap?'trap':'',t.chordId?'chord':'',(t.chordId&&t.chordHit)?'chord-armed':''].filter(Boolean).join(' ');
         const label=t.bonus?'♥':(t.trap?'✕':lane.letter);
         const holdIcon=t.long&&!t.holding?'<div class="tiles-hold-icon">▼</div>':'';
