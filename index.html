@@ -1189,13 +1189,18 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .gsouris-chevron.down{left:50%;bottom:16%;transform:translate(-50%,0) rotate(135deg)}
 .gsouris-chevron.left{left:6%;top:50%;transform:translate(0,-50%) rotate(-135deg)}
 .gsouris-chevron.right{right:6%;top:50%;transform:translate(0,-50%) rotate(45deg)}
-/* Cible cercles concentriques (survol) */
+/* Cible cercles concentriques (survol, et depuis peu tous les niveaux à
+   clic/ZQSD — même langage visuel partout, voir _sourisPaint) */
 .gsouris-target{position:absolute;aspect-ratio:1;transform:translate(-50%,-50%)}
 .gsouris-target-ring{position:absolute;inset:0;border:2px solid rgba(255,255,255,.18);border-radius:50%}
 .gsouris-target-prog{position:absolute;inset:9%;border-radius:50%}
 .gsouris-target-core{position:absolute;inset:22%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FF9868,#FF4D2E 70%);box-shadow:0 0 22px rgba(255,77,46,.55)}
 .gsouris-target-dot{position:absolute;inset:44%;border-radius:50%;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.85)}
 .gsouris-target-lock{position:absolute;left:50%;top:100%;margin-top:8px;transform:translateX(-50%);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:rgba(255,255,255,.5)}
+/* Cœur de précision (niveaux "cœur de cible") et croix de piège, posés au
+   centre de la cible à anneaux ci-dessus, par-dessus le petit point blanc */
+.gsouris-target-heart{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:#FFD84D;box-shadow:0 0 8px #FFD84D;z-index:1}
+.gsouris-target-mark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-weight:800;font-size:15px;text-shadow:0 2px 6px rgba(0,0,0,.5);z-index:1}
 .gsouris-bonus-label{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:11px;letter-spacing:.04em;color:#FFD84D}
 /* Popup "TOUCHÉ" */
 .gsouris-judge{position:absolute;text-align:center;z-index:6;pointer-events:none;animation:gsourisPop .22s ease-out;transform:translate(-50%,-120%)}
@@ -6424,7 +6429,11 @@ const app={
       if(s.drag){e.preventDefault();s.drag.x=s.mx;s.drag.y=s.my;}
     };
     const c=this._sourisCaps(s.lvl);
-    if(c.click)a.onmousedown=(e)=>this._sourisClick(e);
+    // Même raison que le glisser-déposer plus bas : sans preventDefault, des
+    // clics rapides et rapprochés sont lus par le navigateur comme un geste
+    // de sélection de texte (curseur en I, surbrillance bleue qui apparaît)
+    // au lieu d'un simple clic sur la cible.
+    if(c.click)a.onmousedown=(e)=>{e.preventDefault();this._sourisClick();};
     if(c.drag){
       // Sans preventDefault, un mousedown+mousemove sur du texte (ex. les
       // libellés VERTE/BLEUE) déclenche la sélection native du navigateur
@@ -6866,14 +6875,26 @@ const app={
         </div>`;
         return;
       }
+      // Même cible à anneaux concentriques que le survol (ring/prog/core/dot)
+      // au lieu de l'ancien disque plat : avant, seul le niveau 1 avait cette
+      // DA, les autres avaient de simples ronds unis qui juraient à côté.
+      // L'anneau de progression se VIDE à mesure que le temps s'écoule
+      // (miroir du remplissage du verrouillage en survol), en plus du léger
+      // rétrécissement déjà utilisé comme repère d'urgence.
       const left=Math.max(0,1-age/t.life);
-      const sz=t.r*2*(.55+left*.45);
-      const col=t.bad?(t.disguised?'#D98A3D':'#E5484D'):'#1FA971';
+      const sz=t.r*2*(.7+left*.3);
+      const ringCol=t.bad?(t.disguised?'#D98A3D':'#E5484D'):'#1FA971';
       const grad=t.bad?(t.disguised?'radial-gradient(circle at 35% 30%,#F0BE7E,#D98A3D 70%)':'radial-gradient(circle at 35% 30%,#F28B8B,#E5484D 70%)'):'radial-gradient(circle at 35% 30%,#4EE0A0,#1FA971 70%)';
-      const mark=t.bad&&!t.disguised?'✕':'';
+      const mark=t.bad&&!t.disguised?'<div class="gsouris-target-mark">✕</div>':'';
       const frac=c.smaller?0.26:0.30;
-      const core=(c.core&&!t.bad)?`<div style="position:absolute;left:50%;top:50%;width:${frac*2*100}%;height:${frac*2*100}%;transform:translate(-50%,-50%);border-radius:50%;background:#FFD84D;box-shadow:0 0 8px #FFD84D"></div>`:'';
-      html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:${grad};border-radius:50%;box-shadow:inset 0 -2px 0 rgba(0,0,0,.15),0 0 ${t.bad?'20':'16'}px ${col}88;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${mark}${core}</div>`;
+      const heart=(c.core&&!t.bad)?`<div class="gsouris-target-heart" style="width:${frac*2*100}%;height:${frac*2*100}%"></div>`:'';
+      html+=`<div class="gsouris-target" style="left:${t.x}%;top:${t.y}%;width:${sz}%">
+        <div class="gsouris-target-ring"></div>
+        <div class="gsouris-target-prog" style="background:conic-gradient(${ringCol} ${Math.round(left*100)}%,transparent 0)"></div>
+        <div class="gsouris-target-core" style="background:${grad};box-shadow:0 0 20px ${ringCol}88"></div>
+        <div class="gsouris-target-dot"></div>
+        ${heart}${mark}
+      </div>`;
     });
     if(s.judge&&s.judge.until>now){
       const j=s.judge;
