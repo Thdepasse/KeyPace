@@ -105,8 +105,47 @@ create table if not exists duel_results (
 );
 create index if not exists duel_results_room_idx on duel_results(room_id);
 
+-- Battle Royale : N joueurs, code de partie unique, 5 épreuves piochées parmi
+-- les jeux existants (round_game_keys), même principe que duel_rooms/duel_results
+-- mais généralisé à plus de 2 joueurs et plusieurs manches successives.
+create table if not exists royale_sessions (
+  id uuid default gen_random_uuid() primary key,
+  join_code text unique,
+  host_user_id uuid references users(id) on delete set null,
+  host_is_teacher boolean default false,     -- fige le statut au lancement : sert à savoir si la partie doit apparaître sur le dashboard prof
+  status text default 'lobby' check (status in ('lobby','playing','done')),
+  round_index integer default 0,             -- épreuve en cours (0..4)
+  round_game_keys text[],                    -- ordre des 5 épreuves, tiré au sort au lancement
+  created_at timestamptz default now()
+);
+
+create table if not exists royale_players (
+  id uuid default gen_random_uuid() primary key,
+  session_id uuid references royale_sessions(id) on delete cascade,
+  user_id uuid references users(id) on delete set null,
+  label text,
+  joined_at timestamptz default now(),
+  unique (session_id, user_id)
+);
+
+create table if not exists royale_round_results (
+  id uuid default gen_random_uuid() primary key,
+  session_id uuid references royale_sessions(id) on delete cascade,
+  round_index integer not null,
+  user_id uuid references users(id) on delete set null,
+  game_key text not null,
+  score numeric not null,
+  created_at timestamptz default now(),
+  unique (session_id, round_index, user_id)
+);
+create index if not exists royale_players_session_idx on royale_players(session_id);
+create index if not exists royale_round_results_session_idx on royale_round_results(session_id);
+
 alter table duel_rooms   enable row level security;
 alter table duel_results enable row level security;
+alter table royale_sessions      enable row level security;
+alter table royale_players       enable row level security;
+alter table royale_round_results enable row level security;
 
 -- ───────────────────────────────────────────────────────────────
 -- REFONTE COMPTE ÉTABLISSEMENT — Phase 0 : modèle de données
@@ -742,6 +781,9 @@ create policy "no_anon_access" on weekly_challenges for all to anon using (false
 create policy "no_anon_access" on weekly_scores for all to anon using (false) with check (false);
 create policy "no_anon_access" on duel_rooms for all to anon using (false) with check (false);
 create policy "no_anon_access" on duel_results for all to anon using (false) with check (false);
+create policy "no_anon_access" on royale_sessions for all to anon using (false) with check (false);
+create policy "no_anon_access" on royale_players for all to anon using (false) with check (false);
+create policy "no_anon_access" on royale_round_results for all to anon using (false) with check (false);
 create policy "no_anon_access" on classes for all to anon using (false) with check (false);
 create policy "no_anon_access" on class_members for all to anon using (false) with check (false);
 create policy "no_anon_access" on assignments for all to anon using (false) with check (false);
