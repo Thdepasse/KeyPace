@@ -2579,6 +2579,22 @@ let _saveDebounce=null;
 // ce qui faisait ignorer les données serveur ET renvoyait le squelette.
 let _statsDirty=false;
 let _statsLoaded=false;
+// Avertit visiblement l'utilisateur quand la sauvegarde serveur échoue (ex :
+// session expirée) — avant ce correctif, l'échec était totalement silencieux :
+// l'utilisateur voyait "Leçon validée" à chaque leçon sans jamais savoir que
+// plus rien ne s'enregistrait côté serveur, jusqu'au prochain rechargement.
+function _showSaveErrorBanner(){
+  if(document.getElementById('save-error-banner'))return;
+  const el=document.createElement('div');
+  el.id='save-error-banner';
+  el.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;background:#fff3ee;border:1px solid rgba(255,77,46,.35);color:#B23A1E;padding:10px 16px;border-radius:10px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.15);max-width:90vw;text-align:center';
+  el.textContent="Ta progression ne s'enregistre plus sur le serveur. Recharge la page ou reconnecte-toi.";
+  document.body.appendChild(el);
+}
+function _hideSaveErrorBanner(){
+  const el=document.getElementById('save-error-banner');
+  if(el)el.remove();
+}
 async function flushStats(){
   if(!currentUser||!currentToken||!app.stats||!_statsDirty)return;
   if(!_statsLoaded){_saveDebounce=setTimeout(flushStats,800);return;} // attend le vrai chargement
@@ -2588,8 +2604,9 @@ async function flushStats(){
     // progression enregistrée — dans ce cas on garde _statsDirty=true pour
     // réessayer plus tard plutôt que de faire comme si la sauvegarde avait
     // réussi : mieux vaut retenter indéfiniment que perdre le signal d'échec.
-    if(r.ok)_statsDirty=false;
-  }catch{}
+    if(r.ok){_statsDirty=false;_hideSaveErrorBanner();}
+    else{_showSaveErrorBanner();}
+  }catch{_showSaveErrorBanner();}
 }
 function mergeStats(remote){
   const def={tests:[],lessons:{},gameBest:0,courseBest:null,simonBest:null,clavierBest:null,sourisBest:0,sourisHybridHand:null,ghostBest:null,goals:{minWpm:20,maxErrors:8},
@@ -3029,7 +3046,7 @@ const CURRICULUM=[
        ],
        tip:"Objectif : descendre sur C et la virgule sans perdre la rangée de repos, poignet détendu."
      },
-     text:'source classe cause cor classe cause sac des ce rude douze pale court pour de secours clair clou crise'},
+     text:'source, classe, cause, cor, classe, cause, sac, des, ce, rude, douze, pale, court, pour, de, secours, clair, clou, crise'},
     // b2 : + v n   → tout le vocabulaire courant disponible
     {id:'b2',title:'V et N, texte naturel',keys:'v n',
      tip:'V est à l\'index gauche (bas), N à l\'index droit (bas). Les index gèrent beaucoup de touches : entraîne-toi à alterner rapidement entre les rangées sans perdre la position de référence sur F et J.',
@@ -3055,7 +3072,7 @@ const CURRICULUM=[
        ],
        tip:"Objectif : mémoriser la position de X et du point-virgule, sans regarder le clavier."
      },
-     text:'yeux riz taxi alors voix luxe taxi il noix niveau aux neuf luxe noir yeux six aide yeux aux six index'},
+     text:'yeux, riz, taxi, alors; voix, luxe, taxi, il; noix, niveau, aux, neuf; luxe, noir, yeux, six; aide, yeux, aux, six, index'},
     // b4 : + w :   → termes tech + prose
     {id:'b4',title:'W et deux-points',keys:'w :',
      tip:'W est à l\'auriculaire gauche bas, les deux-points à l\'annulaire droit haut (Shift + ;). C\'est ta première touche combinée avec Shift. Appuie sur Shift avec l\'auriculaire opposé à la lettre tapée.',
@@ -3068,7 +3085,7 @@ const CURRICULUM=[
        ],
        tip:"Objectif : placer W et réussir ta première combinaison avec Shift sans crisper la main."
      },
-     text:'wagon tramway wagon et porte kiwi wagon kiwi noix moi kiwi cor kiwi avec van tramway kiwi me wagon on'},
+     text:'wagon, tramway, porte, kiwi: wagon kiwi noix moi kiwi, cor kiwi avec van tramway: kiwi me wagon on'},
     // b5 : + b !   → l'alphabet est complet, vraies phrases
     {id:'b5',title:'B et point d\'exclamation',keys:'b !',
      tip:'B est à l\'index gauche bas (côté centre), le ! avec Shift. Tu couvres maintenant les 26 lettres de l\'alphabet : c\'est un cap important ! Chaque texte réel sera désormais accessible.',
@@ -3323,7 +3340,7 @@ const CURRICULUM=[
        ],
        tip:"Objectif : placer ç et ù sans regarder, et réviser l'ensemble des accents directs."
      },
-     text:'façon leçon garçon français reçu ça voilà. déjà là, façon très douce. père et mère à la leçon. café.'},
+     text:'façon leçon garçon français reçu ça voilà. déjà là où tu es, façon très douce. père et mère à la leçon. café.'},
     // acc5 : révision complète, vrais textes
     {id:'acc5',title:'Révision : tous les accents directs',keys:'é è à ù ç',
      tuto:{
@@ -3335,7 +3352,7 @@ const CURRICULUM=[
        ],
        tip:"Objectif : écrire un texte accentué complet sans chercher les touches."
      },
-     text:'déjà à l\'été, le café et la façon d\'être. très près de là, père et mère écrivent la leçon de français.'},
+     text:'déjà à l\'été, le café et la façon d\'être. très près de là où père et mère écrivent la leçon de français.'},
   ]},
 
   /* ── MODULE 8 : accents circonflexes ────────────────────────────────────── */
@@ -3544,7 +3561,7 @@ const CURRICULUM=[
        intro:"Le pourcentage % et le tiret bas _ (underscore) reviennent souvent dans les chiffres et les noms techniques.",
        rules:[
          {icon:'📊',t:'Le pourcentage %',d:"Il se colle au nombre : 50%, 100%. Sur AZERTY, % s'obtient avec Shift sur la touche ù, à droite."},
-         {icon:'➿',t:'Le tiret bas _',d:"L'underscore relie des mots sans espace dans les noms techniques : ma_variable, nom_fichier. C'est Shift + 8."},
+         {icon:'➿',t:'Le tiret bas _',d:"L'underscore relie des mots sans espace dans les noms techniques : ma_variable, nom_fichier. Il se tape directement, sans Maj : c'est Shift qui donne le chiffre 8 sur cette touche, pas l'inverse."},
          {icon:'💻',t:'Usage technique',d:"% et _ sont surtout utiles en informatique et dans les données. Mémorise leur position pour ne pas ralentir."}
        ],
        tip:"Objectif : placer % et _ (tous deux avec Shift) sans regarder."
@@ -3560,7 +3577,7 @@ const CURRICULUM=[
        rules:[
          {icon:'⌨️',t:'Accolades avec AltGr',d:"Les accolades { } s'obtiennent avec AltGr sur la rangée des chiffres. Elles encadrent des blocs de code : {code}."},
          {icon:'🔠',t:'Chevrons à gauche',d:"Les chevrons sont sur la touche à gauche du W : < en direct, > avec Shift. Ils ouvrent et ferment les balises HTML."},
-         {icon:'🧩',t:'Toujours fermer',d:"Comme les parenthèses, accolades et balises s'ouvrent ET se ferment : <p>texte</p>, {return x}."}
+         {icon:'🧩',t:'Toujours fermer',d:"Comme les parenthèses, accolades et balises s'ouvrent ET se ferment : &lt;p&gt;texte&lt;/p&gt;, {return x}."}
        ],
        tip:"Objectif : ouvrir et fermer accolades et chevrons, AltGr pour les accolades."
      },
@@ -3680,8 +3697,8 @@ const GAME_TIERS=[
 function getGameTier(score){let t=GAME_TIERS[0];for(const tier of GAME_TIERS){if(score>=tier.score)t=tier;}return t;}
 const WORDS=GAME_TIERS[0].words;
 // Dead key composition for AZERTY (handles ^ as '^' not 'Dead' on some setups)
-const DEAD_COMPOSE={'^':{a:'â',e:'ê',i:'î',o:'ô',u:'û',A:'Â',E:'Ê',I:'Î',O:'Ô',U:'Û'},'¨':{a:'ä',e:'ë',i:'ï',o:'ö',u:'ü',y:'ÿ',A:'Ä',E:'Ë',I:'Ï',O:'Ö',U:'Ü'},'`':{a:'à',e:'è',i:'ì',o:'ò',u:'ù',A:'À',E:'È',I:'Ì',O:'Ò',U:'Ù'}};
-const CODE_TO_DEAD={'BracketLeft':'^','BracketRight':'¨','Equal':'`'};
+const DEAD_COMPOSE={'^':{a:'â',e:'ê',i:'î',o:'ô',u:'û',A:'Â',E:'Ê',I:'Î',O:'Ô',U:'Û'},'¨':{a:'ä',e:'ë',i:'ï',o:'ö',u:'ü',y:'ÿ',A:'Ä',E:'Ë',I:'Ï',O:'Ö',U:'Ü'}};
+const CODE_TO_DEAD={'BracketLeft':'^','BracketRight':'¨'};
 const SPRINT_WORDS=["le","la","les","un","une","de","des","et","ou","dans","sur","avec","pour","par","pas","ne","se","ce","ma","ta","sa","qui","que","quoi","où","tout","bien","très","faire","voir","aller","venir","avoir","être","dire","vouloir","pouvoir","savoir","prendre","mettre","partir","sortir","entrer","rester","trouver","donner","penser","parler","aimer","vivre","tenir","tomber","ouvrir","fermer","lire","écrire","taper","apprendre","comprendre","répondre","attendre","perdre","gagner","jouer","courir","marcher","chanter","danser","rire","pleurer","manger","boire","dormir","réveiller","travailler","voyager","revenir","passer","laisser","suivre","montrer","décider","commencer","finir","continuer","arriver","repartir","rentrer","retourner"];
 /* Banque de mots accentués + tiers de difficulté pour les jeux (réutilise WORDS/SPRINT_WORDS) */
 const TIREUR_ACCENTS=["école","élève","fenêtre","château","préféré","règle","forêt","crème","théâtre","numéro","côté","cœur","français","intérêt","élément","problème","éléphant","lumière","révéler","différent"];
@@ -8288,7 +8305,7 @@ const app={
 
     const visibleGames=this._gcineVisible||[];
     const GAP=232;
-    let idx=Math.min(3,visibleGames.length-1),dragOffset=0;
+    let idx=0,dragOffset=0;
     const renderCarousel=()=>{
       cardEls.forEach((el,i)=>{
         const o=i-idx,a=Math.abs(o),hidden=a>3,center=o===0&&dragOffset===0;
