@@ -11645,13 +11645,19 @@ const app={
     // écrasait cette page toutes les 25s, ramenant sans prévenir à la classe.
     clearInterval(this._classRefreshTimer);
     this._classesSub='student';
+    // Numérote l'appel (même principe que bossLoad()) : si on clique vite sur
+    // un autre élève (ou qu'on repart ailleurs) avant la fin de ce fetch, un
+    // appel plus ancien ne doit jamais écraser l'affichage d'un appel plus
+    // récent avec une réponse arrivée en désordre.
+    const seq=(this._sdLoadSeq=(this._sdLoadSeq||0)+1);
     document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
     let d;
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'student-detail',token:currentToken,classId,studentId})});
       d=await r.json();
-      if(!r.ok){document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">${d.error||'Erreur.'}<br><button onclick="app.viewClass('${classId}')" style="margin-top:14px;background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;cursor:pointer">← Retour</button></div></div>`;return;}
-    }catch{document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">Erreur réseau.</div></div>`;return;}
+      if(!r.ok){if(this._sdLoadSeq!==seq)return;document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">${d.error||'Erreur.'}<br><button onclick="app.viewClass('${classId}')" style="margin-top:14px;background:none;border:1px solid var(--border);border-radius:10px;padding:8px 16px;cursor:pointer">← Retour</button></div></div>`;return;}
+    }catch{if(this._sdLoadSeq!==seq)return;document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:60px 20px;text-align:center;color:var(--muted)">Erreur réseau.</div></div>`;return;}
+    if(this._sdLoadSeq!==seq)return;
     this._sd={classId,studentId,...d};
     this._sdFilter='all';
     this._renderSD();
