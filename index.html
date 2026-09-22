@@ -8369,6 +8369,7 @@ const app={
       const total=scroller.offsetHeight-stage.offsetHeight;
       const scrolled=clamp(-rect.top,0,total);
       const raw=total>0?clamp(scrolled/total,0,1):0;
+      if(raw>=0.5)this._gcineSeen=true; // arrivé au bout : plus la peine de rejouer l'intro au prochain retour
       const p=raw<0.5?2*raw*raw:1-Math.pow(-2*raw+2,2)/2;
       const tilt=lerp(64,44,p);
       persp.style.opacity=lerp(1,0.6,p);
@@ -8402,43 +8403,13 @@ const app={
     const schedule=()=>{if(rafId==null)rafId=requestAnimationFrame(tick);};
     const onResize=()=>{setStageTop();schedule();};
 
-    // Un simple geste de scroll (une seule impulsion de molette/trackpad)
-    // s'arrête très souvent à mi-transition : le clavier est à moitié délavé
-    // et "Choisis ton jeu" n'est pas encore là, ce qui ressemble à une page
-    // cassée plutôt qu'à une animation. Dès que le scroll s'arrête, on
-    // "aimante" vers le début ou la fin de l'intro, selon le plus proche.
-    let snapTimer=null;
-    const onScrollSnap=()=>{
-      clearTimeout(snapTimer);
-      snapTimer=setTimeout(()=>{
-        const rect=scroller.getBoundingClientRect();
-        const total=scroller.offsetHeight-stage.offsetHeight;
-        if(total<=0)return;
-        const raw=clamp(-rect.top,0,total)/total;
-        if(raw>=0.5)this._gcineSeen=true; // arrivé (ou aimanté) au bout : plus la peine de la rejouer au prochain retour
-        // N'aimante que les arrêts vraiment ambigus, proches du milieu de la
-        // transition (clavier à moitié délavé, panneau pas encore là). Avec
-        // 130vh de défilement, une pause de 150ms entre deux crans de
-        // molette est banale : aimanter sur toute la plage 0-1 renvoyait
-        // systématiquement au tout début (ou tout à la fin) dès qu'on
-        // scrollait par à-coups, ce qui ressemblait à un roll-back en boucle.
-        if(raw<=0.35||raw>=0.65)return;
-        // Vers la fin : cible la position du panneau (voir gcineEndY() plus
-        // haut), pas total pile — même raison, sticky pas encore décollé.
-        window.scrollTo({top:raw<0.5?window.scrollY+rect.top:gcineEndY(),behavior:'instant'});
-      },150);
-    };
-
     tick();
     window.addEventListener('scroll',schedule,{passive:true});
-    window.addEventListener('scroll',onScrollSnap,{passive:true});
     window.addEventListener('resize',onResize);
 
     this._gcineTeardown=()=>{
       window.removeEventListener('scroll',schedule);
-      window.removeEventListener('scroll',onScrollSnap);
       window.removeEventListener('resize',onResize);
-      clearTimeout(snapTimer);
       window.removeEventListener('pointermove',onMove);
       window.removeEventListener('pointerup',onUp);
       if(rafId)cancelAnimationFrame(rafId);
