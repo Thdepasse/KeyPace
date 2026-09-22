@@ -4775,13 +4775,10 @@ const app={
      l'autre — la forme {boxes,primaryLabel,secondaryLabel} ne les couvre pas
      proprement) ; ne pas forcer leur migration dans ce helper sans d'abord
      étendre sa forme pour ces deux besoins. */
-  _gameHeader(title,emoji,tag){
-    const tagHtml=tag==='expert'?'<span class="game-sel-tag expert" style="margin-left:4px">EXPERT</span>'
-      :tag==='free'?'<span class="game-sel-tag free" style="margin-left:4px">GRATUIT</span>':'';
+  _gameHeader(title,emoji){
     return `<div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
       <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">${title} <span style="color:var(--accent)">${emoji}</span></h2>
-      ${tagHtml}
     </div>`;
   },
   // boxes: [{label, value, unit?, color?, accent?}] · record: texte du bandeau 🏆 si présent
@@ -4971,7 +4968,7 @@ const app={
     const progressPct=s?Math.round(100*(30-timeLeft)/30):0;
 
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Le Sprint',ICONS.flag,'free')}
+      ${this._gameHeader('Le Sprint',ICONS.flag)}
       <div class="sprint-arena">
         ${isIdle?`
           <div class="gidle"><h2 class="gidle-title">Le Sprint<span class="dot"> .</span></h2><p>30 secondes, texte infini. Pas de retour arrière : chaque seconde compte.${best>0?`<br>Record : <b style="color:var(--accent)">${best} mpm</b>`:''}</p>
@@ -8419,7 +8416,13 @@ const app={
         if(total<=0)return;
         const raw=clamp(-rect.top,0,total)/total;
         if(raw>=0.5)this._gcineSeen=true; // arrivé (ou aimanté) au bout : plus la peine de la rejouer au prochain retour
-        if(raw<=0||raw>=1)return; // déjà à une extrémité, rien à aimanter
+        // N'aimante que les arrêts vraiment ambigus, proches du milieu de la
+        // transition (clavier à moitié délavé, panneau pas encore là). Avec
+        // 130vh de défilement, une pause de 150ms entre deux crans de
+        // molette est banale : aimanter sur toute la plage 0-1 renvoyait
+        // systématiquement au tout début (ou tout à la fin) dès qu'on
+        // scrollait par à-coups, ce qui ressemblait à un roll-back en boucle.
+        if(raw<=0.35||raw>=0.65)return;
         // Vers la fin : cible la position du panneau (voir gcineEndY() plus
         // haut), pas total pile — même raison, sticky pas encore décollé.
         window.scrollTo({top:raw<0.5?window.scrollY+rect.top:gcineEndY(),behavior:'instant'});
@@ -8548,7 +8551,7 @@ const app={
     // Countdown/tierBanner are body-injected : no overlay needed here
     const overlay=!currentUser?guestOverlay:gameIdle?idleOverlay:gameOver?gameOverOverlay:'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Frappe-mots',ICONS.target,'free')}
+      ${this._gameHeader('Frappe-mots',ICONS.target)}
       <div class="game-arena" style="max-width:1120px;margin:0 auto;margin-left:24px;margin-right:24px">
         <div class="game-hud"><div class="game-score-val">${score}<span> pts</span></div>${tierHTML}<div style="display:flex;gap:5px">${hearts}</div></div>
         ${wordsHTML}${overlay}
@@ -8689,7 +8692,7 @@ const app={
       primaryLabel:'Rejouer',primaryOnClick:'app.startCourse()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Course de dactylo',ICONS.raceCar,'free')}
+      ${this._gameHeader('Course de dactylo',ICONS.raceCar)}
       <div class="course-arena">
         ${idle&&!IS_TOUCH_ONLY()?`<div class="course-idle"><h2>Course de dactylo<span class="dot"> .</span></h2><p>Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary course-cta" autofocus onclick="app.startCourse()">Lancer la course ▸</button><div class="course-espace">OU APPUIE SUR ESPACE</div></div>`:''}
         ${c?`
@@ -8837,7 +8840,7 @@ const app={
       primaryLabel:'Rejouer',primaryOnClick:'app.startGhost()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Contre ton fantôme',ICONS.ghost,'free')}
+      ${this._gameHeader('Contre ton fantôme',ICONS.ghost)}
       <div class="sprint-arena" style="position:relative">
         ${idle&&!IS_TOUCH_ONLY()?`<div class="gidle"><h2 class="gidle-title">Contre ton fantôme<span class="dot"> .</span></h2><p>${best?'Bats ton meilleur temps sur ce texte : ton fantôme court à ton propre rythme précédent.':'Ta toute première course sur ce texte : elle enregistrera ton fantôme pour la prochaine fois.'}${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary" autofocus onclick="app.startGhost()">Lancer la course ▸</button><div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`:''}
         ${c?`
@@ -8983,7 +8986,7 @@ const app={
       })}</div>`;
     }
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Simon des mots',ICONS.brain,'free')}
+      ${this._gameHeader('Simon des mots',ICONS.brain)}
       <div class="simon-arena">
         <div class="simon-hud">
           <div style="display:flex;gap:22px;align-items:flex-end">
@@ -9033,7 +9036,7 @@ const app={
       })}</div>`;
     }
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Clavier vide',ICONS.keyboard,'free')}
+      ${this._gameHeader('Clavier vide',ICONS.keyboard)}
       <div class="simon-arena">
         <div class="simon-hud">
           <div style="display:flex;gap:22px;align-items:flex-end">
@@ -9213,7 +9216,7 @@ const app={
   },
   renderBoss(){
     const b=this.boss;
-    const head=this._gameHeader('Boss de la semaine',ICONS.trophy,'free');
+    const head=this._gameHeader('Boss de la semaine',ICONS.trophy);
     let body='';
     if(!b||b.phase==='loading'){
       body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Chargement du défi…</div></div>`;
@@ -9522,7 +9525,7 @@ const app={
   },
   renderDuel(){
     const d=this.duel;
-    const head=this._gameHeader('Duel 1v1',ICONS.swords,'free');
+    const head=this._gameHeader('Duel 1v1',ICONS.swords);
     let body='';
     if(!d||d.phase==='menu'){
       const codeErr=d&&d._codeError?d._codeError:'';
