@@ -11639,6 +11639,12 @@ const app={
 
   async viewStudent(classId,studentId){
     const pageId='page-classes';
+    // Le rafraîchissement silencieux périodique de viewClass() (voir plus
+    // bas) ne se base que sur _classesSub==='class' : sans ce changement, il
+    // continuait de tourner pendant qu'on regardait le détail d'un élève et
+    // écrasait cette page toutes les 25s, ramenant sans prévenir à la classe.
+    clearInterval(this._classRefreshTimer);
+    this._classesSub='student';
     document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
     let d;
     try{
