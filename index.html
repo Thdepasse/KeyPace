@@ -1434,7 +1434,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .royale-podium-place.place-1{padding-top:26px;border-color:var(--accent);box-shadow:0 8px 20px -8px var(--accent)}
 .royale-podium-place.place-2{margin-bottom:-10px}
 .royale-podium-place.place-3{margin-bottom:-18px}
-.royale-podium-name{font-weight:800;font-size:15px;margin-top:6px}
+.royale-podium-name{font-weight:800;font-size:15px;margin-top:6px;color:var(--txt)}
 .royale-podium-pts{color:var(--muted);font-size:13px;margin-top:2px}
 .royale-rank-list{display:flex;flex-direction:column;gap:6px;max-width:340px;margin:0 auto}
 .royale-rank-row{display:flex;justify-content:space-between;gap:12px;padding:8px 14px;background:var(--bg);border-radius:10px;font-size:13px;color:var(--txt)}
@@ -9836,7 +9836,7 @@ const app={
         <div class="royale-progress">${dots}</div>
         <div style="font-size:40px;margin:8px 0">⏳</div>
         <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;margin-bottom:6px">Épreuve ${r.roundIndex+1}/5 terminée</h2>
-        <p style="color:var(--muted);font-size:14px;margin-bottom:14px">${this._royaleGameLabel(r.roundGameKeys[r.roundIndex])} · ton score : <b style="color:var(--txt)">${r.myScore!=null?r.myScore:'—'}</b></p>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:14px">${this._royaleGameLabel(r.roundGameKeys[r.roundIndex])} · ton score : <b style="color:#fff">${r.myScore!=null?r.myScore:'—'}</b></p>
         <div class="duel-status"><span class="duel-wait">● En attente des autres joueurs… (${done}/${total})</span></div>
         ${r.role==='host'?`<button class="res-btn sec" style="flex:none;padding:10px 24px;margin-top:12px" onclick="app.royaleForceAdvance()">Passer à la suite sans attendre</button>`:''}
         ${r.error?`<p style="color:var(--danger);font-size:13px;margin-top:10px">${r.error}</p>`:''}
