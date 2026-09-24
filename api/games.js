@@ -50,10 +50,9 @@ module.exports = async function handler(req, res) {
       case 'boss-submit': {
         const { token, wpm, accuracy, timeMs } = body;
         if (!token) return res.status(400).json({ error: 'Token manquant.' });
-        const ur = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username,display_name,plan`);
+        const ur = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username,display_name`);
         const user = ur.data && ur.data[0];
         if (!user) return res.status(401).json({ error: 'Session invalide.' });
-        if (user.plan !== 'expert') return res.status(403).json({ error: 'Réservé aux comptes Expert.' });
         const displayName = user.display_name || user.username;
         const ch = await getCurrentChallenge();
         if (!ch) return res.status(500).json({ error: 'Défi indisponible.' });
@@ -223,6 +222,37 @@ module.exports = async function handler(req, res) {
         return res.json({ ok: true, winner });
       }
 
+      /* ─── Borne de test de vitesse pour stand événementiel (ex. 10 ans de
+         Linkube) : email + résultat -> classement + rang. Groupé ici plutôt
+         que dans un fichier dédié pour rester sous la limite de 12 fonctions
+         du plan Vercel Hobby (voir en-tête de fichier). ─── */
+      case 'event-submit': {
+        const { eventSlug, email, firstName, company, wpm, accuracy, timeMs, textLength } = body;
+        if (!eventSlug) return res.status(400).json({ error: 'Événement manquant.' });
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim())) {
+          return res.status(400).json({ error: 'Email invalide.' });
+        }
+        const minMs = minPlausibleMs(Number(textLength) || 0);
+        if (minMs > 0 && !(Number(timeMs) >= minMs)) {
+          return res.status(400).json({ error: 'Résultat incohérent avec la longueur du texte (temps trop court).' });
+        }
+        const w = Math.max(0, Math.min(220, Math.round(Number(wpm) || 0)));
+        const a = Math.max(0, Math.min(100, Math.round(Number(accuracy) || 0)));
+        const name = (firstName || '').toString().trim().slice(0, 60) || null;
+        const companyName = (company || '').toString().trim().slice(0, 80) || null;
+        const ins = await sb('/event_scores', {
+          method: 'POST',
+          body: JSON.stringify({ event_slug: eventSlug, email: String(email).trim().toLowerCase(), first_name: name, company: companyName, wpm: w, accuracy: a }),
+        });
+        if (!ins.ok) return res.status(500).json({ error: 'Enregistrement impossible.' });
+        return res.json({ ok: true, wpm: w, accuracy: a, ...(await eventStats(eventSlug, w)) });
+      }
+      case 'event-leaderboard': {
+        const { eventSlug } = body;
+        if (!eventSlug) return res.status(400).json({ error: 'Événement manquant.' });
+        return res.json({ ok: true, ...(await eventStats(eventSlug, null)) });
+      }
+
       default:
         return res.status(400).json({ error: 'Action inconnue.' });
     }
@@ -230,3 +260,14 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'Erreur serveur.' });
   }
 };
+
+async function eventStats(eventSlug, myWpm) {
+  const all = await sb(`/event_scores?event_slug=eq.${encodeURIComponent(eventSlug)}&select=first_name,company,wpm,accuracy&order=wpm.desc&limit=1000`);
+  const rows = all.data || [];
+  const count = rows.length;
+  const average = count ? Math.round(rows.reduce((a, r) => a + r.wpm, 0) / count) : 0;
+  const best = count ? rows[0].wpm : 0;
+  const top = rows.slice(0, 10).map((r, i) => ({ rank: i + 1, firstName: r.first_name, company: r.company, wpm: r.wpm, accuracy: r.accuracy }));
+  const rank = typeof myWpm === 'number' ? rows.filter((r) => r.wpm > myWpm).length + 1 : null;
+  return { count, average, best, top, rank };
+}
