@@ -836,6 +836,15 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .kf-arrow-left{grid-column:1;grid-row:2}
 .kf-arrow-down{grid-column:2;grid-row:2}
 .kf-arrow-right{grid-column:3;grid-row:2}
+/* Apple (Mac) n'utilise jamais le "T inversé" des claviers PC : gauche et
+   droite sont pleine hauteur, haut/bas sont deux demi-touches empilées entre
+   les deux — vérifié sur photo d'un vrai Magic Keyboard. */
+.kf-arrows-mac{display:grid;grid-template-columns:repeat(3,16px);grid-template-rows:repeat(2,8px);gap:2px;margin-top:auto}
+.kf-arrows-mac div{display:flex;align-items:center;justify-content:center;border-radius:3px;background:#fff;border:1px solid var(--border);font-size:5px;color:var(--muted);overflow:hidden;white-space:nowrap;min-width:0}
+.kf-arrow-mac-left{grid-column:1;grid-row:1/3}
+.kf-arrow-mac-up{grid-column:2;grid-row:1}
+.kf-arrow-mac-down{grid-column:2;grid-row:2}
+.kf-arrow-mac-right{grid-column:3;grid-row:1/3}
 .kf-numpad{display:grid;grid-template-columns:repeat(4,16px);grid-auto-rows:16px;gap:2px;flex-shrink:0}
 .kf-numpad div{display:flex;align-items:center;justify-content:center;border-radius:3px;background:#fff;border:1px solid var(--border);font-size:5.5px;color:var(--txt);overflow:hidden;white-space:nowrap;min-width:0}
 .kf-np-plus,.kf-np-enter{grid-row:span 2}
@@ -2900,7 +2909,11 @@ function kbFullPreviewHTML(azertyId,formId){
   const isMac=azertyId==='mac';
   const rows=[];
   if(ff.hasFRow){
-    rows.push(`<div class="kf-row">${_kfKey('esc',1.3,'kf-fn')}${_kfKey('',0.5,'kf-gap')}${['F1','F2','F3','F4'].map(f=>_kfKey(f,1,'kf-fn')).join('')}${_kfKey('',0.4,'kf-gap')}${['F5','F6','F7','F8'].map(f=>_kfKey(f,1,'kf-fn')).join('')}${_kfKey('',0.4,'kf-gap')}${['F9','F10','F11','F12'].map(f=>_kfKey(f,1,'kf-fn')).join('')}</div>`);
+    // Rangée F Mac : icônes réelles (luminosité, Mission Control, Spotlight,
+    // dictée, Ne pas déranger, médias, volume), vérifiées sur un vrai Magic
+    // Keyboard — pas juste F1-F12 génériques comme sur un clavier PC.
+    const fKeys=isMac?['🔅','🔆','▦','🔍','🎙','☾','⏮','⏯','⏭','🔇','🔉','🔊']:['F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12'];
+    rows.push(`<div class="kf-row">${_kfKey('esc',1.3,'kf-fn')}${_kfKey('',0.5,'kf-gap')}${fKeys.slice(0,4).map(f=>_kfKey(f,1,'kf-fn')).join('')}${_kfKey('',0.4,'kf-gap')}${fKeys.slice(4,8).map(f=>_kfKey(f,1,'kf-fn')).join('')}${_kfKey('',0.4,'kf-gap')}${fKeys.slice(8,12).map(f=>_kfKey(f,1,'kf-fn')).join('')}${isMac?_kfKey('⏻',1,'kf-fn'):''}</div>`);
   }
   if(!ff.noDigitRow){
     rows.push(`<div class="kf-row">${layout[0].map((k,i)=>_kfAzertyCell(k,baseline[0][i])).join('')}${_kfKey('⌫',2,'kf-fn')}</div>`);
@@ -2922,7 +2935,9 @@ function kbFullPreviewHTML(azertyId,formId){
   const navMode=isMac?false:ff.nav;
   if(navMode==='full')side=`<div class="kf-nav">${['ins','home','pg↑','del','fin','pg↓'].map(l=>`<div>${l}</div>`).join('')}</div>`;
   else if(navMode==='compact')side=`<div class="kf-nav kf-nav-compact">${['del','home','fin','pg↑'].map(l=>`<div>${l}</div>`).join('')}</div>`;
-  if(ff.arrows)side+=`<div class="kf-arrows"><div class="kf-arrow-up">▲</div><div class="kf-arrow-left">◀</div><div class="kf-arrow-down">▼</div><div class="kf-arrow-right">▶</div></div>`;
+  if(ff.arrows)side+=isMac
+    ?`<div class="kf-arrows-mac"><div class="kf-arrow-mac-left">◀</div><div class="kf-arrow-mac-up">▲</div><div class="kf-arrow-mac-down">▼</div><div class="kf-arrow-mac-right">▶</div></div>`
+    :`<div class="kf-arrows"><div class="kf-arrow-up">▲</div><div class="kf-arrow-left">◀</div><div class="kf-arrow-down">▼</div><div class="kf-arrow-right">▶</div></div>`;
   const numpad=ff.numpad?`<div class="kf-numpad"><div>num</div><div>/</div><div>*</div><div>-</div><div>7</div><div>8</div><div>9</div><div class="kf-np-plus">+</div><div>4</div><div>5</div><div>6</div><div>1</div><div>2</div><div>3</div><div class="kf-np-enter">↵</div><div class="kf-np-zero">0</div><div>,</div></div>`:'';
   const note40=ff.noDigitRow?`<div class="kb-preview-note"><b>Sur un 40 %</b>, les chiffres et la rangée de fonction n'ont pas de touche dédiée : on y accède via une touche Fn (couche secondaire), non représentée ici.</div>`:'';
   const noteMac=isMac?`<div class="kb-preview-note"><b>Clavier Mac</b> : fn/control/option/command remplacent Ctrl/Alt/AltGr/Menu, et il n'y a jamais de bloc navigation dédié sur un clavier Apple (juste les flèches).</div>`:'';
