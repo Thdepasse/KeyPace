@@ -897,6 +897,59 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .les-best{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#1FA971}
 .expert-tag{font-size:10px;font-weight:700;color:var(--accent);background:rgba(255,77,46,0.1);padding:2px 6px;border-radius:5px;letter-spacing:.04em}
 
+/* MODULES HUB (page Cours) */
+.modules-hub-page{max-width:1120px;margin:0 auto;padding:0 24px 8px}
+.stat-strip{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 22px;margin:8px 0 38px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+.stat-item{display:flex;align-items:center;gap:10px}
+.stat-icon{width:32px;height:32px;border-radius:9px;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.stat-txt b{display:block;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;line-height:1.2}
+.stat-txt span{font-size:12px;color:var(--muted);font-weight:600}
+.hub-section-hdr{margin-bottom:18px}
+.hub-section-hdr h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:4px}
+.hub-section-hdr p{color:var(--muted);font-size:14.5px}
+.selectorD{position:relative;display:grid;grid-template-columns:240px 1fr;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:28px;padding:16px;min-height:440px;box-shadow:0 30px 60px -35px rgba(22,20,15,.3);margin-bottom:44px}
+@media(max-width:760px){.selectorD{grid-template-columns:1fr;min-height:0}}
+.tabsD1{position:relative;display:flex;flex-direction:column;gap:2px;padding:8px 6px}
+@media(max-width:760px){.tabsD1{flex-direction:row;overflow-x:auto;padding-bottom:4px}}
+.tabs-slider{position:absolute;left:6px;right:6px;top:8px;height:58px;border-radius:15px;transition:transform .4s cubic-bezier(.2,.9,.25,1.1),background .4s;z-index:0;box-shadow:0 12px 26px -8px var(--slider-color,rgba(0,0,0,.3))}
+@media(max-width:760px){.tabs-slider{display:none}}
+.tabD1{position:relative;z-index:1;display:flex;align-items:center;gap:11px;background:none;border:none;border-radius:15px;padding:12px 14px;text-align:left;transition:color .3s;flex-shrink:0;color:var(--txt);height:58px;width:100%;font:inherit;cursor:pointer}
+@media(max-width:760px){.tabD1{background:var(--light)}}
+.tabD1.active{color:#fff}
+@media(max-width:760px){.tabD1.active{color:#fff;background:var(--m-color)}}
+.tabD1-badge{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:var(--m-color);transition:transform .3s,background .3s;box-shadow:0 6px 14px -4px var(--m-color)}
+.tabD1.active .tabD1-badge{background:rgba(255,255,255,.28);box-shadow:none;transform:scale(1.08) rotate(-4deg)}
+.tabD1-txt{font-size:13.5px;font-weight:800;line-height:1.25}
+.tabD1-txt small{display:block;font-weight:600;font-size:10.5px;opacity:.8;margin-top:1px}
+.stageD1{position:relative;overflow:hidden;border-radius:20px;display:flex;align-items:center;gap:32px;padding:38px 42px;min-height:400px;background:var(--m-grad)}
+@media(max-width:640px){.stageD1{flex-direction:column;text-align:center;padding:32px 24px;gap:20px}}
+.stageD1-blob{position:absolute;border-radius:50%;filter:blur(46px);pointer-events:none;background:rgba(255,255,255,.4);animation:blobFloat 7s ease-in-out infinite}
+.stageD1-blob.b1{width:220px;height:220px;top:-60px;right:-40px;animation-delay:0s}
+.stageD1-blob.b2{width:160px;height:160px;bottom:-50px;left:20%;background:rgba(0,0,0,.08);animation-delay:1.2s}
+@keyframes blobFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-14px) scale(1.05)}}
+.stageD1-mascot{position:relative;z-index:2;flex-shrink:0;height:220px;width:auto;filter:drop-shadow(0 18px 22px rgba(0,0,0,.28));animation:mascotPop .5s cubic-bezier(.2,.9,.25,1.2)}
+@keyframes mascotPop{from{opacity:0;transform:translateY(18px) scale(.92)}to{opacity:1;transform:none}}
+.stageD1-body{position:relative;z-index:2;min-width:0;animation:bodyIn .45s ease .05s both}
+@keyframes bodyIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.stageD1-cat{display:inline-flex;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:rgba(255,255,255,.22);padding:4px 11px;border-radius:20px;margin-bottom:12px}
+.stageD1-body h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;margin-bottom:10px;letter-spacing:-.01em;color:#fff}
+.stageD1-body p{font-size:14.5px;color:rgba(255,255,255,.92);line-height:1.55;max-width:360px;margin-bottom:20px}
+.stageD1-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+@media(max-width:640px){.stageD1-foot{justify-content:center}}
+.stageD1-status{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.22);color:#fff}
+.stageD1-cta{background:#fff;border:none;border-radius:14px;padding:13px 24px;font-weight:800;font-size:15px;box-shadow:0 10px 22px rgba(0,0,0,.22);animation:ctaPulse 2.6s ease-in-out infinite;transition:transform .15s;cursor:pointer;font:inherit}
+.stageD1-cta:hover{transform:translateY(-2px)}
+.stageD1-cta:disabled{cursor:default}
+@keyframes ctaPulse{0%,100%{box-shadow:0 10px 22px rgba(0,0,0,.22)}50%{box-shadow:0 12px 30px rgba(0,0,0,.34)}}
+@media(prefers-reduced-motion:reduce){.stageD1-blob,.stageD1-mascot,.stageD1-body,.stageD1-cta,.stage-decor{animation:none}}
+.stage-decor{position:absolute;animation:keyFloat 4.4s ease-in-out infinite}
+@keyframes keyFloat{0%,100%{transform:translateY(0) rotate(var(--r,-4deg))}50%{transform:translateY(-10px) rotate(calc(-1 * var(--r,-4deg)))}}
+@media(max-width:640px){.stage-decor{display:none!important}}
+.stage-chip{z-index:2;background:rgba(255,255,255,.92);border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;box-shadow:0 8px 16px rgba(0,0,0,.18)}
+.stage-tag{z-index:2;background:rgba(255,255,255,.24);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;letter-spacing:.04em;padding:5px 11px;border-radius:20px;box-shadow:0 6px 14px rgba(0,0,0,.15);white-space:nowrap}
+.stage-card{z-index:2;background:rgba(255,255,255,.96);border-radius:12px;padding:9px 13px;box-shadow:0 10px 20px rgba(0,0,0,.2);text-align:left}
+.stage-card-poem{font-family:Georgia,serif;font-style:italic;font-weight:400;font-size:12px;color:var(--txt);line-height:1.45;max-width:165px}
+
 /* GAMES */
 .games-section{max-width:1120px;margin:0 auto;padding:24px}
 .game-arena{background:#16140F;border-radius:24px;padding:20px;position:relative;height:520px;overflow:hidden;margin-bottom:24px}
@@ -1725,7 +1778,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
         </div>
       </div>
       <button class="nav-link" id="nav-test" onclick="go('test')">Test<span class="underline"></span></button>
-      <button class="nav-link" id="nav-lessons" onclick="go('lessons')">Cours<span class="underline"></span></button>
+      <button class="nav-link" id="nav-lessons" onclick="app._skipModulesHub=false;go('lessons')">Cours<span class="underline"></span></button>
       <button class="nav-link" id="nav-games" onclick="go('games')">Jeux<span class="underline"></span></button>
       <button class="nav-link" id="nav-stats" onclick="go('stats')">Progrès<span class="underline"></span></button>
       <button class="nav-link" id="nav-join" onclick="go('classes')" style="display:none">Classe<span class="underline"></span></button>
@@ -1735,7 +1788,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
         <div id="apercu-menu" style="display:none;position:absolute;top:130%;left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:200px;box-shadow:0 12px 32px rgba(0,0,0,.14);z-index:50">
           <div style="font-size:11px;color:var(--muted);padding:6px 10px 4px;font-weight:700;letter-spacing:.04em">Tester comme un élève</div>
           <button onclick="go('test');closeApercu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:14px;color:var(--txt);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='none'">Test de vitesse</button>
-          <button onclick="go('lessons');closeApercu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:14px;color:var(--txt);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='none'">Cours</button>
+          <button onclick="app._skipModulesHub=false;go('lessons');closeApercu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:14px;color:var(--txt);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='none'">Cours</button>
           <button onclick="go('games');closeApercu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:14px;color:var(--txt);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='none'">Jeux</button>
           <button onclick="go('stats');closeApercu()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:14px;color:var(--txt);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='none'">Progrès</button>
         </div>
@@ -3887,6 +3940,72 @@ const CURRICULUM=[
   ]},
 ];
 const MOD_COLORS=['#EE6B5E','#F4A04C','#D9A60C','#5BA84A','#3FA6B2','#6E8BE8','#A77BD6','#E8729A','#4CB8C4','#9B59B6','#E67E22','#27AE60','#2980B9'];
+
+/* Page Cours : sélecteur de modules (hub) affiché avant la liste de leçons */
+const HUB_MODULES=[
+  {id:'bases', color:'#FF4D2E', grad:'linear-gradient(135deg,#FF8A5C 0%,#FF4D2E 55%,#E8391D 100%)', icon:'⌨️', img:'/images/keypace-mascot-bureau-complet.webp',
+    cat:'Découverte', title:'La base de la dactylographie',
+    desc:"De la rangée de base (Q, S, D, F…) jusqu'aux accents, chiffres et symboles : 65 leçons progressives pour taper sans regarder le clavier.",
+    status:'live', statusTxt:'Disponible', cta:'Commencer →',
+    decor:[
+      {t:'chip', c:'A', top:'9%', left:'6%', size:38, delay:'0s', r:'-6deg'},
+      {t:'chip', c:'Z', bottom:'15%', right:'9%', size:38, delay:'.7s', r:'8deg'},
+      {t:'chip', c:'F', top:'60%', left:'3%', size:32, delay:'1.3s', r:'-8deg'},
+      {t:'chip', c:'⏎', top:'16%', right:'6%', size:34, delay:'1.9s', r:'6deg'},
+      {t:'chip', c:'🚀', top:'6%', right:'23%', size:46, delay:'.4s', r:'10deg'},
+      {t:'star', c:'✦', top:'22%', right:'13%', delay:'1s'},
+      {t:'star', c:'✦', bottom:'32%', left:'17%', delay:'1.6s'}
+    ]},
+  {id:'mail', color:'#4F6BE0', grad:'linear-gradient(135deg,#8DA2FF 0%,#4F6BE0 55%,#3A50C4 100%)', icon:'✉️', img:'/images/keypace-mascot-mail-allonge.webp',
+    cat:'Écriture', title:'Rédiger un mail',
+    desc:"Leçon après leçon comme un vrai cours de français : où écrire quoi, le nom de chaque partie du mail, et comment s'adresser à la bonne personne.",
+    status:'soon', statusTxt:'Bientôt', cta:'Bientôt',
+    decor:[]},
+  {id:'conj', color:'#3FA84E', grad:'linear-gradient(135deg,#7BDD7C 0%,#3FA84E 55%,#2C8A3C 100%)', icon:'📖', img:'/images/keypace-mascot-conjugaison-reflexion.webp',
+    cat:'Grammaire', title:'Conjugaison',
+    desc:"Des règles de base du présent jusqu'aux temps les plus complexes, avec des mises en situation dans des phrases et des textes à trous.",
+    status:'soon', statusTxt:'Bientôt', cta:'Bientôt',
+    decor:[]},
+  {id:'poemes', color:'#9B57D6', grad:'linear-gradient(135deg,#D4A3F5 0%,#9B57D6 55%,#7C3CB8 100%)', icon:'✍️', img:'/images/keypace-mascot-poeme-stylo.webp',
+    cat:'Poésie', title:'Les poèmes',
+    desc:"Les règles des rimes et du rythme : de quoi écrire tes propres poèmes, et redécouvrir des classiques de façon ludique.",
+    status:'soon', statusTxt:'Bientôt', cta:'Bientôt',
+    decor:[
+      {t:'tag', c:'LA FONTAINE', top:'9%', left:'5%', delay:'0s', r:'-3deg'},
+      {t:'tag', c:'PRÉVERT', bottom:'17%', left:'6%', delay:'.8s', r:'3deg'},
+      {t:'tag', c:'chagrin', bottom:'34%', right:'26%', delay:'.5s', r:'-2deg'},
+      {t:'tag', c:'🔁 rime', bottom:'25%', right:'15%', delay:'1s', r:'0deg'},
+      {t:'tag', c:'matin', bottom:'16%', right:'5%', delay:'1.4s', r:'2deg'},
+      {t:'poemcard', bottom:'3%', right:'4%', delay:'1.1s', r:'-2deg'}
+    ]}
+];
+function hubDecorHTML(mod){
+  return mod.decor.map(item=>{
+    let pos='';
+    ['top','left','right','bottom'].forEach(k=>{if(item[k]!=null)pos+=k+':'+item[k]+';';});
+    const delayStyle=item.delay?'animation-delay:'+item.delay+';':'';
+    const rVar=item.r?'--r:'+item.r+';':'';
+    if(item.t==='chip')return`<div class="stage-decor stage-chip" style="${pos}${rVar}${delayStyle}width:${item.size}px;height:${item.size}px;font-size:${Math.round(item.size*0.46)}px">${item.c}</div>`;
+    if(item.t==='tag')return`<div class="stage-decor stage-tag" style="${pos}${rVar}${delayStyle}">${item.c}</div>`;
+    if(item.t==='star')return`<span class="stage-decor stage-star" style="${pos}${delayStyle}">${item.c}</span>`;
+    if(item.t==='poemcard')return`<div class="stage-decor stage-card stage-card-poem" style="${pos}${rVar}${delayStyle}">« Deux rimes, un rythme,<br>une phrase qui s'envole… »</div>`;
+    return'';
+  }).join('');
+}
+function hubStageHTML(mod){
+  return`<div class="stageD1-blob b1"></div><div class="stageD1-blob b2"></div>${hubDecorHTML(mod)}
+    <img class="stageD1-mascot" src="${mod.img}" alt="">
+    <div class="stageD1-body">
+      <span class="stageD1-cat">${mod.cat}</span>
+      <h3>${mod.title}</h3>
+      <p>${mod.desc}</p>
+      <div class="stageD1-foot">
+        <span class="stageD1-status">${mod.statusTxt}</span>
+        <button class="stageD1-cta" style="color:${mod.color}" ${mod.status==='live'?`onclick="app.enterBasesModule()"`:'disabled'}>${mod.cta}</button>
+      </div>
+    </div>`;
+}
+
 const GAME_TIERS=[
   {score:0,label:'Débutant',desc:'mots courts sans accents',words:["les","des","une","pas","bon","bas","mal","mot","feu","ami","eau","chat","jeu","but","roi","nez","bras","dos","sol","air","lac","art","vol","bus","rue","mur","sac","pot","ton","son","fin","cas","mer","pic","bec","foi","bal","cap","col","bol","nid","duo","dix","rat","bar","lit","loi","car","gel","riz","vin","sel","gaz","cou","ski","ail","loup","four","pain","main","pont","fond","camp","long","sang","gris","sans","dont","cent","dent","vent","peur","noir","tout","mais","tour","coup","jour","sous","bois","mois","yeux","beau","vrai","haut","bout","lien","lieu","rang","plan","bord","port","sort","mort","fort","nord","brun","plus","char","gant","jupe","robe","arme","drap","dune","toit","voix","nuit","lune","pied","ours","veau","chien","lapin","coude","genou","pouce","nuque"]},
   {score:50,label:'Familier',desc:'accents é, è, à, ê…',words:["fleur","temps","doigt","texte","vélo","rêve","soleil","plume","note","page","ligne","saut","lettre","veste","table","porte","plage","livre","stylo","pomme","salade","tomate","sucre","farine","glace","thème","idée","bleu","héros","forêt","clé","âge","île","fée","été","côté","frère","père","mère","flûte","boîte","pâte","côte","arête","fenêtre","lumière","rivière","manière","sorcière","siècle","fièvre","pièce","crème","même","système","style","rythme","titre","entre","libre","propre","cadre","centre","ordre","timbre","ombre","café","télé","hôtel","écho","épée","fête","prêt","décor","détail","effort","jeune","large","merci","noble","quête","riche","route","suite","utile","valeur","verbe","zeste","bière","terre","guerre","pierre","carré","arrêt","après","théâtre","école","élève","équipe","étape","célèbre","carrière","frontière","bannière","chèvre"]},
@@ -3942,6 +4061,13 @@ const IS_TOUCH_ONLY=()=>!_kbDetected&&!!(window.matchMedia&&window.matchMedia('(
     if(!raf)raf=requestAnimationFrame(apply);
   },{passive:true});
 })();
+
+/* Sélecteur de modules (page Cours) : replace le curseur sous l'onglet actif si la fenêtre est redimensionnée */
+window.addEventListener('resize',()=>{
+  const slider=document.getElementById('hubSlider');
+  const activeEl=document.querySelector('#hubTabs .tabD1.active');
+  if(slider&&activeEl&&window.innerWidth>760)slider.style.transform='translateY('+(activeEl.offsetTop-8)+'px)';
+});
 
 function genSprintText(){
   const pool=[...SPRINT_WORDS,...WORDS];
@@ -5506,7 +5632,7 @@ const app={
             <h2>Prêt à reprendre ?</h2>
             <p>Continue là où tu t'es arrêté : chaque leçon ne prend que quelques minutes.</p>
             <div class="school-banner-actions">
-              <button class="school-banner-btn" onclick="go('lessons')">Reprendre les cours →</button>
+              <button class="school-banner-btn" onclick="app._skipModulesHub=true;go('lessons')">Reprendre les cours →</button>
             </div>
           </div>
           <div class="school-banner-visual" aria-hidden="true">
@@ -6396,7 +6522,7 @@ const app={
           </div>
           <div class="t4a-cta-right">
             <img src="/images/keypace-mascot-cheer.webp" width="282" height="303" alt="Mascotte KeyPace levant le poing pour célébrer, avec un ordinateur portable" loading="lazy" decoding="async">
-            <button class="btn-primary" onclick="go('lessons')">Reprendre les cours →</button>
+            <button class="btn-primary" onclick="app._skipModulesHub=true;go('lessons')">Reprendre les cours →</button>
           </div>
         </div>
       </div>`}
@@ -6491,9 +6617,72 @@ const app={
     </div>`;
   },
 
+  renderModulesHub(){
+    const tabsHTML=HUB_MODULES.map(mod=>`<button class="tabD1${mod.id==='bases'?' active':''}" data-mod="${mod.id}" style="--m-color:${mod.color}" onclick="app._hubSelectTab('${mod.id}')"><span class="tabD1-badge">${mod.icon}</span><span class="tabD1-txt">${mod.title}<small>${mod.statusTxt}</small></span></button>`).join('');
+    document.getElementById('page-lessons').innerHTML=`
+      <div class="home-hero" style="padding-top:8px;padding-bottom:8px">
+        <div>
+          <h1 style="font-size:clamp(28px,3.4vw,42px)">Choisis ton <span style="color:var(--accent)">module</span> du jour.</h1>
+          <p style="max-width:460px">Chaque module est <strong>indépendant</strong> : commence par celui qui t'intéresse, reviens aux autres quand tu veux. Il n'y a pas de bon ordre.</p>
+        </div>
+        <div class="hero-mascots" aria-hidden="true">
+          <div class="hm-key hm-key-1">A</div>
+          <div class="hm-key hm-key-2">Z</div>
+          <div class="hm-char hm-duo"><img class="hm-img" src="/images/keypace-mascots-duo.webp" alt="" width="378" height="422" loading="lazy" decoding="async"></div>
+        </div>
+      </div>
+      <div class="modules-hub-page">
+        <div class="stat-strip">
+          <div class="stat-item"><div class="stat-icon">📚</div><div class="stat-txt"><b>65+</b><span>leçons au total</span></div></div>
+          <div class="stat-item"><div class="stat-icon">🧩</div><div class="stat-txt"><b>4</b><span>modules</span></div></div>
+        </div>
+        <div class="hub-section-hdr"><h2>Les modules</h2><p>Choisis librement, dans l'ordre que tu veux.</p></div>
+        <div class="selectorD">
+          <div class="tabsD1" id="hubTabs">
+            <div class="tabs-slider" id="hubSlider" style="background:${HUB_MODULES[0].grad}"></div>
+            ${tabsHTML}
+          </div>
+          <div class="stageD1" id="hubStage" style="--m-grad:${HUB_MODULES[0].grad}">${hubStageHTML(HUB_MODULES[0])}</div>
+        </div>
+        <div class="school-banner" style="padding:0 0 8px">
+          <div class="school-banner-inner">
+            <div class="school-banner-content">
+              <h2>On ajoute des modules régulièrement</h2>
+              <p>Continue à progresser dans ceux qui sont déjà là : les nouveaux arriveront au même endroit, sans rien changer à ce que tu as déjà fait.</p>
+              <div class="school-banner-actions"><button class="school-banner-btn" onclick="go('stats')">Voir ma progression →</button></div>
+            </div>
+            <div class="school-banner-visual"><img src="/images/keypace-mascot-cheer.webp" width="282" height="303" alt="" loading="lazy" decoding="async" style="height:150px;width:auto;filter:drop-shadow(0 10px 20px rgba(0,0,0,.22))"></div>
+          </div>
+        </div>
+      </div>`;
+    const activeEl=document.querySelector('#hubTabs .tabD1.active');
+    const slider=document.getElementById('hubSlider');
+    if(activeEl&&slider&&window.innerWidth>760)slider.style.transform='translateY('+(activeEl.offsetTop-8)+'px)';
+  },
+  _hubSelectTab(id){
+    const mod=HUB_MODULES.find(m=>m.id===id);if(!mod)return;
+    document.querySelectorAll('#hubTabs .tabD1').forEach(el=>el.classList.toggle('active',el.dataset.mod===id));
+    const stage=document.getElementById('hubStage');
+    stage.style.setProperty('--m-grad',mod.grad);
+    stage.innerHTML=hubStageHTML(mod);
+    const slider=document.getElementById('hubSlider');
+    slider.style.background=mod.grad;
+    const activeEl=document.querySelector('#hubTabs .tabD1.active');
+    if(activeEl&&window.innerWidth>760)slider.style.transform='translateY('+(activeEl.offsetTop-8)+'px)';
+  },
+  enterBasesModule(){
+    this._skipModulesHub=true;
+    this.renderLessons();
+  },
+  backToModulesHub(){
+    this._skipModulesHub=false;
+    this.renderLessons();
+  },
+
   renderLessons(){
     if(this._showIntro){this._renderTypingInto('page-lessons');return;}
     if(this.sess&&this.sess.mode==='lesson'){this._renderTypingInto('page-lessons');return;}
+    if(!this._skipModulesHub){this.renderModulesHub();return;}
     const goals=this.stats?this.stats.goals:{minWpm:20,maxErrors:8};
     const plan=getUserPlan();
     const statusById={};
@@ -6560,7 +6749,7 @@ const app={
     </div>`:'';
 
     document.getElementById('page-lessons').innerHTML=`<div class="lessons-section">
-      <div class="lessons-header"><h2>Cours de frappe</h2><p>Progresse étape par étape · <span style="color:var(--accent);font-weight:700">${FREE_LESSON_IDS.length} leçons gratuites</span> · ${ALL_LESSONS.length-FREE_LESSON_IDS.length} leçons Expert</p></div>
+      <div class="lessons-header"><button onclick="app.backToModulesHub()" style="background:none;border:none;color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;padding:0;margin-bottom:10px;font-family:inherit">← Tous les modules</button><h2>La base de la dactylographie</h2><p>Progresse étape par étape · <span style="color:var(--accent);font-weight:700">${FREE_LESSON_IDS.length} leçons gratuites</span> · ${ALL_LESSONS.length-FREE_LESSON_IDS.length} leçons Expert</p></div>
       ${guestBanner}${goalsHtml}${currentUser?modsHTML:`<div class="gate-teased">${modsHTML}</div>`}
     </div>`;
   },
