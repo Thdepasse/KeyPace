@@ -831,3 +831,89 @@ alter table essay_submissions add column if not exists teacher_grade text;
 alter table users add column if not exists parent_consent_token text;
 alter table users add column if not exists parent_consent_confirmed_at timestamptz;
 create index if not exists users_parent_consent_token_idx on users(parent_consent_token) where parent_consent_token is not null;
+
+-- ───────────────────────────────────────────────────────────────
+-- Salons & events (dashboard interne) : liste des salons pros et events
+-- (job dating, portes ouvertes, forums étudiants...) où KeyPace pourrait
+-- tenir un stand ou intervenir. Fonctionnalité restaurée le 14/09/2026 :
+-- le code (front + back) avait été perdu lors d'un déploiement manuel du
+-- dashboard-app non suivi par git (voir convention "deploy manuel" dans
+-- CLAUDE.md/mémoire) ; cette table n'avait, elle, jamais été committée ici
+-- non plus — si elle existe déjà côté Supabase, ce bloc ne fait rien.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists salons (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  event_date date not null,
+  event_type text not null default 'salon' check (event_type in ('salon', 'conference', 'job_dating', 'portes_ouvertes', 'forum_etudiant', 'concours', 'autre')),
+  status text not null default 'a_venir' check (status in ('a_venir', 'confirme', 'fait', 'annule')),
+  city text not null,
+  country text not null check (country in ('Belgique', 'France', 'Luxembourg', 'Suisse')),
+  audience text,
+  description text,
+  website text,
+  entry_price text,
+  stand_price text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists salons_event_date_idx on salons(event_date);
+alter table salons enable row level security;
+drop policy if exists "no_anon_access" on salons;
+create policy "no_anon_access" on salons for all to anon using (false) with check (false);
+
+-- La table `salons` existait déjà côté Supabase (créée avant que ce fichier
+-- ne documente la fonctionnalité, voir plus haut) avec une contrainte plus
+-- stricte sur `country` (Belgique/France/Luxembourg uniquement). Élargie le
+-- 14/09/2026 pour permettre d'y lister aussi de vraies opportunités hors de
+-- cette zone (ex. Swissdidac & Worlddidac Bern, Suisse).
+alter table salons drop constraint if exists salons_country_check;
+alter table salons add constraint salons_country_check
+  check (country in ('Belgique', 'France', 'Luxembourg', 'Suisse'));
+
+alter table activity_log drop constraint if exists activity_log_entity_type_check;
+alter table activity_log add constraint activity_log_entity_type_check
+  check (entity_type in ('prospect', 'content', 'dev_issue', 'competitor', 'client_school', 'salon'));
+
+-- ───────────────────────────────────────────────────────────────
+-- Borne de test de vitesse pour stand événementiel (ex. 10 ans de Linkube,
+-- 20/09/2026) : collecte l'email d'un visiteur puis son résultat au test de
+-- frappe, pour afficher un classement + une moyenne en écran de résultat.
+-- event_slug distingue plusieurs stands/éditions sans nouvelle table.
+-- Accès uniquement via les actions event-submit/event-leaderboard de
+-- api/games.js (clé service, contourne RLS) — groupées là plutôt que dans un
+-- fichier dédié pour rester sous la limite de 12 fonctions du plan Hobby.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists event_scores (
+  id uuid default gen_random_uuid() primary key,
+  event_slug text not null,
+  email text not null,
+  first_name text,
+  wpm integer not null,
+  accuracy integer not null,
+  created_at timestamptz default now()
+);
+alter table event_scores add column if not exists company text;
+create index if not exists event_scores_rank_idx on event_scores(event_slug, wpm desc);
+alter table event_scores enable row level security;
+drop policy if exists "no_anon_access" on event_scores;
+create policy "no_anon_access" on event_scores for all to anon using (false) with check (false);
+
+-- ───────────────────────────────────────────────────────────────
+-- Rappels prof → élève sur un devoir non rendu. Affichés une seule fois à
+-- l'élève (popup) à sa prochaine ouverture de session, puis marqués vus
+-- (seen_at) pour ne jamais réapparaître. Accès uniquement via les actions
+-- remind-student / reminders-check de api/classes.js (clé service).
+-- ───────────────────────────────────────────────────────────────
+create table if not exists student_reminders (
+  id uuid default gen_random_uuid() primary key,
+  student_id uuid references users(id) on delete cascade,
+  teacher_id uuid references users(id) on delete cascade,
+  assignment_id uuid references assignments(id) on delete cascade,
+  created_at timestamptz default now(),
+  seen_at timestamptz
+);
+create index if not exists student_reminders_pending_idx on student_reminders(student_id) where seen_at is null;
+alter table student_reminders enable row level security;
+drop policy if exists "no_anon_access" on student_reminders;
+create policy "no_anon_access" on student_reminders for all to anon using (false) with check (false);
