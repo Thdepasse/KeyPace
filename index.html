@@ -815,6 +815,16 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .tuto-key.on{color:#fff;font-weight:800;box-shadow:0 3px 0 rgba(0,0,0,0.12)}
 .tuto-key-altgr{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;white-space:nowrap;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:5px;padding:1px 4px}
 .tuto-keys-info{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+/* Aperçu clavier dans les réglages */
+.kb-preview{display:flex;flex-direction:column;gap:16px;background:var(--light);border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:2px}
+.kb-preview-row{display:flex;gap:4px;justify-content:center}
+.kb-preview-key{position:relative;min-width:24px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--txt)}
+.kb-preview-key.differs{border-color:var(--accent);background:rgba(255,77,46,.08);color:var(--accent);font-weight:800}
+.kb-preview-key.has-g{border-bottom:2px solid var(--accent)}
+.kb-preview-sub{position:absolute;top:1px;right:3px;font-size:7px;font-weight:700;opacity:.55}
+.kb-preview-g{position:absolute;bottom:-17px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:800;white-space:nowrap;color:#fff;background:var(--accent);border-radius:5px;padding:1px 4px;box-shadow:0 2px 5px rgba(255,77,46,.35);z-index:1}
+.kb-preview-note{font-size:12px;color:var(--muted);margin-top:16px;line-height:1.45}
+.kb-preview-note b{color:var(--txt)}
 .tuto-keycard{display:flex;align-items:center;gap:10px;background:var(--light);border:1px solid var(--border);border-radius:12px;padding:9px 14px}
 .tuto-keycard .k{width:34px;height:34px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:16px;color:#fff}
 .tuto-keycard .meta{font-size:13px;line-height:1.3;color:#7A7365}
@@ -2834,6 +2844,29 @@ const KB_LAYOUTS={
 };
 KB_LAYOUTS.nf=KB_LAYOUTS.fr.map(row=>row.map(k=>{const{g,...rest}=k;return rest;})); // NF Z71-300 : lettres/chiffres inchangés (AFNOR), AltGr non modélisé ici
 const KB_LAYOUT_LABELS={fr:'Français',be:'Belge',mac:'Mac',nf:'Norme NF Z71-300'};
+/* Note affichée sous l'aperçu clavier des réglages : ce qui change vraiment,
+   pour rester honnête sur ce qui est vérifié (cf. KB_LAYOUTS) plutôt que de
+   laisser croire à des différences qu'on ne modélise pas. */
+const KB_LAYOUT_NOTES={
+  fr:"Disposition de référence (AZERTY français PC).",
+  be:"Diffère du français sur 2 touches : <b>§</b> et <b>!</b> remplacent <b>-</b> et <b>_</b> sur la rangée des chiffres.",
+  mac:"Chiffres et lettres identiques au français ; <b>œ</b> s'obtient avec <b>Option (⌥) + O</b>.",
+  nf:"Identique au français pour tout ce qui est affiché ici (lettres, chiffres) : la norme NF Z71-300 ne change que des symboles moins courants, non représentés sur ce clavier.",
+};
+function kbLayoutPreviewHTML(id){
+  const layout=KB_LAYOUTS[id]||KB_LAYOUTS.fr;
+  const baseline=KB_LAYOUTS.fr;
+  const rows=layout.map((row,r)=>'<div class="kb-preview-row">'+row.map((k,i)=>{
+    const base=(baseline[r]||[])[i];
+    // On ignore `g` (AltGr) ici : il n'est modélisé que pour le français, donc
+    // le comparer ferait ressortir des touches "différentes" juste parce
+    // qu'on n'a pas (encore) vérifié leur AltGr — pas parce qu'elles diffèrent
+    // vraiment. Le tag AltGr reste affiché sous la touche quand il existe.
+    const differs=!!base&&(k.l!==base.l||k.s!==base.s);
+    return`<div class="kb-preview-key${differs?' differs':''}${k.g?' has-g':''}">${k.l.toLowerCase()}${k.s?`<span class="kb-preview-sub">${k.s}</span>`:''}${k.g?`<span class="kb-preview-g">${k.g}</span>`:''}</div>`;
+  }).join('')+'</div>').join('');
+  return`<div class="kb-preview">${rows}</div><div class="kb-preview-note">${KB_LAYOUT_NOTES[id]||''}</div>`;
+}
 function getKbLayoutId(){try{const v=localStorage.getItem('kp_kb_layout');return KB_LAYOUTS[v]?v:'fr';}catch{return 'fr';}}
 function setKbLayoutId(v){try{localStorage.setItem('kp_kb_layout',v);}catch{}}
 function kbModifierName(){return getKbLayoutId()==='mac'?'Option (⌥)':'AltGr';}
@@ -10042,6 +10075,7 @@ const app={
           <div id="kb-layout-btns" style="display:flex;gap:8px;flex-wrap:wrap">
             ${Object.keys(KB_LAYOUT_LABELS).map(id=>`<button class="settings-btn kb-layout-btn${getKbLayoutId()===id?' active':''}" data-kb-layout="${id}" onclick="app.setKbLayout('${id}')">${KB_LAYOUT_LABELS[id]}</button>`).join('')}
           </div>
+          <div id="kb-layout-preview" style="width:100%">${kbLayoutPreviewHTML(getKbLayoutId())}</div>
         </div>
       </div>
       <div class="settings-section">
@@ -10162,6 +10196,8 @@ const app={
     setKbLayoutId(id);
     applyKbLayout(id);
     document.querySelectorAll('.kb-layout-btn').forEach(b=>b.classList.toggle('active',b.dataset.kbLayout===id));
+    const preview=document.getElementById('kb-layout-preview');
+    if(preview)preview.innerHTML=kbLayoutPreviewHTML(id);
   },
   async openBillingPortal(btn){
     if(!currentToken)return;
