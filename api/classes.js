@@ -86,9 +86,9 @@ async function fetchProgressMap(studentIds) {
 }
 
 async function membersOf(classId) {
-  const r = await sb(`/class_members?class_id=eq.${encodeURIComponent(classId)}&select=student_id,joined_at,users(id,username)`);
+  const r = await sb(`/class_members?class_id=eq.${encodeURIComponent(classId)}&select=student_id,joined_at,users(id,username,full_name)`);
   if (!r.ok || !Array.isArray(r.data)) throw new Error('membersOf ' + r.status + ': ' + JSON.stringify(r.data));
-  return r.data.map((m) => ({ student_id: m.student_id, joined_at: m.joined_at, username: m.users ? m.users.username : '?' }));
+  return r.data.map((m) => ({ student_id: m.student_id, joined_at: m.joined_at, username: m.users ? m.users.username : '?', fullName: m.users ? m.users.full_name : null }));
 }
 
 /* ── Cockpit : construit l'aperçu (classes + agrégats + alertes + courbe) pour
@@ -232,6 +232,7 @@ async function classDetail(req, res) {
     .map((m, i) => ({
       studentId: m.student_id,
       username: m.username,
+      fullName: m.fullName,
       joinedAt: m.joined_at,
       ...studentSummary(datas[i], now),
       alertInactive: inactiveNames.has(m.username),
@@ -311,6 +312,9 @@ async function bulkImportStudents(req, res) {
     rawUsername: row.username,
     username: String(row.username || '').trim().toLowerCase(),
     email: String(row.email || '').trim().toLowerCase() || null,
+    // Optionnel : nom réel affiché au prof quand l'identifiant lui-même
+    // (matricule, ex. 260210@ecole.be) ne permet pas d'identifier l'élève.
+    fullName: String(row.fullName || '').trim() || null,
   }));
   const candidateUsernames = [...new Set(normalized.filter((n) => n.username).map((n) => n.username))];
   const candidateEmails = [...new Set(normalized.filter((n) => n.email).map((n) => n.email))];
@@ -329,7 +333,7 @@ async function bulkImportStudents(req, res) {
   const toCreate = [];
   const seenUsernames = new Set(), seenEmails = new Set();
   for (const n of normalized) {
-    const { username, email } = n;
+    const { username, email, fullName } = n;
     if (!username) { results.push({ username: n.rawUsername || '(vide)', status: 'error', reason: "Nom d'utilisateur manquant." }); continue; }
     if (institution && seatsUsed + toCreate.length >= institution.seat_count) { results.push({ username, status: 'error', reason: 'Plus de places disponibles sur la licence.' }); continue; }
     if (takenUsernames.has(username) || seenUsernames.has(username)) { results.push({ username, status: 'skipped', reason: "Nom d'utilisateur déjà pris." }); continue; }
@@ -343,7 +347,7 @@ async function bulkImportStudents(req, res) {
     // passe) avant le re-hachage scrypt côté serveur — sinon le mot de passe
     // temporaire ne fonctionnerait pas au premier login (formulaire standard).
     const passwordHash = hashPassword(sha256hex(tempPassword));
-    toCreate.push({ id: crypto.randomUUID(), username, email, tempPassword, passwordHash });
+    toCreate.push({ id: crypto.randomUUID(), username, email, fullName, tempPassword, passwordHash });
   }
 
   if (toCreate.length) {
@@ -353,6 +357,7 @@ async function bulkImportStudents(req, res) {
         id: u.id,
         username: u.username,
         ...(u.email ? { email: u.email } : {}),
+        ...(u.fullName ? { full_name: u.fullName } : {}),
         password_hash: u.passwordHash,
         plan: institution ? 'expert' : 'free',
         email_verified: true, // créé par l'enseignant, rien à confirmer (même base légale que le rattachement par domaine)
@@ -387,7 +392,7 @@ async function studentDetail(req, res) {
   if (error) return res.status(status).json({ error });
   const studentId = req.body.studentId;
   if (!studentId) return res.status(400).json({ error: 'Élève manquant.' });
-  const mem = await sb(`/class_members?class_id=eq.${cls.id}&student_id=eq.${encodeURIComponent(studentId)}&select=student_id,joined_at,users(username)`);
+  const mem = await sb(`/class_members?class_id=eq.${cls.id}&student_id=eq.${encodeURIComponent(studentId)}&select=student_id,joined_at,users(username,full_name)`);
   const m = mem.data && mem.data[0];
   if (!m) return res.status(404).json({ error: 'Élève introuvable dans cette classe.' });
   const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(studentId)}&select=data`);
@@ -413,6 +418,7 @@ async function studentDetail(req, res) {
   }
   return res.json({
     username: m.users ? m.users.username : '?',
+    fullName: m.users ? m.users.full_name : null,
     joinedAt: m.joined_at,
     summary: studentSummary(data, Date.now()),
     history: tests.slice(-30),
@@ -1207,11 +1213,11 @@ async function essayList(req, res) {
 
   const rows = members.map((m) => {
     const s = subs[m.student_id];
-    if (!s) return { studentId: m.student_id, username: m.username, submitted: false };
+    if (!s) return { studentId: m.student_id, username: m.username, fullName: m.fullName, submitted: false };
     const baseline = studentSummary(pmap[m.student_id] || {}, now).avgWpm;
     const sig = essayWritingSignals(s.keystroke_stats, s.word_count, { baselineWpm: baseline });
     return {
-      studentId: m.student_id, username: m.username, submitted: true,
+      studentId: m.student_id, username: m.username, fullName: m.fullName, submitted: true,
       words: s.word_count, updatedAt: s.updated_at,
       suspicion: sig.suspicion, flags: sig.flags,
       hasFeedback: !!(s.teacher_comment || s.teacher_grade),
@@ -1241,7 +1247,7 @@ async function essayDetail(req, res) {
   const { error, status } = await loadClassForManage(user, a.class_id);
   if (error) return res.status(status).json({ error });
 
-  const sR = await sb(`/essay_submissions?assignment_id=eq.${a.id}&student_id=eq.${encodeURIComponent(req.body.studentId)}&select=*,users(username)`);
+  const sR = await sb(`/essay_submissions?assignment_id=eq.${a.id}&student_id=eq.${encodeURIComponent(req.body.studentId)}&select=*,users(username,full_name)`);
   const s = sR.data && sR.data[0];
   if (!s) return res.status(404).json({ error: 'Aucun rendu de cet élève.' });
 
@@ -1259,6 +1265,7 @@ async function essayDetail(req, res) {
     submission: {
       studentId: s.student_id,
       username: s.users ? s.users.username : '?',
+      fullName: s.users ? s.users.full_name : null,
       content: s.content || {},
       words: s.word_count,
       submittedAt: s.submitted_at,

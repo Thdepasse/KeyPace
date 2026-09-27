@@ -817,6 +817,20 @@ alter table essay_submissions add column if not exists teacher_comment text;
 alter table essay_submissions add column if not exists teacher_grade text;
 
 -- ───────────────────────────────────────────────────────────────
+-- Nom réel de l'élève (audit "identifiants" établissement, sept. 2026)
+-- Certains établissements attribuent un identifiant institutionnel type
+-- matricule (ex. 260210@ecole.be) plutôt que nom.prenom@ — le prof ne peut
+-- alors identifier aucun élève dans ses listes (roster, devoirs, copies).
+-- full_name est rempli à la création du compte (import CSV ou onboarding
+-- KeyPace) et n'est JAMAIS modifiable par l'élève lui-même, contrairement à
+-- display_name (son pseudo de jeu) — sinon on recrée exactement le problème
+-- que display_name évite déjà côté classe (élève qui se cache derrière un
+-- pseudo choisi par lui). Nullable : reste vide quand l'identifiant est
+-- déjà lisible (nom.prenom@...), pas besoin de dupliquer l'info.
+-- ───────────────────────────────────────────────────────────────
+alter table users add column if not exists full_name text;
+
+-- ───────────────────────────────────────────────────────────────
 -- Confirmation réelle de l'accord parental pour les < 13 ans (audit RGPD,
 -- 11 sept. 2026). Jusqu'ici l'email d'un parent n'était vérifié qu'au
 -- format (ex: "parent@n'importe-quoi.fr" passait sans que ce parent n'ait
