@@ -4006,6 +4006,40 @@ function hubStageHTML(mod){
     </div>`;
 }
 
+/* Anecdotes affichées aléatoirement dans le hub (page Cours), une par visite */
+const HUB_FUN_FACTS=[
+  "La lettre E est la plus utilisée en français : environ une lettre sur sept tapée est un E.",
+  "Après le E, les lettres les plus fréquentes en français sont le A, le S, le I, le N et le T.",
+  "Le W est l'une des lettres les plus rares du français : on ne le trouve presque que dans des mots empruntés à d'autres langues.",
+  "Le K et le W sont si rares en français qu'on les retrouve surtout dans des mots comme « kayak » ou « wagon ».",
+  "Les voyelles (a, e, i, o, u, y) représentent près de la moitié des lettres d'un texte français.",
+  "Le nom « AZERTY » vient tout simplement des six premières lettres de la rangée du haut du clavier.",
+  "Sur un clavier AZERTY, les lettres accentuées les plus courantes du français (é, è, à, ç) ont chacune leur propre touche, directement accessible.",
+  "Sur les premières machines à écrire mécaniques, la disposition des lettres a été pensée pour éviter que les tiges de frappe ne se bloquent entre elles.",
+  "Le clavier AZERTY est la disposition standard utilisée en France et en Belgique.",
+  "Sur un clavier AZERTY, les chiffres partagent leur touche avec des symboles : il faut Majuscule pour taper un chiffre.",
+  "Le clavier belge et le clavier français, tous deux « AZERTY », ne sont pas identiques : certains symboles changent de place.",
+  "Sur un clavier AZERTY, la lettre M se trouve à la fin de la rangée du milieu, juste après le L.",
+  "Le clavier AZERTY français dispose d'une touche dédiée au symbole µ, utilisé par exemple dans µg (microgramme).",
+  "La barre d'espace est la touche la plus grande du clavier, et l'une des plus utilisées : elle sépare presque tous les mots.",
+  "Les touches F et J ont un petit repère en relief, pour qu'on puisse positionner ses index sans regarder.",
+  "La « rangée de base », où on pose ses doigts au repos, est le point de départ pour atteindre toutes les autres touches.",
+  "En dactylographie, chaque doigt est responsable d'une colonne précise de touches : c'est ce qui permet de taper sans regarder.",
+  "Le pouce est le seul doigt qui ne s'occupe que d'une touche : la barre d'espace.",
+  "Le français utilise cinq accents ou signes différents : aigu (é), grave (è, à, ù), circonflexe (ê), tréma (ë) et cédille (ç).",
+  "Sur clavier AZERTY, les accents circonflexe (^) et tréma (¨) sont des « touches mortes » : elles n'affichent rien tant qu'on n'appuie pas sur la lettre qui suit.",
+  "Le mot le plus court de la langue française tient en une seule lettre : « a », « à » ou « y », par exemple.",
+  "Le « e » final, souvent muet à l'oral, est pourtant l'une des lettres qu'on tape le plus en français.",
+  "Les mots « et », « le », « la », « de » et « un » comptent parmi les mots les plus fréquents de la langue française.",
+  "Taper sans regarder son clavier permet de garder les yeux sur son texte ou son écran, donc moins d'erreurs de recopiage.",
+  "Un des principes de base de la dactylographie : chaque doigt revient systématiquement à sa position de repos entre deux touches.",
+  "Utiliser tous ses doigts, plutôt que deux ou trois, réduit la fatigue sur de longues sessions d'écriture.",
+  "Une bonne posture (dos droit, poignets relâchés) fait autant de différence que la vitesse pour éviter la fatigue en tapant.",
+  "Quelques minutes de pratique chaque jour font en général plus progresser qu'une longue session une fois par semaine.",
+  "Le clavier que tu utilises aujourd'hui repose sur une disposition vieille de plus de 150 ans.",
+  "« Bonjour » est à l'origine composé de deux mots : « bon » et « jour »."
+];
+
 const GAME_TIERS=[
   {score:0,label:'Débutant',desc:'mots courts sans accents',words:["les","des","une","pas","bon","bas","mal","mot","feu","ami","eau","chat","jeu","but","roi","nez","bras","dos","sol","air","lac","art","vol","bus","rue","mur","sac","pot","ton","son","fin","cas","mer","pic","bec","foi","bal","cap","col","bol","nid","duo","dix","rat","bar","lit","loi","car","gel","riz","vin","sel","gaz","cou","ski","ail","loup","four","pain","main","pont","fond","camp","long","sang","gris","sans","dont","cent","dent","vent","peur","noir","tout","mais","tour","coup","jour","sous","bois","mois","yeux","beau","vrai","haut","bout","lien","lieu","rang","plan","bord","port","sort","mort","fort","nord","brun","plus","char","gant","jupe","robe","arme","drap","dune","toit","voix","nuit","lune","pied","ours","veau","chien","lapin","coude","genou","pouce","nuque"]},
   {score:50,label:'Familier',desc:'accents é, è, à, ê…',words:["fleur","temps","doigt","texte","vélo","rêve","soleil","plume","note","page","ligne","saut","lettre","veste","table","porte","plage","livre","stylo","pomme","salade","tomate","sucre","farine","glace","thème","idée","bleu","héros","forêt","clé","âge","île","fée","été","côté","frère","père","mère","flûte","boîte","pâte","côte","arête","fenêtre","lumière","rivière","manière","sorcière","siècle","fièvre","pièce","crème","même","système","style","rythme","titre","entre","libre","propre","cadre","centre","ordre","timbre","ombre","café","télé","hôtel","écho","épée","fête","prêt","décor","détail","effort","jeune","large","merci","noble","quête","riche","route","suite","utile","valeur","verbe","zeste","bière","terre","guerre","pierre","carré","arrêt","après","théâtre","école","élève","équipe","étape","célèbre","carrière","frontière","bannière","chèvre"]},
@@ -6644,6 +6678,10 @@ const app={
           </div>
           <div class="stageD1" id="hubStage" style="--m-grad:${HUB_MODULES[0].grad}">${hubStageHTML(HUB_MODULES[0])}</div>
         </div>
+        <div style="text-align:center;margin:0 0 32px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:7px">Le saviez-vous ?</div>
+          <div id="hubFunFact" style="font-size:15px;color:var(--txt);font-weight:600;max-width:620px;margin:0 auto;line-height:1.5"></div>
+        </div>
         <div class="school-banner" style="padding:0 0 8px">
           <div class="school-banner-inner">
             <div class="school-banner-content">
@@ -6658,6 +6696,8 @@ const app={
     const activeEl=document.querySelector('#hubTabs .tabD1.active');
     const slider=document.getElementById('hubSlider');
     if(activeEl&&slider&&window.innerWidth>760)slider.style.transform='translateY('+(activeEl.offsetTop-8)+'px)';
+    const factEl=document.getElementById('hubFunFact');
+    if(factEl)factEl.textContent=HUB_FUN_FACTS[Math.floor(Math.random()*HUB_FUN_FACTS.length)];
   },
   _hubSelectTab(id){
     const mod=HUB_MODULES.find(m=>m.id===id);if(!mod)return;
