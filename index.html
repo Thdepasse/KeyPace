@@ -316,6 +316,25 @@ ul,ol{list-style-position:inside}
 .modal-overlay.open{display:flex}
 .modal-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,0.14);position:relative;max-height:90vh;overflow-y:auto;scrollbar-width:none}
 .modal-box::-webkit-scrollbar{display:none}
+/* Classe réutilisable pour un conteneur scrollable placé À L'INTÉRIEUR d'un
+   parent aux coins arrondis + overflow:hidden (jamais sur le même élément
+   que le border-radius — voir .tuto-clip/.tuto-scroll plus haut pour le
+   détail du bug que ça évite : l'indicateur de scroll natif qui déborde du
+   coin arrondi). */
+.hide-scrollbar{scrollbar-width:none}
+.hide-scrollbar::-webkit-scrollbar{display:none;width:0;height:0}
+/* .tuto-clip : variante utilisée par la modale d'intro de leçon — le
+   scroll doit se faire sur un enfant interne, pas sur .modal-box lui-même.
+   Sinon l'indicateur de scroll natif (barre/overlay macOS ou iOS) est peint
+   au ras du rectangle de contenu et déborde du coin arrondi de la modale,
+   au lieu d'être découpé par lui (overflow-y:auto + border-radius sur le
+   même élément ne suffit pas à clipper cet indicateur dans tous les
+   navigateurs). Ici, .tuto-clip garde les coins arrondis mais ne scrolle
+   plus lui-même (overflow:hidden), et .tuto-scroll à l'intérieur scrolle
+   sans avoir de coins arrondis à lui — plus rien ne peut déborder. */
+.modal-box.tuto-clip{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.tuto-scroll{padding:36px;overflow-y:auto;min-height:0;scrollbar-width:none}
+.tuto-scroll::-webkit-scrollbar{display:none}
 /* ── HOME MOBILE BLOCKS ── */
 .home-feat-grid{display:none;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 20px}
 .home-feat-cell{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
@@ -484,6 +503,8 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .settings-btn:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,77,46,.15)}
 .settings-btn.danger{border-color:rgba(229,72,77,.5);color:#E5484D}
 .settings-btn.danger:hover{background:#E5484D;color:#fff;border-color:#E5484D;box-shadow:0 4px 12px rgba(229,72,77,.25)}
+.settings-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.settings-btn.active:hover{color:#fff;transform:none;box-shadow:none}
 .gaze-calibrated-badge{display:inline-flex;align-items:center;gap:5px;background:#1FA97120;color:#1FA971;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700}
 /* CALIBRATION OVERLAY */
 .calib-overlay{position:fixed;inset:0;background:#0d0d0d;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -785,15 +806,14 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .intro-start-btn{width:100%;padding:14px;border-radius:12px;background:var(--accent);color:#fff;border:none;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:opacity .15s}
 .intro-start-btn:hover{opacity:.88}
 /* LESSON TUTORIAL */
-#lesson-tuto-body{scrollbar-width:none;-ms-overflow-style:none}
-#lesson-tuto-body::-webkit-scrollbar{display:none;width:0;height:0}
 .tuto-badge{display:inline-block;background:rgba(255,77,46,0.1);color:var(--accent);font-size:12px;font-weight:700;padding:4px 11px;border-radius:20px;margin-bottom:10px;letter-spacing:.01em}
 .tuto-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;line-height:1.15;margin-bottom:10px}
 .tuto-intro{font-size:15px;color:#7A7365;line-height:1.55;margin-bottom:18px}
 .tuto-kb{display:flex;flex-direction:column;gap:5px;background:var(--light);border:1px solid var(--border);border-radius:14px;padding:14px;margin:0 auto 16px;width:fit-content;max-width:100%}
 .tuto-kb-row{display:flex;gap:5px;justify-content:center}
-.tuto-key{min-width:30px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:7px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#C2BBAC}
+.tuto-key{position:relative;min-width:30px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:7px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#C2BBAC}
 .tuto-key.on{color:#fff;font-weight:800;box-shadow:0 3px 0 rgba(0,0,0,0.12)}
+.tuto-key-altgr{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;white-space:nowrap;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:5px;padding:1px 4px}
 .tuto-keys-info{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
 .tuto-keycard{display:flex;align-items:center;gap:10px;background:var(--light);border:1px solid var(--border);border-radius:12px;padding:9px 14px}
 .tuto-keycard .k{width:34px;height:34px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:16px;color:#fff}
@@ -1626,7 +1646,21 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 
 <!-- LESSON TUTORIAL MODAL -->
 <div class="modal-overlay" id="lesson-tuto-modal">
-  <div class="modal-box" id="lesson-tuto-body" style="max-width:580px"></div>
+  <div class="modal-box tuto-clip" style="max-width:580px">
+    <button class="modal-close" onclick="closeModal('lesson-tuto-modal')">✕</button>
+    <div class="tuto-scroll" id="lesson-tuto-body"></div>
+  </div>
+</div>
+
+<!-- PRINT ESSAY MODAL (personnalisation de l'impression d'une/plusieurs copies) -->
+<!-- z-index:3300 : au-dessus de #essays-overlay (3200) d'où cette modale est
+     ouverte (liste/correction des copies), sinon la modale s'ouvre bien
+     (classe .open posée) mais reste invisible, cachée derrière cet overlay. -->
+<div class="modal-overlay" id="print-essay-modal" style="z-index:3300">
+  <div class="modal-box" style="max-width:440px">
+    <button class="modal-close" onclick="closeModal('print-essay-modal')">✕</button>
+    <div id="print-essay-body"></div>
+  </div>
 </div>
 
 <!-- ONBOARDING MODAL -->
@@ -1655,7 +1689,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
     </button>
     <div class="nav-links">
       <button class="nav-link" id="nav-home" onclick="go('home')">Accueil<span class="underline"></span></button>
-      <div class="nav-dropdown">
+      <div class="nav-dropdown" id="nav-ecoles-wrap">
         <a class="nav-link" href="/ecoles" style="display:inline-flex;align-items:center;text-decoration:none">Établissements</a>
         <div class="nav-dropdown-menu">
           <a href="/dactylographie-primaire">Primaire</a>
@@ -1800,12 +1834,14 @@ const ICONS={
   gamepad:_icon('<rect x="2" y="7" width="20" height="11" rx="5.5"/><path d="M7 10v4M5 12h4"/><circle cx="16" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="18.5" cy="13" r="1" fill="currentColor" stroke="none"/>'),
   barChart:_icon('<rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="14" width="4" height="7" rx="1"/>','fill="currentColor" stroke="none"'),
   monitor:_icon('<rect x="3" y="4" width="18" height="12" rx="2"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="16" x2="12" y2="20"/>'),
+  keyboard:_icon('<rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="10"/><line x1="9" y1="10" x2="9" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="15" y1="10" x2="15" y2="10"/><line x1="18" y1="10" x2="18" y2="10"/><line x1="7" y1="14" x2="17" y2="14"/>','stroke-linecap="round"'),
   gradCap:_icon('<path d="M12 4L2 9l10 5 10-5-10-5z"/><path d="M6 11.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5"/><line x1="19" y1="10" x2="19" y2="15.3"/><circle cx="19" cy="16.3" r="1.1" fill="currentColor" stroke="none"/>'),
   award:_icon('<circle cx="12" cy="8" r="5"/><path d="M9 12.5L7 21l5-3 5 3-2-8.5"/>'),
   trendUp:_icon('<polyline points="3 17 9 11 13 15 21 6"/><polyline points="15 6 21 6 21 12"/>'),
   target:_icon('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>'),
   fileText:_icon('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/>'),
   clipboard:_icon('<rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><line x1="8.5" y1="10" x2="15.5" y2="10"/><line x1="8.5" y1="14" x2="15.5" y2="14"/>'),
+  printer:_icon('<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>'),
   pencil:_icon('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>'),
   bookOpen:_icon('<path d="M2 5c3-1 6-1 9 1v13c-3-2-6-2-9-1V5z"/><path d="M22 5c-3-1-6-1-9 1v13c3-2 6-2 9-1V5z"/>'),
   mic:_icon('<rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="8" y1="21" x2="16" y2="21"/>'),
@@ -2213,6 +2249,7 @@ function loginUser(username){
   app.renderCurrent();
   if(_authCallback){const cb=_authCallback;_authCallback=null;cb();}
   if(window._needsOnboarding){window._needsOnboarding=false;setTimeout(obOpen,400);}
+  setTimeout(()=>app.checkReminders(),800);
 }
 
 // ── Onboarding tooltip walkthrough ─────────────────────────────
@@ -2373,6 +2410,7 @@ function updateNavUser(){
     const cb=document.getElementById('nav-classes');if(cb)cb.style.display='none';
     const ap=document.getElementById('nav-apercu');if(ap)ap.style.display='none';
     const jb=document.getElementById('nav-join');if(jb)jb.style.display='none';
+    const eb=document.getElementById('nav-ecoles-wrap');if(eb)eb.style.display='';
     applyMobileNav();
     return;
   }
@@ -2398,6 +2436,9 @@ function updateNavUser(){
   // indépendant n'a jamais aucun moyen d'en rejoindre une : lui montrer cet
   // onglet ne serait que du bruit.
   const joinBtn=document.getElementById('nav-join');if(joinBtn)joinBtn.style.display=(!teacher&&(currentInstitutionName||currentHasClass))?'inline-flex':'none';
+  // "Établissements" fait la promotion des licences pour écoles : sans objet
+  // pour un compte déjà rattaché à un établissement (élève ou enseignant).
+  const ecolesWrap=document.getElementById('nav-ecoles-wrap');if(ecolesWrap)ecolesWrap.style.display=currentInstitutionName?'none':'';
   applyMobileNav();
 }
 
@@ -2635,10 +2676,17 @@ function saveStats(s){
 /* ── Célébration de fin de leçon : un clavier s'affiche et les touches travaillées explosent ── */
 function celebrateLesson(lesson,res){
   lesson=lesson||{keys:'',title:'Leçon'};
-  const hot=new Set((lesson.keys||'').toUpperCase().split(/\s+/).filter(Boolean));
-  const ROWS=[['A','Z','E','R','T','Y','U','I','O','P'],['Q','S','D','F','G','H','J','K','L','M'],['W','X','C','V','B','N',',',';',':']];
+  const targets=(lesson.keys||'').split(/\s+/).filter(Boolean);
   const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  const kb=ROWS.map(r=>'<div class="cel-row">'+r.map(k=>'<div class="cel-key '+(hot.has(k)?'hot':'dim')+'" data-k="'+k+'">'+k+'</div>').join('')+'</div>').join('');
+  // Clavier réel (KB, dépend de la variante AZERTY choisie) plutôt qu'une
+  // rangée de lettres codée en dur : les touches travaillées s'allument
+  // maintenant aussi pour les leçons de chiffres et de symboles (Maj/AltGr
+  // comprises), là où l'ancienne liste ne connaissait que les lettres.
+  const kb=KB.map(row=>'<div class="cel-row">'+row.map(k=>{
+    const hot=targets.some(t=>kbKeyMatch(k,t));
+    const label=k.l.toLowerCase();
+    return '<div class="cel-key '+(hot?'hot':'dim')+'" data-k="'+label+'">'+label+'</div>';
+  }).join('')+'</div>').join('');
   const ov=document.createElement('div');ov.className='cel-overlay';
   ov.innerHTML='<div class="cel-card">'
     +'<div class="cel-eyebrow">Leçon terminée</div>'
@@ -2759,13 +2807,57 @@ function t4aComputeKpos(){
   m[' ']={x:0,y:T4A_SPACE_Y};
   return m;
 }
-const KB=[
-  [{l:'1',s:'&',f:'lp'},{l:'2',s:'é',f:'lr'},{l:'3',s:'"',f:'lm'},{l:'4',s:"'",f:'li'},{l:'5',s:'(',f:'li'},{l:'6',s:'-',f:'ri'},{l:'7',s:'è',f:'ri'},{l:'8',s:'_',f:'rm'},{l:'9',s:'ç',f:'rr'},{l:'0',s:'à',f:'rp'}],
-  [{l:'A',f:'lp'},{l:'Z',f:'lr'},{l:'E',f:'lm'},{l:'R',f:'li'},{l:'T',f:'li'},{l:'Y',f:'ri'},{l:'U',f:'ri'},{l:'I',f:'rm'},{l:'O',f:'rr'},{l:'P',f:'rp'}],
-  [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
-  [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'!',s:'§',f:'rp'}]
-];
-const T4A_KPOS=t4aComputeKpos();
+/* Variantes AZERTY : chaque disposition ne diffère de la française que sur
+   les points réellement vérifiés (docs Microsoft kbdfr/kbdbe, AFNOR pour la
+   NF Z71-300, contenu déjà présent dans l'app pour Alt+o→œ sur Mac). Pas de
+   symbole inventé : une case sans `g` reste simplement sans indice AltGr
+   plutôt que d'afficher une position non confirmée pour cette variante. */
+const KB_LAYOUTS={
+  fr:[
+    [{l:'1',s:'&',f:'lp'},{l:'2',s:'é',f:'lr',g:'~'},{l:'3',s:'"',f:'lm',g:'#'},{l:'4',s:"'",f:'li',g:'{'},{l:'5',s:'(',f:'li',g:'['},{l:'6',s:'-',f:'ri',g:'|'},{l:'7',s:'è',f:'ri',g:'`'},{l:'8',s:'_',f:'rm',g:'\\'},{l:'9',s:'ç',f:'rr',g:'^'},{l:'0',s:'à',f:'rp',g:'@'}],
+    [{l:'A',f:'lp'},{l:'Z',f:'lr'},{l:'E',f:'lm',g:'€'},{l:'R',f:'li'},{l:'T',f:'li'},{l:'Y',f:'ri'},{l:'U',f:'ri'},{l:'I',f:'rm'},{l:'O',f:'rr'},{l:'P',f:'rp'}],
+    [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
+    [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'!',s:'§',f:'rp'}]
+  ],
+  be:[
+    [{l:'1',s:'&',f:'lp'},{l:'2',s:'é',f:'lr'},{l:'3',s:'"',f:'lm'},{l:'4',s:"'",f:'li'},{l:'5',s:'(',f:'li'},{l:'6',s:'§',f:'ri'},{l:'7',s:'è',f:'ri'},{l:'8',s:'!',f:'rm'},{l:'9',s:'ç',f:'rr'},{l:'0',s:'à',f:'rp'}],
+    [{l:'A',f:'lp'},{l:'Z',f:'lr'},{l:'E',f:'lm'},{l:'R',f:'li'},{l:'T',f:'li'},{l:'Y',f:'ri'},{l:'U',f:'ri'},{l:'I',f:'rm'},{l:'O',f:'rr'},{l:'P',f:'rp'}],
+    [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
+    [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'=',s:'+',f:'rp'}]
+  ],
+  mac:[
+    [{l:'1',s:'&',f:'lp'},{l:'2',s:'é',f:'lr'},{l:'3',s:'"',f:'lm'},{l:'4',s:"'",f:'li'},{l:'5',s:'(',f:'li'},{l:'6',s:'-',f:'ri'},{l:'7',s:'è',f:'ri'},{l:'8',s:'_',f:'rm'},{l:'9',s:'ç',f:'rr'},{l:'0',s:'à',f:'rp'}],
+    [{l:'A',f:'lp'},{l:'Z',f:'lr'},{l:'E',f:'lm'},{l:'R',f:'li'},{l:'T',f:'li'},{l:'Y',f:'ri'},{l:'U',f:'ri'},{l:'I',f:'rm'},{l:'O',f:'rr',g:'œ'},{l:'P',f:'rp'}],
+    [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
+    [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'!',s:'§',f:'rp'}]
+  ],
+};
+KB_LAYOUTS.nf=KB_LAYOUTS.fr.map(row=>row.map(k=>{const{g,...rest}=k;return rest;})); // NF Z71-300 : lettres/chiffres inchangés (AFNOR), AltGr non modélisé ici
+const KB_LAYOUT_LABELS={fr:'Français',be:'Belge',mac:'Mac',nf:'Norme NF Z71-300'};
+function getKbLayoutId(){try{const v=localStorage.getItem('kp_kb_layout');return KB_LAYOUTS[v]?v:'fr';}catch{return 'fr';}}
+function setKbLayoutId(v){try{localStorage.setItem('kp_kb_layout',v);}catch{}}
+function kbModifierName(){return getKbLayoutId()==='mac'?'Option (⌥)':'AltGr';}
+/* Teste si `ch` s'obtient sur la touche `k` (case-insensible) et à quel
+   niveau : 'base' (direct), 'shift' (Maj) ou 'altgr'. null si absent de KB —
+   on ne devine jamais une position qu'on n'a pas modélisée.
+   `invert` : sur la rangée des chiffres, le clavier physique est à l'envers
+   de son étiquette (ex. touche "2/é" → é sort tout seul, 2 demande Maj) —
+   voir KB_LAYOUTS[*][0], seule rangée où `l` est le chiffre affiché en
+   premier mais `s` le caractère réellement obtenu sans Maj. */
+function kbKeyMatch(k,ch,invert){
+  if(ch==null)return null;
+  const low=ch.toLowerCase();
+  if(k.l.toLowerCase()===low)return{via:invert?'shift':'base',ch:k.l};
+  if(k.s&&k.s.toLowerCase()===low)return{via:invert?'base':'shift',ch:k.s};
+  if(k.g&&k.g.toLowerCase()===low)return{via:'altgr',ch:k.g};
+  return null;
+}
+let KB=[],T4A_KPOS={};
+function applyKbLayout(id){
+  KB=(KB_LAYOUTS[id]||KB_LAYOUTS.fr).map(row=>row.map(k=>({...k})));
+  T4A_KPOS=t4aComputeKpos();
+}
+applyKbLayout(getKbLayoutId());
 // Magic Tiles (Visée) : 8 couloirs FIXES, un par doigt hors pouces — Q S D F
 // (main gauche) et J K L M (main droite), la vraie rangée de repos. Chaque
 // colonne correspond toujours à la même touche (comme un vrai piano tiles),
@@ -3075,25 +3167,25 @@ const CURRICULUM=[
      text:'yeux, riz, taxi, alors; voix, luxe, taxi, il; noix, niveau, aux, neuf; luxe, noir, yeux, six; aide, yeux, aux, six, index'},
     // b4 : + w :   → termes tech + prose
     {id:'b4',title:'W et deux-points',keys:'w :',
-     tip:'W est à l\'auriculaire gauche bas, les deux-points à l\'annulaire droit haut (Shift + ;). C\'est ta première touche combinée avec Shift. Appuie sur Shift avec l\'auriculaire opposé à la lettre tapée.',
+     tip:'W est à l\'auriculaire gauche bas, les deux-points à l\'annulaire droit, en haut à droite : une touche à part, sans Shift, juste à côté du point-virgule.',
      tuto:{
-       intro:"W arrive en bas à gauche, et les deux-points t'initient à la touche Shift, ta première combinaison.",
+       intro:"W arrive en bas à gauche, et les deux-points ajoutent une touche de ponctuation à droite, sans Shift.",
        rules:[
          {icon:'🤏',t:"W à l'auriculaire",d:"L'auriculaire gauche descend sur W, tout en bas à gauche. Garde le poignet stable, seul le petit doigt s'étire."},
-         {icon:'⇧',t:'Découvre Shift',d:"Pour les deux-points, maintiens Shift avec l'auriculaire opposé, puis frappe la touche, et relâche Shift juste après."},
-         {icon:'🤝',t:'Les deux mains coopèrent',d:"Shift d'un côté, touche de l'autre. Cette coordination des deux mains te servira pour toutes les majuscules."}
+         {icon:'⌨️',t:'Les deux-points, en direct',d:"Les deux-points se tapent directement, sans Shift : une touche à part, juste à côté du point-virgule."},
+         {icon:'🤝',t:'Une touche par doigt',d:"Comme toujours, chaque touche a son doigt dédié : ne bouge pas toute la main pour une seule frappe."}
        ],
-       tip:"Objectif : placer W et réussir ta première combinaison avec Shift sans crisper la main."
+       tip:"Objectif : placer W et les deux-points, chacun avec le bon doigt, sans crisper la main."
      },
      text:'wagon, tramway, porte, kiwi: wagon kiwi noix moi kiwi, cor kiwi avec van tramway: kiwi me wagon on'},
     // b5 : + b !   → l'alphabet est complet, vraies phrases
     {id:'b5',title:'B et point d\'exclamation',keys:'b !',
-     tip:'B est à l\'index gauche bas (côté centre), le ! avec Shift. Tu couvres maintenant les 26 lettres de l\'alphabet : c\'est un cap important ! Chaque texte réel sera désormais accessible.',
+     tip:'B est à l\'index gauche bas (côté centre), le ! se tape directement, sans Shift. Tu couvres maintenant les 26 lettres de l\'alphabet : c\'est un cap important ! Chaque texte réel sera désormais accessible.',
      tuto:{
        intro:"B complète l'alphabet et le point d'exclamation ajoute de l'émotion. Un vrai cap : tu auras les 26 lettres.",
        rules:[
          {icon:'⬇️',t:'B au centre-bas',d:"L'index gauche s'étire vers le centre puis descend pour B. C'est un mouvement un peu ample : reviens vite sur F."},
-         {icon:'⇧',t:'Le ! avec Shift',d:"Le point d'exclamation se fait avec Shift, comme les deux-points : Shift de la main opposée, puis la touche."},
+         {icon:'⌨️',t:'Le ! sans Shift',d:"Le point d'exclamation se tape directement, comme les deux-points juste à côté : pas besoin de Shift pour l'un ni pour l'autre."},
          {icon:'🏁',t:'Les 26 lettres réunies',d:"Avec B, tu maîtrises tout l'alphabet. À partir d'ici, n'importe quel mot français t'est accessible."}
        ],
        tip:"Objectif : poser B et le point d'exclamation, et savourer d'avoir bouclé l'alphabet complet."
@@ -3267,7 +3359,7 @@ const CURRICULUM=[
        tip:"Objectif : placer apostrophe et trait d'union collés, sans espace autour."
      },
      text:"c'est l'heure qu'il aime. d'où viens-tu ? l'idée d'aujourd'hui est bonne. vingt-cinq élèves présents."},
-    {id:'pon5',title:'Guillemets et parenthèses',keys:'« » ()',
+    {id:'pon5',title:'Guillemets et parenthèses',keys:'« » ( )',
      tuto:{
        intro:"Les guillemets encadrent les citations, les parenthèses ajoutent une précision. On apprend à les ouvrir et les fermer.",
        rules:[
@@ -3487,7 +3579,7 @@ const CURRICULUM=[
        ],
        tip:"Objectif : atteindre 1 et 0 avec les auriculaires, main stable."
      }},
-    {id:'num5',title:'Tous les chiffres enchaînés',keys:'0 à 9',genNum:'1234567890',
+    {id:'num5',title:'Tous les chiffres enchaînés',keys:'tous les chiffres',genNum:'1234567890',
      tuto:{
        intro:"On enchaîne maintenant les dix chiffres. Chacun a son doigt : c'est le moment de tout relier.",
        rules:[
@@ -3523,12 +3615,12 @@ const CURRICULUM=[
        tip:"Objectif : produire @ et # avec AltGr, sans casser ta position de repos."
      },
      text:'contact@keypace.be #keypace @user info@site.com #top @jean #apprendre #clavier @monde contact@mail.fr'},
-    {id:'sym2',title:'Parenthèses () et crochets []',keys:'() []',
+    {id:'sym2',title:'Parenthèses () et crochets []',keys:'( ) [ ]',
      tuto:{
        intro:"Parenthèses et crochets vont par paire : on apprend à toujours ouvrir ET fermer.",
        rules:[
          {icon:'🧩',t:'Toujours par paire',d:"Une parenthèse ou un crochet ouvert se ferme toujours. Tape la paire, puis reviens écrire au milieu."},
-         {icon:'⇧',t:'Parenthèses avec Shift',d:"Sur AZERTY, ( et ) s'obtiennent avec Shift sur la rangée des chiffres. Shift de la main opposée, comme d'habitude."},
+         {icon:'⌨️',t:'Parenthèses en direct',d:"Sur AZERTY, ( et ) se tapent directement, sans Shift, sur la rangée des chiffres."},
          {icon:'⌨️',t:'Crochets avec AltGr',d:"Les crochets [ ] passent par AltGr. Maintiens AltGr puis frappe la touche : utile pour le code et les listes."}
        ],
        tip:"Objectif : ouvrir et fermer parenthèses et crochets, sans en oublier."
@@ -3550,7 +3642,7 @@ const CURRICULUM=[
        intro:"Les opérateurs * = + servent aux calculs et au code. On les enchaîne dans des expressions.",
        rules:[
          {icon:'🧮',t:'Les opérateurs',d:"* pour multiplier, + pour additionner, = pour le résultat ou l'affectation : 2*3=6, a+b=c."},
-         {icon:'⇧',t:'Souvent avec Shift',d:"Sur AZERTY, + et = demandent Shift sur la rangée des chiffres. Pense à la main opposée pour le maintenir."},
+         {icon:'⇧',t:'+ avec Shift, = en direct',d:"Sur AZERTY, + et = sont sur la même touche, tout en haut à droite : + demande Shift, = se tape directement."},
          {icon:'🔗',t:'Sans espace dans les formules',d:"Dans une expression simple, on colle souvent les opérateurs : x*y+z. Repère le rythme touche par touche."}
        ],
        tip:"Objectif : enchaîner * = + dans des expressions, sans hésiter sur Shift."
@@ -3571,7 +3663,7 @@ const CURRICULUM=[
 
   /* ── MODULE 12 : symboles avancés ───────────────────────────────────────── */
   {name:'12. Symboles avancés',lessons:[
-    {id:'sym6',title:'{} et <> : code et HTML',keys:'{} <>',
+    {id:'sym6',title:'{} et <> : code et HTML',keys:'{ } < >',
      tuto:{
        intro:"Les accolades {} et chevrons <> sont les symboles du code et du HTML. Eux aussi vont par paire.",
        rules:[
@@ -3582,15 +3674,15 @@ const CURRICULUM=[
        tip:"Objectif : ouvrir et fermer accolades et chevrons, AltGr pour les accolades."
      },
      text:'{code: true} <html> </html> {style: "bold"} <div class="main"> </div> {return x+y} <p>texte</p>'},
-    {id:'sym7',title:'"" et ~ : chaînes et chemins',keys:'"" ~',
+    {id:'sym7',title:'"" et ~ : chaînes et chemins',keys:'" ~',
      tuto:{
        intro:"Les guillemets droits et le tilde ~ servent aux chaînes de caractères et aux chemins système.",
        rules:[
-         {icon:'⌨️',t:'Guillemets droits',d:"Le guillemet droit (différent des « » français) entoure les chaînes en code. Sur AZERTY, c'est Shift + 3."},
-         {icon:'〜',t:'Le tilde ~',d:"Le tilde désigne le dossier personnel sous Linux et Mac : ~/documents. Il s'obtient avec AltGr (touche é / 2)."},
+         {icon:'⌨️',t:'Guillemets droits',d:"Le guillemet droit (différent des « » français) entoure les chaînes en code. Sur AZERTY, il se tape directement sur la touche 3, sans Shift."},
+         {icon:'〜',t:'Le tilde ~',d:"Le tilde désigne le dossier personnel sous Linux et Mac : ~/documents. Il s'obtient avec AltGr, sur la rangée des chiffres."},
          {icon:'💻',t:'Surtout en code',d:"Ces deux signes sont rares à l'écrit courant mais essentiels en programmation et au terminal."}
        ],
-       tip:"Objectif : taper le guillemet droit (Shift) et ~ (AltGr) sans les confondre avec les signes français."
+       tip:"Objectif : taper le guillemet droit (direct) et ~ (AltGr) sans les confondre avec les signes français."
      },
      text:'"bonjour" "monde" ~/documents ~user "valeur": true ~/bureau "clé": "données" ~root "résultat": 42'},
     {id:'sym8',tuto:{
@@ -3895,27 +3987,36 @@ const app={
     this.stopTimer();this._showIntro=false;this.sess=this.makeSession('lesson',id);this.renderView('lessons');
   },
   _fingerInfo(letter){
-    let key=null;
-    for(const row of KB){for(const k of row){if(k.l.toLowerCase()===letter.toLowerCase()){key=k;break;}}if(key)break;}
+    let key=null,via=null,label=null;
+    for(let r=0;r<KB.length&&!key;r++){for(const k of KB[r]){
+      const m=kbKeyMatch(k,letter,r===0);
+      if(m){key=k;via=m.via;label=m.ch;break;}
+    }}
     if(!key)return null;
     const f=key.f;const side=f[0]==='l'?'gauche':'droite';
     const finger=f==='th'?'pouce':(FINGER_LABEL[f[1]]||'');
-    return{label:key.l,color:FINGERS[f]||'#999',hand:'main '+side,finger};
+    return{label,color:FINGERS[f]||'#999',hand:'main '+side,finger,via};
   },
   openLessonTuto(id){
     const les=this.lessonById(id);if(!les)return;
     this._pendingLessonId=id;
     const num=ALL_LESSONS.findIndex(l=>l.id===id)+1,total=ALL_LESSONS.length;
     const newKeys=(les.keys||'').split(/\s+/).filter(Boolean);
-    const onSet=new Set(newKeys.map(k=>k.toLowerCase()));
-    const kb=KB.map(row=>`<div class="tuto-kb-row">${row.map(k=>{const on=onSet.has(k.l.toLowerCase());return`<div class="tuto-key${on?' on':''}"${on?` style="background:${FINGERS[k.f]};border-color:${FINGERS[k.f]}"`:''}>${k.l.toLowerCase()}</div>`;}).join('')}</div>`).join('');
+    const kb=KB.map((row,r)=>`<div class="tuto-kb-row">${row.map(k=>{
+      let on=false,hint='';
+      for(const t of newKeys){
+        const m=kbKeyMatch(k,t,r===0);
+        if(m){on=true;if(m.via==='shift')hint='Maj → '+m.ch;else if(m.via==='altgr')hint=`${kbModifierName()} → ${m.ch}`;break;}
+      }
+      return`<div class="tuto-key${on?' on':''}"${on?` style="background:${FINGERS[k.f]};border-color:${FINGERS[k.f]}"`:''}>${k.l.toLowerCase()}${hint?`<span class="tuto-key-altgr">${hint}</span>`:''}</div>`;
+    }).join('')}</div>`).join('');
     const infos=newKeys.map(k=>this._fingerInfo(k)).filter(Boolean);
     const showKb=infos.length>0&&infos.length===newKeys.length;
-    const cards=infos.map(i=>`<div class="tuto-keycard"><div class="k" style="background:${i.color}">${i.label}</div><div class="meta"><b>${i.label}</b>${i.finger} · ${i.hand}</div></div>`).join('');
+    const viaHint=v=>v==='shift'?' (Maj)':v==='altgr'?` (${kbModifierName()})`:'';
+    const cards=infos.map(i=>`<div class="tuto-keycard"><div class="k" style="background:${i.color}">${i.label}</div><div class="meta"><b>${i.label}</b>${viaHint(i.via)} · ${i.finger} · ${i.hand}</div></div>`).join('');
     const t=les.tuto||{};
     const rules=(t.rules||[]).map(r=>`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>${r.t}</strong>${r.d}</div></div>`).join('');
-    document.getElementById('lesson-tuto-body').innerHTML=`
-      <button class="modal-close" onclick="closeModal('lesson-tuto-modal')">✕</button>
+    let html=`
       <div class="tuto-badge">${les.module||''}</div>
       <h2 class="tuto-title">${les.title}</h2>
       ${t.intro?`<p class="tuto-intro">${t.intro}</p>`:''}
@@ -3923,6 +4024,15 @@ const app={
       ${rules?`<div class="intro-rules" style="margin-bottom:18px">${rules}</div>`:''}
       ${t.tip?`<div class="lesson-tip"><div class="lesson-tip-icon">🎯</div><div>${t.tip}</div></div>`:''}
       <button class="intro-start-btn" onclick="app.confirmTuto()">Commencer la leçon →</button>`;
+    // Les leçons sont rédigées pour AZERTY PC (touche "AltGr") : sur Mac, la
+    // touche s'appelle "Option" (⌥) et n'est pas nommée "AltGr" sur le
+    // capuchon — on adapte le nom sans changer les positions décrites
+    // (celles-ci restent celles vérifiées pour le français, cf. KB_LAYOUTS).
+    if(getKbLayoutId()==='mac'){
+      html=html.replace(/AltGr/g,'Option (⌥)')
+                .replace('la touche Alt à droite de la barre d\'espace','la touche Option, à droite de la barre d\'espace');
+    }
+    document.getElementById('lesson-tuto-body').innerHTML=html;
     openModal('lesson-tuto-modal');
     document.getElementById('lesson-tuto-body').scrollTop=0; // toujours ouvrir en haut
   },
@@ -4239,9 +4349,15 @@ const app={
   /* ── PROF : copies rendues ───────────────────────────────────── */
 
   async viewAssignmentDetail(assignmentId){
+    // Coins arrondis + overflow:hidden sur le conteneur EXTÉRIEUR, scroll sur
+    // un enfant intérieur sans rayon à lui (.hide-scrollbar) : sinon
+    // l'indicateur de scroll natif déborde du coin arrondi (même bug que
+    // .tuto-clip/.tuto-scroll pour la modale d'intro de leçon).
     const overlay=createOverlay(true);
-    overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:26px;max-width:460px;width:100%;max-height:80vh;overflow-y:auto">
-      <div style="padding:40px 0;text-align:center;color:var(--muted)">Chargement…</div>
+    overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;max-width:460px;width:100%;max-height:80vh;overflow:hidden;display:flex;flex-direction:column">
+      <div class="hide-scrollbar" style="padding:26px;overflow-y:auto;min-height:0">
+        <div style="padding:40px 0;text-align:center;color:var(--muted)">Chargement…</div>
+      </div>
     </div>`;
     let d;
     try{
@@ -4249,10 +4365,10 @@ const app={
       d=await r.json();
       if(!r.ok)throw new Error(d.error||'Erreur');
     }catch(e){
-      overlay.querySelector('div').innerHTML=`<div style="padding:20px 0;text-align:center;color:var(--muted)">${this._esc(e.message||'Erreur de chargement.')}</div>`;
+      overlay.querySelector('.hide-scrollbar').innerHTML=`<div style="padding:20px 0;text-align:center;color:var(--muted)">${this._esc(e.message||'Erreur de chargement.')}</div>`;
       return;
     }
-    overlay.querySelector('div').innerHTML=`
+    overlay.querySelector('.hide-scrollbar').innerHTML=`
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
         <h2 style="margin:0;font-size:17px;font-family:'Bricolage Grotesque',sans-serif">${this._esc(d.assignment.title)}</h2>
         <button onclick="this.closest('[style*=fixed]')._close()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
@@ -4261,18 +4377,62 @@ const app={
         <div style="flex:1;font-size:13.5px;font-weight:600">${this._esc(row.username)}</div>
         ${row.wpm!=null?`<span style="font-size:12.5px;color:var(--muted)">${row.wpm} mpm</span>`:''}
         <span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;color:${row.done?'var(--success)':'var(--muted)'};background:${row.done?'rgba(31,169,113,.1)':'var(--light)'}">${row.done?'✓ fait':'pas encore'}</span>
+        ${!row.done?`<button onclick="app._sendReminder(this,'${assignmentId}','${row.studentId}')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:3px 8px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap">🔔 Rappel</button>`:''}
       </div>`).join('')}
     `;
   },
 
+  async _sendReminder(btn,assignmentId,studentId){
+    btn.disabled=true;btn.textContent='…';
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'remind-student',token:currentToken,assignmentId,studentId})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+      btn.textContent=d.alreadyPending?'✓ déjà envoyé':'✓ envoyé';
+      btn.style.color='var(--success)';btn.style.borderColor='rgba(31,169,113,.35)';
+    }catch(e){btn.disabled=false;btn.textContent='🔔 Rappel';alert(e.message||'Erreur réseau.');}
+  },
+
+  // Élève : rappels laissés par un prof sur un devoir non rendu, affichés une
+  // fois à l'ouverture de session (voir appels dans loginUser() et au boot,
+  // en bas de fichier). Le backend marque déjà les rappels vus dès cet
+  // appel : pas besoin d'acquittement séparé côté client.
+  async checkReminders(){
+    if(!currentToken||isTeacher())return;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'reminders-check',token:currentToken})});
+      const d=await r.json();
+      if(!r.ok||!d.reminders||!d.reminders.length)return;
+      this._showReminderPopup(d.reminders);
+    }catch{}
+  },
+
+  _showReminderPopup(reminders){
+    const overlay=createOverlay(true);
+    overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:100%;text-align:center">
+      <div style="font-size:36px;margin-bottom:10px">🔔</div>
+      <h2 style="margin:0 0 10px;font-size:19px;font-family:'Bricolage Grotesque',sans-serif">Petit rappel de ton prof</h2>
+      <div style="margin:0 0 20px;font-size:14px;color:var(--txt);line-height:1.6;text-align:left">
+        ${reminders.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--border)"><span>📌</span><span>N'oublie pas : <b>${this._esc(r.assignmentTitle)}</b></span></div>`).join('')}
+      </div>
+      <button onclick="this.closest('[style*=fixed]')._close()" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;width:100%">Compris !</button>
+    </div>`;
+  },
+
   async viewEssays(assignmentId){
-    // Même garde anti-double-clic que openEssay() ci-dessus.
-    if(document.getElementById('essays-overlay'))return;
-    const ov=document.createElement('div');
-    ov.id='essays-overlay';
-    ov.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:3200;overflow-y:auto;animation:settings-fade .18s ease';
+    // Réutilise l'overlay s'il existe déjà (ex. retour depuis viewEssayDetail,
+    // qui affiche la copie dans ce même élément sans jamais le retirer du DOM)
+    // au lieu de bloquer l'appel : avec un simple retour anticipé, cliquer sur
+    // "‹ Toutes les copies" depuis une copie ne faisait plus rien, puisque
+    // #essays-overlay était toujours présent.
+    let ov=document.getElementById('essays-overlay');
+    if(!ov){
+      ov=document.createElement('div');
+      ov.id='essays-overlay';
+      ov.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:3200;overflow-y:auto;animation:settings-fade .18s ease';
+      document.body.appendChild(ov);
+    }
     ov.innerHTML=`<div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement des copies…</div>`;
-    document.body.appendChild(ov);
     this._essaysOverlay=ov;
     let d;
     try{
@@ -4299,6 +4459,7 @@ const app={
           <h1 style="margin:0;font-size:22px;letter-spacing:-.01em">${this._esc(a.title)}</h1>
           <div style="font-size:13px;color:var(--muted);margin-top:3px">${def.label} · ${d.submittedCount}/${d.total} rendu${d.submittedCount>1?'s':''}</div>
         </div>
+        ${d.submittedCount>0?`<button onclick="app.printEssayBulk('${a.id}')" style="background:var(--card);border:1.5px solid var(--border);border-radius:11px;padding:9px 15px;font:inherit;font-size:13.5px;font-weight:700;color:var(--txt);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px;flex-shrink:0">${ICONS.printer} Imprimer tout le lot</button>`:''}
       </div>
       ${a.essayBrief?`<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;padding:12px 15px;margin:18px 0;font-size:13.5px;line-height:1.6;white-space:pre-wrap">${this._esc(a.essayBrief)}</div>`:'<div style="height:18px"></div>'}
       <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
@@ -4309,6 +4470,7 @@ const app={
               <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${r.words} mots · ${new Date(r.updatedAt).toLocaleDateString('fr-FR')}</div>
             </div>
             ${badge(r)}
+            <div onclick="event.stopPropagation();app.printEssayFromList('${a.id}','${r.studentId}')" title="Imprimer cette copie" style="width:32px;height:32px;border-radius:9px;border:1.5px solid var(--border);background:#fff;display:grid;place-items:center;color:var(--muted);flex-shrink:0" onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">${ICONS.printer}</div>
             <div style="color:var(--muted);font-size:14px">›</div>
           </div>`:`
           <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);opacity:.55">
@@ -4316,6 +4478,7 @@ const app={
           </div>`).join('')}
       </div>
     </div>`;
+    this._essayListLast=d;
   },
 
   closeEssays(){if(this._essaysOverlay){this._essaysOverlay.remove();this._essaysOverlay=null;}},
@@ -4359,7 +4522,10 @@ const app={
         </div>`;
       }).join('')}
 
-      <button onclick="app._essayCopy('${assignmentId}','${studentId}')" style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px 18px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)">${ICONS.clipboard} Copier le texte</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="app._essayCopy('${assignmentId}','${studentId}')" style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px 18px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)">${ICONS.clipboard} Copier le texte</button>
+        <button onclick="app.openPrintEssay()" style="background:var(--txt);color:#fff;border:1px solid var(--txt);border-radius:11px;padding:10px 18px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">${ICONS.printer} Imprimer</button>
+      </div>
 
       <div style="margin-top:28px;padding-top:22px;border-top:1px solid var(--border)">
         <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:10px">RETOUR À L'ÉLÈVE</div>
@@ -4386,6 +4552,180 @@ const app={
       statusEl.textContent='✓ Enregistré';statusEl.style.color='var(--muted)';
     }catch{statusEl.textContent='Erreur réseau.';statusEl.style.color='#E5484D';}
     finally{btn.disabled=false;btn.textContent='Enregistrer';}
+  },
+
+  // ── Impression des devoirs de rédaction ─────────────────────────────
+  // Réutilise le pattern déjà en place pour les PDF (exportClassPDF) :
+  // document HTML autonome ouvert dans un nouvel onglet, avec
+  // window.print() automatique — pas de dépendance à une lib PDF.
+  _printPrefs(){
+    let p={};
+    try{p=JSON.parse(localStorage.getItem('kp_print_prefs')||'{}');}catch{}
+    return{
+      school: p.school!=null ? p.school : (currentInstitutionName||''),
+      includeFeedback: p.includeFeedback!==false,
+      includeSignature: p.includeSignature!==false,
+      blankGrade: !!p.blankGrade,
+    };
+  },
+  _savePrintPrefs(p){try{localStorage.setItem('kp_print_prefs',JSON.stringify(p));}catch{}},
+
+  openPrintEssay(){
+    const d=this._essayLast;if(!d)return;
+    this._printTarget={mode:'single',data:d};
+    this._renderPrintModal(d.submission.username);
+    openModal('print-essay-modal');
+  },
+
+  async printEssayFromList(assignmentId,studentId){
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'essay-detail',token:currentToken,assignmentId,studentId})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||'Erreur');
+      this._essayLast=d;
+      this.openPrintEssay();
+    }catch(e){this._essayToast(e.message||'Erreur de chargement.');}
+  },
+
+  printEssayBulk(assignmentId){
+    const list=this._essayListLast;if(!list)return;
+    const submitted=(list.rows||[]).filter(r=>r.submitted);
+    if(!submitted.length){this._essayToast('Aucune copie rendue à imprimer.');return;}
+    this._printTarget={mode:'bulk',assignmentId,students:submitted};
+    this._renderPrintModal(submitted.length+' copie'+(submitted.length>1?'s':''));
+    openModal('print-essay-modal');
+  },
+
+  _renderPrintModal(subtitle){
+    const p=this._printPrefs();
+    const single=this._printTarget.mode==='single';
+    document.getElementById('print-essay-body').innerHTML=`
+      <h2 style="margin:0 0 4px;font-size:19px;display:flex;align-items:center;gap:8px">${ICONS.printer} Personnaliser l'impression</h2>
+      <div style="color:var(--muted);font-size:13px;margin-bottom:20px">${this._esc(subtitle)} · ces réglages sont mémorisés pour la prochaine fois</div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px">Nom de l'école (en-tête de la feuille)</label>
+        <input type="text" id="pe-school" value="${this._esc(p.school)}" placeholder="Ex. École communale des Tilleuls" style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font:inherit;font-size:14px;background:var(--light);box-sizing:border-box;color:var(--txt)">
+      </div>
+      ${single?`<div style="margin-bottom:14px">
+        <label style="display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px">Nom de l'élève affiché</label>
+        <input type="text" id="pe-student" value="${this._esc(this._printTarget.data.submission.username)}" style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font:inherit;font-size:14px;background:var(--light);box-sizing:border-box;color:var(--txt)">
+      </div>`:''}
+      <label style="display:flex;align-items:center;gap:9px;font-size:13.5px;margin-bottom:10px;cursor:pointer"><input type="checkbox" id="pe-feedback" ${p.includeFeedback?'checked':''} style="width:17px;height:17px;flex-shrink:0">Inclure ma note et mon commentaire</label>
+      <label style="display:flex;align-items:center;gap:9px;font-size:13.5px;margin-bottom:10px;cursor:pointer"><input type="checkbox" id="pe-sign" ${p.includeSignature?'checked':''} style="width:17px;height:17px;flex-shrink:0">Ajouter une ligne de signature pour un parent</label>
+      <label style="display:flex;align-items:center;gap:9px;font-size:13.5px;margin-bottom:18px;cursor:pointer"><input type="checkbox" id="pe-blank" ${p.blankGrade?'checked':''} style="width:17px;height:17px;flex-shrink:0">Laisser un espace vierge pour noter à la main plutôt</label>
+      <div style="display:flex;gap:10px">
+        <button onclick="closeModal('print-essay-modal')" style="background:none;border:1.5px solid var(--border);color:var(--txt);border-radius:11px;padding:11px 18px;font:inherit;font-size:14px;font-weight:700;cursor:pointer">Annuler</button>
+        <button onclick="app._confirmPrintEssay()" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:11px;padding:11px;font:inherit;font-size:14px;font-weight:700;cursor:pointer">${ICONS.printer} Imprimer</button>
+      </div>`;
+  },
+
+  async _confirmPrintEssay(){
+    const school=document.getElementById('pe-school').value.trim();
+    const includeFeedback=document.getElementById('pe-feedback').checked;
+    const includeSignature=document.getElementById('pe-sign').checked;
+    const blankGrade=document.getElementById('pe-blank').checked;
+    this._savePrintPrefs({school,includeFeedback,includeSignature,blankGrade});
+    const t=this._printTarget;
+    closeModal('print-essay-modal');
+    if(t.mode==='single'){
+      const studentEl=document.getElementById('pe-student');
+      const studentName=(studentEl&&studentEl.value.trim())||t.data.submission.username;
+      this._openPrintDoc([this._essayPageHtml(t.data,{school,studentName,includeFeedback,includeSignature,blankGrade})]);
+    }else{
+      this._essayToast('Préparation de '+t.students.length+' copie(s)…');
+      const pages=[];
+      for(const st of t.students){
+        try{
+          const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'essay-detail',token:currentToken,assignmentId:t.assignmentId,studentId:st.studentId})});
+          const d=await r.json();
+          if(r.ok)pages.push(this._essayPageHtml(d,{school,studentName:d.submission.username,includeFeedback,includeSignature,blankGrade}));
+        }catch{}
+      }
+      if(!pages.length){this._essayToast('Impossible de charger les copies.');return;}
+      this._openPrintDoc(pages);
+    }
+  },
+
+  // Construit le HTML d'UNE page imprimable (une copie), réutilisé pour
+  // l'impression seule (1 page) et en lot (N pages, un saut de page entre
+  // chaque via la classe .pagebreak posée par _openPrintDoc).
+  _essayPageHtml(d,opts){
+    const esc=v=>String(v==null?'':v).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    const a=d.assignment,s=d.submission;
+    const fields=(d.fields||[]).map(f=>{
+      const v=s.content&&s.content[f.key];
+      if(!v||!String(v).trim())return '';
+      const label=(d.fields.length>1)?`<div class="f-label">${esc(f.label)}</div>`:'';
+      return `${label}<div class="p-essay">${esc(v)}</div>`;
+    }).join('');
+    let gradeSection='';
+    if(opts.blankGrade){
+      gradeSection=`<div class="p-blank-lines"><div class="g-label">Note et commentaire</div></div>`;
+    }else if(opts.includeFeedback&&(s.teacherGrade||s.teacherComment)){
+      gradeSection=`<div class="p-grade-box">
+        ${s.teacherGrade?`<div><div class="g-label">Note</div><div class="g-val">${esc(s.teacherGrade)}</div></div>`:''}
+        ${s.teacherComment?`<div class="g-comment"><b>Commentaire :</b> ${esc(s.teacherComment)}</div>`:''}
+      </div>`;
+    }
+    const signature=`<div class="p-signature"><div>Signature de l'enseignant·e</div>${opts.includeSignature?`<div>Signature d'un parent (optionnel)</div>`:'<div></div>'}</div>`;
+    return `
+      <div class="p-header">
+        <div>
+          <div class="p-school">${esc(opts.school||'')}</div>
+          <div class="p-eyebrow">Devoir de rédaction</div>
+        </div>
+        <div class="p-kp">Réalisé avec<br><b>KeyPace</b> · keypace.be</div>
+      </div>
+      <div class="p-meta">
+        <div><div class="l">Élève</div><div class="v">${esc(opts.studentName)}</div></div>
+        <div><div class="l">Date de remise</div><div class="v">${new Date(s.updatedAt).toLocaleDateString('fr-FR')}</div></div>
+      </div>
+      <div class="p-title">${esc(a.title)}</div>
+      ${a.essayBrief?`<div class="p-brief">Consigne : ${esc(a.essayBrief)}</div>`:''}
+      ${fields}
+      <div class="p-wordcount">${s.words} mots</div>
+      ${gradeSection}
+      ${signature}`;
+  },
+
+  // Ouvre le document imprimable dans un nouvel onglet (même pattern que
+  // exportClassPDF) : document HTML autonome, styles inlinés (n'hérite pas
+  // du <style> de l'app), impression déclenchée automatiquement.
+  _openPrintDoc(pages){
+    const style=`<style>
+      *{box-sizing:border-box}
+      body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#16140F;margin:0}
+      .page{padding:48px 56px;max-width:794px;margin:0 auto}
+      .page.pagebreak{page-break-after:always}
+      .p-header{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2.5px solid #16140F;padding-bottom:16px;margin-bottom:24px}
+      .p-school{font-size:19px;font-weight:800}
+      .p-eyebrow{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#FF4D2E;font-weight:700;margin-top:6px}
+      .p-kp{text-align:right;font-family:'Courier New',monospace;font-size:11px;color:#999}
+      .p-kp b{color:#FF4D2E}
+      .p-meta{display:flex;gap:32px;margin-bottom:22px;flex-wrap:wrap}
+      .p-meta .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:#999;font-family:'Courier New',monospace}
+      .p-meta .v{font-size:16px;font-weight:700;margin-top:2px}
+      .p-title{font-size:21px;font-weight:800;margin-bottom:6px}
+      .p-brief{font-size:13px;color:#666;font-style:italic;margin-bottom:20px}
+      .f-label{font-size:10.5px;font-weight:700;color:#999;letter-spacing:.05em;margin-bottom:6px;text-transform:uppercase}
+      .p-essay{font-size:14px;line-height:1.8;white-space:pre-wrap;margin-bottom:16px}
+      .p-wordcount{text-align:right;font-family:'Courier New',monospace;font-size:11px;color:#999;margin-bottom:24px}
+      .p-grade-box{border:2px solid #16140F;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;gap:22px;align-items:flex-start}
+      .p-grade-box .g-label{font-family:'Courier New',monospace;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:#999}
+      .p-grade-box .g-val{font-size:24px;font-weight:800;margin-top:2px}
+      .p-grade-box .g-comment{flex:1;font-size:13px;line-height:1.6;border-left:1.5px solid #E7E1D5;padding-left:18px}
+      .p-blank-lines{border:1.5px dashed #ccc;border-radius:10px;padding:14px 16px;margin-bottom:20px;min-height:90px}
+      .p-blank-lines .g-label{font-family:'Courier New',monospace;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:#999}
+      .p-signature{display:flex;justify-content:space-between;margin-top:36px;padding-top:14px}
+      .p-signature div{width:45%;border-top:1px solid #ccc;padding-top:6px;font-size:10.5px;color:#999;font-family:'Courier New',monospace}
+      @media print{.page{padding:0} .page.pagebreak{page-break-after:always}}
+    </style>`;
+    const html='<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Devoir de rédaction — impression</title>'+style+'</head><body>'
+      +pages.map((p,i)=>`<div class="page${i<pages.length-1?' pagebreak':''}">${p}</div>`).join('')
+      +'<script>window.onload=function(){window.print();}<\/script></body></html>';
+    const w=window.open('','_blank');
+    if(!w){alert('Autorise les fenêtres pop-up pour imprimer.');return;}
+    w.document.write(html);w.document.close();
   },
 
   _essayCopy(){
@@ -4437,7 +4777,7 @@ const app={
   startTimer(){if(this._timer)return;this._timer=setInterval(()=>{this.now=Date.now();if(this._isPlainTest())this._patchTest4a();else this._patchTypingStats();},150);},
   stopTimer(){if(this._timer){clearInterval(this._timer);this._timer=null;}},
 
-  keyMatches(key,ch){if(ch==null)return false;const low=ch.toLowerCase();if(key.l.toLowerCase()===low)return true;if(key.s&&key.s===ch)return true;return false;},
+  keyMatches(key,ch){if(ch==null)return false;const low=ch.toLowerCase();if(key.l.toLowerCase()===low)return true;if(key.s&&key.s===ch)return true;if(key.g&&key.g.toLowerCase()===low)return true;return false;},
   handleKey(e){
     // Ne jamais capturer la frappe quand l'utilisateur écrit dans un champ
     // (connexion/inscription, code promo, nom du certificat, recherche…) :
@@ -5528,7 +5868,7 @@ const app={
     const next=s&&!s.finished&&!vocal?s.text[s.idx]:null;
     let tbHTML='';
     if(s){let wbuf=[];const flush=()=>{if(wbuf.length){tbHTML+='<span style="white-space:nowrap">'+wbuf.join('')+'</span>';wbuf=[];}};s.text.split('').forEach((ch,i)=>{let cls='todo';if(i<s.idx)cls=s.typed[i]==='w'?'wrong':'ok';else if(i===s.idx)cls='cur';if(ch===' '){flush();tbHTML+=`<span class="ch ${cls}">&nbsp;</span>`;}else wbuf.push(`<span class="ch ${cls}">${ch}</span>`);});flush();}
-    const kbHTML=KB.map(row=>`<div class="kb-row-t">${row.map(k=>{const on=next!=null&&this.keyMatches(k,next);return`<div class="kb-key-t${on?' on':''}" data-l="${k.l.toLowerCase()}" data-s="${k.s||''}" data-finger="${FINGERS[k.f]||''}" style="border-bottom-color:${on?'rgba(0,0,0,0.2)':FINGERS[k.f]}">${k.l.toLowerCase()}${k.s?'<br><span style="font-size:9px;opacity:.6">'+k.s+'</span>':''}</div>`;}).join('')}</div>`).join('');
+    const kbHTML=KB.map(row=>`<div class="kb-row-t">${row.map(k=>{const on=next!=null&&this.keyMatches(k,next);const onAltGr=on&&k.g&&k.g.toLowerCase()===(next||'').toLowerCase()&&k.l.toLowerCase()!==(next||'').toLowerCase();return`<div class="kb-key-t${on?' on':''}" data-l="${k.l.toLowerCase()}" data-s="${k.s||''}" data-finger="${FINGERS[k.f]||''}" style="border-bottom-color:${on?'rgba(0,0,0,0.2)':FINGERS[k.f]}">${k.l.toLowerCase()}${k.s?'<br><span style="font-size:9px;opacity:.6">'+k.s+'</span>':''}${onAltGr?'<br><span style="font-size:8px;opacity:.7">'+kbModifierName()+'</span>':''}</div>`;}).join('')}</div>`).join('');
     document.getElementById(pageId).innerHTML=`<div class="typing-section">
       <div class="typing-header">
         <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br>':custom?'<button onclick="go(\'classes\')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Mes devoirs</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
@@ -9692,6 +10032,18 @@ const app={
         </div>
         <div style="font-size:12px;color:var(--muted);margin-top:8px">Musiques : ${[...new Set(TILES_SONGS.map(s=>s.artist))].join(', ')} (Pixabay Content License, usage libre)</div>
       </div>
+      <div class="settings-section" id="settings-keyboard-section">
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.keyboard}</span> Clavier</div>
+        <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+          <div class="settings-row-info">
+            <strong>Disposition AZERTY</strong>
+            <span>Le clavier affiché dans les leçons s'adapte à ton clavier physique. Choisis ta disposition.</span>
+          </div>
+          <div id="kb-layout-btns" style="display:flex;gap:8px;flex-wrap:wrap">
+            ${Object.keys(KB_LAYOUT_LABELS).map(id=>`<button class="settings-btn kb-layout-btn${getKbLayoutId()===id?' active':''}" data-kb-layout="${id}" onclick="app.setKbLayout('${id}')">${KB_LAYOUT_LABELS[id]}</button>`).join('')}
+          </div>
+        </div>
+      </div>
       <div class="settings-section">
         <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.user}</span> Profil</div>
         <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px">
@@ -9804,6 +10156,12 @@ const app={
       this._sourisAudio.muted=isMusicMuted();
       if(!isMusicMuted())this._sourisAudio.volume=0.35;
     }
+  },
+  setKbLayout(id){
+    if(!KB_LAYOUTS[id])return;
+    setKbLayoutId(id);
+    applyKbLayout(id);
+    document.querySelectorAll('.kb-layout-btn').forEach(b=>b.classList.toggle('active',b.dataset.kbLayout===id));
   },
   async openBillingPortal(btn){
     if(!currentToken)return;
@@ -12322,13 +12680,18 @@ if(currentUser){
   const _preRole=app.stats&&app.stats.role;
   app.stats=mergeStats(_preRole?{role:_preRole}:undefined);
   if(localStorage.getItem('klak_ob')!=='1')setTimeout(obOpen,600);
+  setTimeout(()=>app.checkReminders(),900);
 }
 app.init();
 {
   // Arrivée depuis un lien externe pointant vers une vue précise (?view=test|lessons|games|stats|home)
   const _vp=new URLSearchParams(location.search).get('view');
   const _validViews=['home','test','lessons','games','stats'];
-  go(_validViews.includes(_vp)?_vp:'test');
+  // Prof/établissement : atterrir sur son tableau de bord au rechargement de
+  // la page, pas sur la vue Test (même choix déjà fait dans loginUser() au
+  // premier login, manquant ici) — cette vue ne lui sert à rien puisque la
+  // nav Test/Cours/Jeux/Progrès est masquée pour ce rôle.
+  go(_validViews.includes(_vp)?_vp:(isTeacher()?'home':'test'));
 }
 updateNavUser();
 handlePaymentReturn();
