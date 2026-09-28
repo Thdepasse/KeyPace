@@ -821,7 +821,11 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .tuto-key-altgr{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;white-space:nowrap;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:5px;padding:1px 4px}
 .tuto-keys-info{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
 /* Aperçu clavier complet dans les réglages (disposition AZERTY + format physique) */
-.kb-full-preview{display:flex;gap:6px;align-items:flex-start;background:var(--light);border:1px solid var(--border);border-radius:14px;padding:10px;margin-top:2px;min-width:400px}
+/* align-items:stretch (pas flex-start) : .kf-side (nav+flèches) et
+   .kf-numpad doivent s'étirer sur toute la hauteur du clavier principal pour
+   que "margin-top:auto" sur .kf-arrows pousse bien les flèches en bas, au
+   niveau de la barre d'espace — sinon elles restent collées en haut. */
+.kb-full-preview{display:flex;gap:6px;align-items:stretch;background:var(--light);border:1px solid var(--border);border-radius:14px;padding:10px;margin-top:2px;min-width:400px}
 .kf-main{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
 .kf-row{display:flex;gap:3px}
 .kf-key{position:relative;height:22px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--txt);min-width:0;overflow:hidden;white-space:nowrap}
