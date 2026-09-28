@@ -1524,6 +1524,23 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .duel-wait{color:var(--muted)}
 .duel-opp-badge{display:inline-flex;align-items:center;gap:6px;background:#1FA97120;color:#1FA971;border-radius:8px;padding:6px 12px;font-size:14px;font-weight:700}
 
+/* Battle Royale */
+.royale-players{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0}
+.royale-player-chip{background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--txt)}
+.royale-progress{display:flex;gap:8px;justify-content:center;margin-bottom:4px}
+.royale-dot{width:10px;height:10px;border-radius:50%;background:var(--border)}
+.royale-dot.is-done{background:#1FA971}
+.royale-dot.is-current{background:var(--accent)}
+.royale-podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;margin:20px 0}
+.royale-podium-place{background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;text-align:center;min-width:100px}
+.royale-podium-place.place-1{padding-top:26px;border-color:var(--accent);box-shadow:0 8px 20px -8px var(--accent)}
+.royale-podium-place.place-2{margin-bottom:-10px}
+.royale-podium-place.place-3{margin-bottom:-18px}
+.royale-podium-name{font-weight:800;font-size:15px;margin-top:6px;color:var(--txt)}
+.royale-podium-pts{color:var(--muted);font-size:13px;margin-top:2px}
+.royale-rank-list{display:flex;flex-direction:column;gap:6px;max-width:340px;margin:0 auto}
+.royale-rank-row{display:flex;justify-content:space-between;gap:12px;padding:8px 14px;background:var(--bg);border-radius:10px;font-size:13px;color:var(--txt)}
+
 /* FOOTER */
 footer{border-top:1px solid var(--border);margin-top:10px}
 .footer-inner{max-width:1120px;margin:0 auto;padding:26px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:14px;color:#A39C8D}
@@ -4143,7 +4160,7 @@ const GCINE_GAMES=[
   {key:'simon',icon:'brain',name:'Simon des mots',desc:"Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.",expert:false,category:'memoire'},
   {key:'clavier',icon:'keyboard',name:'Clavier vide',desc:"Le clavier est totalement vide : replace chaque lettre au bon endroit, de mémoire. Chrono lancé, chaque erreur compte.",expert:false,category:'memoire'},
   {key:'duel',icon:'swords',name:'Duel 1v1',desc:"Défie un ami en temps réel sur le même texte. Partage un lien, comptez 3-2-1, et que le plus rapide gagne !",expert:false,category:'multi'},
-  {key:'royale',icon:'gamepad',name:'Battle Royale',desc:"Jusqu'à 50 joueurs, un seul texte, un seul survivant. Le mode multijoueur le plus ambitieux de KeyPace arrive bientôt.",expert:false,category:'multi',comingSoon:true},
+  {key:'royale',icon:'gamepad',name:'Battle Royale',desc:"Crée une partie, partage le code : 5 épreuves piochées au hasard parmi les jeux de KeyPace, un classement et un podium à la fin.",expert:false,category:'multi'},
 ];
 const GCINE_BOSS={key:'boss',icon:'trophy',name:'Boss de la semaine',desc:"Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !",expert:false};
 const CLAVIER_ROWS=['AZERTYUIOP'.split(''),'QSDFGHJKLM'.split(''),'WXCVBN'.split('')];
@@ -4182,8 +4199,8 @@ function gcineComputeLayout(){
 const GCINE_LAYOUT=gcineComputeLayout();
 
 const app={
-  view:'home',sess:null,stats:null,game:null,sprint:null,course:null,simon:null,boss:null,duel:null,clavier:null,activeGame:null,now:Date.now(),_gcineCat:'vitesse',_gcineVisible:null,_clavierFlashT:null,
-  _timer:null,_gameLoop:null,_sprintLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_onKey:null,_wid:0,_gameRec:false,_courseRec:false,
+  view:'home',sess:null,stats:null,game:null,sprint:null,course:null,simon:null,boss:null,duel:null,royale:null,clavier:null,activeGame:null,now:Date.now(),_gcineCat:'vitesse',_gcineVisible:null,_clavierFlashT:null,_royaleHistory:null,_royaleHistLoading:false,
+  _timer:null,_gameLoop:null,_sprintLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_royalePollTimer:null,_royaleSeq:0,_onKey:null,_wid:0,_gameRec:false,_courseRec:false,
   _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,_wgPromise:null,_stream:null,_video:null,_landmarker:null,_raf:null,_baseline:null,_baselineBuf:[],_smooth:null,_lastScore:null,_lastGazeOn:null,_calib:null,_sessionThreshold:null,samples:[],permError:null,_fixBaseline:null},
 
   init(){
@@ -4193,7 +4210,7 @@ const app={
     window.addEventListener('keydown',this._onKey);
   },
   stopAll(){
-    this.stopTimer();this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();
+    this.stopTimer();this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.royaleLeave();
     if(this._onKey){window.removeEventListener('keydown',this._onKey);this._onKey=null;}
     if(this._clavierFlashT){clearTimeout(this._clavierFlashT);this._clavierFlashT=null;}
     this.game=null;this.sess=null;this.sprint=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.clavier=null;this.souris=null;this.activeGame=null;
@@ -4381,6 +4398,14 @@ const app={
 
   // Échappement : le texte des élèves passe dans du innerHTML côté prof.
   _esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));},
+
+  // Libellé élève à afficher au prof : le nom réel en priorité (rempli à la
+  // création du compte par KeyPace/l'établissement, ex. quand l'identifiant
+  // est un matricule illisible), sinon le username. _studentSub renvoie le
+  // username en complément quand le nom réel est affiché — le prof garde
+  // toujours le vrai identifiant de connexion sous les yeux.
+  _studentPrimary(st){return this._esc((st&&st.fullName)||(st&&st.username)||'?');},
+  _studentSub(st){return st&&st.fullName?this._esc(st.username):'';},
 
   _essayCountWords(s){
     if(!s)return 0;
@@ -4645,7 +4670,7 @@ const app={
         <button onclick="this.closest('[style*=fixed]')._close()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
       </div>
       ${d.rows.map(row=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border)">
-        <div style="flex:1;font-size:13.5px;font-weight:600">${this._esc(row.username)}</div>
+        <div style="flex:1;font-size:13.5px;font-weight:600">${this._studentPrimary(row)}${this._studentSub(row)?` <span style="font-weight:500;color:var(--muted)">· ${this._studentSub(row)}</span>`:''}</div>
         ${row.wpm!=null?`<span style="font-size:12.5px;color:var(--muted)">${row.wpm} mpm</span>`:''}
         <span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;color:${row.done?'var(--success)':'var(--muted)'};background:${row.done?'rgba(31,169,113,.1)':'var(--light)'}">${row.done?'✓ fait':'pas encore'}</span>
         ${!row.done?`<button onclick="app._sendReminder(this,'${assignmentId}','${row.studentId}')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:3px 8px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap">🔔 Rappel</button>`:''}
@@ -4737,15 +4762,15 @@ const app={
         ${d.rows.map(r=>r.submitted?`
           <div onclick="app.viewEssayDetail('${a.id}','${r.studentId}')" style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background=''">
             <div style="flex:1;min-width:0">
-              <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">${this._esc(r.username)}${r.hasFeedback?'<span style="font-size:10.5px;font-weight:700;color:var(--success);background:rgba(31,169,113,.1);padding:1px 7px;border-radius:99px">✓ noté</span>':''}</div>
-              <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${r.words} mots · ${new Date(r.updatedAt).toLocaleDateString('fr-FR')}</div>
+              <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">${this._studentPrimary(r)}${r.hasFeedback?'<span style="font-size:10.5px;font-weight:700;color:var(--success);background:rgba(31,169,113,.1);padding:1px 7px;border-radius:99px">✓ noté</span>':''}</div>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${this._studentSub(r)?this._studentSub(r)+' · ':''}${r.words} mots · ${new Date(r.updatedAt).toLocaleDateString('fr-FR')}</div>
             </div>
             ${badge(r)}
             <div onclick="event.stopPropagation();app.printEssayFromList('${a.id}','${r.studentId}')" title="Imprimer cette copie" style="width:32px;height:32px;border-radius:9px;border:1.5px solid var(--border);background:#fff;display:grid;place-items:center;color:var(--muted);flex-shrink:0" onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">${ICONS.printer}</div>
             <div style="color:var(--muted);font-size:14px">›</div>
           </div>`:`
           <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);opacity:.55">
-            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${this._esc(r.username)}</div><div style="font-size:11.5px;color:var(--muted);margin-top:2px">Pas encore rendu</div></div>
+            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">${this._studentPrimary(r)}</div><div style="font-size:11.5px;color:var(--muted);margin-top:2px">${this._studentSub(r)?this._studentSub(r)+' · ':''}Pas encore rendu</div></div>
           </div>`).join('')}
       </div>
     </div>`;
@@ -4770,8 +4795,8 @@ const app={
       :{c:'#1FA971',bg:'rgba(31,169,113,.08)',t:'Écriture cohérente'};
     ov.innerHTML=`<div style="max-width:820px;margin:0 auto;padding:28px 20px 80px">
       <button onclick="app.viewEssays('${assignmentId}')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 16px;display:flex;align-items:center;gap:5px">‹ Toutes les copies</button>
-      <h1 style="margin:0 0 4px;font-size:22px;letter-spacing:-.01em">${this._esc(s.username)}</h1>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:20px">${this._esc(a.title)} · ${s.words} mots · rendu le ${new Date(s.updatedAt).toLocaleString('fr-FR')}</div>
+      <h1 style="margin:0 0 4px;font-size:22px;letter-spacing:-.01em">${this._studentPrimary(s)}</h1>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:20px">${this._studentSub(s)?this._studentSub(s)+' · ':''}${this._esc(a.title)} · ${s.words} mots · rendu le ${new Date(s.updatedAt).toLocaleString('fr-FR')}</div>
 
       <div style="background:${tone.bg};border:1px solid ${tone.c}33;border-radius:14px;padding:14px 16px;margin-bottom:22px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:${sig.flags.length?'10px':'0'}">
@@ -5076,6 +5101,7 @@ const app={
   exitActiveGame(){
     this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();
     if(this.duel)this.duelLeave();
+    if(this.royale)this.royaleLeave();
     if(this._clavierFlashT){clearTimeout(this._clavierFlashT);this._clavierFlashT=null;}
     this.activeGame=null;this.game=null;this.sprint=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.clavier=null;this.souris=null;
     this.renderGames();
@@ -5282,6 +5308,7 @@ const app={
     if(g.over&&!this._gameRec){this._gameRec=true;this.stopGame();this.afterGameOver(g.score);}
   },
   afterGameOver(score){
+    if(this.royale&&this.royale.phase==='playing'){this._royaleRoundFinished(score);return;}
     try{track('game_completed',{game:'frappe',score});}catch{}
     // Flag posé AVANT d'écraser gameBest (même bug que Sprint à l'origine :
     // comparé après mutation, "Nouveau record" ne s'affichait jamais).
@@ -5331,7 +5358,7 @@ const app={
     if(v==='classes'&&currentUser&&!isTeacher()&&!currentInstitutionName&&!currentHasClass)v='stats';
     this.view=v;
     maybeConvNudge(v);
-    if(v!=='games'){this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.activeGame=null;this._gcineTeardown();}
+    if(v!=='games'){this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.royaleLeave();this.activeGame=null;this._gcineTeardown();}
     // Sans ça, le poll 25s de viewClass() continuait après avoir quitté la vue
     // "classes" par un onglet de nav (au lieu du bouton ← Retour), et renvoyait
     // de force l'utilisateur vers la liste des classes à chaque tick.
@@ -5515,8 +5542,9 @@ const app={
     this.renderCurrent();
   },
   afterSprint(){
-    if(!currentUser||!this.stats)return;
     const s=this.sprint;
+    if(this.royale&&this.royale.phase==='playing'){this._royaleRoundFinished(Math.round((s.correct/5)/0.5));return;}
+    if(!currentUser||!this.stats)return;
     const wpm=Math.round((s.correct/5)/0.5);
     try{track('game_completed',{game:'sprint',wpm});}catch{}
     // Le flag record doit être posé AVANT d'écraser sprintBest : calculé après
@@ -8821,6 +8849,7 @@ const app={
     if(this.activeGame==='simon'){this.renderSimon();return;}
     if(this.activeGame==='boss'){this.renderBoss();return;}
     if(this.activeGame==='duel'){this.renderDuel();return;}
+    if(this.activeGame==='royale'){this.renderRoyale();return;}
     if(SOURIS_GAMES.includes(this.activeGame)){this.renderSouris();return;}
     if(this.activeGame==='clavier'){this.renderClavier();return;}
     // selector
@@ -9104,6 +9133,7 @@ const app={
     // activeGame/l'état du nouveau jeu qui va être posé juste après.
     this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();
     if(this.duel)this.duelLeave();
+    if(this.royale)this.royaleLeave();
     if(this._clavierFlashT){clearTimeout(this._clavierFlashT);this._clavierFlashT=null;}
     if(which==='sprint'){
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('sprint'));return;}
@@ -9140,8 +9170,8 @@ const app={
       if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('clavier'));return;}
       this.activeGame='clavier';this.clavier=null;this.renderGames();
     } else if(which==='royale'){
-      // Bientôt disponible — carte désactivée dans l'UI, garde défensive ici.
-      return;
+      if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectGame('royale'));return;}
+      this.activeGame='royale';this.royale={phase:'menu'};this.renderGames();
     } else {
       this.activeGame='frappe';this.game=null;this.renderGames();
     }
@@ -9284,6 +9314,7 @@ const app={
     const c=this.course;
     const mins=Math.max((c.endTime-c.startTime)/60000,1/600);
     const wpm=Math.round((c.text.length/5)/mins);
+    if(this.royale&&this.royale.phase==='playing'){this._royaleRoundFinished(wpm);return;}
     const acc=c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     c._wpm=wpm;c._acc=acc;c._isRecord=false;
     try{track('game_completed',{game:'course',wpm,acc,rank:c.rank});}catch{}
@@ -9433,6 +9464,7 @@ const app={
     const c=this.ghost;
     const mins=Math.max((c.endTime-c.startTime)/60000,1/600);
     const wpm=Math.round((c.text.length/5)/mins);
+    if(this.royale&&this.royale.phase==='playing'){this._royaleRoundFinished(wpm);return;}
     const acc=c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     c._wpm=wpm;c._acc=acc;c._isRecord=false;c._isFirst=false;
     try{track('game_completed',{game:'ghost',wpm,acc,won:c.won});}catch{}
@@ -9582,7 +9614,9 @@ const app={
     this.renderCurrent();
   },
   afterSimon(){
-    const s=this.simon;s._isRecord=false;
+    const s=this.simon;
+    if(this.royale&&this.royale.phase==='playing'){this._royaleRoundFinished(s.score);return;}
+    s._isRecord=false;
     try{track('game_completed',{game:'simon',score:s.score,maxSeq:s.maxSeq});}catch{}
     if(currentUser&&this.stats){
       const b=this.stats.simonBest;
@@ -10288,6 +10322,239 @@ const app={
           </div>
         </div>
       </div>`;
+    }
+    document.getElementById('page-games').innerHTML=`<div class="games-section">${head}<div style="max-width:760px;margin:0 auto;padding:0 24px">${body}</div></div>`;
+  },
+
+  /* ── BATTLE ROYALE (N joueurs, 5 épreuves piochées parmi les jeux existants) ──
+     Contrairement au Duel (canal Realtime Supabase), la synchronisation entre
+     joueurs se fait par polling REST toutes les 2s (royale-state) : plus simple
+     et plus robuste qu'un canal par partie pour un nombre de joueurs variable,
+     au prix d'un léger délai de transition entre les manches — acceptable pour
+     cette v1. L'avancée de manche elle-même est arbitrée par le serveur
+     (royale-round-finish), jamais par le client. */
+  _royaleGameLabel(key){return (GCINE_GAMES.find(g=>g.key===key)||{}).name||key;},
+  royaleLeave(){
+    this._royaleSeq=(this._royaleSeq||0)+1;
+    this._royaleStopPoll();
+    this._royaleStopAllMiniGames();
+    this.royale=null;
+  },
+  _royaleStopAllMiniGames(){
+    this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();
+  },
+  async royaleCreate(){
+    const seq=(this._royaleSeq=(this._royaleSeq||0)+1);
+    this.royale={phase:'creating'};this.renderCurrent();
+    try{
+      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'royale-create',token:currentToken})}).then(r=>r.json());
+      if(seq!==this._royaleSeq)return;
+      if(r.error){this.royale={phase:'menu',_error:r.error};this.renderCurrent();return;}
+      this.royale={phase:'lobby',sessionId:r.sessionId,joinCode:r.joinCode,role:'host',players:r.players||[],error:null};
+      this.renderCurrent();
+      this._royaleStartPoll();
+    }catch{if(seq===this._royaleSeq){this.royale={phase:'menu',_error:'Erreur réseau.'};this.renderCurrent();}}
+  },
+  async royaleJoinByCode(code){
+    if(!code||code.trim().length<6){this.royale={phase:'menu',_codeError:'Saisis un code à 6 caractères.'};this.renderCurrent();return;}
+    const seq=(this._royaleSeq=(this._royaleSeq||0)+1);
+    this.activeGame='royale';this.royale={phase:'creating'};this.renderCurrent();
+    try{
+      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'royale-join-code',token:currentToken,code:code.trim().toUpperCase()})}).then(r=>r.json());
+      if(seq!==this._royaleSeq)return;
+      if(r.error){this.royale={phase:'menu',_codeError:r.error};this.renderCurrent();return;}
+      this.royale={phase:'lobby',sessionId:r.sessionId,joinCode:r.joinCode,role:r.role,players:r.players||[],error:null};
+      this.renderCurrent();
+      this._royaleStartPoll();
+    }catch{if(seq===this._royaleSeq){this.royale={phase:'menu',_codeError:'Erreur réseau.'};this.renderCurrent();}}
+  },
+  royaleCopyCode(){
+    const r=this.royale;if(!r||!r.joinCode)return;
+    const done=()=>{if(this.royale){this.royale._codeCopied=true;this.renderCurrent();setTimeout(()=>{if(this.royale)this.royale._codeCopied=false;this.renderCurrent();},2000);}};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(r.joinCode).then(done,done);else done();
+  },
+  async royaleStart(){
+    const r=this.royale;if(!r||r.role!=='host'||r.phase!=='lobby')return;
+    try{
+      const res=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'royale-start',token:currentToken,sessionId:r.sessionId})}).then(x=>x.json());
+      if(this.royale!==r)return;
+      if(res.error){r.error=res.error;this.renderCurrent();return;}
+      this._royaleStopPoll();
+      r.roundGameKeys=res.roundGameKeys;
+      this._royaleBeginRound(res.roundIndex);
+    }catch{r.error='Erreur réseau.';this.renderCurrent();}
+  },
+  _royaleBeginRound(idx){
+    const r=this.royale;if(!r)return;
+    r.roundIndex=idx;r.phase='playing';r.finishedCount=0;r.error=null;r.myScore=null;
+    const key=r.roundGameKeys[idx];
+    this._royaleStopAllMiniGames();
+    this.activeGame=key;
+    if(key==='frappe'){this.game=null;this.startGame();}
+    else if(key==='sprint'){this.sprint=null;this.startSprint();}
+    else if(key==='course'){this.course=null;this.startCourse();}
+    else if(key==='ghost'){this.ghost=null;this.startGhost();}
+    else if(key==='simon'){this.simon=null;this.startSimon();}
+    else{this.activeGame='royale';r.phase='round-wait';this.renderCurrent();}
+  },
+  async _royaleRoundFinished(score){
+    const r=this.royale;if(!r)return;
+    const seq=this._royaleSeq;
+    this._royaleStopAllMiniGames();
+    r.phase='round-wait';r.myScore=Math.round(score)||0;
+    this.activeGame='royale';
+    this.renderCurrent();
+    try{
+      const res=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'royale-round-finish',token:currentToken,sessionId:r.sessionId,roundIndex:r.roundIndex,score:r.myScore})}).then(x=>x.json());
+      if(seq!==this._royaleSeq)return;
+      if(res.error){r.error=res.error;this.renderCurrent();return;}
+      r.finishedCount=res.finishedCount;r.totalPlayers=res.totalPlayers;
+      if(res.advanced){
+        if(res.sessionStatus==='done')this._royaleShowFinal();
+        else this._royaleBeginRound(res.newRoundIndex);
+      }else{
+        this.renderCurrent();
+        this._royaleStartPoll();
+      }
+    }catch{if(seq===this._royaleSeq)this._royaleStartPoll();}
+  },
+  _royaleStartPoll(){
+    this._royaleStopPoll();
+    this._royalePollTimer=setInterval(()=>this._royalePollTick(),2000);
+  },
+  _royaleStopPoll(){if(this._royalePollTimer){clearInterval(this._royalePollTimer);this._royalePollTimer=null;}},
+  async _royalePollTick(){
+    const r=this.royale;if(!r||!r.sessionId||(r.phase!=='lobby'&&r.phase!=='round-wait'))return;
+    const seq=this._royaleSeq;
+    try{
+      const s=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'royale-state',token:currentToken,sessionId:r.sessionId})}).then(x=>x.json());
+      if(seq!==this._royaleSeq||this.royale!==r)return;
+      if(s.error){r.error=s.error;this._royaleStopPoll();this.renderCurrent();return;}
+      r.players=s.players;r.totalPlayers=s.players.length;
+      if(r.phase==='lobby'){
+        this.renderCurrent();
+        if(s.status==='playing'){this._royaleStopPoll();r.roundGameKeys=s.roundGameKeys;this._royaleBeginRound(s.roundIndex);}
+      }else if(r.phase==='round-wait'){
+        r.finishedCount=s.roundFinishedCount;
+        this.renderCurrent();
+        if(s.status==='done'){this._royaleStopPoll();this._royaleShowFinal();}
+        else if(Number(s.roundIndex)>Number(r.roundIndex)){this._royaleStopPoll();r.roundGameKeys=s.roundGameKeys;this._royaleBeginRound(s.roundIndex);}
+      }
+    }catch{}
+  },
+  async royaleForceAdvance(){
+    const r=this.royale;if(!r||r.role!=='host'||r.phase!=='round-wait')return;
+    try{
+      const res=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'royale-force-advance',token:currentToken,sessionId:r.sessionId})}).then(x=>x.json());
+      if(this.royale!==r)return;
+      if(res.error){r.error=res.error;this.renderCurrent();return;}
+      this._royaleStopPoll();
+      if(res.sessionStatus==='done')this._royaleShowFinal();
+      else this._royaleBeginRound(res.newRoundIndex);
+    }catch{r.error='Erreur réseau.';this.renderCurrent();}
+  },
+  async _royaleShowFinal(){
+    const r=this.royale;if(!r)return;
+    r.phase='final';r.finalLoading=true;this.activeGame='royale';
+    this.renderCurrent();
+    try{
+      const res=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'royale-final',token:currentToken,sessionId:r.sessionId})}).then(x=>x.json());
+      if(this.royale!==r)return;
+      r.finalLoading=false;r.ranking=res.ranking||[];
+      this.renderCurrent();
+    }catch{if(this.royale===r){r.finalLoading=false;r.error='Erreur réseau.';this.renderCurrent();}}
+  },
+  renderRoyale(){
+    const r=this.royale;
+    const head=this._gameHeader('Battle Royale',ICONS.gamepad);
+    let body='';
+    if(!r||r.phase==='menu'){
+      const codeErr=r&&r._codeError?r._codeError:'';
+      const genErr=r&&r._error?r._error:'';
+      body=`<div class="boss-card">
+        <div style="text-align:center;margin-bottom:24px">
+          <div style="font-size:44px;margin-bottom:8px">🎮</div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;margin-bottom:6px">Battle Royale</h2>
+          <p style="color:var(--muted);font-size:14px;line-height:1.6">5 épreuves aléatoires parmi les jeux de KeyPace. Classement et podium à la fin !</p>
+          ${genErr?`<p style="color:var(--danger);font-size:13px;margin-top:10px">${genErr}</p>`:''}
+        </div>
+        <div class="duel-menu-grid">
+          <div class="duel-card">
+            <div class="duel-card-icon">🚀</div>
+            <h3>Créer une partie</h3>
+            <p>Génère un code à partager à tes adversaires</p>
+            <button class="btn-primary" style="width:100%;margin-top:4px" onclick="app.royaleCreate()">Créer ▸</button>
+          </div>
+          <div class="duel-card">
+            <div class="duel-card-icon">🔑</div>
+            <h3>Rejoindre</h3>
+            <p>Entre le code reçu pour rejoindre la partie</p>
+            <div class="duel-code-input-wrap" style="margin-top:4px">
+              <input class="duel-code-input${codeErr?' error':''}" id="royale-code-field" maxlength="6" placeholder="ABC123" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" onkeydown="if(event.key==='Enter')app.royaleJoinByCode(document.getElementById('royale-code-field').value)">
+              <div class="duel-code-error">${codeErr}</div>
+              <button class="btn-primary" style="width:100%" onclick="app.royaleJoinByCode(document.getElementById('royale-code-field').value)">Rejoindre ▸</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }else if(r.phase==='creating'){
+      body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Connexion à la partie…</div></div>`;
+    }else if(r.phase==='lobby'){
+      const players=r.players||[];
+      const chips=players.map(p=>`<div class="royale-player-chip">🟢 ${p.label||'Joueur'}</div>`).join('');
+      const canStart=r.role==='host'&&players.length>=2;
+      body=`<div class="boss-card" style="text-align:center">
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;margin-bottom:4px">Salle d'attente</h2>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:16px">${r.role==='host'?'Donne ce code aux autres joueurs :':'Code de la partie :'}</p>
+        <div class="duel-code-display" onclick="app.royaleCopyCode()">${r.joinCode||'------'}</div>
+        <div class="duel-code-copied">${r._codeCopied?'Code copié ✓':''}</div>
+        <div class="royale-players">${chips}</div>
+        <p style="color:var(--muted);font-size:13px;margin-top:6px">${players.length} joueur${players.length>1?'s':''} dans la salle${players.length<2?' · encore 1 joueur minimum pour lancer':''}</p>
+        ${r.role==='host'
+          ?`<button class="btn-primary" style="margin-top:14px;${canStart?'':'opacity:.5;cursor:default'}" ${canStart?'onclick="app.royaleStart()"':'disabled'}>Lancer la partie ▸</button>`
+          :`<div class="duel-status" style="margin-top:14px"><span class="duel-wait">● En attente du lancement par l'hôte…</span></div>`}
+        ${r.error?`<p style="color:var(--danger);font-size:13px;margin-top:10px">${r.error}</p>`:''}
+        <div style="margin-top:14px"><button class="res-btn sec" style="flex:none;padding:10px 24px" onclick="app.royaleLeave();app.exitActiveGame()">← Quitter</button></div>
+      </div>`;
+    }else if(r.phase==='round-wait'){
+      const total=r.totalPlayers||(r.players||[]).length||1;
+      const done=r.finishedCount||0;
+      const dots=(r.roundGameKeys||[]).map((k,i)=>`<span class="royale-dot${i<r.roundIndex?' is-done':''}${i===r.roundIndex?' is-current':''}"></span>`).join('');
+      body=`<div class="boss-card" style="text-align:center">
+        <div class="royale-progress">${dots}</div>
+        <div style="font-size:40px;margin:8px 0">⏳</div>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;margin-bottom:6px">Épreuve ${r.roundIndex+1}/5 terminée</h2>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:14px">${this._royaleGameLabel(r.roundGameKeys[r.roundIndex])} · ton score : <b style="color:#fff">${r.myScore!=null?r.myScore:'—'}</b></p>
+        <div class="duel-status"><span class="duel-wait">● En attente des autres joueurs… (${done}/${total})</span></div>
+        ${r.role==='host'?`<button class="res-btn sec" style="flex:none;padding:10px 24px;margin-top:12px" onclick="app.royaleForceAdvance()">Passer à la suite sans attendre</button>`:''}
+        ${r.error?`<p style="color:var(--danger);font-size:13px;margin-top:10px">${r.error}</p>`:''}
+      </div>`;
+    }else if(r.phase==='final'){
+      if(r.finalLoading){
+        body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Calcul du classement…</div></div>`;
+      }else{
+        const ranking=r.ranking||[];
+        const podium=ranking.slice(0,3);
+        const medals=['🥇','🥈','🥉'];
+        const podiumOrder=[1,0,2].filter(i=>podium[i]); // 2e-1er-3e visuellement
+        const podiumHTML=`<div class="royale-podium">${podiumOrder.map(i=>`
+          <div class="royale-podium-place place-${i+1}">
+            <div style="font-size:28px">${medals[i]}</div>
+            <div class="royale-podium-name">${podium[i].label||'Joueur'}</div>
+            <div class="royale-podium-pts">${podium[i].totalPoints} pts</div>
+          </div>`).join('')}</div>`;
+        const restHTML=ranking.slice(3).map((p,i)=>`
+          <div class="royale-rank-row"><span>#${i+4}</span><span>${p.label||'Joueur'}</span><span>${p.totalPoints} pts</span></div>`).join('');
+        body=`<div class="boss-card" style="text-align:center">
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:14px">🏁 Résultats de la partie</h2>
+          ${podiumHTML}
+          ${restHTML?`<div class="royale-rank-list">${restHTML}</div>`:''}
+          <div style="display:flex;gap:12px;justify-content:center;margin-top:20px">
+            <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="app.royaleLeave();app.activeGame='royale';app.royale={phase:'menu'};app.renderGames()">Nouvelle partie</button>
+            <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="app.exitActiveGame()">← Jeux</button>
+          </div>
+        </div>`;
+      }
     }
     document.getElementById('page-games').innerHTML=`<div class="games-section">${head}<div style="max-width:760px;margin:0 auto;padding:0 24px">${body}</div></div>`;
   },
@@ -11673,6 +11940,7 @@ const app={
             ${inst.licenseExpiresAt?`<span${soon?` style="color:var(--warning);font-weight:700"`:''}>Licence jusqu'au ${new Date(inst.licenseExpiresAt).toLocaleDateString('fr-FR')}</span>`:''}
           </div>`;
         })():''}
+        ${this._royaleHistoryPanelHTML()}
         ${classes.length===0?`
           <div style="text-align:center;padding:80px 20px;color:var(--muted)">
             <div style="font-size:52px;margin-bottom:16px;color:var(--accent)">${ICONS.school}</div>
@@ -11702,6 +11970,43 @@ const app={
           }).join('')}
         </div>`}
       </div></div>`;
+  },
+
+  // Historique des parties Battle Royale lancées par ce prof (host_is_teacher
+  // côté serveur) — chargé une fois, mis en cache, ré-affiché en re-render
+  // de renderClasses() une fois la réponse arrivée.
+  _royaleHistoryPanelHTML(){
+    if(this._royaleHistory==null){
+      if(!this._royaleHistLoading)this.loadRoyaleHistory();
+      return '';
+    }
+    if(!this._royaleHistory.length)return '';
+    const rows=this._royaleHistory.slice(0,8).map(s=>{
+      const date=new Date(s.createdAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border-radius:10px;font-size:13px;cursor:pointer" onclick="app.viewRoyaleHistoryDetail('${s.sessionId}')">
+        <span>${date}</span><span style="color:var(--muted)">${s.playerCount} joueur${s.playerCount!==1?'s':''}</span><span style="color:var(--accent);font-weight:700">Voir le classement →</span>
+      </div>`;
+    }).join('');
+    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:20px">
+      <div style="font-weight:800;font-size:15px;margin-bottom:10px">🎮 Historique Battle Royale</div>
+      <div style="display:flex;flex-direction:column;gap:6px">${rows}</div>
+    </div>`;
+  },
+  async loadRoyaleHistory(){
+    if(this._royaleHistLoading)return;
+    this._royaleHistLoading=true;
+    try{
+      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'royale-teacher-sessions',token:currentToken})}).then(x=>x.json());
+      this._royaleHistory=r.sessions||[];
+    }catch{this._royaleHistory=[];}
+    this._royaleHistLoading=false;
+    if(this.view==='classes')this.renderClasses();
+  },
+  viewRoyaleHistoryDetail(sessionId){
+    this.royale={phase:'final',sessionId,finalLoading:true,ranking:[]};
+    this.activeGame='royale';
+    go('games');
+    this._royaleShowFinal();
   },
 
   async createClass(){
@@ -11919,7 +12224,7 @@ const app={
               const last=st.daysSinceActive==null?'jamais':st.daysSinceActive===0?"aujourd'hui":st.daysSinceActive===1?'hier':'il y a '+st.daysSinceActive+' j';
               const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'var(--warning)':'var(--muted)';
               return`<div onclick="app.viewStudent('${d.id}','${st.studentId}')" style="display:grid;grid-template-columns:1fr 90px 90px 70px 60px 120px 16px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
-                <div><div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">${st.username}${st.alertStuck?`<span style="font-size:10.5px;font-weight:700;color:var(--danger);background:rgba(229,72,77,0.1);padding:1px 7px;border-radius:99px">⚠ bloqué</span>`:st.alertInactive?`<span style="font-size:10.5px;font-weight:700;color:var(--warning);background:rgba(229,114,43,0.1);padding:1px 7px;border-radius:99px">⚠ inactif</span>`:''}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${st.clearedLessons} leçon${st.clearedLessons!==1?'s':''} validée${st.clearedLessons!==1?'s':''}</div></div>
+                <div><div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">${this._studentPrimary(st)}${st.alertStuck?`<span style="font-size:10.5px;font-weight:700;color:var(--danger);background:rgba(229,72,77,0.1);padding:1px 7px;border-radius:99px">⚠ bloqué</span>`:st.alertInactive?`<span style="font-size:10.5px;font-weight:700;color:var(--warning);background:rgba(229,114,43,0.1);padding:1px 7px;border-radius:99px">⚠ inactif</span>`:''}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${this._studentSub(st)?this._studentSub(st)+' · ':''}${st.clearedLessons} leçon${st.clearedLessons!==1?'s':''} validée${st.clearedLessons!==1?'s':''}</div></div>
                 <div style="text-align:center;font-size:16px;font-weight:800;color:${wpmColor}">${st.avgWpm!=null?st.avgWpm:'-'}</div>
                 <div style="text-align:center;font-size:16px;font-weight:800;color:${accColor}">${st.avgAcc!=null?st.avgAcc+'%':'-'}</div>
                 <div style="text-align:center;font-size:14px;color:var(--muted);font-weight:600">${st.sessions||'-'}</div>
@@ -12312,9 +12617,9 @@ const app={
 
   exportClassCSV(){
     const d=this._classDetail;if(!d||!(d.students||[]).length)return;
-    const rows=[['Élève','Vitesse moy (mpm)','Précision moy (%)','Tests','Leçons validées','Inactivité (jours)','Inscrit le']];
+    const rows=[['Nom','Identifiant','Vitesse moy (mpm)','Précision moy (%)','Tests','Leçons validées','Inactivité (jours)','Inscrit le']];
     d.students.forEach(s=>{
-      rows.push([s.username, s.avgWpm==null?'':s.avgWpm, s.avgAcc==null?'':s.avgAcc, s.sessions||0, s.clearedLessons||0, s.daysSinceActive==null?'':s.daysSinceActive, s.joinedAt?new Date(s.joinedAt).toLocaleDateString('fr-FR'):'']);
+      rows.push([s.fullName||'', s.username, s.avgWpm==null?'':s.avgWpm, s.avgAcc==null?'':s.avgAcc, s.sessions||0, s.clearedLessons||0, s.daysSinceActive==null?'':s.daysSinceActive, s.joinedAt?new Date(s.joinedAt).toLocaleDateString('fr-FR'):'']);
     });
     const csv=rows.map(r=>r.map(c=>{const v=String(c);return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(';')).join('\r\n');
     const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
@@ -12331,7 +12636,8 @@ const app={
     const esc=v=>String(v==null?'':v).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
     const rowsHtml=d.students.map(s=>{
       const last=s.daysSinceActive==null?'jamais':s.daysSinceActive===0?"aujourd'hui":s.daysSinceActive+' j';
-      return`<tr><td>${esc(s.username)}</td><td class="n">${s.avgWpm==null?'-':s.avgWpm}</td><td class="n">${s.avgAcc==null?'-':s.avgAcc+'%'}</td><td class="n">${s.sessions||0}</td><td class="n">${s.clearedLessons||0}</td><td class="n">${last}</td></tr>`;
+      const label=s.fullName?esc(s.fullName)+' <span style="color:#8A8275;font-size:11px">('+esc(s.username)+')</span>':esc(s.username);
+      return`<tr><td>${label}</td><td class="n">${s.avgWpm==null?'-':s.avgWpm}</td><td class="n">${s.avgAcc==null?'-':s.avgAcc+'%'}</td><td class="n">${s.sessions||0}</td><td class="n">${s.clearedLessons||0}</td><td class="n">${last}</td></tr>`;
     }).join('');
     const html='<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>KeyPace · '+esc(d.name)+'</title>'
       +'<style>*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#16140F;padding:36px;margin:0}'
@@ -12430,8 +12736,8 @@ const app={
     document.getElementById(pageId).innerHTML=`<div class="stats-section">
       <div class="stats-header" style="padding-bottom:24px">
         <button onclick="app.viewClass('${d.classId}')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Retour à la classe</button>
-        <h1 style="margin-bottom:4px">${d.username}</h1>
-        <p style="margin:0">Inscrit le ${d.joinedAt?new Date(d.joinedAt).toLocaleDateString('fr-FR'):'-'} · dernière activité : ${last}</p>
+        <h1 style="margin-bottom:4px">${this._studentPrimary(d)}</h1>
+        <p style="margin:0">${this._studentSub(d)?this._studentSub(d)+' · ':''}Inscrit le ${d.joinedAt?new Date(d.joinedAt).toLocaleDateString('fr-FR'):'-'} · dernière activité : ${last}</p>
         ${isAdmin()?`<button onclick="app.adminDeleteStudent('${d.studentId}')" style="margin-top:12px;background:none;border:1px solid var(--danger);color:var(--danger);border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Supprimer cet élève (RGPD)</button>`:`<button onclick="app.removeStudentFromClass('${d.classId}','${d.studentId}','${this._esc(d.username).replace(/'/g,"\\'")}')" style="margin-top:12px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Retirer de la classe</button>`}
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">

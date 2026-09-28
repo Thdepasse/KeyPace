@@ -62,7 +62,7 @@ function sessionOkFilter() { return `or=(session_expires_at.is.null,session_expi
 
 async function userFromToken(token) {
   if (!token) return null;
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&${sessionOkFilter()}&select=id,username,display_name,plan`);
+  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&${sessionOkFilter()}&select=id,username,display_name,plan,role`);
   return (r.data && r.data[0]) || null;
 }
 
