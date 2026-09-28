@@ -929,6 +929,8 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 @keyframes blobFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-14px) scale(1.05)}}
 .stageD1-mascot{position:relative;z-index:2;flex-shrink:0;height:220px;width:auto;filter:drop-shadow(0 18px 22px rgba(0,0,0,.28));animation:mascotPop .5s cubic-bezier(.2,.9,.25,1.2)}
 @keyframes mascotPop{from{opacity:0;transform:translateY(18px) scale(.92)}to{opacity:1;transform:none}}
+.stageD1-ground{position:absolute;z-index:1;left:6%;right:46%;bottom:28px;height:34px;background:radial-gradient(closest-side,rgba(0,0,0,.28),transparent 75%);filter:blur(3px)}
+@media(max-width:640px){.stageD1-ground{left:20%;right:20%;bottom:14px}}
 .stageD1-body{position:relative;z-index:2;min-width:0;animation:bodyIn .45s ease .05s both}
 @keyframes bodyIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .stageD1-cat{display:inline-flex;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:rgba(255,255,255,.22);padding:4px 11px;border-radius:20px;margin-bottom:12px}
@@ -3943,7 +3945,7 @@ const MOD_COLORS=['#EE6B5E','#F4A04C','#D9A60C','#5BA84A','#3FA6B2','#6E8BE8','#
 
 /* Page Cours : sélecteur de modules (hub) affiché avant la liste de leçons */
 const HUB_MODULES=[
-  {id:'bases', color:'#FF4D2E', grad:'linear-gradient(135deg,#FF8A5C 0%,#FF4D2E 55%,#E8391D 100%)', icon:'⌨️', img:'/images/keypace-mascot-bureau-complet.webp',
+  {id:'bases', color:'#FF4D2E', grad:'linear-gradient(135deg,#FF8A5C 0%,#FF4D2E 55%,#E8391D 100%)', icon:'⌨️', img:'/images/keypace-mascot-bureau-complet.webp', groundShadow:true,
     cat:'Découverte', title:'La base de la dactylographie',
     desc:"De la rangée de base (Q, S, D, F…) jusqu'aux accents, chiffres et symboles : 65 leçons progressives pour taper sans regarder le clavier.",
     status:'live', statusTxt:'Disponible', cta:'Commencer →',
@@ -3994,6 +3996,7 @@ function hubDecorHTML(mod){
 }
 function hubStageHTML(mod){
   return`<div class="stageD1-blob b1"></div><div class="stageD1-blob b2"></div>${hubDecorHTML(mod)}
+    ${mod.groundShadow?'<div class="stageD1-ground"></div>':''}
     <img class="stageD1-mascot" src="${mod.img}" alt="">
     <div class="stageD1-body">
       <span class="stageD1-cat">${mod.cat}</span>
@@ -6689,7 +6692,7 @@ const app={
               <p>Continue à progresser dans ceux qui sont déjà là : les nouveaux arriveront au même endroit, sans rien changer à ce que tu as déjà fait.</p>
               <div class="school-banner-actions"><button class="school-banner-btn" onclick="go('stats')">Voir ma progression →</button></div>
             </div>
-            <div class="school-banner-visual"><img src="/images/keypace-mascot-cheer.webp" width="282" height="303" alt="" loading="lazy" decoding="async" style="height:150px;width:auto;filter:drop-shadow(0 10px 20px rgba(0,0,0,.22))"></div>
+            <div class="school-banner-visual"><img src="/images/keypace-mascot-cheer.webp" width="282" height="303" alt="" loading="eager" decoding="async" style="height:150px;width:auto;filter:drop-shadow(0 10px 20px rgba(0,0,0,.22))"></div>
           </div>
         </div>
       </div>`;
