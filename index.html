@@ -510,6 +510,9 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .settings-btn.danger:hover{background:#E5484D;color:#fff;border-color:#E5484D;box-shadow:0 4px 12px rgba(229,72,77,.25)}
 .settings-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .settings-btn.active:hover{color:#fff;transform:none;box-shadow:none}
+.kb-form-group{display:flex;flex-direction:column;gap:6px}
+.kb-form-group-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.kb-form-group-btns{display:flex;gap:8px;flex-wrap:wrap}
 .gaze-calibrated-badge{display:inline-flex;align-items:center;gap:5px;background:#1FA97120;color:#1FA971;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700}
 /* CALIBRATION OVERLAY */
 .calib-overlay{position:fixed;inset:0;background:#0d0d0d;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -820,35 +823,29 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .tuto-key.on{color:#fff;font-weight:800;box-shadow:0 3px 0 rgba(0,0,0,0.12)}
 .tuto-key-altgr{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;white-space:nowrap;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:5px;padding:1px 4px}
 .tuto-keys-info{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
-/* Aperçu clavier complet dans les réglages (disposition AZERTY + format physique) */
-/* align-items:stretch (pas flex-start) : .kf-side (nav+flèches) et
-   .kf-numpad doivent s'étirer sur toute la hauteur du clavier principal pour
-   que "margin-top:auto" sur .kf-arrows pousse bien les flèches en bas, au
-   niveau de la barre d'espace — sinon elles restent collées en haut. */
-.kb-full-preview{display:flex;gap:6px;align-items:stretch;background:var(--light);border:1px solid var(--border);border-radius:14px;padding:10px;margin-top:2px;min-width:400px}
-.kf-main{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
-.kf-row{display:flex;gap:3px}
-.kf-key{position:relative;height:22px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--txt);min-width:0;overflow:hidden;white-space:nowrap}
-.kf-key.kf-fn{color:var(--muted);font-size:7.5px;text-transform:uppercase;letter-spacing:.02em}
-.kf-key.kf-gap{background:transparent;border:none}
-.kf-key.differs{border-color:var(--accent);background:rgba(255,77,46,.08);color:var(--accent);font-weight:800}
-.kf-key.has-g{border-bottom:2px solid var(--accent)}
-.kf-sub{position:absolute;top:0;right:2px;font-size:6px;font-weight:700;opacity:.55}
-.kf-g{position:absolute;bottom:-11px;left:50%;transform:translateX(-50%);font-size:7px;font-weight:800;white-space:nowrap;color:#fff;background:var(--accent);border-radius:3px;padding:0 2px;z-index:1}
-.kf-side{display:flex;flex-direction:column;gap:6px;flex-shrink:0;justify-content:flex-start}
-.kf-nav{display:grid;grid-template-columns:repeat(3,16px);gap:2px}
-.kf-nav div{height:16px;min-width:0;display:flex;align-items:center;justify-content:center;border-radius:3px;background:#fff;border:1px solid var(--border);font-size:4.5px;color:var(--muted);text-transform:uppercase;overflow:hidden;white-space:nowrap}
-.kf-nav-compact{grid-template-columns:16px;grid-auto-flow:row;grid-template-rows:repeat(4,16px)}
-.kf-arrows{display:grid;grid-template-columns:repeat(3,16px);grid-template-rows:repeat(2,16px);gap:2px;margin-top:auto}
-.kf-arrows div{display:flex;align-items:center;justify-content:center;border-radius:3px;background:#fff;border:1px solid var(--border);font-size:6px;color:var(--muted);overflow:hidden;white-space:nowrap;min-width:0}
-.kf-arrow-up{grid-column:2;grid-row:1}
-.kf-arrow-left{grid-column:1;grid-row:2}
-.kf-arrow-down{grid-column:2;grid-row:2}
-.kf-arrow-right{grid-column:3;grid-row:2}
-.kf-numpad{display:grid;grid-template-columns:repeat(4,16px);grid-auto-rows:16px;gap:2px;flex-shrink:0}
-.kf-numpad div{display:flex;align-items:center;justify-content:center;border-radius:3px;background:#fff;border:1px solid var(--border);font-size:5.5px;color:var(--txt);overflow:hidden;white-space:nowrap;min-width:0}
-.kf-np-plus,.kf-np-enter{grid-row:span 2}
-.kf-np-zero{grid-column:span 2}
+/* Aperçu clavier complet dans les réglages (disposition AZERTY + format
+   physique) : grille en positions absolues, même style "keycap 3D" que le
+   clavier de frappe (.kb-key-t) via une famille de classes dédiée (.kbp-*)
+   pour ne pas risquer de perturber le rendu flex du clavier de frappe. */
+.kb-full-preview{overflow-x:auto;padding-bottom:4px}
+.kbp-grid{position:relative}
+.kbp-key{
+  position:absolute;border-radius:7px;background:#fff;border:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;font-weight:600;color:#3A352B;font-size:12px;
+  box-shadow:0 1px 0 rgba(0,0,0,.03);user-select:none;border-bottom-width:3px;
+  display:flex;align-items:flex-end;justify-content:flex-start;padding:3px 4px;overflow:hidden;
+}
+.kbp-key.kbp-mod{align-items:center;justify-content:center;padding:0;font-size:9px;color:var(--muted)}
+.kbp-key.kbp-big{font-size:13px}
+.kbp-key.kbp-half{font-size:9px}
+.kbp-key.kbp-space{align-items:center;justify-content:center;padding:0;background:var(--accent);border-color:var(--accent);color:#fff;font-size:9px;letter-spacing:.06em}
+.kbp-key.kbp-differs{border-color:var(--accent);background:rgba(255,77,46,.08);color:var(--accent);font-weight:800}
+.kbp-key.kbp-has-g{box-shadow:inset 0 0 0 1px rgba(255,77,46,.35)}
+.kbp-key.kbp-touchid{border-radius:50%}
+.kbp-key.kbp-iso-pc{clip-path:polygon(0% 0%,100% 0%,100% 100%,16.667% 100%,16.667% 50%,0% 50%)}
+.kbp-key.kbp-iso-mac{clip-path:polygon(0% 0%,100% 0%,100% 100%,27.12% 100%,27.12% 50%,0% 50%);font-size:7px}
+.kbp-sub{position:absolute;top:2px;left:3px;font-size:7px;opacity:.55;font-weight:600}
+.kbp-altgr{position:absolute;top:2px;right:3px;font-size:7px;opacity:.65;font-weight:700;color:#6B7FD7}
 .kb-preview-note{font-size:12px;color:var(--muted);margin-top:16px;line-height:1.45}
 .kb-preview-note b{color:var(--txt)}
 .tuto-keycard{display:flex;align-items:center;gap:10px;background:var(--light);border:1px solid var(--border);border-radius:12px;padding:9px 14px}
@@ -2932,7 +2929,7 @@ const KB_LAYOUTS={
     [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'!',s:'§',f:'rp'}]
   ],
   be:[
-    [{l:'1',s:'&',f:'lp'},{l:'2',s:'é',f:'lr'},{l:'3',s:'"',f:'lm'},{l:'4',s:"'",f:'li'},{l:'5',s:'(',f:'li'},{l:'6',s:'§',f:'ri'},{l:'7',s:'è',f:'ri'},{l:'8',s:'!',f:'rm'},{l:'9',s:'ç',f:'rr'},{l:'0',s:'à',f:'rp'}],
+    [{l:'1',s:'&',f:'lp',g:'|'},{l:'2',s:'é',f:'lr',g:'@'},{l:'3',s:'"',f:'lm',g:'#'},{l:'4',s:"'",f:'li',g:'{'},{l:'5',s:'(',f:'li',g:'['},{l:'6',s:'§',f:'ri',g:'^'},{l:'7',s:'è',f:'ri'},{l:'8',s:'!',f:'rm'},{l:'9',s:'ç',f:'rr',g:'{'},{l:'0',s:'à',f:'rp',g:'}'}],
     [{l:'A',f:'lp'},{l:'Z',f:'lr'},{l:'E',f:'lm'},{l:'R',f:'li'},{l:'T',f:'li'},{l:'Y',f:'ri'},{l:'U',f:'ri'},{l:'I',f:'rm'},{l:'O',f:'rr'},{l:'P',f:'rp'}],
     [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
     [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'=',s:'+',f:'rp'}]
@@ -2946,8 +2943,18 @@ const KB_LAYOUTS={
     [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
     [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'=',s:'+',f:'rp'}]
   ],
+  // NF Z71-300 (norme AFNOR 2019) : PAS identique au français historique.
+  // Vérifié via la référence faisant autorité Djyp/azerty_afnor (fichier XKB
+  // fr_azerty_afnor) : les chiffres s'obtiennent avec Maj (accès direct aux
+  // lettres accentuées à/é/è/ê sur la rangée du haut), et plusieurs
+  // lettres/symboles changent de position par rapport à l'AZERTY historique.
+  nf:[
+    [{l:'1',s:'à',f:'lp',g:'§'},{l:'2',s:'é',f:'lr',g:'´'},{l:'3',s:'è',f:'lm',g:'`'},{l:'4',s:'ê',f:'li',g:'&'},{l:'5',s:'(',f:'li',g:'['},{l:'6',s:')',f:'ri',g:']'},{l:'7',s:'‘',f:'ri',g:'¯'},{l:'8',s:'’',f:'rm',g:'_'},{l:'9',s:'«',f:'rr',g:'“'},{l:'0',s:'»',f:'rp',g:'”'}],
+    [{l:'A',f:'lp',g:'æ'},{l:'Z',f:'lr',g:'£'},{l:'E',f:'lm',g:'€'},{l:'R',f:'li',g:'®'},{l:'T',f:'li',g:'{'},{l:'Y',f:'ri',g:'}'},{l:'U',f:'ri',g:'ù'},{l:'I',f:'rm',g:'˙'},{l:'O',f:'rr',g:'œ'},{l:'P',f:'rp',g:'%'}],
+    [{l:'Q',f:'lp',g:'θ'},{l:'S',f:'lr',g:'ß'},{l:'D',f:'lm',g:'$'},{l:'F',f:'li',home:true,g:'¤'},{l:'G',f:'li',g:'µ'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr',g:'|'},{l:'M',f:'rp',g:'∞'}],
+    [{l:'<',s:'>',f:'lp',g:'≤'},{l:'W',f:'lp',g:'ʒ'},{l:'X',f:'lr',g:'©'},{l:'C',f:'lm',g:'ç'},{l:'V',f:'li',g:'¸'},{l:'B',f:'li'},{l:'N',f:'ri',g:'~'},{l:'.',s:'?',f:'ri',g:'¿'},{l:',',s:'!',f:'rm',g:'¡'},{l:':',s:'…',f:'rr',g:'·'},{l:';',s:'=',f:'rp',g:'≃'}]
+  ],
 };
-KB_LAYOUTS.nf=KB_LAYOUTS.fr.map(row=>row.map(k=>{const{g,...rest}=k;return rest;})); // NF Z71-300 : lettres/chiffres inchangés (AFNOR), AltGr non modélisé ici
 const KB_LAYOUT_LABELS={fr:'Français',be:'Belge',mac:'Mac',nf:'Norme NF Z71-300'};
 /* Note affichée sous l'aperçu clavier des réglages : ce qui change vraiment,
    pour rester honnête sur ce qui est vérifié (cf. KB_LAYOUTS) plutôt que de
@@ -2956,76 +2963,309 @@ const KB_LAYOUT_NOTES={
   fr:"Disposition de référence (AZERTY français PC).",
   be:"Diffère du français sur 2 touches : <b>§</b> et <b>!</b> remplacent <b>-</b> et <b>_</b> sur la rangée des chiffres.",
   mac:"Diffère du français sur 3 touches (comme le belge) : <b>§</b>/<b>!</b> remplacent <b>-</b>/<b>_</b>, et <b>=</b>/<b>+</b> remplace <b>!</b>/<b>§</b> en bas à droite ; <b>œ</b> s'obtient avec <b>Option (⌥) + O</b>.",
-  nf:"Identique au français pour tout ce qui est affiché ici (lettres, chiffres) : la norme NF Z71-300 ne change que des symboles moins courants, non représentés sur ce clavier.",
+  nf:"Norme officielle depuis 2019 : <b>différente</b> de l'AZERTY historique que la plupart des claviers vendus utilisent encore. Les chiffres s'obtiennent avec <b>Maj</b> (les lettres accentuées à/é/è/ê sont en accès direct), et plusieurs lettres changent de position.",
 };
 /* Format physique du clavier (indépendant de la disposition AZERTY) :
    détermine quelles touches existent (pavé numérique, rangée de fonction,
-   navigation, flèches), pas ce qu'elles tapent. Approximatif par nature
-   (un aperçu pour se reconnaître, pas un simulateur pixel-perfect) : la
-   forme de la touche Entrée est simplifiée (ANSI) même si les données
-   clavier ci-dessus modélisent une touche ISO (<>) à côté du Shift gauche. */
+   navigation, flèches) et où elles sont, pas ce qu'elles tapent.
+   Positions vérifiées photo à l'appui (cf. le travail de modélisation des
+   26 configurations réelles) plutôt qu'un aperçu générique approximatif.
+   `nav`: false | 'full' (Inser/Orig./Pg↑ + Suppr/Fin/Pg↓, 2 rangées) |
+   'compact' (colonne de 4 empilées). `arrows`: false | true (T inversé
+   classique) | 'cluster' (Pg↑/▲/Pg↓ à hauteur de la rangée Ctrl + 7e rangée
+   ◀/▼/▶ qui déborde sous le clavier, cf. portables "sans pavé num.") |
+   'half' (◀/▶ pleine hauteur, ▲/▼ empilées en demi-hauteur entre les deux,
+   tout dans la rangée du bas, cf. ultraportables). */
 const KB_FORM_FACTORS={
   full:{label:'Full size',hasFRow:true,nav:'full',arrows:true,numpad:true},
-  tkl:{label:'TKL',hasFRow:true,nav:'full',arrows:true,numpad:false},
-  f75:{label:'75%',hasFRow:true,nav:'compact',arrows:true,numpad:false},
-  f60:{label:'60%',hasFRow:false,nav:false,arrows:false,numpad:false},
-  f40:{label:'40%',hasFRow:false,nav:false,arrows:false,numpad:false,noDigitRow:true},
+  // Un vrai clavier Mac fixe (Magic Keyboard) n'existe qu'en 2 variantes
+  // (avec/sans pavé numérique) chez Apple : pas de TKL/75/60/40 en disposition
+  // Mac dans le commerce, donc exclu plutôt qu'inventé (cf. macExcluded).
+  tkl:{label:'TKL',hasFRow:true,nav:'full',arrows:true,numpad:false,macExcluded:true},
+  f75:{label:'75%',hasFRow:true,nav:'compact',arrows:true,numpad:false,macExcluded:true},
+  f60:{label:'60%',hasFRow:false,nav:false,arrows:false,numpad:false,macExcluded:true},
+  f40:{label:'40%',hasFRow:false,nav:false,arrows:false,numpad:false,noDigitRow:true,macExcluded:true},
+  // Portable 15-17" avec pavé numérique intégré : colonne de navigation
+  // compacte + pavé numérique, aucun MacBook n'en a jamais eu.
+  port_avec:{label:'Avec pavé num.',hasFRow:true,nav:'compact',arrows:true,numpad:true,portable:true,macExcluded:true},
+  // Portable 13-15" sans pavé numérique (le plus courant) : pas de bloc
+  // navigation dédié, Pg.préc/Pg.suiv à hauteur de la rangée Ctrl et
+  // ◀/▼/▶ dans une 7e rangée qui déborde sous le clavier.
+  port_sans:{label:'Sans pavé num.',hasFRow:true,nav:false,arrows:'cluster',numpad:false,portable:true,macExcluded:true},
+  // Ultraportable très fin (Dell XPS et équivalents) : Pg.préc/Pg.suiv
+  // déplacées en couche Fn, flèches en demi-hauteur, tout dans la rangée du bas.
+  port_ultra:{label:'Ultra-compact',hasFRow:true,nav:false,arrows:'half',numpad:false,portable:true,macExcluded:true},
+  // MacBook : un seul clavier réel quelle que soit la taille d'écran (13 à
+  // 16"), jamais de pavé numérique — seul format Portable proposé pour Mac.
+  port_mac:{label:'MacBook',hasFRow:true,nav:false,arrows:true,numpad:false,portable:true,macOnly:true},
 };
-function getKbFormFactorId(){try{const v=localStorage.getItem('kp_kb_form');return KB_FORM_FACTORS[v]?v:'full';}catch{return'full';}}
+function getKbFormFactorId(){
+  try{
+    const v=localStorage.getItem('kp_kb_form');
+    // Auto-guérison : si la valeur stockée (éventuellement ancienne, ex.
+    // "lap"/"lapnum", ou un format Fixe réduit plus proposé en Mac) n'est
+    // plus valide pour la norme actuelle, on retombe sur "Full size" —
+    // sans attendre que l'utilisateur reclique un bouton de format.
+    return(v&&kbFormFactorIdsFor(getKbLayoutId()).includes(v))?v:'full';
+  }catch{return'full';}
+}
 function setKbFormFactorId(v){try{localStorage.setItem('kp_kb_form',v);}catch{}}
-function _kfKey(label,w,cls){return`<div class="kf-key${cls?' '+cls:''}" style="flex:${w} 1 0">${label}</div>`;}
-function _kfAzertyCell(k,base){
-  // Même logique que l'ancien aperçu simple : `g` (AltGr) n'est ignoré dans
-  // le calcul de `differs` que parce qu'il n'est pas modélisé pour toutes
-  // les variantes (voir KB_LAYOUT_NOTES) — pas parce que ça n'a pas d'importance.
+function kbFormFactorIdsFor(azertyId){
+  const isMac=azertyId==='mac';
+  return Object.keys(KB_FORM_FACTORS).filter(id=>{
+    const ff=KB_FORM_FACTORS[id];
+    return isMac?!ff.macExcluded:!ff.macOnly;
+  });
+}
+function kbFormBtnsHTML(azertyId){
+  const activeId=getKbFormFactorId();
+  const btn=id=>`<button class="settings-btn kb-form-btn${activeId===id?' active':''}" data-kb-form="${id}" onclick="app.setKbFormFactor('${id}')">${KB_FORM_FACTORS[id].label}</button>`;
+  const ids=kbFormFactorIdsFor(azertyId);
+  const fixeIds=ids.filter(id=>!KB_FORM_FACTORS[id].portable);
+  const portIds=ids.filter(id=>KB_FORM_FACTORS[id].portable);
+  const group=(label,groupIds)=>groupIds.length?`<div class="kb-form-group"><span class="kb-form-group-label">${label}</span><div class="kb-form-group-btns">${groupIds.map(btn).join('')}</div></div>`:'';
+  return group('Fixe',fixeIds)+group('Portable',portIds);
+}
+/* Moteur de rendu de l'aperçu clavier des réglages : grille en positions
+   absolues (unité = px), même principe que le prototype des 26 configurations
+   validées une à une (photo à l'appui), au lieu d'une grille flex
+   approximative. Rend dans le même style "keycap 3D" que le clavier de
+   frappe (.kb-key-t) via une famille de classes dédiée (.kbp-*), pour rester
+   cohérent visuellement sans risquer de perturber le rendu du clavier de
+   frappe qui, lui, reste flex (pas de repositionnement possible). */
+const KBP_U=34, KBP_GAP=3;
+function _kbpKey(x,y,w,h,main,sub,finger,cls,altgr){
+  return{x,y,w,h,main:main||'',sub:sub||'',finger:finger||'n',cls:cls||'',altgr:altgr||''};
+}
+function _kbpAzertyKey(x,y,k,base){
+  // `differs` : même logique que l'ancien aperçu — signale au survol/visuellement
+  // qu'une touche diffère du français de référence (utile pour Belge/Mac/NF).
   const differs=!!base&&(k.l!==base.l||k.s!==base.s);
-  return`<div class="kf-key${differs?' differs':''}${k.g?' has-g':''}" style="flex:1 1 0">${k.l.toLowerCase()}${k.s?`<span class="kf-sub">${k.s}</span>`:''}${k.g?`<span class="kf-g">${k.g}</span>`:''}</div>`;
+  let cls='';
+  if(differs)cls+=' kbp-differs';
+  if(k.g)cls+=' kbp-has-g';
+  return _kbpKey(x,y,1,1,k.l.toLowerCase(),k.s||'',k.f,cls.trim(),k.g||'');
+}
+function _kbpRenderGrid(keys){
+  let maxX=0,maxY=0;
+  keys.forEach(k=>{if(k.x+k.w>maxX)maxX=k.x+k.w;if(k.y+k.h>maxY)maxY=k.y+k.h;});
+  const body=keys.map(k=>{
+    const style=`left:${(k.x*KBP_U+KBP_GAP/2).toFixed(1)}px;top:${(k.y*KBP_U+KBP_GAP/2).toFixed(1)}px;width:${(k.w*KBP_U-KBP_GAP).toFixed(1)}px;height:${(k.h*KBP_U-KBP_GAP).toFixed(1)}px;border-bottom-color:${FINGERS[k.finger]||FINGERS.n}`;
+    const sub=k.sub?`<span class="kbp-sub">${k.sub}</span>`:'';
+    const ag=k.altgr?`<span class="kbp-altgr">${k.altgr}</span>`:'';
+    return`<div class="kbp-key${k.cls?' '+k.cls:''}" style="${style}">${k.main}${sub}${ag}</div>`;
+  }).join('');
+  return`<div class="kbp-grid" style="width:${(maxX*KBP_U+8).toFixed(1)}px;height:${(maxY*KBP_U+8).toFixed(1)}px">${body}</div>`;
 }
 function kbFullPreviewHTML(azertyId,formId){
   const layout=KB_LAYOUTS[azertyId]||KB_LAYOUTS.fr;
   const baseline=KB_LAYOUTS.fr;
   const ff=KB_FORM_FACTORS[formId]||KB_FORM_FACTORS.full;
   const isMac=azertyId==='mac';
-  const rows=[];
-  if(ff.hasFRow){
-    // Rangée F Mac : icônes réelles (luminosité, Mission Control, Spotlight,
-    // dictée, Ne pas déranger, médias, volume), vérifiées sur un vrai Magic
-    // Keyboard — pas juste F1-F12 génériques comme sur un clavier PC.
-    const fKeys=isMac?['🔅','🔆','▦','🔍','🎙','☾','⏮','⏯','⏭','🔇','🔉','🔊']:['F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12'];
-    rows.push(`<div class="kf-row">${_kfKey('esc',1.3,'kf-fn')}${_kfKey('',0.5,'kf-gap')}${fKeys.slice(0,4).map(f=>_kfKey(f,1,'kf-fn')).join('')}${_kfKey('',0.4,'kf-gap')}${fKeys.slice(4,8).map(f=>_kfKey(f,1,'kf-fn')).join('')}${_kfKey('',0.4,'kf-gap')}${fKeys.slice(8,12).map(f=>_kfKey(f,1,'kf-fn')).join('')}${isMac?_kfKey('⏻',1,'kf-fn'):''}</div>`);
+  const keys=[];
+
+  if(isMac){
+    // --- Rangée F : mesurée sur un vrai Magic/MacBook Keyboard, icônes réelles
+    // (luminosité, Mission Control, Spotlight, dictée, Ne pas déranger, médias,
+    // volume), cadence irrégulière (pas F1-F12 génériques espacés uniformément). ---
+    keys.push(_kbpKey(0,0,0.77,0.72,'esc','','n','kbp-mod'));
+    ['🔅','🔆','▦','🔍','🎙','☾','⏮','⏯','⏭','🔇','🔉','🔊'].forEach((l,i)=>keys.push(_kbpKey(0.9+i*0.9,0,0.77,0.72,l,'','n','kbp-mod')));
+    if(ff.portable){
+      // MacBook : Touch ID (ou bouton d'alimentation sur les modèles avant
+      // 2016) à la place du groupe F13-15/éjecter du Magic Keyboard.
+      keys.push(_kbpKey(15.82,0,1,0.72,'⏻','','n','kbp-mod kbp-touchid'));
+    }else{
+      keys.push(_kbpKey(12.3,0,1,0.72,'⏺','','n','kbp-mod'));
+      ['F13','F14','F15'].forEach((l,i)=>keys.push(_kbpKey(15.82+i,0,1,0.72,l,'','n','kbp-mod')));
+    }
+    // --- digit row ---
+    keys.push(_kbpKey(0,1.2,1,1,'@','#','n'));
+    layout[0].forEach((k,i)=>keys.push(_kbpAzertyKey(i+1,1.2,k,baseline[0][i])));
+    keys.push(_kbpKey(11,1.2,1,1,')','°','rp'));
+    keys.push(_kbpKey(12,1.2,1,1,'-','—','rp'));
+    keys.push(_kbpKey(13,1.2,1.56,1,'⌫','','n','kbp-mod kbp-big'));
+    if(!ff.portable){
+      // Cluster de 3 icônes (Page/Origine), absent des Mac compacts : présent
+      // uniquement sur le Magic Keyboard avec pavé numérique.
+      keys.push(_kbpKey(15.82,1.2,1,1,'▤','','n','kbp-mod'));
+      keys.push(_kbpKey(16.82,1.2,1,1,'⇞','','n','kbp-mod'));
+      keys.push(_kbpKey(17.82,1.2,1,1,'↑','','n','kbp-mod'));
+    }
+    // --- tab row ---
+    keys.push(_kbpKey(0,2.2,1.56,1,'tab','','n','kbp-mod'));
+    layout[1].forEach((k,i)=>keys.push(_kbpAzertyKey(1.56+i,2.2,k,baseline[1][i])));
+    keys.push(_kbpKey(11.56,2.2,1,1,'^','¨','rp'));
+    keys.push(_kbpKey(12.56,2.2,1,1,'$','*','rp',null,'€'));
+    if(!ff.portable){
+      keys.push(_kbpKey(15.82,2.2,1,1,'⌦','','n','kbp-mod'));
+      keys.push(_kbpKey(16.82,2.2,1,1,'⇟','','n','kbp-mod'));
+      keys.push(_kbpKey(17.82,2.2,1,1,'↓','','n','kbp-mod'));
+    }
+    // --- home row + Entrée (ISO, ratio Mac mesuré au pixel près) ---
+    keys.push(_kbpKey(0,3.2,1.84,1,'caps','','n','kbp-mod'));
+    layout[2].forEach((k,i)=>keys.push(_kbpAzertyKey(1.84+i,3.2,k,baseline[2][i])));
+    keys.push(_kbpKey(11.84,3.2,1,1,'ù','%','rp'));
+    keys.push(_kbpKey(12.84,3.2,1,1,'£','`','rp'));
+    keys.push({x:13.56,y:2.2,w:1,h:2,main:'entrée',sub:'',finger:'n',cls:'kbp-mod kbp-iso-mac',altgr:''});
+    // --- shift row ---
+    keys.push(_kbpKey(0,4.2,1.27,1,'maj','','n','kbp-mod'));
+    keys.push(_kbpAzertyKey(1.27,4.2,layout[3][0],baseline[3][0]));
+    layout[3].slice(1,7).forEach((k,i)=>keys.push(_kbpAzertyKey(2.27+i,4.2,k,baseline[3][1+i])));
+    layout[3].slice(7).forEach((k,i)=>keys.push(_kbpAzertyKey(8.27+i,4.2,k,baseline[3][7+i])));
+    keys.push(_kbpKey(12.27,4.2,2.37,1,'maj','','n','kbp-mod'));
+    // --- bottom row : fn/control/option/command, pas de Windows/AltGr/Menu ---
+    keys.push(_kbpKey(0,5.2,1,1,'fn','','n','kbp-mod'));
+    keys.push(_kbpKey(1,5.2,1,1,'⌃','','n','kbp-mod'));
+    keys.push(_kbpKey(2,5.2,1,1,'⌥','','n','kbp-mod'));
+    keys.push(_kbpKey(3,5.2,1.29,1,'⌘','','n','kbp-mod'));
+    keys.push(_kbpKey(4.29,5.2,6.59,1,'espace','','n','kbp-space'));
+    keys.push(_kbpKey(10.88,5.2,1.56,1,'⌘','','n','kbp-mod'));
+    keys.push(_kbpKey(12.44,5.2,1.29,1,'⌥','','n','kbp-mod'));
+    keys.push(_kbpKey(13.73,5.2,1.56,1,'⌃','','n','kbp-mod'));
+    // --- flèches en T inversé (léger espace avant le bloc, réel sur Apple) ---
+    keys.push(_kbpKey(16.82,4.2,1,1,'▲'));
+    keys.push(_kbpKey(15.82,5.2,1,1,'◀'));
+    keys.push(_kbpKey(16.82,5.2,1,1,'▼'));
+    keys.push(_kbpKey(17.82,5.2,1,1,'▶'));
+    if(ff.numpad){
+      const npX=19.07;
+      ['F16','F17','F18','F19'].forEach((l,i)=>keys.push(_kbpKey(npX+i,0,1,0.72,l,'','n','kbp-mod')));
+      keys.push(_kbpKey(npX,1.2,1,1,'verr','','n','kbp-mod'));
+      keys.push(_kbpKey(npX+1,1.2,1,1,'='));
+      keys.push(_kbpKey(npX+2,1.2,1,1,'/'));
+      keys.push(_kbpKey(npX+3,1.2,1,1,'*'));
+      keys.push(_kbpKey(npX,2.2,1,1,'7'));keys.push(_kbpKey(npX+1,2.2,1,1,'8'));keys.push(_kbpKey(npX+2,2.2,1,1,'9'));
+      keys.push(_kbpKey(npX+3,2.2,1,2,'+'));
+      keys.push(_kbpKey(npX,3.2,1,1,'4'));keys.push(_kbpKey(npX+1,3.2,1,1,'5'));keys.push(_kbpKey(npX+2,3.2,1,1,'6'));
+      keys.push(_kbpKey(npX,4.2,1,1,'1'));keys.push(_kbpKey(npX+1,4.2,1,1,'2'));keys.push(_kbpKey(npX+2,4.2,1,1,'3'));
+      keys.push(_kbpKey(npX,5.2,2,1,'0'));
+      keys.push(_kbpKey(npX+2,5.2,1,1,','));
+      keys.push(_kbpKey(npX+3,4.2,1,2,'↵','','n','kbp-mod kbp-big'));
+    }
+  }else{
+    // --- PC (Français / Belge / NF) ---
+    if(ff.hasFRow){
+      keys.push(_kbpKey(0,0,1,1,'esc','','n','kbp-mod'));
+      ['F1','F2','F3','F4'].forEach((l,i)=>keys.push(_kbpKey(2+i,0,1,1,l,'','n','kbp-mod')));
+      ['F5','F6','F7','F8'].forEach((l,i)=>keys.push(_kbpKey(6.5+i,0,1,1,l,'','n','kbp-mod')));
+      ['F9','F10','F11','F12'].forEach((l,i)=>keys.push(_kbpKey(11+i,0,1,1,l,'','n','kbp-mod')));
+      if(formId==='full'||formId==='tkl')['PrtSc','ScrLk','Pause'].forEach((l,i)=>keys.push(_kbpKey(15.25+i,0,1,1,l,'','n','kbp-mod')));
+    }
+    const yDigit=ff.hasFRow?1.5:0;
+    let cursor=yDigit,yDigitRow=null;
+    if(!ff.noDigitRow){yDigitRow=cursor;cursor+=1;}
+    const yTab=cursor;cursor+=1;
+    const yHome=cursor;cursor+=1;
+    const yShift=cursor;cursor+=1;
+    const yBottom=cursor;
+
+    if(yDigitRow!==null){
+      layout[0].forEach((k,i)=>keys.push(_kbpAzertyKey(i,yDigitRow,k,baseline[0][i])));
+      keys.push(_kbpKey(13,yDigitRow,2,1,'⌫','','n','kbp-mod kbp-big'));
+    }
+    keys.push(_kbpKey(0,yTab,1.5,1,'tab','','n','kbp-mod'));
+    layout[1].forEach((k,i)=>keys.push(_kbpAzertyKey(1.5+i,yTab,k,baseline[1][i])));
+    keys.push(_kbpKey(11.5,yTab,1,1,'^','¨','rp'));
+    keys.push(_kbpKey(12.5,yTab,1,1,'$','£','rp',null,'¤'));
+    keys.push({x:13.5,y:yTab,w:1.5,h:2,main:'entrée',sub:'',finger:'n',cls:'kbp-mod kbp-iso-pc',altgr:''});
+
+    keys.push(_kbpKey(0,yHome,1.75,1,'caps','','n','kbp-mod'));
+    layout[2].forEach((k,i)=>keys.push(_kbpAzertyKey(1.75+i,yHome,k,baseline[2][i])));
+    keys.push(_kbpKey(11.75,yHome,1,1,'ù','%','rp'));
+    keys.push(_kbpKey(12.75,yHome,1,1,'*','µ','rp'));
+
+    keys.push(_kbpKey(0,yShift,1.25,1,'maj','','n','kbp-mod'));
+    keys.push(_kbpAzertyKey(1.25,yShift,layout[3][0],baseline[3][0]));
+    layout[3].slice(1,7).forEach((k,i)=>keys.push(_kbpAzertyKey(2.25+i,yShift,k,baseline[3][1+i])));
+    layout[3].slice(7).forEach((k,i)=>keys.push(_kbpAzertyKey(8.25+i,yShift,k,baseline[3][7+i])));
+    keys.push(_kbpKey(12.25,yShift,2.75,1,'maj','','n','kbp-mod'));
+
+    // --- rangée du bas : jeu "bureau" (ctrl/win/alt/altgr/win/menu/ctrl) ou
+    // "portable" (ctrl/fn/win/alt/altgr/ctrl, sans Menu) selon le format ---
+    if(ff.portable){
+      keys.push(_kbpKey(0,yBottom,1.25,1,'ctrl','','n','kbp-mod'));
+      keys.push(_kbpKey(1.25,yBottom,1.25,1,'fn','','n','kbp-mod'));
+      keys.push(_kbpKey(2.5,yBottom,1.25,1,'⊞','','n','kbp-mod'));
+      keys.push(_kbpKey(3.75,yBottom,1.25,1,'alt','','n','kbp-mod'));
+      if(ff.arrows==='cluster'||ff.arrows==='half'){
+        // Espace et modificateurs de droite raccourcis pour que le cluster de
+        // flèches tienne DANS la largeur réelle du clavier (15u, identique aux
+        // autres rangées) au lieu de déborder à droite.
+        keys.push(_kbpKey(5,yBottom,5,1,'espace','','n','kbp-space'));
+        keys.push(_kbpKey(10,yBottom,1,1,'altgr','','n','kbp-mod'));
+        keys.push(_kbpKey(11,yBottom,1,1,'ctrl','','n','kbp-mod'));
+      }else{
+        keys.push(_kbpKey(5,yBottom,7.5,1,'espace','','n','kbp-space'));
+        keys.push(_kbpKey(12.5,yBottom,1.25,1,'altgr','','n','kbp-mod'));
+        keys.push(_kbpKey(13.75,yBottom,1.25,1,'ctrl','','n','kbp-mod'));
+      }
+    }else{
+      keys.push(_kbpKey(0,yBottom,1.25,1,'ctrl','','n','kbp-mod'));
+      keys.push(_kbpKey(1.25,yBottom,1.25,1,'⊞','','n','kbp-mod'));
+      keys.push(_kbpKey(2.5,yBottom,1.25,1,'alt','','n','kbp-mod'));
+      keys.push(_kbpKey(3.75,yBottom,6.25,1,'espace','','n','kbp-space'));
+      keys.push(_kbpKey(10,yBottom,1.25,1,'altgr','','n','kbp-mod'));
+      keys.push(_kbpKey(11.25,yBottom,1.25,1,'⊞','','n','kbp-mod'));
+      keys.push(_kbpKey(12.5,yBottom,1.25,1,'menu','','n','kbp-mod'));
+      keys.push(_kbpKey(13.75,yBottom,1.25,1,'ctrl','','n','kbp-mod'));
+    }
+
+    // --- navigation ---
+    if(ff.nav==='full'){
+      ['Inser','Orig.','Pg↑'].forEach((l,i)=>keys.push(_kbpKey(15.25+i,yDigitRow,1,1,l,'','n','kbp-mod')));
+      ['Suppr','Fin','Pg↓'].forEach((l,i)=>keys.push(_kbpKey(15.25+i,yTab,1,1,l,'','n','kbp-mod')));
+    }else if(ff.nav==='compact'){
+      [['Suppr',0],['Orig.',yDigitRow!==null?yDigitRow:yTab],['Fin',yTab],['Pg↑',yHome]].forEach(p=>keys.push(_kbpKey(15.25,p[1],1,1,p[0],'','n','kbp-mod')));
+    }
+
+    // --- flèches ---
+    if(ff.arrows===true){
+      keys.push(_kbpKey(16.25,yShift,1,1,'▲'));
+      keys.push(_kbpKey(15.25,yBottom,1,1,'◀'));
+      keys.push(_kbpKey(16.25,yBottom,1,1,'▼'));
+      keys.push(_kbpKey(17.25,yBottom,1,1,'▶'));
+    }else if(ff.arrows==='cluster'){
+      keys.push(_kbpKey(12,yBottom,1,1,'Pg↑'));
+      keys.push(_kbpKey(13,yBottom,1,1,'▲'));
+      keys.push(_kbpKey(14,yBottom,1,1,'Pg↓'));
+      keys.push(_kbpKey(12,yBottom+1,1,1,'◀'));
+      keys.push(_kbpKey(13,yBottom+1,1,1,'▼'));
+      keys.push(_kbpKey(14,yBottom+1,1,1,'▶'));
+    }else if(ff.arrows==='half'){
+      keys.push(_kbpKey(12,yBottom,1,1,'◀'));
+      keys.push(_kbpKey(13,yBottom,1,0.5,'▲','','n','kbp-mod kbp-half'));
+      keys.push(_kbpKey(13,yBottom+0.5,1,0.5,'▼','','n','kbp-mod kbp-half'));
+      keys.push(_kbpKey(14,yBottom,1,1,'▶'));
+    }
+
+    // --- pavé numérique ---
+    if(ff.numpad){
+      const npX=18.5;
+      keys.push(_kbpKey(npX,yDigitRow,1,1,'verr','','n','kbp-mod'));
+      keys.push(_kbpKey(npX+1,yDigitRow,1,1,'/'));
+      keys.push(_kbpKey(npX+2,yDigitRow,1,1,'*'));
+      keys.push(_kbpKey(npX+3,yDigitRow,1,1,'-'));
+      keys.push(_kbpKey(npX,yTab,1,1,'7','Orig.'));
+      keys.push(_kbpKey(npX+1,yTab,1,1,'8','↑'));
+      keys.push(_kbpKey(npX+2,yTab,1,1,'9','Pg↑'));
+      keys.push(_kbpKey(npX+3,yTab,1,2,'+'));
+      keys.push(_kbpKey(npX,yHome,1,1,'4','←'));
+      keys.push(_kbpKey(npX+1,yHome,1,1,'5'));
+      keys.push(_kbpKey(npX+2,yHome,1,1,'6','→'));
+      keys.push(_kbpKey(npX,yShift,1,1,'1','Fin'));
+      keys.push(_kbpKey(npX+1,yShift,1,1,'2','↓'));
+      keys.push(_kbpKey(npX+2,yShift,1,1,'3','Pg↓'));
+      keys.push(_kbpKey(npX+3,yShift,1,2,'↵','','n','kbp-mod kbp-big'));
+      keys.push(_kbpKey(npX,yBottom,2,1,'0','Ins'));
+      keys.push(_kbpKey(npX+2,yBottom,1,1,',','Suppr'));
+    }
   }
-  if(!ff.noDigitRow){
-    rows.push(`<div class="kf-row">${layout[0].map((k,i)=>_kfAzertyCell(k,baseline[0][i])).join('')}${_kfKey('⌫',2,'kf-fn')}</div>`);
-  }
-  rows.push(`<div class="kf-row">${_kfKey('tab',1.5,'kf-fn')}${layout[1].map((k,i)=>_kfAzertyCell(k,baseline[1][i])).join('')}${_kfKey('^ ¨',1,'kf-fn')}</div>`);
-  rows.push(`<div class="kf-row">${_kfKey('caps',1.75,'kf-fn')}${layout[2].map((k,i)=>_kfAzertyCell(k,baseline[2][i])).join('')}${_kfKey('entrée',2,'kf-fn')}</div>`);
-  rows.push(`<div class="kf-row">${_kfKey('maj',1.25,'kf-fn')}${layout[3].map((k,i)=>_kfAzertyCell(k,baseline[3][i])).join('')}${_kfKey('maj',2.75,'kf-fn')}</div>`);
-  // Un clavier Mac n'a ni touche Windows/⊞, ni AltGr séparée (Option en tient
-  // lieu), ni touche Menu contextuel — et ajoute fn en bas à gauche. Afficher
-  // les libellés PC (Ctrl/Alt/AltGr/Menu) sur une disposition Mac induit en
-  // erreur : c'est précisément ce qui ne "matchait" pas avec un vrai clavier.
-  rows.push(isMac
-    ?`<div class="kf-row">${_kfKey('fn',1,'kf-fn')}${_kfKey('⌃',1,'kf-fn')}${_kfKey('⌥',1,'kf-fn')}${_kfKey('⌘',1.3,'kf-fn')}${_kfKey('espace',6,'kf-fn')}${_kfKey('⌘',1.3,'kf-fn')}${_kfKey('⌥',1,'kf-fn')}</div>`
-    :`<div class="kf-row">${_kfKey('ctrl',1.25,'kf-fn')}${_kfKey('⊞',1.25,'kf-fn')}${_kfKey('alt',1.25,'kf-fn')}${_kfKey('espace',6,'kf-fn')}${_kfKey('altgr',1.25,'kf-fn')}${_kfKey('menu',1.25,'kf-fn')}${_kfKey('ctrl',1.25,'kf-fn')}</div>`);
-  // Les claviers Apple (compacts ou "avec pavé numérique") n'ont jamais de
-  // bloc navigation dédié (Inser/Origine/Pg.préc/Suppr/Fin/Pg.suiv) : juste
-  // des flèches. On force donc nav=false pour Mac quel que soit le format.
-  let side='';
-  const navMode=isMac?false:ff.nav;
-  if(navMode==='full')side=`<div class="kf-nav">${['ins','home','pg↑','del','fin','pg↓'].map(l=>`<div>${l}</div>`).join('')}</div>`;
-  else if(navMode==='compact')side=`<div class="kf-nav kf-nav-compact">${['del','home','fin','pg↑'].map(l=>`<div>${l}</div>`).join('')}</div>`;
-  // T inversé partout (▲ centrée en haut, ◄▼► en bas) : c'est la disposition
-  // universelle, Mac inclus — vérifié sur photo d'un vrai Magic Keyboard
-  // AZERTY français (le contraire avait été supposé à tort précédemment).
-  if(ff.arrows)side+=`<div class="kf-arrows"><div class="kf-arrow-up">▲</div><div class="kf-arrow-left">◀</div><div class="kf-arrow-down">▼</div><div class="kf-arrow-right">▶</div></div>`;
-  const numpad=ff.numpad?`<div class="kf-numpad"><div>num</div><div>/</div><div>*</div><div>-</div><div>7</div><div>8</div><div>9</div><div class="kf-np-plus">+</div><div>4</div><div>5</div><div>6</div><div>1</div><div>2</div><div>3</div><div class="kf-np-enter">↵</div><div class="kf-np-zero">0</div><div>,</div></div>`:'';
+
   const note40=ff.noDigitRow?`<div class="kb-preview-note"><b>Sur un 40 %</b>, les chiffres et la rangée de fonction n'ont pas de touche dédiée : on y accède via une touche Fn (couche secondaire), non représentée ici.</div>`:'';
   const noteMac=isMac?`<div class="kb-preview-note"><b>Clavier Mac</b> : fn/control/option/command remplacent Ctrl/Alt/AltGr/Menu, et il n'y a jamais de bloc navigation dédié sur un clavier Apple (juste les flèches).</div>`:'';
-  return`<div class="kb-full-preview">`
-    +`<div class="kf-main">${rows.join('')}</div>`
-    +(side?`<div class="kf-side">${side}</div>`:'')
-    +numpad
-    +`</div>${note40}${noteMac}<div class="kb-preview-note">${KB_LAYOUT_NOTES[azertyId]||''}</div>`;
+  const noteCluster=ff.arrows==='cluster'?`<div class="kb-preview-note"><b>Pg.préc/Pg.suiv</b> sont à la hauteur de la rangée Ctrl (pas Maj), et <b>◀/▼/▶</b> sont dans une 7<sup>e</sup> rangée qui déborde sous le clavier — vérifié sur photo, la forme exacte varie un peu d'un fabricant à l'autre.</div>`:'';
+  const noteHalf=ff.arrows==='half'?`<div class="kb-preview-note"><b>Pg.préc/Pg.suiv</b> n'existent pas sur ce format : elles passent par la couche Fn. Le cluster de flèches demi-hauteur est un motif répandu (Dell XPS et équivalents) mais varie un peu d'un fabricant à l'autre.</div>`:'';
+  return`<div class="kb-full-preview">${_kbpRenderGrid(keys)}</div>${note40}${noteMac}${noteCluster}${noteHalf}<div class="kb-preview-note">${KB_LAYOUT_NOTES[azertyId]||''}</div>`;
 }
 function getKbLayoutId(){try{const v=localStorage.getItem('kp_kb_layout');return KB_LAYOUTS[v]?v:'fr';}catch{return 'fr';}}
 function setKbLayoutId(v){try{localStorage.setItem('kp_kb_layout',v);}catch{}}
@@ -3373,12 +3613,12 @@ const CURRICULUM=[
      text:'wagon, tramway, porte, kiwi: wagon kiwi noix moi kiwi, cor kiwi avec van tramway: kiwi me wagon on'},
     // b5 : + b !   → l'alphabet est complet, vraies phrases
     {id:'b5',title:'B et point d\'exclamation',keys:'b !',
-     tip:'B est à l\'index gauche bas (côté centre), le ! se tape directement, sans Shift. Tu couvres maintenant les 26 lettres de l\'alphabet : c\'est un cap important ! Chaque texte réel sera désormais accessible.',
+     tip:'B est à l\'index gauche bas (côté centre) ; la position du ! varie selon ton clavier, regarde le clavier affiché à l\'écran. Tu couvres maintenant les 26 lettres de l\'alphabet : c\'est un cap important ! Chaque texte réel sera désormais accessible.',
      tuto:{
        intro:"B complète l'alphabet et le point d'exclamation ajoute de l'émotion. Un vrai cap : tu auras les 26 lettres.",
        rules:[
          {icon:'⬇️',t:'B au centre-bas',d:"L'index gauche s'étire vers le centre puis descend pour B. C'est un mouvement un peu ample : reviens vite sur F."},
-         {icon:'⌨️',t:'Le ! sans Shift',d:"Le point d'exclamation se tape directement, comme les deux-points juste à côté : pas besoin de Shift pour l'un ni pour l'autre."},
+         {icon:'⌨️',t:'Le !, selon ton clavier',d:"Sa position (et si Shift est nécessaire) dépend de ta disposition AZERTY : suis le clavier affiché à l'écran plutôt qu'un repère fixe."},
          {icon:'🏁',t:'Les 26 lettres réunies',d:"Avec B, tu maîtrises tout l'alphabet. À partir d'ici, n'importe quel mot français t'est accessible."}
        ],
        tip:"Objectif : poser B et le point d'exclamation, et savourer d'avoir bouclé l'alphabet complet."
@@ -10657,8 +10897,8 @@ const app={
             <strong>Format du clavier</strong>
             <span>La taille de ton clavier (pavé numérique, flèches, rangée de fonction…).</span>
           </div>
-          <div id="kb-form-btns" style="display:flex;gap:8px;flex-wrap:wrap">
-            ${Object.keys(KB_FORM_FACTORS).map(id=>`<button class="settings-btn kb-form-btn${getKbFormFactorId()===id?' active':''}" data-kb-form="${id}" onclick="app.setKbFormFactor('${id}')">${KB_FORM_FACTORS[id].label}</button>`).join('')}
+          <div id="kb-form-btns" style="display:flex;flex-direction:column;gap:10px">
+            ${kbFormBtnsHTML(getKbLayoutId())}
           </div>
           <div id="kb-layout-preview" style="width:100%;overflow-x:auto">${kbFullPreviewHTML(getKbLayoutId(),getKbFormFactorId())}</div>
         </div>
@@ -10781,10 +11021,18 @@ const app={
     setKbLayoutId(id);
     applyKbLayout(id);
     document.querySelectorAll('.kb-layout-btn').forEach(b=>b.classList.toggle('active',b.dataset.kbLayout===id));
+    // Les formats proposés dépendent de la disposition (la plupart des
+    // formats Portable/tailles réduites n'existent pas en Mac) : on régénère
+    // les boutons, et si le format actif n'est plus proposé, on retombe sur
+    // "Full size", le seul format toujours valide quelle que soit la norme.
+    if(!kbFormFactorIdsFor(id).includes(getKbFormFactorId()))setKbFormFactorId('full');
+    const formBtns=document.getElementById('kb-form-btns');
+    if(formBtns)formBtns.innerHTML=kbFormBtnsHTML(id);
     this._refreshKbPreview();
   },
   setKbFormFactor(id){
     if(!KB_FORM_FACTORS[id])return;
+    if(!kbFormFactorIdsFor(getKbLayoutId()).includes(id))return; // ex. formats Portable réduits avec Mac actif
     setKbFormFactorId(id);
     document.querySelectorAll('.kb-form-btn').forEach(b=>b.classList.toggle('active',b.dataset.kbForm===id));
     this._refreshKbPreview();
