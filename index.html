@@ -510,6 +510,9 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .settings-btn.danger:hover{background:#E5484D;color:#fff;border-color:#E5484D;box-shadow:0 4px 12px rgba(229,72,77,.25)}
 .settings-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .settings-btn.active:hover{color:#fff;transform:none;box-shadow:none}
+.kb-form-group{display:flex;flex-direction:column;gap:6px}
+.kb-form-group-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.kb-form-group-btns{display:flex;gap:8px;flex-wrap:wrap}
 .gaze-calibrated-badge{display:inline-flex;align-items:center;gap:5px;background:#1FA97120;color:#1FA971;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700}
 /* CALIBRATION OVERLAY */
 .calib-overlay{position:fixed;inset:0;background:#0d0d0d;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -2984,17 +2987,17 @@ const KB_FORM_FACTORS={
   f40:{label:'40%',hasFRow:false,nav:false,arrows:false,numpad:false,noDigitRow:true,macExcluded:true},
   // Portable 15-17" avec pavé numérique intégré : colonne de navigation
   // compacte + pavé numérique, aucun MacBook n'en a jamais eu.
-  port_avec:{label:'Portable (avec pavé num.)',hasFRow:true,nav:'compact',arrows:true,numpad:true,portable:true,macExcluded:true},
+  port_avec:{label:'Avec pavé num.',hasFRow:true,nav:'compact',arrows:true,numpad:true,portable:true,macExcluded:true},
   // Portable 13-15" sans pavé numérique (le plus courant) : pas de bloc
   // navigation dédié, Pg.préc/Pg.suiv à hauteur de la rangée Ctrl et
   // ◀/▼/▶ dans une 7e rangée qui déborde sous le clavier.
-  port_sans:{label:'Portable (sans pavé num.)',hasFRow:true,nav:false,arrows:'cluster',numpad:false,portable:true,macExcluded:true},
+  port_sans:{label:'Sans pavé num.',hasFRow:true,nav:false,arrows:'cluster',numpad:false,portable:true,macExcluded:true},
   // Ultraportable très fin (Dell XPS et équivalents) : Pg.préc/Pg.suiv
   // déplacées en couche Fn, flèches en demi-hauteur, tout dans la rangée du bas.
-  port_ultra:{label:'Portable (ultra-compact)',hasFRow:true,nav:false,arrows:'half',numpad:false,portable:true,macExcluded:true},
+  port_ultra:{label:'Ultra-compact',hasFRow:true,nav:false,arrows:'half',numpad:false,portable:true,macExcluded:true},
   // MacBook : un seul clavier réel quelle que soit la taille d'écran (13 à
   // 16"), jamais de pavé numérique — seul format Portable proposé pour Mac.
-  port_mac:{label:'Portable',hasFRow:true,nav:false,arrows:true,numpad:false,portable:true,macOnly:true},
+  port_mac:{label:'MacBook',hasFRow:true,nav:false,arrows:true,numpad:false,portable:true,macOnly:true},
 };
 function getKbFormFactorId(){
   try{
@@ -3016,7 +3019,12 @@ function kbFormFactorIdsFor(azertyId){
 }
 function kbFormBtnsHTML(azertyId){
   const activeId=getKbFormFactorId();
-  return kbFormFactorIdsFor(azertyId).map(id=>`<button class="settings-btn kb-form-btn${activeId===id?' active':''}" data-kb-form="${id}" onclick="app.setKbFormFactor('${id}')">${KB_FORM_FACTORS[id].label}</button>`).join('');
+  const btn=id=>`<button class="settings-btn kb-form-btn${activeId===id?' active':''}" data-kb-form="${id}" onclick="app.setKbFormFactor('${id}')">${KB_FORM_FACTORS[id].label}</button>`;
+  const ids=kbFormFactorIdsFor(azertyId);
+  const fixeIds=ids.filter(id=>!KB_FORM_FACTORS[id].portable);
+  const portIds=ids.filter(id=>KB_FORM_FACTORS[id].portable);
+  const group=(label,groupIds)=>groupIds.length?`<div class="kb-form-group"><span class="kb-form-group-label">${label}</span><div class="kb-form-group-btns">${groupIds.map(btn).join('')}</div></div>`:'';
+  return group('Fixe',fixeIds)+group('Portable',portIds);
 }
 /* Moteur de rendu de l'aperçu clavier des réglages : grille en positions
    absolues (unité = px), même principe que le prototype des 26 configurations
@@ -10889,7 +10897,7 @@ const app={
             <strong>Format du clavier</strong>
             <span>La taille de ton clavier (pavé numérique, flèches, rangée de fonction…).</span>
           </div>
-          <div id="kb-form-btns" style="display:flex;gap:8px;flex-wrap:wrap">
+          <div id="kb-form-btns" style="display:flex;flex-direction:column;gap:10px">
             ${kbFormBtnsHTML(getKbLayoutId())}
           </div>
           <div id="kb-layout-preview" style="width:100%;overflow-x:auto">${kbFullPreviewHTML(getKbLayoutId(),getKbFormFactorId())}</div>
