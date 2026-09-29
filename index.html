@@ -908,11 +908,14 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 
 /* MODULES HUB (page Cours) */
 .modules-hub-page{max-width:1120px;margin:0 auto;padding:0 24px 8px}
-.stat-strip{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 22px;margin:8px 0 38px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
-.stat-item{display:flex;align-items:center;gap:10px}
-.stat-icon{width:32px;height:32px;border-radius:9px;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.stat-txt b{display:block;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;line-height:1.2}
-.stat-txt span{font-size:12px;color:var(--muted);font-weight:600}
+/* Style repris de la brochure imprimée : grand chiffre gras à l'accent,
+   libellé discret en dessous, sans carte ni encadré — pensé pour un fond
+   blanc/crème, pas pour flotter sur .home-hero. */
+.hub-stats-row{display:flex;align-items:center;gap:28px;margin:6px 0 36px;flex-wrap:wrap}
+.hub-stat b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-size:34px;font-weight:800;color:var(--accent);line-height:1.05;letter-spacing:-0.01em}
+.hub-stat span{font-size:13px;color:var(--muted);font-weight:600}
+.hub-stat-divider{width:1px;height:34px;background:var(--border)}
+@media(max-width:560px){.hub-stats-row{gap:18px}.hub-stat b{font-size:28px}}
 .hub-section-hdr{margin-bottom:18px}
 .hub-section-hdr h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:4px}
 .hub-section-hdr p{color:var(--muted);font-size:14.5px}
@@ -6707,9 +6710,10 @@ const app={
         </div>
       </div>
       <div class="modules-hub-page">
-        <div class="stat-strip">
-          <div class="stat-item"><div class="stat-icon">📚</div><div class="stat-txt"><b>65+</b><span>leçons au total</span></div></div>
-          <div class="stat-item"><div class="stat-icon">🧩</div><div class="stat-txt"><b>4</b><span>modules</span></div></div>
+        <div class="hub-stats-row">
+          <div class="hub-stat"><b>65+</b><span>leçons au total</span></div>
+          <div class="hub-stat-divider"></div>
+          <div class="hub-stat"><b>4</b><span>modules</span></div>
         </div>
         <div class="hub-section-hdr"><h2>Les modules</h2><p>Choisis librement, dans l'ordre que tu veux.</p></div>
         <div class="selectorD">
@@ -6722,16 +6726,6 @@ const app={
         <div style="text-align:center;margin:0 0 32px">
           <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:7px">Le saviez-vous ?</div>
           <div id="hubFunFact" style="font-size:15px;color:var(--txt);font-weight:600;max-width:620px;margin:0 auto;line-height:1.5"></div>
-        </div>
-        <div class="school-banner" style="padding:0 0 8px">
-          <div class="school-banner-inner">
-            <div class="school-banner-content">
-              <h2>On ajoute des modules régulièrement</h2>
-              <p>Continue à progresser dans ceux qui sont déjà là : les nouveaux arriveront au même endroit, sans rien changer à ce que tu as déjà fait.</p>
-              <div class="school-banner-actions"><button class="school-banner-btn" onclick="go('stats')">Voir ma progression →</button></div>
-            </div>
-            <div class="school-banner-visual"><img src="/images/keypace-mascot-cheer.webp" width="282" height="303" alt="" loading="eager" decoding="async" style="height:150px;width:auto;filter:drop-shadow(0 10px 20px rgba(0,0,0,.22))"></div>
-          </div>
         </div>
       </div>`;
     const activeEl=document.querySelector('#hubTabs .tabD1.active');
