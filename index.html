@@ -1047,6 +1047,19 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .stats-header{margin-bottom:24px}
 .stats-header h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:38px;letter-spacing:-0.03em;margin-bottom:6px}
 .stats-header p{font-size:17px;color:#7A7365}
+.cls-path{scrollbar-width:thin;-webkit-mask-image:linear-gradient(90deg,#000 94%,transparent);mask-image:linear-gradient(90deg,#000 94%,transparent)}
+.cls-kpi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;transition:transform .2s,box-shadow .2s}
+.cls-kpi:hover{transform:translateY(-2px);box-shadow:0 10px 24px -12px rgba(22,20,15,.18)}
+.cls-chip{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:8px 13px;font:inherit;font-size:13.5px;font-weight:600;color:var(--txt);cursor:pointer;transition:border-color .15s,transform .15s}
+.cls-chip:hover{border-color:var(--accent);transform:translateY(-1px)}
+.cls-chip b{font-size:17px;font-weight:800}
+.asg-row{display:grid;grid-template-columns:44px minmax(0,1fr) 150px 190px auto;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);transition:background .15s}
+.asg-row:last-child{border-bottom:none}
+.asg-row:hover{background:var(--light)}
+.asg-tag{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--light);color:var(--muted);white-space:nowrap}
+.asg-tag.late{background:rgba(229,72,77,.12);color:var(--danger)}
+.asg-tag.done{background:rgba(31,169,113,.14);color:var(--success)}
+@media(max-width:760px){.asg-row{grid-template-columns:44px minmax(0,1fr) auto}.asg-row .asg-due,.asg-row .asg-prog{grid-column:2 / -1}}
 .stats-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
 .scard{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px}
 .scard-label{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:4px}
@@ -12402,6 +12415,7 @@ const app={
     if(this.view!=='classes')go('classes');
     this._classesSub='class';
     this._classViewingId=id;
+    if(!opts.silent)this._classFilter='all';
     if(!opts.silent)document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
     let d;
     try{
@@ -12421,21 +12435,23 @@ const app={
     this._classAsg=asg;
     const modules=d.modules||[];
     const nStu=students.length||1;
-    const pathHtml=modules.length?`<div style="display:flex;gap:0;overflow-x:auto;padding:8px 2px 6px">
+    const focusIdx=(()=>{let best=-1,bp=0;modules.forEach((m,i)=>{if(m.avgPct>0&&m.avgPct<100&&m.avgPct>bp){bp=m.avgPct;best=i;}});return best;})();
+    const pathHtml=modules.length?`<div class="cls-path" style="display:flex;gap:0;overflow-x:auto;padding:14px 44px 10px 4px">
       ${modules.map((m,i)=>{
         const pct=m.avgPct;
-        const locked=pct===0;
-        const ringColor=pct>=100?'var(--success)':pct>0?'var(--warning)':'var(--border)';
-        const prevReached=i===0||modules[i-1].avgPct>0;
-        return `<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:86px;position:relative">
-          ${i>0?`<div style="position:absolute;top:23px;left:-43px;width:86px;height:2px;background:${prevReached?'var(--accent)':'var(--border)'};z-index:0"></div>`:''}
-          <div style="width:48px;height:48px;border-radius:50%;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;background:conic-gradient(${ringColor} ${Math.max(pct,pct>0?6:0)}%, var(--border) 0);flex-shrink:0">
-            <div style="width:39px;height:39px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center">
-              ${locked?`<span style="color:var(--muted);font-size:15px">${ICONS.lock}</span>`:pct>=100?`<span style="color:var(--success);font-size:17px;font-weight:800">✓</span>`:`<span style="font-size:11px;font-weight:700;color:var(--warning);font-family:'JetBrains Mono',monospace">${pct}%</span>`}
+        const isFocus=i===focusIdx;
+        const ringColor=isFocus?'var(--accent)':pct>=100?'var(--success)':pct>0?'var(--warning)':'var(--border)';
+        const size=isFocus?58:48,inner=isFocus?48:39;
+        const label=pct>=100?'Maîtrisé':isFocus?'Le plus travaillé':pct>0?'En cours':'Pas commencé';
+        return `<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:92px;position:relative;opacity:${pct>0?1:.6}">
+          ${i>0?`<div style="position:absolute;top:29px;left:-46px;width:92px;height:3px;border-radius:3px;background:${modules[i-1].avgPct>=100?'var(--success)':'var(--border)'};z-index:0"></div>`:''}
+          <div style="width:${size}px;height:${size}px;border-radius:50%;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;margin-top:${isFocus?0:5}px;background:conic-gradient(${ringColor} ${Math.max(pct,pct>0?6:0)}%, var(--border) 0);flex-shrink:0;${isFocus?'box-shadow:0 0 0 5px rgba(255,77,46,.13),0 8px 18px -8px rgba(255,77,46,.5)':''}">
+            <div style="width:${inner}px;height:${inner}px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center">
+              ${pct>=100?`<span style="color:var(--success);font-size:17px;font-weight:800">✓</span>`:`<span style="font-size:${isFocus?13:11}px;font-weight:700;color:${pct>0?(isFocus?'var(--accent)':'var(--warning)'):'var(--muted)'};font-family:'JetBrains Mono',monospace">${pct}%</span>`}
             </div>
           </div>
-          <div style="font-size:11px;text-align:center;margin-top:8px;font-weight:600;line-height:1.3;color:var(--txt)">${this._esc(m.name.replace(/^\d+\.\s*/,''))}</div>
-          <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:1px">${pct>=100?'Maîtrisé':pct>0?'En cours':'À venir'}</div>
+          <div style="font-size:11.5px;text-align:center;margin-top:8px;font-weight:700;line-height:1.3;color:var(--txt);padding:0 4px">${this._esc(m.name.replace(/^\d+\.\s*/,''))}</div>
+          <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:1px">${label}</div>
         </div>`;
       }).join('')}
     </div>`:'';
@@ -12446,20 +12462,23 @@ const app={
           <span style="font-size:13.5px;font-weight:600">${this._esc(m.name.replace(/^\d+\.\s*/,''))}</span>
           <span style="font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace">${m.mastered} · ${m.inProgress} · ${m.behind}</span>
         </div>
-        <div style="height:7px;border-radius:4px;background:var(--light);overflow:hidden;display:flex">
+        <div style="height:8px;border-radius:5px;background:var(--light);overflow:hidden;display:flex">
           <span style="display:block;width:${mPct}%;background:var(--success)"></span>
           <span style="display:block;width:${pPct}%;background:var(--warning)"></span>
-          <span style="display:block;width:${bPct}%;background:var(--danger);opacity:.6"></span>
+          <span style="display:block;width:${bPct}%;background:var(--border)"></span>
         </div>
       </div>`;
     }).join('');
     const weak=d.weakestModule;
     const skillsCard=modules.length?`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 22px;margin-bottom:24px">
       <div style="font-size:15px;font-weight:700;margin-bottom:2px">Parcours de compétences</div>
-      <div style="font-size:12.5px;color:var(--muted);margin-bottom:6px">Maîtrise moyenne de la classe, module par module.</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:6px">Maîtrise moyenne de la classe, module par module. Chaque module peut être abordé dans n'importe quel ordre.</div>
       ${pathHtml}
       ${skillBarsHtml?`<div style="margin-top:18px;padding-top:18px;border-top:1px solid var(--border)">
-        <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px">Répartition par module <span style="font-family:'JetBrains Mono',monospace">(maîtrisé · en cours · pas commencé)</span></div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap">Répartition par module
+          <span style="display:inline-flex;align-items:center;gap:5px;font-weight:600"><i style="width:10px;height:10px;border-radius:3px;background:var(--success);display:inline-block"></i>maîtrisé</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-weight:600"><i style="width:10px;height:10px;border-radius:3px;background:var(--warning);display:inline-block"></i>en cours</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-weight:600"><i style="width:10px;height:10px;border-radius:3px;background:var(--border);display:inline-block"></i>pas commencé</span></div>
         ${skillBarsHtml}
       </div>`:''}
       ${weak?`<div style="margin-top:18px;background:var(--light);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
@@ -12470,23 +12489,51 @@ const app={
         <button onclick="app.openAssignModal('${d.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap">Assigner un exercice ciblé</button>
       </div>`:''}
     </div>`:'';
-    const asgHtml=`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">
+    const nowMs=Date.now();
+    const stuFlags=st=>{const f=[];if(st.daysSinceActive==null)f.push('never');if(st.alertStuck)f.push('stuck');if(st.alertInactive)f.push('inactive');if(st.avgAcc!=null&&st.avgAcc<80)f.push('lowacc');return f;};
+    const flagCount={never:0,stuck:0,inactive:0,lowacc:0};
+    students.forEach(st=>stuFlags(st).forEach(k=>flagCount[k]++));
+    const lateAsg=asg.filter(a=>a.dueDate&&a.total&&a.doneCount<a.total&&new Date(a.dueDate).getTime()+864e5<nowMs);
+    const plural=(n,one,many)=>n>1?many:one;
+    const chipDefs=[
+      ['never',flagCount.never,plural(flagCount.never,"n'a jamais commencé","n'ont jamais commencé"),'var(--border)'],
+      ['stuck',flagCount.stuck,plural(flagCount.stuck,'élève bloqué','élèves bloqués'),'var(--danger)'],
+      ['inactive',flagCount.inactive,plural(flagCount.inactive,'élève inactif','élèves inactifs'),'var(--warning)'],
+      ['lowacc',flagCount.lowacc,'sous 80 % de précision','var(--danger)']
+    ].filter(c=>c[1]>0);
+    const todoChips=chipDefs.map(c=>`<button class="cls-chip" data-fchip="${c[0]}" onclick="app.filterClassStudents('${c[0]}')"><span style="width:9px;height:9px;border-radius:50%;background:${c[3]};display:inline-block"></span><b>${c[1]}</b>${c[2]}</button>`).join('')
+      +(lateAsg.length?`<button class="cls-chip" onclick="document.getElementById('class-asg-card').scrollIntoView({behavior:'smooth',block:'start'})"><span style="width:9px;height:9px;border-radius:50%;background:var(--danger);display:inline-block"></span><b>${lateAsg.length}</b>${plural(lateAsg.length,'devoir en retard','devoirs en retard')}</button>`:'');
+    const todoHtml=students.length&&todoChips?`<div style="background:linear-gradient(120deg,rgba(255,77,46,.07),var(--card) 60%);border:1px solid var(--border);border-radius:16px;padding:18px 22px;margin-bottom:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <img src="/images/keypace-mascot-idea.webp" alt="" loading="lazy" decoding="async" style="height:84px;width:auto;flex-shrink:0">
+      <div style="flex:1;min-width:240px">
+        <div style="font-size:15px;font-weight:700;margin-bottom:10px">À suivre</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">${todoChips}</div>
+      </div>
+    </div>`:'';
+    const asgHtml=`<div id="class-asg-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)">
-        <div style="font-size:15px;font-weight:700">Devoirs</div>
-        <button onclick="app.openAssignModal('${d.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">+ Assigner</button>
+        <div style="font-size:15px;font-weight:700">Devoirs ${asg.length?`<span style="font-size:13px;font-weight:600;color:var(--muted)">· ${asg.length}</span>`:''}</div>
+        <button onclick="app.openAssignModal('${d.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 5px 14px rgba(255,77,46,.3)">+ Assigner un devoir</button>
       </div>
       ${asg.length===0?`<div style="padding:26px 20px;text-align:center;color:var(--muted);font-size:13px">Aucun devoir. Assigne un exercice à réaliser pour la classe.</div>`:asg.map(a=>{
         const pct=a.total?Math.round(a.doneCount/a.total*100):0;
         const due=a.dueDate?new Date(a.dueDate).toLocaleDateString('fr-FR'):null;
-        return`<div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border)">
-          <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.targetWpm?('Objectif '+a.targetWpm+' mpm · '):''}${due?('Échéance '+due):'Sans échéance'}</div></div>
-          <div style="min-width:130px;text-align:right">
+        const late=lateAsg.indexOf(a)>=0;
+        const ty=a.mode==='essay'?['✍️','rgba(139,92,246,.13)','Rédaction']:a.mode==='vocal'?['🎧','rgba(240,138,36,.15)','Dictée']:['⌨️','rgba(31,169,113,.13)','Exercice'];
+        const barColor=pct>=100?'var(--success)':late?'var(--danger)':'var(--warning)';
+        return`<div class="asg-row">
+          <div style="width:44px;height:44px;border-radius:13px;background:${ty[1]};display:flex;align-items:center;justify-content:center;font-size:20px">${ty[0]}</div>
+          <div style="min-width:0"><div style="font-weight:700;font-size:14.5px;overflow-wrap:anywhere">${this._esc(a.title)}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px"><span class="asg-tag">${ty[2]}</span>${a.targetWpm?`<span class="asg-tag">Objectif ${a.targetWpm} mpm</span>`:''}${pct>=100?'<span class="asg-tag done">Terminé ✓</span>':''}${late?`<span class="asg-tag late">${a.total-a.doneCount} en retard</span>`:''}</div></div>
+          <div class="asg-due" style="font-size:12.5px;font-weight:600;color:${late?'var(--danger)':'var(--muted)'}">${due?('Échéance '+due):'Sans échéance'}</div>
+          <div class="asg-prog">
             <div style="font-size:13px;font-weight:700;color:${pct>=100?'var(--success)':'var(--txt)'}">${a.doneCount}/${a.total} terminé${a.doneCount!==1?'s':''}</div>
-            <div style="height:6px;background:var(--light);border-radius:4px;margin-top:5px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct>=100?'var(--success)':'var(--accent)'}"></div></div>
+            <div style="height:7px;background:var(--light);border-radius:4px;margin-top:6px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${barColor};border-radius:4px"></div></div>
           </div>
+          <div style="display:flex;align-items:center;gap:2px">
           ${a.mode==='essay'?`<button onclick="app.viewEssays('${a.id}')" style="background:var(--light);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--txt);white-space:nowrap;margin-right:4px"><span style="color:var(--accent)">${ICONS.fileText}</span> Voir les copies</button>`:`<button onclick="app.viewAssignmentDetail('${a.id}')" style="background:var(--light);border:1px solid var(--border);border-radius:9px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--txt);white-space:nowrap;margin-right:4px"><span style="color:var(--accent)">${ICONS.fileText}</span> Voir le détail</button>`}
           <button onclick="app.editAssignment('${a.id}','${d.id}')" title="Modifier" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;opacity:.6;margin-right:2px" onmouseenter="this.style.opacity='1';this.style.color='var(--accent)'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">${ICONS.pencil}</button>
           <button onclick="app.deleteAssignment('${a.id}','${d.id}')" title="Supprimer" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;opacity:.6" onmouseenter="this.style.opacity='1';this.style.color='var(--danger)'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
+          </div>
         </div>`;
       }).join('')}
     </div>`;
@@ -12502,14 +12549,19 @@ const app={
           </div>
         </div>
       </div>
-      <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
-        ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px">
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ÉLÈVES</div><div style="font-size:28px;font-weight:800">${agg.total!=null?agg.total:students.length}</div></div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">ACTIFS / SEM.</div><div style="font-size:28px;font-weight:800">${agg.activeThisWeek||0}</div></div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">VITESSE MOY.</div><div style="font-size:28px;font-weight:800">${agg.avgWpm!=null?agg.avgWpm:'-'}<span style="font-size:14px;color:var(--muted);font-weight:500"> mpm</span></div></div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:6px">PRÉCISION MOY.</div><div style="font-size:28px;font-weight:800">${agg.avgAcc!=null?agg.avgAcc:'-'}<span style="font-size:14px;color:var(--muted);font-weight:500">${agg.avgAcc!=null?' %':''}</span></div></div>
+      <div style="padding:0 0 60px">
+        ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px">
+          ${(()=>{
+            const tot=agg.total!=null?agg.total:students.length,act=agg.activeThisWeek||0;
+            const lab=(ic,t)=>`<div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px"><span style="width:26px;height:26px;border-radius:8px;background:var(--light);display:inline-flex;align-items:center;justify-content:center;font-size:14px;letter-spacing:0">${ic}</span>${t}</div>`;
+            return `<div class="cls-kpi">${lab('👥','ÉLÈVES')}<div style="font-size:30px;font-weight:800">${tot}</div></div>
+          <div class="cls-kpi">${lab('⚡','ACTIFS / SEM.')}<div style="font-size:30px;font-weight:800">${act}<span style="font-size:14px;color:var(--muted);font-weight:500"> / ${tot}</span></div><div style="height:6px;border-radius:4px;background:var(--light);margin-top:10px;overflow:hidden"><div style="height:100%;width:${tot?Math.min(100,Math.round(act/tot*100)):0}%;background:var(--accent);border-radius:4px"></div></div></div>
+          <div class="cls-kpi">${lab('🚀','VITESSE MOY.')}<div style="font-size:30px;font-weight:800">${agg.avgWpm!=null?agg.avgWpm:'-'}<span style="font-size:14px;color:var(--muted);font-weight:500"> mpm</span></div></div>
+          <div class="cls-kpi">${lab('🎯','PRÉCISION MOY.')}<div style="font-size:30px;font-weight:800">${agg.avgAcc!=null?agg.avgAcc:'-'}<span style="font-size:14px;color:var(--muted);font-weight:500">${agg.avgAcc!=null?' %':''}</span></div></div>`;
+          })()}
         </div>`:''}
 
+        ${todoHtml}
         ${skillsCard}
         ${asgHtml}
 
@@ -12520,9 +12572,10 @@ const app={
             <div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Contacte ton établissement KeyPace pour ajouter tes élèves à cette classe.</div>
           </div>
         `:`
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+          <div id="class-stu-note" style="display:none;align-items:center;gap:10px;margin:0 0 10px;font-size:13px;color:var(--muted)"></div>
+          <div id="class-stu-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
             <div style="overflow-x:auto">
-            <div style="min-width:600px">
+            <div id="class-stu-list" style="min-width:600px">
             <div style="display:grid;grid-template-columns:1fr 90px 90px 70px 60px 120px 16px;padding:10px 20px;border-bottom:1px solid var(--border)">
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">ÉLÈVE</div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">VITESSE</div>
@@ -12537,7 +12590,7 @@ const app={
               const accColor=st.avgAcc==null?'var(--muted)':st.avgAcc>=95?'var(--success)':st.avgAcc>=80?'var(--txt)':'var(--danger)';
               const last=st.daysSinceActive==null?'jamais':st.daysSinceActive===0?"aujourd'hui":st.daysSinceActive===1?'hier':'il y a '+st.daysSinceActive+' j';
               const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'var(--warning)':'var(--muted)';
-              return`<div onclick="app.viewStudent('${d.id}','${st.studentId}')" style="display:grid;grid-template-columns:1fr 90px 90px 70px 60px 120px 16px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
+              return`<div data-f="${stuFlags(st).join(' ')}" onclick="app.viewStudent('${d.id}','${st.studentId}')" style="display:grid;grid-template-columns:1fr 90px 90px 70px 60px 120px 16px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
                 <div><div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">${this._studentPrimary(st)}${st.alertStuck?`<span style="font-size:10.5px;font-weight:700;color:var(--danger);background:rgba(229,72,77,0.1);padding:1px 7px;border-radius:99px">⚠ bloqué</span>`:st.alertInactive?`<span style="font-size:10.5px;font-weight:700;color:var(--warning);background:rgba(229,114,43,0.1);padding:1px 7px;border-radius:99px">⚠ inactif</span>`:''}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${this._studentSub(st)?this._studentSub(st)+' · ':''}${st.clearedLessons} leçon${st.clearedLessons!==1?'s':''} validée${st.clearedLessons!==1?'s':''}</div></div>
                 <div style="text-align:center;font-size:16px;font-weight:800;color:${wpmColor}">${st.avgWpm!=null?st.avgWpm:'-'}</div>
                 <div style="text-align:center;font-size:16px;font-weight:800;color:${accColor}">${st.avgAcc!=null?st.avgAcc+'%':'-'}</div>
@@ -12552,6 +12605,7 @@ const app={
           </div>
         `}
       </div></div>`;
+    this._applyClassFilter();
     // Rafraîchissement silencieux périodique (résultats d'élèves saisis en
     // dehors du navigateur du prof) — remplace la dépendance totale au clic
     // manuel sur "↻ Actualiser". S'arrête dès qu'on quitte cette classe.
@@ -12559,6 +12613,25 @@ const app={
     this._classRefreshTimer=setInterval(()=>{
       if(this._classesSub==='class'&&this._classViewingId===id&&document.visibilityState==='visible')this.viewClass(id,{silent:true});
     },25000);
+  },
+
+  filterClassStudents(key){
+    this._classFilter=this._classFilter===key?'all':key;
+    this._applyClassFilter();
+    if(this._classFilter!=='all'){const el=document.getElementById('class-stu-card');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+  },
+
+  _applyClassFilter(){
+    const f=this._classFilter||'all';
+    const list=document.getElementById('class-stu-list');
+    if(list)list.querySelectorAll('[data-f]').forEach(r=>{r.style.display=(f==='all'||r.dataset.f.split(' ').indexOf(f)>=0)?'grid':'none';});
+    document.querySelectorAll('[data-fchip]').forEach(c=>{const on=c.dataset.fchip===f;c.style.borderColor=on?'var(--accent)':'var(--border)';c.style.background=on?'rgba(255,77,46,.08)':'var(--card)';});
+    const note=document.getElementById('class-stu-note');
+    if(note){
+      const labels={never:"Élèves qui n'ont jamais commencé",stuck:'Élèves bloqués',inactive:'Élèves inactifs',lowacc:'Élèves sous 80 % de précision'};
+      if(f==='all'){note.style.display='none';note.innerHTML='';}
+      else{note.style.display='flex';note.innerHTML='<span style="font-weight:700;color:var(--txt)">'+labels[f]+'</span><button onclick="app.filterClassStudents(\''+f+'\')" style="background:none;border:none;color:var(--accent);font:inherit;font-weight:700;cursor:pointer;padding:0">Tout afficher</button>';}
+    }
   },
 
   async submitImport(classId){
