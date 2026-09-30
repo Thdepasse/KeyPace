@@ -2608,6 +2608,7 @@ function applyMobileNav(){
 }
 let _wasMobile=null;
 window.addEventListener('resize',()=>{
+  console.log('[debug] window resize event, innerWidth=',window.innerWidth,'innerHeight=',window.innerHeight,'isMobileLayout=',isMobileLayout()); // TODO: retirer après diagnostic du bug de scroll
   const m=isMobileLayout();
   if(m===_wasMobile)return;
   _wasMobile=m;
@@ -5641,6 +5642,7 @@ const app={
     if(v!=='lessons')document.getElementById('page-lessons').innerHTML='';
     ['home','test','lessons','games','stats','classes'].forEach(p=>{const el=document.getElementById('page-'+p);if(!el)return;if(p===v){el.style.display='block';el.classList.remove('_pgAnim');void el.offsetWidth;el.classList.add('_pgAnim');}else el.style.display='none';});
     ['home','test','lessons','games','stats','classes'].forEach(id=>{const el=document.getElementById('nav-'+id);if(el)el.classList.toggle('active',id===v);});
+    console.trace('[debug] renderView→scrollTo(0) for view=',v); // TODO: retirer après diagnostic du bug de scroll
     window.scrollTo({top:0,behavior:'instant'});
     const _meta={
       home:['KeyPace – Apprenez à taper vite sur clavier AZERTY','KeyPace : 65 leçons progressives pour apprendre la dactylographie AZERTY. Test de vitesse, jeux de frappe et suivi de progression. Gratuit, en français, sans installation.'],
