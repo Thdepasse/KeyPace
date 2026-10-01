@@ -4302,8 +4302,8 @@ const HUB_MODULES=[
     ]},
   {id:'mail', color:'#4F6BE0', grad:'linear-gradient(135deg,#8DA2FF 0%,#4F6BE0 55%,#3A50C4 100%)', icon:'✉️', img:'/images/keypace-mascot-mail-allonge.webp',
     cat:'Écriture', title:'Rédiger un mail',
-    desc:"Leçon après leçon comme un vrai cours de français : où écrire quoi, le nom de chaque partie du mail, et comment s'adresser à la bonne personne.",
-    status:'soon', statusTxt:'Bientôt', cta:'Bientôt',
+    desc:"Où écrire quoi, le ton juste selon la personne, repérer et corriger les erreurs, puis écrire ton propre mail avec une analyse en direct. Termine par un quiz final.",
+    status:'live', statusTxt:'Disponible', cta:'Commencer →', href:'/cours/ecrire-un-mail',
     decor:[]},
   {id:'conj', color:'#3FA84E', grad:'linear-gradient(135deg,#7BDD7C 0%,#3FA84E 55%,#2C8A3C 100%)', icon:'📖', img:'/images/keypace-mascot-conjugaison-reflexion.webp',
     cat:'Grammaire', title:'Conjugaison',
@@ -4348,7 +4348,7 @@ function hubStageHTML(mod){
       <p>${mod.desc}</p>
       <div class="stageD1-foot">
         <span class="stageD1-status">${mod.statusTxt}</span>
-        <button class="stageD1-cta" style="color:${mod.color}" ${mod.status==='live'?`onclick="app.enterBasesModule()"`:'disabled'}>${mod.cta}</button>
+        <button class="stageD1-cta" style="color:${mod.color}" ${mod.status==='live'?`onclick="${mod.href?`location.href='${mod.href}'`:'app.enterBasesModule()'}"`:'disabled'}>${mod.cta}</button>
       </div>
     </div>`;
 }
