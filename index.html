@@ -1063,6 +1063,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .hm-t td.hd{padding:0 8px 0 0;white-space:nowrap}
 .hm-t .hm-btn{background:var(--light);border:1px solid var(--border);border-radius:9px;padding:5px 11px;font:inherit;font-size:12px;font-weight:700;color:var(--txt);cursor:pointer;white-space:nowrap;transition:border-color .15s,color .15s}
 .hm-t .hm-btn:hover{border-color:var(--accent);color:var(--accent)}
+.hm-t th.hl-h{text-align:right;padding-left:10px}
 .hm-t td.hs{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--muted);text-align:right;padding-left:10px;white-space:nowrap}
 .asg-row{display:grid;grid-template-columns:44px minmax(0,1fr) 150px 190px auto;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);transition:background .15s}
 .asg-row:last-child{border-bottom:none}
@@ -12533,17 +12534,20 @@ const app={
         <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:#f2c9a0;display:inline-block"></i>Débuté</span>
         <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:var(--border);display:inline-block"></i>Pas commencé</span>
       </div>
-      <div style="overflow-x:auto"><table class="hm-t"><thead><tr><th></th><th></th>${modules.map((m,i)=>`<th title="${this._esc(m.name)}">${this._esc(HM_SHORT[i]||m.name.replace(/^\d+\.\s*/,''))}</th>`).join('')}<th></th><th></th></tr></thead>
+      <div id="class-stu-note" style="display:none;align-items:center;gap:10px;margin:0 0 10px;font-size:13px;color:var(--muted)"></div>
+      <div style="overflow-x:auto"><table class="hm-t"><thead><tr><th></th><th></th>${modules.map((m,i)=>`<th title="${this._esc(m.name)}">${this._esc(HM_SHORT[i]||m.name.replace(/^\d+\.\s*/,''))}</th>`).join('')}<th></th><th class="hl-h">Dernière activité</th><th></th></tr></thead>
       <tbody id="class-hm-body">${students.map((st,si)=>{
         const nm=(st.fullName||st.username||'?');
         const ini=this._esc(nm.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?');
         const stats=st.avgWpm!=null?`${st.avgWpm} mpm · <span style="${st.avgAcc!=null&&st.avgAcc<80?'color:var(--danger)':''}">${st.avgAcc!=null?st.avgAcc+'%':'-'}</span>`:'<span style="color:var(--danger)">jamais connecté</span>';
         const badge=st.alertStuck?'<span style="font-size:10.5px;font-weight:700;color:var(--danger);background:rgba(229,72,77,0.1);padding:1px 7px;border-radius:99px;margin-left:6px">⚠ bloqué</span>':st.alertInactive?'<span style="font-size:10.5px;font-weight:700;color:var(--warning);background:rgba(229,114,43,0.1);padding:1px 7px;border-radius:99px;margin-left:6px">⚠ inactif</span>':'';
+        const last=st.daysSinceActive==null?'jamais':st.daysSinceActive===0?"aujourd'hui":st.daysSinceActive===1?'hier':'il y a '+st.daysSinceActive+' j';
+        const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'var(--warning)':'var(--muted)';
         return `<tr class="hr" data-f="${stuFlags(st).join(' ')}" onclick="app.viewStudent('${d.id}','${st.studentId}')" title="Ouvrir la fiche de ${this._esc(nm)}">
           <td class="hn"><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font:700 10.5px 'JetBrains Mono',monospace;color:#fff;margin-right:9px;vertical-align:middle;background:${HM_COLORS[si%HM_COLORS.length]}">${ini}</span>${this._studentPrimary(st)}${badge}</td>
           <td class="hd"><button class="hm-btn" onclick="event.stopPropagation();app.viewStudent('${d.id}','${st.studentId}')">Voir le détail ›</button></td>
           ${modules.map((m,mi)=>{const p=(st.modulesProgress||[])[mi];return `<td class="hc" style="background:${hmCell(p)}" title="${this._esc(m.name.replace(/^\d+\.\s*/,''))} : ${p?p.c+'/'+p.t+' leçons':'-'}"></td>`;}).join('')}
-          <td class="hs">${stats}</td><td style="color:var(--muted);font-size:14px">›</td>
+          <td class="hs">${stats}</td><td class="hs" style="color:${lastColor}">${last}</td><td style="color:var(--muted);font-size:14px">›</td>
         </tr>`;
       }).join('')}</tbody></table></div>
     </div>`:'';
@@ -12610,48 +12614,12 @@ const app={
             <div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Contacte ton établissement KeyPace pour ajouter tes élèves à cette classe.</div>
           </div>
         `:`
-          <div style="font-size:15px;font-weight:700;margin:0 0 10px">Détail par élève</div>
-          <div id="class-stu-note" style="display:none;align-items:center;gap:10px;margin:0 0 10px;font-size:13px;color:var(--muted)"></div>
-          <div id="class-stu-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-            <div style="overflow-x:auto">
-            <div id="class-stu-list" style="min-width:600px">
-            <div style="display:grid;grid-template-columns:1fr 90px 90px 70px 60px 120px 16px;padding:10px 20px;border-bottom:1px solid var(--border)">
-              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">ÉLÈVE</div>
-              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">VITESSE</div>
-              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center">PRÉCISION</div>
-              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center" title="Leçons et tests de vitesse confondus">SESSIONS</div>
-              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:center" title="Jours consécutifs avec au moins un test">SÉRIE</div>
-              <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-align:right">DERNIÈRE ACTIVITÉ</div>
-              <div></div>
-            </div>
-            ${students.map(st=>{
-              const wpmColor=st.avgWpm==null?'var(--muted)':st.avgWpm>=50?'var(--success)':st.avgWpm>=30?'var(--txt)':'var(--danger)';
-              const accColor=st.avgAcc==null?'var(--muted)':st.avgAcc>=95?'var(--success)':st.avgAcc>=80?'var(--txt)':'var(--danger)';
-              const last=st.daysSinceActive==null?'jamais':st.daysSinceActive===0?"aujourd'hui":st.daysSinceActive===1?'hier':'il y a '+st.daysSinceActive+' j';
-              const lastColor=st.daysSinceActive!=null&&st.daysSinceActive>=7?'var(--warning)':'var(--muted)';
-              return`<div data-f="${stuFlags(st).join(' ')}" onclick="app.viewStudent('${d.id}','${st.studentId}')" style="display:grid;grid-template-columns:1fr 90px 90px 70px 60px 120px 16px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer" onmouseenter="this.style.background='var(--light)'" onmouseleave="this.style.background='transparent'">
-                <div><div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">${this._studentPrimary(st)}${st.alertStuck?`<span style="font-size:10.5px;font-weight:700;color:var(--danger);background:rgba(229,72,77,0.1);padding:1px 7px;border-radius:99px">⚠ bloqué</span>`:st.alertInactive?`<span style="font-size:10.5px;font-weight:700;color:var(--warning);background:rgba(229,114,43,0.1);padding:1px 7px;border-radius:99px">⚠ inactif</span>`:''}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${this._studentSub(st)?this._studentSub(st)+' · ':''}${st.clearedLessons} leçon${st.clearedLessons!==1?'s':''} validée${st.clearedLessons!==1?'s':''}</div></div>
-                <div style="text-align:center;font-size:16px;font-weight:800;color:${wpmColor}">${st.avgWpm!=null?st.avgWpm:'-'}</div>
-                <div style="text-align:center;font-size:16px;font-weight:800;color:${accColor}">${st.avgAcc!=null?st.avgAcc+'%':'-'}</div>
-                <div style="text-align:center;font-size:14px;color:var(--muted);font-weight:600">${st.sessions||'-'}</div>
-                <div style="text-align:center;font-size:13px;font-weight:700;color:${st.streak?'var(--accent)':'var(--muted)'};display:flex;align-items:center;justify-content:center;gap:3px">${st.streak?ICONS.flame:''}${st.streak||'-'}</div>
-                <div style="text-align:right;font-size:13px;font-weight:600;color:${lastColor}">${last}</div>
-                <div style="text-align:right;color:var(--muted);font-size:14px">›</div>
-              </div>`;
-            }).join('')}
-            </div>
-            </div>
-          </div>
         `}
       </div></div>`;
     this._applyClassFilter();
-    // Rafraîchissement silencieux périodique (résultats d'élèves saisis en
-    // dehors du navigateur du prof) — remplace la dépendance totale au clic
-    // manuel sur "↻ Actualiser". S'arrête dès qu'on quitte cette classe.
+    // Pas de rafraîchissement automatique : la page ne doit jamais bouger toute
+    // seule pendant que le prof la lit. Il actualise lui-même via "↻ Actualiser".
     clearInterval(this._classRefreshTimer);
-    this._classRefreshTimer=setInterval(()=>{
-      if(this._classesSub==='class'&&this._classViewingId===id&&document.visibilityState==='visible')this.viewClass(id,{silent:true});
-    },25000);
   },
 
   filterClassStudents(key){
