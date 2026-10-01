@@ -2,7 +2,7 @@
 // Lancer : node --test api/_class-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary, moduleMastery, MODULE_NAMES } = require('./_class-logic');
+const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary, moduleMastery, studentModuleProgress, MODULE_NAMES } = require('./_class-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -93,6 +93,14 @@ test('moduleMastery : répartit les élèves par module (maîtrisé / en cours /
   assert.equal(first.inProgress, 1);
   assert.equal(first.behind, 1);
   assert.equal(first.avgPct, 44); // (100 + 33.33 + 0) / 3 arrondi
+});
+
+test('studentModuleProgress : leçons validées / total par module pour un élève', () => {
+  const p = studentModuleProgress({ r1: { cleared: true }, r2: { cleared: true }, h1: { cleared: false } });
+  assert.equal(p.length, MODULE_NAMES.length);
+  assert.deepEqual(p[0], { c: 2, t: 6 });
+  assert.deepEqual(p[1], { c: 0, t: 6 });
+  assert.deepEqual(studentModuleProgress(null)[0], { c: 0, t: 6 });
 });
 
 test('canActAsTeacher : prof et admin oui, élève non', () => {

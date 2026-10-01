@@ -1053,6 +1053,14 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .cls-chip{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:8px 13px;font:inherit;font-size:13.5px;font-weight:600;color:var(--txt);cursor:pointer;transition:border-color .15s,transform .15s}
 .cls-chip:hover{border-color:var(--accent);transform:translateY(-1px)}
 .cls-chip b{font-size:17px;font-weight:800}
+.hm-t{border-collapse:separate;border-spacing:4px;min-width:820px;width:100%}
+.hm-t th{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--muted);text-align:center;padding:0 0 6px;vertical-align:bottom;white-space:nowrap}
+.hm-t td.hc{height:28px;min-width:34px;border-radius:7px;transition:transform .12s}
+.hm-t tr.hr{cursor:pointer}
+.hm-t tr.hr:hover td.hc{filter:brightness(.93)}
+.hm-t tr.hr:hover td.hn{color:var(--accent)}
+.hm-t td.hn{font-weight:700;font-size:14px;white-space:nowrap;padding-right:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.hm-t td.hs{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--muted);text-align:right;padding-left:10px;white-space:nowrap}
 .asg-row{display:grid;grid-template-columns:44px minmax(0,1fr) 150px 190px auto;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);transition:background .15s}
 .asg-row:last-child{border-bottom:none}
 .asg-row:hover{background:var(--light)}
@@ -12510,6 +12518,31 @@ const app={
         <div style="display:flex;flex-wrap:wrap;gap:10px">${todoChips}</div>
       </div>
     </div>`:'';
+    const HM_SHORT=['Base','Haut','Bas','Phrases','Maj.','Ponct.','Acc. dir.','Circ.','Tréma','Chiffres','Symb. 1','Symb. 2','Vitesse'];
+    const HM_COLORS=['#FF4D2E','#2a78d6','#1FA971','#8b5cf6','#F08A24','#0ea5a4'];
+    const hmCell=p=>!p||!p.t||!p.c?'var(--border)':p.c>=p.t?'var(--success)':p.c/p.t>=.5?'var(--warning)':'#f2c9a0';
+    const hmHtml=students.length&&students[0].modulesProgress?`<div id="class-hm-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 22px;margin-bottom:24px">
+      <div style="font-size:15px;font-weight:700;margin-bottom:2px">Qui en est où ?</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px">Une ligne par élève, une case par module. Clique sur une ligne pour ouvrir la fiche de l'élève.</div>
+      <div style="display:flex;gap:6px 16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:14px">
+        <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:var(--success);display:inline-block"></i>Maîtrisé</span>
+        <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:var(--warning);display:inline-block"></i>En cours (au moins la moitié)</span>
+        <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:#f2c9a0;display:inline-block"></i>Débuté</span>
+        <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:4px;background:var(--border);display:inline-block"></i>Pas commencé</span>
+      </div>
+      <div style="overflow-x:auto"><table class="hm-t"><thead><tr><th></th>${modules.map((m,i)=>`<th title="${this._esc(m.name)}">${this._esc(HM_SHORT[i]||m.name.replace(/^\d+\.\s*/,''))}</th>`).join('')}<th></th><th></th></tr></thead>
+      <tbody id="class-hm-body">${students.map((st,si)=>{
+        const nm=(st.fullName||st.username||'?');
+        const ini=this._esc(nm.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?');
+        const stats=st.avgWpm!=null?`${st.avgWpm} mpm · <span style="${st.avgAcc!=null&&st.avgAcc<80?'color:var(--danger)':''}">${st.avgAcc!=null?st.avgAcc+'%':'-'}</span>`:'<span style="color:var(--danger)">jamais connecté</span>';
+        const badge=st.alertStuck?'<span style="font-size:10.5px;font-weight:700;color:var(--danger);background:rgba(229,72,77,0.1);padding:1px 7px;border-radius:99px;margin-left:6px">⚠ bloqué</span>':st.alertInactive?'<span style="font-size:10.5px;font-weight:700;color:var(--warning);background:rgba(229,114,43,0.1);padding:1px 7px;border-radius:99px;margin-left:6px">⚠ inactif</span>':'';
+        return `<tr class="hr" data-f="${stuFlags(st).join(' ')}" onclick="app.viewStudent('${d.id}','${st.studentId}')" title="Ouvrir la fiche de ${this._esc(nm)}">
+          <td class="hn"><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font:700 10.5px 'JetBrains Mono',monospace;color:#fff;margin-right:9px;vertical-align:middle;background:${HM_COLORS[si%HM_COLORS.length]}">${ini}</span>${this._studentPrimary(st)}${badge}</td>
+          ${modules.map((m,mi)=>{const p=(st.modulesProgress||[])[mi];return `<td class="hc" style="background:${hmCell(p)}" title="${this._esc(m.name.replace(/^\d+\.\s*/,''))} : ${p?p.c+'/'+p.t+' leçons':'-'}"></td>`;}).join('')}
+          <td class="hs">${stats}</td><td style="color:var(--muted);font-size:14px">›</td>
+        </tr>`;
+      }).join('')}</tbody></table></div>
+    </div>`:'';
     const asgHtml=`<div id="class-asg-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)">
         <div style="font-size:15px;font-weight:700">Devoirs ${asg.length?`<span style="font-size:13px;font-weight:600;color:var(--muted)">· ${asg.length}</span>`:''}</div>
@@ -12563,6 +12596,7 @@ const app={
 
         ${todoHtml}
         ${skillsCard}
+        ${hmHtml}
         ${asgHtml}
 
         ${students.length===0?`
@@ -12572,6 +12606,7 @@ const app={
             <div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Contacte ton établissement KeyPace pour ajouter tes élèves à cette classe.</div>
           </div>
         `:`
+          <div style="font-size:15px;font-weight:700;margin:0 0 10px">Détail par élève</div>
           <div id="class-stu-note" style="display:none;align-items:center;gap:10px;margin:0 0 10px;font-size:13px;color:var(--muted)"></div>
           <div id="class-stu-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
             <div style="overflow-x:auto">
@@ -12618,13 +12653,12 @@ const app={
   filterClassStudents(key){
     this._classFilter=this._classFilter===key?'all':key;
     this._applyClassFilter();
-    if(this._classFilter!=='all'){const el=document.getElementById('class-stu-card');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+    if(this._classFilter!=='all'){const el=document.getElementById('class-hm-card')||document.getElementById('class-stu-card');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
   },
 
   _applyClassFilter(){
     const f=this._classFilter||'all';
-    const list=document.getElementById('class-stu-list');
-    if(list)list.querySelectorAll('[data-f]').forEach(r=>{r.style.display=(f==='all'||r.dataset.f.split(' ').indexOf(f)>=0)?'grid':'none';});
+    document.querySelectorAll('#class-stu-list [data-f],#class-hm-body [data-f]').forEach(r=>{r.style.display=(f==='all'||r.dataset.f.split(' ').indexOf(f)>=0)?(r.tagName==='TR'?'':'grid'):'none';});
     document.querySelectorAll('[data-fchip]').forEach(c=>{const on=c.dataset.fchip===f;c.style.borderColor=on?'var(--accent)':'var(--border)';c.style.background=on?'rgba(255,77,46,.08)':'var(--card)';});
     const note=document.getElementById('class-stu-note');
     if(note){
