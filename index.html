@@ -1989,6 +1989,7 @@ const ICONS={
   trendUp:_icon('<polyline points="3 17 9 11 13 15 21 6"/><polyline points="15 6 21 6 21 12"/>'),
   target:_icon('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>'),
   fileText:_icon('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/>'),
+  upload:_icon('<path d="M12 16V4"/><polyline points="7 9 12 4 17 9"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>'),
   clipboard:_icon('<rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><line x1="8.5" y1="10" x2="15.5" y2="10"/><line x1="8.5" y1="14" x2="15.5" y2="14"/>'),
   printer:_icon('<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>'),
   pencil:_icon('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>'),
@@ -12710,8 +12711,13 @@ const app={
         <div id="asg-block-custom" style="display:none">
           <label style="${lbl}">Titre du devoir</label>
           <input id="asg-title" placeholder="ex. Dictée sur les accents" style="${fld}">
-          <label style="${lbl}">Texte à taper par l'élève</label>
-          <textarea id="asg-text" rows="5" placeholder="Colle ou écris le texte du devoir…" style="${fld};resize:vertical;min-height:96px;line-height:1.5"></textarea>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <label style="${lbl}">Texte à taper par l'élève</label>
+            <button type="button" onclick="document.getElementById('asg-file').click()" title="Word (.docx), PDF, LibreOffice (.odt) ou texte brut (.txt). Le fichier est lu dans ton navigateur, rien n'est envoyé." style="display:flex;align-items:center;gap:6px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;padding:6px 11px;font:inherit;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;white-space:nowrap">${ICONS.upload} Importer un fichier</button>
+          </div>
+          <input type="file" id="asg-file" accept=".txt,.text,.md,.docx,.odt,.pdf" onchange="app._asgImportFile(this)" style="display:none">
+          <textarea id="asg-text" rows="5" placeholder="Colle ou écris le texte du devoir, ou importe un fichier (Word, PDF, texte)…" style="${fld};resize:vertical;min-height:96px;line-height:1.5"></textarea>
+          <div id="asg-import-status" style="display:none;font-size:12px;line-height:1.5;margin:-8px 0 14px"></div>
           <label style="${lbl}">Présentation</label>
           <div style="display:flex;gap:10px;margin:6px 0 14px">
             <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="written" checked onchange="app._asgOnModeChange()" style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px"><span style="color:var(--accent)">${ICONS.fileText}</span> Écrit</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">L'élève voit le texte et le recopie</span></span></label>
@@ -12766,6 +12772,193 @@ const app={
     const sb=document.getElementById('asg-speed-block');
     if(sb)sb.style.display=type==='essay'?'none':'';
     if(type==='essay')app._asgEssayTypeChange();
+  },
+
+  /* ── Import d'un texte externe (devoir « Texte ») ──
+     Tout est lu dans le navigateur : le fichier n'est jamais envoyé au serveur,
+     seul le texte final (relu et éventuellement corrigé par le prof) l'est.
+     Le moteur de frappe n'accepte que des touches d'un seul caractère : un saut
+     de ligne, une espace insécable ou un guillemet « » rendrait le devoir
+     impossible à terminer pour l'élève, d'où la normalisation ci-dessous. */
+  _asgDecodeText(buf){
+    const u=new Uint8Array(buf);
+    if(u[0]===0xFF&&u[1]===0xFE)return new TextDecoder('utf-16le').decode(buf);
+    if(u[0]===0xFE&&u[1]===0xFF)return new TextDecoder('utf-16be').decode(buf);
+    try{return new TextDecoder('utf-8',{fatal:true}).decode(buf);}
+    catch{return new TextDecoder('windows-1252').decode(buf);}
+  },
+  // Lecteur ZIP minimal (docx/odt sont des zips) : évite d'embarquer une librairie.
+  async _asgZipEntry(buf,wanted){
+    const dv=new DataView(buf),u8=new Uint8Array(buf);
+    let eocd=-1;
+    for(let i=buf.byteLength-22;i>=Math.max(0,buf.byteLength-22-65535);i--){if(dv.getUint32(i,true)===0x06054b50){eocd=i;break;}}
+    if(eocd<0)throw new Error('zip');
+    const count=dv.getUint16(eocd+10,true);let p=dv.getUint32(eocd+16,true);
+    const dec=new TextDecoder();
+    for(let n=0;n<count;n++){
+      if(dv.getUint32(p,true)!==0x02014b50)throw new Error('zip');
+      const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),usize=dv.getUint32(p+24,true);
+      const nlen=dv.getUint16(p+28,true),elen=dv.getUint16(p+30,true),clen=dv.getUint16(p+32,true),lho=dv.getUint32(p+42,true);
+      const name=dec.decode(u8.subarray(p+46,p+46+nlen));
+      p+=46+nlen+elen+clen;
+      if(name!==wanted)continue;
+      if(usize>50*1024*1024)throw new Error('zip-size');
+      const start=lho+30+dv.getUint16(lho+26,true)+dv.getUint16(lho+28,true);
+      const data=u8.subarray(start,start+csize);
+      if(method===0)return data;
+      if(method!==8)throw new Error('zip-method');
+      const out=new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw')));
+      return new Uint8Array(await out.arrayBuffer());
+    }
+    return null;
+  },
+  async _asgReadDocx(buf){
+    const xml=await this._asgZipEntry(buf,'word/document.xml');
+    if(!xml)throw new Error('docx');
+    const doc=new DOMParser().parseFromString(new TextDecoder().decode(xml),'application/xml');
+    if(doc.getElementsByTagName('parsererror').length)throw new Error('docx');
+    const W='http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+    const paras=[];
+    for(const p of doc.getElementsByTagNameNS(W,'p')){
+      let s='';
+      for(const el of p.getElementsByTagName('*')){
+        if(el.namespaceURI!==W)continue;
+        const n=el.localName;
+        if(n==='t')s+=el.textContent;
+        else if(n==='tab'||n==='br'||n==='cr')s+=' ';
+        else if(n==='noBreakHyphen')s+='-';
+      }
+      paras.push(s);
+    }
+    return paras.join('\n');
+  },
+  async _asgReadOdt(buf){
+    const xml=await this._asgZipEntry(buf,'content.xml');
+    if(!xml)throw new Error('odt');
+    const doc=new DOMParser().parseFromString(new TextDecoder().decode(xml),'application/xml');
+    if(doc.getElementsByTagName('parsererror').length)throw new Error('odt');
+    const T='urn:oasis:names:tc:opendocument:xmlns:text:1.0';
+    const walk=node=>{
+      let s='';
+      for(const c of node.childNodes){
+        if(c.nodeType===3)s+=c.data;
+        else if(c.nodeType===1){
+          if(c.namespaceURI===T&&c.localName==='s')s+=' '.repeat(Math.min(100,parseInt(c.getAttributeNS(T,'c')||'1',10)||1));
+          else if(c.namespaceURI===T&&(c.localName==='tab'||c.localName==='line-break'))s+=' ';
+          else s+=walk(c);
+        }
+      }
+      return s;
+    };
+    const paras=[];
+    for(const el of doc.getElementsByTagName('*')){
+      if(el.namespaceURI===T&&(el.localName==='p'||el.localName==='h'))paras.push(walk(el));
+    }
+    return paras.join('\n');
+  },
+  // pdf.js n'est chargé qu'à la première importation d'un PDF. Le worker est
+  // chargé en balise <script> (autorisée par la CSP) : pdf.js s'exécute alors
+  // sur le fil principal, sans Worker blob: que la CSP du site refuserait.
+  _asgLoadPdfJs(){
+    if(window.pdfjsLib&&window.pdfjsWorker)return Promise.resolve(window.pdfjsLib);
+    if(this._pdfjsP)return this._pdfjsP;
+    const base='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/';
+    const load=src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('cdn'));document.head.appendChild(s);});
+    this._pdfjsP=load(base+'pdf.min.js').then(()=>load(base+'pdf.worker.min.js')).then(()=>{
+      if(!window.pdfjsLib)throw new Error('cdn');
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc=base+'pdf.worker.min.js';
+      return window.pdfjsLib;
+    }).catch(e=>{this._pdfjsP=null;throw e;});
+    return this._pdfjsP;
+  },
+  async _asgReadPdf(buf){
+    const lib=await this._asgLoadPdfJs();
+    const pdf=await lib.getDocument({data:new Uint8Array(buf)}).promise;
+    let out='';
+    for(let i=1;i<=Math.min(pdf.numPages,100)&&out.length<60000;i++){
+      const tc=await (await pdf.getPage(i)).getTextContent();
+      let prev=null;
+      for(const it of tc.items){
+        if(!it.str&&!it.hasEOL)continue;
+        // pdf.js ne met pas toujours d'espace entre deux fragments d'une même ligne : on la devine d'après l'écart.
+        if(prev&&!prev.hasEOL&&!/\s$/.test(prev.str)&&!/^\s/.test(it.str)&&Math.abs(it.transform[5]-prev.transform[5])<2&&it.transform[4]-(prev.transform[4]+prev.width)>(it.height||10)*0.15)out+=' ';
+        out+=it.str;
+        if(it.hasEOL)out+='\n';
+        prev=it;
+      }
+      out+='\n';
+    }
+    return out;
+  },
+  _asgNormalizeImported(raw,opts){
+    const MAX=20000,notes=[];
+    let t=String(raw).normalize('NFC').replace(/[\u00AD\u200B-\u200D\u2060\uFEFF]/g,'');
+    if(opts&&opts.dehyphenate){
+      const b=t;
+      t=t.replace(/([a-zà-öø-\u00FF])-[ \t]*\r?\n[ \t]*([a-zà-öø-\u00FF])/g,'$1$2');
+      if(t!==b)notes.push('mots coupés en fin de ligne recollés');
+    }
+    const q=t;
+    t=t.replace(/«\s*/g,'"').replace(/\s*»/g,'"').replace(/[“”„‟]/g,'"').replace(/[‘’‚‛ʼ′]/g,"'")
+      .replace(/[–—―‑−]/g,'-').replace(/…/g,'...').replace(/[•●▪◦]/g,'-');
+    if(t!==q)notes.push('guillemets, apostrophes et tirets remplacés par ceux du clavier');
+    if(/[\r\n\u2028\u2029]/.test(t.trim()))notes.push('retours à la ligne remplacés par des espaces');
+    t=t.replace(/\s+/g,' ').trim();
+    const total=t.length;
+    let truncated=false;
+    if(t.length>MAX){
+      truncated=true;
+      let cut=t.slice(0,MAX);
+      const i=Math.max(cut.lastIndexOf('. '),cut.lastIndexOf('! '),cut.lastIndexOf('? '));
+      cut=i>MAX*0.7?cut.slice(0,i+1):cut.slice(0,cut.lastIndexOf(' '));
+      t=cut;
+    }
+    const odd=[...new Set(t.match(/[^\x20-\x7E\u00A1-\u00FF€œŒ]/g)||[])];
+    return{text:t,notes,odd,truncated,total,max:MAX};
+  },
+  async _asgImportFile(input){
+    const file=input.files&&input.files[0];input.value='';
+    if(!file)return;
+    const say=(html,tone)=>{
+      const el=document.getElementById('asg-import-status');if(!el)return;
+      el.style.display='block';
+      el.style.color=tone==='err'?'#E5484D':tone==='warn'?'#B45309':'var(--muted)';
+      el.innerHTML=html;
+    };
+    const name=this._esc(file.name);
+    const ext=(file.name.split('.').pop()||'').toLowerCase();
+    if(ext==='doc')return say('Les anciens fichiers Word (.doc) ne sont pas lisibles ici : enregistre-le en .docx (Fichier → Enregistrer sous) ou en PDF, puis réimporte-le.','err');
+    if(!['txt','text','md','docx','odt','pdf'].includes(ext))return say('Format non pris en charge. Formats acceptés : Word (.docx), PDF, LibreOffice (.odt) et texte brut (.txt).','err');
+    if(file.size>8*1024*1024)return say('Fichier trop volumineux (8 Mo maximum).','err');
+    say('Lecture de «&nbsp;'+name+'&nbsp;»…');
+    try{
+      const buf=await file.arrayBuffer();
+      let raw,dehyphenate=false;
+      if(ext==='docx')raw=await this._asgReadDocx(buf);
+      else if(ext==='odt')raw=await this._asgReadOdt(buf);
+      else if(ext==='pdf'){raw=await this._asgReadPdf(buf);dehyphenate=true;}
+      else{raw=this._asgDecodeText(buf);dehyphenate=true;}
+      const r=this._asgNormalizeImported(raw,{dehyphenate});
+      if(!r.text)return say(ext==='pdf'?"Aucun texte trouvé dans ce PDF (document scanné ou fait d'images ?). Utilise un PDF contenant du vrai texte, ou colle le texte à la main.":'Ce fichier ne contient aucun texte.','err');
+      const ta=document.getElementById('asg-text');
+      if(!ta)return;
+      const hadText=ta.value.trim().length>0;
+      ta.value=r.text;
+      const ti=document.getElementById('asg-title');
+      if(ti&&!ti.value.trim())ti.value=file.name.replace(/\.[^.]+$/,'').replace(/_+/g,' ').trim().slice(0,80);
+      const mins=r.text.length/5/30;
+      const fmt=n=>n.toLocaleString('fr-FR');
+      let html='<span style="color:#1FA971;font-weight:700">✓ «&nbsp;'+name+'&nbsp;» importé</span> · '+fmt(r.text.length)+' caractères · '+(mins<1?'moins d\'1 min':'≈ '+Math.round(mins)+' min')+' à 30 mpm'+(hadText?' · remplace le texte précédent':'');
+      if(r.notes.length)html+='<br>Adapté pour la frappe : '+r.notes.join(', ')+'.';
+      let tone='';
+      if(r.truncated){tone='warn';html+='<br><b>Texte tronqué</b> à '+fmt(r.max)+' caractères (original : '+fmt(r.total)+').';}
+      if(r.odd.length){tone='warn';html+='<br><b>À vérifier</b> — caractères difficiles à taper conservés : '+this._esc(r.odd.slice(0,8).join(' '))+'. Corrige le texte si besoin.';}
+      say(html,tone);
+    }catch(e){
+      if(e&&e.name==='PasswordException')return say('Ce PDF est protégé par un mot de passe : retire la protection puis réimporte-le.','err');
+      if(e&&e.message==='cdn')return say('Impossible de charger le lecteur PDF (connexion ?). Réessaie, ou colle le texte à la main.','err');
+      say('Impossible de lire « '+name+' » (fichier abîmé ou protégé ?). Essaie de le réenregistrer, ou colle le texte à la main.','err');
+    }
   },
 
   // Upload l'enregistrement en attente (this._asgRecBlob), si besoin — partagé
