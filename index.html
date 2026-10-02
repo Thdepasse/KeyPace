@@ -931,6 +931,126 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .les-best{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#1FA971}
 .expert-tag{font-size:10px;font-weight:700;color:var(--accent);background:rgba(255,77,46,0.1);padding:2px 6px;border-radius:5px;letter-spacing:.04em}
 
+/* PAGE PROGRÈS (profil collant + chapitres) */
+.pg-wrap{max-width:1120px;margin:0 auto;padding:44px 24px 70px}
+.pg-grid{display:grid;grid-template-columns:300px 1fr;gap:44px;align-items:start}
+.pg-side{position:sticky;top:84px;background:var(--card);border:1px solid var(--border);border-radius:30px;padding:28px}
+.pg-av{width:64px;height:64px;border-radius:20px;background:linear-gradient(140deg,#ff7a4d,var(--accent));color:#fff;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-size:30px;font-weight:800;box-shadow:0 10px 24px rgba(255,77,46,.35)}
+.pg-side h2{font-family:'Bricolage Grotesque',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:16px;overflow-wrap:anywhere}
+.pg-side .pg-sub{font-size:13px;color:var(--muted);margin-top:3px}
+.pg-goal{margin:22px 0 4px}
+.pg-goal-t{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700}
+.pg-goal-t span:last-child{color:var(--muted)}
+.pg-bar{height:10px;border-radius:99px;background:var(--light);overflow:hidden;margin-top:10px}
+.pg-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff7a4d,var(--accent))}
+.pg-sum{margin-top:18px;border-top:1px solid var(--border)}
+.pg-sum div{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.pg-sum div span{color:var(--muted);font-weight:600}
+.pg-sum div b{font-weight:800;white-space:nowrap}
+.pg-mascot{display:flex;justify-content:center;margin:18px 0 -8px}
+.pg-mascot img{height:150px;width:auto}
+.pg-cta{width:100%;justify-content:center;margin-top:8px;display:flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border:none;border-radius:13px;padding:13px 22px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 8px 20px -8px var(--accent);transition:transform .15s}
+.pg-cta:hover{transform:translateY(-2px)}
+.pg-sec{padding-bottom:44px;margin-bottom:44px;border-bottom:1.5px solid var(--border)}
+.pg-sec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.pg-no{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.14em}
+.pg-sec h2{font-family:'Bricolage Grotesque',sans-serif;font-size:34px;font-weight:800;letter-spacing:-.03em;margin:6px 0 4px;line-height:1.1}
+.pg-d{color:var(--muted);font-size:15px;margin-bottom:24px;max-width:520px;line-height:1.55}
+.pg-nums{display:flex;gap:46px;margin-bottom:24px;flex-wrap:wrap}
+.pg-big{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.03em;line-height:.95;color:var(--accent);font-size:76px}
+.pg-big small{font-size:22px;color:var(--muted);letter-spacing:0;margin-left:4px;font-weight:700}
+.pg-lbl{font-size:13.5px;color:var(--muted);font-weight:600;margin-top:6px}
+.pg-card{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:22px 22px 12px}
+.pg-kb{padding:28px 20px;overflow-x:auto}
+.pg-empty{text-align:center;padding:36px 20px;color:var(--muted);font-size:14.5px;line-height:1.6}
+.pg-last{margin-top:18px}
+.pg-last-r{display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:center;padding:11px 4px;border-top:1px solid var(--border);font-size:13px;color:var(--muted)}
+.pg-last-r:first-child{border-top:none}
+.pg-last-r b{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;letter-spacing:-.02em;color:var(--txt)}
+.pg-last-r b small{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);font-weight:600;margin-left:3px}
+.pg-acc{font-weight:700;color:#15784f;background:rgba(31,169,113,.12);padding:4px 10px;border-radius:999px;font-size:12px}
+.pg-cal{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,16px);gap:5px;justify-content:start;overflow-x:auto;padding-bottom:4px}
+.pg-cal i{width:16px;height:16px;border-radius:5px;background:#efe9dd}
+.pg-cal i.l1{background:rgba(255,77,46,.28)}.pg-cal i.l2{background:rgba(255,77,46,.55)}.pg-cal i.l3{background:rgba(255,77,46,.85)}.pg-cal i.l4{background:var(--accent)}
+.pg-cal i.f{background:transparent}
+.pg-cal-leg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-top:14px;flex-wrap:wrap}
+.pg-cal-leg i{width:12px;height:12px;border-radius:4px;display:inline-block}
+.pg-rec{border-top:1.5px solid var(--txt)}
+.pg-rec-r{display:grid;grid-template-columns:34px 1.2fr 1fr 1.3fr;gap:14px;align-items:center;padding:16px 0;border-bottom:1px solid var(--border)}
+.pg-rec-r .ico{color:var(--accent);font-size:20px}
+.pg-rec-r .nm{font-weight:800;font-size:15px}
+.pg-rec-r .vl{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;letter-spacing:-.02em}
+.pg-rec-r .vl small{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:0;margin-left:4px}
+.pg-rec-r .sb{font-size:12.5px;color:var(--muted);line-height:1.45}
+.pg-rec-r.empty .vl{color:#bdb4a3;font-size:16px}
+.pg-rec-r a{color:var(--accent);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px;background:none;border:none;padding:0;font:inherit;font-size:12.5px;display:block;margin-top:3px}
+.pg-main .spanel{border-radius:28px;margin-bottom:0;margin-top:18px}
+@media(max-width:900px){
+  .pg-wrap{padding:28px 16px 56px}
+  .pg-grid{grid-template-columns:minmax(0,1fr);gap:28px}
+  .pg-main{min-width:0}
+  .pg-kb{padding:20px 8px}
+  .pg-card{padding:16px 12px 8px}
+  .pg-side{position:static}
+  .pg-mascot{display:none}
+  .pg-sec h2{font-size:28px}
+  .pg-big{font-size:58px}
+  .pg-nums{gap:30px}
+  .pg-rec-r{grid-template-columns:30px 1fr auto}
+  .pg-rec-r .sb{grid-column:2 / span 2;margin-top:-8px}
+  .pg-last-r{grid-template-columns:96px 1fr auto}
+}
+
+/* PAGE CLASSE (élève) : devoirs d'abord */
+.cl-wrap{max-width:1120px;margin:0 auto;padding:0 24px 70px}
+.cl-hero{display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:center;padding:50px 0 34px}
+.cl-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.cl-h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.025em;line-height:1.04;font-size:clamp(34px,4.6vw,56px);margin:12px 0 14px}
+.cl-h1 em{font-style:normal;color:var(--accent)}
+.cl-lead{color:var(--muted);font-size:16.5px;line-height:1.6;max-width:480px}
+.cl-lead b{color:var(--txt)}
+.cl-mascot{display:flex;justify-content:center}
+.cl-mascot img{height:280px;width:auto;filter:drop-shadow(0 16px 22px rgba(255,77,46,.16))}
+.cl-back{background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;font-weight:600;padding:0 0 4px;display:flex;align-items:center;gap:6px}
+.cl-sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 16px}
+.cl-sec-h h2{font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.cl-sec-h span{font-size:13px;color:var(--muted)}
+.cl-todo{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:46px}
+.cl-card{padding:24px;border-radius:28px;background:var(--card);border:1px solid var(--border);display:flex;flex-direction:column;gap:14px;transition:transform .2s,box-shadow .2s}
+.cl-card:hover{transform:translateY(-3px);box-shadow:0 18px 36px rgba(22,20,15,.09)}
+.cl-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.cl-ico{width:46px;height:46px;border-radius:14px;background:rgba(255,77,46,.1);color:var(--accent);display:grid;place-items:center;font-size:22px}
+.cl-card h3{font-family:'Bricolage Grotesque',sans-serif;font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.15;overflow-wrap:anywhere}
+.cl-meta{display:flex;gap:7px;flex-wrap:wrap}
+.cl-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;background:var(--light);color:var(--muted);border:none;font-family:inherit}
+button.cl-pill{cursor:pointer}
+button.cl-pill:hover{color:var(--accent);background:rgba(255,77,46,.1)}
+.cl-pill.or{background:rgba(255,77,46,.1);color:var(--accent)}
+.cl-pill.gr{background:rgba(31,169,113,.12);color:#15784f}
+.cl-pill.rd{background:rgba(229,72,77,.12);color:#b3252a}
+.cl-go{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;border:none;border-radius:13px;padding:13px 22px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 8px 20px -8px var(--accent);transition:transform .15s}
+.cl-go:hover{transform:translateY(-2px)}
+.cl-done{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cl-drow{display:flex;align-items:center;gap:13px;padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--border)}
+.cl-ck{width:34px;height:34px;border-radius:50%;background:rgba(31,169,113,.14);color:var(--success);display:grid;place-items:center;font-weight:800;flex-shrink:0}
+.cl-drow div.t{flex:1;min-width:0}
+.cl-drow b{font-size:14px;line-height:1.3;display:block;overflow-wrap:anywhere}
+.cl-drow .s{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.cl-mini{border:1.5px solid var(--border);background:var(--card);color:var(--muted);border-radius:11px;padding:9px 15px;font-weight:800;font-size:13px;white-space:nowrap;cursor:pointer;font-family:inherit}
+.cl-classes{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.cl-class{display:flex;align-items:center;gap:14px;padding:18px;border-radius:24px;background:var(--card);border:1px solid var(--border);cursor:pointer;transition:transform .2s,box-shadow .2s}
+.cl-class:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(22,20,15,.08)}
+.cl-class .ini{width:48px;height:48px;border-radius:15px;background:rgba(255,77,46,.1);color:var(--accent);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px;flex-shrink:0}
+.cl-class .nm{font-weight:800;font-size:16px;line-height:1.2}
+.cl-class .sb{font-size:12px;color:var(--muted);margin-top:3px}
+.cl-empty{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:44px 24px;text-align:center;color:var(--muted)}
+@media(max-width:900px){
+  .cl-wrap{padding:0 16px 56px}
+  .cl-hero{grid-template-columns:1fr;padding:30px 0 24px}
+  .cl-mascot{display:none}
+  .cl-todo,.cl-done,.cl-classes{grid-template-columns:1fr}
+}
+
 /* MODULES HUB (page Cours) */
 .modules-hub-page{max-width:1120px;margin:0 auto;padding:0 24px 8px}
 /* Style repris de la brochure imprimée : grand chiffre gras à l'accent,
@@ -11840,44 +11960,130 @@ const app={
     const bestWpm=tests.length?Math.max(...tests.map(t=>t.wpm)):0;
     const avgAcc=tests.length?Math.round(tests.reduce((a,t)=>a+t.acc,0)/tests.length):0;
     const clearedLessons=ALL_LESSONS.filter(l=>this.lessonRec(l.id).cleared).length;
-    const gameBest=this.stats.gameBest||0;
     const dset=new Set(tests.map(t=>{const d=new Date(t.t);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();}));
     let streak=0;const cur=new Date();
     for(let i=0;i<60;i++){const k=cur.getFullYear()+'-'+cur.getMonth()+'-'+cur.getDate();if(dset.has(k)){streak++;cur.setDate(cur.getDate()-1);}else if(i===0){cur.setDate(cur.getDate()-1);}else break;}
-    // Vitesse récente : les 8 derniers tests (une barre par test), avec la vraie date sous chaque barre.
-    const lastN=tests.slice(-8);
-    const maxW=Math.max(40,...lastN.map(t=>t.wpm));
-    const _lbl=ts=>{const d=new Date(ts);const a=new Date();a.setHours(0,0,0,0);const b=new Date(ts);b.setHours(0,0,0,0);const dd=Math.round((a-b)/86400000);if(dd===0)return"auj.";if(dd===1)return"hier";return d.getDate()+'/'+(d.getMonth()+1);};
-    const chartHTML=lastN.length?lastN.map(t=>{const full=new Date(t.t).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});const tip=full+' · '+t.wpm+' mpm · '+t.acc+'%';return `<div class="cbar-wrap" title="${tip}"><div class="cbar-val">${t.wpm}</div><div class="cbar" style="height:${Math.max(6,Math.round(150*t.wpm/maxW))}px"></div><div class="cbar-lbl">${_lbl(t.t)}</div></div>`;}).join(''):'<div class="empty-hint">Pas encore de données.</div>';
     const rel=t=>{const d=Math.floor((Date.now()-t)/86400000);if(d<=0)return"aujourd'hui";if(d===1)return'hier';return'il y a '+d+' j';};
-    const recentHTML=tests.length===0?`<div class="empty-hint">Aucun test encore.<br><button class="btn-primary" style="padding:8px 16px;font-size:14px;margin-top:12px" onclick="go('test')">Commencer →</button></div>`:tests.slice(-5).reverse().map(t=>`<div class="recent-item"><div><div class="rwpm">${t.wpm} <span>mpm</span></div><div class="rwhen">${rel(t.t)}</div></div><div class="racc">${t.acc}%</div></div>`).join('');
-    document.getElementById('page-stats').innerHTML=`<div class="stats-section">
-      <div class="stats-header"><h1>Tes progrès</h1><p>Chaque test et chaque leçon comptent. Continue ta série !</p></div>
-      <div class="stats-cards">
-        <div class="scard"><div class="scard-label">Meilleure vitesse</div><div class="scard-val acc">${bestWpm}</div><div class="scard-unit">mots / minute</div></div>
-        <div class="scard"><div class="scard-label">Précision moy.</div><div class="scard-val">${avgAcc}%</div><div class="scard-unit">sur tous les tests</div></div>
-        <div class="scard"><div class="scard-label">Série</div><div class="scard-val">${streak}<span style="color:var(--accent);font-size:0.7em">${ICONS.flame}</span></div><div class="scard-unit">jours d'affilée</div></div>
-        <div class="scard"><div class="scard-label">Cours validés</div><div class="scard-val">${clearedLessons} <span style="font-size:20px;color:var(--muted)">/ ${ALL_LESSONS.length}</span></div><div class="scard-unit">leçons terminées</div></div>
-      </div>
-      ${this._certPanel()}
-      ${this._reviewBanner(clearedLessons)}
-      <div class="stats-grid">
-        <div class="spanel"><h3>Vitesse récente</h3><div class="chart">${chartHTML}</div></div>
-        <div class="spanel" style="margin-bottom:0"><h3>Derniers tests</h3><div class="recent-list">${recentHTML}</div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:22px">
-        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.target}</span> Frappe-mots : meilleur score</h3><div class="scard-val acc" style="font-size:36px;margin-top:8px">${gameBest} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div>${gameBest===0?'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance le jeu pour établir un score !</p>':''}</div>
-        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.raceCar}</span> Course de dactylo : record</h3>${this.stats.courseBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.courseBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.courseBest.acc}% précision · ${this.stats.courseBest.rank===1?'1ʳᵉ place 🥇':this.stats.courseBest.rank+'ᵉ place'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance une course pour établir ton record !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.ghost}</span> Contre ton fantôme : record</h3>${this.stats.ghostBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.ghostBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.ghostBest.acc}% précision</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance une course pour enregistrer ton premier fantôme !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.brain}</span> Simon des mots : record</h3>${this.stats.simonBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.simonBest.score} <span style="font-size:16px;color:var(--muted);font-weight:500">pts</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">séquence max : ${this.stats.simonBest.maxSeq} mots</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance Simon des mots pour établir ton record de mémoire !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.keyboard}</span> Clavier vide : record</h3>${this.stats.clavierBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.clavierBest.elapsed} <span style="font-size:16px;color:var(--muted);font-weight:500">s</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.clavierBest.mistakes} erreur${this.stats.clavierBest.mistakes>1?'s':''}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance Clavier vide pour établir ton record de mémoire du clavier !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.trophy}</span> Boss de la semaine</h3>${this.stats.bossBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">#${this.stats.bossBest.rank}</div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.bossBest.score} pts · ${this.stats.bossBest.wpm} mpm ${this.stats.bossBest.isoWeek===this._currentIsoWeek()?'cette semaine':'(semaine '+this.stats.bossBest.isoWeek.replace(/^\d+-W/,'')+')'}</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Tente le défi pour apparaître au classement !</p>'}<button onclick="go('games');setTimeout(()=>app.selectGame('boss'),0)" style="background:none;border:none;padding:0;margin-top:8px;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;text-decoration:underline">Voir le classement →</button></div>
-        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.flag}</span> Le Sprint : record personnel</h3>${this.stats.sprintBest?`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${this.stats.sprintBest.wpm} <span style="font-size:16px;color:var(--muted);font-weight:500">mpm</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${this.stats.sprintBest.correct} corrects · ${this.stats.sprintBest.errors} erreurs</p>`:'<p style="color:var(--muted);font-size:14px;margin-top:8px">Lance un Sprint pour établir ton record !</p>'}</div>
-        <div class="spanel" style="margin-bottom:0"><h3><span style="color:var(--accent)">${ICONS.swords}</span> Duel 1v1</h3>${this.stats.duelRecord&&(this.stats.duelRecord.wins+this.stats.duelRecord.losses+this.stats.duelRecord.draws)>0?(()=>{const r=this.stats.duelRecord;const total=r.wins+r.losses+r.draws;const winRate=Math.round(100*r.wins/total);return`<div class="scard-val acc" style="font-size:36px;margin-top:8px">${r.wins}<span style="font-size:16px;color:var(--muted);font-weight:500">V</span> · ${r.losses}<span style="font-size:16px;color:var(--muted);font-weight:500">D</span></div><p style="color:var(--muted);font-size:13px;margin-top:6px">${winRate}% de victoires${r.draws?' · '+r.draws+' nul'+(r.draws>1?'s':''):''} sur ${total} duel${total>1?'s':''}</p>`;})():'<p style="color:var(--muted);font-size:14px;margin-top:8px">Défie un ami pour ton premier duel !</p>'}</div>
-      </div>
-      <div class="spanel" style="margin-bottom:22px"><h3><span style="color:var(--accent)">${ICONS.keyboard}</span> Tes touches difficiles</h3><div style="font-size:13px;color:var(--muted);margin:4px 0 16px">Les touches en rouge sont celles où tu fais le plus de fautes. Concentre-toi dessus !</div>${this._keyHeatmap(this.stats.keyStats)}</div>
-      ${this._gazeAnalysisPanel(tests)}
-      <div style="text-align:center;padding:8px 0 24px;color:var(--muted);font-size:13px">${tests.length} exercice${tests.length>1?'s':''} réalisé${tests.length>1?'s':''}</div>
+    const name=this._esc(currentDisplayName||currentUser||'');
+    const gain=tests.length>=2?bestWpm-tests[0].wpm:0;
+    // Prochain palier : dizaine supérieure au record (aucun objectif n'existe côté données, on en dérive un).
+    const palier=bestWpm>0?(Math.floor(bestWpm/10)+1)*10:0;
+
+    const secs=[];
+    // 01 — Vitesse
+    secs.push({t:'VITESSE',h:'Ta vitesse.',d:'Chaque point est un test'+(palier&&tests.length>=2?' ; la ligne pointillée marque ton prochain palier.':'.'),b:
+      (tests.length?`<div class="pg-nums"><div><div class="pg-big">${bestWpm}<small>mpm</small></div><div class="pg-lbl">record</div></div>${gain>0?`<div><div class="pg-big" style="color:var(--txt)">+${gain}<small>mpm</small></div><div class="pg-lbl">depuis ton 1er test</div></div>`:''}</div>`:'')
+      +this._pgChart(tests,palier)
+      +(tests.length?`<div class="pg-last"><div class="pg-lbl" style="margin:0 0 4px;font-weight:700">Derniers tests</div>${tests.slice(-5).reverse().map(t=>`<div class="pg-last-r"><b>${t.wpm}<small>mpm</small></b><span>${rel(t.t)}</span><span class="pg-acc">${t.acc}%</span></div>`).join('')}</div>`:'')});
+    // 02 — Régularité
+    secs.push({t:'RÉGULARITÉ',h:streak>0?`${streak} jour${streak>1?'s':''} de suite.`:'Lance ta série.',d:"Un peu chaque jour vaut mieux qu'une longue séance par semaine.",b:this._pgCalendar(tests)});
+    // 03 — Jeux
+    secs.push({t:'JEUX',h:'Tes records.',d:'Un record par jeu : bats-les pour grimper.',b:this._pgRecords()});
+    // 04 — Clavier (+ analyse du regard quand elle existe)
+    const ks=this.stats.keyStats||{};
+    const hard=Object.entries(ks).filter(([k,v])=>v&&v.n>=15&&v.e/v.n>=0.15).sort((a,b)=>b[1].e/b[1].n-a[1].e/a[1].n).slice(0,6).map(([k])=>k.toUpperCase());
+    secs.push({t:'CLAVIER',h:'Tes touches difficiles.',d:'En rouge : là où tu fais le plus de fautes. '+(hard.length?`Entraîne-toi dessus : <b style="color:var(--txt)">${hard.join(' · ')}</b>.`:'Concentre-toi dessus !'),b:`<div class="pg-card pg-kb">${this._keyHeatmap(ks)}</div>${this._gazeAnalysisPanel(tests)}`});
+    // 05 — Certification
+    const cert=this._myCert;
+    secs.push({t:'CERTIFICATION',h:cert&&cert.level?'Ton certificat.':'Prouve ton niveau.',d:'Un certificat officiel de ton niveau de dactylographie.',b:this._certPanel(true)});
+    // 06 — Avis (uniquement quand l'élève y est éligible)
+    const review=this._reviewBanner(clearedLessons,true);
+    if(review)secs.push({t:'AVIS',h:'Ton avis compte.',d:"Une minute pour nous dire ce qui t'aide avec KeyPace.",b:review});
+
+    const initial=(currentDisplayName||currentUser||'?').trim().charAt(0).toUpperCase();
+    const side=`<aside class="pg-side">
+        <div class="pg-av">${this._esc(initial)}</div>
+        <h2>${name}</h2>
+        <div class="pg-sub">${tests.length} exercice${tests.length>1?'s':''} réalisé${tests.length>1?'s':''}</div>
+        ${palier?`<div class="pg-goal"><div class="pg-goal-t"><span>Prochain palier : ${palier} mpm</span><span>${bestWpm} / ${palier}</span></div><div class="pg-bar"><i style="width:${Math.min(100,Math.round(100*bestWpm/palier))}%"></i></div></div>`:''}
+        <div class="pg-sum">
+          <div><span>Meilleure vitesse</span><b>${bestWpm} mpm</b></div>
+          <div><span>Précision moyenne</span><b>${tests.length?avgAcc+' %':'-'}</b></div>
+          <div><span>Série</span><b>${streak} jour${streak>1?'s':''}</b></div>
+          <div><span>Leçons validées</span><b>${clearedLessons} / ${ALL_LESSONS.length}</b></div>
+        </div>
+        <div class="pg-mascot"><img src="/images/keypace-mascot-beanbag.webp" width="317" height="301" alt="" loading="lazy" decoding="async"></div>
+        <button class="pg-cta" onclick="go('test')">Faire un test ${ICONS.zap}</button>
+      </aside>`;
+    document.getElementById('page-stats').innerHTML=`<div class="pg-wrap"><div class="pg-grid">${side}<main class="pg-main">${secs.map((s,i)=>`<section class="pg-sec"><div class="pg-no">${String(i+1).padStart(2,'0')} — ${s.t}</div><h2>${s.h}</h2><p class="pg-d">${s.d}</p>${s.b}</section>`).join('')}</main></div></div>`;
+  },
+
+  /* ── Page Progrès : briques ── */
+  _pgDayLabel(ts){
+    const a=new Date();a.setHours(0,0,0,0);const b=new Date(ts);b.setHours(0,0,0,0);
+    const dd=Math.round((a-b)/86400000);
+    if(dd===0)return'auj.';if(dd===1)return'hier';
+    return b.getDate()+'/'+(b.getMonth()+1);
+  },
+  // Courbe de vitesse (12 derniers tests) : SVG lissé, infobulle native sur chaque point.
+  _pgChart(tests,palier){
+    const last=tests.slice(-12);
+    if(last.length<2)return`<div class="pg-card"><div class="pg-empty">${last.length?'Fais encore un test pour voir ta courbe.':'Aucun test encore.'}<br><button class="pg-cta" style="width:auto;display:inline-flex;margin-top:14px" onclick="go('test')">${last.length?'Refaire un test':'Commencer'} →</button></div></div>`;
+    const vals=last.map(t=>t.wpm);
+    const w=700,h=250,pl=34,pr=34,pt=24,pb=30;
+    const max=Math.max(palier,...vals)+6,min=Math.max(0,Math.min(...vals)-10);
+    const X=i=>pl+(w-pl-pr)*i/(vals.length-1),Y=v=>pt+(h-pt-pb)*(1-(v-min)/(max-min));
+    const pts=vals.map((v,i)=>[X(i),Y(v)]);
+    let line='M'+pts[0][0].toFixed(1)+','+pts[0][1].toFixed(1);
+    for(let i=0;i<pts.length-1;i++){
+      const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+      line+=' C'+(p1[0]+(p2[0]-p0[0])/6).toFixed(1)+','+(p1[1]+(p2[1]-p0[1])/6).toFixed(1)+' '+(p2[0]-(p3[0]-p1[0])/6).toFixed(1)+','+(p2[1]-(p3[1]-p1[1])/6).toFixed(1)+' '+p2[0].toFixed(1)+','+p2[1].toFixed(1);
+    }
+    const area=line+' L'+X(vals.length-1).toFixed(1)+','+(h-pb)+' L'+X(0).toFixed(1)+','+(h-pb)+' Z';
+    let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" style="display:block;overflow:visible" role="img" aria-label="Courbe de ta vitesse sur tes ${last.length} derniers tests"><defs><linearGradient id="pgGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF4D2E" stop-opacity=".28"/><stop offset="1" stop-color="#FF4D2E" stop-opacity="0"/></linearGradient></defs>`;
+    for(let g=0;g<4;g++){const v=min+(max-min)*g/3,y=Y(v);s+=`<line x1="${pl}" x2="${w-pr}" y1="${y}" y2="${y}" stroke="#E7E1D5" stroke-width="1" stroke-dasharray="3 5"/><text x="${pl-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#8A8275" font-family="JetBrains Mono">${Math.round(v)}</text>`;}
+    if(palier){const y=Y(palier);s+=`<line x1="${pl}" x2="${w-pr}" y1="${y}" y2="${y}" stroke="#16140F" stroke-width="1.5" stroke-dasharray="6 5" opacity=".55"/><text x="${pl+8}" y="${y-7}" font-size="11.5" font-weight="700" fill="#16140F" font-family="JetBrains Mono">palier ${palier}</text>`;}
+    s+=`<path d="${area}" fill="url(#pgGrad)"/><path d="${line}" fill="none" stroke="#FF4D2E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    pts.forEach((p,i)=>{
+      const t=last[i];const full=new Date(t.t).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+      s+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${i===pts.length-1?6:3.5}" fill="#fff" stroke="#FF4D2E" stroke-width="2.5"><title>${full} · ${t.wpm} mpm · ${t.acc}%</title></circle>`;
+    });
+    const lp=pts[pts.length-1];
+    s+=`<g><rect x="${lp[0]-28}" y="${lp[1]-38}" width="56" height="26" rx="9" fill="#16140F"/><text x="${lp[0]}" y="${lp[1]-20}" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" font-family="Bricolage Grotesque">${vals[vals.length-1]} mpm</text></g>`;
+    const step=Math.ceil(last.length/6);
+    const idx=last.map((_,i)=>i).filter(i=>i%step===0);
+    const lastI=last.length-1;
+    if(idx[idx.length-1]!==lastI){if(lastI-idx[idx.length-1]<Math.ceil(step/2)+1)idx.pop();idx.push(lastI);}
+    idx.forEach(i=>{s+=`<text x="${X(i).toFixed(1)}" y="${h-8}" text-anchor="middle" font-size="11" fill="#8A8275" font-family="JetBrains Mono">${this._pgDayLabel(last[i].t)}</text>`;});
+    return`<div class="pg-card">${s}</svg></div>`;
+  },
+  // Calendrier d'activité : 15 semaines, une case par jour, intensité = nombre de tests.
+  _pgCalendar(tests){
+    const weeks=15;
+    const today=new Date();today.setHours(0,0,0,0);
+    const dow=(today.getDay()+6)%7;
+    const start=new Date(today);start.setDate(today.getDate()-(dow+(weeks-1)*7));
+    const key=d=>d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();
+    const cnt={};tests.forEach(t=>{const k=key(new Date(t.t));cnt[k]=(cnt[k]||0)+1;});
+    let cells='';
+    for(let i=0;i<weeks*7;i++){
+      const d=new Date(start);d.setDate(start.getDate()+i);
+      if(d>today){cells+='<i class="f"></i>';continue;}
+      const n=cnt[key(d)]||0;
+      const l=n===0?0:n===1?2:n===2?3:4;
+      cells+=`<i class="${l?'l'+l:''}" title="${d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})} · ${n} test${n>1?'s':''}"></i>`;
+    }
+    return`<div class="pg-cal">${cells}</div><div class="pg-cal-leg">Moins <i style="background:#efe9dd"></i><i style="background:rgba(255,77,46,.28)"></i><i style="background:rgba(255,77,46,.55)"></i><i style="background:rgba(255,77,46,.85)"></i><i style="background:#FF4D2E"></i> Plus · ${weeks} dernières semaines</div>`;
+  },
+  // Records de tous les jeux, une ligne par jeu (valeur, détail, ou invitation à jouer).
+  _pgRecords(){
+    const s=this.stats;
+    const row=(icon,nm,v,u,sb,hint,extra)=>v==null
+      ?`<div class="pg-rec-r empty"><span class="ico">${ICONS[icon]}</span><span class="nm">${nm}</span><span class="vl">À débloquer</span><span class="sb">${hint}${extra||''}</span></div>`
+      :`<div class="pg-rec-r"><span class="ico">${ICONS[icon]}</span><span class="nm">${nm}</span><span class="vl">${v}${u?`<small>${u}</small>`:''}</span><span class="sb">${sb}${extra||''}</span></div>`;
+    const gameBest=s.gameBest||0;
+    const cb=s.courseBest,gb=s.ghostBest,sb=s.simonBest,kb=s.clavierBest,bb=s.bossBest,sp=s.sprintBest,dr=s.duelRecord;
+    const duelTotal=dr?dr.wins+dr.losses+dr.draws:0;
+    const bossLink=`<a href="#" onclick="event.preventDefault();go('games');setTimeout(()=>app.selectGame('boss'),0)">Voir le classement →</a>`;
+    return`<div class="pg-rec">
+      ${row('target','Frappe-mots',gameBest>0?gameBest:null,'pts','meilleur score','Lance le jeu pour établir un score !')}
+      ${row('raceCar','Course de dactylo',cb?cb.wpm:null,'mpm',cb?`${cb.acc}% de précision · ${cb.rank===1?'1ʳᵉ place 🥇':cb.rank+'ᵉ place'}`:'','Lance une course pour établir ton record !')}
+      ${row('ghost','Contre ton fantôme',gb?gb.wpm:null,'mpm',gb?`${gb.acc}% de précision`:'','Lance une course pour enregistrer ton premier fantôme !')}
+      ${row('brain','Simon des mots',sb?sb.score:null,'pts',sb?`séquence max : ${sb.maxSeq} mots`:'','Lance Simon des mots pour établir ton record de mémoire !')}
+      ${row('keyboard','Clavier vide',kb?kb.elapsed:null,'s',kb?`${kb.mistakes} erreur${kb.mistakes>1?'s':''}`:'','Lance Clavier vide pour établir ton record de mémoire du clavier !')}
+      ${row('trophy','Boss de la semaine',bb?'#'+bb.rank:null,'',bb?`${bb.score} pts · ${bb.wpm} mpm ${bb.isoWeek===this._currentIsoWeek()?'cette semaine':'(semaine '+bb.isoWeek.replace(/^\d+-W/,'')+')'}`:'','Tente le défi pour apparaître au classement !',bossLink)}
+      ${row('flag','Le Sprint',sp?sp.wpm:null,'mpm',sp?`${sp.correct} corrects · ${sp.errors} erreurs`:'','Lance un Sprint pour établir ton record !')}
+      ${row('swords','Duel 1v1',duelTotal>0?`${dr.wins}V · ${dr.losses}D`:null,'',duelTotal>0?`${Math.round(100*dr.wins/duelTotal)}% de victoires${dr.draws?' · '+dr.draws+' nul'+(dr.draws>1?'s':''):''} sur ${duelTotal} duel${duelTotal>1?'s':''}`:'','Défie un ami pour ton premier duel !')}
     </div>`;
   },
 
@@ -11893,9 +12099,9 @@ const app={
     this._certLoading=false;
     if(this.view==='stats')this.renderStats();
   },
-  _certPanel(){
+  _certPanel(bare){
     const c=this._myCert;
-    const wrap=(inner)=>`<div class="spanel" style="margin-bottom:22px;background:linear-gradient(135deg,rgba(255,77,46,0.06),rgba(124,58,237,0.06))"><h3><span style="color:var(--accent)">${ICONS.gradCap}</span> Certification de niveau</h3>${inner}</div>`;
+    const wrap=(inner)=>bare?`<div>${inner}</div>`:`<div class="spanel" style="margin-bottom:22px;background:linear-gradient(135deg,rgba(255,77,46,0.06),rgba(124,58,237,0.06))"><h3><span style="color:var(--accent)">${ICONS.gradCap}</span> Certification de niveau</h3>${inner}</div>`;
     if(c===undefined)return wrap(`<div style="color:var(--muted);font-size:14px;padding:8px 0">Chargement…</div>`);
     if(!c)return wrap(`<div style="font-size:14px;color:var(--muted);line-height:1.6;margin:6px 0 16px">Obtiens un certificat officiel de ton niveau de dactylographie. Conditions : <b>regard sur l'écran ≥ 90%</b> (traqueur des yeux activé) et <b>précision ≥ 90%</b>, sur un texte standardisé. Passe-le en mode écrit et/ou en dictée vocale.</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -11938,11 +12144,11 @@ const app={
     this._reviewLoading=false;
     if(this.view==='stats')this.renderStats();
   },
-  _reviewBanner(clearedLessons){
+  _reviewBanner(clearedLessons,bare){
     const eligible=clearedLessons>=10||(this._myCert&&this._myCert.level);
     if(!eligible)return '';
     if(this._myReview===undefined){this.loadMyReview();return '';}
-    const wrap=(inner)=>`<div class="spanel" style="margin-bottom:22px"><h3><span style="color:var(--accent)">${ICONS.message}</span> Ton avis compte</h3>${inner}</div>`;
+    const wrap=(inner)=>bare?`<div>${inner}</div>`:`<div class="spanel" style="margin-bottom:22px"><h3><span style="color:var(--accent)">${ICONS.message}</span> Ton avis compte</h3>${inner}</div>`;
     if(this._myReview){
       const msg=this._myReview.status==='published'?"Merci, ton avis est publié sur la page d'accueil !":"Merci ! Ton avis est en cours de vérification avant publication.";
       return wrap(`<div style="font-size:14px;color:var(--muted)">${msg}</div>`);
@@ -12165,60 +12371,84 @@ const app={
     if(this.view==='classes'&&!isTeacher())this.renderStudentClasses();
   },
 
+  /* ── Page Classe (élève) : les devoirs d'abord ── */
+  // Échéance d'un devoir : nombre de jours restants, libellé et teinte (rouge ≤ 1 j, orange ≤ 7 j).
+  _clDue(a){
+    if(!a.dueDate)return null;
+    const t=new Date();t.setHours(0,0,0,0);
+    const d=new Date(String(a.dueDate).slice(0,10)+'T00:00:00');
+    if(isNaN(d))return null;
+    const days=Math.round((d-t)/86400000);
+    return{days,cls:days<=1?'rd':days<=7?'or':'',label:days<0?'en retard de '+(-days)+' j':days===0?"aujourd'hui":days===1?'demain':'dans '+days+' j'};
+  },
+  _clKind(a){
+    if(a.mode==='essay')return{icon:'pencil',kind:'Rédaction'};
+    if(a.customText)return a.mode==='vocal'?{icon:'volume',kind:'Dictée'}:{icon:'fileText',kind:'Texte'};
+    if(a.lessonId)return{icon:'bookOpen',kind:'Leçon'};
+    return{icon:'zap',kind:'Test'};
+  },
+  // Même action que l'ancienne liste : rédiger, dictée/texte perso, leçon, ou test libre.
+  _clAction(a){
+    if(a.mode==='essay')return{onclick:`app.openEssay('${a.id}')`,label:ICONS.pencil+' Rédiger'};
+    if(a.customText)return{onclick:`app.startAssignment('${a.id}')`,label:a.mode==='vocal'?ICONS.volume+' Faire la dictée':"Faire l'exercice"};
+    if(a.lessonId)return{onclick:`app.tryStartLesson('${a.lessonId}')`,label:"Faire l'exercice"};
+    return{onclick:"go('test')",label:"Faire l'exercice"};
+  },
+  _clCard(a,withClass){
+    const k=this._clKind(a),du=this._clDue(a),ac=this._clAction(a);
+    return`<div class="cl-card">
+      <div class="cl-top"><div class="cl-ico">${ICONS[k.icon]}</div>${du?`<span class="cl-pill ${du.cls}">${ICONS.clock} ${du.label}</span>`:''}</div>
+      <h3>${this._esc(a.title)}</h3>
+      <div class="cl-meta">${withClass&&a.className?`<button class="cl-pill" title="Voir la classe" onclick="app.viewStudentClass('${a.classId}')">${this._esc(a.className)}</button>`:''}<span class="cl-pill">${k.kind}</span>${a.targetWpm?`<span class="cl-pill">objectif ${a.targetWpm} mpm</span>`:''}</div>
+      <button class="cl-go" onclick="${ac.onclick}">${ac.label} →</button>
+    </div>`;
+  },
+  _clDoneRow(a,withClass){
+    const k=this._clKind(a);
+    const sub=withClass&&a.className?this._esc(a.className):k.kind+(a.targetWpm?' · objectif '+a.targetWpm+' mpm':'');
+    return`<div class="cl-drow"><div class="cl-ck">✓</div><div class="t"><b>${this._esc(a.title)}</b><span class="s">${sub}</span></div>${a.mode==='essay'?`<button class="cl-mini" onclick="app.openEssay('${a.id}')">Revoir ma copie</button>`:'<span class="cl-pill gr">Terminé</span>'}</div>`;
+  },
+  _clSections(todo,done,withClass){
+    return(todo.length?`<div class="cl-sec-h"><h2>À faire</h2><span>${todo.length} devoir${todo.length>1?'s':''}</span></div><section class="cl-todo">${todo.map(a=>this._clCard(a,withClass)).join('')}</section>`:'')
+      +(done.length?`<div class="cl-sec-h"><h2>Terminés</h2><span>${done.length} devoir${done.length>1?'s':''}</span></div><section class="cl-done">${done.map(a=>this._clDoneRow(a,withClass)).join('')}</section>`:'');
+  },
+  _clHero(o){
+    return`<section class="cl-hero"><div>${o.back||''}<div class="cl-eyebrow">${o.eyebrow||'Ma classe'}</div><h1 class="cl-h1">${o.h1}</h1><p class="cl-lead">${o.lead}</p></div><div class="cl-mascot" aria-hidden="true"><img src="/images/keypace-mascot-books.webp" width="235" height="335" alt="" loading="lazy" decoding="async"></div></section>`;
+  },
+  _clSortTodo(arr){return arr.filter(a=>!a.done).sort((a,b)=>{const x=a.dueDate||'9999',y=b.dueDate||'9999';return x<y?-1:x>y?1:0;});},
+
   renderStudentClasses(){
     const pageId='page-classes';
     if(!this._myClasses){
       this.loadMyClasses();
-      document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
+      document.getElementById(pageId).innerHTML=`<div class="cl-wrap"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
       return;
     }
     const list=this._myClasses;
     const asg=this._myAssignments||[];
-    const devoirs=asg.length?`<div style="margin-bottom:30px">
-        <h2 style="font-size:18px;margin:0 0 12px">Mes devoirs</h2>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          ${asg.map(a=>{
-            const due=a.dueDate?new Date(a.dueDate).toLocaleDateString('fr-FR'):null;
-            return`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px">
-              <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};color:${a.done?'#1FA971':'var(--accent)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':(a.mode==='essay'?ICONS.pencil:ICONS.fileText)}</div>
-              <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.className}${a.targetWpm?(' · objectif '+a.targetWpm+' mpm'):''}${due?(' · pour le '+due):''}</div></div>
-              ${a.mode==='essay'?`<button onclick="app.openEssay('${a.id}')" style="background:${a.done?'var(--card)':'var(--accent)'};color:${a.done?'var(--muted)':'#fff'};border:${a.done?'1px solid var(--border)':'none'};border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.done?'Revoir ma copie':ICONS.pencil+' Rédiger'}</button>`:a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.customText?`app.startAssignment('${a.id}')`:a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.customText&&a.mode==='vocal'?ICONS.volume+' Faire la dictée':"Faire l'exercice"}</button>`}
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`:'';
-    document.getElementById(pageId).innerHTML=`<div class="stats-section">
-      <div class="stats-header" style="padding-bottom:28px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
-          <div><h1 style="margin-bottom:4px">Mes classes</h1><p style="margin:0">Les classes que tu as rejointes.</p></div>
-        </div>
-      </div>
-      <div style="max-width:760px;padding-bottom:60px">
-        ${devoirs}
-        ${list.length===0?`
-          <div style="text-align:center;padding:72px 20px;color:var(--muted)">
-            <div style="font-size:48px;margin-bottom:16px;color:var(--accent)">${ICONS.gradCap}</div>
-            <div style="font-size:17px;font-weight:700;color:var(--txt);margin-bottom:8px">Tu n'as rejoint aucune classe</div>
-            <div style="font-size:14px;max-width:360px;margin:0 auto 22px;line-height:1.6">${currentInstitutionName?`Ton compte est rattaché à <b style="color:var(--txt)">${this._esc(currentInstitutionName)}</b>, mais il te manque encore une classe. `:''}Contacte ton établissement pour être ajouté à une classe.</div>
-          </div>
-        `:`<div style="display:flex;flex-direction:column;gap:10px">
-          ${list.map(c=>{
-            const init=(c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-            const since=c.joinedAt?new Date(c.joinedAt).toLocaleDateString('fr-FR'):'';
-            const cAsg=asg.filter(a=>a.classId===c.id);
-            const todo=cAsg.filter(a=>!a.done).length;
-            const badge=cAsg.length?`<span style="font-size:12px;font-weight:700;white-space:nowrap;color:${todo?'var(--accent)':'#1FA971'}">${todo?(todo+' devoir'+(todo>1?'s':'')+' à faire'):'Devoirs à jour'}</span>`:`<span style="font-size:12px;color:var(--muted)">Aucun devoir</span>`;
-            return`<div onclick="app.viewStudentClass('${c.id}')" style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:box-shadow .15s" onmouseenter="this.style.boxShadow='0 4px 18px rgba(0,0,0,0.07)'" onmouseleave="this.style.boxShadow='none'">
-              <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,77,46,0.1);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--accent);flex-shrink:0;font-family:'JetBrains Mono',monospace">${init}</div>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:16px;font-weight:700;color:var(--txt)">${c.name}</div>
-                <div style="font-size:13px;color:var(--muted);margin-top:2px">Rejointe le ${since}</div>
-              </div>
-              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">${badge}<span style="font-size:11px;color:var(--muted);opacity:.7">Voir ›</span></div>
-            </div>`;
-          }).join('')}
-        </div>`}
-      </div></div>`;
+    const todo=this._clSortTodo(asg),done=asg.filter(a=>a.done);
+    const first=this._esc((currentDisplayName||currentUser||'').trim().split(' ')[0]);
+    let hero;
+    if(list.length===0){
+      hero=this._clHero({h1:`Pas encore de <em>classe</em>.`,lead:`${currentInstitutionName?`Ton compte est rattaché à <b>${this._esc(currentInstitutionName)}</b>, mais il te manque encore une classe. `:''}Contacte ton établissement pour être ajouté à une classe.`});
+    }else if(asg.length===0){
+      hero=this._clHero({h1:`Aucun devoir<br>pour l'<em>instant</em>.`,lead:`Ton professeur n'a pas encore assigné de devoir. Tu fais partie de ${list.map(c=>'<b>'+this._esc(c.name)+'</b>').join(', ')}.`});
+    }else if(todo.length===0){
+      hero=this._clHero({h1:`Tu es à jour,<br><em>bravo ${first}</em> !`,lead:'Tous tes devoirs sont rendus. Profites-en pour battre un record !'});
+    }else{
+      const n=todo.length,nx=todo.find(a=>a.dueDate),du=nx?this._clDue(nx):null;
+      const lead=du?(du.days<0?`<b>Attention</b> : « ${this._esc(nx.title)} » devait être rendu ${du.label.replace('en retard de ','il y a ')}.`:`Prochain rendu ${du.days===0?"<b>aujourd'hui</b>":du.days===1?'<b>demain</b>':'dans <b>'+du.days+' jours</b>'} : ${this._esc(nx.title)}.`):'Fais-les à ton rythme, dans l\'ordre que tu veux.';
+      hero=this._clHero({h1:`Salut ${first},<br><em>${n} devoir${n>1?'s':''}</em> ${n>1?"t'attendent":"t'attend"}.`,lead});
+    }
+    // Les classes restent accessibles via la pastille de chaque devoir ; celles qui n'ont encore aucun devoir sont listées ici pour ne pas disparaître.
+    const withAsg=new Set(asg.map(a=>a.classId));
+    const orphan=asg.length?list.filter(c=>!withAsg.has(c.id)):list;
+    const classes=orphan.length&&list.length?`<div class="cl-sec-h" style="margin-top:46px"><h2>Mes classes</h2><span>${orphan.length}</span></div><section class="cl-classes">${orphan.map(c=>{
+      const init=(c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const since=c.joinedAt?new Date(c.joinedAt).toLocaleDateString('fr-FR'):'';
+      return`<div class="cl-class" onclick="app.viewStudentClass('${c.id}')"><div class="ini">${this._esc(init)}</div><div><div class="nm">${this._esc(c.name)}</div><div class="sb">Rejointe le ${since} · aucun devoir</div></div></div>`;
+    }).join('')}</section>`:'';
+    document.getElementById(pageId).innerHTML=`<div class="cl-wrap">${hero}${this._clSections(todo,done,true)}${classes}</div>`;
   },
 
   viewStudentClass(classId){
@@ -12226,33 +12456,15 @@ const app={
     const c=(this._myClasses||[]).find(x=>x.id===classId);
     if(!c){this.renderStudentClasses();return;}
     const asg=(this._myAssignments||[]).filter(a=>a.classId===classId);
+    const todo=this._clSortTodo(asg),done=asg.filter(a=>a.done);
     const since=c.joinedAt?new Date(c.joinedAt).toLocaleDateString('fr-FR'):'';
-    const todo=asg.filter(a=>!a.done).length;
-    const devoirs=asg.length?`<div style="display:flex;flex-direction:column;gap:10px">
-      ${asg.map(a=>{
-        const due=a.dueDate?new Date(a.dueDate).toLocaleDateString('fr-FR'):null;
-        return`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px">
-          <div style="width:34px;height:34px;border-radius:9px;background:${a.done?'rgba(31,169,113,0.15)':'rgba(255,77,46,0.1)'};color:${a.done?'#1FA971':'var(--accent)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${a.done?'✓':(a.mode==='essay'?ICONS.pencil:ICONS.fileText)}</div>
-          <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px">${a.title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${a.targetWpm?('objectif '+a.targetWpm+' mpm'):'Exercice libre'}${due?(' · pour le '+due):''}</div></div>
-          ${a.mode==='essay'?`<button onclick="app.openEssay('${a.id}')" style="background:${a.done?'var(--card)':'var(--accent)'};color:${a.done?'var(--muted)':'#fff'};border:${a.done?'1px solid var(--border)':'none'};border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.done?'Revoir ma copie':ICONS.pencil+' Rédiger'}</button>`:a.done?`<span style="font-size:13px;font-weight:700;color:#1FA971;white-space:nowrap">Terminé</span>`:`<button onclick="${a.customText?`app.startAssignment('${a.id}')`:a.lessonId?`app.tryStartLesson('${a.lessonId}')`:`go('test')`}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">${a.customText&&a.mode==='vocal'?ICONS.volume+' Faire la dictée':"Faire l'exercice"}</button>`}
-        </div>`;
-      }).join('')}
-    </div>`:`<div style="text-align:center;padding:56px 20px;color:var(--muted)">
-        <div style="font-size:40px;margin-bottom:14px;color:var(--muted)">${ICONS.inbox}</div>
-        <div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun devoir pour l'instant</div>
-        <div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Ton professeur n'a pas encore assigné de devoir dans cette classe.</div>
-      </div>`;
-    document.getElementById(pageId).innerHTML=`<div class="stats-section">
-      <div class="stats-header" style="padding-bottom:24px">
-        <button onclick="app.renderStudentClasses()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;padding:0 0 14px;display:flex;align-items:center;gap:6px">‹ Mes classes</button>
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
-          <div><h1 style="margin-bottom:4px">${c.name}</h1><p style="margin:0">Rejointe le ${since}${c.inviteCode?(' · code '+c.inviteCode):''}</p></div>
-        </div>
-      </div>
-      <div style="max-width:760px;padding-bottom:60px">
-        <h2 style="font-size:18px;margin:0 0 12px">Devoirs ${asg.length?`<span style="font-size:13px;font-weight:600;color:var(--muted)">· ${todo} à faire sur ${asg.length}</span>`:''}</h2>
-        ${devoirs}
-      </div></div>`;
+    const hero=this._clHero({
+      back:`<button class="cl-back" onclick="app.renderStudentClasses()">‹ Mes devoirs</button>`,
+      h1:this._esc(c.name),
+      lead:`Rejointe le ${since}${c.inviteCode?' · code <b>'+this._esc(c.inviteCode)+'</b>':''}${asg.length?` · ${todo.length} devoir${todo.length>1?'s':''} à faire sur ${asg.length}`:''}.`,
+    });
+    const body=asg.length?this._clSections(todo,done,false):`<div class="cl-empty"><div style="font-size:40px;margin-bottom:14px">${ICONS.inbox}</div><div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun devoir pour l'instant</div><div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Ton professeur n'a pas encore assigné de devoir dans cette classe.</div></div>`;
+    document.getElementById(pageId).innerHTML=`<div class="cl-wrap">${hero}${body}</div>`;
   },
 
   renderClasses(){
