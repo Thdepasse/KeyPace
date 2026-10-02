@@ -1001,54 +1001,101 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
   .pg-last-r{grid-template-columns:96px 1fr auto}
 }
 
-/* PAGE CLASSE (élève) : devoirs d'abord */
+/* PAGE CLASSE (élève) : tableau de bord des devoirs */
 .cl-wrap{max-width:1120px;margin:0 auto;padding:0 24px 70px}
-.cl-hero{display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:center;padding:50px 0 34px}
+.cl-head{padding:40px 0 26px}
 .cl-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
-.cl-h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.025em;line-height:1.04;font-size:clamp(34px,4.6vw,56px);margin:12px 0 14px}
+.cl-h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.025em;line-height:1.05;font-size:clamp(32px,4vw,46px);margin:10px 0 10px}
 .cl-h1 em{font-style:normal;color:var(--accent)}
-.cl-lead{color:var(--muted);font-size:16.5px;line-height:1.6;max-width:480px}
+.cl-lead{color:var(--muted);font-size:16px;line-height:1.55;max-width:560px}
 .cl-lead b{color:var(--txt)}
-.cl-mascot{display:flex;justify-content:center}
-.cl-mascot img{height:280px;width:auto;filter:drop-shadow(0 16px 22px rgba(255,77,46,.16))}
-.cl-back{background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;font-weight:600;padding:0 0 4px;display:flex;align-items:center;gap:6px}
-.cl-sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 16px}
-.cl-sec-h h2{font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em}
-.cl-sec-h span{font-size:13px;color:var(--muted)}
-.cl-todo{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:46px}
-.cl-card{padding:24px;border-radius:28px;background:var(--card);border:1px solid var(--border);display:flex;flex-direction:column;gap:14px;transition:transform .2s,box-shadow .2s}
-.cl-card:hover{transform:translateY(-3px);box-shadow:0 18px 36px rgba(22,20,15,.09)}
-.cl-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.cl-ico{width:46px;height:46px;border-radius:14px;background:rgba(255,77,46,.1);color:var(--accent);display:grid;place-items:center;font-size:22px}
-.cl-card h3{font-family:'Bricolage Grotesque',sans-serif;font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.15;overflow-wrap:anywhere}
-.cl-meta{display:flex;gap:7px;flex-wrap:wrap}
-.cl-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;background:var(--light);color:var(--muted);border:none;font-family:inherit}
-button.cl-pill{cursor:pointer}
-button.cl-pill:hover{color:var(--accent);background:rgba(255,77,46,.1)}
+.cl-back{background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;font-weight:600;padding:0 0 6px;display:flex;align-items:center;gap:6px}
+.cl-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px;align-items:start}
+.cl-main{min-width:0}
+.cl-side{position:sticky;top:84px;display:flex;flex-direction:column;gap:14px}
+.cl-feat{position:relative;overflow:hidden;border-radius:32px;padding:32px 36px;background:linear-gradient(140deg,#ff7a4d,var(--accent) 64%);color:#fff;box-shadow:0 26px 54px rgba(255,77,46,.28);margin-bottom:8px}
+.cl-feat::before{content:'';position:absolute;right:-70px;top:-90px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.11)}
+.cl-feat::after{content:'';position:absolute;left:-50px;bottom:-80px;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.08)}
+.cl-feat>*{position:relative;z-index:1}
+.cl-feat .ey{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cl-feat h2{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(26px,3vw,36px);font-weight:800;letter-spacing:-.03em;line-height:1.08;margin:12px 0 16px;overflow-wrap:anywhere}
+.cl-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.cl-chips span{background:rgba(255,255,255,.2);padding:6px 13px;border-radius:999px;font-weight:700;font-size:12.5px;display:inline-flex;gap:6px;align-items:center}
+.cl-white{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--accent);border:none;border-radius:13px;padding:13px 22px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.16);transition:transform .15s}
+.cl-white:hover{transform:translateY(-2px)}
+.cl-gh{display:flex;align-items:center;gap:9px;margin:26px 0 10px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.cl-gh::before{content:'';width:9px;height:9px;border-radius:50%;background:#cfc8ba}
+.cl-gh.rd{color:#b3252a}.cl-gh.rd::before{background:var(--danger)}
+.cl-gh.or{color:var(--accent)}.cl-gh.or::before{background:var(--accent)}
+.cl-gh span{margin-left:auto;font-weight:600;letter-spacing:0;text-transform:none;font-family:inherit;font-size:12.5px}
+.cl-row{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:20px;background:var(--card);border:1px solid var(--border);margin-bottom:8px;transition:box-shadow .2s,border-color .2s}
+.cl-row:hover{box-shadow:0 10px 26px rgba(22,20,15,.07);border-color:#d9d2c2}
+.cl-ico{width:40px;height:40px;border-radius:12px;background:rgba(255,77,46,.1);color:var(--accent);display:grid;place-items:center;font-size:19px;flex-shrink:0}
+.cl-rt{flex:1;min-width:0}
+.cl-rt b{display:block;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+.cl-rt span{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.cl-pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;background:var(--light);color:var(--muted);border:none;font-family:inherit;white-space:nowrap}
 .cl-pill.or{background:rgba(255,77,46,.1);color:var(--accent)}
 .cl-pill.gr{background:rgba(31,169,113,.12);color:#15784f}
 .cl-pill.rd{background:rgba(229,72,77,.12);color:#b3252a}
-.cl-go{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;border:none;border-radius:13px;padding:13px 22px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 8px 20px -8px var(--accent);transition:transform .15s}
-.cl-go:hover{transform:translateY(-2px)}
-.cl-done{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.cl-drow{display:flex;align-items:center;gap:13px;padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--border)}
-.cl-ck{width:34px;height:34px;border-radius:50%;background:rgba(31,169,113,.14);color:var(--success);display:grid;place-items:center;font-weight:800;flex-shrink:0}
-.cl-drow div.t{flex:1;min-width:0}
-.cl-drow b{font-size:14px;line-height:1.3;display:block;overflow-wrap:anywhere}
-.cl-drow .s{display:block;font-size:12px;color:var(--muted);margin-top:2px}
-.cl-mini{border:1.5px solid var(--border);background:var(--card);color:var(--muted);border-radius:11px;padding:9px 15px;font-weight:800;font-size:13px;white-space:nowrap;cursor:pointer;font-family:inherit}
-.cl-classes{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.cl-class{display:flex;align-items:center;gap:14px;padding:18px;border-radius:24px;background:var(--card);border:1px solid var(--border);cursor:pointer;transition:transform .2s,box-shadow .2s}
-.cl-class:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(22,20,15,.08)}
-.cl-class .ini{width:48px;height:48px;border-radius:15px;background:rgba(255,77,46,.1);color:var(--accent);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px;flex-shrink:0}
-.cl-class .nm{font-weight:800;font-size:16px;line-height:1.2}
-.cl-class .sb{font-size:12px;color:var(--muted);margin-top:3px}
-.cl-empty{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:44px 24px;text-align:center;color:var(--muted)}
+.cl-feat .cl-pill{background:rgba(255,255,255,.22);color:#fff}
+.cl-btn{border:none;border-radius:11px;padding:9px 15px;font-weight:800;font-size:13px;background:var(--accent);color:#fff;white-space:nowrap;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:transform .15s}
+.cl-btn:hover{transform:translateY(-1px)}
+.cl-more{display:block;width:100%;margin-top:6px;background:none;border:1.5px dashed #d9d2c2;border-radius:16px;padding:12px;font:inherit;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer}
+.cl-more:hover{color:var(--accent);border-color:var(--accent)}
+.cl-fold{margin-top:30px;border:1px solid var(--border);border-radius:24px;background:var(--card);overflow:hidden}
+.cl-fold summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:16px 20px;font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em}
+.cl-fold summary::-webkit-details-marker{display:none}
+.cl-fold summary .n{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(31,169,113,.14);color:#15784f;border-radius:8px;padding:2px 9px}
+.cl-fold summary::after{content:'›';margin-left:auto;font-size:22px;color:var(--muted);transition:transform .2s}
+.cl-fold[open] summary::after{transform:rotate(90deg)}
+.cl-fold-b{max-height:430px;overflow-y:auto;padding:0 12px 12px}
+.cl-drow{display:flex;align-items:center;gap:12px;padding:10px 10px;border-top:1px solid var(--border)}
+.cl-ck{width:30px;height:30px;border-radius:50%;background:rgba(31,169,113,.14);color:var(--success);display:grid;place-items:center;font-weight:800;font-size:13px;flex-shrink:0}
+.cl-drow .cl-rt b{font-size:14px}
+.cl-mini{border:1.5px solid var(--border);background:var(--card);color:var(--muted);border-radius:10px;padding:7px 13px;font-weight:800;font-size:12.5px;white-space:nowrap;cursor:pointer;font-family:inherit}
+.cl-sc{display:flex;align-items:center;gap:13px;padding:14px;border-radius:22px;background:var(--card);border:1.5px solid var(--border);transition:border-color .2s,box-shadow .2s}
+.cl-sc.clk{cursor:pointer}
+.cl-sc.clk:hover{box-shadow:0 10px 24px rgba(22,20,15,.07)}
+.cl-sc.on{border-color:var(--accent);box-shadow:0 10px 26px -10px rgba(255,77,46,.45)}
+.cl-sc .ini{width:42px;height:42px;border-radius:13px;background:rgba(255,77,46,.1);color:var(--accent);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:14px;flex-shrink:0}
+.cl-sc .bd{flex:1;min-width:0}
+.cl-sc .nm{font-weight:800;font-size:14.5px;line-height:1.2;overflow-wrap:anywhere}
+.cl-sc .sb{font-size:12px;color:var(--muted);margin-top:2px}
+.cl-bar{height:6px;border-radius:99px;background:var(--light);overflow:hidden;margin-top:8px}
+.cl-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff7a4d,var(--accent))}
+.cl-det{border:none;background:var(--light);color:var(--muted);width:30px;height:30px;border-radius:10px;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1}
+.cl-det:hover{background:rgba(255,77,46,.12);color:var(--accent)}
+.cl-side-h{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted);display:flex;justify-content:space-between;align-items:center;padding:0 4px}
+.cl-side-h button{background:none;border:none;color:var(--accent);font:inherit;font-size:12px;font-weight:700;cursor:pointer;text-transform:none;letter-spacing:0}
+.cl-mascot{display:flex;justify-content:center}
+.cl-mascot img{height:150px;width:auto;filter:drop-shadow(0 12px 18px rgba(255,77,46,.14))}
+.cl-clear{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:34px 24px;text-align:center;color:var(--muted)}
+.cl-clear b{display:block;color:var(--txt);font-size:17px;margin-bottom:4px}
+.cl-idle{display:flex;flex-direction:column;align-items:center;text-align:center;padding:46px 0 10px}
+.cl-idle .cl-mascot img{height:230px}
+.cl-idle .cl-h1{margin-top:14px}
+.cl-idle .cl-lead{margin:0 auto}
+.cl-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:820px;margin:34px auto 0}
+.cl-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;padding:22px;border-radius:26px;background:var(--card);border:1px solid var(--border);cursor:pointer;font-family:inherit;transition:transform .2s,box-shadow .2s}
+.cl-tile:hover{transform:translateY(-3px);box-shadow:0 18px 36px rgba(22,20,15,.09)}
+.cl-tile .ti{width:44px;height:44px;border-radius:14px;background:rgba(255,77,46,.1);color:var(--accent);display:grid;place-items:center;font-size:21px;margin-bottom:8px}
+.cl-tile b{font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em;color:var(--txt)}
+.cl-tile span{font-size:13px;color:var(--muted);line-height:1.45}
+.cl-idle-list{width:100%;max-width:820px;margin:30px auto 0;text-align:left}
 @media(max-width:900px){
   .cl-wrap{padding:0 16px 56px}
-  .cl-hero{grid-template-columns:1fr;padding:30px 0 24px}
+  .cl-head{padding:26px 0 18px}
+  .cl-grid{grid-template-columns:minmax(0,1fr)}
+  .cl-side{position:static}
   .cl-mascot{display:none}
-  .cl-todo,.cl-done,.cl-classes{grid-template-columns:1fr}
+  .cl-idle{padding-top:26px}
+  .cl-tiles{grid-template-columns:1fr}
+  .cl-feat{padding:24px 22px;border-radius:26px}
+  .cl-row{flex-wrap:wrap}
+  .cl-rt{flex:1 1 calc(100% - 60px)}
+  .cl-row .cl-pill{margin-left:54px}
+  .cl-row .cl-btn{margin-left:auto}
 }
 
 /* MODULES HUB (page Cours) */
@@ -12371,8 +12418,12 @@ const app={
     if(this.view==='classes'&&!isTeacher())this.renderStudentClasses();
   },
 
-  /* ── Page Classe (élève) : les devoirs d'abord ── */
-  // Échéance d'un devoir : nombre de jours restants, libellé et teinte (rouge ≤ 1 j, orange ≤ 7 j).
+  /* ── Page Classe (élève) : tableau de bord des devoirs ──
+     Pensée pour 0, 2 ou 30 devoirs : le plus urgent en vedette, le reste en
+     lignes compactes groupées par échéance (8 visibles puis « Voir les autres »),
+     les terminés repliés dans un panneau défilant, un écran dédié quand il n'y a
+     rien à faire, et les classes en colonne (filtre quand il y en a plusieurs). */
+  // Échéance d'un devoir : jours restants, libellé et teinte (rouge ≤ 1 j / en retard, orange ≤ 7 j).
   _clDue(a){
     if(!a.dueDate)return null;
     const t=new Date();t.setHours(0,0,0,0);
@@ -12394,28 +12445,70 @@ const app={
     if(a.lessonId)return{onclick:`app.tryStartLesson('${a.lessonId}')`,label:"Faire l'exercice"};
     return{onclick:"go('test')",label:"Faire l'exercice"};
   },
-  _clCard(a,withClass){
+  _clSortTodo(arr){return arr.filter(a=>!a.done).sort((a,b)=>{const x=a.dueDate||'9999',y=b.dueDate||'9999';return x<y?-1:x>y?1:0;});},
+  _clMore(v){this._clExpanded=v;if(this._clCur)this.viewStudentClass(this._clCur);else this.renderStudentClasses();},
+  _clSetFilter(id){this._clFilter=(id&&this._clFilter!==id)?id:null;this._clExpanded=false;this.renderStudentClasses();},
+
+  _clFeatured(a){
     const k=this._clKind(a),du=this._clDue(a),ac=this._clAction(a);
-    return`<div class="cl-card">
-      <div class="cl-top"><div class="cl-ico">${ICONS[k.icon]}</div>${du?`<span class="cl-pill ${du.cls}">${ICONS.clock} ${du.label}</span>`:''}</div>
-      <h3>${this._esc(a.title)}</h3>
-      <div class="cl-meta">${withClass&&a.className?`<button class="cl-pill" title="Voir la classe" onclick="app.viewStudentClass('${a.classId}')">${this._esc(a.className)}</button>`:''}<span class="cl-pill">${k.kind}</span>${a.targetWpm?`<span class="cl-pill">objectif ${a.targetWpm} mpm</span>`:''}</div>
-      <button class="cl-go" onclick="${ac.onclick}">${ac.label} →</button>
-    </div>`;
+    return`<div class="cl-feat"><div class="ey">À faire en premier${du?`<span class="cl-pill">${ICONS.clock} ${du.label}</span>`:''}</div>
+      <h2>${this._esc(a.title)}</h2>
+      <div class="cl-chips">${a.className?`<span>${ICONS.gradCap} ${this._esc(a.className)}</span>`:''}<span>${ICONS[k.icon]} ${k.kind}</span>${a.targetWpm?`<span>${ICONS.target} objectif ${a.targetWpm} mpm</span>`:''}</div>
+      <button class="cl-white" onclick="${ac.onclick}">${ac.label} →</button></div>`;
+  },
+  _clRow(a,withClass){
+    const k=this._clKind(a),du=this._clDue(a),ac=this._clAction(a);
+    const meta=[withClass&&a.className?this._esc(a.className):'',k.kind,a.targetWpm?'objectif '+a.targetWpm+' mpm':''].filter(Boolean).join(' · ');
+    return`<div class="cl-row"><div class="cl-ico">${ICONS[k.icon]}</div><div class="cl-rt"><b>${this._esc(a.title)}</b><span>${meta}</span></div>${du?`<span class="cl-pill ${du.cls}">${ICONS.clock} ${du.label}</span>`:''}<button class="cl-btn" onclick="${ac.onclick}">${ac.label}</button></div>`;
   },
   _clDoneRow(a,withClass){
     const k=this._clKind(a);
-    const sub=withClass&&a.className?this._esc(a.className):k.kind+(a.targetWpm?' · objectif '+a.targetWpm+' mpm':'');
-    return`<div class="cl-drow"><div class="cl-ck">✓</div><div class="t"><b>${this._esc(a.title)}</b><span class="s">${sub}</span></div>${a.mode==='essay'?`<button class="cl-mini" onclick="app.openEssay('${a.id}')">Revoir ma copie</button>`:'<span class="cl-pill gr">Terminé</span>'}</div>`;
+    const sub=(withClass&&a.className?this._esc(a.className)+' · ':'')+k.kind+(a.targetWpm?' · objectif '+a.targetWpm+' mpm':'');
+    return`<div class="cl-drow"><div class="cl-ck">✓</div><div class="cl-rt"><b>${this._esc(a.title)}</b><span>${sub}</span></div>${a.mode==='essay'?`<button class="cl-mini" onclick="app.openEssay('${a.id}')">Revoir ma copie</button>`:'<span class="cl-pill gr">Terminé</span>'}</div>`;
   },
-  _clSections(todo,done,withClass){
-    return(todo.length?`<div class="cl-sec-h"><h2>À faire</h2><span>${todo.length} devoir${todo.length>1?'s':''}</span></div><section class="cl-todo">${todo.map(a=>this._clCard(a,withClass)).join('')}</section>`:'')
-      +(done.length?`<div class="cl-sec-h"><h2>Terminés</h2><span>${done.length} devoir${done.length>1?'s':''}</span></div><section class="cl-done">${done.map(a=>this._clDoneRow(a,withClass)).join('')}</section>`:'');
+  // Devoirs restants groupés par urgence ; 8 lignes visibles tant que la liste n'est pas dépliée.
+  _clTodoList(todo,withClass){
+    const g={late:[],week:[],later:[],none:[]};
+    todo.forEach(a=>{const d=this._clDue(a);if(!d)g.none.push(a);else if(d.days<0)g.late.push(a);else if(d.days<=7)g.week.push(a);else g.later.push(a);});
+    const LIM=8,exp=!!this._clExpanded;
+    let shown=0,html='';
+    [['En retard','rd',g.late],['Cette semaine','or',g.week],['Plus tard','',g.later],['Sans échéance','',g.none]].forEach(([label,cls,items])=>{
+      if(!items.length)return;
+      const take=exp?items:items.slice(0,Math.max(0,LIM-shown));
+      if(!take.length)return;
+      shown+=take.length;
+      html+=`<div class="cl-gh ${cls}">${label}<span>${items.length}</span></div>`+take.map(a=>this._clRow(a,withClass)).join('');
+    });
+    if(!exp&&todo.length>shown)html+=`<button class="cl-more" onclick="app._clMore(true)">Voir les ${todo.length-shown} autres devoirs</button>`;
+    else if(exp&&todo.length>LIM)html+=`<button class="cl-more" onclick="app._clMore(false)">Réduire la liste</button>`;
+    return html;
   },
-  _clHero(o){
-    return`<section class="cl-hero"><div>${o.back||''}<div class="cl-eyebrow">${o.eyebrow||'Ma classe'}</div><h1 class="cl-h1">${o.h1}</h1><p class="cl-lead">${o.lead}</p></div><div class="cl-mascot" aria-hidden="true"><img src="/images/keypace-mascot-books.webp" width="235" height="335" alt="" loading="lazy" decoding="async"></div></section>`;
+  _clDoneFold(done,withClass,open){
+    if(!done.length)return'';
+    return`<details class="cl-fold"${open?' open':''}><summary>Terminés <span class="n">${done.length}</span></summary><div class="cl-fold-b">${done.map(a=>this._clDoneRow(a,withClass)).join('')}</div></details>`;
   },
-  _clSortTodo(arr){return arr.filter(a=>!a.done).sort((a,b)=>{const x=a.dueDate||'9999',y=b.dueDate||'9999';return x<y?-1:x>y?1:0;});},
+  _clClassCards(list,asgAll){
+    const filterable=list.length>1;
+    return list.map(c=>{
+      const a=asgAll.filter(x=>x.classId===c.id),t=a.length,d=a.filter(x=>x.done).length,pct=t?Math.round(100*d/t):0;
+      const init=(c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const on=this._clFilter===c.id;
+      return`<div class="cl-sc${filterable?' clk':''}${on?' on':''}"${filterable?` onclick="app._clSetFilter('${c.id}')"`:''}><div class="ini">${this._esc(init)}</div><div class="bd"><div class="nm">${this._esc(c.name)}</div><div class="sb">${t?d+' / '+t+' rendus':'aucun devoir'}</div>${t?`<div class="cl-bar"><i style="width:${pct}%"></i></div>`:''}</div><button class="cl-det" title="Détails de la classe" onclick="event.stopPropagation();app.viewStudentClass('${c.id}')">›</button></div>`;
+    }).join('');
+  },
+  _clTiles(){
+    return`<div class="cl-tiles">
+      <button class="cl-tile" onclick="go('test')"><div class="ti">${ICONS.zap}</div><b>Test de vitesse</b><span>Mesure où tu en es.</span></button>
+      <button class="cl-tile" onclick="go('lessons')"><div class="ti">${ICONS.bookOpen}</div><b>Reprendre un cours</b><span>Avance dans ta progression.</span></button>
+      <button class="cl-tile" onclick="go('games')"><div class="ti">${ICONS.gamepad}</div><b>Jouer</b><span>Entraîne-toi en t'amusant.</span></button>
+    </div>`;
+  },
+  // Écran dédié quand il n'y a rien à faire (pas de classe, pas de devoir, ou tout rendu).
+  _clIdle(o){
+    const im={books:[235,335],cheer:[282,303],idea:[234,282]}[o.img];
+    return`<div class="cl-idle"><div class="cl-mascot" style="display:flex"><img src="/images/keypace-mascot-${o.img}.webp" width="${im[0]}" height="${im[1]}" alt="" decoding="async"></div>
+      <div class="cl-eyebrow" style="margin-top:14px">Ma classe</div><h1 class="cl-h1">${o.h1}</h1><p class="cl-lead">${o.lead}</p>${this._clTiles()}${o.extra||''}</div>`;
+  },
 
   renderStudentClasses(){
     const pageId='page-classes';
@@ -12424,47 +12517,43 @@ const app={
       document.getElementById(pageId).innerHTML=`<div class="cl-wrap"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
       return;
     }
-    const list=this._myClasses;
-    const asg=this._myAssignments||[];
-    const todo=this._clSortTodo(asg),done=asg.filter(a=>a.done);
+    this._clCur=null;
+    const list=this._myClasses,asgAll=this._myAssignments||[];
+    if(this._clFilter&&!list.some(c=>c.id===this._clFilter))this._clFilter=null;
+    const asg=this._clFilter?asgAll.filter(a=>a.classId===this._clFilter):asgAll;
+    const todoAll=this._clSortTodo(asgAll),todo=this._clSortTodo(asg),done=asg.filter(a=>a.done);
     const first=this._esc((currentDisplayName||currentUser||'').trim().split(' ')[0]);
-    let hero;
+    let body;
     if(list.length===0){
-      hero=this._clHero({h1:`Pas encore de <em>classe</em>.`,lead:`${currentInstitutionName?`Ton compte est rattaché à <b>${this._esc(currentInstitutionName)}</b>, mais il te manque encore une classe. `:''}Contacte ton établissement pour être ajouté à une classe.`});
-    }else if(asg.length===0){
-      hero=this._clHero({h1:`Aucun devoir<br>pour l'<em>instant</em>.`,lead:`Ton professeur n'a pas encore assigné de devoir. Tu fais partie de ${list.map(c=>'<b>'+this._esc(c.name)+'</b>').join(', ')}.`});
-    }else if(todo.length===0){
-      hero=this._clHero({h1:`Tu es à jour,<br><em>bravo ${first}</em> !`,lead:'Tous tes devoirs sont rendus. Profites-en pour battre un record !'});
+      body=this._clIdle({img:'idea',h1:`Pas encore de <em>classe</em>.`,lead:`${currentInstitutionName?`Ton compte est rattaché à <b>${this._esc(currentInstitutionName)}</b>, mais il te manque encore une classe. `:''}Contacte ton établissement pour être ajouté à une classe. En attendant, tu peux t'entraîner :`});
+    }else if(asgAll.length===0){
+      body=this._clIdle({img:'books',h1:`Rien à faire<br>pour l'<em>instant</em>.`,lead:`Ton professeur n'a pas encore assigné de devoir. Ils apparaîtront ici dès qu'il y en aura. En attendant, entraîne-toi :`,extra:`<div class="cl-idle-list"><div class="cl-side-h" style="margin-bottom:10px"><span>Mes classes</span></div><div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${this._clClassCards(list,asgAll)}</div></div>`});
+    }else if(todoAll.length===0){
+      body=this._clIdle({img:'cheer',h1:`Tu es à jour,<br><em>bravo ${first}</em> !`,lead:'Tous tes devoirs sont rendus. En attendant le prochain, entraîne-toi :',extra:`<div class="cl-idle-list">${this._clDoneFold(asgAll.filter(a=>a.done),true,true)}</div>`});
     }else{
-      const n=todo.length,nx=todo.find(a=>a.dueDate),du=nx?this._clDue(nx):null;
-      const lead=du?(du.days<0?`<b>Attention</b> : « ${this._esc(nx.title)} » devait être rendu ${du.label.replace('en retard de ','il y a ')}.`:`Prochain rendu ${du.days===0?"<b>aujourd'hui</b>":du.days===1?'<b>demain</b>':'dans <b>'+du.days+' jours</b>'} : ${this._esc(nx.title)}.`):'Fais-les à ton rythme, dans l\'ordre que tu veux.';
-      hero=this._clHero({h1:`Salut ${first},<br><em>${n} devoir${n>1?'s':''}</em> ${n>1?"t'attendent":"t'attend"}.`,lead});
+      const n=todoAll.length,nx=todoAll.find(a=>a.dueDate),du=nx?this._clDue(nx):null;
+      const lead=du?(du.days<0?`<b>Attention</b> : « ${this._esc(nx.title)} » devait être rendu ${du.label.replace('en retard de ','il y a ')}.`:`Prochain rendu ${du.days===0?"<b>aujourd'hui</b>":du.days===1?'<b>demain</b>':'dans <b>'+du.days+' jours</b>'} : ${this._esc(nx.title)}.`):"Fais-les à ton rythme, dans l'ordre que tu veux.";
+      const head=`<div class="cl-head"><div class="cl-eyebrow">Ma classe</div><h1 class="cl-h1">Salut ${first}, <em>${n} devoir${n>1?'s':''}</em> ${n>1?"t'attendent":"t'attend"}.</h1><p class="cl-lead">${lead}</p></div>`;
+      const main=(todo.length?this._clFeatured(todo[0])+this._clTodoList(todo.slice(1),true):`<div class="cl-clear"><b>Rien à faire pour cette classe</b>Tous ses devoirs sont rendus.</div>`)+this._clDoneFold(done,true,false);
+      const side=`<aside class="cl-side"><div class="cl-side-h"><span>Mes classes</span>${this._clFilter?`<button onclick="app._clSetFilter(null)">Toutes</button>`:''}</div>${this._clClassCards(list,asgAll)}<div class="cl-mascot"><img src="/images/keypace-mascot-books.webp" width="235" height="335" alt="" loading="lazy" decoding="async"></div></aside>`;
+      body=head+`<div class="cl-grid"><main class="cl-main">${main}</main>${side}</div>`;
     }
-    // Les classes restent accessibles via la pastille de chaque devoir ; celles qui n'ont encore aucun devoir sont listées ici pour ne pas disparaître.
-    const withAsg=new Set(asg.map(a=>a.classId));
-    const orphan=asg.length?list.filter(c=>!withAsg.has(c.id)):list;
-    const classes=orphan.length&&list.length?`<div class="cl-sec-h" style="margin-top:46px"><h2>Mes classes</h2><span>${orphan.length}</span></div><section class="cl-classes">${orphan.map(c=>{
-      const init=(c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      const since=c.joinedAt?new Date(c.joinedAt).toLocaleDateString('fr-FR'):'';
-      return`<div class="cl-class" onclick="app.viewStudentClass('${c.id}')"><div class="ini">${this._esc(init)}</div><div><div class="nm">${this._esc(c.name)}</div><div class="sb">Rejointe le ${since} · aucun devoir</div></div></div>`;
-    }).join('')}</section>`:'';
-    document.getElementById(pageId).innerHTML=`<div class="cl-wrap">${hero}${this._clSections(todo,done,true)}${classes}</div>`;
+    document.getElementById(pageId).innerHTML=`<div class="cl-wrap">${body}</div>`;
   },
 
   viewStudentClass(classId){
     const pageId='page-classes';
     const c=(this._myClasses||[]).find(x=>x.id===classId);
     if(!c){this.renderStudentClasses();return;}
+    this._clCur=classId;
     const asg=(this._myAssignments||[]).filter(a=>a.classId===classId);
     const todo=this._clSortTodo(asg),done=asg.filter(a=>a.done);
     const since=c.joinedAt?new Date(c.joinedAt).toLocaleDateString('fr-FR'):'';
-    const hero=this._clHero({
-      back:`<button class="cl-back" onclick="app.renderStudentClasses()">‹ Mes devoirs</button>`,
-      h1:this._esc(c.name),
-      lead:`Rejointe le ${since}${c.inviteCode?' · code <b>'+this._esc(c.inviteCode)+'</b>':''}${asg.length?` · ${todo.length} devoir${todo.length>1?'s':''} à faire sur ${asg.length}`:''}.`,
-    });
-    const body=asg.length?this._clSections(todo,done,false):`<div class="cl-empty"><div style="font-size:40px;margin-bottom:14px">${ICONS.inbox}</div><div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun devoir pour l'instant</div><div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Ton professeur n'a pas encore assigné de devoir dans cette classe.</div></div>`;
-    document.getElementById(pageId).innerHTML=`<div class="cl-wrap">${hero}${body}</div>`;
+    const head=`<div class="cl-head"><button class="cl-back" onclick="app._clCur=null;app.renderStudentClasses()">‹ Mes devoirs</button><div class="cl-eyebrow">Ma classe</div><h1 class="cl-h1">${this._esc(c.name)}</h1><p class="cl-lead">Rejointe le ${since}${c.inviteCode?' · code <b>'+this._esc(c.inviteCode)+'</b>':''}${asg.length?` · ${todo.length} devoir${todo.length>1?'s':''} à faire sur ${asg.length}`:''}.</p></div>`;
+    const body=asg.length
+      ?(todo.length?this._clTodoList(todo,false):'')+this._clDoneFold(done,false,todo.length===0)
+      :`<div class="cl-clear"><div style="font-size:40px;margin-bottom:12px;color:var(--muted)">${ICONS.inbox}</div><b>Aucun devoir pour l'instant</b>Ton professeur n'a pas encore assigné de devoir dans cette classe.</div>`;
+    document.getElementById(pageId).innerHTML=`<div class="cl-wrap">${head}${body}</div>`;
   },
 
   renderClasses(){
