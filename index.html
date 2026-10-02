@@ -1143,6 +1143,8 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .gcine-card-inner::before{content:'';position:absolute;inset:0;z-index:0;background:var(--gcine-fill,linear-gradient(140deg,#ff7a4d,var(--accent) 64%));opacity:0;transition:opacity .45s cubic-bezier(.22,.9,.3,1)}
 .gcine-card:not(.is-center):hover .gcine-card-inner{box-shadow:0 16px 40px rgba(21,19,15,.14)}
 .gcine-card.is-center .gcine-card-inner{box-shadow:0 26px 60px rgba(255,77,46,.34);border-color:transparent}
+/* Une bordure transparente laissait voir le fond blanc de la carte sous le dégradé (::before ne couvre que la zone de padding) : liseré blanc. On la retire, le padding compense pour que le contenu ne bouge pas. */
+.gcine-card.is-center .gcine-card-inner{border-width:0;padding:27px}
 .gcine-card.is-center .gcine-card-inner::before{opacity:1}
 .gcine-blob{position:absolute;border-radius:50%;background:#fff5f1;transition:background .45s cubic-bezier(.22,.9,.3,1)}
 .gcine-blob-a{width:200px;height:200px;right:-72px;top:-80px}
@@ -1179,6 +1181,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
   .gcine-sub{font-size:15px}
   .gcine-h2{font-size:32px}
   .gcine-card-inner{width:220px;height:310px;padding:20px}
+  .gcine-card.is-center .gcine-card-inner{padding:21px}
   .gcine-card-name{font-size:20px}
 }
 
