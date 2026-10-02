@@ -1013,16 +1013,19 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .cl-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px;align-items:start}
 .cl-main{min-width:0}
 .cl-side{position:sticky;top:84px;display:flex;flex-direction:column;gap:14px}
-.cl-feat{position:relative;overflow:hidden;border-radius:32px;padding:32px 36px;background:linear-gradient(140deg,#ff7a4d,var(--accent) 64%);color:#fff;box-shadow:0 26px 54px rgba(255,77,46,.28);margin-bottom:8px}
-.cl-feat::before{content:'';position:absolute;right:-70px;top:-90px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.11)}
-.cl-feat::after{content:'';position:absolute;left:-50px;bottom:-80px;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.08)}
-.cl-feat>*{position:relative;z-index:1}
-.cl-feat .ey{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.cl-feat h2{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(26px,3vw,36px);font-weight:800;letter-spacing:-.03em;line-height:1.08;margin:12px 0 16px;overflow-wrap:anywhere}
-.cl-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
-.cl-chips span{background:rgba(255,255,255,.2);padding:6px 13px;border-radius:999px;font-weight:700;font-size:12.5px;display:inline-flex;gap:6px;align-items:center}
-.cl-white{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--accent);border:none;border-radius:13px;padding:13px 22px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.16);transition:transform .15s}
-.cl-white:hover{transform:translateY(-2px)}
+.cl-chips{display:flex;gap:8px;flex-wrap:wrap}
+.cl-chips span{background:var(--light);color:var(--muted);padding:6px 13px;border-radius:999px;font-weight:700;font-size:12.5px;display:inline-flex;gap:6px;align-items:center}
+/* Devoir à traiter en premier : carte claire, teintée selon l'urgence (pas de bloc orange plein) */
+.cl-next{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:22px;align-items:center;padding:24px 28px;border-radius:28px;background:var(--card);border:1.5px solid rgba(255,77,46,.38);box-shadow:0 16px 36px -16px rgba(255,77,46,.4);margin-bottom:8px}
+.cl-next.soon{background:linear-gradient(0deg,rgba(255,77,46,.05),rgba(255,77,46,.05)),var(--card)}
+.cl-next.late{border-color:rgba(229,72,77,.5);box-shadow:0 16px 36px -16px rgba(229,72,77,.4);background:linear-gradient(0deg,rgba(229,72,77,.05),rgba(229,72,77,.05)),var(--card)}
+.cl-next .big-ico{width:60px;height:60px;border-radius:18px;background:rgba(255,77,46,.1);color:var(--accent);font-size:28px;display:grid;place-items:center}
+.cl-next.late .big-ico{background:rgba(229,72,77,.12);color:var(--danger)}
+.cl-next .ey{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--accent)}
+.cl-next.late .ey{color:#b3252a}
+.cl-next h2{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(22px,2.4vw,28px);font-weight:800;letter-spacing:-.02em;line-height:1.12;margin:6px 0 12px;overflow-wrap:anywhere}
+.cl-next .act{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.cl-btn.lg{padding:13px 22px;font-size:15px;border-radius:13px;box-shadow:0 8px 20px -8px var(--accent)}
 .cl-gh{display:flex;align-items:center;gap:9px;margin:26px 0 10px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted)}
 .cl-gh::before{content:'';width:9px;height:9px;border-radius:50%;background:#cfc8ba}
 .cl-gh.rd{color:#b3252a}.cl-gh.rd::before{background:var(--danger)}
@@ -1038,7 +1041,6 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .cl-pill.or{background:rgba(255,77,46,.1);color:var(--accent)}
 .cl-pill.gr{background:rgba(31,169,113,.12);color:#15784f}
 .cl-pill.rd{background:rgba(229,72,77,.12);color:#b3252a}
-.cl-feat .cl-pill{background:rgba(255,255,255,.22);color:#fff}
 .cl-btn{border:none;border-radius:11px;padding:9px 15px;font-weight:800;font-size:13px;background:var(--accent);color:#fff;white-space:nowrap;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:transform .15s}
 .cl-btn:hover{transform:translateY(-1px)}
 .cl-more{display:block;width:100%;margin-top:6px;background:none;border:1.5px dashed #d9d2c2;border-radius:16px;padding:12px;font:inherit;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer}
@@ -1091,7 +1093,10 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
   .cl-mascot{display:none}
   .cl-idle{padding-top:26px}
   .cl-tiles{grid-template-columns:1fr}
-  .cl-feat{padding:24px 22px;border-radius:26px}
+  .cl-next{grid-template-columns:1fr;gap:16px;padding:22px 20px;border-radius:24px}
+  .cl-next .big-ico{width:48px;height:48px;font-size:22px;border-radius:15px}
+  .cl-next .act{align-items:stretch}
+  .cl-next .cl-btn{justify-content:center}
   .cl-row{flex-wrap:wrap}
   .cl-rt{flex:1 1 calc(100% - 60px)}
   .cl-row .cl-pill{margin-left:54px}
@@ -12406,14 +12411,15 @@ const app={
         fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'my-classes',token:currentToken})}),
         fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'my-assignments',token:currentToken})}),
       ]);
-      const classes=rc.ok?((await rc.json()).classes||[]):[];
-      const assignments=ra.ok?((await ra.json()).assignments||[]):[];
+      const ok=rc.ok&&ra.ok;
+      const classes=ok?((await rc.json()).classes||[]):null;
+      const assignments=ok?((await ra.json()).assignments||[]):null;
       if(currentToken!==_token)return;
-      this._myClasses=classes;
-      this._myAssignments=assignments;
+      if(ok){this._myClasses=classes;this._myAssignments=assignments;this._clError=false;}
+      else if(!this._myClasses)this._clError=true; // sans données déjà chargées : écran d'erreur plutôt que « aucune classe »
     }catch{
       if(currentToken!==_token)return;
-      this._myClasses=this._myClasses||[];this._myAssignments=this._myAssignments||[];
+      if(!this._myClasses)this._clError=true;
     }
     if(this.view==='classes'&&!isTeacher())this.renderStudentClasses();
   },
@@ -12449,12 +12455,12 @@ const app={
   _clMore(v){this._clExpanded=v;if(this._clCur)this.viewStudentClass(this._clCur);else this.renderStudentClasses();},
   _clSetFilter(id){this._clFilter=(id&&this._clFilter!==id)?id:null;this._clExpanded=false;this.renderStudentClasses();},
 
-  _clFeatured(a){
+  _clNext(a){
     const k=this._clKind(a),du=this._clDue(a),ac=this._clAction(a);
-    return`<div class="cl-feat"><div class="ey">À faire en premier${du?`<span class="cl-pill">${ICONS.clock} ${du.label}</span>`:''}</div>
-      <h2>${this._esc(a.title)}</h2>
-      <div class="cl-chips">${a.className?`<span>${ICONS.gradCap} ${this._esc(a.className)}</span>`:''}<span>${ICONS[k.icon]} ${k.kind}</span>${a.targetWpm?`<span>${ICONS.target} objectif ${a.targetWpm} mpm</span>`:''}</div>
-      <button class="cl-white" onclick="${ac.onclick}">${ac.label} →</button></div>`;
+    const tone=du&&du.days<0?'late':du&&du.days<=1?'soon':'';
+    return`<div class="cl-next ${tone}"><div class="big-ico">${ICONS[k.icon]}</div><div><div class="ey">${tone==='late'?'À rattraper en premier':'À faire en premier'}</div><h2>${this._esc(a.title)}</h2>
+      <div class="cl-chips">${a.className?`<span>${ICONS.gradCap} ${this._esc(a.className)}</span>`:''}<span>${ICONS[k.icon]} ${k.kind}</span>${a.targetWpm?`<span>${ICONS.target} objectif ${a.targetWpm} mpm</span>`:''}</div></div>
+      <div class="act">${du?`<span class="cl-pill ${du.cls}">${ICONS.clock} ${du.label}</span>`:''}<button class="cl-btn lg" onclick="${ac.onclick}">${ac.label} →</button></div></div>`;
   },
   _clRow(a,withClass){
     const k=this._clKind(a),du=this._clDue(a),ac=this._clAction(a);
@@ -12510,9 +12516,37 @@ const app={
       <div class="cl-eyebrow" style="margin-top:14px">Ma classe</div><h1 class="cl-h1">${o.h1}</h1><p class="cl-lead">${o.lead}</p>${this._clTiles()}${o.extra||''}</div>`;
   },
 
+  // Titre et accroche selon la situation de l'élève, du plus à jour au plus en retard.
+  _clHead(first,todoAll,asgAll){
+    const n=todoAll.length,doneN=asgAll.length-n;
+    const dues=todoAll.map(a=>({a,d:this._clDue(a)}));
+    const late=dues.filter(x=>x.d&&x.d.days<0),soon=dues.filter(x=>x.d&&x.d.days>=0&&x.d.days<=1),dated=dues.filter(x=>x.d);
+    const t=a=>'« '+this._esc(a.title)+' »';
+    const hasTests=((this.stats&&this.stats.tests)||[]).length>0;
+    if(late.length){
+      const old=late[0],days=-old.d.days,rest=n-late.length;
+      const h1=late.length>=5?`${first}, on fait le <em>point</em> ?`:late.length===1?`Salut ${first}, 1 devoir est <em>en retard</em>.`:`Salut ${first}, ${late.length} devoirs sont <em>en retard</em>.`;
+      return{h1,lead:`${t(old.a)} devait être rendu il y a ${days} jour${days>1?'s':''}. ${late.length>=5?'Pas de panique : prends-les un par un, en commençant par le plus ancien.':'Commence par le plus ancien.'}${rest>0?` Il t'en reste ${rest} autre${rest>1?'s':''} à venir.`:''}`};
+    }
+    if(soon.length){
+      const x=soon[0],when=x.d.days===0?"aujourd'hui":'demain',m=n-1;
+      return{h1:`Salut ${first}, c'est pour <em>${when}</em>.`,lead:`${t(x.a)} est à rendre ${when}.${m>0?` ${m} autre${m>1?'s':''} devoir${m>1?'s':''} ${m>1?"t'attendent":"t'attend"} ensuite.`:''}`};
+    }
+    if(doneN===0&&!hasTests)return{h1:`Bienvenue dans ta classe, <em>${first}</em>.`,lead:`Ton professeur t'a préparé ${n} devoir${n>1?'s':''}. Commence par le premier, juste en dessous.`};
+    const nx=dated[0];
+    let lead=nx?`Prochain rendu dans <b>${nx.d.days} jours</b> : ${t(nx.a)}.`:"Pas de date limite : fais-les à ton rythme, dans l'ordre que tu veux.";
+    if(doneN>0&&doneN>=n)lead+=` Déjà ${doneN} rendu${doneN>1?'s':''}, continue !`;
+    return{h1:`Salut ${first}, <em>${n} devoir${n>1?'s':''}</em> ${n>1?"t'attendent":"t'attend"}.`,lead};
+  },
+
   renderStudentClasses(){
     const pageId='page-classes';
     if(!this._myClasses){
+      if(this._clError){
+        this._clError=false; // consommé : le prochain affichage retentera le chargement
+        document.getElementById(pageId).innerHTML=`<div class="cl-wrap"><div class="cl-idle"><div class="cl-eyebrow">Ma classe</div><h1 class="cl-h1">Impossible de charger <em>tes devoirs</em>.</h1><p class="cl-lead">Vérifie ta connexion puis réessaie.</p><button class="cl-btn lg" style="margin-top:22px" onclick="app.renderStudentClasses()">Réessayer</button></div></div>`;
+        return;
+      }
       this.loadMyClasses();
       document.getElementById(pageId).innerHTML=`<div class="cl-wrap"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
       return;
@@ -12531,10 +12565,11 @@ const app={
     }else if(todoAll.length===0){
       body=this._clIdle({img:'cheer',h1:`Tu es à jour,<br><em>bravo ${first}</em> !`,lead:'Tous tes devoirs sont rendus. En attendant le prochain, entraîne-toi :',extra:`<div class="cl-idle-list">${this._clDoneFold(asgAll.filter(a=>a.done),true,true)}</div>`});
     }else{
-      const n=todoAll.length,nx=todoAll.find(a=>a.dueDate),du=nx?this._clDue(nx):null;
-      const lead=du?(du.days<0?`<b>Attention</b> : « ${this._esc(nx.title)} » devait être rendu ${du.label.replace('en retard de ','il y a ')}.`:`Prochain rendu ${du.days===0?"<b>aujourd'hui</b>":du.days===1?'<b>demain</b>':'dans <b>'+du.days+' jours</b>'} : ${this._esc(nx.title)}.`):"Fais-les à ton rythme, dans l'ordre que tu veux.";
-      const head=`<div class="cl-head"><div class="cl-eyebrow">Ma classe</div><h1 class="cl-h1">Salut ${first}, <em>${n} devoir${n>1?'s':''}</em> ${n>1?"t'attendent":"t'attend"}.</h1><p class="cl-lead">${lead}</p></div>`;
-      const main=(todo.length?this._clFeatured(todo[0])+this._clTodoList(todo.slice(1),true):`<div class="cl-clear"><b>Rien à faire pour cette classe</b>Tous ses devoirs sont rendus.</div>`)+this._clDoneFold(done,true,false);
+      const hd=this._clHead(first,todoAll,asgAll);
+      const head=`<div class="cl-head"><div class="cl-eyebrow">Ma classe</div><h1 class="cl-h1">${hd.h1}</h1><p class="cl-lead">${hd.lead}</p></div>`;
+      const sel=this._clFilter?list.find(c=>c.id===this._clFilter):null;
+      const clear=sel?(asg.length?`<b>Tout est rendu dans ${this._esc(sel.name)}</b>Aucun devoir en attente pour cette classe.`:`<b>Aucun devoir dans ${this._esc(sel.name)}</b>Ton professeur n'en a pas encore assigné.`):'';
+      const main=(todo.length?this._clNext(todo[0])+this._clTodoList(todo.slice(1),true):`<div class="cl-clear">${clear}</div>`)+this._clDoneFold(done,true,false);
       const side=`<aside class="cl-side"><div class="cl-side-h"><span>Mes classes</span>${this._clFilter?`<button onclick="app._clSetFilter(null)">Toutes</button>`:''}</div>${this._clClassCards(list,asgAll)}<div class="cl-mascot"><img src="/images/keypace-mascot-books.webp" width="235" height="335" alt="" loading="lazy" decoding="async"></div></aside>`;
       body=head+`<div class="cl-grid"><main class="cl-main">${main}</main>${side}</div>`;
     }
@@ -12551,7 +12586,7 @@ const app={
     const since=c.joinedAt?new Date(c.joinedAt).toLocaleDateString('fr-FR'):'';
     const head=`<div class="cl-head"><button class="cl-back" onclick="app._clCur=null;app.renderStudentClasses()">‹ Mes devoirs</button><div class="cl-eyebrow">Ma classe</div><h1 class="cl-h1">${this._esc(c.name)}</h1><p class="cl-lead">Rejointe le ${since}${c.inviteCode?' · code <b>'+this._esc(c.inviteCode)+'</b>':''}${asg.length?` · ${todo.length} devoir${todo.length>1?'s':''} à faire sur ${asg.length}`:''}.</p></div>`;
     const body=asg.length
-      ?(todo.length?this._clTodoList(todo,false):'')+this._clDoneFold(done,false,todo.length===0)
+      ?(todo.length?this._clTodoList(todo,false):`<div class="cl-clear"><b>Tout est rendu</b>Aucun devoir en attente dans cette classe.</div>`)+this._clDoneFold(done,false,todo.length===0)
       :`<div class="cl-clear"><div style="font-size:40px;margin-bottom:12px;color:var(--muted)">${ICONS.inbox}</div><b>Aucun devoir pour l'instant</b>Ton professeur n'a pas encore assigné de devoir dans cette classe.</div>`;
     document.getElementById(pageId).innerHTML=`<div class="cl-wrap">${head}${body}</div>`;
   },
