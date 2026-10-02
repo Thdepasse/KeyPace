@@ -2,7 +2,7 @@
 // Tout passe par la clé service (RLS deny-anon). Logique pure dans _class-logic.
 const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary,
   essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
-  moduleMastery } = require('./_class-logic');
+  moduleMastery, studentModuleProgress } = require('./_class-logic');
 const { hashPassword, safeEqual } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
 
@@ -237,6 +237,7 @@ async function classDetail(req, res) {
       ...studentSummary(datas[i], now),
       alertInactive: inactiveNames.has(m.username),
       alertStuck: stuckNames.has(m.username),
+      modulesProgress: studentModuleProgress(datas[i].lessons),
     }))
     // Élèves à surveiller en premier (bloqué avant inactif), le reste garde son ordre.
     .sort((a, b) => alertRank(a) - alertRank(b));

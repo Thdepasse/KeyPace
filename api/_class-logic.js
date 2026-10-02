@@ -129,6 +129,19 @@ function moduleMastery(studentsLessonsData) {
   });
 }
 
+// Progression d'UN élève module par module (leçons validées / total), même
+// découpage que moduleMastery : alimente la heatmap "Qui en est où ?".
+function studentModuleProgress(lessons) {
+  const total = MODULE_NAMES.map(() => 0);
+  Object.values(LESSON_MODULE).forEach((mi) => { total[mi]++; });
+  const cleared = MODULE_NAMES.map(() => 0);
+  const l = lessons && typeof lessons === 'object' ? lessons : {};
+  for (const [lid, mi] of Object.entries(LESSON_MODULE)) {
+    if (l[lid] && l[lid].cleared) cleared[mi]++;
+  }
+  return MODULE_NAMES.map((_, mi) => ({ c: cleared[mi], t: total[mi] }));
+}
+
 // Série d'activité jour par jour (par défaut 7 jours), du plus ancien au plus récent.
 // Retourne [{sessions, avgWpm}] pour alimenter la courbe d'évolution du cockpit.
 function dailySeries(studentsData, now, days = 7) {
@@ -400,4 +413,4 @@ function sanitizeEssayStats(raw) {
 
 module.exports = { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
   ESSAY_TYPES, essayTypeDef, countWords, essayWordCount, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
-  moduleMastery, MODULE_NAMES };
+  moduleMastery, studentModuleProgress, MODULE_NAMES };
