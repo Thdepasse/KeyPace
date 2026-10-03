@@ -44,27 +44,39 @@ function render(html, key) {
 // /cours-dactylographie…) avec les bonnes balises pour Google. Appelée depuis
 // api/track.js (rewrites vers /api/track?r=<clé> dans vercel.json) : le plan
 // Hobby plafonne à 12 fonctions, on ne peut donc pas en ajouter une 13e.
+const fs = require('fs');
+const path = require('path');
+
 const ORIGIN = /^(keypace\.be|www\.keypace\.be|[a-z0-9-]+\.vercel\.app)$/i;
+const isApp = (t) => typeof t === 'string' && t.includes('id="main-nav"') && t.includes('id="seo-zone"');
+
+// index.html est embarqué avec la fonction (includeFiles dans vercel.json) ;
+// repli réseau si le fichier est introuvable.
+async function loadIndex(req) {
+  for (const p of [path.join(process.cwd(), 'index.html'), path.join(__dirname, '..', 'index.html')]) {
+    try { const t = fs.readFileSync(p, 'utf8'); if (isApp(t)) return t; } catch (e) { /* suivant */ }
+  }
+  const fwd = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+  const host = ORIGIN.test(fwd) ? fwd : 'keypace.be';
+  const r = await fetch(`https://${host}/index.html`);
+  const t = r.ok ? await r.text() : '';
+  if (!isApp(t)) throw new Error('index.html invalide');
+  return t;
+}
 
 async function handlePage(req, res) {
   const key = String((req.query && req.query.r) || '');
-  const route = ROUTES[key];
-  if (!route) { res.statusCode = 404; return res.end('Not found'); }
-  const fwd = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
-  const host = ORIGIN.test(fwd) ? fwd : 'keypace.be';
+  if (!ROUTES[key]) { res.statusCode = 404; return res.end('Not found'); }
   try {
-    const r = await fetch(`https://${host}/index.html`);
-    if (!r.ok) throw new Error('index ' + r.status);
-    const html = render(await r.text(), key);
+    const html = render(await loadIndex(req), key);
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
     res.statusCode = 200;
     return res.end(html);
   } catch (e) {
     // Repli : l'appli complète reste accessible par le paramètre ?view=.
-    const view = key === 'testtime' ? 'testtime' : key;
     res.statusCode = 302;
-    res.setHeader('Location', '/?view=' + view);
+    res.setHeader('Location', '/?view=' + key);
     return res.end();
   }
 }

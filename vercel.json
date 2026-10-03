@@ -1,5 +1,6 @@
 {
     "regions": ["fra1"],
+    "functions": { "api/track.js": { "includeFiles": "index.html" } },
     "rewrites": [
           { "source": "/a-propos", "destination": "/a-propos.html" },
           { "source": "/conditions", "destination": "/conditions.html" },
