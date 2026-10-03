@@ -478,16 +478,19 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .nav-dropdown-menu a:hover{background:var(--light)}
 .nav-dropdown:hover .nav-dropdown-menu{display:block}
 /* ── Test sur base de temps ── */
-.tt-wrap{max-width:920px;margin:0 auto;padding:28px 20px 56px}
+.tt-wrap{padding:28px 29px 56px}
+@media(max-width:760px){.tt-wrap{padding:24px 16px 48px}}
 .tt-eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
 .tt-title{font-size:clamp(26px,4vw,38px);line-height:1.12;font-weight:800;margin:0 0 10px;color:var(--txt)}
 .tt-sub{font-size:16px;line-height:1.55;color:var(--muted);margin:0 0 26px;max-width:620px}
-.tt-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tt-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
 .tt-card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:22px 18px;text-align:left;font:inherit;color:var(--txt);cursor:pointer;transition:.15s;display:flex;flex-direction:column;gap:6px}
 .tt-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 12px 28px -14px rgba(255,77,46,.45)}
 .tt-card-num{font-size:44px;font-weight:800;line-height:1;color:var(--accent)}
 .tt-card-unit{font-size:14px;font-weight:700}
 .tt-card-sub{font-size:13px;line-height:1.45;color:var(--muted)}
+.tt-card.locked{opacity:.55}
+.tt-card-lock{margin-top:6px;font-size:12px;font-weight:700;color:var(--muted)}
 .tt-card-best{margin-top:6px;font-size:12px;font-weight:700;color:var(--success)}
 .tt-note{margin-top:22px;font-size:14px;line-height:1.6;color:var(--muted)}
 .tt-note a{color:var(--accent);font-weight:700;cursor:pointer;text-decoration:none}
@@ -528,6 +531,7 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .tt-btn.pri{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(255,77,46,.3)}
 .tt-save{margin-top:16px;font-size:13.5px;color:var(--muted)}
 .tt-save a{color:var(--accent);font-weight:700;cursor:pointer}
+@media(max-width:900px){.tt-cards{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:760px){.tt-cards{grid-template-columns:repeat(2,1fr)}.tt-grid{grid-template-columns:repeat(2,1fr)}.tt-stats{grid-template-columns:repeat(3,1fr);gap:8px}.tt-stat{padding:10px 12px}.tt-stat-val{font-size:24px}.tt-text{font-size:18px}}
 .nav-spacer{flex:1}
 .nav-burger{display:none;background:none;border:1.5px solid var(--border);border-radius:10px;width:40px;height:40px;font-size:19px;color:var(--txt);align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent}
@@ -6622,6 +6626,7 @@ const app={
      'test') avec `dur` (secondes), pour ne pas fausser le record du test court
      (voir _prevBestFor). */
   _ttDurations(){return[
+    {sec:30,n:30,label:'secondes',sub:'Le format découverte, ouvert à tous.'},
     {sec:60,n:1,label:'minute',sub:'Un aperçu rapide de ta vitesse.'},
     {sec:180,n:3,label:'minutes',sub:'Pour voir si ton rythme tient.'},
     {sec:300,n:5,label:'minutes',sub:'Un bon équilibre entre effort et fiabilité.'},
@@ -6635,10 +6640,17 @@ const app={
     return{name:'Débutant',desc:'Tu poses les bases. Avec un peu de pratique chaque jour, la vitesse viendra vite.'};
   },
   _ttBest(sec){return Math.max(0,...((this.stats&&this.stats.tests)||[]).filter(t=>t.dur===sec).map(t=>t.wpm));},
+  _ttLabel(sec){return sec<60?sec+' secondes':(sec/60)+' minute'+(sec>60?'s':'');},
+  // Visiteur sans compte : seul le test de 30 s, une fois par jour (même principe que le test court).
+  _ttGuestUsed(){try{const g=JSON.parse(localStorage.getItem('keypace-guest-timed')||'null');return !!(g&&g.d===this._todayKey());}catch{return false;}},
   _ttFmt(sec){const m=Math.floor(sec/60),s=Math.floor(sec%60);return m+':'+String(s).padStart(2,'0');},
   openTimedTest(){this._ttStop();this.tt=null;go('testtime');},
   _ttStop(){if(this._ttTimer){clearInterval(this._ttTimer);this._ttTimer=null;}},
   ttStart(sec){
+    if(!currentUser&&(sec!==30||this._ttGuestUsed())){
+      openAuth('register',sec!==30?'Crée un compte gratuit pour débloquer les tests de 1, 3, 5 et 10 minutes.':"Tu as déjà fait ton test de 30 secondes aujourd'hui. Crée un compte gratuit pour en faire autant que tu veux.");
+      return;
+    }
     this._ttStop();
     this.tt={sec,phase:'ready',text:'',idx:0,typed:[],keystrokes:0,correct:0,startTime:0,log:[]};
     this._ttExtend();
@@ -6668,8 +6680,8 @@ const app={
       el.innerHTML=`<div class="tt-wrap">
         <p class="tt-eyebrow">Test sur base de temps</p>
         <h1 class="tt-title">Évalue ton niveau, chrono en main.</h1>
-        <p class="tt-sub">Choisis une durée et tape sans t'arrêter. Plus le test est long, plus le résultat reflète ta vitesse réelle et ta régularité.</p>
-        <div class="tt-cards">${this._ttDurations().map(d=>{const b=currentUser?this._ttBest(d.sec):0;return`<button class="tt-card" onclick="app.ttStart(${d.sec})"><span class="tt-card-num">${d.n}</span><span class="tt-card-unit">${d.label}</span><span class="tt-card-sub">${d.sub}</span>${b?`<span class="tt-card-best">Ton record : ${b} mpm</span>`:''}</button>`;}).join('')}</div>
+        <p class="tt-sub">Choisis une durée et tape sans t'arrêter.${currentUser?'':' Sans compte, le test de 30 secondes est disponible une fois par jour.'} Plus le test est long, plus le résultat reflète ta vitesse réelle et ta régularité.</p>
+        <div class="tt-cards">${this._ttDurations().map(d=>{const b=currentUser?this._ttBest(d.sec):0;const lock=!currentUser&&(d.sec!==30||this._ttGuestUsed());return`<button class="tt-card${lock?' locked':''}" onclick="app.ttStart(${d.sec})"><span class="tt-card-num">${d.n}</span><span class="tt-card-unit">${d.label}</span><span class="tt-card-sub">${d.sub}</span>${b?`<span class="tt-card-best">Ton record : ${b} mpm</span>`:''}${lock?`<span class="tt-card-lock">${d.sec===30?'Déjà fait aujourd\'hui : reviens demain ou crée un compte':'Compte gratuit requis'}</span>`:''}</button>`;}).join('')}</div>
         <p class="tt-note">Le chrono démarre à ta première touche. Pas de retour arrière : tape juste, ta précision compte. Tu préfères une seule phrase à recopier&nbsp;? <a onclick="go('test')">Test sur base de longueur</a></p>
       </div>`;
       return;
@@ -6677,7 +6689,7 @@ const app={
     if(t.phase==='done'){el.innerHTML=this._ttResultHTML();return;}
     el.innerHTML=`<div class="tt-wrap">
       <button class="tt-back" onclick="app.openTimedTest()">← Changer de durée</button>
-      <p class="tt-eyebrow">Test de ${t.sec/60} minute${t.sec>60?'s':''}</p>
+      <p class="tt-eyebrow">Test de ${this._ttLabel(t.sec)}</p>
       <div class="tt-stats">
         <div class="tt-stat main"><div class="tt-stat-label">TEMPS RESTANT</div><div class="tt-stat-val" id="tt-left">${this._ttFmt(t.sec)}</div></div>
         <div class="tt-stat"><div class="tt-stat-label">VITESSE</div><div class="tt-stat-val"><span id="tt-wpm">0</span> <small>mpm</small></div></div>
@@ -6759,6 +6771,7 @@ const app={
       this.stats.tests.push({t:Date.now(),wpm,acc,mode:'test',dur:t.sec});
       saveStats(this.stats);
     }
+    if(!currentUser){try{localStorage.setItem('keypace-guest-timed',JSON.stringify({d:this._todayKey()}));}catch{}}
     try{track('timed_test_completed',{wpm,acc,dur:t.sec,loggedIn:!!currentUser});}catch{}
     this.renderTestTime();
   },
@@ -6767,9 +6780,9 @@ const app={
     const accNote=r.acc<92?' Ta précision est le point à travailler : vise 95 % avant de chercher à aller plus vite.':'';
     let cmp='';
     if(currentUser){
-      if(!r.prevBest)cmp=`<div class="tt-compare">Premier test de ${t.sec/60} min : <b>${r.wpm} mpm</b> devient ta référence.</div>`;
-      else if(r.wpm>r.prevBest)cmp=`<div class="tt-compare">🏆 Nouveau record sur ${t.sec/60} min : <b>+${r.wpm-r.prevBest} mpm</b> (ancien record : ${r.prevBest} mpm).</div>`;
-      else cmp=`<div class="tt-compare">Ton record sur ${t.sec/60} min : <b>${r.prevBest} mpm</b>${r.wpm===r.prevBest?' (égalé).':`. Il te manque ${r.prevBest-r.wpm} mpm.`}</div>`;
+      if(!r.prevBest)cmp=`<div class="tt-compare">Premier test de ${this._ttLabel(t.sec)} : <b>${r.wpm} mpm</b> devient ta référence.</div>`;
+      else if(r.wpm>r.prevBest)cmp=`<div class="tt-compare">🏆 Nouveau record sur ${this._ttLabel(t.sec)} : <b>+${r.wpm-r.prevBest} mpm</b> (ancien record : ${r.prevBest} mpm).</div>`;
+      else cmp=`<div class="tt-compare">Ton record sur ${this._ttLabel(t.sec)} : <b>${r.prevBest} mpm</b>${r.wpm===r.prevBest?' (égalé).':`. Il te manque ${r.prevBest-r.wpm} mpm.`}</div>`;
     }
     const max=Math.max(1,...r.segWpm);
     const bars=r.segWpm.map(v=>`<div class="tt-seg-col" title="${v} mpm"><span class="tt-seg-v">${v}</span><div class="tt-seg-bar" style="height:${Math.max(3,Math.round(88*v/max))}px"></div></div>`).join('');
@@ -6781,7 +6794,7 @@ const app={
         <p class="tt-lvl">${lv.desc}${accNote}</p>
         <div class="tt-grid">
           <div class="tt-stat"><div class="tt-stat-label">PRÉCISION</div><div class="tt-stat-val">${r.acc}<small> %</small></div></div>
-          <div class="tt-stat"><div class="tt-stat-label">DURÉE</div><div class="tt-stat-val">${t.sec/60}<small> min</small></div></div>
+          <div class="tt-stat"><div class="tt-stat-label">DURÉE</div><div class="tt-stat-val">${t.sec<60?t.sec:t.sec/60}<small> ${t.sec<60?'s':'min'}</small></div></div>
           <div class="tt-stat"><div class="tt-stat-label">ERREURS</div><div class="tt-stat-val">${r.errors}</div></div>
           <div class="tt-stat"><div class="tt-stat-label">CARACTÈRES JUSTES</div><div class="tt-stat-val">${r.chars}</div></div>
         </div>
@@ -6790,7 +6803,7 @@ const app={
         <div class="tt-seg">${bars}</div>
         <div class="tt-seg-lbls">${lbls}</div>
         <div class="tt-actions">
-          <button class="tt-btn pri" onclick="app.ttStart(${t.sec})">Recommencer (${t.sec/60} min)</button>
+          <button class="tt-btn pri" onclick="app.ttStart(${t.sec})">Recommencer (${t.sec<60?t.sec+' s':t.sec/60+' min'})</button>
           <button class="tt-btn" onclick="app.openTimedTest()">Changer de durée</button>
           <button class="tt-btn" onclick="go('test')">Test sur base de longueur</button>
         </div>
