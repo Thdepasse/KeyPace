@@ -477,6 +477,35 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .nav-dropdown-menu a{display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:var(--txt);text-decoration:none}
 .nav-dropdown-menu a:hover{background:var(--light)}
 .nav-dropdown:hover .nav-dropdown-menu{display:block}
+/* ── Contenu de référencement sous chaque page ── */
+a.nav-link{text-decoration:none;display:inline-block}
+.seo-zone{border-top:1px solid var(--border);margin-top:24px}
+.seo-inner{max-width:960px;margin:0 auto;padding:8px 22px 28px;line-height:1.6}
+.seo-sec[hidden]{display:none}
+.seo-sec h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1;font-size:26px;font-weight:800;margin:8px 0 10px}
+.seo-sec h2.seo-h1{font-size:clamp(28px,4.5vw,38px);margin:8px 0 12px}
+.seo-sec h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:18px;font-weight:700;margin:16px 0 4px}
+.seo-sec section{padding:22px 0}
+.seo-sec p{margin:0 0 14px}
+.seo-sec a{color:var(--accent);text-decoration:none}
+.seo-sec a:hover{text-decoration:underline}
+.seo-sec .seo-hero{padding:26px 0 8px}
+.seo-sec .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.seo-sec .lead{font-size:19px;color:var(--muted);max-width:60ch}
+.seo-sec table{width:100%;border-collapse:collapse;margin:14px 0}
+.seo-sec th,.seo-sec td{text-align:left;padding:10px 12px;border:1px solid var(--border)}
+.seo-sec th{background:var(--light);font-weight:700}
+.seo-sec .callout{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin:14px 0}
+.seo-sec .faq details{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:4px 18px;margin-bottom:10px}
+.seo-sec .faq summary{font-weight:700;cursor:pointer;padding:12px 0;list-style:none;font-size:16px}
+.seo-sec .faq summary::-webkit-details-marker{display:none}
+.seo-sec .faq summary::after{content:"+";float:right;color:var(--accent);font-weight:800}
+.seo-sec .faq details[open] summary::after{content:"3"}
+.seo-sec .faq p{color:var(--muted);padding-bottom:8px}
+.seo-sec .final-cta{background:linear-gradient(135deg,#FFEDE8,#FFF6F2);border:1px solid var(--border);border-radius:22px;padding:28px 24px;text-align:center;margin:20px 0}
+.seo-sec .final-cta h2{margin-top:0}
+.seo-sec .btn{display:inline-block;background:var(--accent);color:#fff;font-weight:700;font-size:19px;padding:11px 20px;border-radius:12px;box-shadow:0 8px 20px -8px var(--accent)}
+.seo-sec .btn:hover{text-decoration:none;transform:translateY(-1px);transition:.15s}
 /* ── Test sur base de temps ── */
 .tt-wrap{padding:28px 29px 56px}
 @media(max-width:760px){.tt-wrap{padding:24px 16px 48px}}
@@ -2107,7 +2136,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <div class="nav-logo-name">KeyPace</div>
     </button>
     <div class="nav-links">
-      <button class="nav-link" id="nav-home" onclick="go('home')">Accueil<span class="underline"></span></button>
+      <a class="nav-link" id="nav-home" href="/accueil" onclick="go('home');return false">Accueil<span class="underline"></span></a>
       <div class="nav-dropdown" id="nav-ecoles-wrap">
         <a class="nav-link" href="/ecoles" style="display:inline-flex;align-items:center;text-decoration:none">Établissements</a>
         <div class="nav-dropdown-menu">
@@ -2117,15 +2146,15 @@ footer{border-top:1px solid var(--border);margin-top:10px}
         </div>
       </div>
       <div class="nav-dropdown" id="nav-test-wrap">
-        <button class="nav-link" id="nav-test" onclick="go('test')">Test<span class="underline"></span></button>
+        <a class="nav-link" id="nav-test" href="/test-vitesse-frappe" onclick="go('test');return false">Test<span class="underline"></span></a>
         <div class="nav-dropdown-menu">
-          <a href="/?view=test" onclick="go('test');return false">Test sur base de longueur</a>
-          <a href="/?view=testtime" onclick="app.openTimedTest();return false">Test sur base de temps</a>
+          <a href="/test-vitesse-frappe" onclick="go('test');return false">Test sur base de longueur</a>
+          <a href="/test-dactylographie-chronometre" onclick="app.openTimedTest();return false">Test sur base de temps</a>
         </div>
       </div>
-      <button class="nav-link" id="nav-lessons" onclick="app._skipModulesHub=false;go('lessons')">Cours<span class="underline"></span></button>
-      <button class="nav-link" id="nav-games" onclick="go('games')">Jeux<span class="underline"></span></button>
-      <button class="nav-link" id="nav-stats" onclick="go('stats')">Progrès<span class="underline"></span></button>
+      <a class="nav-link" id="nav-lessons" href="/cours-dactylographie" onclick="app._skipModulesHub=false;go('lessons');return false">Cours<span class="underline"></span></a>
+      <a class="nav-link" id="nav-games" href="/jeux-dactylo" onclick="go('games');return false">Jeux<span class="underline"></span></a>
+      <a class="nav-link" id="nav-stats" href="/progres" onclick="go('stats');return false">Progrès<span class="underline"></span></a>
       <button class="nav-link" id="nav-join" onclick="go('classes')" style="display:none">Classe<span class="underline"></span></button>
       <button class="nav-link" id="nav-classes" onclick="go('classes')" style="display:none">Gestion de classes<span class="underline"></span></button>
       <div id="nav-apercu" style="display:none;position:relative;align-items:center">
@@ -2222,6 +2251,230 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <div id="page-stats" style="display:none"></div>
 <div id="page-classes" style="display:none"></div>
 
+<!-- Contenu de référencement par adresse : la fonction api/page.js retire l'attribut hidden de la section de la page demandée ; le JS (app._seoSync) affiche celle de la vue courante. -->
+<div id="seo-zone" class="seo-zone"><div class="seo-inner">
+<div class="seo-sec" data-route="test" hidden>
+  <div class="seo-hero">
+    <div class="eyebrow">Test de vitesse</div>
+    <h2 class="seo-h1">Test de vitesse de frappe gratuit</h2>
+    <p class="lead">Combien de mots par minute tapes-tu vraiment ? Fais le test en une minute, obtiens ta vitesse et ta précision, puis compare-toi aux moyennes. Gratuit, sans inscription, sur ton clavier AZERTY.</p>
+  </div>
+
+  <section>
+    <h2>Comment fonctionne le test</h2>
+    <p>Tu recopies un texte affiché à l'écran en tapant le plus naturellement possible. KeyPace mesure deux choses : ta <strong>vitesse</strong>, exprimée en mots par minute, et ta <strong>précision</strong>, c'est-à-dire le pourcentage de frappes correctes. Le test se lance dans le navigateur, sur ton propre <a href="/clavier-azerty-belge">clavier AZERTY belge</a> ou français, sans rien installer.</p>
+    <p>À la fin, tu vois ton résultat en un coup d'œil. En créant un compte gratuit, tu peux enregistrer tes tests et suivre ta progression dans le temps sur un graphique.</p>
+  </section>
+
+  <section>
+    <h2>Qu'est-ce qu'un bon score ?</h2>
+    <p>La vitesse moyenne se situe autour de 30 à 40 mots par minute. Voici quelques repères pour te situer :</p>
+    <table>
+      <thead><tr><th>Niveau</th><th>Mots par minute</th></tr></thead>
+      <tbody>
+        <tr><td>Débutant</td><td>Moins de 25</td></tr>
+        <tr><td>Moyen</td><td>30 à 40</td></tr>
+        <tr><td>Bon</td><td>50 à 70</td></tr>
+        <tr><td>Avancé</td><td>Plus de 70</td></tr>
+      </tbody>
+    </table>
+    <p>La vitesse n'est qu'une moitié de l'histoire : viser <strong>95 % de précision</strong> ou plus évite de perdre du temps à corriger. Pour progresser sur les deux, l'idéal est d'apprendre à taper à dix doigts sans regarder le clavier.</p>
+  </section>
+
+  <section>
+    <h2>Progresser après le test</h2>
+    <p>Un test te donne un point de départ. Pour gagner en vitesse durablement, la clé est une pratique régulière et structurée. KeyPace propose 65 leçons progressives pour construire la mémoire musculaire, ainsi que des jeux de frappe pour s'entraîner sans s'ennuyer.</p>
+    <p>Pour aller plus loin : découvre notre <a href="/guide/vitesse-de-frappe-moyenne">guide sur la vitesse de frappe moyenne</a>, la méthode pour <a href="/guide/taper-a-10-doigts">taper à dix doigts</a>, ou attaque directement les <a href="/cours-dactylographie">cours de dactylographie</a>. Si ton clavier vient de Belgique, le guide <a href="/clavier-azerty-belge">clavier AZERTY belge</a> détaille ses quelques différences avec le clavier français. Une fois la frappe maîtrisée, les <a href="/guide/raccourcis-clavier-mac">raccourcis clavier Mac</a> et <a href="/guide/raccourcis-clavier-windows">Windows</a> font gagner encore plus de temps.</p>
+  </section>
+
+  <section class="faq">
+    <h2>Questions fréquentes</h2>
+    <details open>
+      <summary>Qu'est-ce qu'une bonne vitesse de frappe ?</summary>
+      <p>La moyenne tourne autour de 30 à 40 mots par minute. Au-delà de 50, c'est un bon niveau, et les dactylographes entraînés dépassent 70 mots par minute. La précision (viser 95 % ou plus) compte autant que la vitesse.</p>
+    </details>
+    <details>
+      <summary>Le test est-il vraiment gratuit ?</summary>
+      <p>Oui, le test fonctionne dans le navigateur sans installation ni inscription. Un compte gratuit permet en plus d'enregistrer tes résultats et de suivre ta progression.</p>
+    </details>
+    <details>
+      <summary>Comment la vitesse est-elle calculée ?</summary>
+      <p>Le score en mots par minute correspond aux caractères tapés correctement, divisés par cinq (la longueur moyenne d'un mot), ramenés à une minute. Les erreurs non corrigées font baisser la précision.</p>
+    </details>
+  </section>
+
+  <div class="final-cta">
+    <h2>Prêt à connaître ton score ?</h2>
+    <p style="color:var(--muted);max-width:46ch;margin:0 auto 18px">Lance le test en une minute, sur ton clavier belge ou français.</p>
+    <a class="btn" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">Faire le test gratuitement →</a>
+  </div>
+</div>
+<div class="seo-sec" data-route="lessons" hidden>
+  <div class="seo-hero">
+    <div class="eyebrow">Cours de dactylographie</div>
+    <h2 class="seo-h1">Cours de dactylographie en ligne, gratuit</h2>
+    <p class="lead">Apprends à taper à dix doigts sans regarder ton clavier, avec 65 leçons progressives pensées pour l'AZERTY. Commence gratuitement, à ton rythme, directement dans le navigateur.</p>
+  </div>
+
+  <section>
+    <h2>Une méthode progressive, leçon après leçon</h2>
+    <p>La dactylographie s'apprend par étapes : on ne mémorise pas tout le clavier d'un coup, mais quelques touches à la fois, jusqu'à ce que les doigts trouvent leur place tout seuls. KeyPace suit cette logique en quatre grandes étapes, sur clavier AZERTY belge ou français : les deux <a href="/clavier-azerty-belge">se pratiquent avec la même méthode</a>.</p>
+    <ol class="steps">
+      <li><strong>La rangée de repos.</strong> On pose les huit doigts sur Q, S, D, F et J, K, L, M, point de départ de chaque frappe.</li>
+      <li><strong>Les rangées du haut et du bas.</strong> On étend progressivement vers les autres lettres sans quitter la rangée de repos des yeux.</li>
+      <li><strong>Mots et phrases.</strong> On enchaîne des mots réels pour construire le rythme et la fluidité.</li>
+      <li><strong>Chiffres, accents et ponctuation.</strong> On complète avec les caractères du quotidien pour taper n'importe quel texte.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Suivre sa progression</h2>
+    <p>Chaque leçon mesure ta vitesse et ta précision. Avec un compte, tu retrouves un graphique de ta progression, tes meilleurs scores et les touches qui te ralentissent encore. C'est cette boucle, pratiquer puis mesurer, qui fait vraiment progresser.</p>
+    <div class="callout">
+      <h3>Gratuit, puis Expert</h3>
+      <p>Les 10 premières leçons et le test de vitesse sont gratuits. L'offre <strong>Expert à 4,99 € par mois</strong> débloque les 65 leçons, les jeux et le suivi complet. Les établissements scolaires disposent de <a href="/ecoles">licences pour leurs classes</a>.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pour qui ?</h2>
+    <p>Le cours convient aussi bien aux débutants complets qu'aux personnes qui tapent déjà mais regardent leur clavier. Élèves, étudiants, professionnels ou curieux : la méthode à dix doigts fait gagner un temps précieux dès qu'on écrit chaque jour à l'ordinateur.</p>
+    <p>Pour préparer le terrain, lis notre guide sur la <a href="/guide/position-des-doigts-azerty">position des doigts sur le clavier AZERTY</a> et la méthode pour <a href="/guide/taper-sans-regarder-le-clavier">taper sans regarder le clavier</a>. Élève ou étudiant ? Voir aussi comment prendre des notes efficacement au <a href="/guide/prendre-notes-secondaire">secondaire</a>, en <a href="/guide/prendre-notes-haute-ecole">haute école</a> ou à <a href="/guide/prendre-notes-universite">l'université</a>, et les <a href="/guide/metiers-vitesse-de-frappe">métiers où la vitesse de frappe fait la différence</a>. Et pour être encore plus efficace au quotidien, la liste des <a href="/guide/raccourcis-clavier-mac">raccourcis clavier Mac</a> et des <a href="/guide/raccourcis-clavier-windows">raccourcis clavier Windows</a>.</p>
+  </section>
+
+  <section class="faq">
+    <h2>Questions fréquentes</h2>
+    <details open>
+      <summary>Combien de temps pour apprendre à taper à dix doigts ?</summary>
+      <p>Avec quinze à vingt minutes de pratique par jour, la plupart des gens tapent sans regarder le clavier en quelques semaines. La régularité compte plus que la durée de chaque séance.</p>
+    </details>
+    <details>
+      <summary>Le cours est-il gratuit ?</summary>
+      <p>Les 10 premières leçons et le test sont gratuits. Les 65 leçons complètes font partie de l'offre Expert à 4,99 € par mois, et les écoles ont des licences dédiées.</p>
+    </details>
+    <details>
+      <summary>Faut-il installer un logiciel ?</summary>
+      <p>Non, tout se passe dans le navigateur, sur ordinateur ou tablette avec clavier. Rien à télécharger.</p>
+    </details>
+  </section>
+
+  <div class="final-cta">
+    <h2>Prêt à taper sans regarder ?</h2>
+    <p style="color:var(--muted);max-width:46ch;margin:0 auto 18px">Commence par les 10 leçons gratuites, à ton rythme.</p>
+    <a class="btn" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">Commencer gratuitement →</a>
+  </div>
+</div>
+<div class="seo-sec" data-route="games" hidden>
+  <div class="seo-hero">
+    <div class="eyebrow">Jeux de dactylo</div>
+    <h2 class="seo-h1">Jeux de dactylo pour taper plus vite</h2>
+    <p class="lead">S'entraîner à la frappe n'a pas à être ennuyeux. Avec les jeux de dactylo KeyPace, tu gagnes en vitesse et en précision en t'amusant, sur ton clavier AZERTY, directement dans le navigateur.</p>
+  </div>
+
+  <section>
+    <h2>Pourquoi jouer pour progresser</h2>
+    <p>Le principal frein en dactylographie, c'est l'abandon : on décroche avant que les réflexes ne s'installent. Le jeu résout ce problème en rendant la répétition motivante. On revient parce qu'on veut battre son score, et à force de revenir, les doigts trouvent leurs touches tout seuls.</p>
+    <p>Les jeux fonctionnent d'autant mieux qu'ils s'appuient sur une bonne base technique. L'idéal est de les combiner avec les <a href="/cours-dactylographie">leçons de dactylographie</a>, qui construisent d'abord la méthode à dix doigts.</p>
+  </section>
+
+  <section>
+    <h2>Ce que les jeux entraînent</h2>
+    <div class="cards">
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h3>La vitesse</h3><p>Taper vite sous une contrainte de temps, pour repousser ton plafond de mots par minute.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></div><h3>La précision</h3><p>Viser la bonne touche du premier coup, car chaque erreur coûte des points.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3a3 3 0 0 0-3 3 3 3 0 0 0-1 5.8 3.5 3.5 0 0 0 2 6.2h1a2 2 0 0 0 2-2V6a3 3 0 0 0-1-3z"/><path d="M15 3a3 3 0 0 1 3 3 3 3 0 0 1 1 5.8 3.5 3.5 0 0 1-2 6.2h-1a2 2 0 0 1-2-2V6a3 3 0 0 1 1-3z"/></svg></div><h3>Les réflexes</h3><p>Réagir sans réfléchir, pour ancrer la mémoire musculaire du clavier AZERTY.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Gratuit et sans installation</h2>
+    <p>Les jeux se lancent dans le navigateur, sur ordinateur comme sur tablette avec clavier. Une partie des jeux est gratuite ; l'ensemble des jeux et des 65 leçons fait partie de l'offre Expert à 4,99 € par mois.</p>
+    <p>Envie de mesurer tes progrès ? Fais le <a href="/test-vitesse-frappe">test de vitesse de frappe</a> avant et après tes parties pour voir la différence.</p>
+  </section>
+
+  <section class="faq">
+    <h2>Questions fréquentes</h2>
+    <details open>
+      <summary>Les jeux aident-ils vraiment à taper plus vite ?</summary>
+      <p>Oui, s'ils s'accompagnent d'une bonne technique. Le jeu entretient la motivation et la régularité. Il fonctionne mieux en complément des leçons, qui construisent d'abord les bons réflexes à dix doigts.</p>
+    </details>
+    <details>
+      <summary>Les jeux sont-ils gratuits ?</summary>
+      <p>Une partie des jeux est gratuite. L'ensemble, avec les 65 leçons, fait partie de l'offre Expert à 4,99 € par mois. Tout se joue dans le navigateur.</p>
+    </details>
+    <details>
+      <summary>Sur quel clavier peut-on jouer ?</summary>
+      <p>Sur n'importe quel clavier AZERTY, belge ou français, et sur tablette avec clavier physique. Rien à télécharger.</p>
+    </details>
+  </section>
+
+  <div class="final-cta">
+    <h2>Prêt à jouer et progresser ?</h2>
+    <p style="color:var(--muted);max-width:46ch;margin:0 auto 18px">Lance une partie et fais grimper ton score de mots par minute.</p>
+    <a class="btn" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">Jouer gratuitement →</a>
+  </div>
+</div>
+<div class="seo-sec" data-route="testtime" hidden>
+  <div class="seo-hero">
+    <div class="eyebrow">Test chronométré</div>
+    <h2 class="seo-h1">Test de frappe chronométré gratuit</h2>
+    <p class="lead">Choisis une durée, de 30 secondes à 10 minutes, et tape sans t'arrêter. KeyPace mesure ta vitesse en mots par minute, ta précision et l'évolution de ton rythme au fil du test. Sur clavier AZERTY, directement dans le navigateur.</p>
+  </div>
+  <section>
+    <h2>Pourquoi choisir la durée du test</h2>
+    <p>Un test court (30 secondes ou 1 minute) donne une première idée de ta vitesse. Un test plus long (3, 5 ou 10 minutes) mesure aussi ton <strong>endurance</strong> : la vitesse a tendance à varier quand la concentration et la fatigue entrent en jeu. Le graphique de fin de test te montre ta vitesse tranche par tranche, pour voir si ton rythme se maintient.</p>
+  </section>
+  <section>
+    <h2>Quelle durée choisir ?</h2>
+    <table>
+      <thead><tr><th>Durée</th><th>Pour quoi faire</th></tr></thead>
+      <tbody>
+        <tr><td>30 secondes</td><td>Découvrir le test, sans compte (une fois par jour)</td></tr>
+        <tr><td>1 minute</td><td>Un aperçu rapide de ta vitesse</td></tr>
+        <tr><td>3 minutes</td><td>Vérifier que ton rythme tient</td></tr>
+        <tr><td>5 minutes</td><td>Un résultat plus stable, moins sensible à un bon ou mauvais départ</td></tr>
+        <tr><td>10 minutes</td><td>L'épreuve d'endurance</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section>
+    <h2>Comment est calculé ton résultat</h2>
+    <p>La vitesse en mots par minute correspond aux caractères tapés correctement, divisés par cinq (la longueur moyenne d'un mot), ramenés à une minute. La précision est la part de frappes correctes. Il n'y a pas de retour arrière : chaque faute compte, ce qui t'encourage à taper juste.</p>
+    <p>À la fin, KeyPace te donne un niveau selon ces repères :</p>
+    <table>
+      <thead><tr><th>Niveau</th><th>Mots par minute</th></tr></thead>
+      <tbody>
+        <tr><td>Débutant</td><td>Moins de 20</td></tr>
+        <tr><td>Intermédiaire</td><td>20 à 34</td></tr>
+        <tr><td>Confirmé</td><td>35 à 49</td></tr>
+        <tr><td>Avancé</td><td>50 à 69</td></tr>
+        <tr><td>Expert</td><td>70 et plus</td></tr>
+      </tbody>
+    </table>
+    <p>Pour progresser, découvre les <a href="/cours-dactylographie">cours de dactylographie</a>, les <a href="/jeux-dactylo">jeux de frappe</a>, ou fais d'abord le <a href="/test-vitesse-frappe">test de vitesse sur une phrase</a>.</p>
+  </section>
+  <section class="faq">
+    <h2>Questions fréquentes</h2>
+    <details open>
+      <summary>Quelle durée choisir pour mon test de frappe ?</summary>
+      <p>Pour une première mesure, 30 secondes ou 1 minute suffisent. Pour vérifier que ton rythme tient dans la durée, choisis 3, 5 ou 10 minutes : plus le test est long, plus le résultat reflète ta vitesse réelle et ta régularité.</p>
+    </details>
+    <details>
+      <summary>Pourquoi ma vitesse baisse-t-elle sur un test long ?</summary>
+      <p>Sur plusieurs minutes, la concentration et la fatigue des mains jouent un rôle. C'est pour cela que KeyPace affiche la vitesse tranche par tranche : tu vois où ton rythme se maintient et où il flanche.</p>
+    </details>
+    <details>
+      <summary>Le test chronométré est-il gratuit ?</summary>
+      <p>Oui. Sans compte, tu peux faire le test de 30 secondes une fois par jour. Un compte gratuit débloque les durées de 1, 3, 5 et 10 minutes, sans limite, et enregistre tes records.</p>
+    </details>
+  </section>
+  <div class="final-cta">
+    <h2>Prêt à te chronométrer ?</h2>
+    <p style="color:var(--muted);max-width:46ch;margin:0 auto 18px">Choisis ta durée et lance-toi, c'est gratuit.</p>
+    <a class="btn" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">Choisir ma durée →</a>
+  </div>
+</div>
+</div></div>
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">
@@ -2902,6 +3155,9 @@ function isMobileLayout(){
       && !window.matchMedia('(any-pointer:fine)').matches
       && !_kbDetected;
 }
+const VIEW_PATHS={home:'/accueil',test:'/test-vitesse-frappe',testtime:'/test-dactylographie-chronometre',lessons:'/cours-dactylographie',games:'/jeux-dactylo',stats:'/progres',classes:'/classe'};
+const VIEW_FROM_PATH=Object.fromEntries(Object.entries(VIEW_PATHS).map(([v,p])=>[p,v]));
+function normPath(p){return p.length>1?p.replace(/\/+$/,''):p;}
 const MOBILE_BLOCKED_VIEWS=['test','testtime','lessons','games'];
 function applyMobileNav(){
   if(!isMobileLayout())return;
@@ -5926,6 +6182,7 @@ const app={
   },
 
   renderView(v){
+    const _req=v; // vue demandée (avant redirection mobile) : sert à l'adresse et au contenu de référencement
     // Sur mobile : un visiteur ne voit que la landing ; les écrans de frappe
     // sont inaccessibles et redirigent vers l'espace pertinent du compte.
     if(isMobileLayout()){
@@ -5960,10 +6217,10 @@ const app={
     window.scrollTo({top:0,behavior:'instant'});
     const _meta={
       home:['KeyPace – Apprenez à taper vite sur clavier AZERTY','KeyPace : 65 leçons progressives pour apprendre la dactylographie AZERTY. Test de vitesse, jeux de frappe et suivi de progression. Gratuit, en français, sans installation.'],
-      lessons:['Cours de dactylographie AZERTY – KeyPace','Parcourez les 65 leçons KeyPace et progressez du niveau zéro à 60 mots/min sur clavier AZERTY. Exercices progressifs avec feedback immédiat.'],
-      testtime:['Test de frappe chronométré (1, 3, 5 ou 10 min) – KeyPace','Évaluez votre niveau de dactylographie : vitesse en mots par minute et précision sur 1, 3, 5 ou 10 minutes de frappe continue.'],
-      test:['Test de vitesse de frappe – KeyPace','Mesurez votre vitesse de frappe en mots par minute et votre précision. Test chronométré sur clavier AZERTY, résultats instantanés.'],
-      games:['Jeux de dactylographie – KeyPace','Entraînez-vous en vous amusant : Course de dactylo, Simon des mots, Sprint et Boss de la semaine. Progressez sans vous en rendre compte.'],
+      lessons:['Cours de dactylographie en ligne gratuit (AZERTY) | KeyPace','Apprends la dactylographie en ligne avec 65 leçons progressives sur clavier AZERTY. Méthode à dix doigts, suivi de progression, 10 leçons gratuites.'],
+      testtime:['Test de frappe chronométré en ligne : 30 s, 1, 3, 5 ou 10 min | KeyPace','Mesure ta vitesse de frappe et ta précision sur 30 secondes, 1, 3, 5 ou 10 minutes. Test chronométré gratuit sur clavier AZERTY, directement dans le navigateur.'],
+      test:['Test de vitesse de frappe en ligne gratuit | KeyPace','Teste ta vitesse de frappe en ligne gratuitement : mots par minute, précision et score AZERTY. Sans inscription, directement dans le navigateur.'],
+      games:['Jeux de dactylo pour taper plus vite (gratuit) | KeyPace',"Des jeux de dactylo pour s'entraîner à taper vite en s'amusant, sur clavier AZERTY. Gratuit dans le navigateur, sans installation."],
       stats:['Mes progrès – KeyPace','Suivez votre progression en dactylographie : vitesse (mots/min), précision, série de jours, leçons validées et touches difficiles.'],
       classes:['Ma classe – KeyPace','Gérez vos classes, suivez vos élèves et assignez des devoirs depuis votre tableau de bord KeyPace.'],
     };
@@ -5971,7 +6228,29 @@ const app={
     document.title=t;
     const desc=document.querySelector('meta[name="description"]');
     if(desc)desc.setAttribute('content',d);
+    this._syncUrl(v,_req);
+    this._seoSync(_req);
     this.renderCurrent();
+  },
+  // Une adresse propre par page (voir VIEW_PATHS). Arrivée sur "/" : on garde "/".
+  _syncUrl(v,req){
+    const first=!this._urlInit;this._urlInit=true;
+    if(this._popping||v!==req)return; // retour navigateur, ou vue remplacée (mobile) : l'adresse demandée reste
+    const want=VIEW_PATHS[v];
+    if(!want||normPath(location.pathname)===want)return;
+    const legacy=new URLSearchParams(location.search).has('view');
+    if(first&&location.pathname==='/'&&!legacy)return;
+    try{
+      if(first){const q=new URLSearchParams(location.search);q.delete('view');const qs=q.toString();history.replaceState(null,'',want+(qs?'?'+qs:'')+location.hash);}
+      else history.pushState(null,'',want);
+    }catch{}
+  },
+  // Affiche le contenu de référencement de l'adresse courante (les autres restent cachés).
+  _seoSync(req){
+    const z=document.getElementById('seo-zone');if(!z)return;
+    let any=false;
+    z.querySelectorAll('.seo-sec').forEach(el=>{const on=el.dataset.route===req;el.hidden=!on;if(on)any=true;});
+    z.style.display=any?'':'none';
   },
   renderCurrent(){
     if(!this.stats)this.stats=loadStats();
@@ -14550,14 +14829,29 @@ if(currentUser){
 app.init();
 {
   // Arrivée depuis un lien externe pointant vers une vue précise (?view=test|lessons|games|stats|home)
-  const _vp=new URLSearchParams(location.search).get('view');
-  const _validViews=['home','test','testtime','lessons','games','stats'];
+  const _vp=VIEW_FROM_PATH[normPath(location.pathname)]||new URLSearchParams(location.search).get('view');
+  const _validViews=['home','test','testtime','lessons','games','stats','classes'];
   // Prof/établissement : atterrir sur son tableau de bord au rechargement de
   // la page, pas sur la vue Test (même choix déjà fait dans loginUser() au
   // premier login, manquant ici) — cette vue ne lui sert à rien puisque la
   // nav Test/Cours/Jeux/Progrès est masquée pour ce rôle.
   go(_validViews.includes(_vp)?_vp:(isTeacher()?'home':'test'));
 }
+window.addEventListener('popstate',()=>{
+  const v=VIEW_FROM_PATH[normPath(location.pathname)]||(isTeacher()?'home':'test');
+  app._popping=true;try{app.renderView(v);}finally{app._popping=false;}
+});
+// Liens internes vers une page de l'appli : navigation sans rechargement.
+document.addEventListener('click',e=>{
+  if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
+  const a=e.target.closest&&e.target.closest('a[href]');
+  if(!a||a.hasAttribute('onclick')||(a.target&&a.target!=='_self'))return;
+  let u;try{u=new URL(a.href,location.href);}catch{return;}
+  if(u.origin!==location.origin||u.search||u.hash)return;
+  const v=VIEW_FROM_PATH[normPath(u.pathname)];if(!v)return;
+  e.preventDefault();
+  if(v==='testtime')app.openTimedTest();else{if(v==='lessons')app._skipModulesHub=false;go(v);}
+});
 updateNavUser();
 handlePaymentReturn();
 handleVerificationReturn();
