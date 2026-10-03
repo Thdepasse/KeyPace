@@ -477,6 +477,58 @@ nav{border-bottom:1px solid var(--border);background:rgba(250,249,245,0.92);back
 .nav-dropdown-menu a{display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:var(--txt);text-decoration:none}
 .nav-dropdown-menu a:hover{background:var(--light)}
 .nav-dropdown:hover .nav-dropdown-menu{display:block}
+/* ── Test sur base de temps ── */
+.tt-wrap{max-width:920px;margin:0 auto;padding:28px 20px 56px}
+.tt-eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+.tt-title{font-size:clamp(26px,4vw,38px);line-height:1.12;font-weight:800;margin:0 0 10px;color:var(--txt)}
+.tt-sub{font-size:16px;line-height:1.55;color:var(--muted);margin:0 0 26px;max-width:620px}
+.tt-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tt-card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:22px 18px;text-align:left;font:inherit;color:var(--txt);cursor:pointer;transition:.15s;display:flex;flex-direction:column;gap:6px}
+.tt-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 12px 28px -14px rgba(255,77,46,.45)}
+.tt-card-num{font-size:44px;font-weight:800;line-height:1;color:var(--accent)}
+.tt-card-unit{font-size:14px;font-weight:700}
+.tt-card-sub{font-size:13px;line-height:1.45;color:var(--muted)}
+.tt-card-best{margin-top:6px;font-size:12px;font-weight:700;color:var(--success)}
+.tt-note{margin-top:22px;font-size:14px;line-height:1.6;color:var(--muted)}
+.tt-note a{color:var(--accent);font-weight:700;cursor:pointer;text-decoration:none}
+.tt-back{background:none;border:none;cursor:pointer;font:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 10px}
+.tt-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.tt-stat{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 18px}
+.tt-stat-label{font-size:11px;font-weight:800;letter-spacing:.07em;color:var(--muted)}
+.tt-stat-val{font-size:32px;font-weight:800;line-height:1.2;color:var(--txt);font-variant-numeric:tabular-nums}
+.tt-stat-val small{font-size:14px;font-weight:600;color:var(--muted)}
+.tt-stat.main .tt-stat-val{color:var(--accent)}
+.tt-bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden;margin-bottom:14px}
+.tt-bar-fill{height:100%;width:0;background:var(--accent);border-radius:3px;transition:width .25s linear}
+.tt-card-text{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px 24px}
+.tt-hint{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px}
+.tt-hint.idle{color:var(--accent)}
+.tt-text{position:relative;height:calc(3 * 2.2em);overflow:hidden;font-family:'JetBrains Mono',monospace;font-size:22px;line-height:2.2em;color:var(--muted)}
+.tt-text{white-space:pre-wrap}
+.tt-w{white-space:nowrap}
+.tt-ch.ok{color:var(--txt)}
+.tt-ch.wrong{color:var(--danger);background:rgba(229,72,77,.12);border-radius:3px}
+.tt-ch.cur{background:var(--accent);color:#fff;border-radius:3px}
+.tt-result{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:28px 26px}
+.tt-badge{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:rgba(255,77,46,.1);color:var(--accent);margin-bottom:12px}
+.tt-big{font-size:64px;font-weight:800;line-height:1;color:var(--txt)}
+.tt-big small{font-size:18px;font-weight:600;color:var(--muted)}
+.tt-lvl{font-size:15px;line-height:1.55;color:var(--muted);margin:10px 0 20px;max-width:560px}
+.tt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.tt-compare{background:var(--light);border:1px solid var(--border);border-radius:14px;padding:12px 16px;font-size:14px;margin-bottom:18px}
+.tt-seg-title{font-size:12px;font-weight:800;letter-spacing:.07em;color:var(--muted);margin:6px 0 10px}
+.tt-seg{display:flex;align-items:flex-end;gap:8px;height:120px;margin-bottom:6px}
+.tt-seg-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:4px}
+.tt-seg-bar{width:100%;border-radius:6px 6px 2px 2px;background:var(--accent);opacity:.85;min-height:3px}
+.tt-seg-v{font-size:12px;font-weight:700;color:var(--txt)}
+.tt-seg-lbls{display:flex;gap:8px;margin-bottom:18px}
+.tt-seg-lbls span{flex:1;text-align:center;font-size:11px;color:var(--muted)}
+.tt-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.tt-btn{font:inherit;font-size:14px;font-weight:700;border-radius:12px;padding:12px 20px;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--txt)}
+.tt-btn.pri{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(255,77,46,.3)}
+.tt-save{margin-top:16px;font-size:13.5px;color:var(--muted)}
+.tt-save a{color:var(--accent);font-weight:700;cursor:pointer}
+@media(max-width:760px){.tt-cards{grid-template-columns:repeat(2,1fr)}.tt-grid{grid-template-columns:repeat(2,1fr)}.tt-stats{grid-template-columns:repeat(3,1fr);gap:8px}.tt-stat{padding:10px 12px}.tt-stat-val{font-size:24px}.tt-text{font-size:18px}}
 .nav-spacer{flex:1}
 .nav-burger{display:none;background:none;border:1.5px solid var(--border);border-radius:10px;width:40px;height:40px;font-size:19px;color:var(--txt);align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent}
 /* logged-out nav */
@@ -2060,7 +2112,13 @@ footer{border-top:1px solid var(--border);margin-top:10px}
           <a href="/dactylographie-superieur">Supérieur</a>
         </div>
       </div>
-      <button class="nav-link" id="nav-test" onclick="go('test')">Test<span class="underline"></span></button>
+      <div class="nav-dropdown" id="nav-test-wrap">
+        <button class="nav-link" id="nav-test" onclick="go('test')">Test<span class="underline"></span></button>
+        <div class="nav-dropdown-menu">
+          <a href="/?view=test" onclick="go('test');return false">Test sur base de longueur</a>
+          <a href="/?view=testtime" onclick="app.openTimedTest();return false">Test sur base de temps</a>
+        </div>
+      </div>
       <button class="nav-link" id="nav-lessons" onclick="app._skipModulesHub=false;go('lessons')">Cours<span class="underline"></span></button>
       <button class="nav-link" id="nav-games" onclick="go('games')">Jeux<span class="underline"></span></button>
       <button class="nav-link" id="nav-stats" onclick="go('stats')">Progrès<span class="underline"></span></button>
@@ -2154,6 +2212,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
   </main>
 </noscript></div>
 <div id="page-test" style="display:none"></div>
+<div id="page-testtime" style="display:none"></div>
 <div id="page-lessons" style="display:none"></div>
 <div id="page-games" style="display:none"></div>
 <div id="page-stats" style="display:none"></div>
@@ -2771,7 +2830,7 @@ function updateNavUser(){
   if(!currentUser){
     guest.style.display='flex';logged.style.display='none';
     // Restaurer la nav publique par défaut (notamment après déconnexion d'un compte prof/élève).
-    ['nav-home','nav-test','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='';});
+    ['nav-home','nav-test-wrap','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='';});
     const cb=document.getElementById('nav-classes');if(cb)cb.style.display='none';
     const ap=document.getElementById('nav-apercu');if(ap)ap.style.display='none';
     const jb=document.getElementById('nav-join');if(jb)jb.style.display='none';
@@ -2792,7 +2851,7 @@ function updateNavUser(){
   else{badge.textContent=plan==='expert'?'EXPERT':'GRATUIT';badge.className='nav-plan-badge '+(plan==='expert'?'expert':'free');}
   upgradeBtn.style.display=(plan==='expert'||teacher)?'none':'inline-block';
   if(classesBtn)classesBtn.style.display=teacher?'inline-flex':'none';
-  ['nav-test','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=teacher?'none':'';});
+  ['nav-test-wrap','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=teacher?'none':'';});
   const homeBtn=document.getElementById('nav-home');if(homeBtn)homeBtn.style.display='';
   const apercu=document.getElementById('nav-apercu');if(apercu)apercu.style.display=teacher?'inline-flex':'none';
   // "Classe" n'a de sens que pour un élève rattaché à un établissement, ou
@@ -2839,10 +2898,10 @@ function isMobileLayout(){
       && !window.matchMedia('(any-pointer:fine)').matches
       && !_kbDetected;
 }
-const MOBILE_BLOCKED_VIEWS=['test','lessons','games'];
+const MOBILE_BLOCKED_VIEWS=['test','testtime','lessons','games'];
 function applyMobileNav(){
   if(!isMobileLayout())return;
-  ['nav-test','nav-lessons','nav-games'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='none';});
+  ['nav-test-wrap','nav-lessons','nav-games'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='none';});
   const ap=document.getElementById('nav-apercu');if(ap)ap.style.display='none'; // mène à test/cours/jeux
   const eleve=!!currentUser&&!isTeacher();
   const st=document.getElementById('nav-stats');if(st)st.style.display=eleve?'':'none';
@@ -4746,7 +4805,7 @@ const app={
     if(s.mode==='lesson')return this.lessonRec(s.lessonId).bestWpm||0;
     const tests=(this.stats&&this.stats.tests)||[];
     if(s.custom&&s.assignmentId)return Math.max(0,...tests.filter(t=>t.assignmentId===s.assignmentId).map(t=>t.wpm));
-    return Math.max(0,...tests.filter(t=>!t.assignmentId).map(t=>t.wpm));
+    return Math.max(0,...tests.filter(t=>!t.assignmentId&&!t.dur).map(t=>t.wpm));
   },
   setGoal(key,delta){
     if(!currentUser)return;
@@ -5614,6 +5673,7 @@ const app={
     if(this.view==='games'&&this.activeGame==='boss'&&this.boss&&this.boss.phase==='playing'){this.bossKey(e);return;}
     if(this.view==='games'&&this.activeGame==='duel'&&this.duel&&this.duel.phase==='racing'){this.duelKey(e);return;}
     if(this.view==='games'&&SOURIS_GAMES.includes(this.activeGame)&&this.souris&&this.souris.phase==='play'){this.sourisKey(e);return;}
+    if(this.view==='testtime'){this.ttKey(e);return;}
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   exitActiveGame(){
@@ -5889,13 +5949,15 @@ const app={
     if(v==='test'){if(!this.sess||this.sess.mode!=='test')this.sess=this.makeSession('test');}
     // Vider les pages avec #tb-scroll pour éviter les IDs dupliqués
     if(v!=='test')document.getElementById('page-test').innerHTML='';
+    if(v!=='testtime'){this._ttStop();this.tt=null;document.getElementById('page-testtime').innerHTML='';}
     if(v!=='lessons')document.getElementById('page-lessons').innerHTML='';
-    ['home','test','lessons','games','stats','classes'].forEach(p=>{const el=document.getElementById('page-'+p);if(!el)return;if(p===v){el.style.display='block';el.classList.remove('_pgAnim');void el.offsetWidth;el.classList.add('_pgAnim');}else el.style.display='none';});
-    ['home','test','lessons','games','stats','classes'].forEach(id=>{const el=document.getElementById('nav-'+id);if(el)el.classList.toggle('active',id===v);});
+    ['home','test','testtime','lessons','games','stats','classes'].forEach(p=>{const el=document.getElementById('page-'+p);if(!el)return;if(p===v){el.style.display='block';el.classList.remove('_pgAnim');void el.offsetWidth;el.classList.add('_pgAnim');}else el.style.display='none';});
+    ['home','test','lessons','games','stats','classes'].forEach(id=>{const el=document.getElementById('nav-'+id);if(el)el.classList.toggle('active',id===v||(id==='test'&&v==='testtime'));});
     window.scrollTo({top:0,behavior:'instant'});
     const _meta={
       home:['KeyPace – Apprenez à taper vite sur clavier AZERTY','KeyPace : 65 leçons progressives pour apprendre la dactylographie AZERTY. Test de vitesse, jeux de frappe et suivi de progression. Gratuit, en français, sans installation.'],
       lessons:['Cours de dactylographie AZERTY – KeyPace','Parcourez les 65 leçons KeyPace et progressez du niveau zéro à 60 mots/min sur clavier AZERTY. Exercices progressifs avec feedback immédiat.'],
+      testtime:['Test de frappe chronométré (1, 3, 5 ou 10 min) – KeyPace','Évaluez votre niveau de dactylographie : vitesse en mots par minute et précision sur 1, 3, 5 ou 10 minutes de frappe continue.'],
       test:['Test de vitesse de frappe – KeyPace','Mesurez votre vitesse de frappe en mots par minute et votre précision. Test chronométré sur clavier AZERTY, résultats instantanés.'],
       games:['Jeux de dactylographie – KeyPace','Entraînez-vous en vous amusant : Course de dactylo, Simon des mots, Sprint et Boss de la semaine. Progressez sans vous en rendre compte.'],
       stats:['Mes progrès – KeyPace','Suivez votre progression en dactylographie : vitesse (mots/min), précision, série de jours, leçons validées et touches difficiles.'],
@@ -5912,6 +5974,7 @@ const app={
     switch(this.view){
       case 'home':this.renderHome();break;
       case 'test':this.renderTyping();break;
+      case 'testtime':this.renderTestTime();break;
       case 'lessons':this.renderLessons();break;
       case 'games':this.renderGames();break;
       case 'stats':this.renderStats();break;
@@ -6552,6 +6615,190 @@ const app={
   },
   _classIdOf(name){return ((this.etab&&this.etab.classes)||[]).find(c=>c.name===name)?.id;},
 
+  /* ── TEST SUR BASE DE TEMPS ──
+     Même principe que le test de vitesse, mais c'est le chrono qui décide de la
+     fin (1, 3, 5 ou 10 min) : le texte s'allonge au fil de la frappe. Le chrono
+     démarre à la première touche. Résultat enregistré comme un test (mode
+     'test') avec `dur` (secondes), pour ne pas fausser le record du test court
+     (voir _prevBestFor). */
+  _ttDurations(){return[
+    {sec:60,n:1,label:'minute',sub:'Un aperçu rapide de ta vitesse.'},
+    {sec:180,n:3,label:'minutes',sub:'Pour voir si ton rythme tient.'},
+    {sec:300,n:5,label:'minutes',sub:'Un bon équilibre entre effort et fiabilité.'},
+    {sec:600,n:10,label:'minutes',sub:"L'épreuve d'endurance."},
+  ];},
+  _ttLevel(wpm){
+    if(wpm>=70)return{name:'Expert',desc:'Une frappe très rapide. À ce niveau, tout se joue sur la régularité et la précision.'};
+    if(wpm>=50)return{name:'Avancé',desc:'Une frappe rapide et solide. Tu peux encore gagner en régularité.'};
+    if(wpm>=35)return{name:'Confirmé',desc:'Ta frappe est fluide. Continue pour gagner en vitesse sans perdre en précision.'};
+    if(wpm>=20)return{name:'Intermédiaire',desc:'Tu as un bon rythme de base. Les cours et les jeux t\'aideront à passer au niveau suivant.'};
+    return{name:'Débutant',desc:'Tu poses les bases. Avec un peu de pratique chaque jour, la vitesse viendra vite.'};
+  },
+  _ttBest(sec){return Math.max(0,...((this.stats&&this.stats.tests)||[]).filter(t=>t.dur===sec).map(t=>t.wpm));},
+  _ttFmt(sec){const m=Math.floor(sec/60),s=Math.floor(sec%60);return m+':'+String(s).padStart(2,'0');},
+  openTimedTest(){this._ttStop();this.tt=null;go('testtime');},
+  _ttStop(){if(this._ttTimer){clearInterval(this._ttTimer);this._ttTimer=null;}},
+  ttStart(sec){
+    this._ttStop();
+    this.tt={sec,phase:'ready',text:'',idx:0,typed:[],keystrokes:0,correct:0,startTime:0,log:[]};
+    this._ttExtend();
+    this.renderTestTime();
+  },
+  // Ajoute des phrases tant qu'il n'y a pas ~800 caractères d'avance. Retourne l'ancienne longueur.
+  _ttExtend(){
+    const t=this.tt,from=t.text.length;
+    while(t.text.length<t.idx+800){t.text+=(t.text.length?' ':'')+PASSAGES[Math.floor(Math.random()*PASSAGES.length)];}
+    return from;
+  },
+  _ttCharsHTML(from,to){
+    const t=this.tt;let out='',buf=[];
+    const flush=()=>{if(buf.length){out+='<span class="tt-w">'+buf.join('')+'</span>';buf=[];}};
+    for(let i=from;i<to;i++){
+      const c=t.text[i];
+      const cls=i<t.idx?(t.typed[i]==='w'?'wrong':'ok'):i===t.idx?'cur':'todo';
+      if(c===' '){flush();out+=`<span class="tt-ch ${cls}"> </span>`;}
+      else buf.push(`<span class="tt-ch ${cls}">${c.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}</span>`);
+    }
+    flush();return out;
+  },
+  renderTestTime(){
+    const el=document.getElementById('page-testtime');if(!el)return;
+    const t=this.tt;
+    if(!t){
+      el.innerHTML=`<div class="tt-wrap">
+        <p class="tt-eyebrow">Test sur base de temps</p>
+        <h1 class="tt-title">Évalue ton niveau, chrono en main.</h1>
+        <p class="tt-sub">Choisis une durée et tape sans t'arrêter. Plus le test est long, plus le résultat reflète ta vitesse réelle et ta régularité.</p>
+        <div class="tt-cards">${this._ttDurations().map(d=>{const b=currentUser?this._ttBest(d.sec):0;return`<button class="tt-card" onclick="app.ttStart(${d.sec})"><span class="tt-card-num">${d.n}</span><span class="tt-card-unit">${d.label}</span><span class="tt-card-sub">${d.sub}</span>${b?`<span class="tt-card-best">Ton record : ${b} mpm</span>`:''}</button>`;}).join('')}</div>
+        <p class="tt-note">Le chrono démarre à ta première touche. Pas de retour arrière : tape juste, ta précision compte. Tu préfères une seule phrase à recopier&nbsp;? <a onclick="go('test')">Test sur base de longueur</a></p>
+      </div>`;
+      return;
+    }
+    if(t.phase==='done'){el.innerHTML=this._ttResultHTML();return;}
+    el.innerHTML=`<div class="tt-wrap">
+      <button class="tt-back" onclick="app.openTimedTest()">← Changer de durée</button>
+      <p class="tt-eyebrow">Test de ${t.sec/60} minute${t.sec>60?'s':''}</p>
+      <div class="tt-stats">
+        <div class="tt-stat main"><div class="tt-stat-label">TEMPS RESTANT</div><div class="tt-stat-val" id="tt-left">${this._ttFmt(t.sec)}</div></div>
+        <div class="tt-stat"><div class="tt-stat-label">VITESSE</div><div class="tt-stat-val"><span id="tt-wpm">0</span> <small>mpm</small></div></div>
+        <div class="tt-stat"><div class="tt-stat-label">PRÉCISION</div><div class="tt-stat-val"><span id="tt-acc">·</span></div></div>
+      </div>
+      <div class="tt-bar"><div class="tt-bar-fill" id="tt-bar"></div></div>
+      <div class="tt-card-text">
+        <div class="tt-hint${t.phase==='ready'?' idle':''}" id="tt-hint">${t.phase==='ready'?'Commence à taper : le chrono démarre tout seul.':'Garde le rythme, ne regarde pas le clavier.'}</div>
+        <div class="tt-text" id="tt-text">${this._ttCharsHTML(0,t.text.length)}</div>
+      </div>
+    </div>`;
+    this._ttSpans=[...el.querySelectorAll('.tt-ch')];
+    this._ttScroll();
+    this._ttLive();
+  },
+  _ttScroll(){
+    const box=document.getElementById('tt-text'),sp=this._ttSpans,t=this.tt;
+    if(!box||!sp||!sp[t.idx])return;
+    const lh=parseFloat(getComputedStyle(box).lineHeight)||48;
+    box.scrollTop=Math.max(0,sp[t.idx].offsetTop-lh);
+  },
+  _ttLive(){
+    const t=this.tt;if(!t||t.phase==='done')return;
+    const elapsed=t.phase==='run'?Math.min(Date.now()-t.startTime,t.sec*1000):0;
+    const $=id=>document.getElementById(id);
+    const l=$('tt-left');if(l)l.textContent=this._ttFmt(Math.ceil((t.sec*1000-elapsed)/1000));
+    const b=$('tt-bar');if(b)b.style.width=(100*elapsed/(t.sec*1000))+'%';
+    const w=$('tt-wpm');if(w)w.textContent=elapsed>=3000?Math.round((t.correct/5)/(elapsed/60000)):0;
+    const a=$('tt-acc');if(a)a.textContent=t.keystrokes?Math.round(100*t.correct/t.keystrokes)+'%':'·';
+  },
+  _ttTick(){
+    const t=this.tt;if(!t||t.phase!=='run')return;
+    if(Date.now()-t.startTime>=t.sec*1000){this._ttFinish();return;}
+    this._ttLive();
+  },
+  ttKey(e){
+    const t=this.tt;if(!t||t.phase==='done')return;
+    const k=e._composedKey||e.key;
+    if(k==='Backspace'){e.preventDefault();return;} // frappe en avant uniquement, comme le test court
+    if(k.length!==1)return;
+    e.preventDefault();
+    const now=Date.now();
+    if(t.phase==='ready'){
+      t.phase='run';t.startTime=now;
+      this._ttTimer=setInterval(()=>this._ttTick(),200);
+      const h=document.getElementById('tt-hint');if(h){h.classList.remove('idle');h.textContent='Garde le rythme, ne regarde pas le clavier.';}
+    }
+    if(now-t.startTime>=t.sec*1000){this._ttFinish();return;}
+    const expected=t.text[t.idx],ok=k===expected,sp=this._ttSpans;
+    t.keystrokes++;
+    if(ok){t.correct++;t.typed[t.idx]='c';}else t.typed[t.idx]='w';
+    t.log.push([now-t.startTime,ok?1:0]);
+    this._recordKey(expected,ok);
+    if(sp&&sp[t.idx])sp[t.idx].className='tt-ch '+(ok?'ok':'wrong');
+    t.idx++;
+    if(t.text.length-t.idx<400){
+      const from=this._ttExtend(),box=document.getElementById('tt-text');
+      if(box){box.insertAdjacentHTML('beforeend',this._ttCharsHTML(from,t.text.length));this._ttSpans=[...box.querySelectorAll('.tt-ch')];}
+    }
+    if(this._ttSpans&&this._ttSpans[t.idx])this._ttSpans[t.idx].className='tt-ch cur';
+    this._ttScroll();
+    this._ttLive();
+  },
+  _ttFinish(){
+    const t=this.tt;if(!t||t.phase==='done')return;
+    this._ttStop();
+    t.phase='done';
+    const mins=t.sec/60;
+    const wpm=Math.round((t.correct/5)/mins);
+    const acc=t.keystrokes?Math.round(100*t.correct/t.keystrokes):100;
+    // Courbe : vitesse par tranche de temps (6 tranches pour 1 et 3 min, 10 pour 5 et 10 min).
+    const nSeg=t.sec<=180?6:10,segMs=t.sec*1000/nSeg;
+    const seg=Array.from({length:nSeg},()=>0);
+    t.log.forEach(([ms,ok])=>{if(ok){const i=Math.min(nSeg-1,Math.floor(ms/segMs));seg[i]++;}});
+    const segWpm=seg.map(c=>Math.round((c/5)/(segMs/60000)));
+    const prevBest=currentUser?this._ttBest(t.sec):0;
+    t.res={wpm,acc,errors:t.keystrokes-t.correct,chars:t.correct,segWpm,segMs,prevBest};
+    if(currentUser&&this.stats){
+      this.stats.tests.push({t:Date.now(),wpm,acc,mode:'test',dur:t.sec});
+      saveStats(this.stats);
+    }
+    try{track('timed_test_completed',{wpm,acc,dur:t.sec,loggedIn:!!currentUser});}catch{}
+    this.renderTestTime();
+  },
+  _ttResultHTML(){
+    const t=this.tt,r=t.res,lv=this._ttLevel(r.wpm);
+    const accNote=r.acc<92?' Ta précision est le point à travailler : vise 95 % avant de chercher à aller plus vite.':'';
+    let cmp='';
+    if(currentUser){
+      if(!r.prevBest)cmp=`<div class="tt-compare">Premier test de ${t.sec/60} min : <b>${r.wpm} mpm</b> devient ta référence.</div>`;
+      else if(r.wpm>r.prevBest)cmp=`<div class="tt-compare">🏆 Nouveau record sur ${t.sec/60} min : <b>+${r.wpm-r.prevBest} mpm</b> (ancien record : ${r.prevBest} mpm).</div>`;
+      else cmp=`<div class="tt-compare">Ton record sur ${t.sec/60} min : <b>${r.prevBest} mpm</b>${r.wpm===r.prevBest?' (égalé).':`. Il te manque ${r.prevBest-r.wpm} mpm.`}</div>`;
+    }
+    const max=Math.max(1,...r.segWpm);
+    const bars=r.segWpm.map(v=>`<div class="tt-seg-col" title="${v} mpm"><span class="tt-seg-v">${v}</span><div class="tt-seg-bar" style="height:${Math.max(3,Math.round(88*v/max))}px"></div></div>`).join('');
+    const lbls=r.segWpm.map((_,i)=>`<span>${this._ttFmt((i+1)*r.segMs/1000)}</span>`).join('');
+    return`<div class="tt-wrap">
+      <div class="tt-result">
+        <span class="tt-badge">Niveau ${lv.name}</span>
+        <div class="tt-big">${r.wpm}<small> mots / min</small></div>
+        <p class="tt-lvl">${lv.desc}${accNote}</p>
+        <div class="tt-grid">
+          <div class="tt-stat"><div class="tt-stat-label">PRÉCISION</div><div class="tt-stat-val">${r.acc}<small> %</small></div></div>
+          <div class="tt-stat"><div class="tt-stat-label">DURÉE</div><div class="tt-stat-val">${t.sec/60}<small> min</small></div></div>
+          <div class="tt-stat"><div class="tt-stat-label">ERREURS</div><div class="tt-stat-val">${r.errors}</div></div>
+          <div class="tt-stat"><div class="tt-stat-label">CARACTÈRES JUSTES</div><div class="tt-stat-val">${r.chars}</div></div>
+        </div>
+        ${cmp}
+        <div class="tt-seg-title">VITESSE AU FIL DU TEST (MPM)</div>
+        <div class="tt-seg">${bars}</div>
+        <div class="tt-seg-lbls">${lbls}</div>
+        <div class="tt-actions">
+          <button class="tt-btn pri" onclick="app.ttStart(${t.sec})">Recommencer (${t.sec/60} min)</button>
+          <button class="tt-btn" onclick="app.openTimedTest()">Changer de durée</button>
+          <button class="tt-btn" onclick="go('test')">Test sur base de longueur</button>
+        </div>
+        ${currentUser?'':`<p class="tt-save">Ce résultat n'est pas enregistré. <a onclick="openAuth('register')">Crée un compte gratuit</a> pour suivre ta progression.</p>`}
+      </div>
+    </div>`;
+  },
+
   /* ── TYPING ── */
   renderTyping(){
     const _s=this.sess;
@@ -7011,7 +7258,7 @@ const app={
     const err=s.keystrokes-s.correct;
     const elapsed=s.started?((s.finished?s.endTime:now)-s.startTime)/1000:0;
     const prog=Math.round(100*s.idx/T.length);
-    const pb=currentUser&&this.stats?Math.max(0,...(this.stats.tests||[]).map(t=>t.wpm)):0;
+    const pb=currentUser&&this.stats?Math.max(0,...(this.stats.tests||[]).filter(t=>!t.dur).map(t=>t.wpm)):0;
     const beating=!!(pb&&s.started&&!s.finished&&wpm>pb);
 
     const hintText=s.finished?`Terminé : ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé, garde le rythme':'Commence à taper : le chrono démarre tout seul.';
@@ -7143,7 +7390,7 @@ const app={
     const err=s.keystrokes-s.correct;
     const elapsed=s.started?((s.finished?s.endTime:now)-s.startTime)/1000:0;
     const prog=Math.round(100*s.idx/s.text.length);
-    const pb=currentUser&&this.stats?Math.max(0,...(this.stats.tests||[]).map(x=>x.wpm)):0;
+    const pb=currentUser&&this.stats?Math.max(0,...(this.stats.tests||[]).filter(x=>!x.dur).map(x=>x.wpm)):0;
     const beating=!!(pb&&s.started&&!s.finished&&wpm>pb);
 
     const odoEl=document.getElementById('t4a-odo');
@@ -14291,7 +14538,7 @@ app.init();
 {
   // Arrivée depuis un lien externe pointant vers une vue précise (?view=test|lessons|games|stats|home)
   const _vp=new URLSearchParams(location.search).get('view');
-  const _validViews=['home','test','lessons','games','stats'];
+  const _validViews=['home','test','testtime','lessons','games','stats'];
   // Prof/établissement : atterrir sur son tableau de bord au rechargement de
   // la page, pas sur la vue Test (même choix déjà fait dans loginUser() au
   // premier login, manquant ici) — cette vue ne lui sert à rien puisque la
