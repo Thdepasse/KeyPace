@@ -40,6 +40,8 @@ function sessionHash(ip, ua) {
 }
 
 module.exports = async function handler(req, res) {
+  // Pages de l'appli (rewrites /api/track?r=<clé>) : voir _page-render.js
+  if (req.query && req.query.r) return require('./_page-render').handlePage(req, res);
   if (req.method !== 'POST') return res.status(405).end();
 
   try {
