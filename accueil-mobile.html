@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://keypace.be/">
+<meta name="description" content="KeyPace : apprends à taper à dix doigts sur clavier AZERTY. 65 leçons progressives, test de vitesse et jeux de frappe. À faire sur ordinateur ou tablette avec clavier.">
+<meta name="theme-color" content="#FF4D2E">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<script src="/cookie-consent.js" defer></script>
+<title>KeyPace – Dactylographie AZERTY sur ordinateur et tablette</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--accent:#FF4D2E;--accent-d:#E23A1C;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA;--success:#1FA971;--ink:#1B1712}
+html{scroll-behavior:smooth}
+body{background:#e9e5da;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',Arial,sans-serif;color:var(--txt);line-height:1.45}
+img{display:block;max-width:100%}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit}
+
+/* Colonne mobile (sur desktop : centrée comme un téléphone) */
+.app{max-width:430px;margin:0 auto;background:var(--bg);min-height:100vh;position:relative;overflow:hidden}
+@media(min-width:520px){.app{box-shadow:0 0 0 1px var(--border),0 30px 80px -30px rgba(40,30,15,.45)}}
+
+
+.fnt-h{font-family:'Bricolage Grotesque',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* Top bar */
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+.logo{display:flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font:700 15px 'JetBrains Mono',monospace;font-style:normal}
+.top-link{font-size:13px;font-weight:700;color:var(--txt);padding:8px 14px;border-radius:20px;background:var(--light);text-decoration:none}
+
+/* Hero */
+.hero{padding:6px 20px 26px;position:relative}
+.hero::before{content:'';position:absolute;top:-20px;right:-60px;width:260px;height:260px;background:radial-gradient(closest-side,rgba(255,77,46,.16),transparent 72%);pointer-events:none}
+.pill{display:inline-flex;align-items:center;gap:7px;font:700 11px 'JetBrains Mono',monospace;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);background:rgba(255,77,46,.09);padding:5px 11px;border-radius:20px}
+.pill b{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.25}}
+h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:36px;line-height:1.04;letter-spacing:-.02em;margin:4px 0 12px;position:relative}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{color:var(--muted);font-size:15.5px;max-width:340px;position:relative}
+.hero-art{position:relative;margin:18px -8px 0;display:flex;justify-content:center}
+.hero-art img{height:178px;width:auto;filter:drop-shadow(0 14px 18px rgba(40,30,15,.22));animation:float 4.5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-6px)}}
+
+/* Demo de frappe */
+.typer{margin-top:16px;background:var(--ink);color:#fff;border-radius:20px;padding:16px 16px 14px;position:relative;box-shadow:0 18px 34px -18px rgba(27,23,18,.7)}
+.typer-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#a89f8e}
+.dots{display:flex;gap:5px}.dots i{width:8px;height:8px;border-radius:50%;background:#3b352c}
+.dots i:first-child{background:var(--accent)}
+.typer-text{font:500 17px/1.5 'JetBrains Mono',monospace;min-height:78px;word-break:break-word}
+.typer-text .ok{color:#fff}.typer-text .nx{color:#6e6556}
+.caret{display:inline-block;width:2px;height:1.1em;background:var(--accent);vertical-align:-3px;margin-left:1px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.typer-ft{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid #2e2820}
+.wpm{font:700 26px 'JetBrains Mono',monospace;color:var(--accent);line-height:1}
+.wpm small{font-size:11px;color:#a89f8e;font-weight:600;margin-left:4px}
+.bar{flex:1;height:6px;border-radius:6px;background:#2e2820;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#FF9A3C);border-radius:6px;transition:width .2s}
+.typer-note{font-size:11.5px;color:#a89f8e;margin-top:10px}
+
+/* Boutons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:15px;padding:15px 18px;font-weight:800;font-size:16px;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn-main{background:var(--accent);color:#fff;box-shadow:0 10px 22px -10px var(--accent)}
+.btn-ghost{background:var(--card);border:1.5px solid var(--border);color:var(--txt)}
+.btn-dark{background:var(--txt);color:#fff}
+.btn-light{background:#fff;color:var(--txt)}
+.cta-stack{display:grid;gap:10px;margin-top:18px}
+.cta-hint{text-align:center;font-size:12.5px;color:var(--muted);margin-top:2px}
+
+/* Sections */
+.sec{padding:34px 20px}
+.sec-tag{font:700 11px 'JetBrains Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:27px;line-height:1.1;letter-spacing:-.015em;margin-bottom:8px}
+.lead{color:var(--muted);font-size:14.5px;margin-bottom:18px}
+
+/* Preuve sociale */
+.proof{padding:26px 0 30px;background:var(--card);border-top:1px solid var(--border)}
+.proof .sec-tag,.proof .proof-t{padding:0 20px}
+.proof-t{font:800 20px 'Bricolage Grotesque',sans-serif;margin-bottom:16px}
+.marq{overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.marq-track{display:flex;align-items:center;gap:38px;width:max-content;animation:scroll 22s linear infinite}
+.marq:active .marq-track{animation-play-state:paused}
+@keyframes scroll{to{transform:translateX(-50%)}}
+.lg{height:40px;display:flex;align-items:center;flex:none}
+.lg img{height:100%;width:auto;mix-blend-mode:multiply}
+.lg.tall{height:54px}
+.facts{padding:22px 20px 0}
+.facts p{font:800 29px/1.14 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;color:var(--txt)}
+.facts p em{font-style:normal;color:var(--accent)}
+.facts.js .w{display:inline-block;opacity:0;transform:translateY(14px);transition:opacity .35s ease,transform .35s ease}
+.facts.js .w.in{opacity:1;transform:none}
+
+
+/* Vidéo de présentation */
+.vid{padding:30px 20px 6px}
+.vid-box{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:16/9;background:var(--ink);box-shadow:0 22px 40px -24px rgba(40,30,15,.5)}
+.vid-box video,.vid-box .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vid-box .poster{filter:brightness(.82)}
+.vid-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;width:100%}
+.vid-play i{width:66px;height:66px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 26px -8px rgba(255,77,46,.8);transition:transform .15s}
+.vid-play:active i{transform:scale(.94)}
+.vid-play svg{width:24px;height:24px;margin-left:3px}
+.vid-box.playing .vid-play,.vid-box.playing .poster{display:none}
+.vid-tag{position:absolute;left:12px;bottom:12px;background:rgba(22,20,15,.85);color:#fff;font:700 11px 'JetBrains Mono',monospace;letter-spacing:.04em;padding:6px 10px;border-radius:20px}
+
+/* Choix du profil */
+.chips{display:flex;gap:8px;overflow-x:auto;margin:0 -20px 14px;padding:2px 20px 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:10px 16px;border-radius:30px;background:var(--card);border:1.5px solid var(--border);font-weight:700;font-size:14px;transition:all .15s}
+.chip[aria-selected=true]{background:var(--txt);border-color:var(--txt);color:#fff}
+.role{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}}
+.role h3{font:800 20px 'Bricolage Grotesque',sans-serif;margin-bottom:6px}
+.role p{color:var(--muted);font-size:14px;margin-bottom:12px}
+.role ul{list-style:none;display:grid;gap:8px;margin-bottom:16px}
+.role li{display:flex;gap:9px;font-size:14px;font-weight:600}
+.role li::before{content:'';flex:none;width:18px;height:18px;margin-top:1px;border-radius:50%;background:rgba(31,169,113,.14) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231FA971' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center/12px no-repeat}
+
+/* Etablissement */
+.etab{background:var(--ink);color:#fff;border-radius:26px 26px 0 0;margin-top:0;padding:36px 20px 34px;position:relative;overflow:hidden}
+.etab::before{content:'';position:absolute;top:-80px;left:-60px;width:260px;height:260px;background:radial-gradient(closest-side,rgba(255,77,46,.32),transparent 70%)}
+.etab .sec-tag{color:#FFB199;position:relative}
+.etab h2{position:relative}
+.etab .lead{color:#b7ae9d;position:relative}
+.steps{display:grid;gap:10px;margin:18px 0;position:relative}
+.step{display:flex;gap:14px;align-items:flex-start;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px;text-align:left;width:100%;transition:background .2s}
+.step[aria-expanded=true]{background:rgba(255,255,255,.12)}
+.step .n{flex:none;width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font:700 14px 'JetBrains Mono',monospace}
+.step b{display:block;font-size:15px}
+.step p{font-size:13px;color:#b7ae9d;max-height:0;overflow:hidden;transition:max-height .3s,margin .3s}
+.step[aria-expanded=true] p{max-height:90px;margin-top:4px}
+.etab-feats{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;position:relative}
+.etab-feats span{font-size:12.5px;font-weight:700;background:rgba(255,255,255,.08);border-radius:20px;padding:6px 11px}
+.etab .cta-stack{position:relative}
+.etab .cta-hint{color:#a89f8e}
+
+/* Partenaire */
+.part{padding:34px 20px 120px}
+.acc{display:grid;gap:10px;margin-bottom:18px}
+.acc-i{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.acc-b{display:flex;align-items:center;gap:12px;width:100%;padding:15px 16px;text-align:left}
+.acc-ico{flex:none;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;background:var(--light)}
+.acc-b b{flex:1;font-size:15px;line-height:1.2}
+.acc-b span.pm{font:700 18px 'JetBrains Mono',monospace;color:var(--accent);transition:transform .2s}
+.acc-i[data-open=true] .pm{transform:rotate(45deg)}
+.acc-p{max-height:0;overflow:hidden;transition:max-height .3s;padding:0 16px;font-size:13.5px;color:var(--muted)}
+.acc-i[data-open=true] .acc-p{max-height:140px;padding-bottom:16px}
+.part-card{background:linear-gradient(135deg,#FF4D2E,#FF7A3C);color:#fff;border-radius:22px;padding:22px 20px;position:relative;overflow:hidden}
+.part-card img{position:absolute;right:-8px;bottom:-4px;height:120px;width:auto;opacity:.95}
+.part-card h3{font:800 21px/1.1 'Bricolage Grotesque',sans-serif;max-width:190px;margin-bottom:8px;position:relative}
+.part-card p{font-size:13.5px;max-width:190px;margin-bottom:14px;opacity:.95;position:relative}
+.part-card .btn{width:auto;display:inline-flex;padding:12px 18px;font-size:14.5px;position:relative}
+
+.foot{padding:22px 20px 110px;text-align:center;font-size:12px;color:var(--muted);border-top:1px solid var(--border)}
+.foot a{margin:0 7px;text-decoration:none;font-weight:600}
+
+/* Barre collante */
+.dock{position:fixed;left:50%;bottom:0;transform:translate(-50%,0);width:100%;max-width:430px;z-index:200;padding:10px 14px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(250,249,245,0),var(--bg) 40%);transition:transform .3s}
+.dock.hide{transform:translate(-50%,120%)}
+.dock-in{display:flex;gap:8px;background:var(--txt);border-radius:20px;padding:8px;box-shadow:0 14px 30px -10px rgba(0,0,0,.5)}
+.dock-in button{flex:1;border-radius:14px;padding:12px 6px;font-weight:800;font-size:13.5px;color:#fff;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}
+.dock-in button small{font-size:10.5px;font-weight:600;color:#a89f8e}
+.dock-in .go{background:var(--accent)}
+.dock-in .go small{color:#ffe0d8}
+
+/* Feuille (bottom sheet) */
+.scrim{position:fixed;inset:0;background:rgba(22,20,15,.55);z-index:10000;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:430px;transform:translate(-50%,105%);z-index:10001;background:var(--card);border-radius:26px 26px 0 0;padding:12px 20px calc(24px + env(safe-area-inset-bottom));transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.sheet.on{transform:translate(-50%,0)}
+.grab{width:42px;height:5px;border-radius:5px;background:var(--border);margin:0 auto 16px}
+.sheet h3{font:800 23px/1.1 'Bricolage Grotesque',sans-serif;margin-bottom:6px}
+.sheet p{font-size:14px;color:var(--muted);margin-bottom:14px}
+.sheet input,.sheet textarea{width:100%;font:inherit;font-size:16px;padding:14px;border-radius:13px;border:1.5px solid var(--border);background:var(--bg);margin-bottom:10px;outline:none}
+.sheet input:focus{border-color:var(--accent)}
+.sheet .err{color:var(--accent-d);font-size:12.5px;font-weight:600;margin:-4px 0 8px;min-height:0}
+.ok-state{text-align:center;padding:10px 0 4px}
+.ok-state .tick{width:64px;height:64px;border-radius:50%;background:rgba(31,169,113,.13);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:30px;animation:pop .4s}
+.proto{font-size:11px;color:var(--muted);text-align:center;margin-top:10px}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <header class="top">
+    <div class="logo"><i>K</i>KeyPace</div>
+    <a class="top-link" href="/?app=1">Se connecter</a>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>KeyPace se joue sur un <em>vrai clavier</em>.</h1>
+    <p class="sub">Dix doigts, 65 leçons, des jeux de frappe. Il te faut un ordinateur ou une tablette avec clavier. Ton téléphone sert à préparer le terrain.</p>
+
+    <div class="hero-art"><img src="/images/keypace-mascots-duo-laptop.webp" alt="Les mascottes KeyPace devant un ordinateur" width="260" height="178"></div>
+
+    <div class="typer" aria-label="Démonstration de frappe animée">
+      <div class="typer-hd"><div class="dots"><i></i><i></i><i></i></div><span>Démo en direct</span></div>
+      <div class="typer-text" id="tt" aria-live="off"></div>
+      <div class="typer-ft">
+        <div class="wpm"><span id="wpm">0</span><small>mots/min</small></div>
+        <div class="bar"><i id="pg"></i></div>
+      </div>
+      <p class="typer-note">Sur ordinateur, c'est toi qui tapes. Ici, tu regardes la démo.</p>
+    </div>
+
+    <div class="cta-stack">
+      <button class="btn btn-main" onclick="shareLink()">📩 Envoyer le lien à mon ordinateur</button>
+      <button class="btn btn-ghost" onclick="goTo(event,'etab')">🏫 Je représente un établissement</button>
+      <p class="cta-hint">Gratuit pour commencer, aucune installation.</p>
+    </div>
+  </section>
+
+  <!-- PREUVE SOCIALE -->
+  <section class="proof" aria-label="Ils nous font confiance">
+    <div class="sec-tag">Ils nous font confiance</div>
+    <div class="proof-t">Déjà dans les classes et les villes.</div>
+    <div class="marq"><div class="marq-track" id="marq"></div></div>
+    <div class="facts">
+      <p id="facts-p"><em>65</em> leçons pour apprendre. <em>100%</em> en ligne, rien à installer.</p>
+    </div>
+  </section>
+
+  <!-- PROFIL -->
+  <section class="sec" id="profil">
+    <div class="sec-tag">Pour qui ?</div>
+    <h2>Dis-nous qui tu es.</h2>
+    <p class="lead">On te montre ce qui t'intéresse.</p>
+    <div class="chips" role="tablist" id="chips"></div>
+    <div id="role" class="role" role="tabpanel"></div>
+  </section>
+
+  <!-- ETABLISSEMENT -->
+  <section class="etab" id="etab">
+    <div class="sec-tag">Écoles · Universités · Centres de formation</div>
+    <h2>Équipez toute votre classe.</h2>
+    <p class="lead">Un compte Expert pour chaque élève, un suivi pour chaque enseignant. Mise en place par notre équipe.</p>
+    <div class="steps" id="steps"></div>
+    <div class="etab-feats"><span>Suivi par élève</span><span>Devoirs assignables</span><span>100% en ligne</span><span>Devis sur mesure</span></div>
+    <div class="cta-stack">
+      <button class="btn btn-main" onclick="openSheet('sh-school')">Demander une démo gratuite →</button>
+      <a class="btn btn-light" href="/ecoles" style="text-decoration:none">Voir l'offre établissements</a>
+      <p class="cta-hint">Réponse par notre équipe, sans engagement.</p>
+    </div>
+  </section>
+
+  <!-- PARTENAIRE -->
+  <section class="part" id="part" style="background:var(--bg)">
+    <div class="sec-tag">Partenaires</div>
+    <h2>Faites grandir KeyPace avec nous.</h2>
+    <p class="lead">Touchez votre profil pour voir comment collaborer.</p>
+    <div class="acc" id="acc"></div>
+    <div class="part-card">
+      <h3>Une idée de partenariat ?</h3>
+      <p>Parlons-en, la porte est ouverte.</p>
+      <button class="btn btn-light" onclick="partner()">Devenir partenaire</button>
+      <img src="/images/keypace-mascot-idea.webp" alt="" width="120" height="120">
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="logo" style="justify-content:center;margin-bottom:8px"><i>K</i>KeyPace</div>
+    <div><a href="/a-propos">À propos</a><a href="/ecoles">Établissements</a><a href="mailto:contact@keypace.be">Contact</a></div>
+    <div style="margin-top:10px"><a href="/?app=1" style="color:var(--accent)">Voir le site complet</a></div>
+    <div style="margin-top:8px"><a href="/conditions">Conditions</a><a href="/confidentialite">Confidentialité</a><a href="/cookies">Cookies</a></div>
+    <p style="margin-top:10px">Belgique · France</p>
+  </footer>
+
+  <!-- Barre collante -->
+  <div class="dock" id="dock">
+    <div class="dock-in">
+      <button class="go" onclick="shareLink()">Sur mon PC<small>Recevoir le lien</small></button>
+      <button onclick="goTo(event,'etab')">Établissement<small>Démo gratuite</small></button>
+      <button onclick="goTo(event,'part')">Partenaire<small>Collaborer</small></button>
+    </div>
+  </div>
+
+  <div class="scrim" id="scrim" onclick="closeSheet()"></div>
+
+  <!-- Feuille : établissement -->
+  <div class="sheet" id="sh-school" role="dialog" aria-modal="true" aria-label="Démo établissement">
+    <div class="grab"></div>
+    <div data-form>
+      <h3>Demandez votre démo gratuite.</h3>
+      <p>Quelques infos, et notre équipe vous recontacte.</p>
+      <input type="text" id="sc-name" placeholder="Nom de l'établissement" autocomplete="organization">
+      <input type="email" id="sc-email" inputmode="email" autocomplete="email" placeholder="direction@ecole.be">
+      <input type="number" id="sc-count" inputmode="numeric" min="1" placeholder="Nombre d'élèves (approximatif)">
+      <div class="err" id="sc-err"></div>
+      <button class="btn btn-main" id="sc-btn" onclick="submitSchool()">Envoyer ma demande</button>
+    </div>
+    <div class="ok-state" data-ok hidden>
+      <div class="tick">🏫</div>
+      <h3>Demande reçue !</h3>
+      <p>Notre équipe vous répond rapidement avec une démo adaptée à votre établissement.</p>
+      <button class="btn btn-ghost" onclick="closeSheet()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- Logos partenaires (réels, ceux du bandeau de l'accueil) ---------- */
+var LOGOS=[
+  ['logo-isj.png','Institut Saint-Joseph Jambes',''],
+  ['logo-artamines.svg','Artamines',''],
+  ['logo-charleroi.png','Ville de Charleroi','tall'],
+  ['logo-stservais.jpg','Centre scolaire Asty-Moulin','']
+];
+(function(){
+  var h='';
+  for(var r=0;r<2;r++)LOGOS.forEach(function(l){h+='<div class="lg '+l[2]+'"'+(r?' aria-hidden="true"':'')+'><img src="/images/partners/'+l[0]+'" alt="'+(r?'':l[1])+'"></div>'});
+  h+=h; /* 4 copies = boucle sans saut */
+  document.getElementById('marq').innerHTML=h;
+})();
+
+/* ---------- Démo de frappe animée ---------- */
+(function(){
+  var phrases=['Les dix doigts sur la rangée de base.','Taper sans regarder, ça s\'apprend.','Chaque jour un peu plus vite.'];
+  var el=document.getElementById('tt'),wpm=document.getElementById('wpm'),pg=document.getElementById('pg');
+  var pi=0,ci=0,t0=0;
+  function render(){
+    var p=phrases[pi];
+    el.innerHTML='<span class="ok">'+esc(p.slice(0,ci))+'</span><span class="caret"></span><span class="nx">'+esc(p.slice(ci))+'</span>';
+    pg.style.width=(ci/p.length*100)+'%';
+  }
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+  function tick(){
+    var p=phrases[pi];
+    if(ci===0)t0=Date.now();
+    if(ci<p.length){
+      ci++;render();
+      var el_=(Date.now()-t0)/60000;
+      if(ci>6)wpm.textContent=Math.round((ci/5)/el_);
+      setTimeout(tick,170+Math.random()*110);
+    }else{
+      setTimeout(function(){pi=(pi+1)%phrases.length;ci=0;render();setTimeout(tick,350)},1700);
+    }
+  }
+  render();setTimeout(tick,600);
+})();
+
+/* ---------- Profils ---------- */
+var ROLES=[
+ {k:'eleve',n:'Élève',t:'Tu veux taper vite sans regarder.',p:'Des leçons courtes, des jeux, et tes progrès qui montent à chaque session.',l:['65 leçons progressives','Jeux de frappe pour t\'amuser','Ta progression sauvegardée'],c:'M\'envoyer le lien',a:"shareLink()"},
+ {k:'parent',n:'Parent',t:'Votre enfant doit apprendre à taper.',p:'Une méthode à dix doigts, claire et sans publicité, à faire sur l\'ordinateur de la maison.',l:['Méthode AZERTY à dix doigts','Sans installation','Gratuit pour commencer'],c:'Recevoir le lien',a:"shareLink()"},
+ {k:'prof',n:'Enseignant',t:'Vous voulez suivre votre classe.',p:'Assignez des devoirs, suivez chaque élève, laissez-les progresser à leur rythme.',l:['Suivi de progression par élève','Devoirs assignables','Comptes créés par notre équipe'],c:'Demander une démo',a:"openSheet('sh-school')"},
+ {k:'etab',n:'Établissement',t:'Vous équipez une école entière.',p:'Licence établissement, mise en place par notre équipe, tarif adapté à votre taille.',l:['Comptes Expert pour tous','Rien à configurer','Devis personnalisé'],c:'Demander une démo gratuite',a:"openSheet('sh-school')"},
+ {k:'part',n:'Partenaire',t:'Vous voulez collaborer.',p:'Commune, association, éditeur, centre de formation : construisons quelque chose ensemble.',l:['Visibilité auprès des écoles','Projets sur mesure','Échange direct avec l\'équipe'],c:'Devenir partenaire',a:"partner()"}
+];
+(function(){
+  var chips=document.getElementById('chips'),box=document.getElementById('role'),cur=0;
+  function paint(){
+    chips.innerHTML=ROLES.map(function(r,i){return '<button class="chip" role="tab" aria-selected="'+(i===cur)+'" data-i="'+i+'">'+r.n+'</button>'}).join('');
+    var r=ROLES[cur];
+    box.style.animation='none';void box.offsetWidth;box.style.animation='';
+    box.innerHTML='<h3>'+r.t+'</h3><p>'+r.p+'</p><ul>'+r.l.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul><button class="btn btn-main" onclick="'+r.a+'">'+r.c+'</button>';
+  }
+  chips.addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;cur=+b.dataset.i;paint()});
+  paint();
+})();
+
+/* ---------- Etapes établissement ---------- */
+(function(){
+  var S=[
+    ['Vous nous contactez','Présentez votre établissement et vos besoins : nombre de classes, d\'élèves, niveau.'],
+    ['On crée vos comptes','Notre équipe crée les comptes des enseignants et des élèves et vous transmet les accès.'],
+    ['Vous vous connectez','Assignez des devoirs, suivez la progression, guidez vos élèves.']
+  ];
+  var box=document.getElementById('steps'),open=0;
+  function paint(){
+    box.innerHTML=S.map(function(s,i){return '<button class="step" aria-expanded="'+(i===open)+'" data-i="'+i+'"><span class="n">'+(i+1)+'</span><span><b>'+s[0]+'</b><p>'+s[1]+'</p></span></button>'}).join('');
+  }
+  box.addEventListener('click',function(e){var b=e.target.closest('.step');if(!b)return;open=+b.dataset.i;paint()});
+  paint();
+})();
+
+/* ---------- Accordéon partenaires ---------- */
+(function(){
+  var P=[
+    ['🏛️','Communes et institutions','Offrez KeyPace aux écoles de votre territoire. Nous construisons l\'offre avec vous.'],
+    ['🤝','Associations et fondations','Un outil pour l\'inclusion numérique et la remise à niveau. Parlons de votre public.'],
+    ['📚','Éditeurs et acteurs éducatifs','Complétez vos ressources avec un entraînement à la frappe intégré.'],
+    ['🎓','Centres de formation','Intégrez la dactylographie à vos parcours et suivez vos apprenants.']
+  ];
+  var box=document.getElementById('acc');
+  box.innerHTML=P.map(function(p,i){return '<div class="acc-i" data-open="'+(i===0)+'"><button class="acc-b" aria-expanded="'+(i===0)+'"><span class="acc-ico">'+p[0]+'</span><b>'+p[1]+'</b><span class="pm">+</span></button><div class="acc-p">'+p[2]+'</div></div>'}).join('');
+  box.addEventListener('click',function(e){
+    var b=e.target.closest('.acc-b');if(!b)return;
+    var it=b.parentNode,o=it.dataset.open==='true';
+    [].forEach.call(box.children,function(c){c.dataset.open='false';c.firstChild.setAttribute('aria-expanded','false')});
+    if(!o){it.dataset.open='true';b.setAttribute('aria-expanded','true')}
+  });
+})();
+
+/* ---------- Navigation, feuilles, barre collante ---------- */
+function goTo(e,id){if(e)e.preventDefault();var t=document.getElementById(id);if(t)window.scrollTo({top:t.getBoundingClientRect().top+scrollY-44,behavior:'smooth'})}
+var openId=null,scrim=document.getElementById('scrim');
+function openSheet(id){
+  closeSheet(true);openId=id;var s=document.getElementById(id);
+  s.querySelector('[data-form]').hidden=false;s.querySelector('[data-ok]').hidden=true;
+  scrim.classList.add('on');s.classList.add('on');document.body.style.overflow='hidden';
+}
+function closeSheet(keep){
+  if(openId){document.getElementById(openId).classList.remove('on');openId=null}
+  scrim.classList.remove('on');if(!keep)document.body.style.overflow='';
+}
+async function submitSchool(){
+  var s=document.getElementById('sh-school'),er=document.getElementById('sc-err'),btn=document.getElementById('sc-btn');
+  var name=document.getElementById('sc-name').value.trim(),email=document.getElementById('sc-email').value.trim(),count=parseInt(document.getElementById('sc-count').value,10);
+  if(!name){er.textContent="Indiquez le nom de votre établissement.";return}
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){er.textContent='Cette adresse email semble incomplète.';return}
+  if(!count||count<1){er.textContent="Indiquez un nombre d'élèves approximatif.";return}
+  er.textContent='';btn.disabled=true;btn.textContent='Envoi…';
+  try{
+    var r=await fetch('/api/institutions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,email:email,count:count,message:'Demande depuis la version mobile du site'})});
+    var d=await r.json().catch(function(){return {}});
+    if(!r.ok){er.textContent=d.error||'Erreur, réessayez.';btn.disabled=false;btn.textContent='Envoyer ma demande';return}
+    s.querySelector('[data-form]').hidden=true;s.querySelector('[data-ok]').hidden=false;
+  }catch(e){er.textContent='Erreur réseau, réessayez.';btn.disabled=false;btn.textContent='Envoyer ma demande'}
+}
+function shareLink(){
+  var u='https://keypace.be/',t='KeyPace : apprendre à taper sur un vrai clavier';
+  if(navigator.share){navigator.share({title:'KeyPace',text:t,url:u}).catch(function(){})}
+  else{location.href='mailto:?subject='+encodeURIComponent('Le lien KeyPace')+'&body='+encodeURIComponent(t+'\n'+u)}
+}
+function partner(){location.href='mailto:contact@keypace.be?subject='+encodeURIComponent('Partenariat KeyPace')}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet()});
+
+/* La barre se cache quand on arrive sur les sections qui ont déjà leurs boutons */
+(function(){
+  var dock=document.getElementById('dock'),hero=document.querySelector('.hero .cta-stack'),etab=document.querySelector('#etab .cta-stack');
+  function vis(el){var r=el.getBoundingClientRect();return r.top<innerHeight&&r.bottom>0}
+  function upd(){dock.classList.toggle('hide',vis(hero)||vis(etab))}
+  addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);upd();
+})();
+
+/* ---------- Phrase chiffres clés : apparition mot à mot au scroll ---------- */
+(function(){
+  var box=document.querySelector('.facts'),p=document.getElementById('facts-p');
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  var words=[];
+  (function wrap(node,em){
+    [].slice.call(node.childNodes).forEach(function(n){
+      if(n.nodeType===3){
+        var f=document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(function(t){
+          if(!t)return;
+          if(/^\s+$/.test(t)){f.appendChild(document.createTextNode(' '));return}
+          var w=document.createElement('span');w.className='w';w.textContent=t;words.push(w);f.appendChild(w);
+        });
+        node.replaceChild(f,n);
+      }else if(n.nodeType===1)wrap(n);
+    });
+  })(p);
+  box.classList.add('js');
+  function upd(){
+    var r=p.getBoundingClientRect(),vh=innerHeight;
+    var prog=(vh*0.92-r.top)/(vh*0.45); /* 0 quand le bloc entre, 1 quand il est bien dans l'écran */
+    var n=Math.round(Math.max(0,Math.min(1,prog))*words.length);
+    words.forEach(function(w,i){w.classList.toggle('in',i<n)});
+  }
+  addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);upd();
+})();
+
+</script>
+</body>
+</html>

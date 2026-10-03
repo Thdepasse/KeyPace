@@ -2,6 +2,21 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<!-- Visiteurs sur téléphone (sans clavier) : page d'accueil dédiée. Ne touche ni les liens avec paramètres
+     (?classe=, ?prof=, ?defi=, ?cert=, confirmation email...), ni les comptes connectés, ni les robots, ni les tablettes.
+     "?app=1" force le site complet. -->
+<script>
+(function(){try{
+  var l=location;
+  if(l.pathname!=='/'||l.search||l.hash)return;
+  var ua=navigator.userAgent||'';
+  if(!/iPhone|iPod|Android.+Mobile|Windows Phone|Mobile.+Firefox/i.test(ua))return;
+  if(/bot|crawl|spider|slurp|lighthouse|facebookexternalhit|preview/i.test(ua))return;
+  if(localStorage.getItem('klak_session'))return;
+  l.replace('/accueil-mobile.html');
+}catch(e){}})();
+</script>
+
 <!-- Consentement cookies + Google Analytics (chargé seulement après accord, voir /cookies) -->
 <script src="/cookie-consent.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
