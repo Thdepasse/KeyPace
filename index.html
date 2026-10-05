@@ -5185,7 +5185,7 @@ function mount(host){
   menu2.innerHTML=['Primaire','Secondaire'].map(g=>`<h6>${g}</h6>`+YEARS.filter(y=>y.g===g).map(y=>`<button type="button" data-l="${y.l}" style="--c:${y.c}"><i></i>${y.l}</button>`).join('')).join('');
   const isExpert=()=>typeof getUserPlan==='function'&&getUserPlan()==='expert';
   const isLogged=()=>typeof currentUser!=='undefined'&&!!currentUser;
-  const MOD_HREF={mail:'/cours/ecrire-un-mail'};
+  const MOD_HREF={mail:'/cours/ecrire-un-mail',cv:'/cours/ecrire-un-cv'};
   const statusLabel=m=>m.live?(isExpert()?'Disponible':'Expert'):'Bientôt';
   const ctaLabel=m=>m.live?(isExpert()?'Commencer →':'Débloquer avec Expert'):'Bientôt';
   function openModule(id){
@@ -5267,7 +5267,7 @@ function mount(host){
   const M=(id,k,icon,img,cat,title,desc,live,ck)=>({id,k,color:(C[ck||k]||C[k])[0],grad:(C[ck||k]||C[k])[1],icon,img,cat,title,desc,live,st:live?'Disponible':'Bientôt',cta:live?'Commencer →':'Bientôt'});
   const MODS=[
     M('mail','ecr',IC.mail,'images/keypace-mascot-mail-allonge.webp','Écriture','Rédiger un mail',"Où écrire quoi, le ton juste selon la personne, repérer et corriger les erreurs, puis écrire ton propre mail avec une analyse en direct. Termine par un quiz final.",true),
-    M('cv','emp',IC.cv,'images/keypace-perso-cv.webp','Emploi','Faire son CV',"Construire un CV clair et lisible : les rubriques, la mise en page, les mots qui comptent. Tu tapes ton propre CV pas à pas.",false),
+    M('cv','emp',IC.cv,'images/keypace-perso-cv.webp','Emploi','Rédiger un CV',"Les éléments d'un CV, l'adapter à ton objectif et à ton secteur, repérer et corriger les erreurs, puis créer ton propre CV avec une checklist et l'exporter en PDF.",true),
     M('lettre','emp',IC.letter,'images/keypace-perso-lettre.webp','Emploi','Lettre de motivation',"Structurer ta lettre, trouver le bon ton et éviter les formules toutes faites, puis rédiger la tienne avec une analyse en direct.",false),
     M('commande','ecr',IC.parcel,'images/keypace-mascot-cheer.webp','Écriture','Répondre à une commande',"Écrire un retour à un mail de commande : confirmer, signaler un souci, demander un échange ou un remboursement, poliment et clairement.",false),
     M('pave','cla',IC.numpad,'images/keypace-perso-pave.webp','Clavier','Le pavé numérique',"Apprendre à taper les chiffres vite et sans regarder : montants, dates, numéros de téléphone, petits calculs.",false),
