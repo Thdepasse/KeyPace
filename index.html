@@ -3834,11 +3834,9 @@ function getKbLayoutId(){try{const v=localStorage.getItem('kp_kb_layout');return
 function setKbLayoutId(v){try{localStorage.setItem('kp_kb_layout',v);}catch{}}
 function kbModifierName(){return getKbLayoutId()==='mac'?'Option (⌥)':'AltGr';}
 /* Guillemets : « » n'existent pas sur la plupart des claviers AZERTY (français,
-   belge) : sans Alt+code, impossible de les taper. Réglage 'fr' (« ») ou
-   'droits' ("). Par défaut ('auto') : « » seulement sur NF, où ils
-   s'obtiennent directement ; guillemets droits ailleurs (sur Mac ils
-   demandent une combinaison que les élèves ne connaissent pas). */
-function getQuoteStyle(){try{const v=localStorage.getItem('kp_quotes');if(v==='fr'||v==='droits')return v;}catch{}return getKbLayoutId()==='nf'?'fr':'droits';}
+   belge). Les leçons affichent « » par défaut ('fr') et le guillemet droit "
+   est accepté à la place (cf. typeKey). Réglage 'droits' : afficher " à la place. */
+function getQuoteStyle(){try{const v=localStorage.getItem('kp_quotes');if(v==='fr'||v==='droits')return v;}catch{}return'fr';}
 function setQuoteStyle(v){try{localStorage.setItem('kp_quotes',v);}catch{}}
 /* « œ » n'existe pas sur les claviers AZERTY français/belge sous Windows :
    par défaut on écrit « oe » ailleurs que sur Mac et NF ('oe' ou 'lig'). */
@@ -5530,7 +5528,8 @@ const app={
     const t=les.tuto||{};
     const rules=(t.rules||[]).map(r=>{
       if(straightQ&&r.t==='Guillemets français')return`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>Guillemets droits</strong>Sur ton clavier, on tape le guillemet droit " (touche 3, sans Maj) : "bonjour". Pas d'espace à l'intérieur. Ils vont toujours par paire.</div></div>`;
-      return`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>${r.t}</strong>${r.d}</div></div>`;
+      const extra=r.t==='Guillemets français'?` <b>Pas de touche « » sur ton clavier ? Tape le guillemet droit "</b> (touche 3) : il est accepté.`:'';
+      return`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>${r.t}</strong>${r.d}${extra}</div></div>`;
     }).join('');
     const hasLig=/[œŒ]/.test((les.keys||'')+(les.text||''));
     const oeMode=hasLig&&getLigStyle()==='oe';
