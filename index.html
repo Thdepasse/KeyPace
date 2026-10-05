@@ -5039,30 +5039,30 @@ function mount(host){
     M('pave','cla',IC.numpad,'images/keypace-perso-pave.webp','Clavier','Le pavé numérique',"Apprendre à taper les chiffres vite et sans regarder : montants, dates, numéros de téléphone, petits calculs.",false),
     M('raccourcis','cla',IC.cmd,'images/keypace-perso-raccourcis.webp','Clavier','Les raccourcis clavier',"Copier, coller, annuler, sélectionner : les raccourcis qui font gagner du temps, pour Windows et pour Mac.",false),
     M('formulaire','cla',IC.form,'images/keypace-perso-formulaire.webp','Clavier','Remplir un formulaire',"Tabulation, champs obligatoires, majuscules, adresses : remplir un formulaire en ligne sans erreur.",false),
-    M('ponctuation','lan',IC.quote,'images/keypace-mascot-books.webp','Langue','Ponctuation et majuscules',"Virgules, points, guillemets, majuscules : les règles qui rendent un texte facile à lire.",false),
+    M('ponctuation','lan',IC.quote,'images/keypace-perso-ponctuation.webp','Langue','Ponctuation et majuscules',"Virgules, points, guillemets, majuscules : les règles qui rendent un texte facile à lire.",false),
     M('conj','lan',IC.book,'images/keypace-mascot-conjugaison-reflexion.webp','Langue','Conjugaison',"Des règles de base du présent jusqu'aux temps les plus complexes, avec des mises en situation dans des phrases et des textes à trous.",false),
-    M('ortho','lan',IC.spell,'images/keypace-mascot-idea.webp','Langue','Orthographe',"Les accords, les homophones et les pièges classiques, à travers des phrases à corriger et des textes à compléter.",false),
+    M('ortho','lan',IC.spell,'images/keypace-perso-ortho.webp','Langue','Orthographe',"Les accords, les homophones et les pièges classiques, à travers des phrases à corriger et des textes à compléter.",false),
     M('dictee','lan',IC.ear,'images/keypace-perso-dictee.webp','Langue','Dictée',"Écoute, tape, compare : une dictée qui s'adapte à ton rythme et corrige tes erreurs en direct.",false),
     M('poemes','poe',IC.pen,'images/keypace-mascot-poeme-stylo.webp','Poésie','Les poèmes',"Les règles des rimes et du rythme : de quoi écrire tes propres poèmes, et redécouvrir des classiques de façon ludique.",false),
-    M('notes','ecr',IC.notes,'images/keypace-mascot-beanbag.webp','Écriture','Prendre des notes',"Écouter, résumer, abréger : prendre des notes rapides et utiles pendant un cours ou une réunion.",false),
+    M('notes','ecr',IC.notes,'images/keypace-perso-notes.webp','Écriture','Prendre des notes',"Écouter, résumer, abréger : prendre des notes rapides et utiles pendant un cours ou une réunion.",false),
     M('word','ecr',IC.layout,'images/keypace-mascot-cheer.webp','Écriture','Mise en page d\'un document',"Titres, paragraphes, listes, gras et italique : mettre en forme un texte propre dans un traitement de texte.",false)
   ];
   const THEMES=[['ecr','Écriture'],['emp','Emploi'],['cla','Clavier'],['num','Outils numériques'],['lan','Langue'],['poe','Poésie']];
   /* Modules créés à partir du programme (pas encore disponibles). Quand l'un d'eux est prêt : live:true. */
   const NEW_MODS=[
    {id:'posture',k:'cla',icon:'user',img:'images/keypace-mascot-desk.webp',cat:'Clavier',title:'Bien s’installer devant le clavier',short:'Dos, bras et poignets : la bonne position pour taper sans se fatiguer.'},
-   {id:'saisir-texte',k:'cla',icon:'keyboard',img:'images/keypace-mascots-duo-laptop.webp',cat:'Clavier',title:'Saisir un texte court',short:'Utiliser les touches principales du clavier, les yeux sur l’écran.'},
+   {id:'saisir-texte',k:'cla',icon:'keyboard',img:'images/keypace-perso-saisir-texte.webp',cat:'Clavier',title:'Saisir un texte court',short:'Utiliser les touches principales du clavier, les yeux sur l’écran.'},
    {id:'caracteres-speciaux',k:'cla',icon:'keyboard',img:'images/keypace-test-vitesse-frappe.webp',cat:'Clavier',title:'Insérer des caractères spéciaux',short:'Retrouver et taper les symboles qui ne sont pas sur les touches habituelles.'},
    {id:'tableur',k:'num',icon:'table',img:'images/keypace-mascot-idea.webp',cat:'Outils numériques',title:'Le tableur : données et formules',short:'Taper des chiffres, des mots et des formules dans les bonnes cases.'},
-   {id:'mot-de-passe',k:'num',icon:'lock',img:'images/keypace-mascot-beanbag.webp',cat:'Outils numériques',title:'Créer un mot de passe solide',short:'Lettres, chiffres et symboles : taper un mot de passe sûr.'},
+   {id:'mot-de-passe',k:'num',icon:'lock',img:'images/keypace-perso-mot-de-passe.webp',cat:'Outils numériques',title:'Créer un mot de passe solide',short:'Lettres, chiffres et symboles : taper un mot de passe sûr.'},
    {id:'recherche',k:'num',icon:'eye',img:'images/keypace-mascot-books.webp',cat:'Outils numériques',title:'Écrire une recherche',short:'Choisir les bons mots-clés et taper les symboles des recherches avancées.'},
-   {id:'nommer-fichier',k:'num',icon:'layout',img:'images/keypace-mascot-cheer.webp',cat:'Outils numériques',title:'Nommer un fichier et un dossier',short:'Choisir des noms clairs pour retrouver ses documents.'},
-   {id:'adresse-email',k:'ecr',icon:'mail',img:'images/keypace-mascot-mail-allonge.webp',cat:'Écriture',title:'Créer une adresse email, Cc et Cci',short:'Choisir son adresse, répondre, répondre à tous, transférer.'},
+   {id:'nommer-fichier',k:'num',icon:'layout',img:'images/keypace-perso-nommer-fichier.webp',cat:'Outils numériques',title:'Nommer un fichier et un dossier',short:'Choisir des noms clairs pour retrouver ses documents.'},
+   {id:'adresse-email',k:'ecr',icon:'mail',img:'images/keypace-perso-adresse-email.webp',cat:'Écriture',title:'Créer une adresse email, Cc et Cci',short:'Choisir son adresse, répondre, répondre à tous, transférer.'},
    {id:'messagerie-instantanee',k:'ecr',icon:'mail',img:'images/keypace-mascot-desk.webp',cat:'Écriture',title:'Discuter en messagerie instantanée',short:'Écrire des messages courts, y compris dans une conversation de groupe.'},
-   {id:'netiquette',k:'ecr',icon:'mail',img:'images/keypace-mascot-idea.webp',cat:'Écriture',title:'Écrire poliment en ligne',short:'Les règles de politesse des messages, des chats et des documents partagés.'},
-   {id:'ecrire-texte',k:'ecr',icon:'pen',img:'images/keypace-mascot-books.webp',cat:'Écriture',title:'Écrire un texte au clavier',short:'Rédiger un texte, puis le présenter proprement avec un traitement de texte.'},
-   {id:'courrier-ecole',k:'ecr',icon:'letter',img:'images/keypace-mascot-poeme-stylo.webp',cat:'Écriture',title:'Structurer un courrier pour l’école',short:'Organiser l’information pour un texte clair et hiérarchisé.'},
-   {id:'ecrire-a-plusieurs',k:'ecr',icon:'pen',img:'images/keypace-mascot-cheer.webp',cat:'Écriture',title:'Écrire à plusieurs',short:'Commentaires et suivi des modifications dans un document partagé.'},
+   {id:'netiquette',k:'ecr',icon:'mail',img:'images/keypace-perso-netiquette.webp',cat:'Écriture',title:'Écrire poliment en ligne',short:'Les règles de politesse des messages, des chats et des documents partagés.'},
+   {id:'ecrire-texte',k:'ecr',icon:'pen',img:'images/keypace-perso-ecrire-texte.webp',cat:'Écriture',title:'Écrire un texte au clavier',short:'Rédiger un texte, puis le présenter proprement avec un traitement de texte.'},
+   {id:'courrier-ecole',k:'ecr',icon:'letter',img:'images/keypace-perso-courrier-ecole.webp',cat:'Écriture',title:'Structurer un courrier pour l’école',short:'Organiser l’information pour un texte clair et hiérarchisé.'},
+   {id:'ecrire-a-plusieurs',k:'ecr',icon:'pen',img:'images/keypace-perso-ecrire-a-plusieurs.webp',cat:'Écriture',title:'Écrire à plusieurs',short:'Commentaires et suivi des modifications dans un document partagé.'},
    {id:'clavier-langue',k:'lan',icon:'keyboard',img:'images/keypace-mascot-beanbag.webp',cat:'Langue',title:'Écrire au clavier dans une langue étrangère',short:'Produire un écrit dans la langue étudiée, sur un support numérique.'}
   ];
   NEW_MODS.forEach(n=>{if(!MODS.find(m=>m.id===n.id))MODS.push(Object.assign(M(n.id,n.k,miniIcon(n.icon),n.img,n.cat,n.title,n.short+' Ce module arrive bientôt.',false),{short:n.short}))});
