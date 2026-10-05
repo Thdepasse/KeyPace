@@ -3838,14 +3838,34 @@ function kbModifierName(){return getKbLayoutId()==='mac'?'Option (⌥)':'AltGr';
    est accepté à la place (cf. typeKey). Réglage 'droits' : afficher " à la place. */
 function getQuoteStyle(){try{const v=localStorage.getItem('kp_quotes');if(v==='fr'||v==='droits')return v;}catch{}return'fr';}
 function setQuoteStyle(v){try{localStorage.setItem('kp_quotes',v);}catch{}}
-/* « œ » n'existe pas sur les claviers AZERTY français/belge sous Windows :
-   par défaut on écrit « oe » ailleurs que sur Mac et NF ('oe' ou 'lig'). */
-function getLigStyle(){try{const v=localStorage.getItem('kp_lig');if(v==='oe'||v==='lig')return v;}catch{}return['nf','mac'].includes(getKbLayoutId())?'lig':'oe';}
-function setLigStyle(v){try{localStorage.setItem('kp_lig',v);}catch{}}
+
+/* Gestes par disposition. Sources : fichiers de disposition xkeyboard-config
+   (français, belge, Mac) et fr_azerty_afnor (NF Z71-300) ; tilde belge confirmé
+   par Wikipédia. "puis espace" = touche morte (le signe n'apparaît qu'après la barre d'espace). */
+const KB_HOW={
+ fr:{'@':'AltGr + 0','#':'AltGr + 3','[':'AltGr + 5',']':'AltGr + ° (touche à droite du 0)','|':'AltGr + 6','/':'Maj + :','*':'touche * (à gauche de Entrée)','=':'touche = (à droite du °)','+':'Maj + =','%':'Maj + ù','_':'touche 8','{':'AltGr + 4','}':'AltGr + =','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'AltGr + é, puis espace','\\':'AltGr + 8','`':'AltGr + 7, puis espace','(':'touche 5, sans Maj',')':'touche ° (à droite du 0), sans Maj','«':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','»':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','œ':'Alt + 0156 (pavé numérique, Windows). Sinon tape o puis e : c\'est accepté','É':'Alt + 0201 (pavé numérique, Windows). Maj + é donne « 2 » : c\'est accepté'},
+ be:{'@':'AltGr + 2','#':'AltGr + 3','[':'AltGr + ^ (touche à droite du P)',']':'AltGr + $','|':'AltGr + 1','/':'Maj + :','*':'Maj + $','=':'touche = (rangée du bas, à droite)','+':'Maj + =','%':'Maj + ù','_':'Maj + - (touche à droite du 0)','{':'AltGr + 9','}':'AltGr + 0','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'AltGr + =, puis espace','\\':'AltGr + <','`':'AltGr + µ, puis espace','(':'touche 5, sans Maj',')':'touche ) (à droite du 0), sans Maj','«':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','»':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','œ':'Alt + 0156 (pavé numérique, Windows). Sinon tape o puis e : c\'est accepté','É':'Alt + 0201 (pavé numérique, Windows). Maj + é donne « 2 » : c\'est accepté'},
+ mac:{'@':'touche à gauche du 1','#':'Maj + touche à gauche du 1','[':'Option + Maj + 5',']':'Option + Maj + ) (touche à droite du 0)','|':'Option + Maj + L','/':'Maj + :','*':'Maj + $','=':'touche = (rangée du bas, à droite)','+':'Maj + =','%':'Maj + ù','_':'Maj + -','{':'Option + 5','}':'Option + ) (touche à droite du 0)','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'Option + Maj + N','\\':'Option + Maj + :','`':'touche accent grave, puis espace','(':'touche 5, sans Maj',')':'touche ) (à droite du 0), sans Maj','«':'Option + 7','»':'Option + Maj + 7','œ':'Option + O','É':'Option + Maj + é. Maj + é donne « 2 » : c\'est accepté'},
+ nf:{'@':'touche à gauche du 1','#':'Maj + touche à gauche du 1','[':'AltGr + 5',']':'AltGr + 6','|':'AltGr + L','/':'touche / (à droite du M)','*':'touche * (à droite du /)','=':'Maj + ;','+':'touche + (en haut à droite)','%':'AltGr + P','_':'AltGr + 8','{':'AltGr + T','}':'AltGr + Y','<':'touche < (à gauche du W)','>':'Maj + <','"':'Maj + touche \' (à droite du 0)','~':'AltGr + N','\\':'Maj + /','`':'AltGr + è, puis espace','(':'touche 5',')':'touche 6','«':'touche 9','»':'touche 0','œ':'AltGr + O','É':'AltGr + Maj + é. Maj + é donne « 2 » : c\'est accepté'}
+};
+const KB_HOW_TEXT_LESSONS=['pon6','tre3','sym9','flu4','flu5','flu6'];
+function kbHowHTML(les){
+  const lay=getKbLayoutId(),H=KB_HOW[lay]||KB_HOW.fr;
+  const chars=[];
+  const kt=(les.keys||'').split(/\s+/).filter(Boolean);
+  // `keys` est parfois un libellé (« Maj + lettres gauches ») : on ne le lit que s'il liste des touches.
+  if(kt.every(x=>x.length===1))for(const c of kt)if(H[c]!==undefined&&!chars.includes(c))chars.push(c);
+  if(KB_HOW_TEXT_LESSONS.includes(les.id))for(const c of (les.text||''))if(H[c]!==undefined&&c!=="'"&&!chars.includes(c))chars.push(c);
+  if(!chars.length)return'';
+  const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const groups=[];
+  for(const c of chars){const g=groups.find(x=>x.how===H[c]);if(g)g.cs.push(c);else groups.push({how:H[c],cs:[c]});}
+  const items=groups.map(g=>`<b>${esc(g.cs.join(' '))}</b> : ${esc(g.how)}`).join('<br>');
+  return`<div class="intro-rule"><div class="intro-rule-icon">⌨️</div><div class="intro-rule-text"><strong>Sur ton clavier (${KB_LAYOUT_LABELS[lay]})</strong>${items}</div></div>`;
+}
 function adaptQuotes(t){
   if(typeof t!=='string')return t;
   if(getQuoteStyle()==='droits')t=t.replace(/«\s*/g,'"').replace(/\s*»/g,'"');
-  if(getLigStyle()==='oe')t=t.replace(/œ/g,'oe').replace(/Œ/g,'Oe');
   return t;
 }
 /* Teste si `ch` s'obtient sur la touche `k` (case-insensible) et à quel
@@ -4528,7 +4548,7 @@ const CURRICULUM=[
        intro:"Les ligatures œ et æ collent deux lettres en une. Plus rares, elles demandent une combinaison selon ton système.",
        rules:[
          {icon:'🔗',t:'Deux lettres soudées',d:"œ = o et e soudés (cœur, sœur, œuf) ; æ = a et e soudés (et æquo). On les écrit comme un seul caractère."},
-         {icon:'⌨️',t:'Selon le système',d:"Sur Mac : Alt + o donne œ. Sur Windows, l'œ passe souvent par la correction automatique ou un raccourci : repère ce qui marche chez toi."},
+         {icon:'⌨️',t:'Selon le système',d:"Le geste dépend de ton clavier (indiqué plus haut). Si tu n'arrives pas à taper œ, tape o puis e : c'est accepté."},
          {icon:'💬',t:'Surtout l\'œ',d:"L'œ est le plus courant : cœur, sœur, œil, œuvre, bœuf. L'æ est rare. Concentre-toi sur l'œ."}
        ],
        tip:"Objectif : reconnaître et produire œ et æ, surtout l'œ très fréquent."
@@ -4617,13 +4637,13 @@ const CURRICULUM=[
   {name:'11. Symboles courants',lessons:[
     {id:'sym1',title:'@ et # : email et hashtag',keys:'@ #',
      tuto:{
-       intro:"Les symboles comme @ et # s'obtiennent avec AltGr (la touche Alt à droite de la barre d'espace) maintenue, puis la touche.",
+       intro:"Les symboles comme @ et # demandent une combinaison de touches qui change selon les claviers : le geste du tien est indiqué juste en dessous.",
        rules:[
-         {icon:'⌨️',t:'La touche AltGr',d:"AltGr est à droite de la barre d'espace. Maintiens-la avec le pouce droit, puis frappe la touche du symbole."},
+         {icon:'⌨️',t:'Les touches spéciales',d:"Selon ton clavier, un symbole se tape en direct, avec Maj, ou avec AltGr (la touche à droite de la barre d'espace, à maintenir avec le pouce droit)."},
          {icon:'📧',t:'@ pour les emails',d:"L'arobase relie le nom et le domaine d'une adresse : contact@keypace.be. Indispensable au quotidien."},
-         {icon:'#️⃣',t:'# le hashtag',d:"Le croisillon sert aux mots-clés et au code. Sur AZERTY, @ et # s'atteignent via AltGr sur la rangée du haut."}
+         {icon:'#️⃣',t:'# le hashtag',d:"Le croisillon sert aux mots-clés et au code."}
        ],
-       tip:"Objectif : produire @ et # avec AltGr, sans casser ta position de repos."
+       tip:"Objectif : produire @ et # avec le bon geste, sans casser ta position de repos."
      },
      text:'contact@keypace.be #keypace @user info@site.com #top @jean #apprendre #clavier @monde contact@mail.fr'},
     {id:'sym2',title:'Parenthèses () et crochets []',keys:'( ) [ ]',
@@ -4631,8 +4651,8 @@ const CURRICULUM=[
        intro:"Parenthèses et crochets vont par paire : on apprend à toujours ouvrir ET fermer.",
        rules:[
          {icon:'🧩',t:'Toujours par paire',d:"Une parenthèse ou un crochet ouvert se ferme toujours. Tape la paire, puis reviens écrire au milieu."},
-         {icon:'⌨️',t:'Parenthèses en direct',d:"Sur AZERTY, ( et ) se tapent directement, sans Shift, sur la rangée des chiffres."},
-         {icon:'⌨️',t:'Crochets avec AltGr',d:"Les crochets [ ] passent par AltGr. Maintiens AltGr puis frappe la touche : utile pour le code et les listes."}
+         {icon:'⌨️',t:'Parenthèses en direct',d:"( et ) se tapent directement, sans Maj, sur la rangée des chiffres."},
+         {icon:'⌨️',t:'Les crochets',d:"Les crochets [ ] demandent une combinaison de touches (le geste de ton clavier est indiqué plus haut). Utiles pour le code et les listes."}
        ],
        tip:"Objectif : ouvrir et fermer parenthèses et crochets, sans en oublier."
      },
@@ -4641,11 +4661,11 @@ const CURRICULUM=[
      tuto:{
        intro:"La barre oblique / et la barre verticale | servent aux adresses web, chemins de fichiers et commandes.",
        rules:[
-         {icon:'🌐',t:'Le slash /',d:"La barre oblique sépare les parties d'une URL ou d'un chemin : http://site.fr, dossier/fichier. Sur AZERTY, c'est Shift + : ."},
-         {icon:'⌨️',t:'Le pipe |',d:"La barre verticale s'obtient avec AltGr. En informatique, elle relie deux commandes : cat fichier | grep mot."},
+         {icon:'🌐',t:'Le slash /',d:"La barre oblique sépare les parties d'une URL ou d'un chemin : http://site.fr, dossier/fichier."},
+         {icon:'⌨️',t:'Le pipe |',d:"La barre verticale demande une combinaison de touches. En informatique, elle relie deux commandes : cat fichier | grep mot."},
          {icon:'💻',t:'Symboles de l\'informatique',d:"Ces deux signes sont partout dès qu'on touche au web ou au terminal. Repère bien leur combinaison."}
        ],
-       tip:"Objectif : taper / (Shift) et | (AltGr) pour les chemins et les commandes."
+       tip:"Objectif : taper / et | pour les chemins et les commandes."
      },
      text:'http://site.fr chemin/vers/fichier cat fichier | grep mot droite | gauche /home/user a/b | c/d /var/log'},
     {id:'sym4',title:'* = + : calculs et code',keys:'* = +',
@@ -4653,21 +4673,21 @@ const CURRICULUM=[
        intro:"Les opérateurs * = + servent aux calculs et au code. On les enchaîne dans des expressions.",
        rules:[
          {icon:'🧮',t:'Les opérateurs',d:"* pour multiplier, + pour additionner, = pour le résultat ou l'affectation : 2*3=6, a+b=c."},
-         {icon:'⇧',t:'+ avec Shift, = en direct',d:"Sur AZERTY, + et = sont sur la même touche, tout en haut à droite : + demande Shift, = se tape directement."},
+         {icon:'⇧',t:'Où sont + et = ?',d:"Leur position change selon les claviers : regarde le geste de ton clavier, indiqué plus haut."},
          {icon:'🔗',t:'Sans espace dans les formules',d:"Dans une expression simple, on colle souvent les opérateurs : x*y+z. Repère le rythme touche par touche."}
        ],
-       tip:"Objectif : enchaîner * = + dans des expressions, sans hésiter sur Shift."
+       tip:"Objectif : enchaîner * = + dans des expressions, sans hésiter sur le bon geste."
      },
      text:'2*3=6 a+b=c x*y+z=0 total=prix*quantité résultat=a+b+c valeur*2=8 score=temps*précision vitesse+1=ok'},
     {id:'sym5',title:'% et _ : taux et variables',keys:'% _',
      tuto:{
        intro:"Le pourcentage % et le tiret bas _ (underscore) reviennent souvent dans les chiffres et les noms techniques.",
        rules:[
-         {icon:'📊',t:'Le pourcentage %',d:"Il se colle au nombre : 50%, 100%. Sur AZERTY, % s'obtient avec Shift sur la touche ù, à droite."},
-         {icon:'➿',t:'Le tiret bas _',d:"L'underscore relie des mots sans espace dans les noms techniques : ma_variable, nom_fichier. Il se tape directement, sans Maj : c'est Shift qui donne le chiffre 8 sur cette touche, pas l'inverse."},
+         {icon:'📊',t:'Le pourcentage %',d:"Il se colle au nombre : 50%, 100%."},
+         {icon:'➿',t:'Le tiret bas _',d:"L'underscore relie des mots sans espace dans les noms techniques : ma_variable, nom_fichier."},
          {icon:'💻',t:'Usage technique',d:"% et _ sont surtout utiles en informatique et dans les données. Mémorise leur position pour ne pas ralentir."}
        ],
-       tip:"Objectif : placer % et _ (tous deux avec Shift) sans regarder."
+       tip:"Objectif : placer % et _ sans regarder."
      },
      text:'50% 75% ma_variable nom_fichier 100% style_css mon_pseudo classe_active taux_erreur score_max_wpm'},
   ]},
@@ -4678,32 +4698,32 @@ const CURRICULUM=[
      tuto:{
        intro:"Les accolades {} et chevrons <> sont les symboles du code et du HTML. Eux aussi vont par paire.",
        rules:[
-         {icon:'⌨️',t:'Accolades avec AltGr',d:"Les accolades { } s'obtiennent avec AltGr sur la rangée des chiffres. Elles encadrent des blocs de code : {code}."},
+         {icon:'⌨️',t:'Les accolades',d:"Les accolades { } encadrent des blocs de code : {code}. Leur geste dépend de ton clavier (indiqué plus haut)."},
          {icon:'🔠',t:'Chevrons à gauche',d:"Les chevrons sont sur la touche à gauche du W : < en direct, > avec Shift. Ils ouvrent et ferment les balises HTML."},
          {icon:'🧩',t:'Toujours fermer',d:"Comme les parenthèses, accolades et balises s'ouvrent ET se ferment : &lt;p&gt;texte&lt;/p&gt;, {return x}."}
        ],
-       tip:"Objectif : ouvrir et fermer accolades et chevrons, AltGr pour les accolades."
+       tip:"Objectif : ouvrir et fermer accolades et chevrons."
      },
      text:'{code: true} <html> </html> {style: "bold"} <div class="main"> </div> {return x+y} <p>texte</p>'},
     {id:'sym7',title:'"" et ~ : chaînes et chemins',keys:'" ~',
      tuto:{
        intro:"Les guillemets droits et le tilde ~ servent aux chaînes de caractères et aux chemins système.",
        rules:[
-         {icon:'⌨️',t:'Guillemets droits',d:"Le guillemet droit (\") entoure les chaînes en code. Sur AZERTY, il se tape directement sur la touche 3, sans Shift."},
-         {icon:'〜',t:'Le tilde ~',d:"Le tilde désigne le dossier personnel sous Linux et Mac : ~/documents. Il s'obtient avec AltGr, sur la rangée des chiffres."},
+         {icon:'⌨️',t:'Guillemets droits',d:"Le guillemet droit (\") entoure les chaînes en code. Son geste dépend de ton clavier (indiqué plus haut)."},
+         {icon:'〜',t:'Le tilde ~',d:"Le tilde désigne le dossier personnel sous Linux et Mac : ~/documents."},
          {icon:'💻',t:'Surtout en code',d:"Ces deux signes sont rares à l'écrit courant mais essentiels en programmation et au terminal."}
        ],
-       tip:"Objectif : taper le guillemet droit (direct) et ~ (AltGr) sans hésiter."
+       tip:"Objectif : taper le guillemet droit et ~ sans hésiter."
      },
      text:'"bonjour" "monde" ~/documents ~user "valeur": true ~/bureau "clé": "données" ~root "résultat": 42'},
     {id:'sym8',tuto:{
        intro:"L'antislash et l'accent grave (le backtick) sont des symboles purement techniques, fréquents en code.",
        rules:[
-         {icon:'⌨️',t:"L'antislash",d:"Il sépare les dossiers sous Windows et marque les caractères spéciaux en code. On l'obtient avec AltGr."},
-         {icon:'⌨️',t:'Le backtick',d:"L'accent grave seul entoure le code en ligne et les variables en programmation. Lui aussi via AltGr."},
+         {icon:'⌨️',t:"L'antislash",d:"Il sépare les dossiers sous Windows et marque les caractères spéciaux en code."},
+         {icon:'⌨️',t:'Le backtick',d:"L'accent grave seul entoure le code en ligne et les variables en programmation. Sur la plupart des claviers, il faut taper la touche puis la barre d'espace."},
          {icon:'💻',t:'Réservés au technique',d:"Tu ne t'en serviras qu'en code ou au terminal. Mémorise-les si tu programmes, sinon retiens juste leur existence."}
        ],
-       tip:"Objectif : situer l'antislash et le backtick (tous deux AltGr) et les taper sans regarder."
+       tip:"Objectif : situer l'antislash et le backtick et les taper sans regarder."
      },title:'\\ et ` : code et terminal',keys:'\\ `',
      text:'C:\\Users\\theo `code inline` \\n \\t `variable` C:\\Windows `npm install` \\r\\n `git commit -m "fix"`'},
     {id:'sym9',title:'Révision : tous les symboles en texte',keys:'tous symboles',
@@ -5531,18 +5551,15 @@ const app={
       const extra=r.t==='Guillemets français'?` <b>Pas de touche « » sur ton clavier ? Tape le guillemet droit "</b> (touche 3) : il est accepté.`:'';
       return`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>${r.t}</strong>${r.d}${extra}</div></div>`;
     }).join('');
-    const hasLig=/[œŒ]/.test((les.keys||'')+(les.text||''));
-    const oeMode=hasLig&&getLigStyle()==='oe';
-    const ligSwitch=hasLig?`<p style="font-size:13px;color:var(--muted);margin:0 0 18px">${oeMode?'Sur ton clavier, « œ » n\'existe pas : dans cette leçon on tape <b>oe</b>.':'Tu tapes la vraie lettre « œ ».'} <a href="#" style="color:var(--accent)" onclick="app.toggleLigStyle();return false">${oeMode?'Je sais taper « œ »':'Utiliser oe à la place'}</a></p>`:'';
+    const how=kbHowHTML(les);
     const quoteSwitch=hasFrQuotes?`<p style="font-size:13px;color:var(--muted);margin:0 0 18px">${straightQ?'Ton clavier a les guillemets « » ?':'Ton clavier n\'a pas les guillemets « » ?'} <a href="#" style="color:var(--accent)" onclick="app.toggleQuoteStyle();return false">${straightQ?'Utiliser « et »':'Utiliser les guillemets droits (")'}</a></p>`:'';
     let html=`
       <div class="tuto-badge">${les.module||''}</div>
       <h2 class="tuto-title">${les.title}</h2>
       ${t.intro?`<p class="tuto-intro">${t.intro}</p>`:''}
       ${showKb?`<div class="tuto-kb">${kb}</div><div class="tuto-keys-info">${cards}</div>`:''}
-      ${rules?`<div class="intro-rules" style="margin-bottom:18px">${rules}</div>`:''}
+      ${(how||rules)?`<div class="intro-rules" style="margin-bottom:18px">${how}${rules}</div>`:''}
       ${quoteSwitch}
-      ${ligSwitch}
       ${t.tip?`<div class="lesson-tip"><div class="lesson-tip-icon">🎯</div><div>${t.tip}</div></div>`:''}
       <button class="intro-start-btn" onclick="app.confirmTuto()">Commencer la leçon →</button>`;
     // Les leçons sont rédigées pour AZERTY PC (touche "AltGr") : sur Mac, la
@@ -5558,7 +5575,6 @@ const app={
     document.getElementById('lesson-tuto-body').scrollTop=0; // toujours ouvrir en haut
   },
   toggleQuoteStyle(){setQuoteStyle(getQuoteStyle()==='droits'?'fr':'droits');if(this._pendingLessonId)this.openLessonTuto(this._pendingLessonId);},
-  toggleLigStyle(){setLigStyle(getLigStyle()==='oe'?'lig':'oe');if(this._pendingLessonId)this.openLessonTuto(this._pendingLessonId);},
   confirmTuto(){this._closeTutoAndStart();},
   skipTuto(){this._closeTutoAndStart();},
   _closeTutoAndStart(){
@@ -6319,9 +6335,21 @@ const app={
     if([...document.querySelectorAll('.modal-overlay,.settings-overlay')].some(m=>m.classList.contains('open')))return;
     if(document.getElementById('lesson-tuto-modal').classList.contains('open'))return;
     // Centralised dead-key composition (^+u→û etc.) for all modes
-    if(e.key==='Dead'){this._pendingDeadKey=(e.code==='BracketLeft'&&e.shiftKey)?'¨':(CODE_TO_DEAD[e.code]||null);return;} // AZERTY : ^ et ¨ (Maj) sont sur la même touche
+    if(e.key==='Dead'){
+      // AZERTY : ^ et ¨ (Maj) sont sur la même touche ; NF : touche à gauche du Retour arrière.
+      // Autre touche morte (~ ` ...) : '?', résolue par la barre d'espace qui suit.
+      let d=CODE_TO_DEAD[e.code]||null;
+      if(e.code==='BracketLeft'&&e.shiftKey)d='¨';
+      else if(e.code==='Equal'&&getKbLayoutId()==='nf')d=e.shiftKey?'¨':'^';
+      this._pendingDeadKey=d||'?';return;
+    }
     if(DEAD_COMPOSE[e.key]&&e.key.length===1){this._pendingDeadKey=e.key;return;}
-    if(this._pendingDeadKey){e._composedKey=(DEAD_COMPOSE[this._pendingDeadKey]||{})[e.key]||e.key;this._pendingDeadKey=null;}
+    if(this._pendingDeadKey){
+      const pk=this._pendingDeadKey;this._pendingDeadKey=null;
+      if(pk==='?'){
+        if(e.key===' '&&this.sess&&this.sess.text){const ex=this.sess.text[this.sess.idx];if(ex&&'~`^¨'.includes(ex))e._composedKey=ex;}
+      }else e._composedKey=(DEAD_COMPOSE[pk]||{})[e.key]||(e.key===' '?pk:e.key);
+    }
     if(e.key==='Escape'&&this.view==='games'&&this.activeGame){this.exitActiveGame();return;}
     if(this.view==='games'&&this.activeGame==='sprint'&&this.sprint&&this.sprint.on){this.sprintKey(e);return;}
     if(this.view==='games'&&this.activeGame==='frappe'&&this.game&&this.game.on){this.gameKey(e);return;}
@@ -6348,19 +6376,21 @@ const app={
     if(k.length!==1)return;
     e.preventDefault();
     const s=this.sess;
-    // Après un " pris pour « : l'espace intérieur est déjà passé, on ignore celle que l'élève tape quand même.
-    if(s._ignoreSpaceAt===s.idx&&k===' '){s._ignoreSpaceAt=null;return;}
-    s._ignoreSpaceAt=null;
+    // Touche à ignorer : espace intérieure après un " pris pour «, ou e après un o pris pour œ.
+    if(s._skipNext&&s._skipNext.at===s.idx&&k===s._skipNext.ch){s._skipNext=null;return;}
+    s._skipNext=null;
     if(!s.started){s.started=true;s.startTime=Date.now();this.startTimer();this._gazeStart();this._clearNudge();}
     const expected=s.text[s.idx];s.keystrokes++;
-    let _ok=(k===expected)||(expected==='É'&&k==='2'); // AZERTY : Maj+é donne 2 (É = Verr. Maj + é)
+    let _ok=(k===expected)||(expected==='É'&&k==='2'); // AZERTY : Maj+é donne 2, accepté pour É
     // Guillemet droit " équivalent à « » : on accepte " pour « ou », et on saute
     // l'espace intérieur (« bonjour » ↔ "bonjour") que l'élève n'a pas à taper.
     let _skip=0;
     if(k==='"'&&!_ok){
-      if(expected==='«'||expected==='»'){_ok=true;if(expected==='«'&&s.text[s.idx+1]===' '){_skip=1;s._ignoreSpaceAt=s.idx+2;}}
+      if(expected==='«'||expected==='»'){_ok=true;if(expected==='«'&&s.text[s.idx+1]===' '){_skip=1;s._skipNext={at:s.idx+2,ch:' '};}}
       else if(expected===' '&&s.text[s.idx+1]==='»'){_ok=true;_skip=1;}
     }
+    // œ / Œ : « oe » (o puis e) est accepté quand l'élève n'a pas la touche œ.
+    if(!_ok&&((expected==='œ'&&k==='o')||(expected==='Œ'&&k==='O'))){_ok=true;s._skipNext={at:s.idx+1,ch:'e'};}
     if(_ok){s.typed[s.idx]='c';s.correct++;}else{s.typed[s.idx]='w';}
     if(_skip){s.typed[s.idx+1]='c';}
     this._recordKey(expected,_ok);
