@@ -42,6 +42,8 @@ function sessionHash(ip, ua) {
 module.exports = async function handler(req, res) {
   // Pages de l'appli (rewrites /api/track?r=<clé>) : voir _page-render.js
   if (req.query && req.query.r) return require('./_page-render').handlePage(req, res);
+  // Modules réservés aux comptes Expert (mail, CV…) : voir _module-gate.js
+  if (req.query && req.query.m) return require('./_module-gate').handle(req, res);
   if (req.method !== 'POST') return res.status(405).end();
 
   try {
