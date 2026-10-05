@@ -3835,9 +3835,10 @@ function setKbLayoutId(v){try{localStorage.setItem('kp_kb_layout',v);}catch{}}
 function kbModifierName(){return getKbLayoutId()==='mac'?'Option (⌥)':'AltGr';}
 /* Guillemets : « » n'existent pas sur la plupart des claviers AZERTY (français,
    belge) : sans Alt+code, impossible de les taper. Réglage 'fr' (« ») ou
-   'droits' ("). Par défaut ('auto') : « » seulement sur NF et Mac, où ils
-   s'obtiennent directement ; guillemets droits ailleurs. */
-function getQuoteStyle(){try{const v=localStorage.getItem('kp_quotes');if(v==='fr'||v==='droits')return v;}catch{}return['nf','mac'].includes(getKbLayoutId())?'fr':'droits';}
+   'droits' ("). Par défaut ('auto') : « » seulement sur NF, où ils
+   s'obtiennent directement ; guillemets droits ailleurs (sur Mac ils
+   demandent une combinaison que les élèves ne connaissent pas). */
+function getQuoteStyle(){try{const v=localStorage.getItem('kp_quotes');if(v==='fr'||v==='droits')return v;}catch{}return getKbLayoutId()==='nf'?'fr':'droits';}
 function setQuoteStyle(v){try{localStorage.setItem('kp_quotes',v);}catch{}}
 /* « œ » n'existe pas sur les claviers AZERTY français/belge sous Windows :
    par défaut on écrit « oe » ailleurs que sur Mac et NF ('oe' ou 'lig'). */
