@@ -3833,6 +3833,22 @@ function kbFullPreviewHTML(azertyId,formId){
 function getKbLayoutId(){try{const v=localStorage.getItem('kp_kb_layout');return KB_LAYOUTS[v]?v:'fr';}catch{return 'fr';}}
 function setKbLayoutId(v){try{localStorage.setItem('kp_kb_layout',v);}catch{}}
 function kbModifierName(){return getKbLayoutId()==='mac'?'Option (⌥)':'AltGr';}
+/* Guillemets : « » n'existent pas sur la plupart des claviers AZERTY (français,
+   belge) : sans Alt+code, impossible de les taper. Réglage 'fr' (« ») ou
+   'droits' ("). Par défaut ('auto') : « » seulement sur NF et Mac, où ils
+   s'obtiennent directement ; guillemets droits ailleurs. */
+function getQuoteStyle(){try{const v=localStorage.getItem('kp_quotes');if(v==='fr'||v==='droits')return v;}catch{}return['nf','mac'].includes(getKbLayoutId())?'fr':'droits';}
+function setQuoteStyle(v){try{localStorage.setItem('kp_quotes',v);}catch{}}
+/* « œ » n'existe pas sur les claviers AZERTY français/belge sous Windows :
+   par défaut on écrit « oe » ailleurs que sur Mac et NF ('oe' ou 'lig'). */
+function getLigStyle(){try{const v=localStorage.getItem('kp_lig');if(v==='oe'||v==='lig')return v;}catch{}return['nf','mac'].includes(getKbLayoutId())?'lig':'oe';}
+function setLigStyle(v){try{localStorage.setItem('kp_lig',v);}catch{}}
+function adaptQuotes(t){
+  if(typeof t!=='string')return t;
+  if(getQuoteStyle()==='droits')t=t.replace(/«\s*/g,'"').replace(/\s*»/g,'"');
+  if(getLigStyle()==='oe')t=t.replace(/œ/g,'oe').replace(/Œ/g,'Oe');
+  return t;
+}
 /* Teste si `ch` s'obtient sur la touche `k` (case-insensible) et à quel
    niveau : 'base' (direct), 'shift' (Maj) ou 'altgr'. null si absent de KB —
    on ne devine jamais une position qu'on n'a pas modélisée.
@@ -5445,7 +5461,7 @@ const app={
   },
 
   makeSession(mode,lessonId){
-    let text=mode==='lesson'?this.genDrill(lessonId):PASSAGES[Math.floor(Math.random()*PASSAGES.length)];
+    let text=adaptQuotes(mode==='lesson'?this.genDrill(lessonId):PASSAGES[Math.floor(Math.random()*PASSAGES.length)]);
     return{mode,lessonId:lessonId||null,text,idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false};
   },
   lessonById(id){return ALL_LESSONS.find(l=>l.id===id);},
@@ -5495,7 +5511,9 @@ const app={
     const les=this.lessonById(id);if(!les)return;
     this._pendingLessonId=id;
     const num=ALL_LESSONS.findIndex(l=>l.id===id)+1,total=ALL_LESSONS.length;
-    const newKeys=(les.keys||'').split(/\s+/).filter(Boolean);
+    const hasFrQuotes=/[«»]/.test((les.keys||'')+(les.text||''));
+    const straightQ=hasFrQuotes&&getQuoteStyle()==='droits';
+    const newKeys=[...new Set((getQuoteStyle()==='droits'?(les.keys||'').replace(/[«»]/g,'"'):(les.keys||'')).split(/\s+/).filter(Boolean))];
     const kb=KB.map((row,r)=>`<div class="tuto-kb-row">${row.map(k=>{
       let on=false,hint='';
       for(const t of newKeys){
@@ -5509,13 +5527,22 @@ const app={
     const viaHint=v=>v==='shift'?' (Maj)':v==='altgr'?` (${kbModifierName()})`:'';
     const cards=infos.map(i=>`<div class="tuto-keycard"><div class="k" style="background:${i.color}">${i.label}</div><div class="meta"><b>${i.label}</b>${viaHint(i.via)} · ${i.finger} · ${i.hand}</div></div>`).join('');
     const t=les.tuto||{};
-    const rules=(t.rules||[]).map(r=>`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>${r.t}</strong>${r.d}</div></div>`).join('');
+    const rules=(t.rules||[]).map(r=>{
+      if(straightQ&&r.t==='Guillemets français')return`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>Guillemets droits</strong>Sur ton clavier, on tape le guillemet droit " (touche 3, sans Maj) : "bonjour". Pas d'espace à l'intérieur. Ils vont toujours par paire.</div></div>`;
+      return`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>${r.t}</strong>${r.d}</div></div>`;
+    }).join('');
+    const hasLig=/[œŒ]/.test((les.keys||'')+(les.text||''));
+    const oeMode=hasLig&&getLigStyle()==='oe';
+    const ligSwitch=hasLig?`<p style="font-size:13px;color:var(--muted);margin:0 0 18px">${oeMode?'Sur ton clavier, « œ » n\'existe pas : dans cette leçon on tape <b>oe</b>.':'Tu tapes la vraie lettre « œ ».'} <a href="#" style="color:var(--accent)" onclick="app.toggleLigStyle();return false">${oeMode?'Je sais taper « œ »':'Utiliser oe à la place'}</a></p>`:'';
+    const quoteSwitch=hasFrQuotes?`<p style="font-size:13px;color:var(--muted);margin:0 0 18px">${straightQ?'Ton clavier a les guillemets « » ?':'Ton clavier n\'a pas les guillemets « » ?'} <a href="#" style="color:var(--accent)" onclick="app.toggleQuoteStyle();return false">${straightQ?'Utiliser « et »':'Utiliser les guillemets droits (")'}</a></p>`:'';
     let html=`
       <div class="tuto-badge">${les.module||''}</div>
       <h2 class="tuto-title">${les.title}</h2>
       ${t.intro?`<p class="tuto-intro">${t.intro}</p>`:''}
       ${showKb?`<div class="tuto-kb">${kb}</div><div class="tuto-keys-info">${cards}</div>`:''}
       ${rules?`<div class="intro-rules" style="margin-bottom:18px">${rules}</div>`:''}
+      ${quoteSwitch}
+      ${ligSwitch}
       ${t.tip?`<div class="lesson-tip"><div class="lesson-tip-icon">🎯</div><div>${t.tip}</div></div>`:''}
       <button class="intro-start-btn" onclick="app.confirmTuto()">Commencer la leçon →</button>`;
     // Les leçons sont rédigées pour AZERTY PC (touche "AltGr") : sur Mac, la
@@ -5530,6 +5557,8 @@ const app={
     openModal('lesson-tuto-modal');
     document.getElementById('lesson-tuto-body').scrollTop=0; // toujours ouvrir en haut
   },
+  toggleQuoteStyle(){setQuoteStyle(getQuoteStyle()==='droits'?'fr':'droits');if(this._pendingLessonId)this.openLessonTuto(this._pendingLessonId);},
+  toggleLigStyle(){setLigStyle(getLigStyle()==='oe'?'lig':'oe');if(this._pendingLessonId)this.openLessonTuto(this._pendingLessonId);},
   confirmTuto(){this._closeTutoAndStart();},
   skipTuto(){this._closeTutoAndStart();},
   _closeTutoAndStart(){
@@ -6290,7 +6319,7 @@ const app={
     if([...document.querySelectorAll('.modal-overlay,.settings-overlay')].some(m=>m.classList.contains('open')))return;
     if(document.getElementById('lesson-tuto-modal').classList.contains('open'))return;
     // Centralised dead-key composition (^+u→û etc.) for all modes
-    if(e.key==='Dead'){this._pendingDeadKey=CODE_TO_DEAD[e.code]||null;return;}
+    if(e.key==='Dead'){this._pendingDeadKey=(e.code==='BracketLeft'&&e.shiftKey)?'¨':(CODE_TO_DEAD[e.code]||null);return;} // AZERTY : ^ et ¨ (Maj) sont sur la même touche
     if(DEAD_COMPOSE[e.key]&&e.key.length===1){this._pendingDeadKey=e.key;return;}
     if(this._pendingDeadKey){e._composedKey=(DEAD_COMPOSE[this._pendingDeadKey]||{})[e.key]||e.key;this._pendingDeadKey=null;}
     if(e.key==='Escape'&&this.view==='games'&&this.activeGame){this.exitActiveGame();return;}
@@ -6321,7 +6350,7 @@ const app={
     const s=this.sess;
     if(!s.started){s.started=true;s.startTime=Date.now();this.startTimer();this._gazeStart();this._clearNudge();}
     const expected=s.text[s.idx];s.keystrokes++;
-    const _ok=(k===expected);
+    const _ok=(k===expected)||(expected==='É'&&k==='2'); // AZERTY : Maj+é donne 2 (É = Verr. Maj + é)
     if(_ok){s.typed[s.idx]='c';s.correct++;}else{s.typed[s.idx]='w';}
     this._recordKey(expected,_ok);
     if(this._isPlainTest())this._t4aFx(k,_ok);
@@ -12040,6 +12069,14 @@ const app={
           <div id="kb-form-btns" style="display:flex;flex-direction:column;gap:10px">
             ${kbFormBtnsHTML(getKbLayoutId())}
           </div>
+          <div class="settings-row-info" style="margin-top:4px">
+            <strong>Guillemets dans les leçons</strong>
+            <span>Si ton clavier n'a pas les touches « et », choisis les guillemets droits (").</span>
+          </div>
+          <div id="quote-btns" style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="settings-btn${getQuoteStyle()==='fr'?' active':''}" onclick="app.setQuotes('fr')">« Français »</button>
+            <button class="settings-btn${getQuoteStyle()==='droits'?' active':''}" onclick="app.setQuotes('droits')">"Droits"</button>
+          </div>
           <div id="kb-layout-preview" style="width:100%;overflow-x:auto">${kbFullPreviewHTML(getKbLayoutId(),getKbFormFactorId())}</div>
         </div>
       </div>
@@ -12156,6 +12193,7 @@ const app={
       if(!isMusicMuted())this._sourisAudio.volume=0.35;
     }
   },
+  setQuotes(v){setQuoteStyle(v);const b=document.querySelectorAll('#quote-btns .settings-btn');if(b.length===2){b[0].classList.toggle('active',v==='fr');b[1].classList.toggle('active',v==='droits');}},
   setKbLayout(id){
     if(!KB_LAYOUTS[id])return;
     setKbLayoutId(id);
