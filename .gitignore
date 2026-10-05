@@ -6,3 +6,10 @@ game-server/dist/
 
 # Workflows CI gérés via GitHub web (le token PAT n'a pas le scope workflow)
 .github/workflows/
+
+# Documents de travail volumineux (programmes officiels fournis par les réseaux) : ne jamais les versionner ni les déployer
+Programme CPEONS/
+Programme FELSI/
+Programme WBE/
+TeachInSteam-Guide.pdf
+images/personnages/

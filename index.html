@@ -1203,76 +1203,6 @@ a.nav-link{text-decoration:none;display:inline-block}
   .cl-row .cl-btn{margin-left:auto}
 }
 
-/* MODULES HUB (page Cours) */
-.modules-hub-page{max-width:1120px;margin:0 auto;padding:0 24px 8px}
-/* Style repris de la brochure imprimée : grand chiffre gras à l'accent,
-   libellé discret en dessous, sans carte ni encadré — pensé pour un fond
-   blanc/crème, pas pour flotter sur .home-hero. */
-.hub-stats-row{display:flex;align-items:center;gap:48px;margin:18px 0 48px;flex-wrap:wrap}
-.hub-stat b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-size:64px;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-0.02em}
-.hub-stat span{font-size:15px;color:var(--muted);font-weight:600}
-.hub-stat-divider{width:1px;height:56px;background:var(--border)}
-@media(max-width:560px){.hub-stats-row{gap:28px;margin:12px 0 38px}.hub-stat b{font-size:44px}.hub-stat-divider{height:42px}}
-.hub-section-hdr{margin-bottom:18px}
-.hub-section-hdr h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:4px}
-.hub-section-hdr p{color:var(--muted);font-size:14.5px}
-.selectorD{position:relative;display:grid;grid-template-columns:240px 1fr;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:28px;padding:16px;min-height:440px;box-shadow:0 30px 60px -35px rgba(22,20,15,.3);margin-bottom:44px}
-@media(max-width:760px){.selectorD{grid-template-columns:1fr;min-height:0}}
-.tabsD1{position:relative;display:flex;flex-direction:column;gap:2px;padding:8px 6px}
-@media(max-width:760px){.tabsD1{flex-direction:row;overflow-x:auto;padding-bottom:4px}}
-.tabs-slider{position:absolute;left:6px;right:6px;top:8px;height:58px;border-radius:15px;transition:transform .4s cubic-bezier(.2,.9,.25,1.1),background .4s;z-index:0;box-shadow:0 12px 26px -8px var(--slider-color,rgba(0,0,0,.3))}
-@media(max-width:760px){.tabs-slider{display:none}}
-.tabD1{position:relative;z-index:1;display:flex;align-items:center;gap:11px;background:none;border:none;border-radius:15px;padding:12px 14px;text-align:left;transition:color .3s;flex-shrink:0;color:var(--txt);height:58px;width:100%;font:inherit;cursor:pointer}
-@media(max-width:760px){.tabD1{background:var(--light)}}
-.tabD1.active{color:#fff}
-@media(max-width:760px){.tabD1.active{color:#fff;background:var(--m-color)}}
-.tabD1-badge{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:var(--m-color);transition:transform .3s,background .3s;box-shadow:0 6px 14px -4px var(--m-color)}
-.tabD1.active .tabD1-badge{background:rgba(255,255,255,.28);box-shadow:none;transform:scale(1.08) rotate(-4deg)}
-.tabD1-txt{font-size:13.5px;font-weight:800;line-height:1.25}
-.tabD1-txt small{display:block;font-weight:600;font-size:10.5px;opacity:.8;margin-top:1px}
-.stageD1{position:relative;overflow:hidden;border-radius:20px;display:flex;align-items:center;gap:32px;padding:38px 42px;min-height:400px;background:var(--m-grad)}
-@media(max-width:640px){.stageD1{flex-direction:column;text-align:center;padding:32px 24px;gap:20px}}
-.stageD1-blob{position:absolute;border-radius:50%;filter:blur(46px);pointer-events:none;background:rgba(255,255,255,.4);animation:blobFloat 7s ease-in-out infinite}
-.stageD1-blob.b1{width:220px;height:220px;top:-60px;right:-40px;animation-delay:0s}
-.stageD1-blob.b2{width:160px;height:160px;bottom:-50px;left:20%;background:rgba(0,0,0,.08);animation-delay:1.2s}
-@keyframes blobFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-14px) scale(1.05)}}
-.stageD1-mascot-wrap{position:relative;flex-shrink:0;height:220px}
-.stageD1-mascot{position:relative;z-index:2;height:220px;width:auto;filter:drop-shadow(0 18px 22px rgba(0,0,0,.28));animation:mascotPop .5s cubic-bezier(.2,.9,.25,1.2)}
-@keyframes mascotPop{from{opacity:0;transform:translateY(18px) scale(.92)}to{opacity:1;transform:none}}
-/* Deux points de contact (chaise + pied de bureau), pas un seul dégradé radial
-   centré : l'image source coupe les deux au ras du bord (aucun des deux ne
-   touche vraiment le sol dans le visuel d'origine), et un seul point chaud
-   centré entre les deux ne "grounde" visiblement que celui le plus proche du
-   centre — l'autre reste en bord de dégradé, quasi invisible. Positions en %
-   de la largeur de l'image elle-même (via le wrapper), pas de la carte
-   entière : reste juste si l'image change de taille (mobile compris). */
-.stageD1-ground{position:absolute;z-index:1;inset:0;
-  background-image:radial-gradient(closest-side,rgba(0,0,0,.3),transparent 75%),radial-gradient(closest-side,rgba(0,0,0,.3),transparent 75%);
-  background-repeat:no-repeat,no-repeat;
-  background-size:24% 30px,18% 30px;
-  background-position:16% 100%,65% 100%;
-  filter:blur(3px)}
-.stageD1-body{position:relative;z-index:2;min-width:0;animation:bodyIn .45s ease .05s both}
-@keyframes bodyIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.stageD1-cat{display:inline-flex;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:rgba(255,255,255,.22);padding:4px 11px;border-radius:20px;margin-bottom:12px}
-.stageD1-body h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;margin-bottom:10px;letter-spacing:-.01em;color:#fff}
-.stageD1-body p{font-size:14.5px;color:rgba(255,255,255,.92);line-height:1.55;max-width:360px;margin-bottom:20px}
-.stageD1-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-@media(max-width:640px){.stageD1-foot{justify-content:center}}
-.stageD1-status{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.22);color:#fff}
-.stageD1-cta{background:#fff;border:none;border-radius:14px;padding:13px 24px;font-weight:800;font-size:15px;box-shadow:0 10px 22px rgba(0,0,0,.22);animation:ctaPulse 2.6s ease-in-out infinite;transition:transform .15s;cursor:pointer;font:inherit}
-.stageD1-cta:hover{transform:translateY(-2px)}
-.stageD1-cta:disabled{cursor:default}
-@keyframes ctaPulse{0%,100%{box-shadow:0 10px 22px rgba(0,0,0,.22)}50%{box-shadow:0 12px 30px rgba(0,0,0,.34)}}
-@media(prefers-reduced-motion:reduce){.stageD1-blob,.stageD1-mascot,.stageD1-body,.stageD1-cta,.stage-decor{animation:none}}
-.stage-decor{position:absolute;animation:keyFloat 4.4s ease-in-out infinite}
-@keyframes keyFloat{0%,100%{transform:translateY(0) rotate(var(--r,-4deg))}50%{transform:translateY(-10px) rotate(calc(-1 * var(--r,-4deg)))}}
-@media(max-width:640px){.stage-decor{display:none!important}}
-.stage-chip{z-index:2;background:rgba(255,255,255,.92);border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;box-shadow:0 8px 16px rgba(0,0,0,.18)}
-.stage-tag{z-index:2;background:rgba(255,255,255,.24);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;letter-spacing:.04em;padding:5px 11px;border-radius:20px;box-shadow:0 6px 14px rgba(0,0,0,.15);white-space:nowrap}
-.stage-card{z-index:2;background:rgba(255,255,255,.96);border-radius:12px;padding:9px 13px;box-shadow:0 10px 20px rgba(0,0,0,.2);text-align:left}
-.stage-card-poem{font-family:Georgia,serif;font-style:italic;font-weight:400;font-size:12px;color:var(--txt);line-height:1.45;max-width:165px}
-
 /* GAMES */
 .games-section{max-width:1120px;margin:0 auto;padding:24px}
 .game-arena{background:#16140F;border-radius:24px;padding:20px;position:relative;height:520px;overflow:hidden;margin-bottom:24px}
@@ -4649,74 +4579,6 @@ const CURRICULUM=[
 ];
 const MOD_COLORS=['#EE6B5E','#F4A04C','#D9A60C','#5BA84A','#3FA6B2','#6E8BE8','#A77BD6','#E8729A','#4CB8C4','#9B59B6','#E67E22','#27AE60','#2980B9'];
 
-/* Page Cours : sélecteur de modules (hub) affiché avant la liste de leçons */
-const HUB_MODULES=[
-  {id:'bases', color:'#FF4D2E', grad:'linear-gradient(135deg,#FF8A5C 0%,#FF4D2E 55%,#E8391D 100%)', icon:'⌨️', img:'/images/keypace-mascot-bureau-complet.webp', groundShadow:true,
-    cat:'Découverte', title:'La base de la dactylographie',
-    desc:"De la rangée de base (Q, S, D, F…) jusqu'aux accents, chiffres et symboles : 65 leçons progressives pour taper sans regarder le clavier.",
-    status:'live', statusTxt:'Disponible', cta:'Commencer →',
-    decor:[
-      {t:'chip', c:'A', top:'9%', left:'6%', size:38, delay:'0s', r:'-6deg'},
-      {t:'chip', c:'Z', bottom:'15%', right:'9%', size:38, delay:'.7s', r:'8deg'},
-      {t:'chip', c:'F', top:'60%', left:'3%', size:32, delay:'1.3s', r:'-8deg'},
-      {t:'chip', c:'⏎', top:'16%', right:'6%', size:34, delay:'1.9s', r:'6deg'},
-      {t:'chip', c:'🚀', top:'6%', right:'23%', size:46, delay:'.4s', r:'10deg'},
-      {t:'star', c:'✦', top:'22%', right:'13%', delay:'1s'},
-      {t:'star', c:'✦', bottom:'32%', left:'17%', delay:'1.6s'}
-    ]},
-  {id:'mail', color:'#4F6BE0', grad:'linear-gradient(135deg,#8DA2FF 0%,#4F6BE0 55%,#3A50C4 100%)', icon:'✉️', img:'/images/keypace-mascot-mail-allonge.webp',
-    cat:'Écriture', title:'Rédiger un mail',
-    desc:"Où écrire quoi, le ton juste selon la personne, repérer et corriger les erreurs, puis écrire ton propre mail avec une analyse en direct. Termine par un quiz final.",
-    status:'live', statusTxt:'Disponible', cta:'Commencer →', href:'/cours/ecrire-un-mail',
-    decor:[]},
-  {id:'conj', color:'#3FA84E', grad:'linear-gradient(135deg,#7BDD7C 0%,#3FA84E 55%,#2C8A3C 100%)', icon:'📖', img:'/images/keypace-mascot-conjugaison-reflexion.webp',
-    cat:'Grammaire', title:'Conjugaison',
-    desc:"Des règles de base du présent jusqu'aux temps les plus complexes, avec des mises en situation dans des phrases et des textes à trous.",
-    status:'soon', statusTxt:'Bientôt', cta:'Bientôt',
-    decor:[]},
-  {id:'poemes', color:'#9B57D6', grad:'linear-gradient(135deg,#D4A3F5 0%,#9B57D6 55%,#7C3CB8 100%)', icon:'✍️', img:'/images/keypace-mascot-poeme-stylo.webp',
-    cat:'Poésie', title:'Les poèmes',
-    desc:"Les règles des rimes et du rythme : de quoi écrire tes propres poèmes, et redécouvrir des classiques de façon ludique.",
-    status:'soon', statusTxt:'Bientôt', cta:'Bientôt',
-    decor:[
-      {t:'tag', c:'LA FONTAINE', top:'9%', left:'5%', delay:'0s', r:'-3deg'},
-      {t:'tag', c:'PRÉVERT', bottom:'17%', left:'6%', delay:'.8s', r:'3deg'},
-      {t:'tag', c:'chagrin', bottom:'34%', right:'26%', delay:'.5s', r:'-2deg'},
-      {t:'tag', c:'🔁 rime', bottom:'25%', right:'15%', delay:'1s', r:'0deg'},
-      {t:'tag', c:'matin', bottom:'16%', right:'5%', delay:'1.4s', r:'2deg'},
-      {t:'poemcard', bottom:'3%', right:'4%', delay:'1.1s', r:'-2deg'}
-    ]}
-];
-function hubDecorHTML(mod){
-  return mod.decor.map(item=>{
-    let pos='';
-    ['top','left','right','bottom'].forEach(k=>{if(item[k]!=null)pos+=k+':'+item[k]+';';});
-    const delayStyle=item.delay?'animation-delay:'+item.delay+';':'';
-    const rVar=item.r?'--r:'+item.r+';':'';
-    if(item.t==='chip')return`<div class="stage-decor stage-chip" style="${pos}${rVar}${delayStyle}width:${item.size}px;height:${item.size}px;font-size:${Math.round(item.size*0.46)}px">${item.c}</div>`;
-    if(item.t==='tag')return`<div class="stage-decor stage-tag" style="${pos}${rVar}${delayStyle}">${item.c}</div>`;
-    if(item.t==='star')return`<span class="stage-decor stage-star" style="${pos}${delayStyle}">${item.c}</span>`;
-    if(item.t==='poemcard')return`<div class="stage-decor stage-card stage-card-poem" style="${pos}${rVar}${delayStyle}">« Deux rimes, un rythme,<br>une phrase qui s'envole… »</div>`;
-    return'';
-  }).join('');
-}
-function hubStageHTML(mod){
-  return`<div class="stageD1-blob b1"></div><div class="stageD1-blob b2"></div>${hubDecorHTML(mod)}
-    <div class="stageD1-mascot-wrap">
-      <img class="stageD1-mascot" src="${mod.img}" alt="">
-      ${mod.groundShadow?'<div class="stageD1-ground"></div>':''}
-    </div>
-    <div class="stageD1-body">
-      <span class="stageD1-cat">${mod.cat}</span>
-      <h3>${mod.title}</h3>
-      <p>${mod.desc}</p>
-      <div class="stageD1-foot">
-        <span class="stageD1-status">${mod.statusTxt}</span>
-        <button class="stageD1-cta" style="color:${mod.color}" ${mod.status==='live'?`onclick="${mod.href?`location.href='${mod.href}'`:'app.enterBasesModule()'}"`:'disabled'}>${mod.cta}</button>
-      </div>
-    </div>`;
-}
-
 /* Anecdotes affichées aléatoirement dans le hub (page Cours), une par visite */
 const HUB_FUN_FACTS=[
   "La lettre E est la plus utilisée en français : environ une lettre sur sept tapée est un E.",
@@ -4807,13 +4669,6 @@ const IS_TOUCH_ONLY=()=>!_kbDetected&&!!(window.matchMedia&&window.matchMedia('(
   },{passive:true});
 })();
 
-/* Sélecteur de modules (page Cours) : replace le curseur sous l'onglet actif si la fenêtre est redimensionnée */
-window.addEventListener('resize',()=>{
-  const slider=document.getElementById('hubSlider');
-  const activeEl=document.querySelector('#hubTabs .tabD1.active');
-  if(slider&&activeEl&&window.innerWidth>760)slider.style.transform='translateY('+(activeEl.offsetTop-8)+'px)';
-});
-
 function genSprintText(){
   const pool=[...SPRINT_WORDS,...WORDS];
   const pick=()=>pool[Math.floor(Math.random()*pool.length)];
@@ -4888,6 +4743,467 @@ function gcineComputeLayout(){
   return {layout,cx,cy};
 }
 const GCINE_LAYOUT=gcineComputeLayout();
+
+/* ===== Page Cours : choix du programme par réseau et par année + liste des modules =====
+   Affichée dans un Shadow DOM : son style ne peut ni déborder sur le reste de l'appli ni être cassé par lui. */
+const KPCours=(function(){
+const KP_CSS=":host{display:block}\n.kp-root{background:transparent}\n:host{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA;--success:#1FA971}\n.modules-hub-page{max-width:1120px;margin:0 auto;padding:24px 24px 60px}\n.page-title{text-align:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(38px,5.6vw,72px);letter-spacing:-0.03em;line-height:1.05;margin:36px 0 16px}\n.page-title span{color:var(--accent)}\n.page-sub{text-align:center;font-size:17px;color:#7A7365;line-height:1.6;max-width:560px;margin:0 auto 40px}\n.main-hero{position:relative;overflow:hidden;border-radius:28px;display:flex;align-items:center;justify-content:center;gap:48px;padding:48px 56px;min-height:420px;margin-bottom:56px;background:linear-gradient(135deg,#FF8A5C 0%,#FF4D2E 55%,#E8391D 100%);box-shadow:0 30px 60px -30px rgba(232,57,29,.55)}\n.mh-mascot{position:relative;z-index:2;height:300px;width:auto;flex-shrink:0;filter:drop-shadow(0 18px 22px rgba(0,0,0,.28))}\n.mh-body{position:relative;z-index:2;max-width:470px}\n.mh-cat{display:inline-flex;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:rgba(255,255,255,.22);padding:5px 13px;border-radius:20px;margin-bottom:14px}\n.mh-body h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,4vw,46px);line-height:1.08;letter-spacing:-.02em;color:#fff;margin-bottom:14px}\n.mh-body p{font-size:16px;color:rgba(255,255,255,.92);line-height:1.6;margin-bottom:26px}\n.mh-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}\n.mh-status{font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.22);color:#fff}\n.mh-cta{background:#fff;color:var(--accent);border:none;border-radius:16px;padding:16px 30px;font-weight:800;font-size:17px;box-shadow:0 10px 22px rgba(0,0,0,.22);transition:transform .15s}\n.mh-cta:hover{transform:translateY(-2px)}\n.mh-chip{position:absolute;z-index:1;width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.92);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:18px;box-shadow:0 8px 16px rgba(0,0,0,.18);animation:keyFloat 4.4s ease-in-out infinite}\n.mh-chip.big{width:54px;height:54px;font-size:26px}\n.mh-chip.c1{top:9%;left:5%}\n.mh-chip.c2{bottom:12%;right:6%;animation-delay:.7s}\n.mh-chip.c3{top:62%;left:3%;animation-delay:1.3s}\n.mh-chip.c4{top:14%;right:5%;animation-delay:1.9s}\n.mh-chip.c5{top:7%;right:22%;animation-delay:.4s}\n@keyframes keyFloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-10px) rotate(4deg)}}\n@media(max-width:760px){.main-hero{flex-direction:column;text-align:center;padding:36px 24px;gap:20px}.mh-mascot{height:210px}.mh-foot{justify-content:center}.mh-chip{display:none}}\n@media(prefers-reduced-motion:reduce){.mh-chip{animation:none}}\n.prog{margin-top:20px}\n.hub-section-hdr{margin-bottom:18px}\n.hub-section-hdr h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin-bottom:4px}\n.hub-section-hdr p{color:var(--muted);font-size:14.5px}\n.prog{position:relative;background:var(--card);border:1px solid var(--border);border-radius:28px;padding:16px;margin-bottom:44px;box-shadow:0 30px 60px -35px rgba(22,20,15,.3)}\n.prog-eyebrow{display:inline-flex;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:rgba(255,77,46,.1);padding:4px 11px;border-radius:20px;margin-bottom:10px}\n\n.net{position:relative;display:flex;align-items:center;gap:12px;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;text-align:left;color:var(--txt);transition:transform .12s,border-color .15s,box-shadow .15s}\n.net:hover{transform:translateY(-2px);border-color:#FFB199;box-shadow:0 12px 24px -16px rgba(40,30,15,.4)}\n.net b{display:block;font-size:14px;font-weight:800;line-height:1.25}\n.net small{display:block;font-size:11.5px;color:var(--muted);font-weight:600;margin-top:1px}\n.net.sel{border-color:var(--accent);background:rgba(255,77,46,.05);box-shadow:0 0 0 3px rgba(255,77,46,.12)}\n.net.sel::after{content:\"✓\";position:absolute;top:10px;right:12px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center}\n.year{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 16px 14px;text-align:left;color:var(--txt);transition:transform .12s,box-shadow .12s,border-color .15s}\n.year:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 14px 26px -16px var(--c)}\n.year::before{content:\"\";position:absolute;top:-30px;right:-30px;width:90px;height:90px;border-radius:50%;background:var(--c);opacity:.12}\n.duo{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}\n.duo .col{min-width:0}\n@media(max-width:980px){.duo{grid-template-columns:1fr}}\n.duo .selectorD{grid-template-columns:1fr;min-height:0;margin-bottom:0}\n.duo .stageD1{flex-direction:column;text-align:center;min-height:380px;justify-content:center;padding:30px 26px;gap:14px}\n.duo .stageD1-mascot{height:170px}\n.duo .stageD1-body p{margin-left:auto;margin-right:auto;max-width:400px}\n.duo .stageD1-foot{justify-content:center}\n.duo .stageD1-body h3{font-size:26px}\n.duo .prog{margin:0}\n.duo .stageD1{min-height:340px}\n.mod-pick{padding:16px 6px 4px}\n.mod-pick-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}\n.mod-count{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}\n.mtile-ico{flex-shrink:0;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;color:#fff;background:var(--m-color);box-shadow:0 5px 10px -4px var(--m-color)}\n.mlist{padding:0 2px}\n.mlist h4{display:flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:13px;margin:14px 0 6px}\n.mlist h4:first-child{margin-top:2px}\n.mlist h4::before{content:\"\";width:8px;height:8px;border-radius:50%;background:var(--c)}\n.mlist h4::after{content:\"\";flex:1;height:1px;background:var(--border)}\n.mrow{width:100%;display:flex;align-items:center;gap:10px;background:none;border:1.5px solid transparent;border-radius:12px;padding:6px 8px;text-align:left;transition:background .15s,border-color .15s}\n.mrow:hover{background:var(--light)}\n.mrow.on{background:#fff;border-color:var(--m-color);box-shadow:0 8px 16px -10px var(--m-color)}\n.mrow b{flex:1;font-size:13px;font-weight:700}\n.mst{font-size:10.5px;font-weight:700;color:var(--muted)}\n.mst.live{color:var(--success)}\n.duo{grid-template-columns:1fr;gap:48px}\n.duo .stageD1{flex-direction:row;text-align:left;min-height:320px;padding:34px 42px;gap:36px;justify-content:flex-start}\n.duo .stageD1-mascot{height:210px}\n.duo .stageD1-body p{margin-left:0;margin-right:0}\n.duo .stageD1-foot{justify-content:flex-start}\n.duo .stageD1-body h3{font-size:30px}\n.duo .mlist{display:grid;grid-template-columns:repeat(2,1fr);column-gap:28px;align-items:start}\n.duo .mlist h4{grid-column:1/-1}\n@media(max-width:760px){.duo .stageD1{flex-direction:column;text-align:center;padding:28px 22px}.duo .stageD1-body p{margin-left:auto;margin-right:auto}.duo .stageD1-foot{justify-content:center}.duo .mlist{grid-template-columns:1fr}}\n.hub-section-hdr{min-height:58px}\n.selectorD{position:relative;display:grid;grid-template-columns:240px 1fr;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:28px;padding:16px;min-height:440px;box-shadow:0 30px 60px -35px rgba(22,20,15,.3);margin-bottom:44px}\n@media(max-width:760px){.selectorD{grid-template-columns:1fr;min-height:0}}\n.stageD1{position:relative;overflow:hidden;border-radius:20px;display:flex;align-items:center;gap:32px;padding:38px 42px;min-height:400px;background:var(--m-grad)}\n@media(max-width:640px){.stageD1{flex-direction:column;text-align:center;padding:32px 24px;gap:20px}}\n.stageD1-mascot{position:relative;height:220px;width:auto;filter:drop-shadow(0 18px 22px rgba(0,0,0,.28))}\n.stageD1-body{position:relative;min-width:0}\n.stageD1-cat{display:inline-flex;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:rgba(255,255,255,.22);padding:4px 11px;border-radius:20px;margin-bottom:12px}\n.stageD1-body h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;margin-bottom:10px;color:#fff}\n.stageD1-body p{font-size:14.5px;color:rgba(255,255,255,.92);line-height:1.55;max-width:360px;margin-bottom:20px}\n.stageD1-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}\n.stageD1-status{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.22);color:#fff}\n.stageD1-cta{background:#fff;border:none;border-radius:14px;padding:13px 24px;font-weight:800;font-size:15px;box-shadow:0 10px 22px rgba(0,0,0,.22)}\n.duo .stageD1{gap:30px}\n.duo .stageD1-mascot{height:170px}\n.duo .stageD1-body p{max-width:320px}\n.demo-col{flex-shrink:0;width:316px;position:relative;z-index:2}\n.demo{background:#fff;border-radius:18px;box-shadow:0 22px 40px -16px rgba(0,0,0,.45);overflow:hidden;transform:rotate(1.6deg);animation:demoIn .55s cubic-bezier(.2,.9,.25,1.1) both;color:var(--txt);font-size:12.5px}\n@keyframes demoIn{from{opacity:0;transform:translateY(16px) rotate(4deg) scale(.96)}}\n.demo-bar{display:flex;align-items:center;gap:5px;padding:9px 12px;background:#F4F1EA;border-bottom:1px solid #E7E1D5}\n.demo-bar i{width:9px;height:9px;border-radius:50%;background:#E0D9C9}\n.demo-bar i:first-child{background:#FF8A7A}\n.demo-bar i:nth-child(2){background:#FFD47A}\n.demo-bar i:nth-child(3){background:#8FDFA0}\n.demo-bar span{margin-left:6px;font-size:11px;font-weight:700;color:var(--muted)}\n.demo-body{position:relative;padding:14px;min-height:226px;line-height:1.45}\n.demo-cap{margin-top:10px;text-align:center;font-size:11px;font-weight:700;color:rgba(255,255,255,.88)}\n.cur::after{content:\"\";display:inline-block;width:2px;height:1.05em;background:var(--m-color,#4F6BE0);margin-left:1px;vertical-align:-.15em;animation:blink 1s steps(1) infinite}\n@keyframes blink{50%{opacity:0}}\n.d-f{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid #EEE8DB;min-height:27px}\n.d-f b{width:42px;flex-shrink:0;color:var(--muted);font-weight:700}\n.d-msg{white-space:pre-wrap;margin-top:10px;min-height:96px}\n.d-send{display:flex;align-items:center;gap:10px;margin-top:8px}\n.d-btn{border:none;border-radius:9px;padding:7px 14px;font-weight:800;font-size:12px;color:#fff;background:var(--m-color);transition:transform .15s,box-shadow .15s}\n.d-btn.press{transform:scale(.92);box-shadow:0 0 0 5px color-mix(in srgb,var(--m-color) 25%,transparent)}\n.d-pop{font-weight:800;color:var(--success);opacity:0;transform:translateY(6px);transition:.35s}\n.d-pop.on{opacity:1;transform:none}\n.d-bars{display:grid;gap:6px;margin:6px 0 10px}\n.d-bar{height:7px;border-radius:4px;background:#E9E3D6;width:0;transition:width .7s cubic-bezier(.2,.9,.25,1)}\n.d-sec{opacity:0;transform:translateY(10px);transition:opacity .5s,transform .5s}\n.d-sec.on{opacity:1;transform:none}\n.d-sec h5{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--m-color);margin-bottom:5px}\n.d-skill{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;margin:3px 0}\n.d-skill span{width:62px}\n.d-skill i{flex:1;height:7px;border-radius:4px;background:#EEE8DB;overflow:hidden}\n.d-skill i em{display:block;height:100%;width:0;border-radius:4px;background:var(--m-color);transition:width .8s cubic-bezier(.2,.9,.25,1)}\n.d-av{width:38px;height:38px;border-radius:50%;background:var(--m-color);flex-shrink:0;display:grid;place-items:center;color:#fff;font-weight:800}\n.d-sig{display:block;margin-top:6px}\n.d-sig path{fill:none;stroke:var(--m-color);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset 1.1s ease}\n.d-sig.on path{stroke-dashoffset:0}\n.d-mail{background:#F4F1EA;border-radius:10px;padding:8px 10px;margin-bottom:10px;font-size:11.5px}\n.d-mail b{display:block;font-size:11px;color:var(--muted)}\n.d-chip{display:inline-block;margin-top:8px;padding:5px 11px;border-radius:20px;background:rgba(31,169,113,.13);color:var(--success);font-weight:800;font-size:11.5px;opacity:0;transform:scale(.7);transition:.4s cubic-bezier(.3,1.6,.5,1)}\n.d-chip.on{opacity:1;transform:none}\n.d-disp{background:#16140F;color:#fff;border-radius:10px;padding:8px 12px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;min-height:42px;margin-bottom:8px;overflow:hidden;white-space:nowrap}\n.d-pad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}\n.d-key{height:34px;border-radius:9px;background:#F4F1EA;border-bottom:3px solid #DDD5C4;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:14px;transition:transform .1s,background .15s,color .15s}\n.d-key.on{background:var(--m-color);color:#fff;border-bottom-color:rgba(0,0,0,.25);transform:translateY(2px)}\n.d-box{border:1.5px dashed #D9CFBC;border-radius:10px;padding:9px 11px;min-height:38px;font-weight:700}\n.d-sel{background:color-mix(in srgb,var(--m-color) 25%,transparent);border-radius:3px;padding:1px 2px}\n.d-kbd{display:flex;justify-content:center;align-items:center;gap:6px;margin:10px 0}\n.d-kbd .d-key{min-width:46px;padding:0 10px;height:32px}\n.d-kbd em{font-style:normal;color:var(--muted);font-weight:800}\n.d-toast{position:absolute;top:10px;right:12px;background:var(--txt);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;opacity:0;transform:translateY(-6px);transition:.3s}\n.d-toast.on{opacity:1;transform:none}\n.d-in{border:1.5px solid #E7E1D5;border-radius:9px;padding:7px 10px;margin-bottom:8px;min-height:32px;font-weight:700;transition:border-color .25s,box-shadow .25s}\n.d-in small{display:block;font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}\n.d-in.foc{border-color:var(--m-color);box-shadow:0 0 0 3px color-mix(in srgb,var(--m-color) 20%,transparent)}\n.d-check{display:flex;align-items:center;gap:8px;font-weight:700;margin:2px 0 10px}\n.d-check i{width:17px;height:17px;border-radius:5px;border:2px solid #CFC6B3;display:grid;place-items:center;color:#fff;font-style:normal;font-size:11px;transition:.25s}\n.d-check.on i{background:var(--m-color);border-color:var(--m-color)}\n.d-big{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;line-height:1.25;min-height:52px;display:flex;align-items:center;flex-wrap:wrap}\n.d-big mark{background:rgba(255,77,46,.18);color:var(--accent);border-radius:4px;padding:0 2px}\n.d-tag{margin-top:10px;display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;background:color-mix(in srgb,var(--m-color) 14%,#fff);color:var(--m-color);min-height:22px}\n.d-ans{display:inline-block;min-width:72px;border-bottom:2px solid var(--m-color);color:var(--m-color);text-align:center}\n.d-chips{display:flex;gap:8px;margin-top:12px}\n.d-opt{padding:7px 16px;border-radius:10px;background:#F4F1EA;font-weight:800;border:2px solid transparent;transition:.25s}\n.d-opt.bad{background:#FFE2DE;border-color:#FF7A6B;animation:shake .4s}\n.d-opt.good{background:#DDF6E8;border-color:var(--success);color:var(--success)}\n@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}\n.d-wave{display:flex;align-items:center;gap:4px;height:44px;margin-bottom:8px}\n.d-wave i{width:5px;border-radius:3px;background:var(--m-color);height:8px;opacity:.35;transition:opacity .3s}\n.d-wave.on i{opacity:1;animation:wv .7s ease-in-out infinite alternate;animation-delay:calc(var(--i)*60ms)}\n@keyframes wv{from{height:8px}to{height:40px}}\n.d-err{text-decoration:underline wavy #FF4D2E;text-underline-offset:3px}\n.d-ok{color:var(--success);font-weight:800}\n.d-poem{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:600;line-height:1.7;min-height:60px}\n.d-poem .rw{color:var(--m-color);font-weight:800;border-bottom:2.5px solid var(--m-color)}\n.d-note{margin:5px 0;font-weight:600;min-height:20px}\n.d-note.star{background:linear-gradient(transparent 55%,rgba(255,212,60,.55) 55%)}\n.d-bar2{display:flex;gap:6px;margin-bottom:10px}\n.d-bar2 span{width:30px;height:26px;border-radius:7px;background:#F4F1EA;display:grid;place-items:center;font-weight:800;font-size:12px;transition:.2s}\n.d-bar2 span.on{background:var(--m-color);color:#fff;transform:scale(1.12)}\n.d-h{font-weight:700;transition:font-size .4s,font-family .4s}\n.d-h.big{font-family:'Bricolage Grotesque',sans-serif;font-size:21px;font-weight:800}\n.d-li{opacity:0;transform:translateX(-8px);transition:.4s}\n.d-li.on{opacity:1;transform:none}\n@media(max-width:1020px){.duo .stageD1{flex-wrap:wrap;justify-content:center}.demo-col{width:100%;max-width:380px}}\n.pbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:6px 0}\n.pbar-mascot{height:84px;width:auto;margin:-14px 0 -14px;filter:drop-shadow(0 10px 10px rgba(22,20,15,.2));transition:transform .5s cubic-bezier(.2,.9,.25,1)}\n.pbar:hover .pbar-mascot{transform:rotate(-5deg) scale(1.05)}\n.pbar-t{margin-right:8px}\n.pbar-t .prog-eyebrow{margin-bottom:6px}\n.pbar-t h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(22px,2.4vw,28px);letter-spacing:-.01em;line-height:1.1;max-width:250px}\n.sel{position:relative}\n.sel>button{display:flex;align-items:center;gap:12px;min-width:200px;justify-content:space-between;background:#fff;border:1.5px solid var(--border);border-radius:30px;padding:13px 20px;font-weight:800;font-size:14px;transition:border-color .2s,box-shadow .2s,transform .2s;box-shadow:0 8px 18px -14px rgba(22,20,15,.5)}\n.sel>button:hover,.sel.open>button{border-color:#FFB199;box-shadow:0 12px 22px -14px rgba(255,77,46,.6)}\n.sel>button span{color:var(--muted);font-weight:700}\n.sel>button.has span{color:var(--txt)}\n.sel>button svg{flex-shrink:0;transition:transform .3s}\n.sel.open>button svg{transform:rotate(180deg)}\n.sel .menu{position:absolute;z-index:30;top:calc(100% + 8px);left:0;min-width:100%;background:#fff;border:1px solid var(--border);border-radius:18px;box-shadow:0 24px 40px -18px rgba(22,20,15,.45);padding:6px;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .25s,transform .3s cubic-bezier(.2,.9,.25,1)}\n.sel.open .menu{opacity:1;transform:none;pointer-events:auto}\n.menu button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:none;background:none;padding:9px 12px;border-radius:11px;font-weight:700;font-size:13.5px;white-space:nowrap}\n.menu button:hover{background:var(--light)}\n.menu button i{width:9px;height:9px;border-radius:50%;background:var(--c)}\n.menu h6{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:8px 12px 3px}\n.pgo{margin-left:auto;border:none;border-radius:30px;padding:14px 26px;background:var(--accent);color:#fff;font-weight:800;font-size:15px;box-shadow:0 12px 22px -12px var(--accent);transition:transform .2s,opacity .3s;opacity:.35;pointer-events:none}\n.pgo.ready{opacity:1;pointer-events:auto}\n.pgo.ready:hover{transform:translateY(-2px)}\n.pfold{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s cubic-bezier(.2,.9,.25,1)}\n.pfold>div{overflow:hidden;min-height:0}\n.pfold.open{grid-template-rows:1fr}\n.pc{padding:28px 4px 6px}\n.pc-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}\n.pc-year{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;line-height:1;letter-spacing:-.03em;color:var(--c)}\n.pc-year small{font-size:.42em;letter-spacing:0;color:var(--txt);margin-left:6px}\n.pc-net{font-size:12px;font-weight:700;padding:5px 13px;border-radius:20px;background:rgba(255,77,46,.1);color:var(--accent)}\n.pc-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:46px;align-items:start}\n@media(max-width:860px){.pc-grid{grid-template-columns:1fr;gap:26px}.pbar-t h2{white-space:normal}.pgo{margin-left:0}}\n.pc h4{display:flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;margin-bottom:12px}\n.pc h4::after{content:\"\";flex:1;height:1px;background:var(--border)}\n.pc-in>*{animation:pcIn .6s cubic-bezier(.2,.9,.25,1) both}\n.pc-in>*:nth-child(2){animation-delay:.08s}\n.pc-in>*:nth-child(3){animation-delay:.16s}\n@keyframes pcIn{from{opacity:0;transform:translateY(14px)}}\n.ticks{display:flex;gap:2px;height:22px;margin-bottom:10px}\n.ticks i{flex:1;border-radius:3px;background:#E9E3D6;transition:background .4s,transform .4s}\n.ticks i.on{background:var(--accent);transform:scaleY(1.25)}\n.pc-go{margin-top:16px;display:inline-flex;align-items:center;gap:8px;border:none;border-radius:14px;padding:12px 22px;background:var(--txt);color:#fff;font-weight:800;font-size:14px;transition:transform .2s}\n.pc-go:hover{transform:translateY(-2px)}\n.pc-empty{font-size:13.5px;color:var(--muted)}\n.tl-wrap{position:relative;padding-top:34px;margin-bottom:6px}\n.pin-lab{position:absolute;top:0;white-space:nowrap;background:var(--accent);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.02em;padding:4px 12px;border-radius:20px;box-shadow:0 8px 14px -8px var(--accent)}\n.pin-lab.c{transform:translateX(-50%)}\n.pin-lab.r{transform:none}\n.pin-tri{position:absolute;top:24px;width:0;height:0;border:6px solid transparent;border-top-color:var(--accent);border-bottom:0;transform:translateX(-50%)}\n.ticks{margin-bottom:0}\n.ticks i.known{background:#7FD3AA}\n.ticks i.later{background:#E9E3D6}\n.ticks i.on{background:var(--accent);transform:scaleY(1.45);box-shadow:0 6px 12px -6px var(--accent)}\n.legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 18px;margin-top:16px}\n@media(max-width:560px){.legend{grid-template-columns:1fr}}\n.lg{display:flex;align-items:center;gap:11px}\n.lg>i{flex-shrink:0;width:14px;height:14px;border-radius:4px}\n.lg.known>i{background:#7FD3AA}\n.lg.now>i{background:var(--accent)}\n.lg.later>i{background:#E9E3D6}\n.lg b{display:block;font-size:13.5px;font-weight:800;line-height:1.2}\n.lg span{display:block;font-size:12.5px;color:var(--muted);font-weight:600}\n.lg.now b{color:var(--accent)}\n.lg.none{opacity:.55}\n.pc-src{margin-left:auto;font-size:11.5px;font-weight:700;color:#2F7A57;background:#E5F5EC;border:1px solid #BFE5D0;padding:5px 12px;border-radius:20px}\n.pc-intro{margin:-6px 0 20px;font-size:14px;font-style:italic;color:#6F6757;max-width:760px}\n.h4-tag{font-family:-apple-system,sans-serif;font-size:10.5px;font-weight:800;letter-spacing:.02em;color:var(--muted);background:var(--light);padding:2px 8px;border-radius:20px;margin-left:6px}\n.whys{margin-top:14px;display:grid;gap:8px}\n.why{display:flex;align-items:baseline;gap:8px;font-size:12.5px;line-height:1.4;color:#5C5547}\n.why em{font-style:normal;color:var(--muted);font-weight:700;white-space:nowrap}\n.wtag{flex-shrink:0;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}\n.wtag.prog{background:#E5F5EC;color:#2F7A57}\n.wtag.choix{background:#FFF1E0;color:#B25A1C}\n.pc-pending{background:#FFF8EC;border:1.5px dashed #F0C48A;border-radius:16px;padding:18px 20px;font-size:14px;line-height:1.55;color:#6B5A3A;max-width:720px}\n@media(min-width:1000px){.pbar{flex-wrap:nowrap}.pbar-t h2{max-width:215px}.sel{flex:1 1 235px;min-width:0}.sel>button{width:100%;min-width:0}.sel>button span{line-height:1.2;text-align:left}.pgo{flex-shrink:0}.pbar-t{flex-shrink:0}}\n.pc-intro.warn{font-style:normal;font-weight:700;color:#7A5B25;background:#FFF8EC;border:1px solid #F3D9A8;border-radius:12px;padding:9px 14px;max-width:820px}\n.pc-netnote{margin:-6px 0 18px;font-size:12.5px;line-height:1.5;border-radius:12px;padding:9px 14px;max-width:820px}\n.pc-netnote b{margin-right:4px}\n.pc-netnote.ok{background:#E8F6EE;color:#25694B;border:1px solid #BFE5D0}\n.pc-netnote.part{background:#FFF8EC;color:#7A5B25;border:1px solid #F3D9A8}\n.pc-netnote.ko{background:#FFF8EC;color:#7A5B25;border:1px solid #F3D9A8}\n.funfact{text-align:center;margin:64px 0 32px}\n.funfact-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:7px}\n.funfact-txt{font-size:15px;color:var(--txt);font-weight:600;max-width:620px;margin:0 auto;line-height:1.5}\n.mini-note{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5}\n.mini-list{display:grid;gap:10px}\n.mini{position:relative;display:flex;gap:12px;background:#fff;border:1.5px dashed #DCD3C2;border-radius:16px;padding:14px;transition:transform .25s cubic-bezier(.2,.9,.25,1),box-shadow .25s,border-color .25s}\n.mini:hover{transform:translateY(-3px);box-shadow:0 14px 24px -16px rgba(40,30,15,.45)}\n.mini.live{border-style:solid;border-color:#BFE5D0;background:linear-gradient(#fff,#F4FBF7)}\n.mini-ico{flex-shrink:0;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:19px;color:#fff;background:var(--c);opacity:.85;box-shadow:0 6px 12px -6px var(--c)}\n.mini.live .mini-ico{opacity:1}\n.mini-b{min-width:0;flex:1}\n.mini-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}\n.mini-top b{font-size:14px;font-weight:800;line-height:1.25;padding-top:3px}\n.mini-top .mini-go{flex-shrink:0;white-space:nowrap}\n.mini-b>span{display:block;font-size:12.5px;color:#6F6757;line-height:1.4;margin-top:3px}\n.mini-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:9px}\n.mini-tag{font-size:10.5px;font-weight:700;color:var(--muted);background:var(--light);padding:2px 8px;border-radius:20px}\n.mini-go{border:none;background:var(--success);color:#fff;border-radius:20px;padding:4px 12px;font-size:11.5px;font-weight:800}\n.mini-go.soft{background:var(--light);color:var(--txt)}\n.mini-go.soft:hover{background:#fff;box-shadow:0 0 0 1.5px var(--border)}\n.mini-src{margin-top:8px}\n.mini-src summary{cursor:pointer;font-size:11.5px;font-weight:700;color:var(--muted);list-style:none}\n.mini-src summary::before{content:\"▸ \";transition:transform .2s;display:inline-block}\n.mini-src[open] summary::before{transform:rotate(90deg)}\n.mini-src blockquote{font-size:12px;line-height:1.5;color:#5C5547;border-left:3px solid var(--c);padding-left:9px;margin-top:7px}\n.mini-src blockquote i{display:block;font-style:normal;font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--c);margin-bottom:2px}\n.mst.expert{color:var(--accent)}\n.pc-note{font-size:12.5px;color:#7A5B25;background:#FFF8EC;border:1px solid #F3D9A8;border-radius:10px;padding:7px 12px;margin:14px 0 0;line-height:1.45}\n.pc-note+.pc-go{margin-top:10px}";
+const KP_HTML="\n\n<div class=\"modules-hub-page\">\n  <h1 class=\"page-title\">Choisis ton <span>module<\/span> du jour.<\/h1>\n  <p class=\"page-sub\">Chaque module est <strong>indépendant<\/strong> : commence par celui qui t'intéresse, reviens aux autres quand tu veux.<\/p>\n\n  <!-- 1. BLOC PRINCIPAL : DACTYLOGRAPHIE -->\n  <section class=\"main-hero\" id=\"mainHero\">\n    <div class=\"mh-chip c1\">A<\/div><div class=\"mh-chip c2\">Z<\/div><div class=\"mh-chip c3\">F<\/div><div class=\"mh-chip c4\">⏎<\/div><div class=\"mh-chip c5 big\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" width=\"1em\" height=\"1em\" style=\"color:#FF4D2E\"><path d=\"M12 2.5c2.3 2 3.7 5.2 3.7 8.5 0 1.9-.5 3.7-1.4 5.1L12 18.5l-2.3-2.4c-.9-1.4-1.4-3.2-1.4-5.1 0-3.3 1.4-6.5 3.7-8.5z\"/><circle cx=\"12\" cy=\"9.5\" r=\"1.4\" fill=\"currentColor\" stroke=\"none\"/><path d=\"M9 16l-2.5 1.5.5-3\"/><path d=\"M15 16l2.5 1.5-.5-3\"/><\/svg><\/div>\n    <img class=\"mh-mascot\" src=\"images/keypace-mascot-bureau-complet.webp\" alt=\"\">\n    <div class=\"mh-body\">\n      <span class=\"mh-cat\">Découverte<\/span>\n      <h2>La base de la dactylographie<\/h2>\n      <p>De la rangée de base (Q, S, D, F…) jusqu'aux accents, chiffres et symboles : 65 leçons progressives pour taper sans regarder le clavier.<\/p>\n      <div class=\"mh-foot\"><span class=\"mh-status\">Disponible<\/span><button class=\"mh-cta\" id=\"heroCta\" type=\"button\">Commencer →<\/button><\/div>\n    <\/div>\n  <\/section>\n\n  <!-- 2. MODULES + PROGRAMME, côte à côte -->\n  <div class=\"duo\">\n<div class=\"col\">\n  <div class=\"pbar-wrap\" id=\"pbarWrap\">\n    <div class=\"pbar\">\n      <img class=\"pbar-mascot\" src=\"images/keypace-mascot-books.webp\" alt=\"\" width=\"84\" height=\"84\">\n      <div class=\"pbar-t\"><span class=\"prog-eyebrow\">Parcours scolaire<\/span><h2>Et si on suivait le programme ?<\/h2><\/div>\n      <div class=\"sel\" id=\"sel1\"><button type=\"button\" aria-haspopup=\"listbox\"><span>Mon enseignement<\/span><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"6 9 12 15 18 9\"/><\/svg><\/button><div class=\"menu\" id=\"menu1\"><\/div><\/div>\n      <div class=\"sel\" id=\"sel2\"><button type=\"button\" aria-haspopup=\"listbox\"><span>Mon année<\/span><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"6 9 12 15 18 9\"/><\/svg><\/button><div class=\"menu\" id=\"menu2\"><\/div><\/div>\n      <button class=\"pgo\" id=\"pgo\" type=\"button\">Voir mon programme →<\/button>\n    <\/div>\n    <div class=\"pfold\" id=\"pfold\"><div><div class=\"pc\" id=\"pc\"><\/div><\/div><\/div>\n  <\/div>\n<\/div>\n<div class=\"col\">\n  <div class=\"hub-section-hdr\"><h2>Les autres modules<\/h2><p>Choisis librement, dans l'ordre que tu veux.<\/p><\/div>\n  <div class=\"selectorD\">\n    <div class=\"stageD1\" id=\"hubStage\"><\/div>\n    <div class=\"mod-pick\">\n      <div class=\"mod-pick-top\"><span class=\"mod-count\" id=\"modCount\"><\/span><\/div>\n      <div class=\"mlist\" id=\"modList\"><\/div>\n<\/div>\n  <\/div>\n<\/div>\n  <\/div>\n  <div class=\"funfact\">\n    <div class=\"funfact-lbl\">Le saviez-vous ?<\/div>\n    <div class=\"funfact-txt\" id=\"hubFunFact\"><\/div>\n  <\/div>\n<\/div>\n\n";
+const offs=[];
+function mount(host){
+  offs.splice(0).forEach(f=>{try{f()}catch(e){}});
+  const on=(t,ev,fn)=>{t.addEventListener(ev,fn);offs.push(()=>t.removeEventListener(ev,fn))};
+  const root=host.attachShadow({mode:'open'});
+  root.innerHTML='<style>'+KP_CSS+'</style><div class="kp-root">'+KP_HTML+'</div>';
+
+  const _i=(d,x='')=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em" ${x}>${d}</svg>`;
+  const IC={
+    mail:_i('<rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/>'),
+    book:_i('<path d="M2 5c3-1 6-1 9 1v13c-3-2-6-2-9-1V5z"/><path d="M22 5c-3-1-6-1-9 1v13c3-2 6-2 9-1V5z"/>'),
+    pen:_i('<path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19l-4 1z"/><path d="M14.5 6.5l3 3"/>'),
+    cross:_i('<path d="M12 3v18"/><path d="M6 9h12"/>'),
+    school:_i('<path d="M4 21V8l8-5 8 5v13"/><line x1="4" y1="21" x2="20" y2="21"/><rect x="10" y="14" width="4" height="7"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="11" r="1" fill="currentColor" stroke="none"/>'),
+    landmark:_i('<path d="M3 9l9-5 9 5"/><line x1="3" y1="20" x2="21" y2="20"/><path d="M6 9v8M10 9v8M14 9v8M18 9v8"/>'),
+    cap:_i('<path d="M12 4L2 9l10 5 10-5-10-5z"/><path d="M6 11.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5"/><line x1="19" y1="10" x2="19" y2="15.3"/>'),
+    keyboard:_i('<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M9 10h.01M12 10h.01M15 10h.01M18 10h.01M7 14h10"/>'),
+    cv:_i('<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><circle cx="12" cy="11" r="2"/><path d="M8.5 17c.5-2 2-3 3.5-3s3 1 3.5 3"/>'),
+    letter:_i('<path d="M3 10l9-6 9 6v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M7 11h10M7 15h6"/>'),
+    parcel:_i('<path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5L12 12l9-4.5M12 12v9"/>'),
+    numpad:_i('<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8.5 8h.01M12 8h.01M15.5 8h.01M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01" stroke-width="2.6"/>'),
+    cmd:_i('<path d="M9 9V6.5A2.5 2.5 0 1 0 6.5 9H9zm0 0h6m-6 0v6m6-6V6.5A2.5 2.5 0 1 1 17.5 9H15zm0 0v6m0 0h2.5a2.5 2.5 0 1 1-2.5 2.5V15zm0 0H9m0 0v2.5A2.5 2.5 0 1 1 6.5 15H9z"/>'),
+    form:_i('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M9 11l1.5 1.5L13.5 9.5M9 16.5h6"/>'),
+    quote:_i('<path d="M5 17c0-4 1-7 4-9M13 17c0-4 1-7 4-9"/><path d="M5 17h4v-4H5zM13 17h4v-4h-4z"/>'),
+    spell:_i('<path d="M3 17l4-11 4 11M4.7 13h4.6"/><path d="M14 12l3 3 5-6"/>'),
+    ear:_i('<path d="M7 9a5 5 0 0 1 10 0c0 3-3 3.5-3 6.5a2.5 2.5 0 0 1-5 0"/><path d="M10 9a2 2 0 0 1 4 0"/>'),
+    notes:_i('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>'),
+    layout:_i('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/>'),
+    rocket:_i('<path d="M12 2.5c2.3 2 3.7 5.2 3.7 8.5 0 1.9-.5 3.7-1.4 5.1L12 18.5l-2.3-2.4c-.9-1.4-1.4-3.2-1.4-5.1 0-3.3 1.4-6.5 3.7-8.5z"/><circle cx="12" cy="9.5" r="1.4" fill="currentColor" stroke="none"/><path d="M9 16l-2.5 1.5.5-3"/><path d="M15 16l2.5 1.5-.5-3"/>'),
+  };
+  /* ===== programme : barre de choix + contenu de l'année ===== */
+  /* La circulaire 9744 compte 3 réseaux : Wallonie-Bruxelles Enseignement, officiel subventionné, libre subventionné
+     (lui-même divisé en confessionnel et non confessionnel). On propose donc 4 choix, regroupés sous ces 3 réseaux. */
+  const NETS=[
+    {id:'fwb',c:'#FF4D2E',t:'Wallonie-Bruxelles Enseignement',grp:'Enseignement officiel'},
+    {id:'off',c:'#3FA84E',t:'Officiel subventionné',grp:'Enseignement officiel'},
+    {id:'cath',c:'#4F6BE0',t:'Libre confessionnel',grp:'Enseignement libre subventionné'},
+    {id:'libre',c:'#9B57D6',t:'Libre non confessionnel',grp:'Enseignement libre subventionné'}];
+  const YEARS=[...[3,4,5,6].map(n=>({n,suf:'e',l:n+'e primaire',g:'Primaire',c:'#FF8A3C'})),...[1,2,3,4,5,6].map(n=>({n,suf:n===1?'re':'e',l:n+(n===1?'re':'e')+' secondaire',g:'Secondaire',c:'#4F6BE0'}))];
+  /* ===== CONTENU RÉEL =====
+     Source : « Référentiel de formation manuelle, technique, technologique et numérique » (FMTTN),
+     tronc commun de la Fédération Wallonie-Bruxelles, de la 3e primaire à la 3e secondaire.
+     Ce référentiel est fixé par le Gouvernement et vaut pour tous les réseaux ; chaque réseau en tire
+     ensuite son propre programme (non consultés pour l'instant : à ajouter via PROGRAMME_RESEAU).
+     Les citations ci-dessous sont reprises mot pour mot. Les leçons proposées sont un choix KeyPace,
+     expliqué à chaque fois ; les leçons correspondent aux 66 leçons du parcours dactylographie. */
+  /* Mode audit : ajouter ?audit=1 à l'adresse pour voir aussi les notes internes (vérification par réseau, origine des leçons, citations officielles complètes). Sans ce paramètre, la page n'affiche que ce qu'un utilisateur doit voir. */
+  const AUDIT=false;
+  const TOTAL_LESSONS=ALL_LESSONS.length;
+  const PROGRAMME_RESEAU={}; // surcharge par réseau : PROGRAMME_RESEAU.cath['4e primaire']={...}
+  const PROGRAMME_COMMUN={
+   '3e primaire':{
+    cal:'En vigueur dans toutes les années du primaire : « Depuis la rentrée scolaire 2025-2026, les neufs référentiels disciplinaires concernent tous les élèves de primaire. » (Circulaire 9744, FWB, juin 2026)',
+    lecons:[{r:[1,6],why:'Découvrir le clavier et prendre la bonne posture.',tag:'prog'}],},
+   '4e primaire':{
+    cal:'En vigueur dans toutes les années du primaire : « Depuis la rentrée scolaire 2025-2026, les neufs référentiels disciplinaires concernent tous les élèves de primaire. » (Circulaire 9744, FWB, juin 2026)',
+    intro:'Sur le plan numérique, l’accent est mis sur la découverte du traitement de texte et de l’image.',
+    lecons:[{r:[7,23],why:'Les touches principales du clavier, pour saisir un texte court.',tag:'prog'},{r:[24,33],why:'Les majuscules et la ponctuation, pour que le texte soit correct.',tag:'choix'}],},
+   '5e primaire':{
+    cal:'En vigueur dans toutes les années du primaire : « Depuis la rentrée scolaire 2025-2026, les neufs référentiels disciplinaires concernent tous les élèves de primaire. » (Circulaire 9744, FWB, juin 2026)',
+    lecons:[{r:[34,45],why:'Les accents, pour écrire correctement en français dans tes messages et tes textes.',tag:'choix'},{r:[46,51],why:'Les chiffres, pour encoder des données dans un tableur.',tag:'prog'},{r:[52,52],why:'Le @, pour les adresses email.',tag:'prog'}],},
+   '6e primaire':{
+    cal:'En vigueur dans toutes les années du primaire : « Depuis la rentrée scolaire 2025-2026, les neufs référentiels disciplinaires concernent tous les élèves de primaire. » (Circulaire 9744, FWB, juin 2026)',
+    lecons:[{r:[53,60],why:'Les symboles, pour créer un mot de passe de niveau de sécurité élevé.',tag:'prog'}],},
+   '1re secondaire':{
+    cal:'En vigueur depuis la rentrée 2026-2027 : « À partir de la rentrée scolaire 2026-2027, ils concerneront également les élèves entrant en première année de secondaire. » (Circulaire 9744, FWB, juin 2026)',
+    intro:'L’élève consolide ses acquis liés au traitement de texte qu’il enrichit d’images et/ou de sons.',
+    lecons:[{r:[61,64],why:'Enchaîner phrases et paragraphes, pour éditer et enrichir un texte.',tag:'prog'}],},
+   '2e secondaire':{
+    calUser:'Pas encore en vigueur en 2e secondaire : ce programme arrive progressivement d’ici 2028.',
+    cal:'Pas encore en vigueur : en 2026-2027, la 2e secondaire reste sous l’organisation actuelle (Circulaire 9744, FWB, juin 2026). Le volet numérique y arrive au fil du calendrier du Pacte, « jusqu’à la 3e secondaire à la rentrée 2028 ».',
+    lecons:[{r:[65,66],why:'Textes techniques avec symboles, pour les formules du tableur, et gagner en vitesse.',tag:'prog'}],},
+   '3e secondaire':{
+    calUser:'Pas encore en vigueur en 3e secondaire : ce programme arrive à la rentrée 2028.',
+    intro:'Sur le plan numérique, la dernière année du tronc commun est centrée sur la communication et la collaboration.',
+    lecons:[],
+    note:'Pas de nouvelle leçon cette année : on consolide la vitesse et la fluidité.',
+    cal:'Pas encore en vigueur : le volet numérique « entrera ensuite en vigueur pour chaque année scolaire successive, jusqu’à la 3e secondaire à la rentrée 2028. » (Pacte pour un Enseignement d’excellence)',},
+   '4e secondaire':{pending:true},'5e secondaire':{pending:true},'6e secondaire':{pending:true}
+  };
+  /* ===== VÉRIFICATION PAR RÉSEAU (état des recherches) =====
+     ok:true  = programme du réseau consulté pour cette année, comparé au référentiel.
+     Sinon    = programme du réseau non trouvé : on affiche le référentiel commun, qui s'applique à tous. */
+  const NET_CHECK={
+    cath:{part:{'3e primaire':'Site du SeGEC pour le fondamental (La Salle des Profs) consulté : ses séquences de formation numérique portent sur les mêmes sujets que le référentiel (titres cités dans « Voir la source »). Le programme complet, volume 3 (mathématiques, sciences et FMTTN), est sur l’extranet du SeGEC, qui demande une connexion : non lu.','4e primaire':'Site du SeGEC pour le fondamental (La Salle des Profs) consulté : ses séquences de formation numérique portent sur les mêmes sujets que le référentiel (titres cités dans « Voir la source »). Le programme complet, volume 3 (mathématiques, sciences et FMTTN), est sur l’extranet du SeGEC, qui demande une connexion : non lu.','5e primaire':'Site du SeGEC pour le fondamental (La Salle des Profs) consulté : ses séquences de formation numérique portent sur les mêmes sujets que le référentiel (titres cités dans « Voir la source »). Le programme complet, volume 3 (mathématiques, sciences et FMTTN), est sur l’extranet du SeGEC, qui demande une connexion : non lu.','6e primaire':'Site du SeGEC pour le fondamental (La Salle des Profs) consulté : ses séquences de formation numérique portent sur les mêmes sujets que le référentiel (titres cités dans « Voir la source »). Le programme complet, volume 3 (mathématiques, sciences et FMTTN), est sur l’extranet du SeGEC, qui demande une connexion : non lu.'},nom:'Libre confessionnel (le programme consulté est celui du SeGEC, catholique)',ok:{'1re secondaire':'Programme du SeGEC (enseignement catholique) FMTTN de 1re secondaire (juin 2025) consulté : mêmes attendus que le référentiel (Cc et Cci, puces, marges…), avec des situations d’apprentissage en plus. Aucune mention de la frappe au clavier.'}},
+    fwb:{nom:'Wallonie-Bruxelles Enseignement',ko:{'1re secondaire':'Programmes WBE du tronc commun secondaire consultés (français, mathématiques, sciences, langues modernes et anciennes, FHGES, éducation culturelle et artistique, philosophie et citoyenneté, éducation physique), tous « en attente de validation par le Gouvernement ». Aucun ne contient de programme de formation numérique : le numérique n’y apparaît que dans d’autres cours. Le référentiel commun s’applique.','2e secondaire':'Programmes WBE du tronc commun secondaire consultés (français, mathématiques, sciences, langues modernes et anciennes, FHGES, éducation culturelle et artistique, philosophie et citoyenneté, éducation physique), tous « en attente de validation par le Gouvernement ». Aucun ne contient de programme de formation numérique : le numérique n’y apparaît que dans d’autres cours. Le référentiel commun s’applique.','3e secondaire':'Programmes WBE du tronc commun secondaire consultés (français, mathématiques, sciences, langues modernes et anciennes, FHGES, éducation culturelle et artistique, philosophie et citoyenneté, éducation physique), tous « en attente de validation par le Gouvernement ». Aucun ne contient de programme de formation numérique : le numérique n’y apparaît que dans d’autres cours. Le référentiel commun s’applique.'},ok:{'3e primaire':'Programme de 3e primaire rédigé en commun par le CECP et Wallonie-Bruxelles Enseignement : consulté. Il reprend les attendus du référentiel et y ajoute des séquences d’apprentissage.','4e primaire':'Programme de 4e primaire rédigé en commun par le CECP et Wallonie-Bruxelles Enseignement : consulté. Il reprend les attendus du référentiel et y ajoute des séquences d’apprentissage.','5e primaire':'Programme de 5e primaire rédigé en commun par le CECP et Wallonie-Bruxelles Enseignement : consulté. Il reprend les attendus du référentiel et y ajoute des séquences d’apprentissage.'}},
+    off:{nom:'Officiel subventionné',ko:{'1re secondaire':'Programmes du CPEONS pour la 1re secondaire (2026) consultés : éducation culturelle et artistique, langues modernes, philosophie et citoyenneté, FHGES. Aucun ne contient de programme de formation numérique : ils ne citent la FMTTN que pour des liens avec d’autres cours. Le référentiel commun s’applique.'},ok:{'3e primaire':'Programme de 3e primaire rédigé en commun par le CECP (écoles communales et provinciales) et Wallonie-Bruxelles Enseignement : consulté, avec des séquences d’apprentissage en plus. Programme propre au CPEONS : non trouvé.','4e primaire':'Programme de 4e primaire rédigé en commun par le CECP (écoles communales et provinciales) et Wallonie-Bruxelles Enseignement : consulté, avec des séquences d’apprentissage en plus. Programme propre au CPEONS : non trouvé.','5e primaire':'Programme de 5e primaire rédigé en commun par le CECP (écoles communales et provinciales) et Wallonie-Bruxelles Enseignement : consulté, avec des séquences d’apprentissage en plus. Programme propre au CPEONS : non trouvé.'}},
+    libre:{nom:'Libre non confessionnel (FELSI)',ok:{'1re secondaire':'Programme FELSI S1-S2-S3 (avril 2026, « en cours d’approbation ») consulté : il reprend les attendus du référentiel, numérotés « FMTTN 7.xx », et y ajoute des pistes méthodologiques.','2e secondaire':'Programme FELSI S1-S2-S3 (avril 2026, « en cours d’approbation ») consulté : il reprend les attendus du référentiel, numérotés « FMTTN 7.xx », et y ajoute des pistes méthodologiques.','3e secondaire':'Programme FELSI S1-S2-S3 (avril 2026, « en cours d’approbation ») consulté : il reprend les attendus du référentiel, numérotés « FMTTN 7.xx », et y ajoute des pistes méthodologiques.'}}
+  };
+  const PENDING_USER='Il n’y a pas encore de programme officiel de formation numérique pour la 4e, la 5e et la 6e secondaire. Les autres modules, plus bas, restent à ta disposition.';
+  const PENDING_SUP='Il n’existe pas encore de référentiel numérique officiel pour la 4e, la 5e et la 6e secondaire : le tronc commun s’arrête à la 3e secondaire. La Fédération Wallonie-Bruxelles annonce seulement : « Pour la suite du tronc commun, de nouveaux référentiels adaptés en fonction des nouvelles filières dans l’enseignement secondaire supérieur seront également élaborés. » Aucune date n’est donnée. Rien n’est affiché ici tant qu’il n’y a pas de vrai programme.';
+  const contentFor=(net,y)=>(PROGRAMME_RESEAU[net]&&PROGRAMME_RESEAU[net][y.l])||PROGRAMME_COMMUN[y.l]||{pending:true};
+
+  /* ===== POINTS DE PROGRAMME -> MODULES =====
+     Chaque point de programme (PROG_ITEMS) pointe vers UN module du catalogue (MODS, la liste « Les autres modules »).
+     « Modules associés » n'affiche donc que des modules qui existent aussi dans « Les autres modules » : c'est la même liste, filtrée.
+     `sources` : reseaux ('tous' = référentiel commun, sinon liste d'identifiants de réseau), annees, dom (origine), cite (mot pour mot).
+     POUR AJOUTER UN POINT DE PROGRAMME : ajouter un objet à PROG_ITEMS avec mod = id d'un module existant ou d'un module à créer dans NEW_MODS.
+     QUAND UN MODULE EST CRÉÉ : passer live à true dans sa définition (NEW_MODS ou MODS). Il apparaît « Disponible » partout. */
+  const ALL7=['3e primaire','4e primaire','5e primaire','6e primaire','1re secondaire','2e secondaire','3e secondaire'];
+  const PROG_ITEMS=[
+   {id:'posture',mod:'posture',titre:'Bien s’installer devant le clavier',desc:'Dos, bras et poignets : la bonne position pour taper sans se fatiguer.',icon:'user',sources:[
+     {reseaux:'tous',annees:ALL7,dom:'Contenus communs',cite:'Adopter une posture ergonomique.'},
+     {reseaux:['fwb','off'],annees:['4e primaire'],dom:'Programme WBE et CECP',cite:'il y a lieu d’être attentif(ve) à l’attendu concernant la posture ergonomique. Rendre cet attendu explicite permet aux élèves d’adopter une position adéquate face aux outils numériques.'},
+     {reseaux:['fwb','off'],annees:['5e primaire'],dom:'Programme WBE et CECP',cite:'afin d’appliquer une posture ergonomique adéquate, mettre le focus sur la position des mains et des bras par rapport au clavier (avant-bras horizontaux, angle du coude légèrement supérieur à 90 degrés).'}]},
+   {id:'yeux',mod:'saisir-texte',titre:'Garder les yeux sur l’écran en tapant',desc:'Taper sans regarder le clavier, pour voir ce qu’on écrit.',icon:'eye',sources:[
+     {reseaux:['fwb','off'],annees:['3e primaire'],dom:'Programme WBE et CECP',cite:'ils/elles utilisent peu les suggestions faites par le moteur de recherche, car ils/elles ne les voient pas, trop occupé(e)s à regarder le clavier lorsqu’ils/elles tapent.'},
+     {reseaux:['fwb','off'],annees:['3e primaire'],dom:'Programme WBE et CECP',cite:'Les moments de « dactylographie », dénués d’enjeux d’apprentissage, peuvent se révéler fortement différenciateurs. Certain(e)s élèves encodent plus rapidement au clavier (ou sont plus à l’aise avec l’utilisation du clavier) et s’engagent donc rapidement dans les apprentissages tandis que d’autres peuvent y consacrer un temps trop long.'}]},
+   {id:'saisir-texte',mod:'saisir-texte',titre:'Saisir un texte court',desc:'Utiliser les touches principales du clavier, jusqu’à 500 caractères.',icon:'keyboard',sources:[
+     {reseaux:'tous',annees:['4e primaire'],dom:'Création de contenus',cite:'Utiliser les touches principales du clavier pour saisir un texte court (500 caractères maximum).'}]},
+   {id:'copier-coller',mod:'raccourcis',titre:'Couper, copier, coller',desc:'Déplacer du texte, à la souris puis avec les touches du clavier.',icon:'cmd',sources:[
+     {reseaux:'tous',annees:['4e primaire'],dom:'Création de contenus',cite:'Utiliser les fonctionnalités dont couper, copier, coller, glisser.'},
+     {reseaux:['fwb','off'],annees:['5e primaire'],dom:'Programme WBE et CECP',cite:'on n’utilise pas le clic droit mais les touches du clavier : - Ctrl et C pour copier ; - Ctrl et V pour coller ; - Ctrl et X pour couper.'}]},
+   {id:'mise-en-forme',mod:'word',titre:'Mettre en forme un texte',desc:'Police, taille, alignement : rendre un texte court agréable à lire.',icon:'layout',sources:[
+     {reseaux:'tous',annees:['4e primaire'],dom:'Création de contenus',cite:'Éditer un contenu court, le mettre en forme et en page, en respectant une ligne éditoriale limitée à la forme.'},
+     {reseaux:['cath'],annees:['4e primaire'],dom:'Séquence SeGEC (La Salle des Profs)',cite:'Utiliser un traitement de texte'},
+     {reseaux:['fwb','off'],annees:['4e primaire'],dom:'Programme WBE et CECP',cite:'Elle aborde la découverte, la prise en main et l’utilisation d’un logiciel de traitement de texte, quel que soit le système d’exploitation auquel il appartient.'}]},
+   {id:'ecrire-message',mod:'mail',titre:'Écrire un message',desc:'Destinataire, objet, texte du message et pièce jointe.',icon:'mail',sources:[
+     {reseaux:'tous',annees:['5e primaire'],dom:'Communication et collaboration',cite:'Ouvrir l’outil de communication et consulter des messages. Utiliser ses fonctionnalités : destinataire, objet et insérer un corps de texte et une pièce jointe.'},
+     {reseaux:['cath'],annees:['5e primaire'],dom:'Séquence SeGEC (La Salle des Profs)',cite:'Écrire un courriel'}]},
+   {id:'tableur-encoder',mod:'tableur',titre:'Encoder des données dans un tableur',desc:'Taper des chiffres et des mots dans les bonnes cases.',icon:'table',sources:[
+     {reseaux:'tous',annees:['5e primaire'],dom:'Création de contenus',cite:'Encoder des données dans un tableur et réaliser un graphique.'},
+     {reseaux:'tous',annees:['2e secondaire'],dom:'Création de contenus',cite:'Encoder, modifier des données, dupliquer par la série, utiliser l’incrémentation.'}]},
+   {id:'mot-de-passe',mod:'mot-de-passe',titre:'Créer un mot de passe solide',desc:'Lettres, chiffres et symboles : taper un mot de passe sûr.',icon:'lock',sources:[
+     {reseaux:'tous',annees:['6e primaire'],dom:'Sécurité',cite:'Créer un mot de passe respectant un niveau de sécurité élevé.'},
+     {reseaux:['cath'],annees:['6e primaire'],dom:'Séquence SeGEC (La Salle des Profs)',cite:'Les mots de passe'}]},
+   {id:'adresse-email',mod:'adresse-email',titre:'Créer une adresse email, Cc et Cci',desc:'Choisir son adresse, répondre, répondre à tous, transférer.',icon:'mail',sources:[
+     {reseaux:'tous',annees:['1re secondaire'],dom:'Communication et collaboration',cite:'Créer une adresse email et utiliser les fonctionnalités Cc et Cci, répondre, répondre à tous, transférer.'},
+     {reseaux:['cath'],annees:['1re secondaire'],dom:'Programme SeGEC, situations d’apprentissage',cite:'Création d’une adresse email'},
+     {reseaux:['cath'],annees:['1re secondaire'],dom:'Programme SeGEC, situations d’apprentissage',cite:'Fonctionnalités d’un email'}]},
+   {id:'puces-marges',mod:'word',titre:'Puces, marges et sauts de page',desc:'Structurer un document pour le rendre lisible.',icon:'layout',sources:[
+     {reseaux:'tous',annees:['1re secondaire'],dom:'Création de contenus',cite:'Utiliser des puces, des numéros et des alignements. Insérer un saut de page. Modifier les marges.'},
+     {reseaux:['libre'],annees:['1re secondaire'],dom:'Programme FELSI, pistes méthodologiques',cite:'Ils dépassent l’édition de texte simple/brut (FMTTN 7.51) pour faire du traitement de texte un outil de création et de mise en forme professionnelle (FMTTN 7.64).'}]},
+   {id:'courrier-ecole',mod:'courrier-ecole',titre:'Structurer un courrier pour l’école',desc:'Organiser l’information pour un texte clair et hiérarchisé.',icon:'letter',sources:[
+     {reseaux:['libre'],annees:['1re secondaire'],dom:'Programme FELSI, pistes méthodologiques',cite:'Lors d’un courrier pour l’école, d’une mise en page de recherches ou d’une actualité, les élèves apprennent à structurer l’information pour la rendre lisible et hiérarchisée, en vue d’une production finale (ex: article, journal, guide, rapport, emploi du temps…).'}]},
+   {id:'raccourcis-usuels',mod:'raccourcis',titre:'Les raccourcis clavier usuels',desc:'Gagner du temps avec les touches Ctrl (ou Cmd).',icon:'cmd',sources:[
+     {reseaux:'tous',annees:['2e secondaire'],dom:'Création de contenus',cite:'Utiliser, adéquatement en contexte, les raccourcis clavier usuels.'}]},
+   {id:'formules',mod:'tableur',titre:'Formules de base d’un tableur',desc:'Taper des formules avec + - * / et le signe =.',icon:'table',sources:[
+     {reseaux:'tous',annees:['2e secondaire'],dom:'Création de contenus',cite:'Appliquer des formules, en utilisant les opérateurs de base (+ - */), le signe =.'}]},
+   {id:'clavier-langue',mod:'clavier-langue',titre:'Écrire au clavier dans une langue étrangère',desc:'Produire un écrit dans la langue étudiée, sur un support numérique.',icon:'keyboard',sources:[
+     {reseaux:['fwb'],annees:['1re secondaire','3e secondaire'],dom:'Programme WBE, langues modernes',cite:'Utiliser adéquatement le clavier. Appliquer les commandes adéquates pour produire un écrit sur un support numérique, dans la langue moderne étudiée.'},
+     {reseaux:['libre'],annees:['2e secondaire'],dom:'Programme FELSI, langues modernes',cite:'Utiliser adéquatement le clavier. Appliquer les commandes adéquates pour produire un écrit sur un support numérique, dans la langue moderne étudiée.'}]},
+   {id:'ecrire-a-plusieurs',mod:'ecrire-a-plusieurs',titre:'Écrire à plusieurs',desc:'Commentaires et suivi des modifications dans un document partagé.',icon:'pen',sources:[
+     {reseaux:'tous',annees:['5e primaire'],dom:'Communication et collaboration',cite:'Collaborer sur un contenu propre à l’école (ex. : écriture collaborative, carte mentale…).'},
+     {reseaux:['cath'],annees:['5e primaire'],dom:'Séquence SeGEC (La Salle des Profs)',cite:'Collaborer sur un contenu numérique'},
+     {reseaux:'tous',annees:['3e secondaire'],dom:'Communication et collaboration',cite:'Paramétrer les conditions d’accessibilité de l’espace collaboratif dont repérer le propriétaire/administrateur, qui est en ligne, qui est autorisé à modifier, utiliser les fonctions commentaire et suivi de modifications.'}]},
+   {id:'ecrire-texte',mod:'ecrire-texte',titre:'Écrire un texte au clavier',desc:'Rédiger un texte, puis le présenter proprement avec un traitement de texte.',icon:'pen',sources:[
+     {reseaux:['fwb','off'],annees:['3e primaire','4e primaire','5e primaire'],dom:'Programme WBE et CECP, français',cite:'Enfin, le quatrième et dernier jet se clôture par une présentation soignée, manuscrite ou effectuée à l’aide d’outils numériques.'},
+     {reseaux:['fwb','off'],annees:['4e primaire'],dom:'Programme WBE et CECP, français',cite:'Faire dactylographier le texte (2e jet) (FMTTN-P4 - Utiliser un traitement de texte pour mettre en forme un texte documentaire).'},
+     {reseaux:'tous',annees:['1re secondaire','2e secondaire','3e secondaire'],dom:'Référentiel de français',cite:'Écrire lisiblement un texte (manuscrit ou numérique).'},
+     {reseaux:'tous',annees:['1re secondaire','2e secondaire','3e secondaire'],dom:'Référentiel de français, liens avec le numérique',cite:'Dans la visée ÉCRIRE, toutes les productions peuvent impliquer l’utilisation du traitement de texte.'}]},
+   {id:'recherche-mots-cles',mod:'recherche',titre:'Écrire une recherche avec les bons mots-clés',desc:'Choisir et taper les mots qui trouvent la bonne information.',icon:'eye',sources:[
+     {reseaux:'tous',annees:['3e primaire'],dom:'Informations et données',cite:'Sélectionner un ou plusieurs mot(s)-clé(s) pertinent(s) pour effectuer une recherche.'},
+     {reseaux:'tous',annees:['4e primaire'],dom:'Informations et données',cite:'Déterminer un ou plusieurs mot(s)-clé(s) pertinent(s) pour effectuer une recherche.'},
+     {reseaux:['cath'],annees:['4e primaire'],dom:'Séquence SeGEC (La Salle des Profs)',cite:'Effectuer une recherche sur le Web'},
+     {reseaux:['fwb','off'],annees:['3e primaire'],dom:'Programme WBE et CECP',cite:'Les accents et les cédilles peuvent être omis, ceci n’influencera pas les résultats de la recherche.'}]},
+   {id:'nommer-fichier',mod:'nommer-fichier',titre:'Nommer un fichier et un dossier',desc:'Choisir des noms clairs pour retrouver ses documents.',icon:'layout',sources:[
+     {reseaux:'tous',annees:['4e primaire'],dom:'Informations et données',cite:'Créer, (re)nommer un fichier et un dossier pour permettre une exploitation ultérieure efficiente.'},
+     {reseaux:['cath'],annees:['4e primaire'],dom:'Séquence SeGEC (La Salle des Profs)',cite:'Comprendre l’utilité de nommer et de structurer ses documents numériques'}]},
+   {id:'messagerie-instantanee',mod:'messagerie-instantanee',titre:'Discuter en messagerie instantanée',desc:'Écrire des messages courts, y compris dans une conversation de groupe.',icon:'mail',sources:[
+     {reseaux:'tous',annees:['1re secondaire'],dom:'Communication et collaboration',cite:'Utiliser les fonctionnalités de la messagerie instantanée dont les conversations de groupe.'}]},
+   {id:'netiquette',mod:'netiquette',titre:'Écrire poliment en ligne (nétiquette)',desc:'Les règles de politesse des messages, des chats et des documents partagés.',icon:'mail',sources:[
+     {reseaux:'tous',annees:['5e primaire'],dom:'Communication et collaboration',cite:'Respecter, dans l’environnement numérique rencontré, une nétiquette convenue en classe.'},
+     {reseaux:'tous',annees:['1re secondaire'],dom:'Communication et collaboration',cite:'Respecter, dans un environnement numérique d’interaction et de communication, une nétiquette définie.'},
+     {reseaux:'tous',annees:['3e secondaire'],dom:'Communication et collaboration',cite:'Respecter, dans un environnement numérique de partage et de collaboration, une nétiquette définie.'}]},
+   {id:'caracteres-speciaux',mod:'caracteres-speciaux',titre:'Insérer des caractères spéciaux',desc:'Retrouver et taper les symboles qui ne sont pas sur les touches habituelles.',icon:'keyboard',sources:[
+     {reseaux:'tous',annees:['1re secondaire'],dom:'Création de contenus',cite:'Insérer une note en bas de page, des caractères spéciaux, un entête et un pied de page, un lien hypertexte.'}]},
+   {id:'operateurs-recherche',mod:'recherche',titre:'Les symboles des recherches avancées',desc:'Taper des opérateurs comme *, +, - et les guillemets dans une recherche.',icon:'keyboard',sources:[
+     {reseaux:'tous',annees:['2e secondaire'],dom:'Informations et données',cite:'Connaitre les opérateurs de recherche dont *, +, -, « », et, ou.'}]}
+  ];
+  const MINI_ICON={user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>',eye:'<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>',table:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16M15 4v16"/>',lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'};
+  const miniIcon=k=>MINI_ICON[k]?_i(MINI_ICON[k]):(IC[k]||IC.keyboard);
+  const miniFor=(net,y)=>{
+    const groups=new Map();
+    PROG_ITEMS.forEach((it,i)=>{
+      const src=it.sources.filter(s=>(s.reseaux==='tous'||s.reseaux.includes(net))&&s.annees.includes(y.l));
+      if(!src.length)return;
+      const g=groups.get(it.mod)||{id:it.mod,first:i,items:[]};g.items.push({it,src});groups.set(it.mod,g);
+    });
+    return [...groups.values()].map(g=>({m:MODS.find(x=>x.id===g.id),g})).filter(o=>o.m)
+      .sort((a,b)=>(b.m.live-a.m.live)||(a.g.first-b.g.first));
+  };
+  function miniList(net,y){
+    const list=miniFor(net,y);
+    const html=list.map(({m,g})=>{
+      const srcs=g.items.flatMap(x=>x.src.map(s=>({s,label:x.it.titre})));
+      const own=srcs.find(o=>o.s.reseaux!=='tous');
+      const tag=own?(own.s.dom.startsWith('Séquence SeGEC')?'Programme SeGEC':own.s.dom.split(',')[0]):'Programme officiel';
+      const sub=m.short||g.items[0].it.desc;
+      const btn=m.live?`<button type="button" class="mini-go" data-open="${m.id}">${ctaLabel(m)}</button>`:`<button type="button" class="mini-go soft" data-mod="${m.id}">Voir le module ↓</button>`;
+      const meta=AUDIT?`<div class="mini-meta"><span class="mst${m.live?' live':''}">${m.live?'Disponible':'Bientôt'}</span><span class="mini-tag">${tag}</span></div>
+        <details class="mini-src"><summary>Voir la source</summary>${srcs.map(({s,label})=>`<blockquote><i>${s.dom}${label&&label!==m.title?' · '+label:''}</i> « ${s.cite} »</blockquote>`).join('')}</details>`:'';
+      return `<div class="mini${m.live?' live':''}" style="--c:${y.c}"><span class="mini-ico">${m.icon}</span><div class="mini-b"><div class="mini-top"><b>${m.title}</b>${btn}</div><span>${sub}</span>${meta}</div></div>`}).join('');
+    return {html:html||'<div class="pc-empty">Pas de module associé pour cette année.</div>',n:list.length,live:list.filter(o=>o.m.live).length};
+  }
+  const lessonSet=g=>{const s=new Set();(g||[]).forEach(({r})=>{for(let n=r[0];n<=r[1];n++)s.add(n)});return s};
+  const runs=set=>{const a=[...set].sort((x,y)=>x-y),o=[];a.forEach(n=>{const l=o[o.length-1];if(l&&n===l[1]+1)l[1]=n;else o.push([n,n])});return o};
+  const fmtRuns=r=>r.map(([a,b])=>a===b?`${a}`:`${a} à ${b}`).join(', ');
+  let pNet=null,pYear=null;
+  const menu1=root.getElementById('menu1'),menu2=root.getElementById('menu2'),pgo=root.getElementById('pgo'),pfold=root.getElementById('pfold'),pc=root.getElementById('pc');
+  menu1.innerHTML=['Enseignement officiel','Enseignement libre subventionné'].map(g=>`<h6>${g}</h6>`+NETS.filter(n=>n.grp===g).map(n=>`<button type="button" data-id="${n.id}" style="--c:${n.c}"><i></i>${n.t}</button>`).join('')).join('');
+  menu2.innerHTML=['Primaire','Secondaire'].map(g=>`<h6>${g}</h6>`+YEARS.filter(y=>y.g===g).map(y=>`<button type="button" data-l="${y.l}" style="--c:${y.c}"><i></i>${y.l}</button>`).join('')).join('');
+  const isExpert=()=>typeof getUserPlan==='function'&&getUserPlan()==='expert';
+  const isLogged=()=>typeof currentUser!=='undefined'&&!!currentUser;
+  const MOD_HREF={mail:'/cours/ecrire-un-mail'};
+  const statusLabel=m=>m.live?(isExpert()?'Disponible':'Expert'):'Bientôt';
+  const ctaLabel=m=>m.live?(isExpert()?'Commencer →':'Débloquer avec Expert'):'Bientôt';
+  function openModule(id){
+    try{track('module_click',{module:id,expert:isExpert()})}catch(e){}
+    if(!isLogged()){openAuth('register','Crée un compte pour accéder aux modules.');return}
+    if(!isExpert()){openModal('upgrade-modal');return}
+    if(MOD_HREF[id])location.href=MOD_HREF[id];
+  }
+  /* Leçon vers laquelle envoyer l'élève : la PREMIÈRE leçon qu'il n'a pas encore faite, même si l'étape conseillée pour son année est plus loin. */
+  function lessonTarget(zoneStart,zoneEnd){
+    const L=ALL_LESSONS,rec=id=>{try{return !!app.lessonRec(id).cleared}catch(e){return false}};
+    let idx=isLogged()?L.findIndex(l=>!rec(l.id)):0;
+    if(idx<0)idx=Math.max(0,zoneStart-1);
+    const n=idx+1,started=isLogged()&&n>1;
+    const label=started?`Continuer à la leçon ${n}`:`Commencer la leçon ${n}`;
+    let note='';
+    if(n<zoneStart)note=n===zoneStart-1?`Il te reste la leçon ${n} à faire avant cette étape.`:`Il te reste les leçons ${n} à ${zoneStart-1} à faire avant cette étape.`;
+    else if(n>zoneEnd)note=`Tu as déjà fait cette étape. Ta prochaine leçon est la ${n}.`;
+    return {id:L[idx].id,n,label,note};
+  }
+  const closeMenus=()=>root.querySelectorAll('.sel').forEach(s=>{s.classList.remove('open');s.firstElementChild.setAttribute('aria-expanded','false')});
+  on(window,'keydown',e=>{if(e.key==='Escape')closeMenus()});
+  root.querySelectorAll('.sel>button').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();const s=b.parentElement,o=s.classList.contains('open');closeMenus();s.classList.toggle('open',!o);b.setAttribute('aria-expanded',String(!o))}));
+  on(document,'click',closeMenus);
+  function renderProgramme(){
+    const y=pYear,net=NETS.find(n=>n.id===pNet),c=contentFor(pNet,y),idx=YEARS.indexOf(y);
+    pc.style.setProperty('--c',y.c);
+    const head=`<div class="pc-top"><div class="pc-year">${y.n}<sup style="font-size:.45em">${y.suf}</sup><small>${y.g.toLowerCase()}</small></div><span class="pc-net">${net.t}</span>${c.pending?'':`<span class="pc-src">${AUDIT?'Base : référentiel FMTTN, tronc commun FWB (commun à tous les réseaux)':'Programme officiel de la Fédération Wallonie-Bruxelles'}</span>`}</div>`;
+    if(c.pending){
+      pc.innerHTML=head+`<div class="pc-pending pc-in"><b>${AUDIT?'Programme à définir.':'Programme à venir.'}</b> ${AUDIT?PENDING_SUP:PENDING_USER}</div>`;
+      return;
+    }
+    const known=new Set();YEARS.slice(0,idx).forEach(yy=>lessonSet((PROGRAMME_COMMUN[yy.l]||{}).lecons).forEach(n=>known.add(n)));
+    const now=lessonSet(c.lecons);now.forEach(n=>known.delete(n));
+    const ticks=Array.from({length:TOTAL_LESSONS},(_,i)=>{const n=i+1,k=now.has(n)?'on':known.has(n)?'known':'later';return`<i class="${k}" title="Leçon ${n}"></i>`}).join('');
+    const nr=runs(now),first=nr[0];
+    let pin='';
+    if(first){const mid=((first[0]-1)+(first[1]-first[0]+1)/2)/TOTAL_LESSONS*100,al=mid<20?'l':mid>80?'r':'c',pos=al==='l'?`left:${(first[0]-1)/TOTAL_LESSONS*100}%`:al==='r'?`right:${(TOTAL_LESSONS-first[1])/TOTAL_LESSONS*100}%`:`left:${mid}%`;pin=`<div class="pin-lab ${al}" style="${pos}">Maintenant</div><div class="pin-tri" style="left:${mid}%"></div>`}
+    const nKnown=known.size,nNow=now.size,nLater=TOTAL_LESSONS-nKnown-nNow;
+    const kr=runs(known),lr=runs(new Set(Array.from({length:TOTAL_LESSONS},(_,i)=>i+1).filter(n=>!known.has(n)&&!now.has(n))));
+    const pl=n=>`${n} leçon${n>1?'s':''}`;
+    const legend=`<div class="lg known${nKnown?'':' none'}"><i></i><div><b>Déjà vu</b><span>${nKnown?`Leçons ${fmtRuns(kr)} · ${pl(nKnown)}`:'Rien : tu pars de zéro'}</span></div></div>
+      <div class="lg now${nNow?'':' none'}"><i></i><div><b>À apprendre maintenant</b><span>${nNow?`Leçons ${fmtRuns(nr)} · ${pl(nNow)}`:'Aucune nouvelle leçon'}</span></div></div>
+      <div class="lg later${nLater?'':' none'}"><i></i><div><b>Plus tard</b><span>${nLater?`Leçons ${fmtRuns(lr)} · ${pl(nLater)}`:'C’est la dernière étape'}</span></div></div>`;
+    const wt=tag=>AUDIT?`<span class="wtag ${tag}">${tag==='prog'?'Lien avec le programme':'Choix KeyPace'}</span>`:'';
+    const why=(c.lecons||[]).map(l=>`<div class="why">${wt(l.tag)}<span>${l.why} <em>Leçons ${l.r[0]===l.r[1]?l.r[0]:l.r[0]+' à '+l.r[1]}.</em></span></div>`).join('')+(c.note?`<div class="why">${wt('choix')}<span>${c.note}</span></div>`:'');
+    const ml=miniList(pNet,y);
+    const first1=[...now].sort((a,b)=>a-b)[0];
+    const lt=first1?lessonTarget(first1,Math.max(...now)):null;
+    const chk=NET_CHECK[pNet],okTxt=chk&&chk.ok[y.l],koTxt=chk&&chk.ko&&chk.ko[y.l],partTxt=chk&&chk.part&&chk.part[y.l];
+    const netnote=!AUDIT?'':`<div class="pc-netnote ${okTxt?'ok':partTxt?'part':'ko'}"><b>${okTxt?'✓ Vérifié pour ce réseau':partTxt?'◐ Partiellement vérifié pour ce réseau':koTxt?'ⓘ Pas de programme de formation numérique propre au réseau':'ⓘ Programme du réseau non trouvé'}</b> ${okTxt||partTxt||koTxt||`Pour ${chk.nom}, je n’ai pas trouvé de programme propre à cette année : on affiche le référentiel officiel, qui s’applique à tous les réseaux.`}</div>`;
+    pc.innerHTML=head+netnote+(AUDIT?(c.cal?`<p class="pc-intro">${c.cal}</p>`:''):(c.calUser?`<p class="pc-intro warn">${c.calUser}</p>`:''))+(c.intro?`<p class="pc-intro">${AUDIT?'« '+c.intro+' »':c.intro}</p>`:'')+`
+    <div class="pc-grid pc-in"><div><h4>Dactylographie <span class="h4-tag">${AUDIT?'proposition KeyPace':'notre conseil'}</span></h4><div class="tl-wrap">${pin}<div class="ticks" aria-hidden="true">${ticks}</div></div><div class="legend">${legend}</div><div class="whys">${why}</div>${lt?`${lt.note?`<p class="pc-note">${lt.note}</p>`:''}<button class="pc-go" type="button" data-lesson="${lt.id}">${lt.label} →</button>`:''}</div>
+    <div><h4>Modules associés <span class="h4-tag">${ml.live?`${ml.live} prêt${ml.live>1?'s':''} sur ${ml.n}`:`${ml.n} à venir`}</span></h4><div class="mini-list">${ml.html}</div><p class="mini-note">${AUDIT?'Ils se créent petit à petit, à partir du programme : ceux qui sont prêts passent en « Disponible » tout seuls.':'De nouveaux modules arrivent régulièrement.'}</p></div></div>`;
+  }
+  function syncGo(){pgo.classList.toggle('ready',!!(pNet&&pYear))}
+  function saveSel(){try{if(pNet&&pYear)localStorage.setItem('kp_prog',JSON.stringify({net:pNet,year:pYear.l}))}catch(e){}}
+  function refresh(){if(pfold.classList.contains('open')&&pNet&&pYear){saveSel();renderProgramme()}}
+  menu1.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;pNet=b.dataset.id;const sb=root.querySelector('#sel1>button');sb.firstElementChild.textContent=NETS.find(n=>n.id===pNet).t;sb.classList.add('has');syncGo();refresh()});
+  menu2.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;pYear=YEARS.find(y=>y.l===b.dataset.l);const sb=root.querySelector('#sel2>button');sb.firstElementChild.textContent=pYear.l;sb.classList.add('has');syncGo();refresh()});
+  pgo.addEventListener('click',()=>{try{track('programme_view',{reseau:pNet,annee:pYear&&pYear.l})}catch(e){}saveSel();renderProgramme();pfold.classList.add('open');setTimeout(()=>pc.scrollIntoView({behavior:'smooth',block:'nearest'}),350)});
+  pc.addEventListener('click',e=>{
+    const o=e.target.closest('[data-open]');if(o){openModule(o.dataset.open);return}
+    const l=e.target.closest('[data-lesson]');if(l){try{track('programme_lesson',{lesson:l.dataset.lesson,reseau:pNet,annee:pYear&&pYear.l})}catch(x){}app.tryStartLesson(l.dataset.lesson);return}
+    const m=e.target.closest('[data-mod]');if(m){pick(m.dataset.mod);root.getElementById('hubStage').scrollIntoView({behavior:'smooth',block:'center'})}});
+    root.getElementById('heroCta').addEventListener('click',()=>{try{track('hub_bases_click')}catch(e){}app.enterBasesModule()});
+
+
+  /* modules : 1 bloc principal (bases) + 14 modules indépendants */
+  const C={num:['#0E9BC4','linear-gradient(135deg,#86DAF2 0%,#0E9BC4 55%,#0A7A99 100%)'],
+           ecr:['#4F6BE0','linear-gradient(135deg,#8DA2FF 0%,#4F6BE0 55%,#3A50C4 100%)'],
+           emp:['#E0883A','linear-gradient(135deg,#FFC37A 0%,#E0883A 55%,#C46A1F 100%)'],
+           cla:['#1FA9A0','linear-gradient(135deg,#6FDDD4 0%,#1FA9A0 55%,#138780 100%)'],
+           lan:['#3FA84E','linear-gradient(135deg,#7BDD7C 0%,#3FA84E 55%,#2C8A3C 100%)'],
+           poe:['#9B57D6','linear-gradient(135deg,#D4A3F5 0%,#9B57D6 55%,#7C3CB8 100%)']};
+  const CATS=[{id:'all',l:'Tous'},{id:'ecr',l:'Écriture'},{id:'emp',l:'Emploi'},{id:'cla',l:'Clavier'},{id:'lan',l:'Langue'}];
+  const M=(id,k,icon,img,cat,title,desc,live,ck)=>({id,k,color:(C[ck||k]||C[k])[0],grad:(C[ck||k]||C[k])[1],icon,img,cat,title,desc,live,st:live?'Disponible':'Bientôt',cta:live?'Commencer →':'Bientôt'});
+  const MODS=[
+    M('mail','ecr',IC.mail,'images/keypace-mascot-mail-allonge.webp','Écriture','Rédiger un mail',"Où écrire quoi, le ton juste selon la personne, repérer et corriger les erreurs, puis écrire ton propre mail avec une analyse en direct. Termine par un quiz final.",true),
+    M('cv','emp',IC.cv,'images/keypace-perso-cv.webp','Emploi','Faire son CV',"Construire un CV clair et lisible : les rubriques, la mise en page, les mots qui comptent. Tu tapes ton propre CV pas à pas.",false),
+    M('lettre','emp',IC.letter,'images/keypace-perso-lettre.webp','Emploi','Lettre de motivation',"Structurer ta lettre, trouver le bon ton et éviter les formules toutes faites, puis rédiger la tienne avec une analyse en direct.",false),
+    M('commande','ecr',IC.parcel,'images/keypace-mascot-cheer.webp','Écriture','Répondre à une commande',"Écrire un retour à un mail de commande : confirmer, signaler un souci, demander un échange ou un remboursement, poliment et clairement.",false),
+    M('pave','cla',IC.numpad,'images/keypace-perso-pave.webp','Clavier','Le pavé numérique',"Apprendre à taper les chiffres vite et sans regarder : montants, dates, numéros de téléphone, petits calculs.",false),
+    M('raccourcis','cla',IC.cmd,'images/keypace-perso-raccourcis.webp','Clavier','Les raccourcis clavier',"Copier, coller, annuler, sélectionner : les raccourcis qui font gagner du temps, pour Windows et pour Mac.",false),
+    M('formulaire','cla',IC.form,'images/keypace-perso-formulaire.webp','Clavier','Remplir un formulaire',"Tabulation, champs obligatoires, majuscules, adresses : remplir un formulaire en ligne sans erreur.",false),
+    M('ponctuation','lan',IC.quote,'images/keypace-mascot-books.webp','Langue','Ponctuation et majuscules',"Virgules, points, guillemets, majuscules : les règles qui rendent un texte facile à lire.",false),
+    M('conj','lan',IC.book,'images/keypace-mascot-conjugaison-reflexion.webp','Langue','Conjugaison',"Des règles de base du présent jusqu'aux temps les plus complexes, avec des mises en situation dans des phrases et des textes à trous.",false),
+    M('ortho','lan',IC.spell,'images/keypace-mascot-idea.webp','Langue','Orthographe',"Les accords, les homophones et les pièges classiques, à travers des phrases à corriger et des textes à compléter.",false),
+    M('dictee','lan',IC.ear,'images/keypace-perso-dictee.webp','Langue','Dictée',"Écoute, tape, compare : une dictée qui s'adapte à ton rythme et corrige tes erreurs en direct.",false),
+    M('poemes','poe',IC.pen,'images/keypace-mascot-poeme-stylo.webp','Poésie','Les poèmes',"Les règles des rimes et du rythme : de quoi écrire tes propres poèmes, et redécouvrir des classiques de façon ludique.",false),
+    M('notes','ecr',IC.notes,'images/keypace-mascot-beanbag.webp','Écriture','Prendre des notes',"Écouter, résumer, abréger : prendre des notes rapides et utiles pendant un cours ou une réunion.",false),
+    M('word','ecr',IC.layout,'images/keypace-mascot-cheer.webp','Écriture','Mise en page d\'un document',"Titres, paragraphes, listes, gras et italique : mettre en forme un texte propre dans un traitement de texte.",false)
+  ];
+  const THEMES=[['ecr','Écriture'],['emp','Emploi'],['cla','Clavier'],['num','Outils numériques'],['lan','Langue'],['poe','Poésie']];
+  /* Modules créés à partir du programme (pas encore disponibles). Quand l'un d'eux est prêt : live:true. */
+  const NEW_MODS=[
+   {id:'posture',k:'cla',icon:'user',img:'images/keypace-mascot-desk.webp',cat:'Clavier',title:'Bien s’installer devant le clavier',short:'Dos, bras et poignets : la bonne position pour taper sans se fatiguer.'},
+   {id:'saisir-texte',k:'cla',icon:'keyboard',img:'images/keypace-mascots-duo-laptop.webp',cat:'Clavier',title:'Saisir un texte court',short:'Utiliser les touches principales du clavier, les yeux sur l’écran.'},
+   {id:'caracteres-speciaux',k:'cla',icon:'keyboard',img:'images/keypace-test-vitesse-frappe.webp',cat:'Clavier',title:'Insérer des caractères spéciaux',short:'Retrouver et taper les symboles qui ne sont pas sur les touches habituelles.'},
+   {id:'tableur',k:'num',icon:'table',img:'images/keypace-mascot-idea.webp',cat:'Outils numériques',title:'Le tableur : données et formules',short:'Taper des chiffres, des mots et des formules dans les bonnes cases.'},
+   {id:'mot-de-passe',k:'num',icon:'lock',img:'images/keypace-mascot-beanbag.webp',cat:'Outils numériques',title:'Créer un mot de passe solide',short:'Lettres, chiffres et symboles : taper un mot de passe sûr.'},
+   {id:'recherche',k:'num',icon:'eye',img:'images/keypace-mascot-books.webp',cat:'Outils numériques',title:'Écrire une recherche',short:'Choisir les bons mots-clés et taper les symboles des recherches avancées.'},
+   {id:'nommer-fichier',k:'num',icon:'layout',img:'images/keypace-mascot-cheer.webp',cat:'Outils numériques',title:'Nommer un fichier et un dossier',short:'Choisir des noms clairs pour retrouver ses documents.'},
+   {id:'adresse-email',k:'ecr',icon:'mail',img:'images/keypace-mascot-mail-allonge.webp',cat:'Écriture',title:'Créer une adresse email, Cc et Cci',short:'Choisir son adresse, répondre, répondre à tous, transférer.'},
+   {id:'messagerie-instantanee',k:'ecr',icon:'mail',img:'images/keypace-mascot-desk.webp',cat:'Écriture',title:'Discuter en messagerie instantanée',short:'Écrire des messages courts, y compris dans une conversation de groupe.'},
+   {id:'netiquette',k:'ecr',icon:'mail',img:'images/keypace-mascot-idea.webp',cat:'Écriture',title:'Écrire poliment en ligne',short:'Les règles de politesse des messages, des chats et des documents partagés.'},
+   {id:'ecrire-texte',k:'ecr',icon:'pen',img:'images/keypace-mascot-books.webp',cat:'Écriture',title:'Écrire un texte au clavier',short:'Rédiger un texte, puis le présenter proprement avec un traitement de texte.'},
+   {id:'courrier-ecole',k:'ecr',icon:'letter',img:'images/keypace-mascot-poeme-stylo.webp',cat:'Écriture',title:'Structurer un courrier pour l’école',short:'Organiser l’information pour un texte clair et hiérarchisé.'},
+   {id:'ecrire-a-plusieurs',k:'ecr',icon:'pen',img:'images/keypace-mascot-cheer.webp',cat:'Écriture',title:'Écrire à plusieurs',short:'Commentaires et suivi des modifications dans un document partagé.'},
+   {id:'clavier-langue',k:'lan',icon:'keyboard',img:'images/keypace-mascot-beanbag.webp',cat:'Langue',title:'Écrire au clavier dans une langue étrangère',short:'Produire un écrit dans la langue étudiée, sur un support numérique.'}
+  ];
+  NEW_MODS.forEach(n=>{if(!MODS.find(m=>m.id===n.id))MODS.push(Object.assign(M(n.id,n.k,miniIcon(n.icon),n.img,n.cat,n.title,n.short+' Ce module arrive bientôt.',false),{short:n.short}))});
+  // sous-titre court pour les modules déjà existants rattachés au programme
+  [['mail','Destinataire, objet, texte du message et pièce jointe.'],['word','Mettre en forme un texte : police, puces, marges, sauts de page.'],['raccourcis','Couper, copier, coller et autres raccourcis avec les touches du clavier.']].forEach(([id,s])=>{const m=MODS.find(x=>x.id===id);if(m)m.short=s});
+  let curId='mail';
+  const list=root.getElementById('modList'),stage=root.getElementById('hubStage');
+  function drawList(){
+    list.innerHTML=THEMES.map(([k,l])=>{
+      const L=MODS.filter(m=>m.k===k);if(!L.length)return'';
+      return`<h4 style="--c:${C[k][0]}">${l}</h4>`+L.map(m=>`<button class="mrow${m.id===curId?' on':''}" data-id="${m.id}" style="--m-color:${m.color}"><span class="mtile-ico">${m.icon}</span><b>${m.title}</b><span class="mst${m.live?(isExpert()?' live':' expert'):''}">${statusLabel(m)}</span></button>`).join('');
+    }).join('');
+  }
+  /* ===== MINI-DÉMOS : un petit scénario animé par module, en boucle ===== */
+  let RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let SNAP={l:-1,h:'',el:null};
+  let DT=0,inView=true;
+  const io=new IntersectionObserver(es=>{inView=es[0].isIntersecting},{threshold:.15});io.observe(root.getElementById('hubStage'));
+  const sleep=async(ms,T)=>{
+    if(RM&&SNAP.el){const l=SNAP.el.innerText.length;if(l>=SNAP.l)SNAP={l,h:SNAP.el.innerHTML,el:SNAP.el}}
+    if(!RM)await new Promise(r=>setTimeout(r,ms));
+    while((!inView||document.hidden)&&T===DT)await new Promise(r=>setTimeout(r,250));
+    if(T!==DT)throw 0;
+  };
+  async function typ(el,text,T,sp=36){
+    if(RM){el.textContent=text;return}
+    el.classList.add('cur');
+    for(let i=1;i<=text.length;i++){el.textContent=text.slice(0,i);await sleep(sp+Math.random()*28,T)}
+    el.classList.remove('cur');
+  }
+  const flash=async(el,T,ms=240)=>{el.classList.add('on');await sleep(ms,T);el.classList.remove('on')};
+  const DEMOS={
+    mail:{title:'Nouveau message',html:`<div class="d-f"><b>À</b><span data-a></span></div><div class="d-f"><b>Objet</b><span data-b></span></div><div class="d-msg" data-c></div><div class="d-send"><button class="d-btn" data-d>Envoyer</button><span class="d-pop" data-e>✓ Envoyé</span></div>`,
+     async run(r,T){const q=s=>r.querySelector(s);
+      await typ(q('[data-a]'),'marie.dupont@ecole.be',T,28);await typ(q('[data-b]'),"Question sur l'exercice 3",T,28);
+      await typ(q('[data-c]'),"Bonjour Madame,\n\nJe n'ai pas bien compris l'exercice 3. Pourriez-vous m'expliquer ?\n\nCordialement,\nLéa",T,24);
+      await sleep(500,T);q('[data-d]').classList.add('press');await sleep(250,T);q('[data-d]').classList.remove('press');q('[data-e]').classList.add('on');await sleep(1900,T);
+      ['[data-a]','[data-b]','[data-c]'].forEach(s=>q(s).textContent='');q('[data-e]').classList.remove('on');}},
+    cv:{title:'mon-cv.doc',html:`<div style="display:flex;gap:10px;align-items:center;margin-bottom:12px"><div class="d-av">L</div><div><div style="font-weight:800;font-size:15px;min-height:20px" data-n></div><div style="color:var(--muted);font-size:11px">Élève en 5e secondaire</div></div></div>
+      <div class="d-sec" data-s1><h5>Profil</h5><div class="d-bars"><div class="d-bar" data-w="100%"></div><div class="d-bar" data-w="82%"></div></div></div>
+      <div class="d-sec" data-s2><h5>Expériences</h5><div class="d-bars"><div class="d-bar" data-w="90%"></div><div class="d-bar" data-w="64%"></div></div></div>
+      <div class="d-sec" data-s3><h5>Compétences</h5><div class="d-skill"><span>Clavier</span><i><em data-w="85%"></em></i></div><div class="d-skill"><span>Langues</span><i><em data-w="65%"></em></i></div></div>`,
+     async run(r,T){const q=s=>r.querySelector(s);await typ(q('[data-n]'),'Léa Martin',T,70);
+      for(const s of ['[data-s1]','[data-s2]','[data-s3]']){const sec=q(s);sec.classList.add('on');await sleep(200,T);sec.querySelectorAll('[data-w]').forEach(b=>b.style.width=b.dataset.w);await sleep(900,T)}
+      await sleep(1800,T);q('[data-n]').textContent='';r.querySelectorAll('.d-sec').forEach(s=>s.classList.remove('on'));r.querySelectorAll('[data-w]').forEach(b=>b.style.width=0);await sleep(400,T)}},
+    lettre:{title:'lettre.doc',html:`<div style="min-height:20px;font-weight:700" data-a></div><div class="d-bars" style="margin-top:12px"><div class="d-bar" data-w="100%"></div><div class="d-bar" data-w="96%"></div><div class="d-bar" data-w="100%"></div><div class="d-bar" data-w="58%"></div></div><div style="min-height:20px;font-weight:700;margin-top:12px" data-b></div><svg class="d-sig" data-sig width="120" height="36" viewBox="0 0 120 36"><path d="M4 26 C14 4 22 4 20 22 C18 34 30 8 38 20 C44 30 50 10 60 18 S86 26 114 10"/></svg>`,
+     async run(r,T){const q=s=>r.querySelector(s);await typ(q('[data-a]'),'Madame, Monsieur,',T,60);
+      for(const b of r.querySelectorAll('[data-w]')){b.style.width=b.dataset.w;await sleep(420,T)}
+      await typ(q('[data-b]'),'Cordialement,',T,60);q('[data-sig]').classList.add('on');await sleep(2600,T);
+      q('[data-a]').textContent='';q('[data-b]').textContent='';q('[data-sig]').classList.remove('on');r.querySelectorAll('[data-w]').forEach(b=>b.style.width=0);await sleep(400,T)}},
+    commande:{title:'Répondre au vendeur',html:`<div class="d-mail"><b>Boutique Lumo</b>Votre commande n° 4821 a été livrée.</div><div class="d-msg" style="min-height:84px" data-a></div><span class="d-chip" data-c>✓ Échange demandé</span>`,
+     async run(r,T){const q=s=>r.querySelector(s);await sleep(500,T);await typ(q('[data-a]'),"Bonjour, mon colis est bien arrivé mais l'article est abîmé. Pourriez-vous me l'échanger ? Merci !",T,26);
+      await sleep(400,T);q('[data-c]').classList.add('on');await sleep(2200,T);q('[data-a]').textContent='';q('[data-c]').classList.remove('on')}},
+    pave:{title:'Calculatrice',html:`<div class="d-disp" data-a>&nbsp;</div><div class="d-pad">${['7','8','9','+','4','5','6','−','1','2','3','×','0',',','⏎','='].map(k=>`<div class="d-key" data-k="${k}">${k}</div>`).join('')}</div>`,
+     async run(r,T){const q=s=>r.querySelector(s),disp=q('[data-a]');let s='';
+      const press=async k=>{const el=q(`[data-k="${k}"]`);el.classList.add('on');if(k==='=')disp.textContent='= 19,75';else{s+=k;disp.textContent=s}await sleep(300,T);el.classList.remove('on')};
+      for(const k of '12,50+7,25')await press(k);await press('=');await sleep(2000,T);s='';disp.innerHTML='&nbsp;'}},
+    raccourcis:{title:'Copier / coller',html:`<div class="d-toast" data-t>Copié</div><div class="d-box"><span data-s>Bonjour tout le monde</span></div><div class="d-kbd"><div class="d-key" data-k="a">Ctrl</div><em>+</em><div class="d-key" data-k="b">C</div></div><div class="d-box" style="min-height:42px"><span data-d></span></div>`,
+     async run(r,T){const q=s=>r.querySelector(s),kb=r.querySelectorAll('.d-kbd .d-key');
+      await sleep(600,T);q('[data-s]').classList.add('d-sel');await sleep(500,T);kb.forEach(k=>k.classList.add('on'));q('[data-t]').classList.add('on');await sleep(700,T);kb.forEach(k=>k.classList.remove('on'));q('[data-t]').classList.remove('on');
+      kb[1].textContent='V';await sleep(500,T);kb.forEach(k=>k.classList.add('on'));await sleep(250,T);q('[data-d]').textContent='Bonjour tout le monde';await sleep(500,T);kb.forEach(k=>k.classList.remove('on'));
+      await sleep(2000,T);q('[data-s]').classList.remove('d-sel');q('[data-d]').textContent='';kb[1].textContent='C'}},
+    formulaire:{title:'Inscription',html:`<div class="d-in" data-f><small>Nom</small><span data-a></span></div><div class="d-in" data-f><small>Adresse</small><span data-b></span></div><div class="d-check" data-c><i>✓</i>J'accepte le règlement</div><div class="d-send"><button class="d-btn" data-d>Envoyer</button><span class="d-pop" data-e>✓ Reçu</span></div>`,
+     async run(r,T){const q=s=>r.querySelector(s),fs=r.querySelectorAll('[data-f]');
+      fs[0].classList.add('foc');await typ(q('[data-a]'),'Léa Martin',T,50);await sleep(300,T);fs[0].classList.remove('foc');fs[1].classList.add('foc');await typ(q('[data-b]'),'12 rue des Écoles',T,40);await sleep(300,T);fs[1].classList.remove('foc');
+      q('[data-c]').classList.add('on');await sleep(600,T);q('[data-d]').classList.add('press');await sleep(250,T);q('[data-d]').classList.remove('press');q('[data-e]').classList.add('on');await sleep(1900,T);
+      q('[data-a]').textContent='';q('[data-b]').textContent='';q('[data-c]').classList.remove('on');q('[data-e]').classList.remove('on')}},
+    ponctuation:{title:'Exercice',html:`<div class="d-big" data-a></div><span class="d-tag" data-t></span>`,
+     async run(r,T){const q=s=>r.querySelector(s);const A=q('[data-a]'),Tg=q('[data-t]');
+      const steps=[['bonjour marie comment vas tu',''],['<mark>B</mark>onjour marie comment vas tu','Majuscule'],['Bonjour <mark>M</mark>arie comment vas tu','Majuscule'],['Bonjour Marie<mark>,</mark> comment vas tu','Virgule'],['Bonjour Marie, comment vas<mark>-</mark>tu','Trait d\'union'],['Bonjour Marie, comment vas-tu<mark>&nbsp;?</mark>','Point d\'interrogation']];
+      for(const [h,t] of steps){A.innerHTML=h;Tg.textContent=t;Tg.style.visibility=t?'visible':'hidden';await sleep(h===steps[0][0]?1100:1000,T)}
+      await sleep(1500,T)}},
+    conj:{title:'Conjugaison',html:`<div class="d-big" data-a></div><span class="d-tag" data-t></span>`,
+     async run(r,T){const A=r.querySelector('[data-a]'),Tg=r.querySelector('[data-t]');
+      for(const [pre,v,post,ans,t] of [['Hier, nous','jouer','au ballon.','jouions','imparfait'],['Demain, elle','finir','son devoir.','finira','futur'],['Chaque jour, ils','prendre','le bus.','prennent','présent']]){
+        A.innerHTML=`${pre}&nbsp;<span class="d-ans" data-x>&nbsp;</span>&nbsp;(${v})&nbsp;${post}`;Tg.textContent='';Tg.style.visibility='hidden';await sleep(900,T);
+        await typ(A.querySelector('[data-x]'),ans,T,70);A.querySelector('[data-x]').classList.add('d-ok');Tg.textContent='✓ '+t;Tg.style.visibility='visible';await sleep(1500,T)}}},
+    ortho:{title:'Orthographe',html:`<div class="d-big" data-a></div><div class="d-chips" data-c></div>`,
+     async run(r,T){const A=r.querySelector('[data-a]'),C=r.querySelector('[data-c]');
+      for(const [pre,ok,ko,post] of [['Il va','à','a',"l'école."],['Léa','a','à','un chat.'],['Ils','sont','son','contents.']]){
+        A.innerHTML=`${pre}&nbsp;<span class="d-ans" data-x>&nbsp;</span>&nbsp;${post}`;C.innerHTML=`<span class="d-opt" data-o="${ko}">${ko}</span><span class="d-opt" data-o="${ok}">${ok}</span>`;await sleep(900,T);
+        const bad=C.querySelector(`[data-o="${ko}"]`),good=C.querySelector(`[data-o="${ok}"]`);bad.classList.add('bad');await sleep(700,T);bad.classList.remove('bad');good.classList.add('good');
+        const x=A.querySelector('[data-x]');x.textContent=ok;x.classList.add('d-ok');await sleep(1500,T)}}},
+    dictee:{title:'Dictée',html:`<div class="d-wave" data-w>${Array.from({length:14},(_,i)=>`<i style="--i:${i}"></i>`).join('')}</div><div class="d-poem" style="font-family:inherit;font-size:14px;font-weight:700" data-a></div><span class="d-tag" data-t style="visibility:hidden"></span>`,
+     async run(r,T){const q=s=>r.querySelector(s),A=q('[data-a]'),W=q('[data-w]'),Tg=q('[data-t]');
+      W.classList.add('on');await sleep(1700,T);W.classList.remove('on');
+      await typ(A,'Le chat dort sur le canapet.',T,55);A.innerHTML='Le chat dort sur le <span class="d-err">canapet</span>.';Tg.textContent='1 faute repérée';Tg.style.visibility='visible';await sleep(1300,T);
+      A.innerHTML='Le chat dort sur le <span class="d-ok">canapé</span>.';Tg.textContent='✓ Corrigé';await sleep(1700,T);A.textContent='';Tg.style.visibility='hidden'}},
+    poemes:{title:'Mon poème',html:`<div class="d-poem"><div data-a></div><div data-b></div></div><span class="d-tag" data-t style="visibility:hidden"></span>`,
+     async run(r,T){const q=s=>r.querySelector(s),A=q('[data-a]'),B=q('[data-b]'),Tg=q('[data-t]');
+      await typ(A,"Sous la lune qui s'éveille",T,50);await typ(B,'Le jardin tout entier sommeille',T,50);
+      A.innerHTML="Sous la lune qui s'<span class=\"rw\">éveille</span>";B.innerHTML='Le jardin tout entier <span class="rw">sommeille</span>';Tg.textContent='✓ Deux rimes';Tg.style.visibility='visible';await sleep(2800,T);
+      A.textContent='';B.textContent='';Tg.style.visibility='hidden'}},
+    notes:{title:'Notes de cours',html:`<div class="d-note" data-l></div><div class="d-note" data-l></div><div class="d-note" data-l></div><div class="d-note" data-l></div>`,
+     async run(r,T){const L=r.querySelectorAll('[data-l]');
+      const lines=['• Contrôle lundi','• Apporter : calculatrice','→ réviser chap. 3','★ Ne pas oublier le carnet'];
+      for(let i=0;i<4;i++){await typ(L[i],lines[i],T,34);if(i===3)L[i].classList.add('star');await sleep(250,T)}
+      await sleep(2200,T);L.forEach(l=>{l.textContent='';l.classList.remove('star')})}},
+    word:{title:'Document',html:`<div class="d-bar2"><span data-t="h">H1</span><span data-t="b"><b>G</b></span><span data-t="l">•</span></div><div class="d-h" data-h>Mon voyage</div><div style="margin:8px 0" data-p>Cet été, nous sommes partis à la <span data-bold>mer</span>.</div><div class="d-li" data-li>Le soleil</div><div class="d-li" data-li>Les vagues</div>`,
+     async run(r,T){const q=s=>r.querySelector(s);
+      await sleep(900,T);await flash(q('[data-t="h"]'),T,500);q('[data-h]').classList.add('big');await sleep(700,T);
+      await flash(q('[data-t="b"]'),T,500);q('[data-bold]').style.fontWeight='800';q('[data-bold]').style.color='var(--m-color)';await sleep(600,T);
+      q('[data-t="l"]').classList.add('on');for(const li of r.querySelectorAll('[data-li]')){li.classList.add('on');li.textContent='• '+li.textContent.replace('• ','');await sleep(500,T)}
+      await sleep(2000,T);q('[data-t="l"]').classList.remove('on');q('[data-h]').classList.remove('big');q('[data-bold]').style.fontWeight='';q('[data-bold]').style.color='';r.querySelectorAll('[data-li]').forEach(l=>{l.classList.remove('on');l.textContent=l.textContent.replace('• ','')});await sleep(300,T)}}
+  };
+  async function runDemo(id){
+    const T=++DT,slot=root.getElementById('demoSlot'),d=DEMOS[id];if(!slot||!d)return;
+    slot.innerHTML=`<div class="demo"><div class="demo-bar"><i></i><i></i><i></i><span>${d.title}</span></div><div class="demo-body">${d.html}</div></div>`;
+    const body=slot.querySelector('.demo-body');
+    try{
+      if(RM){SNAP={l:-1,h:'',el:body};await d.run(body,T);if(T===DT&&SNAP.h)body.innerHTML=SNAP.h;SNAP.el=null;return}
+      while(true){await d.run(body,T);if(T!==DT)return;body.innerHTML=d.html}
+    }catch(e){}
+  }
+
+  function pick(id){
+    curId=id;const m=MODS.find(x=>x.id===id);
+    stage.style.setProperty('--m-grad',m.grad);
+    stage.innerHTML=`<img class="stageD1-mascot" src="${m.img}" alt=""><div class="stageD1-body"><span class="stageD1-cat">${m.cat}</span><h3>${m.title}</h3><p>${m.desc}</p><div class="stageD1-foot"><span class="stageD1-status">${statusLabel(m)}</span><button class="stageD1-cta" data-open="${m.id}" style="color:${m.color}" ${m.live?'':'disabled'}>${ctaLabel(m)}</button></div></div>${DEMOS[id]?`<div class="demo-col"><div id="demoSlot"></div><div class="demo-cap">${m.live?'Un aperçu de ce que tu vas faire':'Aperçu : ce module arrive bientôt'}</div></div>`:''}`;
+    stage.style.setProperty('--m-color',m.color);runDemo(id);
+    drawList();
+  }
+  list.addEventListener('click',e=>{const b=e.target.closest('.mrow');if(b)pick(b.dataset.id);});
+  pick('mail');
+  stage.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o)openModule(o.dataset.open)});
+  root.getElementById('modCount').textContent=MODS.length+' modules';
+
+  root.getElementById('hubFunFact').textContent=HUB_FUN_FACTS[Math.floor(Math.random()*HUB_FUN_FACTS.length)];
+  offs.push(()=>{DT=-999;io.disconnect()});
+  try{const s=JSON.parse(localStorage.getItem('kp_prog')||'null');
+    if(s&&NETS.some(n=>n.id===s.net)&&YEARS.some(y=>y.l===s.year)){
+      pNet=s.net;pYear=YEARS.find(y=>y.l===s.year);
+      const b1=root.querySelector('#sel1>button'),b2=root.querySelector('#sel2>button');
+      b1.firstElementChild.textContent=NETS.find(n=>n.id===pNet).t;b1.classList.add('has');
+      b2.firstElementChild.textContent=pYear.l;b2.classList.add('has');
+      syncGo();renderProgramme();pfold.classList.add('open');
+    }}catch(e){}
+
+}
+return {mount};
+})();
 
 const app={
   view:'home',sess:null,stats:null,game:null,sprint:null,course:null,simon:null,boss:null,duel:null,royale:null,clavier:null,activeGame:null,now:Date.now(),_gcineCat:'vitesse',_gcineVisible:null,_clavierFlashT:null,_royaleHistory:null,_royaleHistLoading:false,
@@ -7607,54 +7923,8 @@ const app={
   },
 
   renderModulesHub(){
-    const tabsHTML=HUB_MODULES.map(mod=>`<button class="tabD1${mod.id==='bases'?' active':''}" data-mod="${mod.id}" style="--m-color:${mod.color}" onclick="app._hubSelectTab('${mod.id}')"><span class="tabD1-badge">${mod.icon}</span><span class="tabD1-txt">${mod.title}<small>${mod.statusTxt}</small></span></button>`).join('');
-    document.getElementById('page-lessons').innerHTML=`
-      <div class="home-hero" style="padding-top:8px;padding-bottom:8px">
-        <div>
-          <h1 style="font-size:clamp(28px,3.4vw,42px)">Choisis ton <span style="color:var(--accent)">module</span> du jour.</h1>
-          <p style="max-width:460px">Chaque module est <strong>indépendant</strong> : commence par celui qui t'intéresse, reviens aux autres quand tu veux. Il n'y a pas de bon ordre.</p>
-        </div>
-        <div class="hero-mascots" aria-hidden="true">
-          <div class="hm-key hm-key-1">A</div>
-          <div class="hm-key hm-key-2">Z</div>
-          <div class="hm-char hm-duo"><img class="hm-img" src="/images/keypace-mascots-duo.webp" alt="" width="378" height="422" loading="lazy" decoding="async"></div>
-        </div>
-      </div>
-      <div class="modules-hub-page">
-        <div class="hub-stats-row">
-          <div class="hub-stat"><b>65+</b><span>leçons au total</span></div>
-          <div class="hub-stat-divider"></div>
-          <div class="hub-stat"><b>4</b><span>modules</span></div>
-        </div>
-        <div class="hub-section-hdr"><h2>Les modules</h2><p>Choisis librement, dans l'ordre que tu veux.</p></div>
-        <div class="selectorD">
-          <div class="tabsD1" id="hubTabs">
-            <div class="tabs-slider" id="hubSlider" style="background:${HUB_MODULES[0].grad}"></div>
-            ${tabsHTML}
-          </div>
-          <div class="stageD1" id="hubStage" style="--m-grad:${HUB_MODULES[0].grad}">${hubStageHTML(HUB_MODULES[0])}</div>
-        </div>
-        <div style="text-align:center;margin:0 0 32px">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:7px">Le saviez-vous ?</div>
-          <div id="hubFunFact" style="font-size:15px;color:var(--txt);font-weight:600;max-width:620px;margin:0 auto;line-height:1.5"></div>
-        </div>
-      </div>`;
-    const activeEl=document.querySelector('#hubTabs .tabD1.active');
-    const slider=document.getElementById('hubSlider');
-    if(activeEl&&slider&&window.innerWidth>760)slider.style.transform='translateY('+(activeEl.offsetTop-8)+'px)';
-    const factEl=document.getElementById('hubFunFact');
-    if(factEl)factEl.textContent=HUB_FUN_FACTS[Math.floor(Math.random()*HUB_FUN_FACTS.length)];
-  },
-  _hubSelectTab(id){
-    const mod=HUB_MODULES.find(m=>m.id===id);if(!mod)return;
-    document.querySelectorAll('#hubTabs .tabD1').forEach(el=>el.classList.toggle('active',el.dataset.mod===id));
-    const stage=document.getElementById('hubStage');
-    stage.style.setProperty('--m-grad',mod.grad);
-    stage.innerHTML=hubStageHTML(mod);
-    const slider=document.getElementById('hubSlider');
-    slider.style.background=mod.grad;
-    const activeEl=document.querySelector('#hubTabs .tabD1.active');
-    if(activeEl&&window.innerWidth>760)slider.style.transform='translateY('+(activeEl.offsetTop-8)+'px)';
+    document.getElementById('page-lessons').innerHTML='<div id="kpCoursHost"></div>';
+    KPCours.mount(document.getElementById('kpCoursHost'));
   },
   enterBasesModule(){
     this._skipModulesHub=true;
