@@ -234,6 +234,10 @@ em{font-style:normal;color:var(--mod)}
 .mbody{padding:20px 22px 22px;display:grid;gap:10px;font-size:15px;line-height:1.55}
 .zone{padding:4px 8px;margin:0 -8px;border-radius:8px;transition:all .25s;opacity:.4}
 .zone.on{background:var(--mod-soft);box-shadow:inset 0 0 0 2px var(--mod);opacity:1}
+.replybar{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px!important}
+.replybar span{font-size:12.5px;font-weight:600;border:1px solid var(--border);border-radius:9px;padding:5px 10px;background:#fff}
+.follow{font-size:12.5px;color:#6B645C}
+.tbtn{font-size:12px;padding:3px 9px;border-radius:8px;margin:0 0 0 8px!important}
 .attach{margin:6px -8px 0;padding:8px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:14px;transition:all .25s}
 .attach small{font-size:12px;color:#8A8279;margin-left:auto}
 
@@ -519,7 +523,8 @@ const INFORMAL = { salut:'bonjour', coucou:'bonjour', hello:'bonjour', hey:'bonj
 
 
 const STEPS = [
-  { z:'to', t:'Le destinataire', x:"« À » : la ou les personnes qui doivent agir. « Cc » : celles qui doivent juste être au courant. « Cci » : copie cachée, les autres ne voient pas l'adresse.", tip:"Remplis le champ « À » en dernier : tu évites d'envoyer un brouillon par erreur.", a:"Mettre 30 personnes en « À » ou en « Cc » quand une seule est concernée." },
+  { z:'to', t:'Le destinataire', x:"Dans « À », tu mets la personne qui doit agir : celle à qui tu poses ta question ou fais ta demande. S'il y a plusieurs personnes concernées, tu peux en mettre plusieurs.", tip:"Remplis le champ « À » en dernier : tu évites d'envoyer un brouillon par erreur.", a:"Mettre 30 personnes en « À » quand une seule est concernée." },
+  { z:'cc', t:'Cc et Cci : qui reçoit une copie', x:"« Cc » veut dire copie : les personnes qui doivent seulement être au courant. Tout le monde voit leur adresse. « Cci » veut dire copie cachée : la personne reçoit le mail, mais les autres ne voient pas son adresse. On l'utilise pour écrire à un groupe de personnes qui ne se connaissent pas, afin de ne pas partager leurs adresses.", tip:"Écris à plusieurs personnes qui ne se connaissent pas ? Mets-les toutes en « Cci ».", a:"Mettre toute la classe en « Cc » : tout le monde recevra les réponses si quelqu'un clique sur « Répondre à tous »." },
   { z:'subject', t:"L'objet", x:"Le titre de ton mail. Il doit dire en quelques mots de quoi tu parles, pour que la personne sache si c'est urgent avant même d'ouvrir.", tip:"Sujet + action : « Devoir de géo : demande de délai ».", a:"Un objet vide, « Question », « Urgent !!! » ou tout ton message dans l'objet." },
   { z:'greet', t:"La formule d'appel", x:"La première ligne, suivie d'une virgule. Elle donne le ton du mail : « Bonjour Madame Dupont, » n'a pas le même effet que « Salut ! ».", tip:"Si tu ne connais pas le nom : « Madame, Monsieur, ».", a:"« Bonjour Madame Sophie » : jamais le prénom avec Madame ou Monsieur." },
   { z:'intro', t:'La présentation', x:"Une phrase pour dire qui tu es, si la personne ne te connaît pas bien. Ton prof a peut-être 150 élèves !", tip:"Nom + contexte : « élève de 4e B », « stagiaire au service IT ».", a:"Commencer directement par la demande sans te présenter." },
@@ -527,7 +532,11 @@ const STEPS = [
   { z:'ask', t:'La demande', x:"Le cœur du mail : qu'attends-tu de la personne ? Formule-le clairement, avec une date si besoin.", tip:"« Serait-il possible de… ? », « Pourriez-vous… ? ».", a:"Une demande floue ou cachée au milieu d'un paragraphe." },
   { z:'polite', t:'La formule de politesse', x:"Tu remercies et tu conclus. Plus la personne est haut placée ou inconnue, plus la formule est soutenue.", tip:"« Bien cordialement, » marche dans presque toutes les situations formelles.", a:"« Cdlt », « Bizz » ou rien du tout." },
   { z:'sign', t:'La signature', x:"Ton prénom et ton nom, et si utile ta classe, ton école ou ton numéro. La personne doit savoir qui tu es sans regarder ton adresse.", tip:"Crée une signature automatique dans ta messagerie.", a:"Signer « Léa » seule dans un mail formel, ou pas de signature." },
-  { z:'attach', t:'La pièce jointe', x:"Un document à envoyer ? Joins-le et annonce-le dans le texte. Donne-lui un nom clair.", tip:"Nomme tes fichiers : « CV-Lea-Martin.pdf ». Préfère le PDF.", a:"Écrire « voir PJ » et oublier de la joindre (ça arrive à tout le monde)." }
+  { z:'attach', t:'La pièce jointe', x:"Un document à envoyer ? Joins-le et annonce-le dans le texte. Donne-lui un nom clair. Attention à la taille : les messageries limitent le poids des pièces jointes, souvent autour de 20 à 25 Mo.", tip:"Nomme tes fichiers : « CV-Lea-Martin.pdf ». Préfère le PDF.", a:"Écrire « voir PJ » et oublier de la joindre (ça arrive à tout le monde)." },
+  { z:'prio', t:'La priorité', x:"Certaines messageries, comme Outlook, permettent de marquer un mail en « importance haute » : le destinataire voit alors un point d'exclamation rouge dans sa boîte de réception. Toutes les messageries n'ont pas ce bouton, et son affichage peut varier selon la messagerie de la personne qui reçoit.", tip:"Réserve la priorité haute aux messages vraiment urgents, avec une date précise dans le texte.", a:"Tout marquer comme urgent : à force, personne ne le remarque plus, et c'est mal perçu." },
+  { z:'draft', t:'Le brouillon', x:"Un mail pas fini ? Tu peux l'enregistrer en brouillon : il reste dans le dossier « Brouillons » et tu le retrouves plus tard. Beaucoup de messageries le font aussi toutes seules pendant que tu écris. Un mail important mérite d'être relu après une pause, avant de l'envoyer.", tip:"Écris, enregistre en brouillon, fais une pause, puis relis-toi à voix haute avant d'envoyer.", a:"Envoyer tout de suite, sans relire : une faute ou un oubli ne se rattrape plus." },
+  { z:'reply', t:'Répondre, répondre à tous, transférer', x:"« Répondre » écrit uniquement à la personne qui t'a écrit. « Répondre à tous » écrit aussi à toutes les personnes en copie. « Transférer » envoie le mail à quelqu'un d'autre. Ces trois boutons sont proches : on se trompe vite.", tip:"Avant de cliquer sur « Répondre à tous », demande-toi : est-ce que chaque personne a besoin de lire ma réponse ?", a:"Répondre à tous pour dire « merci » ou « ok » : tu remplis la boîte de réception de dizaines de personnes. Et vérifie aussi avant de transférer : le mail d'origine contient peut-être des informations privées." },
+  { z:'follow', t:'La relance', x:"Pas de réponse ? Les gens sont occupés et un mail peut se perdre. Attends quelques jours, puis envoie un court rappel poli, dans le même fil, en rappelant ta demande. Pour une candidature, on peut relancer environ 15 jours après l'envoi.", tip:"« Je me permets de revenir vers vous au sujet de mon message du 6 octobre. »", a:"Relancer le lendemain, ou envoyer plusieurs rappels agacés (« Vous avez vu mon mail ??? »)." }
 ];
 
 const QCM = {
@@ -535,6 +544,7 @@ const QCM = {
     { q:"Pour éviter d'envoyer un brouillon par erreur, quel champ remplis-tu en dernier ?", o:["L'objet","Le destinataire (« À »)","La signature"], a:1, why:"Sans adresse, le mail ne peut pas partir : tu as le temps de te relire." },
     { q:"Tu écris à ta prof, Mme Dupont. Quelle formule d'appel est la bonne ?", o:["Salut Madame,","Bonjour Madame Sophie,","Bonjour Madame Dupont,","Hello,"], a:2, why:"Madame ou Monsieur + nom de famille, jamais le prénom, et une virgule à la fin." },
     { q:"Quel objet est le plus efficace ?", o:["Question","Urgent !!!","Devoir de géo : demande de délai","Bonjour Madame"], a:2, why:"Un bon objet dit de quoi on parle et ce que tu demandes, en quelques mots." },
+    { q:"Tu écris à 20 parents qui ne se connaissent pas. Où mets-tu leurs adresses ?", o:["Toutes en « À »","En « Cci »","En « Cc »"], a:1, why:"« Cci » est la copie cachée : chaque parent reçoit le mail sans voir les adresses des autres." },
     { q:"Tu écris « mon CV est en pièce jointe ». Que fais-tu avant d'envoyer ?", o:["Rien, c'est bon","Je vérifie que le fichier est bien joint","Je le copie dans le texte"], a:1, why:"Annoncer une pièce jointe sans la joindre arrive à tout le monde : un dernier coup d'œil évite l'oubli." }
   ],
   adapter: [
@@ -548,6 +558,11 @@ const QCM = {
 
 /* Banque du quiz final : tire 10 questions au hasard parmi toutes les parties */
 const BANK_EXTRA = [
+  { part:1, q:"Tu veux seulement dire « merci » à la personne qui t'a écrit, avec 15 personnes en copie. Que cliques-tu ?", o:["Répondre à tous","Répondre","Transférer"], a:1, why:"« Répondre » écrit uniquement à l'expéditeur. « Répondre à tous » dérange inutilement tout le monde." },
+  { part:1, q:"Ta demande est restée sans réponse. Que fais-tu ?", o:["J'attends quelques jours, puis j'envoie un rappel poli","J'envoie dix messages dans l'heure","J'abandonne tout de suite"], a:0, why:"Un court rappel poli, dans le même fil, après quelques jours, fait ressortir ta demande sans agacer." },
+  { part:1, q:"Quand marques-tu un mail en « importance haute » ?", o:["Pour tous mes mails","Seulement quand c'est vraiment urgent","Jamais, c'est interdit"], a:1, why:"Si tout est urgent, plus rien ne l'est. Réserve cette option aux messages qui le méritent." },
+  { part:1, q:"Ton mail n'est pas fini. Que fais-tu ?", o:["Je l'envoie quand même","Je l'enregistre en brouillon et je le termine plus tard","Je le supprime"], a:1, why:"Le brouillon te permet de le retrouver, de te relire après une pause et d'éviter un envoi raté." },
+  { part:1, q:"Que se passe-t-il quand tu mets toute la classe en « Cc » ?", o:["Chacun voit toutes les adresses","Personne ne reçoit le mail","Les adresses restent cachées"], a:0, why:"En « Cc », les adresses sont visibles par tous. Pour un groupe qui ne se connaît pas, utilise « Cci »." },
   { part:1, q:"Que mets-tu en « Cc » ?", o:["Les personnes qui doivent agir","Les personnes qui doivent juste être au courant","Les personnes dont l'adresse doit rester cachée"], a:1, why:"« À » : ceux qui agissent. « Cc » : ceux qui sont informés. « Cci » : copie cachée." },
   { part:1, q:"Où place-t-on la formule de politesse ?", o:["Au tout début du mail","Juste avant la signature","Après la signature"], a:1, why:"L'ordre naturel : appel, présentation, demande, politesse, signature." },
   { part:3, q:"« Bonjour Madame Sophie, » : quelle est l'erreur ?", o:["Le prénom avec « Madame »","La virgule","Le mot « Bonjour »"], a:0, why:"Madame ou Monsieur se met avec le nom de famille, jamais avec le prénom." },
@@ -608,7 +623,7 @@ const QUIZ = [
 const SMS = /\b(slt|stp|svp|mdr|ptdr|pk|pq|bcp|jsp|tkt|dsl|cc|bjr|cdlt|jpp|wesh)\b/i;
 
 const PARTS = [
-  { k:'comprendre', n:1, title:'Comprendre un mail', hl:'un mail', img:'keypace-mascot-idea', desc:"Les 9 cases d'un mail, une par une. Fais défiler : chaque étape allume la zone correspondante.", prev:['9 étapes','Mail annoté','Quiz'] },
+  { k:'comprendre', n:1, title:'Comprendre un mail', hl:'un mail', img:'keypace-mascot-idea', desc:"Les 14 cases d'un mail, une par une : destinataire, copies, objet, texte, pièce jointe, priorité, brouillon, réponses et relance. Fais défiler : chaque étape allume la zone correspondante.", prev:['14 étapes','Mail annoté','Quiz'] },
   { k:'adapter', n:2, title:'Adapter le ton', hl:'le ton', img:'keypace-mascots-duo', desc:"La structure reste la même. Ce qui change : le ton, la formule d'appel et la formule de politesse.", prev:['7 destinataires','Formalité','Quiz'] },
   { k:'reperer', n:3, title:'Repérer les erreurs', hl:'les erreurs', img:'keypace-mascot-conjugaison-reflexion', desc:"D'abord tu repères les erreurs d'un mail, puis tu les corriges et tu vois le lecteur réagir en direct.", prev:['2 mails','Repère + corrige','Le lecteur réagit'] },
   { k:'entrainer', n:4, title:"S'entraîner à écrire", hl:'à écrire', img:'keypace-mascot-bureau-complet', desc:"Choisis une situation et rédige le mail. La checklist se valide au fur et à mesure.", prev:['12 situations','Checklist en direct'] }
@@ -699,7 +714,7 @@ function renderHub(){
     <div class="stop ${done[p.k]?'done':''} ${p.k===nextK?'next':''}">
       ${partCard(p)}
       <div class="node">${done[p.k] ? '✓' : p.n}</div>
-      <div class="side">${p.k===nextK ? `<img src="//images/keypace-mascot-${mascots[i]}.webp" alt=""><span class="bubble">${n ? 'Tu en es là !' : 'Commence ici !'}</span>` : ''}</div>
+      <div class="side">${p.k===nextK ? `<img src="/images/keypace-mascot-${mascots[i]}.webp" alt=""><span class="bubble">${n ? 'Tu en es là !' : 'Commence ici !'}</span>` : ''}</div>
     </div>`).join('')}</div>${quizBanner(n)}`;
   startRecDemo();
   show('v-hub');
@@ -753,7 +768,7 @@ function renderLesson(p){
   $('#lesson-pos').textContent = 'Partie ' + p.n + ' sur 4';
   $('#lesson-hero').innerHTML = `<div class="hero small"><div class="wrap"><div class="txt">
       <span class="tag">Partie ${p.n} sur 4</span><h1>${hlTitle(p)}</h1><p>${p.desc}</p></div>
-      <img src="//images/${p.img}.webp" alt=""></div></div>`;
+      <img src="/images/${p.img}.webp" alt=""></div></div>`;
   $('#lesson-root').innerHTML = '<div id="lesson-body"></div><div id="lesson-quiz"></div>' + footer(p);
   show('v-lesson');
   ({ comprendre:initComprendre, adapter:initAdapter, reperer:initReperer, entrainer:initEntrainer })[p.k]($('#lesson-body'));
@@ -811,9 +826,11 @@ function initComprendre(el){
     <div class="stk">
       <div class="cap"><span>Exemple : Léa écrit à sa prof</span><b id="active-label"></b></div>
       <div class="mailwin">
-        <div class="bar"><i></i><i></i><i></i><span>Nouveau message</span></div>
+        <div class="bar"><i></i><i></i><i></i><span>Nouveau message</span><span class="tbtn zone" data-z="draft" style="margin-left:auto">💾 Brouillon enregistré</span><span class="tbtn zone" data-z="prio" style="color:#C0392B;font-weight:700">! Importance haute</span></div>
         <div class="mhead">
           <div class="mrow zone" data-z="to"><span class="l">À</span><span>s.dupont@institut-stmichel.be</span></div>
+          <div class="mrow zone" data-z="cc"><span class="l">Cc</span><span>titulaire.4b@institut-stmichel.be</span></div>
+          <div class="mrow zone" data-z="cc"><span class="l">Cci</span><span style="color:#8A8279">les autres ne voient pas cette adresse</span></div>
           <div class="mrow zone" data-z="subject"><span class="l">Objet</span><span style="font-weight:600">Devoir de géographie : demande de délai</span></div>
         </div>
         <div class="mbody">
@@ -824,6 +841,8 @@ function initComprendre(el){
           ${z('polite','Je vous remercie par avance pour votre compréhension.<br>Bien cordialement,')}
           ${z('sign','<strong>Léa Martin</strong><br><span style="color:#6B645C;font-size:14px">4e B, Institut Saint-Michel</span>')}
           <div class="attach zone" data-z="attach">📎 <span>certificat-medical.pdf</span><small>84 Ko</small></div>
+          <div class="replybar zone" data-z="reply"><span>↩ Répondre</span><span>↩↩ Répondre à tous</span><span>➦ Transférer</span></div>
+          <div class="follow zone" data-z="follow">⏰ Pas de réponse depuis 5 jours ? Un rappel poli, dans le même fil.</div>
         </div>
       </div>
     </div>
