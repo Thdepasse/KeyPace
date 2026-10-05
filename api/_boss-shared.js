@@ -20,7 +20,7 @@ async function sb(path, opts = {}) {
 // Banque de textes du défi (FR cohérents, accentués). Rotation déterministe par semaine ISO.
 const BOSS_TEXTS = [
   "le vent du nord balaie la plaine déserte tandis que les premiers flocons dansent dans la lumière pâle du matin ; au loin, une cheminée fume doucement et rappelle qu'un foyer attend toujours quelque part.",
-  "apprendre à taper vite, c'est apprendre à faire confiance à ses mains : au début chaque touche demande un effort, puis vient le jour où les mots glissent tout seuls, comme une mélodie que les doigts connaissent par cœur.",
+  "apprendre à taper vite, c'est apprendre à faire confiance à ses mains : au début chaque touche demande un effort, puis vient le jour où les mots glissent tout seuls, comme une mélodie que les doigts connaissent déjà.",
   "la bibliothèque sentait le vieux papier et la cire ; entre les rayonnages silencieux, des milliers d'histoires patientaient, prêtes à offrir un voyage immobile à quiconque oserait ouvrir la première page.",
   "sur le marché du dimanche, les étals débordent de fruits mûrs, de fleurs fraîches et de fromages affinés ; les voix se mêlent, les rires fusent, et l'odeur du pain chaud guide les promeneurs jusqu'au coin du boulanger.",
   "chaque champion a un jour été un débutant maladroit ; la différence ne tient pas au talent mais à la régularité, à cette petite habitude tenace de recommencer, encore et encore, jusqu'à ce que le geste devienne naturel.",
