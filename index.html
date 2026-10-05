@@ -6349,10 +6349,21 @@ const app={
     if(k.length!==1)return;
     e.preventDefault();
     const s=this.sess;
+    // Après un " pris pour « : l'espace intérieur est déjà passé, on ignore celle que l'élève tape quand même.
+    if(s._ignoreSpaceAt===s.idx&&k===' '){s._ignoreSpaceAt=null;return;}
+    s._ignoreSpaceAt=null;
     if(!s.started){s.started=true;s.startTime=Date.now();this.startTimer();this._gazeStart();this._clearNudge();}
     const expected=s.text[s.idx];s.keystrokes++;
-    const _ok=(k===expected)||(expected==='É'&&k==='2'); // AZERTY : Maj+é donne 2 (É = Verr. Maj + é)
+    let _ok=(k===expected)||(expected==='É'&&k==='2'); // AZERTY : Maj+é donne 2 (É = Verr. Maj + é)
+    // Guillemet droit " équivalent à « » : on accepte " pour « ou », et on saute
+    // l'espace intérieur (« bonjour » ↔ "bonjour") que l'élève n'a pas à taper.
+    let _skip=0;
+    if(k==='"'&&!_ok){
+      if(expected==='«'||expected==='»'){_ok=true;if(expected==='«'&&s.text[s.idx+1]===' '){_skip=1;s._ignoreSpaceAt=s.idx+2;}}
+      else if(expected===' '&&s.text[s.idx+1]==='»'){_ok=true;_skip=1;}
+    }
     if(_ok){s.typed[s.idx]='c';s.correct++;}else{s.typed[s.idx]='w';}
+    if(_skip){s.typed[s.idx+1]='c';}
     this._recordKey(expected,_ok);
     if(this._isPlainTest())this._t4aFx(k,_ok);
     // Lier la frappe à l'état du regard à cet instant précis
@@ -6365,7 +6376,7 @@ const app={
         s._gazeKeys.push({t:Date.now()-s.startTime,gazeOn,ok:_ok?1:0});
       }
     }
-    s.idx++;
+    s.idx+=1+_skip;
     if(s.idx>=s.text.length){s.finished=true;s.endTime=Date.now();this.stopTimer();this._gazeStop();s._gazeStats=this._gazeStats(s);const res=this.computeResult(s);if(currentUser){s._prevBestWpm=this._prevBestFor(s);}try{if(s.mode==='test'&&!s.cert)track('speed_test_completed',{wpm:res.wpm,acc:res.acc,loggedIn:!!currentUser});}catch{}this.recordResult(s.mode,res,s.lessonId,s._gazeStats);if(!currentUser&&s.mode==='test')this._markGuestTest(res.wpm,res.acc);this.renderCurrent();if(s.mode==='lesson'&&!s.cert)celebrateLesson(this.lessonById(s.lessonId),res);if(s.mode==='test'&&!s.cert){if(!currentUser)maybeConvGuest(res);else maybeConvUpsell(res);}if(s.cert)this._finishCertExam(s,res);return;}
     if(this._isPlainTest())this._patchTest4a();else this._patchTypingBox();
   },
