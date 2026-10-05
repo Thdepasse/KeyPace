@@ -506,6 +506,141 @@ a.nav-link{text-decoration:none;display:inline-block}
 .seo-sec .final-cta h2{margin-top:0}
 .seo-sec .btn{display:inline-block;background:var(--accent);color:#fff;font-weight:700;font-size:19px;padding:11px 20px;border-radius:12px;box-shadow:0 8px 20px -8px var(--accent)}
 .seo-sec .btn:hover{text-decoration:none;transform:translateY(-1px);transition:.15s}
+/* ===== Test chronométré : bas de page pleine largeur ===== */
+.seo-sec .tt{overflow:hidden}
+.seo-sec .tt h2,.seo-sec .tt h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.05;margin:0}
+.seo-sec .tt a{color:var(--accent);text-decoration:none;font-weight:700}
+.seo-sec .tt a:hover{text-decoration:underline}
+.seo-sec .tt .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.seo-sec .tt .tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;padding:6px 14px;border-radius:30px}
+.seo-sec .tt .tt-hero{position:relative;background:linear-gradient(135deg,#FF8A5C 0%,#FF4D2E 55%,#E8391D 100%);color:#fff;padding:72px 0 96px}
+.seo-sec .tt .tt-hero .wrap{display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:center;position:relative;z-index:2}
+.seo-sec .tt .tt-hero .tag{background:rgba(255,255,255,.22);color:#fff;margin-bottom:18px}
+.seo-sec .tt .tt-hero h2{font-size:clamp(38px,5.4vw,70px);font-weight:800;margin-bottom:20px}
+.seo-sec .tt .tt-hero .lead{font-size:19px;color:rgba(255,255,255,.93);max-width:52ch;margin:0 0 26px}
+.seo-sec .tt .tt-chips{display:flex;gap:10px;flex-wrap:wrap}
+.seo-sec .tt .tt-chips span{background:#fff;color:var(--accent);font-weight:800;border-radius:30px;padding:9px 16px;font-size:14px;box-shadow:0 10px 18px -12px rgba(0,0,0,.4)}
+@keyframes ttfloaty{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-16px) rotate(6deg)}}
+/* visuel d'en-tête : fusée + trois mesures */
+.seo-sec .tt .tt-scene{position:relative;height:440px}
+.seo-sec .tt .tt-sky{position:absolute;left:44%;right:0;top:0;height:1300px;will-change:transform;z-index:1;pointer-events:none}
+.seo-sec .tt .tt-sky i{position:absolute;border-radius:50%;background:#fff;opacity:.9}
+.seo-sec .tt .tt-sky em{position:absolute;font-style:normal;font-family:'JetBrains Mono',monospace;font-weight:800;color:rgba(255,255,255,.7);background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.35);border-radius:10px;width:38px;height:38px;display:grid;place-items:center;font-size:16px}
+@keyframes rkbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes rkfl{from{transform:scaleY(.75)}to{transform:scaleY(1.3)}}
+@keyframes rkpulse{0%{box-shadow:0 0 0 0 rgba(43,214,123,.6)}100%{box-shadow:0 0 0 10px rgba(43,214,123,0)}}
+.seo-sec .tt .rk-card{position:absolute;background:#fff;color:#16140F;border-radius:20px;padding:12px 16px 13px;box-shadow:0 18px 26px -14px rgba(0,0,0,.5);width:170px;z-index:4;animation:rkbob 4s ease-in-out infinite}
+.seo-sec .tt .rk-card span{font-size:11px;font-weight:800;color:#8A8275;letter-spacing:.08em}
+.seo-sec .tt .rk-card b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-size:36px;line-height:1.05;color:var(--accent)}
+.seo-sec .tt .rk-card b small{font-size:13px;color:#8A8275;font-family:'JetBrains Mono',monospace}.seo-sec .tt .rk-card b em{font-style:normal}
+.seo-sec .tt .rk-mini{height:6px;border-radius:5px;background:#EFE9DC;margin-top:8px;overflow:hidden}.seo-sec .tt .rk-mini i{display:block;height:100%;width:0;background:var(--accent);border-radius:5px}
+.seo-sec .tt .rk-rt{display:flex;align-items:center;gap:8px}
+.seo-sec .tt .rk-live{width:10px;height:10px;border-radius:50%;background:#2BD67B;flex:none;animation:rkpulse 1.6s ease-out infinite}
+.seo-sec .tt .rk-rc{width:100%;height:46px;display:block;margin-top:6px;overflow:visible}
+.seo-sec .tt .rk-rl{display:flex;justify-content:space-between;margin-top:3px;white-space:nowrap}
+.seo-sec .tt .rk-rl small{font-size:10px;font-weight:800;color:#8A8275;letter-spacing:.06em;font-family:'JetBrains Mono',monospace}.seo-sec .tt .rk-rl .rk-rv2{color:#1FA960}
+.seo-sec .tt .rk-rocket{position:absolute;will-change:transform;z-index:3}
+.seo-sec .tt .rk-flame{transform-origin:50% 0;animation:rkfl .16s ease-in-out infinite alternate}
+.seo-sec .tt .rk-smoke{position:absolute;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:rgba(255,255,255,.55);opacity:0;will-change:transform,opacity}
+@media(max-width:960px){.seo-sec .tt .tt-sky{left:0}.seo-sec .tt .tt-scene{height:420px}}
+@media(prefers-reduced-motion:reduce){.seo-sec .tt .rk-card,.seo-sec .tt .rk-live,.seo-sec .tt .rk-flame{animation:none}}
+.seo-sec .tt .tt-wave{position:absolute;left:0;right:0;bottom:-1px;height:48px;display:block}
+.seo-sec .tt .tt-dur{padding:64px 0 24px;background:var(--bg)}
+.seo-sec .tt .tt-dur .head{display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:end;margin-bottom:34px}
+.seo-sec .tt .tt-dur h2{font-size:clamp(30px,3.6vw,46px);font-weight:800}
+.seo-sec .tt .tt-dur h2 em{font-style:normal;color:var(--accent)}
+.seo-sec .tt .tt-dur .why{font-size:17px;color:#4A453B;margin:0}
+.seo-sec .tt .tt-dur .why strong{color:var(--txt);background:#FFE6DC;border-radius:6px;padding:0 5px}
+.seo-sec .tt .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.seo-sec .tt .dcard{--c:#4F6BE0;position:relative;background:#fff;border:2px solid var(--border);border-radius:24px;padding:22px 18px 22px;text-align:center;cursor:default;transition:transform .25s cubic-bezier(.2,.9,.25,1),box-shadow .25s,border-color .25s}
+.seo-sec .tt .dcard:hover{transform:translateY(-8px) rotate(-1deg);border-color:var(--c);box-shadow:0 22px 34px -22px var(--c)}
+.seo-sec .tt .dcard svg{width:96px;height:96px;display:block;margin:0 auto 10px}
+.seo-sec .tt .dcard .ring-bg{fill:none;stroke:#EFE9DC;stroke-width:9}
+.seo-sec .tt .dcard .ring-fg{fill:none;stroke:var(--c);stroke-width:9;stroke-linecap:round;stroke-dasharray:264;stroke-dashoffset:264;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 1.2s cubic-bezier(.2,.9,.25,1)}
+.seo-sec .tt .in .dcard .ring-fg{stroke-dashoffset:var(--o)}
+.seo-sec .tt .dcard .num{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:25px;fill:var(--txt)}
+.seo-sec .tt .dcard h3{font-size:19px;font-weight:800;margin-bottom:8px;color:var(--c)}
+.seo-sec .tt .dcard p{font-size:14.5px;color:#5A5447;margin:0}
+.seo-sec .tt .dcard .free{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--c);color:#fff;font-size:11px;font-weight:800;border-radius:20px;padding:3px 11px;white-space:nowrap}
+.seo-sec .tt .endu{margin-top:28px;background:#fff;border:2px solid var(--border);border-radius:26px;padding:24px 28px;display:grid;grid-template-columns:1fr 1.4fr;gap:30px;align-items:center}
+.seo-sec .tt .endu h3{font-size:24px;font-weight:800;margin-bottom:8px}
+.seo-sec .tt .endu p{margin:0;color:#5A5447;font-size:15.5px}
+.seo-sec .tt .endu svg{width:100%;height:auto}
+.seo-sec .tt .endu .line{fill:none;stroke-width:4;stroke-linecap:round;stroke-dasharray:700;stroke-dashoffset:700;transition:stroke-dashoffset 2.2s ease}
+.seo-sec .tt .in .endu .line{stroke-dashoffset:0}
+.seo-sec .tt .endu text{font-family:'JetBrains Mono',monospace;font-size:10px;fill:#8A8275;font-weight:700}
+.seo-sec .tt .tt-calc{margin-top:56px;background:#16140F;color:#fff;padding:68px 0 74px;position:relative}
+.seo-sec .tt .tt-calc .tag{background:rgba(255,255,255,.12);color:#FFB59F;margin-bottom:14px}
+.seo-sec .tt .tt-calc h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin-bottom:16px}
+.seo-sec .tt .tt-calc .intro{max-width:62ch;color:#CFC8B8;font-size:17px;margin:0 0 34px}
+.seo-sec .tt .eq{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap;margin-bottom:40px}
+.seo-sec .tt .eq>div{flex:1 1 150px;background:#25221B;border:2px solid #3A352A;border-radius:20px;padding:18px;text-align:center}
+.seo-sec .tt .eq>div b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-size:30px;font-weight:800;color:#fff}
+.seo-sec .tt .eq>div span{font-size:13.5px;color:#B8B09F}
+.seo-sec .tt .eq .op{flex:0 0 auto;align-self:center;font-family:'Bricolage Grotesque',sans-serif;font-size:34px;font-weight:800;color:var(--accent);background:none;border:none;padding:0 2px}
+.seo-sec .tt .eq .res{background:var(--accent);border-color:var(--accent)}
+.seo-sec .tt .eq .res span{color:#FFE2D9}
+.seo-sec .tt .play{display:grid;grid-template-columns:1fr 1.3fr;gap:30px;align-items:stretch}
+.seo-sec .tt .box{background:#25221B;border:2px solid #3A352A;border-radius:24px;padding:26px}
+.seo-sec .tt .box h3{font-size:22px;font-weight:800;margin-bottom:14px}
+.seo-sec .tt .box label{display:block;font-size:13px;color:#B8B09F;font-weight:700;margin:14px 0 6px}
+.seo-sec .tt .box input[type=range]{width:100%;accent-color:var(--accent)}
+.seo-sec .tt .box select{width:100%;padding:11px 12px;border-radius:12px;border:2px solid #3A352A;background:#16140F;color:#fff;font-size:15px;font-weight:700}
+.seo-sec .tt .out{display:flex;align-items:baseline;gap:10px;margin-top:20px}
+.seo-sec .tt .out b{font-family:'Bricolage Grotesque',sans-serif;font-size:64px;font-weight:800;line-height:1;color:var(--accent)}
+.seo-sec .tt .out span{color:#CFC8B8;font-weight:700}
+.seo-sec .tt .note{font-size:14.5px;color:#B8B09F;margin:14px 0 0}
+.seo-sec .tt .stairs{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;height:100%;min-height:250px}
+.seo-sec .tt .step{background:#2E2A20;border:2px solid #3A352A;border-radius:16px 16px 6px 6px;padding:14px 8px;text-align:center;display:flex;flex-direction:column;justify-content:flex-end;transition:transform .3s,background .3s,border-color .3s}
+.seo-sec .tt .step:nth-child(1){height:42%}
+.seo-sec .tt .step:nth-child(2){height:55%}
+.seo-sec .tt .step:nth-child(3){height:68%}
+.seo-sec .tt .step:nth-child(4){height:82%}
+.seo-sec .tt .step:nth-child(5){height:100%}
+.seo-sec .tt .step b{font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:800}
+.seo-sec .tt .step span{font-size:12.5px;color:#B8B09F}
+.seo-sec .tt .step.on{background:var(--accent);border-color:#FFB59F;transform:translateY(-10px)}
+.seo-sec .tt .step.on span{color:#FFE2D9}
+.seo-sec .tt .tt-calc .links{margin-top:34px;color:#CFC8B8;font-size:15.5px}
+.seo-sec .tt .tt-calc .links a{color:#FFB59F}
+.seo-sec .tt .tt-faq{padding:70px 0 40px;background:var(--bg)}
+.seo-sec .tt .tt-faq h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin-bottom:28px}
+.seo-sec .tt .tt-faq .qs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+.seo-sec .tt .q{background:#fff;border:2px solid var(--border);border-radius:22px;padding:6px 20px;transition:border-color .2s,box-shadow .2s}
+.seo-sec .tt .q[open]{border-color:var(--accent);box-shadow:0 18px 30px -24px var(--accent)}
+.seo-sec .tt .q summary{list-style:none;cursor:pointer;font-weight:800;font-size:16.5px;padding:16px 38px 16px 0;position:relative;line-height:1.35}
+.seo-sec .tt .q summary::-webkit-details-marker{display:none}
+.seo-sec .tt .q summary::after{content:"+";position:absolute;right:0;top:14px;width:30px;height:30px;border-radius:50%;background:#FFF1E8;color:var(--accent);text-align:center;line-height:30px;font-size:20px;font-weight:800;transition:transform .25s}
+.seo-sec .tt .q[open] summary::after{content:"\2212";transform:rotate(180deg)}
+.seo-sec .tt .q p{margin:0;padding:0 0 18px;color:#5A5447;font-size:15.5px}
+.seo-sec .tt .tt-cta{background:linear-gradient(135deg,#FF8A5C 0%,#FF4D2E 60%,#E8391D 100%);color:#fff;text-align:center;padding:64px 20px;position:relative;overflow:hidden}
+.seo-sec .tt .tt-cta h2{font-size:clamp(32px,4vw,52px);font-weight:800;margin-bottom:10px}
+.seo-sec .tt .tt-cta p{margin:0 auto 24px;color:rgba(255,255,255,.92);font-size:18px}
+.seo-sec .tt .tt-cta .btn{display:inline-block;background:#fff;color:var(--accent);font-weight:800;font-size:19px;border-radius:18px;padding:16px 32px;box-shadow:0 14px 26px -12px rgba(0,0,0,.4);transition:transform .2s}
+.seo-sec .tt .tt-cta .btn:hover{transform:translateY(-3px);text-decoration:none}
+.seo-sec .tt .tt-cta .k{position:absolute;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:rgba(255,255,255,.55);background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.3);border-radius:12px;width:50px;height:50px;display:grid;place-items:center;animation:ttfloaty 6s ease-in-out infinite}
+.seo-sec .tt .tt-js .rv{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+.seo-sec .tt .tt-js .in .rv,.seo-sec .tt .tt-js .rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.seo-sec .tt *{animation:none!important;transition:none!important}
+.seo-sec .tt .rv{opacity:1;transform:none}
+.seo-sec .tt .dcard .ring-fg{stroke-dashoffset:var(--o)}
+.seo-sec .tt .endu .line{stroke-dashoffset:0}
+}
+@media(max-width:960px){.seo-sec .tt .tt-hero .wrap,.seo-sec .tt .tt-dur .head,.seo-sec .tt .endu,.seo-sec .tt .play{grid-template-columns:1fr}
+.seo-sec .tt .cards{grid-template-columns:repeat(2,1fr)}
+.seo-sec .tt .cards .dcard:last-child{grid-column:1/-1}
+.seo-sec .tt .tt-faq .qs{grid-template-columns:1fr}
+
+}
+@media(max-width:560px){.seo-sec .tt .wrap{padding:0 18px}
+.seo-sec .tt .stairs{min-height:200px;gap:6px}
+.seo-sec .tt .step b{font-size:12px}
+.seo-sec .tt .step span{font-size:10.5px}
+.seo-sec .tt .eq .op{display:none}
+}
+
+.seo-zone:has(.seo-sec[data-route="testtime"]:not([hidden])) .seo-inner{max-width:none;padding:0}
+
 /* ── Test sur base de temps ── */
 .tt-wrap{padding:28px 29px 56px}
 @media(max-width:760px){.tt-wrap{padding:24px 16px 48px}}
@@ -2193,66 +2328,134 @@ footer{border-top:1px solid var(--border);margin-top:10px}
     <p class="lead">Frappe-mots, Sprint, Course, Simon, Boss de la semaine : choisis un jeu et améliore ta vitesse et ta précision en t'amusant.</p></div>
   <section><p>Pour découvrir l'esprit des jeux et leurs bénéfices, lis la page <a href="/jeux-dactylo">jeux de dactylo</a>. Envie de te mesurer ? Fais d'abord le <a href="/test-frappe-en-ligne">test de frappe</a>.</p></section>
 </div>
-<div class="seo-sec" data-route="testtime" hidden>
-  <div class="seo-hero">
-    <div class="eyebrow">Test chronométré</div>
-    <h2 class="seo-h1">Test de frappe chronométré gratuit</h2>
-    <p class="lead">Choisis une durée, de 30 secondes à 10 minutes, et tape sans t'arrêter. KeyPace mesure ta vitesse en mots par minute, ta précision et l'évolution de ton rythme au fil du test. Sur clavier AZERTY, directement dans le navigateur.</p>
+<div class="seo-sec" data-route="testtime" hidden><div class="tt">
+
+<!-- 1. héros -->
+<section class="tt-hero">
+  <div class="tt-sky" id="rkSky" aria-hidden="true"></div>
+  <div class="wrap">
+    <div>
+      <span class="tag">Test chronométré</span>
+      <h2>Test de frappe chronométré gratuit</h2>
+      <p class="lead">Choisis une durée, de 30 secondes à 10 minutes, et tape sans t'arrêter. KeyPace mesure ta vitesse en mots par minute, ta précision et l'évolution de ton rythme au fil du test. Sur clavier AZERTY, directement dans le navigateur.</p>
+      <div class="tt-chips"><span>30 s</span><span>1 min</span><span>3 min</span><span>5 min</span><span>10 min</span></div>
+    </div>
+    <div class="tt-scene" aria-hidden="true">
+      <div class="rk-card" style="left:0;top:30px"><span>VITESSE</span><b><em class="rk-bv">0</em> <small>MPM</small></b><div class="rk-mini"><i class="rk-barv"></i></div></div>
+      <div class="rk-card" style="right:0;top:100px;animation-delay:-1.3s"><span>PRÉCISION</span><b><em class="rk-bp">0</em>%</b><div class="rk-mini"><i class="rk-barp"></i></div></div>
+      <div class="rk-card" style="left:2%;top:300px;animation-delay:-2.6s"><span>RYTHME</span><b class="rk-rt"><i class="rk-live"></i>stable</b>
+        <svg class="rk-rc" viewBox="0 0 150 46" preserveAspectRatio="none"><defs><linearGradient id="rkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4F6BE0" stop-opacity=".35"/><stop offset="1" stop-color="#4F6BE0" stop-opacity="0"/></linearGradient></defs>
+          <g stroke="#EFE9DC" stroke-width="1"><line x1="0" y1="8" x2="150" y2="8"/><line x1="0" y1="23" x2="150" y2="23"/><line x1="0" y1="38" x2="150" y2="38"/></g>
+          <path id="rkArea" fill="url(#rkGrad)" d=""/><path id="rkLine" fill="none" stroke="#4F6BE0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d=""/>
+          <circle id="rkDot" r="3.6" fill="#fff" stroke="#4F6BE0" stroke-width="2.4" cx="150" cy="23"/></svg>
+        <div class="rk-rl"><small>PAR TRANCHE</small><small class="rk-rv2">± 3 %</small></div></div>
+      <span class="rk-smoke"></span><span class="rk-smoke"></span><span class="rk-smoke"></span><span class="rk-smoke"></span><span class="rk-smoke"></span>
+      <div class="rk-rocket" style="left:50%;top:130px;margin-left:-55px;width:110px;height:230px"><svg viewBox="0 0 90 190"><g class="rk-flame"><path d="M30 128 Q45 192 60 128Z" fill="#FFB020"/><path d="M37 128 Q45 168 53 128Z" fill="#fff"/></g><path d="M45 4 C72 36 72 90 66 128 H24 C18 90 18 36 45 4Z" fill="#fff"/><circle cx="45" cy="62" r="15" fill="#FF4D2E"/><circle cx="45" cy="62" r="8" fill="#FFD5BE"/><path d="M24 100 L6 138 L26 128Z M66 100 L84 138 L64 128Z" fill="#16140F"/></svg></div>
+    </div>
   </div>
-  <section>
-    <h2>Pourquoi choisir la durée du test</h2>
-    <p>Un test court (30 secondes ou 1 minute) donne une première idée de ta vitesse. Un test plus long (3, 5 ou 10 minutes) mesure aussi ton <strong>endurance</strong> : la vitesse a tendance à varier quand la concentration et la fatigue entrent en jeu. Le graphique de fin de test te montre ta vitesse tranche par tranche, pour voir si ton rythme se maintient.</p>
-  </section>
-  <section>
-    <h2>Quelle durée choisir ?</h2>
-    <table>
-      <thead><tr><th>Durée</th><th>Pour quoi faire</th></tr></thead>
-      <tbody>
-        <tr><td>30 secondes</td><td>Découvrir le test, sans compte (une fois par jour)</td></tr>
-        <tr><td>1 minute</td><td>Un aperçu rapide de ta vitesse</td></tr>
-        <tr><td>3 minutes</td><td>Vérifier que ton rythme tient</td></tr>
-        <tr><td>5 minutes</td><td>Un résultat plus stable, moins sensible à un bon ou mauvais départ</td></tr>
-        <tr><td>10 minutes</td><td>L'épreuve d'endurance</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section>
+  <svg class="tt-wave" viewBox="0 0 1440 48" preserveAspectRatio="none"><path d="M0 48V22C240 -6 480 -6 720 20S1200 50 1440 14V48Z" fill="#faf9f5"/></svg>
+</section>
+
+<!-- 2. durées -->
+<section class="tt-dur" id="dur">
+  <div class="wrap">
+    <div class="head rv">
+      <h2>Pourquoi choisir <em>la durée</em> du test</h2>
+      <p class="why">Un test court (30 secondes ou 1 minute) donne une première idée de ta vitesse. Un test plus long (3, 5 ou 10 minutes) mesure aussi ton <strong>endurance</strong> : la vitesse a tendance à varier quand la concentration et la fatigue entrent en jeu. Le graphique de fin de test te montre ta vitesse tranche par tranche, pour voir si ton rythme se maintient.</p>
+    </div>
+
+    <h3 class="rv" style="font-size:26px;margin-bottom:22px">Quelle durée choisir ?</h3>
+    <div class="cards">
+      <div class="dcard rv" style="--c:#1FA9A0;--o:220"><span class="free">Sans compte</span>
+        <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="42"/><circle class="ring-fg" cx="50" cy="50" r="42"/><text class="num" x="50" y="58" text-anchor="middle">30</text></svg>
+        <h3>30 secondes</h3><p>Découvrir le test, sans compte (une fois par jour)</p></div>
+      <div class="dcard rv" style="--c:#3FA84E;--o:200"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="42"/><circle class="ring-fg" cx="50" cy="50" r="42"/><text class="num" x="50" y="58" text-anchor="middle">1</text></svg>
+        <h3>1 minute</h3><p>Un aperçu rapide de ta vitesse</p></div>
+      <div class="dcard rv" style="--c:#E0883A;--o:150"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="42"/><circle class="ring-fg" cx="50" cy="50" r="42"/><text class="num" x="50" y="58" text-anchor="middle">3</text></svg>
+        <h3>3 minutes</h3><p>Vérifier que ton rythme tient</p></div>
+      <div class="dcard rv" style="--c:#4F6BE0;--o:90"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="42"/><circle class="ring-fg" cx="50" cy="50" r="42"/><text class="num" x="50" y="58" text-anchor="middle">5</text></svg>
+        <h3>5 minutes</h3><p>Un résultat plus stable, moins sensible à un bon ou mauvais départ</p></div>
+      <div class="dcard rv" style="--c:#FF4D2E;--o:20"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="42"/><circle class="ring-fg" cx="50" cy="50" r="42"/><text class="num" x="50" y="58" text-anchor="middle">10</text></svg>
+        <h3>10 minutes</h3><p>L'épreuve d'endurance</p></div>
+    </div>
+
+    <div class="endu rv">
+      <div><h3>Ton rythme, tranche par tranche</h3><p>Sur un test long, la courbe de fin de test montre où ton rythme se maintient et où il flanche. Exemple de courbe :</p></div>
+      <svg viewBox="0 0 420 140" role="img" aria-label="Exemple de courbe de vitesse">
+        <g stroke="#EFE9DC" stroke-width="1"><line x1="30" y1="20" x2="410" y2="20"/><line x1="30" y1="60" x2="410" y2="60"/><line x1="30" y1="100" x2="410" y2="100"/></g>
+        <path class="line" d="M30 50 C70 28 100 30 130 38 S190 60 230 70 S300 66 330 48 S380 40 410 44" stroke="#4F6BE0"/>
+        <path class="line" d="M30 56 C80 40 110 44 150 62 S220 100 270 104 S350 108 410 112" stroke="#FF4D2E" style="transition-delay:.5s"/>
+        <text x="32" y="132">DÉBUT</text><text x="372" y="132">FIN</text>
+        <circle cx="410" cy="44" r="5" fill="#4F6BE0"/><circle cx="410" cy="112" r="5" fill="#FF4D2E"/>
+        <text x="330" y="32" fill="#4F6BE0" style="fill:#4F6BE0">rythme tenu</text><text x="300" y="98" style="fill:#FF4D2E">il flanche</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 3. calcul -->
+<section class="tt-calc">
+  <div class="wrap">
+    <span class="tag">Comment ça marche</span>
     <h2>Comment est calculé ton résultat</h2>
-    <p>La vitesse en mots par minute correspond aux caractères tapés correctement, divisés par cinq (la longueur moyenne d'un mot), ramenés à une minute. La précision est la part de frappes correctes. Il n'y a pas de retour arrière : chaque faute compte, ce qui t'encourage à taper juste.</p>
-    <p>À la fin, KeyPace te donne un niveau selon ces repères :</p>
-    <table>
-      <thead><tr><th>Niveau</th><th>Mots par minute</th></tr></thead>
-      <tbody>
-        <tr><td>Débutant</td><td>Moins de 20</td></tr>
-        <tr><td>Intermédiaire</td><td>20 à 34</td></tr>
-        <tr><td>Confirmé</td><td>35 à 49</td></tr>
-        <tr><td>Avancé</td><td>50 à 69</td></tr>
-        <tr><td>Expert</td><td>70 et plus</td></tr>
-      </tbody>
-    </table>
-    <p>Pour progresser, découvre les <a href="/cours-dactylographie">cours de dactylographie</a>, les <a href="/jeux-dactylo">jeux de frappe</a>, ou fais d'abord le <a href="/test-vitesse-frappe">test de vitesse sur une phrase</a>.</p>
-  </section>
-  <section class="faq">
-    <h2>Questions fréquentes</h2>
-    <details open>
-      <summary>Quelle durée choisir pour mon test de frappe ?</summary>
-      <p>Pour une première mesure, 30 secondes ou 1 minute suffisent. Pour vérifier que ton rythme tient dans la durée, choisis 3, 5 ou 10 minutes : plus le test est long, plus le résultat reflète ta vitesse réelle et ta régularité.</p>
-    </details>
-    <details>
-      <summary>Pourquoi ma vitesse baisse-t-elle sur un test long ?</summary>
-      <p>Sur plusieurs minutes, la concentration et la fatigue des mains jouent un rôle. C'est pour cela que KeyPace affiche la vitesse tranche par tranche : tu vois où ton rythme se maintient et où il flanche.</p>
-    </details>
-    <details>
-      <summary>Le test chronométré est-il gratuit ?</summary>
-      <p>Oui. Sans compte, tu peux faire le test de 30 secondes une fois par jour. Un compte gratuit débloque les durées de 1, 3, 5 et 10 minutes, sans limite, et enregistre tes records.</p>
-    </details>
-  </section>
-  <div class="final-cta">
-    <h2>Prêt à te chronométrer ?</h2>
-    <p style="color:var(--muted);max-width:46ch;margin:0 auto 18px">Choisis ta durée et lance-toi, c'est gratuit.</p>
-    <a class="btn" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">Choisir ma durée →</a>
+    <p class="intro">La vitesse en mots par minute correspond aux caractères tapés correctement, divisés par cinq (la longueur moyenne d'un mot), ramenés à une minute. La précision est la part de frappes correctes. Il n'y a pas de retour arrière : chaque faute compte, ce qui t'encourage à taper juste.</p>
+
+    <div class="eq rv">
+      <div><b>750</b><span>caractères tapés correctement</span></div>
+      <div class="op">÷</div>
+      <div><b>5</b><span>longueur moyenne d'un mot</span></div>
+      <div class="op">÷</div>
+      <div><b>3</b><span>minutes</span></div>
+      <div class="op">=</div>
+      <div class="res"><b>50 MPM</b><span>mots par minute</span></div>
+    </div>
+
+    <div class="play">
+      <div class="box">
+        <h3>Calcule ton score</h3>
+        <label for="chars">Caractères tapés correctement : <b id="cv">750</b></label>
+        <input type="range" id="chars" min="50" max="3500" step="10" value="750">
+        <label for="mins">Durée du test</label>
+        <select id="mins"><option value="0.5">30 secondes</option><option value="1">1 minute</option><option value="3" selected>3 minutes</option><option value="5">5 minutes</option><option value="10">10 minutes</option></select>
+        <div class="out"><b id="wpm">50</b><span>mots par minute</span></div>
+        <p class="note" id="lv">Niveau : Avancé</p>
+      </div>
+      <div>
+        <p style="margin:0 0 14px;color:#CFC8B8;font-size:17px">À la fin, KeyPace te donne un niveau selon ces repères :</p>
+        <div class="stairs" id="stairs">
+          <div class="step"><b>Débutant</b><span>Moins de 20</span></div>
+          <div class="step"><b>Intermédiaire</b><span>20 à 34</span></div>
+          <div class="step"><b>Confirmé</b><span>35 à 49</span></div>
+          <div class="step"><b>Avancé</b><span>50 à 69</span></div>
+          <div class="step"><b>Expert</b><span>70 et plus</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="links">Pour progresser, découvre les <a href="/cours-dactylographie">cours de dactylographie</a>, les <a href="/jeux-dactylo">jeux de frappe</a>, ou fais d'abord le <a href="/test-vitesse-frappe">test de vitesse sur une phrase</a>.</p>
   </div>
-</div>
+</section>
+
+<!-- 4. FAQ -->
+<section class="tt-faq">
+  <div class="wrap">
+    <h2 class="rv">Questions fréquentes</h2>
+    <div class="qs">
+      <details class="q rv" open><summary>Quelle durée choisir pour mon test de frappe ?</summary><p>Pour une première mesure, 30 secondes ou 1 minute suffisent. Pour vérifier que ton rythme tient dans la durée, choisis 3, 5 ou 10 minutes : plus le test est long, plus le résultat reflète ta vitesse réelle et ta régularité.</p></details>
+      <details class="q rv"><summary>Pourquoi ma vitesse baisse-t-elle sur un test long ?</summary><p>Sur plusieurs minutes, la concentration et la fatigue des mains jouent un rôle. C'est pour cela que KeyPace affiche la vitesse tranche par tranche : tu vois où ton rythme se maintient et où il flanche.</p></details>
+      <details class="q rv"><summary>Le test chronométré est-il gratuit ?</summary><p>Oui. Sans compte, tu peux faire le test de 30 secondes une fois par jour. Un compte gratuit débloque les durées de 1, 3, 5 et 10 minutes, sans limite, et enregistre tes records.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- 5. appel final -->
+<section class="tt-cta">
+  <span class="k" style="left:8%;top:22%">K</span><span class="k" style="right:10%;top:30%;animation-delay:-2s">P</span><span class="k" style="left:24%;bottom:14%;animation-delay:-4s;width:40px;height:40px;font-size:16px">M</span>
+  <h2>Prêt à te chronométrer ?</h2>
+  <p>Choisis ta durée et lance-toi, c'est gratuit.</p>
+  <a class="btn" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">Choisir ma durée →</a>
+</section>
+
+</div></div>
 </div></div>
 <footer>
   <div class="footer-inner">
@@ -14995,6 +15198,61 @@ window.addEventListener('pagehide',()=>{
     try{navigator.sendBeacon('/api/save-progress',new Blob([JSON.stringify({token:currentToken,data:app.stats})],{type:'application/json'}));}catch{}
   }
 });
+</script>
+<script>
+document.documentElement.classList.add('tt-js');
+
+(function(){
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.15});
+  document.querySelectorAll('.rv,.tt-dur').forEach(function(el){io.observe(el)});
+  var ch=document.getElementById('chars'),mi=document.getElementById('mins'),steps=document.querySelectorAll('#stairs .step');
+  var names=['Débutant','Intermédiaire','Confirmé','Avancé','Expert'];
+  function calc(){var c=+ch.value,m=+mi.value,w=Math.round(c/5/m);document.getElementById('cv').textContent=c;document.getElementById('wpm').textContent=w;
+    var i=w<20?0:w<35?1:w<50?2:w<70?3:4;steps.forEach(function(s,k){s.classList.toggle('on',k===i)});document.getElementById('lv').textContent='Niveau : '+names[i]}
+  ch.addEventListener('input',calc);mi.addEventListener('change',calc);calc();
+})();
+</script>
+<script>
+(function(){
+  var hero=document.querySelector('.seo-sec .tt .tt-hero');if(!hero)return;
+  var sky=document.getElementById('rkSky'),sc=hero.querySelector('.tt-scene'),rocket=hero.querySelector('.rk-rocket'),sm=[].slice.call(hero.querySelectorAll('.rk-smoke'));
+  var RM=matchMedia('(prefers-reduced-motion:reduce)').matches,L='AZERTYUIOPQSDFGH'.split(''),P=650,built=false,on=false,t0=performance.now(),cur=.55,skyY=0;
+  function q(s){return [].slice.call(hero.querySelectorAll(s))}
+  function build(){if(built)return;built=true;var items=[],i,j;
+    for(i=0;i<46;i++)items.push(['i',Math.random()*98,Math.random()*640,3+Math.random()*5]);
+    for(j=0;j<14;j++)items.push(['em',3+Math.random()*92,Math.random()*600,0,L[j]]);
+    [0,P].forEach(function(off){items.forEach(function(it){var n=document.createElement(it[0]);
+      if(it[0]==='i')n.style.cssText='left:'+it[1]+'%;top:'+(it[2]+off)+'px;width:'+it[3]+'px;height:'+it[3]+'px';
+      else{n.textContent=it[4];n.style.cssText='left:'+it[1]+'%;top:'+(it[2]+off)+'px'}
+      sky.appendChild(n)})})}
+  function frame(now){
+    if(!on)return;
+    var s=(now-t0)/1000;
+    var tgt=.55+.28*Math.sin(s*.9)+.14*Math.sin(s*2.3+1)+.05*Math.sin(s*5.1);
+    cur+=(tgt-cur)*.12;var kk=Math.max(0,Math.min(1,cur));
+    var sp=Math.round(30+kk*50),pr=Math.round(90+6*Math.sin(s*.7)+2*Math.sin(s*1.9));
+    q('.rk-bv').forEach(function(n){n.textContent=sp});q('.rk-bp').forEach(function(n){n.textContent=pr});
+    q('.rk-barv').forEach(function(n){n.style.width=(kk*100)+'%'});q('.rk-barp').forEach(function(n){n.style.width=pr+'%'});
+    var y=-kk*40;
+    rocket.style.transform='translate(0,'+y+'px) rotate('+(Math.sin(s*7)*1.6)+'deg)';
+    if(!RM)sm.forEach(function(el,i){var ph=((s*1.1)+i/sm.length)%1,side=(i%2?1:-1)*(8+ph*40);
+      el.style.left='50%';el.style.top=(rocket.offsetTop+rocket.offsetHeight*.62)+'px';
+      el.style.opacity=(1-ph)*.6;el.style.transform='translate('+side+'px,'+(y+ph*70)+'px) scale('+(.6+ph*2)+')'});
+    var rl=document.getElementById('rkLine');
+    if(rl){var N=40,pts=[],dev=0,xs=[],ys=[],qq,d;
+      for(qq=0;qq<N;qq++){var ts=s-(N-1-qq)*.16,rv=.5+.17*Math.sin(ts*.8)+.07*Math.sin(ts*2.1+2)+.035*Math.sin(ts*5.3);pts.push(rv);dev=Math.max(dev,Math.abs(rv-.5))}
+      for(qq=0;qq<N;qq++){xs.push(qq/(N-1)*150);ys.push(40-pts[qq]*34)}
+      d='M'+xs[0].toFixed(1)+' '+ys[0].toFixed(1);for(qq=1;qq<N;qq++){d+=' Q'+xs[qq-1].toFixed(1)+' '+ys[qq-1].toFixed(1)+' '+((xs[qq-1]+xs[qq])/2).toFixed(1)+' '+((ys[qq-1]+ys[qq])/2).toFixed(1)}
+      rl.setAttribute('d',d);document.getElementById('rkArea').setAttribute('d',d+' L150 46 L0 46Z');
+      var dt=document.getElementById('rkDot');dt.setAttribute('cx',xs[N-1]);dt.setAttribute('cy',ys[N-1]);
+      var rv2=hero.querySelector('.rk-rv2');if(rv2)rv2.textContent='± '+Math.round(dev*35)+' %'}
+    skyY=(skyY+(RM?0:2+kk*9))%P;sky.style.transform='translateY('+(skyY-P)+'px)';
+    requestAnimationFrame(frame);
+  }
+  /* tourne seulement quand l'en-tête est visible à l'écran */
+  new IntersectionObserver(function(es){es.forEach(function(e){var vis=e.isIntersecting&&hero.offsetParent!==null;
+    if(vis&&!on){on=true;build();requestAnimationFrame(frame)}else if(!vis)on=false})},{threshold:0}).observe(hero);
+})();
 </script>
 </body>
 </html>
