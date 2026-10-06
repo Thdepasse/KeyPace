@@ -3843,10 +3843,10 @@ function setQuoteStyle(v){try{localStorage.setItem('kp_quotes',v);}catch{}}
    (français, belge, Mac) et fr_azerty_afnor (NF Z71-300) ; tilde belge confirmé
    par Wikipédia. "puis espace" = touche morte (le signe n'apparaît qu'après la barre d'espace). */
 const KB_HOW={
- fr:{'@':'AltGr + 0','#':'AltGr + 3','[':'AltGr + 5',']':'AltGr + ° (touche à droite du 0)','|':'AltGr + 6','/':'Maj + :','*':'touche * (à gauche de Entrée)','=':'touche = (à droite du °)','+':'Maj + =','%':'Maj + ù','_':'touche 8','{':'AltGr + 4','}':'AltGr + =','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'AltGr + é, puis espace','\\':'AltGr + 8','`':'AltGr + 7, puis espace','(':'touche 5, sans Maj',')':'touche ° (à droite du 0), sans Maj','«':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','»':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','œ':'Alt + 0156 (pavé numérique, Windows). Sinon tape o puis e : c\'est accepté','É':'Alt + 0201 (pavé numérique, Windows). Maj + é donne « 2 » : c\'est accepté'},
- be:{'@':'AltGr + 2','#':'AltGr + 3','[':'AltGr + ^ (touche à droite du P)',']':'AltGr + $','|':'AltGr + 1','/':'Maj + :','*':'Maj + $','=':'touche = (rangée du bas, à droite)','+':'Maj + =','%':'Maj + ù','_':'Maj + - (touche à droite du 0)','{':'AltGr + 9','}':'AltGr + 0','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'AltGr + =, puis espace','\\':'AltGr + <','`':'AltGr + µ, puis espace','(':'touche 5, sans Maj',')':'touche ) (à droite du 0), sans Maj','«':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','»':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','œ':'Alt + 0156 (pavé numérique, Windows). Sinon tape o puis e : c\'est accepté','É':'Alt + 0201 (pavé numérique, Windows). Maj + é donne « 2 » : c\'est accepté'},
- mac:{'@':'touche à gauche du 1','#':'Maj + touche à gauche du 1','[':'Option + Maj + 5',']':'Option + Maj + ) (touche à droite du 0)','|':'Option + Maj + L','/':'Maj + :','*':'Maj + $','=':'touche = (rangée du bas, à droite)','+':'Maj + =','%':'Maj + ù','_':'Maj + -','{':'Option + 5','}':'Option + ) (touche à droite du 0)','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'Option + Maj + N','\\':'Option + Maj + :','`':'touche accent grave, puis espace','(':'touche 5, sans Maj',')':'touche ) (à droite du 0), sans Maj','«':'Option + 7','»':'Option + Maj + 7','œ':'Option + O','É':'Option + Maj + é. Maj + é donne « 2 » : c\'est accepté'},
- nf:{'@':'touche à gauche du 1','#':'Maj + touche à gauche du 1','[':'AltGr + 5',']':'AltGr + 6','|':'AltGr + L','/':'touche / (à droite du M)','*':'touche * (à droite du /)','=':'Maj + ;','+':'touche + (en haut à droite)','%':'AltGr + P','_':'AltGr + 8','{':'AltGr + T','}':'AltGr + Y','<':'touche < (à gauche du W)','>':'Maj + <','"':'Maj + touche \' (à droite du 0)','~':'AltGr + N','\\':'Maj + /','`':'AltGr + è, puis espace','(':'touche 5',')':'touche 6','«':'touche 9','»':'touche 0','œ':'AltGr + O','É':'AltGr + Maj + é. Maj + é donne « 2 » : c\'est accepté'}
+ fr:{'@':'AltGr + 0','#':'AltGr + 3','[':'AltGr + 5',']':'AltGr + ° (touche à droite du 0)','|':'AltGr + 6','/':'Maj + :','*':'touche * (à gauche de Entrée)','=':'touche = (à droite du °)','+':'Maj + =','%':'Maj + ù','_':'touche 8','{':'AltGr + 4','}':'AltGr + =','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'AltGr + é, puis espace','\\':'AltGr + 8','`':'AltGr + 7, puis espace','(':'touche 5, sans Maj',')':'touche ° (à droite du 0), sans Maj','«':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','»':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','œ':'Alt + 0156 (pavé numérique, Windows). Sinon tape o puis e : c\'est accepté','æ':'Alt + 0230 (pavé numérique, Windows). Sinon tape a puis e : c\'est accepté','É':'Alt + 0201 (pavé numérique, Windows). Maj + é donne « 2 » : c\'est accepté'},
+ be:{'@':'AltGr + 2','#':'AltGr + 3','[':'AltGr + ^ (touche à droite du P)',']':'AltGr + $','|':'AltGr + 1','/':'Maj + :','*':'Maj + $','=':'touche = (rangée du bas, à droite)','+':'Maj + =','%':'Maj + ù','_':'Maj + - (touche à droite du 0)','{':'AltGr + 9','}':'AltGr + 0','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'AltGr + =, puis espace','\\':'AltGr + <','`':'AltGr + µ, puis espace','(':'touche 5, sans Maj',')':'touche ) (à droite du 0), sans Maj','«':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','»':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','œ':'Alt + 0156 (pavé numérique, Windows). Sinon tape o puis e : c\'est accepté','æ':'Alt + 0230 (pavé numérique, Windows). Sinon tape a puis e : c\'est accepté','É':'Alt + 0201 (pavé numérique, Windows). Maj + é donne « 2 » : c\'est accepté'},
+ mac:{'@':'touche à gauche du 1','#':'Maj + touche à gauche du 1','[':'Option + Maj + 5',']':'Option + Maj + ) (touche à droite du 0)','|':'Option + Maj + L','/':'Maj + :','*':'Maj + $','=':'touche = (rangée du bas, à droite)','+':'Maj + =','%':'Maj + ù','_':'Maj + -','{':'Option + 5','}':'Option + ) (touche à droite du 0)','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'Option + Maj + N','\\':'Option + Maj + :','`':'touche accent grave, puis espace','(':'touche 5, sans Maj',')':'touche ) (à droite du 0), sans Maj','«':'Option + 7','»':'Option + Maj + 7','œ':'Option + O','æ':'Option + A','É':'Option + Maj + é. Maj + é donne « 2 » : c\'est accepté'},
+ nf:{'@':'touche à gauche du 1','#':'Maj + touche à gauche du 1','[':'AltGr + 5',']':'AltGr + 6','|':'AltGr + L','/':'touche / (à droite du M)','*':'touche * (à droite du /)','=':'Maj + ;','+':'touche + (en haut à droite)','%':'AltGr + P','_':'AltGr + 8','{':'AltGr + T','}':'AltGr + Y','<':'touche < (à gauche du W)','>':'Maj + <','"':'Maj + touche \' (à droite du 0)','~':'AltGr + N','\\':'Maj + /','`':'AltGr + è, puis espace','(':'touche 5',')':'touche 6','«':'touche 9','»':'touche 0','œ':'AltGr + O','æ':'AltGr + A','É':'AltGr + Maj + é. Maj + é donne « 2 » : c\'est accepté'}
 };
 const KB_HOW_TEXT_LESSONS=['pon6','tre3','sym9','flu4','flu5','flu6'];
 function kbHowHTML(les){
@@ -4548,7 +4548,7 @@ const CURRICULUM=[
        intro:"Les ligatures œ et æ collent deux lettres en une. Plus rares, elles demandent une combinaison selon ton système.",
        rules:[
          {icon:'🔗',t:'Deux lettres soudées',d:"œ = o et e soudés (cœur, sœur, œuf) ; æ = a et e soudés (et æquo). On les écrit comme un seul caractère."},
-         {icon:'⌨️',t:'Selon le système',d:"Le geste dépend de ton clavier (indiqué plus haut). Si tu n'arrives pas à taper œ, tape o puis e : c'est accepté."},
+         {icon:'⌨️',t:'Selon le système',d:"Le geste dépend de ton clavier (indiqué plus haut). Si tu n'arrives pas à taper œ ou æ, tape o puis e (ou a puis e) : c'est accepté."},
          {icon:'💬',t:'Surtout l\'œ',d:"L'œ est le plus courant : cœur, sœur, œil, œuvre, bœuf. L'æ est rare. Concentre-toi sur l'œ."}
        ],
        tip:"Objectif : reconnaître et produire œ et æ, surtout l'œ très fréquent."
@@ -6377,7 +6377,11 @@ const app={
     e.preventDefault();
     const s=this.sess;
     // Touche à ignorer : espace intérieure après un " pris pour «, ou e après un o pris pour œ.
-    if(s._skipNext&&s._skipNext.at===s.idx&&k===s._skipNext.ch){s._skipNext=null;return;}
+    if(s._skipNext&&s._skipNext.at===s.idx){
+      if(k===s._skipNext.ch){s._skipNext=null;return;}
+      // o (ou a) pris pour œ (ou æ) mais le e n'est pas venu : c'était une faute.
+      if(s._skipNext.lig!=null&&s.typed[s._skipNext.lig]==='c'){s.typed[s._skipNext.lig]='w';s.correct--;}
+    }
     s._skipNext=null;
     if(!s.started){s.started=true;s.startTime=Date.now();this.startTimer();this._gazeStart();this._clearNudge();}
     const expected=s.text[s.idx];s.keystrokes++;
@@ -6389,8 +6393,8 @@ const app={
       if(expected==='«'||expected==='»'){_ok=true;if(expected==='«'&&s.text[s.idx+1]===' '){_skip=1;s._skipNext={at:s.idx+2,ch:' '};}}
       else if(expected===' '&&s.text[s.idx+1]==='»'){_ok=true;_skip=1;}
     }
-    // œ / Œ : « oe » (o puis e) est accepté quand l'élève n'a pas la touche œ.
-    if(!_ok&&((expected==='œ'&&k==='o')||(expected==='Œ'&&k==='O'))){_ok=true;s._skipNext={at:s.idx+1,ch:'e'};}
+    // œ / æ : « oe » / « ae » (deux lettres) est accepté quand l'élève n'a pas la touche.
+    if(!_ok&&((expected==='œ'&&k==='o')||(expected==='Œ'&&k==='O')||(expected==='æ'&&k==='a')||(expected==='Æ'&&k==='A'))){_ok=true;s._skipNext={at:s.idx+1,ch:'e',lig:s.idx};}
     if(_ok){s.typed[s.idx]='c';s.correct++;}else{s.typed[s.idx]='w';}
     if(_skip){s.typed[s.idx+1]='c';}
     this._recordKey(expected,_ok);
