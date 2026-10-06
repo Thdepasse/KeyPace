@@ -443,7 +443,7 @@ module.exports = async function handler(req, res) {
           body: JSON.stringify({ event_slug: eventSlug, email: String(email).trim().toLowerCase(), first_name: name, company: companyName, wpm: w, accuracy: a }),
         });
         if (!ins.ok) return res.status(500).json({ error: 'Enregistrement impossible.' });
-        return res.json({ ok: true, wpm: w, accuracy: a, ...(await eventStats(eventSlug, w)) });
+        return res.json({ ok: true, wpm: w, accuracy: a, ...(await eventStats(eventSlug, w, a)) });
       }
       case 'event-leaderboard': {
         const { eventSlug } = body;
@@ -459,16 +459,24 @@ module.exports = async function handler(req, res) {
   }
 };
 
-async function eventStats(eventSlug, myWpm) {
+// Événements dont le classement suit le score du Boss de la semaine
+// (vitesse x précision², voir computeScore) au lieu de la seule vitesse.
+const SCORED_EVENTS = ['linkube-10ans-2026'];
+
+async function eventStats(eventSlug, myWpm, myAcc) {
   const all = await sb(`/event_scores?event_slug=eq.${encodeURIComponent(eventSlug)}&select=email,first_name,company,wpm,accuracy&order=wpm.desc&limit=1000`);
-  // Un participant peut rejouer : on ne garde que son meilleur score (premier
-  // rencontré, la liste est triée par wpm décroissant) pour le classement.
+  const scored = SCORED_EVENTS.includes(eventSlug);
+  const withScore = (all.data || []).map((r) => ({ ...r, score: scored ? computeScore(r.wpm, r.accuracy) : r.wpm }));
+  withScore.sort((a, b) => b.score - a.score);
+  // Un participant peut rejouer : on ne garde que son meilleur résultat (le
+  // premier rencontré, la liste étant triée du meilleur au moins bon).
   const seen = new Set();
-  const rows = (all.data || []).filter((r) => { const k = r.email || Math.random(); if (seen.has(k)) return false; seen.add(k); return true; });
+  const rows = withScore.filter((r) => { const k = r.email || Math.random(); if (seen.has(k)) return false; seen.add(k); return true; });
   const count = rows.length;
   const average = count ? Math.round(rows.reduce((a, r) => a + r.wpm, 0) / count) : 0;
-  const best = count ? rows[0].wpm : 0;
-  const top = rows.slice(0, 10).map((r, i) => ({ rank: i + 1, firstName: r.first_name, company: r.company, wpm: r.wpm, accuracy: r.accuracy }));
-  const rank = typeof myWpm === 'number' ? rows.filter((r) => r.wpm > myWpm).length + 1 : null;
-  return { count, average, best, top, rank };
+  const best = count ? (scored ? Math.round(rows[0].score) : rows[0].wpm) : 0;
+  const top = rows.slice(0, 10).map((r, i) => ({ rank: i + 1, firstName: r.first_name, company: r.company, wpm: r.wpm, accuracy: r.accuracy, score: scored ? Math.round(r.score * 10) / 10 : r.wpm }));
+  const myScore = scored ? computeScore(myWpm, myAcc) : myWpm;
+  const rank = typeof myWpm === 'number' ? rows.filter((r) => r.score > myScore).length + 1 : null;
+  return { count, average, best, top, rank, score: typeof myWpm === 'number' ? myScore : null };
 }

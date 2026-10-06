@@ -54,7 +54,8 @@
   .t4a-hint.idle{animation:t4aBlinkHint 1.4s steps(1) infinite}
   .t4a-counter{font-size:13px;font-weight:500;color:#8a857c}
   .t4a-textbox{width:100%;display:flex;flex-wrap:wrap;align-content:flex-start;gap:2px 3px;font-family:'JetBrains Mono',monospace;font-size:min(18px,1.7vw);line-height:1.35}
-  .t4a-textbox.big{font-size:min(26px,2.4vw);line-height:1.5}
+  .t4a-textbox{position:relative;overflow:hidden;max-height:calc(1.35em * 3 + 10px)}
+  .t4a-textbox.big{font-size:min(26px,2.4vw);line-height:1.5;max-height:calc(1.5em * 3 + 10px)}
   .t4a-textbox.font-access{font-family:'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:.01em}
   .t4a-word{display:inline-flex;white-space:nowrap;border-radius:6px;padding:0 4px;transition:background .18s,opacity .3s}
   .t4a-word.active{background:rgba(255,74,28,.07)}
@@ -159,6 +160,7 @@
   table.lb td{padding:7px 4px;border-bottom:1px solid var(--border)}
   table.lb tr.me{background:rgba(255,77,46,.08)}
   table.lb td.r{color:var(--muted);width:28px;font-family:'JetBrains Mono',monospace}
+  table.lb td.d{text-align:right;color:var(--muted);font-size:13px;white-space:nowrap;padding-right:14px}
   table.lb td.w{text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace}
   .qrbox{flex:0 0 auto;width:190px;text-align:center}
   .qrbox img,.qrbox canvas{border-radius:12px;border:1px solid var(--border);padding:10px;background:#fff}
@@ -193,8 +195,8 @@
     .t4a-card-head{margin-bottom:16px}
     .t4a-hint{font-size:16px;padding:8px 16px}
     .t4a-counter{font-size:16px}
-    .t4a-textbox{font-size:min(26px,1.9vw);line-height:1.45}
-    .t4a-textbox.big{font-size:min(38px,2.7vw)}
+    .t4a-textbox{font-size:min(26px,1.9vw);line-height:1.45;max-height:calc(1.45em * 3 + 10px)}
+    .t4a-textbox.big{font-size:min(38px,2.7vw);line-height:1.5;max-height:calc(1.5em * 3 + 10px)}
     .t4a-ch.space{width:min(18px,1.2vw)}
     .t4a-progressbar{max-width:1100px;height:8px}
     .pref-btn{font-size:14px;padding:8px 16px}
@@ -270,7 +272,7 @@
       <div class="t4a-stat"><div class="t4a-stat-label">VITESSE</div><div class="t4a-stat-val" id="t4a-wpm">0</div><div class="t4a-stat-sub">mots / min</div></div>
       <div class="t4a-stat"><div class="t4a-stat-label">PRÉCISION</div><div class="t4a-stat-val" id="t4a-acc">-</div><div class="t4a-stat-sub" id="t4a-accmeta">0 faute</div></div>
       <div class="t4a-stat"><div class="t4a-stat-label">TEMPS</div><div class="t4a-stat-val" id="t4a-time">0.0s</div><div class="t4a-stat-sub" id="t4a-timemeta">en cours</div></div>
-      <div class="t4a-stat"><div class="t4a-stat-label">PROGRESSION</div><div class="t4a-stat-val" id="t4a-progval">0%</div><div class="t4a-stat-sub" id="t4a-progmeta">0 / 0 car.</div></div>
+      <div class="t4a-stat"><div class="t4a-stat-label">CARACTÈRES</div><div class="t4a-stat-val" id="t4a-progval">0</div><div class="t4a-stat-sub" id="t4a-progmeta">caractères tapés</div></div>
     </div>
     <div class="t4a-textwrap">
       <div class="t4a-card">
@@ -294,13 +296,14 @@
       <div class="metrics">
         <div class="stat"><div class="n" id="res-acc">100%</div><div class="l">Précision</div></div>
         <div class="stat"><div class="n" id="res-time">0s</div><div class="l">Temps</div></div>
+        <div class="stat"><div class="n" id="res-score">0</div><div class="l">Score</div></div>
       </div>
       <div class="rankline" id="res-rank"></div>
       <div class="cmpline" id="res-cmp"></div>
 
       <div class="split">
         <div class="lb-col">
-          <div class="lb-title">Classement du jour</div>
+          <div class="lb-title">Classement du jour <span style="text-transform:none;letter-spacing:0;font-weight:600">(vitesse × précision)</span></div>
           <table class="lb" id="lb-table"><tbody></tbody></table>
         </div>
         <div class="qrbox">
@@ -322,7 +325,8 @@
   // ── Config ────────────────────────────────────────────────────────────
   var EVENT_SLUG = 'linkube-10ans-2026';
   var REVIEW_URL = 'https://g.page/r/CTS6FqKTZhpKEAE/review';
-  var TEST_TEXT = "le clavier azerty n'a plus aucun secret pour vous : montrez à quelle vitesse vos doigts dansent sur les touches, sans faire une seule faute de frappe.";
+  var TEST_TEXT = "le clavier azerty n'a plus aucun secret pour vous : montrez à quelle vitesse vos doigts dansent sur les touches, sans faire une seule faute de frappe. chaque seconde compte, alors gardez un rythme régulier et ne regardez pas le clavier. les meilleurs dactylos tapent avec dix doigts, chacun reste sur sa rangée de départ et rejoint la touche voulue sans effort. la précision est aussi importante que la vitesse : une erreur coûte plus cher qu'un mot de moins. respirez, restez calme et laissez vos mains travailler. à force de répéter les mêmes gestes, le clavier devient une seconde nature, et les mots viennent tout seuls sur l'écran. continuez jusqu'à la fin du temps, chaque lettre ajoute des points à votre score et peut vous faire grimper dans le classement du soir.";
+  var TEST_DURATION_MS = 30000; // durée fixe : on tape 30 secondes, pas jusqu'au bout du texte
   var AUTO_RESET_MS = 45000;
   var API_URL = '/api/games';
 
@@ -412,20 +416,22 @@
     }).then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); });
   }
 
-  function demoStats(myWpm){
+  function kpScore(w, a){ return Math.round(w * Math.pow(a / 100, 2) * 10) / 10; }
+
+  function demoStats(myWpm, myAcc){
     var key = 'keypace_event_demo_' + EVENT_SLUG;
     var rows = JSON.parse(localStorage.getItem(key) || '[]');
     if (typeof myWpm === 'number') {
-      rows.push({ firstName: participant.name || 'Vous', wpm: myWpm, accuracy: 100 });
+      rows.push({ firstName: participant.name || 'Vous', wpm: myWpm, accuracy: myAcc, score: kpScore(myWpm, myAcc) });
       localStorage.setItem(key, JSON.stringify(rows));
     }
-    rows = rows.slice().sort(function(a,b){ return b.wpm - a.wpm; });
+    rows = rows.slice().sort(function(a,b){ return b.score - a.score; });
     var count = rows.length;
     var average = count ? Math.round(rows.reduce(function(a,r){ return a + r.wpm; }, 0) / count) : 0;
-    var best = count ? rows[0].wpm : 0;
-    var top = rows.slice(0, 10).map(function(r,i){ return { rank: i+1, firstName: r.firstName, wpm: r.wpm, accuracy: r.accuracy }; });
-    var rank = typeof myWpm === 'number' ? rows.filter(function(r){ return r.wpm > myWpm; }).length + 1 : null;
-    return { count: count, average: average, best: best, top: top, rank: rank };
+    var best = count ? Math.round(rows[0].score) : 0;
+    var top = rows.slice(0, 10).map(function(r,i){ return { rank: i+1, firstName: r.firstName, wpm: r.wpm, accuracy: r.accuracy, score: r.score }; });
+    var rank = typeof myWpm === 'number' ? rows.filter(function(r){ return r.score > kpScore(myWpm, myAcc); }).length + 1 : null;
+    return { count: count, average: average, best: best, top: top, rank: rank, score: typeof myWpm === 'number' ? kpScore(myWpm, myAcc) : null };
   }
 
   // ── Écran d'accueil : bandeau de stats (participants / moyenne / meilleur score) ─
@@ -469,8 +475,7 @@
   // ── Test de frappe — même logique de scoring et même rendu de texte que
   // index.html._renderTest4a : mots avec espaces rendus en "·", touche
   // survolée mise en avant sur le clavier en volume. La correction (⌫) est
-  // permise : le test ne se valide qu'une fois arrivé au bout du texte SANS
-  // faute restante (voir hasPendingError/onKeyDown plus bas). ────────
+  // impossible : une faute reste affichée mais n'arrête pas le test. ────────
   function startTest(){
     sess = { text: TEST_TEXT, idx: 0, started: false, startTime: 0, correct: 0, keystrokes: 0, typed: [] };
     renderPlane();
@@ -536,22 +541,14 @@
     }).join('');
   }
 
-  // Une faute reste modifiable (⌫) tant que le test n'est pas validé : on
-  // n'autorise la fin du test que lorsque plus aucun caractère saisi n'est
-  // marqué "bad", même une fois arrivé au bout du texte.
-  function hasPendingError(){
-    for (var i = 0; i < sess.idx; i++) { if (sess.typed[i] === 'bad') return true; }
-    return false;
-  }
-
   function renderTextbox(){
     document.getElementById('t4a-textbox').innerHTML = buildWordsHTML();
-    document.getElementById('t4a-counter').textContent = sess.idx + ' / ' + sess.text.length + ' caractères';
+    document.getElementById('t4a-counter').textContent = '30 secondes chrono';
+    var tb = document.getElementById('t4a-textbox'), cur = tb.querySelector('.cur');
+    if (cur) { var lh = parseFloat(getComputedStyle(tb).lineHeight) || 24; tb.scrollTop = Math.max(0, cur.offsetTop - lh); }
     var hintEl = document.getElementById('t4a-hint');
-    var awaitingFix = !sess.finished && sess.idx >= sess.text.length && hasPendingError();
-    hintEl.className = 't4a-hint' + (sess.finished ? ' done' : (awaitingFix ? ' warn' : (!sess.started ? ' idle' : '')));
-    hintEl.textContent = sess.finished ? 'Terminé !' : (awaitingFix ? 'Corrige les fautes en rouge avant de valider (⌫ pour revenir en arrière).' : (sess.started ? 'Chrono lancé, garde le rythme' : 'Commence à taper : le chrono démarre tout seul.'));
-    document.getElementById('t4a-progressbar-fill').style.width = Math.round(100 * sess.idx / sess.text.length) + '%';
+    hintEl.className = 't4a-hint' + (sess.finished ? ' done' : (!sess.started ? ' idle' : ''));
+    hintEl.textContent = sess.finished ? 'Terminé !' : (sess.started ? 'Chrono lancé, garde le rythme' : 'Commence à taper : 30 secondes, le chrono démarre tout seul.');
   }
 
   function renderPlane(){
@@ -566,21 +563,10 @@
 
   function onKeyDown(e){
     if (!sess || sess.finished) return;
-    if (e.key === 'Backspace') {
-      e.preventDefault();
-      if (sess.idx > 0) {
-        sess.idx--;
-        sess.typed[sess.idx] = undefined;
-        renderTextbox();
-        renderPlane();
-        updateLiveStats();
-      }
-      return;
-    }
-    if (e.key === 'Delete') { e.preventDefault(); return; }
+    if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); return; }
     if (e.key.length !== 1) return; // ignore touches spéciales (Shift, Tab, flèches...)
     e.preventDefault();
-    if (sess.idx >= sess.text.length) return; // en attente de correction, seul ⌫ agit
+    if (sess.started && Date.now() - sess.startTime >= TEST_DURATION_MS) { finishTest(); return; }
     if (!sess.started) { sess.started = true; sess.startTime = Date.now(); startTicker(); }
     var expected = sess.text[sess.idx];
     sess.keystrokes++;
@@ -591,32 +577,39 @@
     renderTextbox();
     renderPlane();
     updateLiveStats();
-    if (sess.idx >= sess.text.length && !hasPendingError()) finishTest();
+    if (sess.idx >= sess.text.length) finishTest();
   }
 
-  function startTicker(){ tickInterval = setInterval(updateLiveStats, 200); }
+  function startTicker(){
+    tickInterval = setInterval(function(){
+      updateLiveStats();
+      // Test à durée fixe : on s'arrête à 30 s, où que l'on en soit dans le texte.
+      if (sess && !sess.finished && Date.now() - sess.startTime >= TEST_DURATION_MS) finishTest();
+    }, 100);
+  }
   function stopTicker(){ clearInterval(tickInterval); tickInterval = null; }
 
   function computeResult(){
-    var endTime = Date.now();
-    var mins = Math.max((endTime - sess.startTime) / 60000, 1/600);
+    var elapsedMs = Math.min(Date.now() - sess.startTime, TEST_DURATION_MS);
+    var mins = Math.max(elapsedMs / 60000, 1/600);
     var wpm = Math.round((sess.correct / 5) / mins);
     var acc = sess.keystrokes ? Math.round(100 * sess.correct / sess.keystrokes) : 100;
-    return { wpm: wpm, acc: acc, timeMs: endTime - sess.startTime };
+    return { wpm: wpm, acc: acc, timeMs: elapsedMs };
   }
 
   function updateLiveStats(){
-    var elapsed = sess.started ? (Date.now() - sess.startTime) / 1000 : 0;
+    var elapsed = sess.started ? Math.min((Date.now() - sess.startTime) / 1000, TEST_DURATION_MS / 1000) : 0;
+    var remaining = TEST_DURATION_MS / 1000 - elapsed;
     var r = sess.started ? computeResult() : { wpm: 0, acc: 100 };
     var err = sess.keystrokes - sess.correct;
     document.getElementById('t4a-wpm').textContent = sess.started ? r.wpm : 0;
     document.getElementById('t4a-acc').textContent = sess.idx ? r.acc + '%' : '-';
     document.getElementById('t4a-accmeta').textContent = err + ' faute' + (err === 1 ? '' : 's');
-    document.getElementById('t4a-time').textContent = elapsed.toFixed(1) + 's';
-    document.getElementById('t4a-timemeta').textContent = sess.finished ? 'test terminé' : 'en cours';
-    var prog = Math.round(100 * sess.idx / sess.text.length);
-    document.getElementById('t4a-progval').textContent = prog + '%';
-    document.getElementById('t4a-progmeta').textContent = sess.idx + ' / ' + sess.text.length + ' car.';
+    document.getElementById('t4a-time').textContent = remaining.toFixed(1) + 's';
+    document.getElementById('t4a-timemeta').textContent = sess.finished ? 'test terminé' : 'restantes';
+    document.getElementById('t4a-progval').textContent = sess.idx;
+    document.getElementById('t4a-progmeta').textContent = 'caractères tapés';
+    document.getElementById('t4a-progressbar-fill').style.width = Math.round(100 * elapsed / (TEST_DURATION_MS / 1000)) + '%';
   }
 
   function finishTest(){
@@ -638,13 +631,13 @@
       wpm: result.wpm,
       accuracy: result.acc,
       timeMs: result.timeMs,
-      textLength: sess.text.length
+      textLength: sess.idx
     };
     callApi('event-submit', payload).then(function(res){
       if (!res.ok) throw new Error(res.data && res.data.error || 'api-error');
       renderResults(result, res.data);
     }).catch(function(){
-      renderResults(result, demoStats(result.wpm));
+      renderResults(result, demoStats(result.wpm, result.acc));
     });
   }
 
@@ -652,6 +645,7 @@
   function renderResults(result, stats){
     document.getElementById('res-wpm').textContent = result.wpm;
     document.getElementById('res-acc').textContent = result.acc + '%';
+    document.getElementById('res-score').textContent = (stats.score != null ? stats.score : 0);
     document.getElementById('res-time').textContent = Math.round(result.timeMs / 1000) + 's';
 
     var rankEl = document.getElementById('res-rank');
@@ -674,9 +668,9 @@
     tbody.innerHTML = '';
     (stats.top || []).forEach(function(row){
       var tr = document.createElement('tr');
-      var isMe = row.firstName === (participant.name || 'Vous') && row.wpm === result.wpm;
+      var isMe = row.firstName === (participant.name || 'Vous') && row.score === stats.score;
       if (isMe) tr.className = 'me';
-      tr.innerHTML = '<td class="r">' + row.rank + '</td><td>' + escapeHtml(row.firstName || 'Anonyme') + '</td><td class="w">' + row.wpm + '</td>';
+      tr.innerHTML = '<td class="r">' + row.rank + '</td><td>' + escapeHtml(row.firstName || 'Anonyme') + '</td><td class="d">' + row.wpm + ' mpm · ' + row.accuracy + '%</td><td class="w">' + row.score + '</td>';
       tbody.appendChild(tr);
     });
 
