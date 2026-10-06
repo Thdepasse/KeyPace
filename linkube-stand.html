@@ -313,7 +313,7 @@
         </div>
       </div>
 
-      <div class="again row"><button class="btn ghost" id="btn-retry">↻ Recommencer</button><button class="btn auto" id="btn-again">Nouveau participant →</button></div>
+      <div class="again"><button class="btn auto" id="btn-again">Nouveau participant →</button></div>
     </div>
   </section>
 </div>
@@ -325,7 +325,7 @@
   // ── Config ────────────────────────────────────────────────────────────
   var EVENT_SLUG = 'linkube-10ans-2026';
   var REVIEW_URL = 'https://g.page/r/CTS6FqKTZhpKEAE/review';
-  var TEST_TEXT = "le clavier azerty n'a plus aucun secret pour vous : montrez à quelle vitesse vos doigts dansent sur les touches, sans faire une seule faute de frappe. chaque seconde compte, alors gardez un rythme régulier et ne regardez pas le clavier. les meilleurs dactylos tapent avec dix doigts, chacun reste sur sa rangée de départ et rejoint la touche voulue sans effort. la précision est aussi importante que la vitesse : une erreur coûte plus cher qu'un mot de moins. respirez, restez calme et laissez vos mains travailler. à force de répéter les mêmes gestes, le clavier devient une seconde nature, et les mots viennent tout seuls sur l'écran. continuez jusqu'à la fin du temps, chaque lettre ajoute des points à votre score et peut vous faire grimper dans le classement du soir.";
+  var TEST_TEXT = "le clavier azerty n'a plus aucun secret pour vous : montrez à quelle vitesse vos doigts dansent sur les touches, sans faire une seule faute de frappe. chaque seconde compte, alors gardez un rythme régulier et ne regardez pas le clavier. les meilleurs dactylos tapent avec dix doigts, chacun reste sur sa rangée de départ et rejoint la touche voulue sans effort. la précision est aussi importante que la vitesse : une erreur vaut plus cher qu'un mot de moins. respirez, restez calme et laissez vos mains travailler. à force de répéter les memes gestes, le clavier devient une seconde nature, et les mots viennent tout seuls sur l'écran. continuez jusqu'à la fin du temps, chaque lettre ajoute des points à votre score et peut vous faire grimper dans le classement du soir. prenez le temps de bien placer vos doigts sur la rangée centrale, les index sur le f et le j, puis laissez-les voyager de touche en touche. une frappe régulière vaut mieux qu'une série de départs trop rapides suivis d'erreurs. le dernier mot que vous taperez comptera autant que le premier, alors ne relachez pas votre attention avant la fin du chrono. bravo à tous les participants, et merci d'avoir joué le jeu avec nous pour feter les dix ans de linkube, une belle aventure faite de rencontres, de projets et de bonne humeur.";
   var TEST_DURATION_MS = 30000; // durée fixe : on tape 30 secondes, pas jusqu'au bout du texte
   var AUTO_RESET_MS = 45000;
   var API_URL = '/api/games';
@@ -458,8 +458,6 @@
   // sinon automatiquement (45s après un résultat) ou via "Nouveau participant".
   window.addEventListener('keydown', function(e){ if (e.key === 'Escape') resetToLanding(); });
   document.getElementById('btn-again').addEventListener('click', resetToLanding);
-  // Même participant : on relance un test sans repasser par le formulaire.
-  document.getElementById('btn-retry').addEventListener('click', function(){ startTest(); });
 
   document.getElementById('email-form').addEventListener('submit', function(e){
     e.preventDefault();
