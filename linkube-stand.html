@@ -313,7 +313,7 @@
         </div>
       </div>
 
-      <div class="again"><button class="btn auto" id="btn-again">Nouveau participant →</button></div>
+      <div class="again row"><button class="btn ghost" id="btn-retry">↻ Réessayer pour battre mon score</button><button class="btn auto" id="btn-again">Nouveau participant →</button></div>
     </div>
   </section>
 </div>
@@ -422,7 +422,10 @@
     var key = 'keypace_event_demo_' + EVENT_SLUG;
     var rows = JSON.parse(localStorage.getItem(key) || '[]');
     if (typeof myWpm === 'number') {
-      rows.push({ firstName: participant.name || 'Vous', wpm: myWpm, accuracy: myAcc, score: kpScore(myWpm, myAcc) });
+      var mine = rows.filter(function(r){ return r.email === participant.email; })[0];
+      var sc = kpScore(myWpm, myAcc);
+      if (!mine) rows.push({ email: participant.email, firstName: participant.name || 'Vous', wpm: myWpm, accuracy: myAcc, score: sc });
+      else if (sc > mine.score) { mine.wpm = myWpm; mine.accuracy = myAcc; mine.score = sc; }
       localStorage.setItem(key, JSON.stringify(rows));
     }
     rows = rows.slice().sort(function(a,b){ return b.score - a.score; });
@@ -430,8 +433,9 @@
     var average = count ? Math.round(rows.reduce(function(a,r){ return a + r.wpm; }, 0) / count) : 0;
     var best = count ? Math.round(rows[0].score) : 0;
     var top = rows.slice(0, 10).map(function(r,i){ return { rank: i+1, firstName: r.firstName, wpm: r.wpm, accuracy: r.accuracy, score: r.score }; });
-    var rank = typeof myWpm === 'number' ? rows.filter(function(r){ return r.score > kpScore(myWpm, myAcc); }).length + 1 : null;
-    return { count: count, average: average, best: best, top: top, rank: rank, score: typeof myWpm === 'number' ? kpScore(myWpm, myAcc) : null };
+    var myBest = typeof myWpm === 'number' ? Math.max.apply(null, rows.filter(function(r){ return r.email === participant.email; }).map(function(r){ return r.score; })) : 0;
+    var rank = typeof myWpm === 'number' ? rows.filter(function(r){ return r.score > myBest; }).length + 1 : null;
+    return { count: count, average: average, best: best, top: top, rank: rank, score: typeof myWpm === 'number' ? kpScore(myWpm, myAcc) : null, bestScore: typeof myWpm === 'number' ? Math.max.apply(null, rows.filter(function(r){ return r.email === participant.email; }).map(function(r){ return r.score; })) : null };
   }
 
   // ── Écran d'accueil : bandeau de stats (participants / moyenne / meilleur score) ─
@@ -458,6 +462,8 @@
   // sinon automatiquement (45s après un résultat) ou via "Nouveau participant".
   window.addEventListener('keydown', function(e){ if (e.key === 'Escape') resetToLanding(); });
   document.getElementById('btn-again').addEventListener('click', resetToLanding);
+  // Même participant : nouvelle tentative sans repasser par le formulaire ; seul son meilleur score est gardé.
+  document.getElementById('btn-retry').addEventListener('click', function(){ startTest(); });
 
   document.getElementById('email-form').addEventListener('submit', function(e){
     e.preventDefault();
@@ -648,6 +654,7 @@
 
     var rankEl = document.getElementById('res-rank');
     var cmpEl = document.getElementById('res-cmp');
+    var improved = stats.bestScore == null || stats.score >= stats.bestScore;
     if (stats.rank && stats.count) {
       rankEl.innerHTML = 'Tu es classé <b>#' + stats.rank + '</b> sur ' + stats.count + ' participant' + (stats.count > 1 ? 's' : '') + ' ce soir';
     } else {
@@ -661,12 +668,13 @@
     } else {
       cmpEl.textContent = '';
     }
+    if (!improved) cmpEl.textContent = 'Ton meilleur score (' + stats.bestScore + ') reste celui du classement : réessaie pour le battre !';
 
     var tbody = document.querySelector('#lb-table tbody');
     tbody.innerHTML = '';
     (stats.top || []).forEach(function(row){
       var tr = document.createElement('tr');
-      var isMe = row.firstName === (participant.name || 'Vous') && row.score === stats.score;
+      var isMe = row.firstName === (participant.name || 'Vous') && row.score === (stats.bestScore != null ? stats.bestScore : stats.score);
       if (isMe) tr.className = 'me';
       tr.innerHTML = '<td class="r">' + row.rank + '</td><td>' + escapeHtml(row.firstName || 'Anonyme') + '</td><td class="d">' + row.wpm + ' mpm · ' + row.accuracy + '%</td><td class="w">' + row.score + '</td>';
       tbody.appendChild(tr);

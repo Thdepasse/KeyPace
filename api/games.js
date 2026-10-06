@@ -438,12 +438,24 @@ module.exports = async function handler(req, res) {
         const a = Math.max(0, Math.min(100, Math.round(Number(accuracy) || 0)));
         const name = (firstName || '').toString().trim().slice(0, 60) || null;
         const companyName = (company || '').toString().trim().slice(0, 80) || null;
-        const ins = await sb('/event_scores', {
-          method: 'POST',
-          body: JSON.stringify({ event_slug: eventSlug, email: String(email).trim().toLowerCase(), first_name: name, company: companyName, wpm: w, accuracy: a }),
-        });
-        if (!ins.ok) return res.status(500).json({ error: 'Enregistrement impossible.' });
-        return res.json({ ok: true, wpm: w, accuracy: a, ...(await eventStats(eventSlug, w, a)) });
+        const mail = String(email).trim().toLowerCase();
+        // Un participant peut rejouer : son meilleur résultat écrase le
+        // précédent, un résultat moins bon est simplement ignoré.
+        const scoredEvent = SCORED_EVENTS.includes(eventSlug);
+        const scoreOf = (wp, ac) => (scoredEvent ? computeScore(wp, ac) : wp);
+        const prevRes = await sb(`/event_scores?event_slug=eq.${encodeURIComponent(eventSlug)}&email=eq.${encodeURIComponent(mail)}&select=id,wpm,accuracy`);
+        const prevRows = prevRes.data || [];
+        let bestPrev = null;
+        prevRows.forEach((r) => { if (!bestPrev || scoreOf(r.wpm, r.accuracy) > scoreOf(bestPrev.wpm, bestPrev.accuracy)) bestPrev = r; });
+        const fields = { first_name: name, company: companyName, wpm: w, accuracy: a };
+        if (!bestPrev) {
+          const ins = await sb('/event_scores', { method: 'POST', body: JSON.stringify({ event_slug: eventSlug, email: mail, ...fields }) });
+          if (!ins.ok) return res.status(500).json({ error: 'Enregistrement impossible.' });
+        } else if (scoreOf(w, a) > scoreOf(bestPrev.wpm, bestPrev.accuracy)) {
+          const upd = await sb(`/event_scores?id=eq.${bestPrev.id}`, { method: 'PATCH', body: JSON.stringify({ ...fields, created_at: new Date().toISOString() }) });
+          if (!upd.ok) return res.status(500).json({ error: 'Enregistrement impossible.' });
+        }
+        return res.json({ ok: true, wpm: w, accuracy: a, ...(await eventStats(eventSlug, w, a, mail)) });
       }
       case 'event-leaderboard': {
         const { eventSlug } = body;
@@ -463,7 +475,7 @@ module.exports = async function handler(req, res) {
 // (vitesse x précision², voir computeScore) au lieu de la seule vitesse.
 const SCORED_EVENTS = ['linkube-10ans-2026'];
 
-async function eventStats(eventSlug, myWpm, myAcc) {
+async function eventStats(eventSlug, myWpm, myAcc, myEmail) {
   const all = await sb(`/event_scores?event_slug=eq.${encodeURIComponent(eventSlug)}&select=email,first_name,company,wpm,accuracy&order=wpm.desc&limit=1000`);
   const scored = SCORED_EVENTS.includes(eventSlug);
   const withScore = (all.data || []).map((r) => ({ ...r, score: scored ? computeScore(r.wpm, r.accuracy) : r.wpm }));
@@ -476,7 +488,10 @@ async function eventStats(eventSlug, myWpm, myAcc) {
   const average = count ? Math.round(rows.reduce((a, r) => a + r.wpm, 0) / count) : 0;
   const best = count ? (scored ? Math.round(rows[0].score) : rows[0].wpm) : 0;
   const top = rows.slice(0, 10).map((r, i) => ({ rank: i + 1, firstName: r.first_name, company: r.company, wpm: r.wpm, accuracy: r.accuracy, score: scored ? Math.round(r.score * 10) / 10 : r.wpm }));
-  const myScore = scored ? computeScore(myWpm, myAcc) : myWpm;
+  const attempt = scored ? computeScore(myWpm, myAcc) : myWpm;
+  // Le rang et le score "retenu" sont ceux du meilleur résultat du participant.
+  const mine = myEmail ? rows.find((r) => r.email === myEmail) : null;
+  const myScore = mine ? Math.max(mine.score, attempt) : attempt;
   const rank = typeof myWpm === 'number' ? rows.filter((r) => r.score > myScore).length + 1 : null;
-  return { count, average, best, top, rank, score: typeof myWpm === 'number' ? myScore : null };
+  return { count, average, best, top, rank, score: typeof myWpm === 'number' ? attempt : null, bestScore: typeof myWpm === 'number' ? Math.round(myScore * 10) / 10 : null };
 }
