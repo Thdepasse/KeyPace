@@ -49,8 +49,18 @@ function isoWeekBounds(d) {
   return { start: monday, end: nextMonday };
 }
 
+// « œ » n'existe pas sur les claviers AZERTY français/belge sous Windows : on écrit « oe ».
+// Appliqué à la lecture, car le texte de la semaine est figé en base dès le premier affichage.
+function sansLigatures(ch) {
+  return ch && typeof ch.text === 'string' ? { ...ch, text: ch.text.replace(/œ/g, 'oe').replace(/Œ/g, 'Oe') } : ch;
+}
+
 // Récupère (ou crée) le défi de la semaine courante, de façon déterministe
 async function getCurrentChallenge() {
+  return sansLigatures(await getOrCreateChallenge());
+}
+
+async function getOrCreateChallenge() {
   const now = new Date();
   const { year, week } = isoWeek(now);
   const isoWeekStr = `${year}-W${String(week).padStart(2, '0')}`;
