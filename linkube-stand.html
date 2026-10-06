@@ -482,10 +482,16 @@
   // impossible : une faute reste affichée mais n'arrête pas le test. ────────
   function startTest(){
     sess = { text: TEST_TEXT, idx: 0, started: false, startTime: 0, correct: 0, keystrokes: 0, typed: [] };
+    // L'écran doit être affiché avant de rendre le texte : sinon le défilement
+    // de la zone de texte ne peut pas être remis à zéro (texte décalé au retry).
+    show('test');
+    var tbox = document.getElementById('t4a-textbox');
+    void tbox.offsetHeight; // force la mise en page avant de remettre le défilement à zéro
+    tbox.scrollTop = 0;
+    requestAnimationFrame(function(){ if (sess && sess.idx === 0) tbox.scrollTop = 0; });
     renderPlane();
     renderTextbox();
     updateLiveStats();
-    show('test');
     window.addEventListener('keydown', onKeyDown);
   }
 
