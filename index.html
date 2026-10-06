@@ -2043,6 +2043,10 @@ footer{border-top:1px solid var(--border);margin-top:10px}
   .typing-actions{flex-wrap:wrap;gap:8px}
   .typing-box{padding:18px 16px;font-size:17px}
   .kb-row-t{gap:3px}
+  .kb-row-t{width:100%}
+  .kb-row-t .kb-key-t{min-width:0;flex:1 1 0;max-width:40px;padding:0;font-size:10px}
+  .tuto-kb-row{gap:2px}
+  .tuto-key{min-width:18px;font-size:11px;padding:0}
   .kb-key-t{min-width:clamp(22px,7.7vw,40px);height:clamp(34px,9vw,48px);font-size:11px;border-bottom-width:3px}
 }
 </style>
@@ -3492,19 +3496,19 @@ const KB_LAYOUTS={
     [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'!',s:'§',f:'rp'}]
   ],
   be:[
-    [{l:'1',s:'&',f:'lp',g:'|'},{l:'2',s:'é',f:'lr',g:'@'},{l:'3',s:'"',f:'lm',g:'#'},{l:'4',s:"'",f:'li',g:'{'},{l:'5',s:'(',f:'li',g:'['},{l:'6',s:'§',f:'ri',g:'^'},{l:'7',s:'è',f:'ri'},{l:'8',s:'!',f:'rm'},{l:'9',s:'ç',f:'rr',g:'{'},{l:'0',s:'à',f:'rp',g:'}'}],
+    [{l:'1',s:'&',f:'lp',g:'|'},{l:'2',s:'é',f:'lr',g:'@'},{l:'3',s:'"',f:'lm',g:'#'},{l:'4',s:"'",f:'li'},{l:'5',s:'(',f:'li'},{l:'6',s:'§',f:'ri',g:'^'},{l:'7',s:'è',f:'ri'},{l:'8',s:'!',f:'rm'},{l:'9',s:'ç',f:'rr',g:'{'},{l:'0',s:'à',f:'rp',g:'}'}],
     [{l:'A',f:'lp'},{l:'Z',f:'lr'},{l:'E',f:'lm'},{l:'R',f:'li'},{l:'T',f:'li'},{l:'Y',f:'ri'},{l:'U',f:'ri'},{l:'I',f:'rm'},{l:'O',f:'rr'},{l:'P',f:'rp'}],
     [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
-    [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'=',s:'+',f:'rp'}]
+    [{l:'<',s:'>',f:'lp',g:'\\'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'=',s:'+',f:'rp',g:'~'}]
   ],
   mac:[
     // Vérifié sur photo d'un vrai Magic Keyboard AZERTY français : les
     // touches 6/8 et la dernière touche de la rangée du bas suivent le motif
     // belge (§/!, =/+), pas le motif PC français (-/_,  !/§) supposé au départ.
-    [{l:'1',s:'&',f:'lp'},{l:'2',s:'é',f:'lr'},{l:'3',s:'"',f:'lm'},{l:'4',s:"'",f:'li'},{l:'5',s:'(',f:'li'},{l:'6',s:'§',f:'ri'},{l:'7',s:'è',f:'ri'},{l:'8',s:'!',f:'rm'},{l:'9',s:'ç',f:'rr'},{l:'0',s:'à',f:'rp'}],
-    [{l:'A',f:'lp'},{l:'Z',f:'lr'},{l:'E',f:'lm'},{l:'R',f:'li'},{l:'T',f:'li'},{l:'Y',f:'ri'},{l:'U',f:'ri'},{l:'I',f:'rm'},{l:'O',f:'rr',g:'œ'},{l:'P',f:'rp'}],
-    [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}],
-    [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr'},{l:'=',s:'+',f:'rp'}]
+    [{l:'1',s:'&',f:'lp'},{l:'2',s:'é',f:'lr'},{l:'3',s:'"',f:'lm'},{l:'4',s:"'",f:'li'},{l:'5',s:'(',f:'li',g:'{',gs:'['},{l:'6',s:'§',f:'ri'},{l:'7',s:'è',f:'ri',g:'«',gs:'»'},{l:'8',s:'!',f:'rm'},{l:'9',s:'ç',f:'rr'},{l:'0',s:'à',f:'rp'}],
+    [{l:'A',f:'lp',g:'æ'},{l:'Z',f:'lr'},{l:'E',f:'lm'},{l:'R',f:'li'},{l:'T',f:'li'},{l:'Y',f:'ri'},{l:'U',f:'ri'},{l:'I',f:'rm'},{l:'O',f:'rr',g:'œ'},{l:'P',f:'rp'}],
+    [{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li',home:true},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri',home:true},{l:'K',f:'rm'},{l:'L',f:'rr',gs:'|'},{l:'M',f:'rp'}],
+    [{l:'<',s:'>',f:'lp'},{l:'W',f:'lp'},{l:'X',f:'lr'},{l:'C',f:'lm'},{l:'V',f:'li'},{l:'B',f:'li'},{l:'N',f:'ri',gs:'~'},{l:',',s:'?',f:'ri'},{l:';',s:'.',f:'rm'},{l:':',s:'/',f:'rr',gs:'\\'},{l:'=',s:'+',f:'rp'}]
   ],
   // NF Z71-300 (norme AFNOR 2019) : PAS identique au français historique.
   // Vérifié via la référence faisant autorité Djyp/azerty_afnor (fichier XKB
@@ -3519,6 +3523,31 @@ const KB_LAYOUTS={
   ],
 };
 const KB_LAYOUT_LABELS={fr:'Français',be:'Belge',mac:'Mac',nf:'Norme NF Z71-300'};
+/* Touches du bloc alphanumérique qui ne sont pas dans KB_LAYOUTS (rangées 4 touches) :
+   à gauche du 1 (tlde), à droite du 0 (ae), à droite du P (ad), à droite du M (ac).
+   `nd` : sur la rangée des chiffres, touche dont `l` s'obtient SANS Maj (pas d'inversion).
+   Sources : xkeyboard-config symbols/fr (basic, mac, afnor) et symbols/be ; mêmes gestes que KB_HOW.
+   `gs` : niveau AltGr/Option + Maj. Touches mortes (^ ¨ `) : `l`/`s` = le signe obtenu avec la barre d'espace. */
+const KB_EXTRA={
+  fr:{tlde:[{l:'²',f:'lp',nd:true}],
+      ae:[{l:')',s:'°',f:'rp',g:']',nd:true},{l:'=',s:'+',f:'rp',g:'}',nd:true}],
+      ad:[{l:'^',s:'¨',f:'rp'},{l:'$',s:'£',f:'rp',g:'¤'}],
+      ac:[{l:'ù',s:'%',f:'rp'},{l:'*',s:'µ',f:'rp'}]},
+  be:{tlde:[{l:'²',s:'³',f:'lp',nd:true}],
+      ae:[{l:')',s:'°',f:'rp',nd:true},{l:'-',s:'_',f:'rp',nd:true}],
+      ad:[{l:'^',s:'¨',f:'rp',g:'['},{l:'$',s:'*',f:'rp',g:']'}],
+      ac:[{l:'ù',s:'%',f:'rp'},{l:'µ',s:'£',f:'rp',g:'`'}]},
+  mac:{tlde:[{l:'@',s:'#',f:'lp',nd:true}],
+      ae:[{l:')',s:'°',f:'rp',g:'}',gs:']',nd:true},{l:'-',s:'_',f:'rp',nd:true}],
+      ad:[{l:'^',s:'¨',f:'rp'},{l:'$',s:'*',f:'rp',g:'€'}],
+      ac:[{l:'ù',s:'%',f:'rp'},{l:'`',s:'£',f:'rp'}]},
+  nf:{tlde:[{l:'@',s:'#',f:'lp',nd:true}],
+      ae:[{l:"'",s:'"',f:'rp',g:'°',nd:true},{l:'^',s:'¨',f:'rp',nd:true}],
+      ad:[{l:'-',s:'–',f:'rp'},{l:'+',s:'±',f:'rp'}],
+      ac:[{l:'/',s:'\\',f:'rp',g:'÷'},{l:'*',s:'½',f:'rp',g:'×'}]}
+};
+/* Lettre accentuée sans touche propre : touche morte puis voyelle (surbrillance en deux temps). */
+const KB_DEAD_DECOMP={'â':['^','a'],'ê':['^','e'],'î':['^','i'],'ô':['^','o'],'û':['^','u'],'ä':['¨','a'],'ë':['¨','e'],'ï':['¨','i'],'ö':['¨','o'],'ü':['¨','u'],'ÿ':['¨','y']};
 /* Note affichée sous l'aperçu clavier des réglages : ce qui change vraiment,
    pour rester honnête sur ce qui est vérifié (cf. KB_LAYOUTS) plutôt que de
    laisser croire à des différences qu'on ne modélise pas. */
@@ -3626,6 +3655,8 @@ function kbFullPreviewHTML(azertyId,formId){
   const ff=KB_FORM_FACTORS[formId]||KB_FORM_FACTORS.full;
   const isMac=azertyId==='mac';
   const keys=[];
+  const exL=KB_EXTRA[azertyId]||KB_EXTRA.fr;
+  const eK=(x,y,slot,i)=>_kbpAzertyKey(x,y,exL[slot][i],KB_EXTRA.fr[slot][i]);
 
   if(isMac){
     // --- Rangée F : mesurée sur un vrai Magic/MacBook Keyboard, icônes réelles
@@ -3642,10 +3673,10 @@ function kbFullPreviewHTML(azertyId,formId){
       ['F13','F14','F15'].forEach((l,i)=>keys.push(_kbpKey(15.82+i,0,1,0.72,l,'','n','kbp-mod')));
     }
     // --- digit row ---
-    keys.push(_kbpKey(0,1.2,1,1,'@','#','n'));
+    keys.push(eK(0,1.2,'tlde',0));
     layout[0].forEach((k,i)=>keys.push(_kbpAzertyKey(i+1,1.2,k,baseline[0][i])));
-    keys.push(_kbpKey(11,1.2,1,1,')','°','rp'));
-    keys.push(_kbpKey(12,1.2,1,1,'-','—','rp'));
+    keys.push(eK(11,1.2,'ae',0));
+    keys.push(eK(12,1.2,'ae',1));
     keys.push(_kbpKey(13,1.2,1.56,1,'⌫','','n','kbp-mod kbp-big'));
     if(!ff.portable){
       // Cluster de 3 icônes (Page/Origine), absent des Mac compacts : présent
@@ -3657,8 +3688,8 @@ function kbFullPreviewHTML(azertyId,formId){
     // --- tab row ---
     keys.push(_kbpKey(0,2.2,1.56,1,'tab','','n','kbp-mod'));
     layout[1].forEach((k,i)=>keys.push(_kbpAzertyKey(1.56+i,2.2,k,baseline[1][i])));
-    keys.push(_kbpKey(11.56,2.2,1,1,'^','¨','rp'));
-    keys.push(_kbpKey(12.56,2.2,1,1,'$','*','rp',null,'€'));
+    keys.push(eK(11.56,2.2,'ad',0));
+    keys.push(eK(12.56,2.2,'ad',1));
     if(!ff.portable){
       keys.push(_kbpKey(15.82,2.2,1,1,'⌦','','n','kbp-mod'));
       keys.push(_kbpKey(16.82,2.2,1,1,'⇟','','n','kbp-mod'));
@@ -3667,8 +3698,8 @@ function kbFullPreviewHTML(azertyId,formId){
     // --- home row + Entrée (ISO, ratio Mac mesuré au pixel près) ---
     keys.push(_kbpKey(0,3.2,1.84,1,'caps','','n','kbp-mod'));
     layout[2].forEach((k,i)=>keys.push(_kbpAzertyKey(1.84+i,3.2,k,baseline[2][i])));
-    keys.push(_kbpKey(11.84,3.2,1,1,'ù','%','rp'));
-    keys.push(_kbpKey(12.84,3.2,1,1,'£','`','rp'));
+    keys.push(eK(11.84,3.2,'ac',0));
+    keys.push(eK(12.84,3.2,'ac',1));
     keys.push({x:13.56,y:2.2,w:1,h:2,main:'entrée',sub:'',finger:'n',cls:'kbp-mod kbp-iso-mac',altgr:''});
     // --- shift row ---
     keys.push(_kbpKey(0,4.2,1.27,1,'maj','','n','kbp-mod'));
@@ -3723,19 +3754,22 @@ function kbFullPreviewHTML(azertyId,formId){
     const yBottom=cursor;
 
     if(yDigitRow!==null){
-      layout[0].forEach((k,i)=>keys.push(_kbpAzertyKey(i,yDigitRow,k,baseline[0][i])));
+      keys.push(eK(0,yDigitRow,'tlde',0));
+      layout[0].forEach((k,i)=>keys.push(_kbpAzertyKey(i+1,yDigitRow,k,baseline[0][i])));
+      keys.push(eK(11,yDigitRow,'ae',0));
+      keys.push(eK(12,yDigitRow,'ae',1));
       keys.push(_kbpKey(13,yDigitRow,2,1,'⌫','','n','kbp-mod kbp-big'));
     }
     keys.push(_kbpKey(0,yTab,1.5,1,'tab','','n','kbp-mod'));
     layout[1].forEach((k,i)=>keys.push(_kbpAzertyKey(1.5+i,yTab,k,baseline[1][i])));
-    keys.push(_kbpKey(11.5,yTab,1,1,'^','¨','rp'));
-    keys.push(_kbpKey(12.5,yTab,1,1,'$','£','rp',null,'¤'));
+    keys.push(eK(11.5,yTab,'ad',0));
+    keys.push(eK(12.5,yTab,'ad',1));
     keys.push({x:13.5,y:yTab,w:1.5,h:2,main:'entrée',sub:'',finger:'n',cls:'kbp-mod kbp-iso-pc',altgr:''});
 
     keys.push(_kbpKey(0,yHome,1.75,1,'caps','','n','kbp-mod'));
     layout[2].forEach((k,i)=>keys.push(_kbpAzertyKey(1.75+i,yHome,k,baseline[2][i])));
-    keys.push(_kbpKey(11.75,yHome,1,1,'ù','%','rp'));
-    keys.push(_kbpKey(12.75,yHome,1,1,'*','µ','rp'));
+    keys.push(eK(11.75,yHome,'ac',0));
+    keys.push(eK(12.75,yHome,'ac',1));
 
     keys.push(_kbpKey(0,yShift,1.25,1,'maj','','n','kbp-mod'));
     keys.push(_kbpAzertyKey(1.25,yShift,layout[3][0],baseline[3][0]));
@@ -3833,6 +3867,17 @@ function kbFullPreviewHTML(azertyId,formId){
 function getKbLayoutId(){try{const v=localStorage.getItem('kp_kb_layout');return KB_LAYOUTS[v]?v:'fr';}catch{return 'fr';}}
 function setKbLayoutId(v){try{localStorage.setItem('kp_kb_layout',v);}catch{}}
 function kbModifierName(){return getKbLayoutId()==='mac'?'Option (⌥)':'AltGr';}
+/* Petit message temporaire en bas d'écran (Verr. Maj, Verr. Num, touches non transmises). */
+function kbNotice(msg){
+  try{
+    let n=document.getElementById('kb-notice');
+    if(!n){n=document.createElement('div');n.id='kb-notice';n.setAttribute('role','status');n.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#3A352B;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;line-height:1.35;z-index:9999;max-width:min(92vw,520px);text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)';document.body.appendChild(n);}
+    n.textContent=msg;n.style.display='block';
+    clearTimeout(kbNotice._t);kbNotice._t=setTimeout(()=>{n.style.display='none';},5000);
+  }catch{}
+}
+/* Valeur d'attribut HTML : la touche " (guillemet) cassait data-s et sortait de la surbrillance. */
+function kbAttr(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 /* Guillemets : « » n'existent pas sur la plupart des claviers AZERTY (français,
    belge). Les leçons affichent « » par défaut ('fr') et le guillemet droit "
    est accepté à la place (cf. typeKey). Réglage 'droits' : afficher " à la place. */
@@ -3843,12 +3888,20 @@ function setQuoteStyle(v){try{localStorage.setItem('kp_quotes',v);}catch{}}
    (français, belge, Mac) et fr_azerty_afnor (NF Z71-300) ; tilde belge confirmé
    par Wikipédia. "puis espace" = touche morte (le signe n'apparaît qu'après la barre d'espace). */
 const KB_HOW={
- fr:{'@':'AltGr + 0','#':'AltGr + 3','[':'AltGr + 5',']':'AltGr + ° (touche à droite du 0)','|':'AltGr + 6','/':'Maj + :','*':'touche * (à gauche de Entrée)','=':'touche = (à droite du °)','+':'Maj + =','%':'Maj + ù','_':'touche 8','{':'AltGr + 4','}':'AltGr + =','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'AltGr + é, puis espace','\\':'AltGr + 8','`':'AltGr + 7, puis espace','(':'touche 5, sans Maj',')':'touche ° (à droite du 0), sans Maj','«':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','»':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','œ':'Alt + 0156 (pavé numérique, Windows). Sinon tape o puis e : c\'est accepté','æ':'Alt + 0230 (pavé numérique, Windows). Sinon tape a puis e : c\'est accepté','É':'Alt + 0201 (pavé numérique, Windows). Maj + é donne « 2 » : c\'est accepté'},
- be:{'@':'AltGr + 2','#':'AltGr + 3','[':'AltGr + ^ (touche à droite du P)',']':'AltGr + $','|':'AltGr + 1','/':'Maj + :','*':'Maj + $','=':'touche = (rangée du bas, à droite)','+':'Maj + =','%':'Maj + ù','_':'Maj + - (touche à droite du 0)','{':'AltGr + 9','}':'AltGr + 0','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'AltGr + =, puis espace','\\':'AltGr + <','`':'AltGr + µ, puis espace','(':'touche 5, sans Maj',')':'touche ) (à droite du 0), sans Maj','«':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','»':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','œ':'Alt + 0156 (pavé numérique, Windows). Sinon tape o puis e : c\'est accepté','æ':'Alt + 0230 (pavé numérique, Windows). Sinon tape a puis e : c\'est accepté','É':'Alt + 0201 (pavé numérique, Windows). Maj + é donne « 2 » : c\'est accepté'},
- mac:{'@':'touche à gauche du 1','#':'Maj + touche à gauche du 1','[':'Option + Maj + 5',']':'Option + Maj + ) (touche à droite du 0)','|':'Option + Maj + L','/':'Maj + :','*':'Maj + $','=':'touche = (rangée du bas, à droite)','+':'Maj + =','%':'Maj + ù','_':'Maj + -','{':'Option + 5','}':'Option + ) (touche à droite du 0)','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'Option + Maj + N','\\':'Option + Maj + :','`':'touche accent grave, puis espace','(':'touche 5, sans Maj',')':'touche ) (à droite du 0), sans Maj','«':'Option + 7','»':'Option + Maj + 7','œ':'Option + O','æ':'Option + A','É':'Option + Maj + é. Maj + é donne « 2 » : c\'est accepté'},
- nf:{'@':'touche à gauche du 1','#':'Maj + touche à gauche du 1','[':'AltGr + 5',']':'AltGr + 6','|':'AltGr + L','/':'touche / (à droite du M)','*':'touche * (à droite du /)','=':'Maj + ;','+':'touche + (en haut à droite)','%':'AltGr + P','_':'AltGr + 8','{':'AltGr + T','}':'AltGr + Y','<':'touche < (à gauche du W)','>':'Maj + <','"':'Maj + touche \' (à droite du 0)','~':'AltGr + N','\\':'Maj + /','`':'AltGr + è, puis espace','(':'touche 5',')':'touche 6','«':'touche 9','»':'touche 0','œ':'AltGr + O','æ':'AltGr + A','É':'AltGr + Maj + é. Maj + é donne « 2 » : c\'est accepté'}
+ fr:{'ù':'touche ù (à droite du M)','-':'touche 6, sans Maj','â':'touche ^ (à droite du P), puis la voyelle','î':'touche ^ (à droite du P), puis la voyelle','ô':'touche ^ (à droite du P), puis la voyelle','û':'touche ^ (à droite du P), puis la voyelle','ê':'touche ^ (à droite du P), puis la voyelle','ë':'Maj + touche ^ (à droite du P), puis la voyelle','ï':'Maj + touche ^ (à droite du P), puis la voyelle','@':'AltGr + 0','#':'AltGr + 3','[':'AltGr + 5',']':'AltGr + ) (touche à droite du 0)','|':'AltGr + 6','/':'Maj + :','*':'touche * (à gauche de Entrée)','=':'touche = (à droite du °)','+':'Maj + =','%':'Maj + ù','_':'touche 8','{':'AltGr + 4','}':'AltGr + =','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'AltGr + é, puis espace','\\':'AltGr + 8','`':'AltGr + 7, puis espace','(':'touche 5, sans Maj',')':'touche ) (à droite du 0), sans Maj','«':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','»':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','œ':'Tape o puis e : c\'est accepté. Sinon, Alt + 0156 au pavé numérique (Windows)','æ':'Tape a puis e : c\'est accepté. Sinon, Alt + 0230 au pavé numérique (Windows)','É':'Maj + é donne « 2 » : c\'est accepté. Sinon, Alt + 0201 au pavé numérique (Windows)'},
+ be:{'ù':'touche ù (à droite du M)','-':'touche - (à droite du ), sans Maj)','â':'touche ^ (à droite du P), puis la voyelle','î':'touche ^ (à droite du P), puis la voyelle','ô':'touche ^ (à droite du P), puis la voyelle','û':'touche ^ (à droite du P), puis la voyelle','ê':'touche ^ (à droite du P), puis la voyelle','ë':'Maj + touche ^ (à droite du P), puis la voyelle','ï':'Maj + touche ^ (à droite du P), puis la voyelle','@':'AltGr + 2','#':'AltGr + 3','[':'AltGr + ^ (touche à droite du P)',']':'AltGr + $','|':'AltGr + 1','/':'Maj + :','*':'Maj + $','=':'touche = (rangée du bas, à droite)','+':'Maj + =','%':'Maj + ù','_':'Maj + - (touche à droite du 0)','{':'AltGr + 9','}':'AltGr + 0','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'AltGr + =, puis espace','\\':'AltGr + <','`':'AltGr + µ, puis espace','(':'touche 5, sans Maj',')':'touche ) (à droite du 0), sans Maj','«':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','»':'pas de touche sur ton clavier : tape le guillemet droit " (accepté)','œ':'Tape o puis e : c\'est accepté. Sinon, Alt + 0156 au pavé numérique (Windows)','æ':'Tape a puis e : c\'est accepté. Sinon, Alt + 0230 au pavé numérique (Windows)','É':'Maj + é donne « 2 » : c\'est accepté. Sinon, Alt + 0201 au pavé numérique (Windows)'},
+ mac:{'ù':'touche ù (à droite du M)','-':'touche - (à droite du ), sans Maj)','â':'touche ^ (à droite du P), puis la voyelle','î':'touche ^ (à droite du P), puis la voyelle','ô':'touche ^ (à droite du P), puis la voyelle','û':'touche ^ (à droite du P), puis la voyelle','ê':'touche ^ (à droite du P), puis la voyelle','ë':'Maj + touche ^ (à droite du P), puis la voyelle','ï':'Maj + touche ^ (à droite du P), puis la voyelle','@':'touche à gauche du 1','#':'Maj + touche à gauche du 1','[':'Option + Maj + 5',']':'Option + Maj + ) (touche à droite du 0)','|':'Option + Maj + L','/':'Maj + :','*':'Maj + $','=':'touche = (rangée du bas, à droite)','+':'Maj + =','%':'Maj + ù','_':'Maj + -','{':'Option + 5','}':'Option + ) (touche à droite du 0)','<':'touche < (à gauche du W)','>':'Maj + <','"':'touche 3, sans Maj','~':'Option + Maj + N','\\':'Option + Maj + :','`':'touche accent grave, puis espace','(':'touche 5, sans Maj',')':'touche ) (à droite du 0), sans Maj','«':'Option + 7','»':'Option + Maj + 7','œ':'Option + O','æ':'Option + A','É':'Option + Maj + é. Maj + é donne « 2 » : c\'est accepté'},
+ nf:{'ù':'AltGr + U','-':'touche - (à droite du P)',"'":'touche \' (à droite du 0), sans Maj','â':'touche ^ (à gauche de Retour arrière), puis la voyelle','î':'touche ^ (à gauche de Retour arrière), puis la voyelle','ô':'touche ^ (à gauche de Retour arrière), puis la voyelle','û':'touche ^ (à gauche de Retour arrière), puis la voyelle','ê':'Maj + touche 4','ë':'Maj + touche ^ (à gauche de Retour arrière), puis la voyelle','ï':'Maj + touche ^ (à gauche de Retour arrière), puis la voyelle','@':'touche à gauche du 1','#':'Maj + touche à gauche du 1','[':'AltGr + 5',']':'AltGr + 6','|':'AltGr + L','/':'touche / (à droite du M)','*':'touche * (à droite du /)','=':'Maj + ;','+':'touche + (en haut à droite)','%':'AltGr + P','_':'AltGr + 8','{':'AltGr + T','}':'AltGr + Y','<':'touche < (à gauche du W)','>':'Maj + <','"':'Maj + touche \' (à droite du 0)','~':'AltGr + N','\\':'Maj + /','`':'AltGr + è, puis espace','(':'touche 5',')':'touche 6','«':'touche 9','»':'touche 0','œ':'AltGr + O','æ':'AltGr + A','É':'AltGr + Maj + é. Maj + é donne « 2 » : c\'est accepté'}
 };
 const KB_HOW_TEXT_LESSONS=['pon6','tre3','sym9','flu4','flu5','flu6'];
+/* Les gestes « Alt + 0156 » passent par le pavé numérique : sur un clavier qui n'en a pas
+   (TKL, 75 %, 60 %, 40 %, portable sans pavé), on ne les propose pas, on garde le repli accepté. */
+function kbHowFor(H,c){
+  let t=H[c];
+  const ff=KB_FORM_FACTORS[getKbFormFactorId()]||KB_FORM_FACTORS.full;
+  if(!ff.numpad)t=t.replace(/\. Sinon, Alt \+ 0\d+ au pavé numérique \(Windows\)$/,'');
+  return t;
+}
 function kbHowHTML(les){
   const lay=getKbLayoutId(),H=KB_HOW[lay]||KB_HOW.fr;
   const chars=[];
@@ -3859,7 +3912,7 @@ function kbHowHTML(les){
   if(!chars.length)return'';
   const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const groups=[];
-  for(const c of chars){const g=groups.find(x=>x.how===H[c]);if(g)g.cs.push(c);else groups.push({how:H[c],cs:[c]});}
+  for(const c of chars){const how=kbHowFor(H,c);const g=groups.find(x=>x.how===how);if(g)g.cs.push(c);else groups.push({how,cs:[c]});}
   const items=groups.map(g=>`<b>${esc(g.cs.join(' '))}</b> : ${esc(g.how)}`).join('<br>');
   return`<div class="intro-rule"><div class="intro-rule-icon">⌨️</div><div class="intro-rule-text"><strong>Sur ton clavier (${KB_LAYOUT_LABELS[lay]})</strong>${items}</div></div>`;
 }
@@ -3888,15 +3941,26 @@ function adaptQuotes(t){
    premier mais `s` le caractère réellement obtenu sans Maj. */
 function kbKeyMatch(k,ch,invert){
   if(ch==null)return null;
+  if(k.nd)invert=false; // touche non numérique de la rangée des chiffres (ex. ")" "=")
   const low=ch.toLowerCase();
   if(k.l.toLowerCase()===low)return{via:invert?'shift':'base',ch:k.l};
   if(k.s&&k.s.toLowerCase()===low)return{via:invert?'base':'shift',ch:k.s};
-  if(k.g&&k.g.toLowerCase()===low)return{via:'altgr',ch:k.g};
+  // AltGr/Option : seulement si le caractère n'a pas de touche directe (ex. ^ a sa propre touche)
+  if(k.g&&k.g.toLowerCase()===low)return kbDirect(ch)?null:{via:'altgr',ch:k.g};
+  if(k.gs&&k.gs.toLowerCase()===low)return kbDirect(ch)?null:{via:'altgrshift',ch:k.gs};
   return null;
 }
-let KB=[],T4A_KPOS={};
+/* `ch` a-t-il une touche directe (ou Maj) quelque part sur le clavier complet ? */
+function kbDirect(ch){
+  if(ch==null)return false;const low=ch.toLowerCase();
+  return KB_FULL.some(row=>row.some(k=>k.l.toLowerCase()===low||(k.s&&k.s.toLowerCase()===low)));
+}
+let KB=[],KB_FULL=[],T4A_KPOS={};
 function applyKbLayout(id){
   KB=(KB_LAYOUTS[id]||KB_LAYOUTS.fr).map(row=>row.map(k=>({...k})));
+  // Clavier complet (leçons et explications) : 4 rangées + les touches de bord (², ), =, ^, $, ù, * …).
+  const ex=KB_EXTRA[id]||KB_EXTRA.fr,cp=a=>(a||[]).map(k=>({...k}));
+  KB_FULL=[cp(ex.tlde).concat(KB[0],cp(ex.ae)),KB[1].concat(cp(ex.ad)),KB[2].concat(cp(ex.ac)),KB[3]];
   T4A_KPOS=t4aComputeKpos();
 }
 applyKbLayout(getKbLayoutId());
@@ -5460,10 +5524,14 @@ const app={
     if(this._onKey)window.removeEventListener('keydown',this._onKey);
     this._onKey=e=>this.handleKey(e);
     window.addEventListener('keydown',this._onKey);
+    if(this._onKeyPress)window.removeEventListener('keypress',this._onKeyPress);
+    this._onKeyPress=e=>this._onKeyPress_(e);
+    window.addEventListener('keypress',this._onKeyPress);
   },
   stopAll(){
     this.stopTimer();this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.royaleLeave();
     if(this._onKey){window.removeEventListener('keydown',this._onKey);this._onKey=null;}
+    if(this._onKeyPress){window.removeEventListener('keypress',this._onKeyPress);this._onKeyPress=null;}
     if(this._clavierFlashT){clearTimeout(this._clavierFlashT);this._clavierFlashT=null;}
     this.game=null;this.sess=null;this.sprint=null;this.course=null;this.ghost=null;this.simon=null;this.boss=null;this.clavier=null;this.souris=null;this.activeGame=null;
   },
@@ -5528,7 +5596,7 @@ const app={
   },
   _fingerInfo(letter){
     let key=null,via=null,label=null;
-    for(let r=0;r<KB.length&&!key;r++){for(const k of KB[r]){
+    for(let r=0;r<KB_FULL.length&&!key;r++){for(const k of KB_FULL[r]){
       const m=kbKeyMatch(k,letter,r===0);
       if(m){key=k;via=m.via;label=m.ch;break;}
     }}
@@ -5544,17 +5612,21 @@ const app={
     const hasFrQuotes=/[«»]/.test((les.keys||'')+(les.text||''));
     const straightQ=hasFrQuotes&&getQuoteStyle()==='droits';
     const newKeys=[...new Set((getQuoteStyle()==='droits'?(les.keys||'').replace(/[«»]/g,'"'):(les.keys||'')).split(/\s+/).filter(Boolean))];
-    const kb=KB.map((row,r)=>`<div class="tuto-kb-row">${row.map(k=>{
+    const kb=KB_FULL.map((row,r)=>`<div class="tuto-kb-row">${row.map(k=>{
       let on=false,hint='';
       for(const t of newKeys){
         const m=kbKeyMatch(k,t,r===0);
-        if(m){on=true;if(m.via==='shift')hint='Maj → '+m.ch;else if(m.via==='altgr')hint=`${kbModifierName()} → ${m.ch}`;break;}
+        if(m){on=true;if(m.via==='shift')hint='Maj → '+m.ch;else if(m.via==='altgr')hint=`${kbModifierName()} → ${m.ch}`;else if(m.via==='altgrshift')hint=`${kbModifierName()} + Maj → ${m.ch}`;break;}
       }
       return`<div class="tuto-key${on?' on':''}"${on?` style="background:${FINGERS[k.f]};border-color:${FINGERS[k.f]}"`:''}>${k.l.toLowerCase()}${hint?`<span class="tuto-key-altgr">${hint}</span>`:''}</div>`;
     }).join('')}</div>`).join('');
     const infos=newKeys.map(k=>this._fingerInfo(k)).filter(Boolean);
-    const showKb=infos.length>0&&infos.length===newKeys.length;
-    const viaHint=v=>v==='shift'?' (Maj)':v==='altgr'?` (${kbModifierName()})`:'';
+    // Clavier illustré : toutes les touches enseignées y figurent, ou celles qui n'y sont pas
+    // (ù, ^, -, ' selon la disposition) sont décrites par écrit dans « Sur ton clavier ».
+    const Hlay=KB_HOW[getKbLayoutId()]||KB_HOW.fr;
+    const missing=newKeys.filter(k=>!this._fingerInfo(k));
+    const showKb=infos.length>0&&missing.every(k=>Hlay[k]!==undefined);
+    const viaHint=v=>v==='shift'?' (Maj)':v==='altgr'?` avec ${kbModifierName()}`:v==='altgrshift'?` avec ${kbModifierName()} + Maj`:'';
     const cards=infos.map(i=>`<div class="tuto-keycard"><div class="k" style="background:${i.color}">${i.label}</div><div class="meta"><b>${i.label}</b>${viaHint(i.via)} · ${i.finger} · ${i.hand}</div></div>`).join('');
     const t=les.tuto||{};
     const rules=(t.rules||[]).map(r=>{
@@ -5571,6 +5643,7 @@ const app={
       ${showKb?`<div class="tuto-kb">${kb}</div><div class="tuto-keys-info">${cards}</div>`:''}
       ${(how||rules)?`<div class="intro-rules" style="margin-bottom:18px">${how}${rules}</div>`:''}
       ${quoteSwitch}
+      ${(KB_FORM_FACTORS[getKbFormFactorId()]||{}).noDigitRow&&(/[0-9]/.test(les.keys||'')||/^num/.test(les.id))?`<p style="font-size:13px;color:var(--muted);margin:0 0 18px">Sur un clavier 40 %, les chiffres sont sur une couche Fn : repère-les sur la légende de tes touches.</p>`:''}
       ${t.tip?`<div class="lesson-tip"><div class="lesson-tip-icon">🎯</div><div>${t.tip}</div></div>`:''}
       <button class="intro-start-btn" onclick="app.confirmTuto()">Commencer la leçon →</button>`;
     // Les leçons sont rédigées pour AZERTY PC (touche "AltGr") : sur Mac, la
@@ -6335,13 +6408,53 @@ const app={
   startTimer(){if(this._timer)return;this._timer=setInterval(()=>{this.now=Date.now();if(this._isPlainTest())this._patchTest4a();else this._patchTypingStats();},150);},
   stopTimer(){if(this._timer){clearInterval(this._timer);this._timer=null;}},
 
-  keyMatches(key,ch){if(ch==null)return false;const low=ch.toLowerCase();if(key.l.toLowerCase()===low)return true;if(key.s&&key.s===ch)return true;if(key.g&&key.g.toLowerCase()===low)return true;return false;},
+  keyMatches(key,ch){if(ch==null)return false;const low=ch.toLowerCase();if(key.l.toLowerCase()===low)return true;if(key.s&&key.s===ch)return true;if((key.g&&key.g.toLowerCase()===low)||(key.gs&&key.gs.toLowerCase()===low))return !kbDirect(ch);return false;},
+  /* Caractère dont la touche doit s'allumer : la frappe attendue, ou son premier temps
+     (touche morte avant la voyelle, o avant le e de œ, " pour « »…). */
+  _kbNext(s){
+    if(!s||s.finished||s.vocal)return null;
+    if(s._skipNext&&s._skipNext.at===s.idx&&s._skipNext.lig!=null)return s._skipNext.ch; // le e de œ / æ (l'espace après « est facultative)
+    const ch=s.text[s.idx];if(ch==null)return null;
+    const low=ch.toLowerCase();
+    // Majuscule d'un caractère porté par la touche en Maj (É, À, Ç…) : on allume la touche (la Maj ne s'affiche pas).
+    if(low!==ch&&KB_FULL.some(row=>row.some(k=>k.s===low)))return low;
+    const any=KB_FULL.some(row=>row.some(k=>k.l.toLowerCase()===low||(k.s&&k.s.toLowerCase()===low)||(k.g&&k.g.toLowerCase()===low)||(k.gs&&k.gs.toLowerCase()===low)));
+    if(any)return ch;
+    const dd=KB_DEAD_DECOMP[low];
+    if(dd)return this._pendingDeadKey===dd[0]?dd[1]:dd[0];
+    if(ch==='É')return 'é';
+    if(ch==='œ'||ch==='Œ')return 'o';
+    if(ch==='æ'||ch==='Æ')return 'a';
+    if(ch==='«'||ch==='»')return '"';
+    return ch;
+  },
+  /* Alt + code au pavé numérique (Windows) : le navigateur envoie les chiffres en keydown puis le caractère
+     final (œ, æ, É…) seulement en keypress. On le rejoue comme une frappe, sauf si un keydown l'a déjà donné. */
+  _onKeyPress_(e){
+    const k=e.key;
+    if(!k||k.length!==1||!'œæŒÆÉ'.includes(k))return;
+    if(this._lastKdKey===k&&Date.now()-(this._lastKdAt||0)<250)return;
+    const t=e.target;
+    if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable))return;
+    if([...document.querySelectorAll('.modal-overlay,.settings-overlay')].some(m=>m.classList.contains('open')))return;
+    const s=this.sess;
+    if(!s||s.finished||!(this.view==='test'||(this.view==='lessons')))return;
+    this.typeKey({key:k,code:'',repeat:false,altKey:false,ctrlKey:false,shiftKey:false,target:t,preventDefault(){},getModifierState(){return false;}});
+  },
+  _kbRefresh(){
+    const s=this.sess;if(!s||s.finished||!(this.view==='test'||this.view==='lessons'))return;
+    if(this._isPlainTest())this._patchTest4a();else this._patchTypingBox();
+  },
   handleKey(e){
     // Ne jamais capturer la frappe quand l'utilisateur écrit dans un champ
     // (connexion/inscription, code promo, nom du certificat, recherche…) :
     // sinon typeKey() fait preventDefault() et rien ne s'inscrit dans le champ.
     const t=e.target;
     if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable))return;
+    if(e.key&&e.key.length===1){this._lastKdKey=e.key;this._lastKdAt=Date.now();}
+    // Alt + pavé numérique (Alt + 0156…) : les chiffres tapés ne sont pas des frappes (le caractère final
+    // arrive par un événement « keypress », cf. _onKeyPress_).
+    if(e.altKey&&!e.ctrlKey&&/^Numpad[0-9]$/.test(e.code||'')){e.preventDefault();return;}
     // Ni quand une fenêtre modale est ouverte (auth, upgrade, réglages, tuto…).
     if([...document.querySelectorAll('.modal-overlay,.settings-overlay')].some(m=>m.classList.contains('open')))return;
     if(document.getElementById('lesson-tuto-modal').classList.contains('open'))return;
@@ -6352,9 +6465,19 @@ const app={
       let d=CODE_TO_DEAD[e.code]||null;
       if(e.code==='BracketLeft'&&e.shiftKey)d='¨';
       else if(e.code==='Equal'&&getKbLayoutId()==='nf')d=e.shiftKey?'¨':'^';
-      this._pendingDeadKey=d||'?';return;
+      else if(!d&&e.altKey&&getKbLayoutId()==='mac'){if(e.code==='KeyI')d='^';else if(e.code==='KeyU')d='¨';} // Mac : Option+i / Option+u
+      this._pendingDeadKey=d||'?';this._kbRefresh();return;
     }
-    if(DEAD_COMPOSE[e.key]&&e.key.length===1){this._pendingDeadKey=e.key;return;}
+    if(DEAD_COMPOSE[e.key]&&e.key.length===1){this._pendingDeadKey=e.key;this._kbRefresh();return;}
+    // Une touche de modification (Maj pour une majuscule, AltGr…) arrivant après la touche morte
+    // ne doit pas l'annuler : Ê, Ë… restent possibles.
+    if(this._pendingDeadKey&&['Shift','Control','Alt','AltGraph','Meta','CapsLock'].includes(e.key))return;
+    // Touche non transmise par le navigateur (clavier virtuel, méthode de saisie) : on le dit.
+    if((e.key==='Unidentified'||e.key==='Process')&&this.sess&&!this.sess.finished&&(this.view==='test'||this.view==='lessons')){
+      this._badKeyN=(this._badKeyN||0)+1;
+      if(this._badKeyN===3)kbNotice("Ton navigateur ne transmet pas certaines touches (clavier virtuel ou méthode de saisie). Utilise un clavier physique et désactive la méthode de saisie.");
+      return;
+    }
     if(this._pendingDeadKey){
       const pk=this._pendingDeadKey;this._pendingDeadKey=null;
       if(pk==='?'){
@@ -6384,6 +6507,9 @@ const app={
   typeKey(e){
     const k=e._composedKey||e.key;
     if(k==='Backspace'){e.preventDefault();return;} // pas de correction : frappe en avant uniquement
+    if(e.repeat){if(k.length===1)e.preventDefault();return;} // touche maintenue : pas de frappe en plus
+    // Pavé numérique avec Verr. Num coupé : le navigateur envoie « Fin », « ↓ »… au lieu du chiffre.
+    if(k.length>1&&/^Numpad[0-9]$/.test(e.code||'')&&/[0-9]/.test(this.sess.text[this.sess.idx]||'')){kbNotice("Verr. Num est désactivée : appuie sur Verr. Num pour utiliser le pavé numérique, ou tape les chiffres de la rangée du haut.");return;}
     if(k.length!==1)return;
     e.preventDefault();
     const s=this.sess;
@@ -6406,7 +6532,11 @@ const app={
     }
     // œ / æ : « oe » / « ae » (deux lettres) est accepté quand l'élève n'a pas la touche.
     if(!_ok&&((expected==='œ'&&k==='o')||(expected==='Œ'&&k==='O')||(expected==='æ'&&k==='a')||(expected==='Æ'&&k==='A'))){_ok=true;s._skipNext={at:s.idx+1,ch:'e',lig:s.idx};}
-    if(_ok){s.typed[s.idx]='c';s.correct++;}else{s.typed[s.idx]='w';}
+    if(_ok){s.typed[s.idx]='c';s.correct++;}else{
+      s.typed[s.idx]='w';
+      // Verr. Maj : la bonne lettre, mais dans l'autre casse, alors que Verr. Maj est active.
+      if(expected&&k!==expected&&k.toLowerCase()===expected.toLowerCase()&&/[a-zA-Z]/.test(k)&&typeof e.getModifierState==='function'&&e.getModifierState('CapsLock'))kbNotice("Verr. Maj est activée : appuie sur Verr. Maj pour la désactiver.");
+    }
     if(_skip){s.typed[s.idx+1]='c';}
     this._recordKey(expected,_ok);
     if(this._isPlainTest())this._t4aFx(k,_ok);
@@ -7691,7 +7821,8 @@ const app={
     const next=s&&!s.finished&&!vocal?s.text[s.idx]:null;
     let tbHTML='';
     if(s){let wbuf=[];const flush=()=>{if(wbuf.length){tbHTML+='<span style="white-space:nowrap">'+wbuf.join('')+'</span>';wbuf=[];}};s.text.split('').forEach((ch,i)=>{let cls='todo';if(i<s.idx)cls=s.typed[i]==='w'?'wrong':'ok';else if(i===s.idx)cls='cur';if(ch===' '){flush();tbHTML+=`<span class="ch ${cls}">&nbsp;</span>`;}else wbuf.push(`<span class="ch ${cls}">${ch}</span>`);});flush();}
-    const kbHTML=KB.map(row=>`<div class="kb-row-t">${row.map(k=>{const on=next!=null&&this.keyMatches(k,next);const onAltGr=on&&k.g&&k.g.toLowerCase()===(next||'').toLowerCase()&&k.l.toLowerCase()!==(next||'').toLowerCase();return`<div class="kb-key-t${on?' on':''}" data-l="${k.l.toLowerCase()}" data-s="${k.s||''}" data-finger="${FINGERS[k.f]||''}" style="border-bottom-color:${on?'rgba(0,0,0,0.2)':FINGERS[k.f]}">${k.l.toLowerCase()}${k.s?'<br><span style="font-size:9px;opacity:.6">'+k.s+'</span>':''}${onAltGr?'<br><span style="font-size:8px;opacity:.7">'+kbModifierName()+'</span>':''}</div>`;}).join('')}</div>`).join('');
+    const knext=this._kbNext(s),klow=(knext||'').toLowerCase(),kdir=knext!=null&&kbDirect(knext);
+    const kbHTML=KB_FULL.map(row=>`<div class="kb-row-t">${row.map(k=>{const on=knext!=null&&this.keyMatches(k,knext);const viaG=on&&!kdir&&!!k.g&&k.g.toLowerCase()===klow&&k.l.toLowerCase()!==klow;const viaGS=on&&!kdir&&!viaG&&!!k.gs&&k.gs.toLowerCase()===klow&&k.l.toLowerCase()!==klow;return`<div class="kb-key-t${on?' on':''}" data-l="${kbAttr(k.l.toLowerCase())}" data-s="${kbAttr(k.s)}" data-g="${kbAttr(k.g)}" data-gs="${kbAttr(k.gs)}" data-finger="${FINGERS[k.f]||''}" style="border-bottom-color:${on?'rgba(0,0,0,0.2)':FINGERS[k.f]}">${k.l.toLowerCase()}${k.s?'<br><span style="font-size:9px;opacity:.6">'+k.s+'</span>':''}${(k.g||k.gs)?`<span class="kb-ag" style="display:${viaG||viaGS?'block':'none'};font-size:8px;opacity:.7">${viaGS?kbModifierName()+' + Maj':kbModifierName()}</span>`:''}</div>`;}).join('')}</div>`).join('');
     document.getElementById(pageId).innerHTML=`<div class="typing-section">
       <div class="typing-header">
         <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br>':custom?'<button onclick="go(\'classes\')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Mes devoirs</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
@@ -7817,15 +7948,23 @@ const app={
     });
     this._patchTypingStats();
     // Update keyboard highlight
-    const next=s.text[s.idx]||null;
+    const realNext=s.text[s.idx]||null;
+    const next=this._kbNext(s);
     const low=next?next.toLowerCase():null;
+    const kdir=next!=null&&kbDirect(next);
     document.querySelectorAll('.kb-key-t').forEach(el=>{
-      const on=!!low&&(el.dataset.l===low||(el.dataset.s&&el.dataset.s===next));
+      // Même règle que keyMatches() : touche directe, Maj, ou AltGr/Option (+ Maj) si le caractère n'a pas de touche directe.
+      const dir=!!low&&(el.dataset.l===low||(el.dataset.s&&el.dataset.s===next));
+      const viaG=!!low&&!dir&&!kdir&&!!el.dataset.g&&el.dataset.g.toLowerCase()===low;
+      const viaGS=!!low&&!dir&&!kdir&&!viaG&&!!el.dataset.gs&&el.dataset.gs.toLowerCase()===low;
+      const on=dir||viaG||viaGS;
       const wasOn=el.classList.contains('on');
       if(on!==wasOn){el.classList.toggle('on',on);el.style.borderBottomColor=on?'rgba(0,0,0,0.2)':(el.dataset.finger||'');}
+      const ag=el.querySelector('.kb-ag');
+      if(ag){const show=viaG||viaGS;ag.style.display=show?'block':'none';if(show)ag.textContent=viaGS?kbModifierName()+' + Maj':kbModifierName();}
     });
     const sp=document.querySelector('.kb-space');
-    if(sp)sp.classList.toggle('on',next===' ');
+    if(sp)sp.classList.toggle('on',realNext===' '||(next===' '));
     const hint=document.querySelector('.hint-txt');
     if(hint)hint.innerHTML=s.started?'<span style="opacity:.45;font-size:12px">Tab pour recommencer</span>':'Commence à taper pour démarrer le chrono…';
     requestAnimationFrame(()=>this.scrollToCursor());
@@ -7983,10 +8122,11 @@ const app={
     }
 
     // Clavier en volume : 4 rangées + barre d'espace
+    const knext=this._kbNext(s);
     const keysHTML=KB.map(row=>`<div class="t4a-row">${row.map(k=>{
-      const on=next!=null&&this.keyMatches(k,next);
+      const on=knext!=null&&this.keyMatches(k,knext);
       const col=FINGERS[k.f]||'';
-      return `<div class="t4a-key${on?' next':''}" data-l="${k.l.toLowerCase()}" data-s="${k.s||''}">
+      return `<div class="t4a-key${on?' next':''}" data-l="${kbAttr(k.l.toLowerCase())}" data-s="${kbAttr(k.s)}" data-g="${kbAttr(k.g)}">
         <div class="t4a-key-base"></div>
         <div class="t4a-key-face">
           <div class="t4a-key-main">${k.l.toLowerCase()}</div>
@@ -8171,9 +8311,11 @@ const app={
     });
 
     const next=!s.finished?s.text[s.idx]:null;
-    const low=next?next.toLowerCase():null;
+    const knx=this._kbNext(s);
+    const low=knx?knx.toLowerCase():null;
+    const kdir=knx!=null&&kbDirect(knx);
     document.querySelectorAll('#t4a-plane .t4a-key').forEach(el=>{
-      const on=!!low&&(el.dataset.l===low||(el.dataset.s&&el.dataset.s===next));
+      const on=!!low&&(el.dataset.l===low||(el.dataset.s&&el.dataset.s===knx)||(!kdir&&el.dataset.g&&el.dataset.g.toLowerCase()===low));
       if(el.classList.contains('next')!==on)el.classList.toggle('next',on);
     });
     const spaceWrapEl=$('t4a-spacewrap');
