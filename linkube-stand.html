@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>10 ans de Linkube × KeyPace — Testez votre vitesse de frappe</title>
+<title>10 ans de Linkube × KeyPace : Testez votre vitesse de frappe</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -168,6 +168,19 @@
   @media (max-width:900px){
     .field-row{flex-direction:column;gap:0}
   }
+  @media (min-width:1000px) and (min-height:760px){
+    .hero{max-width:760px}
+    .eyebrow{font-size:15px}
+    .hero h1{font-size:clamp(40px,4.6vw,62px);margin:14px 0 18px}
+    .hero p.sub{font-size:21px;max-width:640px;margin:0 auto 28px}
+    .field label{font-size:15px;margin-bottom:7px}
+    .field input[type=text],.field input[type=email]{padding:18px 20px;font-size:19px}
+    .consent{font-size:15px;margin:16px 0 22px}
+    .btn{font-size:22px;padding:20px 30px}
+    .stats-row{margin-top:26px;padding-top:22px}
+    .stats-row .s .n{font-size:38px}
+    .stats-row .s .l{font-size:15px}
+  }
   @media (max-height:700px){
     .topbar{padding:8px 40px 0}
     .screen{padding:14px 40px}
@@ -205,7 +218,7 @@
   <section class="screen active" id="screen-landing">
     <div class="floaters" id="floaters"></div>
     <div class="hero">
-      <div class="eyebrow">Stand KeyPace — 10 ans de Linkube</div>
+      <div class="eyebrow">Stand KeyPace, 10 ans de Linkube</div>
       <h1>Teste ta vitesse au clavier <span class="hl">en 30 secondes</span>.</h1>
       <p class="sub">Ton e-mail, et tu tapes. On t'envoie ton résultat et un accès d'essai KeyPace après l'événement.</p>
 
@@ -674,7 +687,7 @@
     loadQrLib().then(function(){
       new window.QRCode(holder, { text: REVIEW_URL, width: 150, height: 150, correctLevel: window.QRCode.CorrectLevel.M });
     }).catch(function(){
-      holder.innerHTML = '<p style="font-size:13px;color:var(--muted)">QR indisponible — <a href="' + REVIEW_URL + '">' + REVIEW_URL + '</a></p>';
+      holder.innerHTML = '<p style="font-size:13px;color:var(--muted)">QR indisponible : <a href="' + REVIEW_URL + '">' + REVIEW_URL + '</a></p>';
     });
   }
 
