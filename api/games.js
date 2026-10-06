@@ -460,8 +460,11 @@ module.exports = async function handler(req, res) {
 };
 
 async function eventStats(eventSlug, myWpm) {
-  const all = await sb(`/event_scores?event_slug=eq.${encodeURIComponent(eventSlug)}&select=first_name,company,wpm,accuracy&order=wpm.desc&limit=1000`);
-  const rows = all.data || [];
+  const all = await sb(`/event_scores?event_slug=eq.${encodeURIComponent(eventSlug)}&select=email,first_name,company,wpm,accuracy&order=wpm.desc&limit=1000`);
+  // Un participant peut rejouer : on ne garde que son meilleur score (premier
+  // rencontré, la liste est triée par wpm décroissant) pour le classement.
+  const seen = new Set();
+  const rows = (all.data || []).filter((r) => { const k = r.email || Math.random(); if (seen.has(k)) return false; seen.add(k); return true; });
   const count = rows.length;
   const average = count ? Math.round(rows.reduce((a, r) => a + r.wpm, 0) / count) : 0;
   const best = count ? rows[0].wpm : 0;

@@ -310,7 +310,7 @@
         </div>
       </div>
 
-      <div class="again"><button class="btn auto" id="btn-again">Nouveau participant →</button></div>
+      <div class="again row"><button class="btn ghost" id="btn-retry">↻ Recommencer</button><button class="btn auto" id="btn-again">Nouveau participant →</button></div>
     </div>
   </section>
 </div>
@@ -452,6 +452,8 @@
   // sinon automatiquement (45s après un résultat) ou via "Nouveau participant".
   window.addEventListener('keydown', function(e){ if (e.key === 'Escape') resetToLanding(); });
   document.getElementById('btn-again').addEventListener('click', resetToLanding);
+  // Même participant : on relance un test sans repasser par le formulaire.
+  document.getElementById('btn-retry').addEventListener('click', function(){ startTest(); });
 
   document.getElementById('email-form').addEventListener('submit', function(e){
     e.preventDefault();
