@@ -3863,6 +3863,17 @@ function kbHowHTML(les){
   const items=groups.map(g=>`<b>${esc(g.cs.join(' '))}</b> : ${esc(g.how)}`).join('<br>');
   return`<div class="intro-rule"><div class="intro-rule-icon">⌨️</div><div class="intro-rule-text"><strong>Sur ton clavier (${KB_LAYOUT_LABELS[lay]})</strong>${items}</div></div>`;
 }
+/* Texte qui vient d'ailleurs (devoir d'un prof, défi, duel) : on le ramène à ce qu'un
+   clavier AZERTY français/belge sait taper. Guillemets, apostrophes, tirets, points de
+   suspension, espaces insécables, retours à la ligne, œ et æ. Les leçons gardent « » (cf. typeKey). */
+function kpTypable(t){
+  if(typeof t!=='string')return t;
+  return t.normalize('NFC').replace(/[\u00AD\u200B-\u200D\u2060\uFEFF]/g,'')
+    .replace(/«\s*/g,'"').replace(/\s*»/g,'"').replace(/[“”„‟]/g,'"').replace(/[‘’‚‛ʼ′]/g,"'")
+    .replace(/[–—―‑−]/g,'-').replace(/…/g,'...').replace(/[•●▪◦]/g,'-')
+    .replace(/œ/g,'oe').replace(/Œ/g,'Oe').replace(/æ/g,'ae').replace(/Æ/g,'Ae')
+    .replace(/\s+/g,' ').trim();
+}
 function adaptQuotes(t){
   if(typeof t!=='string')return t;
   if(getQuoteStyle()==='droits')t=t.replace(/«\s*/g,'"').replace(/\s*»/g,'"');
@@ -6292,7 +6303,7 @@ const app={
     if(this.sess.vocal)setTimeout(()=>this.speakAssignment(),450);
   },
   _makeCustomSess(a){
-    return{mode:'test',lessonId:null,text:a.customText,idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false,custom:true,vocal:a.mode==='vocal',audioUrl:a.audioUrl||null,assignmentId:a.id,title:a.title};
+    return{mode:'test',lessonId:null,text:kpTypable(a.customText),idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false,custom:true,vocal:a.mode==='vocal',audioUrl:a.audioUrl||null,assignmentId:a.id,title:a.title};
   },
   // Lit la dictée : audio du prof si disponible, sinon synthèse vocale FR.
   speakAssignment(){
@@ -10712,7 +10723,7 @@ const app={
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startCourse());return;}
     this.stopGame();this.stopSprint();this.stopCourse();
     this.activeGame='course';this._courseRec=false;
-    const text=RACE_TEXTS[Math.floor(Math.random()*RACE_TEXTS.length)];
+    const text=kpTypable(RACE_TEXTS[Math.floor(Math.random()*RACE_TEXTS.length)]);
     this.course={on:true,over:false,text,typed:[],correct:0,keystrokes:0,
       raceStarted:false,startAt:Date.now()+3000,startTime:0,endTime:0,finished:false,
       bots:this._courseAdaptiveBots().map(b=>({...b,prog:0,finished:false,finishTime:0,_jit:0.85+Math.random()*0.3,_ahead:null})),rank:0};
@@ -11294,7 +11305,7 @@ const app={
   },
   startBossAttempt(){
     const b=this.boss;if(!b||!b.challenge)return;
-    this.boss={...b,phase:'playing',text:b.challenge.text,typed:[],correct:0,keystrokes:0,started:false,startTime:0,endTime:0,finished:false};
+    this.boss={...b,phase:'playing',text:kpTypable(b.challenge.text),typed:[],correct:0,keystrokes:0,started:false,startTime:0,endTime:0,finished:false};
     this.renderCurrent();
   },
   _bossCorrectPrefix(){return this._correctPrefix(this.boss.typed,this.boss.text);},
@@ -11494,7 +11505,7 @@ const app={
     }catch{if(seq===this._duelSeq){this.duel={phase:'menu',_codeError:'Erreur réseau.'};this.renderCurrent();}}
   },
   _duelBlank(role,roomId,roomCode,text,hostLabel){
-    return {phase:'lobby',role,roomId,roomCode,text,hostLabel,oppLabel:null,oppPresent:false,startAt:0,
+    return {phase:'lobby',role,roomId,roomCode,text:kpTypable(text),hostLabel,oppLabel:null,oppPresent:false,startAt:0,
       typed:[],correct:0,keystrokes:0,started:false,startTime:0,endTime:0,finished:false,myFinishMs:0,
       myProg:0,oppProg:0,oppFinished:false,oppForfeit:false,oppWpm:0,oppAcc:0,oppFinishMs:0,
       myWpm:0,myAcc:0,winner:null,_channel:null,_copied:false,_lastSent:0};
