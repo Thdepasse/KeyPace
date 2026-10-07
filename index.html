@@ -1871,6 +1871,77 @@ a.nav-link{text-decoration:none;display:inline-block}
 .lb-sub{color:rgba(255,255,255,.4);font-weight:500;font-size:12px}
 .lb-ellipsis{text-align:center;color:rgba(255,255,255,.4);font-size:18px;line-height:1;padding:2px}
 
+/* Boss de la semaine : page pleine largeur (affiche + podium) */
+.bp-page{width:100%;min-height:70vh}
+.bp-page.bp-orange{background:linear-gradient(135deg,#FF8A5C 0%,#FF4D2E 55%,#E8391D 100%);color:#fff}
+.bp-poster{position:relative;overflow:hidden;background:linear-gradient(135deg,#FF8A5C 0%,#FF4D2E 55%,#E8391D 100%);color:#fff;text-align:center;padding:56px 24px 0}
+.bp-big{position:absolute;left:50%;top:6px;transform:translateX(-50%);font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(150px,26vw,380px);line-height:1;letter-spacing:-.04em;color:rgba(255,255,255,.14);white-space:nowrap;pointer-events:none;user-select:none}
+.bp-poster-in{position:relative;z-index:1;max-width:1360px;margin:0 auto}
+.bp-back{position:absolute;left:0;top:-30px;background:rgba(255,255,255,.2);color:#fff;border:0;border-radius:20px;padding:8px 16px;font-weight:700;font-size:14px;cursor:pointer}
+.bp-back:hover{background:rgba(255,255,255,.32)}
+.bp-pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.14em;background:rgba(255,255,255,.22);padding:6px 16px;border-radius:20px;margin-bottom:18px}
+.bp-poster h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(42px,6vw,84px);letter-spacing:-.03em;line-height:1;margin-bottom:14px}
+.bp-poster p{font-size:18px;opacity:.92;max-width:560px;margin:0 auto 30px;line-height:1.55}
+.bp-poster img{display:block;height:300px;width:auto;margin:0 auto -4px;filter:drop-shadow(0 22px 26px rgba(0,0,0,.3))}
+.bp-board{position:relative;z-index:2;max-width:1360px;margin:-56px auto 0;padding:0 48px 80px}
+.bp-board.bp-flat{margin-top:0;padding-top:36px}
+.bp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:24px}
+.bp-stat{background:#fff;border:1px solid var(--border);border-radius:22px;padding:22px 26px;box-shadow:0 24px 50px -30px rgba(22,20,15,.4);display:flex;align-items:center;gap:16px;color:var(--txt)}
+.bp-stat i{font-style:normal;flex:none;width:52px;height:52px;border-radius:16px;background:rgba(255,77,46,.1);display:grid;place-items:center;font-size:26px}
+.bp-stat small{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--muted)}
+.bp-stat b{font-family:'Bricolage Grotesque',sans-serif;font-size:28px;font-weight:800}
+.bp-podium{display:grid;grid-template-columns:1fr 1.18fr 1fr;gap:20px;align-items:end;margin-bottom:24px}
+.bp-pc{border-radius:24px;padding:26px 24px;text-align:center;background:#16140F;color:#fff;box-shadow:0 24px 50px -30px rgba(22,20,15,.5)}
+.bp-pc.p1{padding-top:44px;padding-bottom:40px;background:linear-gradient(160deg,#FF7A4D,#E8391D);box-shadow:0 30px 60px -25px rgba(255,77,46,.7)}
+.bp-pc.empty{opacity:.45}
+.bp-pc .m{font-size:44px;line-height:1;margin-bottom:10px}
+.bp-pc.p1 .m{font-size:60px}
+.bp-pc .nm{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bp-pc .sc{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:30px;color:var(--accent)}
+.bp-pc.p1 .sc{color:#fff;font-size:40px}
+.bp-pc small{display:block;margin-top:4px;font-size:13px;opacity:.6}
+.bp-pc.me{outline:3px solid #fff;outline-offset:-3px}
+.bp-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.bp-card{border-radius:26px;padding:30px}
+.bp-card.dark{background:#16140F;color:#fff}
+.bp-card.light{background:#fff;border:1px solid var(--border);box-shadow:0 30px 60px -40px rgba(22,20,15,.35);color:var(--txt)}
+.bp-card h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;margin-bottom:14px}
+.bp-txt{font-family:'JetBrains Mono',monospace;font-size:16px;line-height:1.85;color:rgba(255,255,255,.62);background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.14);border-radius:16px;padding:22px 24px;margin-bottom:22px;max-height:300px;overflow:auto}
+.bp-go{width:100%;background:var(--accent);color:#fff;border:0;border-radius:16px;padding:17px 34px;font-weight:800;font-size:17px;cursor:pointer;box-shadow:0 12px 26px -10px rgba(255,77,46,.7);transition:transform .15s}
+.bp-go:hover{transform:translateY(-2px)}
+.bp-best{margin-top:16px;background:rgba(255,77,46,.14);border:1px solid rgba(255,77,46,.4);border-radius:14px;padding:13px 16px;font-size:14.5px;color:rgba(255,255,255,.8)}
+.bp-best b{color:var(--accent)}
+.bp-lb{display:flex;flex-direction:column;gap:6px}
+.bp-row{display:flex;align-items:center;gap:14px;padding:11px 14px;border-radius:12px;border:1px solid transparent;font-size:15px}
+.bp-row:nth-child(odd){background:#F8F6F0}
+.bp-row.me{background:rgba(255,77,46,.1);border-color:rgba(255,77,46,.4)}
+.bp-rank{width:38px;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--muted)}
+.bp-name{flex:1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bp-score{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);flex-shrink:0}
+.bp-score span{font-weight:500;font-size:12px;opacity:.5;color:var(--txt)}
+.bp-ell{text-align:center;color:var(--muted);line-height:1;padding:2px}
+.bp-note{padding:18px;text-align:center;color:var(--muted);font-size:14.5px}
+.bp-play{max-width:1360px;margin:0 auto;padding:36px 48px 80px}
+.bp-play-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.bp-quit{background:transparent;color:#fff;opacity:.8;border:0;font-weight:700;font-size:15px;padding:8px 0;cursor:pointer}
+.bp-quit:hover{opacity:1}
+.bp-hud{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:end;margin-bottom:16px}
+.bp-hud small{display:block;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.12em;opacity:.7;margin-bottom:4px}
+.bp-hud b{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(44px,6vw,84px);line-height:1;letter-spacing:-.02em}
+.bp-hud b em{font-style:normal;font-size:20px;font-weight:500;opacity:.6;letter-spacing:0}
+.bp-hud .mid{text-align:center}.bp-hud .r{text-align:right}
+.bp-bar{height:10px;border-radius:6px;background:rgba(255,255,255,.28);overflow:hidden;margin-bottom:26px}
+.bp-bar i{display:block;height:100%;background:#fff;border-radius:6px;transition:width .15s}
+.bp-tbox{font-family:'JetBrains Mono',monospace;font-size:clamp(20px,2.1vw,28px);line-height:2;padding:36px 40px;border-radius:24px;background:#16140F;min-height:300px}
+.bp-hint{text-align:center;margin-top:20px;font-size:15px;opacity:.85}
+.bp-resbox{background:#16140F;border-radius:26px;padding:30px;color:#fff}
+@media(max-width:900px){
+  .bp-poster{padding-top:48px}.bp-poster img{height:210px}.bp-back{top:-34px}
+  .bp-board{padding:0 20px 60px}.bp-stats,.bp-cols{grid-template-columns:1fr}
+  .bp-podium{grid-template-columns:1fr;gap:12px}.bp-pc.p1{order:-1}
+  .bp-play{padding:24px 20px 60px}.bp-tbox{padding:22px 20px}.bp-hud b em{font-size:14px}
+}
+
 /* GAZE PLUGIN */
 .gaze-toggle{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap}
 .gaze-toggle:hover{border-color:var(--accent);color:var(--accent)}
@@ -11500,26 +11571,62 @@ const app={
     if(!lb.top.length)rows='<div class="empty-hint" style="padding:20px">Personne n\'a encore tenté le défi cette semaine. Sois le premier !</div>';
     return rows;
   },
+  _bpEsc(t){return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));},
+  _bossPodiumHTML(lb){
+    const top=(lb&&lb.top)||[];
+    const card=(r,medal,cls)=>{
+      if(!r)return`<div class="bp-pc ${cls} empty"><div class="m">${medal}</div><div class="nm">À prendre</div><div class="sc">–</div><small>&nbsp;</small></div>`;
+      const me=lb.me&&lb.me.rank===r.rank&&lb.me.username===r.username;
+      return`<div class="bp-pc ${cls}${me?' me':''}"><div class="m">${medal}</div><div class="nm">${this._bpEsc(r.username)}${me?' (toi)':''}</div><div class="sc">${r.score}</div><small>${r.wpm} mpm</small></div>`;
+    };
+    return`<div class="bp-podium">${card(top[1],'🥈','p2')}${card(top[0],'🥇','p1')}${card(top[2],'🥉','p3')}</div>`;
+  },
+  _bossRestHTML(lb){
+    const top=(lb&&lb.top)||[];
+    const row=(r,me)=>`<div class="bp-row${me?' me':''}"><div class="bp-rank">#${r.rank}</div><div class="bp-name">${this._bpEsc(r.username)}${me?' (toi)':''}</div><div class="bp-score">${r.score}<span> · ${r.wpm} mpm</span></div></div>`;
+    const rest=top.slice(3,10);
+    let rows=rest.map(r=>row(r,lb.me&&lb.me.rank===r.rank&&lb.me.username===r.username)).join('');
+    if(lb&&lb.me&&lb.me.rank>10)rows+=`<div class="bp-ell">⋯</div>`+row(lb.me,true);
+    if(!rows)rows=`<div class="bp-note">${top.length?'Les places suivantes sont à prendre.':'Personne n\'a encore tenté le défi cette semaine. Sois le premier !'}</div>`;
+    return`<div class="bp-lb">${rows}</div>`;
+  },
+  _bossBoardHTML(lb){
+    return`${this._bossPodiumHTML(lb)}<section class="bp-card light"><h2>Suite du classement</h2>${this._bossRestHTML(lb)}</section>`;
+  },
   renderBoss(){
     const b=this.boss;
-    const head=this._gameHeader('Boss de la semaine',ICONS.trophy);
-    let body='';
+    let html='';
     if(!b||b.phase==='loading'){
-      body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Chargement du défi…</div></div>`;
+      html=`<div class="bp-board bp-flat"><div class="bp-card dark"><div class="empty-hint" style="padding:48px">Chargement du défi…</div></div></div>`;
     } else if(b.phase==='error'){
-      body=`<div class="boss-card"><div class="empty-hint" style="padding:40px">${b.msg}<br><button class="btn-sm btn-dark" style="margin-top:14px" onclick="app.bossLoad()">Réessayer</button></div></div>`;
+      html=`<div class="bp-board bp-flat"><div class="bp-card dark"><div class="empty-hint" style="padding:40px">${b.msg}<br><button class="btn-sm btn-dark" style="margin-top:14px" onclick="app.bossLoad()">Réessayer</button></div></div></div>`;
     } else if(b.phase==='lobby'){
-      body=`<div class="boss-card">
-        <div class="boss-meta">
-          <div><div class="boss-meta-lbl">DÉFI</div><div class="boss-meta-val">${b.challenge.isoWeek.replace('-W',' · semaine ')}</div></div>
-          <div style="text-align:right"><div class="boss-meta-lbl">RÉINITIALISATION</div><div class="boss-meta-val">${this._bossTimeLeft(b.secondsLeft)}</div></div>
-        </div>
-        <div class="boss-text-preview">${b.challenge.text}</div>
-        <button class="btn-primary" style="width:100%;margin:6px 0 22px" onclick="app.startBossAttempt()">Tenter le défi ▸</button>
-        ${b.lb&&b.lb.me?`<div class="boss-yourbest">Ton meilleur cette semaine : <b>${b.lb.me.score} pts</b> · rang <b>#${b.lb.me.rank}</b></div>`:''}
-        <h3 class="boss-lb-title">Classement de la semaine</h3>
-        <div class="lb-table">${this._bossLeaderboardHTML(b.lb,true)}</div>
-      </div>`;
+      const lb=b.lb||{top:[],me:null};
+      const week=b.challenge.isoWeek.replace(/^\d+-W0?/,'');
+      const n=lb.count||0;
+      html=`<header class="bp-poster"><div class="bp-big">BOSS</div><div class="bp-poster-in">
+          <button class="bp-back" onclick="app.exitActiveGame()">← Jeux</button>
+          <div class="bp-pill">🏆 SEMAINE ${week}</div>
+          <h1>Boss de la semaine</h1>
+          <p>Le même texte pour tout le monde. Un seul meilleur essai compte : fais-le grimper au classement.</p>
+          <img src="/images/keypace-mascot-cheer.webp" width="282" height="303" alt="">
+        </div></header>
+        <main class="bp-board">
+          <div class="bp-stats">
+            <div class="bp-stat"><i>⏳</i><div><small>RÉINITIALISATION DANS</small><b>${this._bossTimeLeft(b.secondsLeft)}</b></div></div>
+            <div class="bp-stat"><i>👥</i><div><small>PARTICIPANTS</small><b>${n>=100?'100+':n}</b></div></div>
+            <div class="bp-stat"><i>🎯</i><div><small>TON RANG</small><b>${lb.me?'#'+lb.me.rank+' · '+lb.me.score+' pts':'Pas encore classé'}</b></div></div>
+          </div>
+          ${this._bossPodiumHTML(lb)}
+          <div class="bp-cols">
+            <section class="bp-card dark"><h2>Le texte du défi</h2>
+              <div class="bp-txt">${b.challenge.text}</div>
+              <button class="bp-go" onclick="app.startBossAttempt()">Tenter le défi ▸</button>
+              ${lb.me?`<div class="bp-best">Ton meilleur cette semaine : <b>${lb.me.score} pts</b> · rang <b>#${lb.me.rank}</b></div>`:''}
+            </section>
+            <section class="bp-card light"><h2>Suite du classement</h2>${this._bossRestHTML(lb)}</section>
+          </div>
+        </main>`;
     } else if(b.phase==='playing'){
       let textHTML='';
       let word=[];const flushWord=()=>{if(word.length){textHTML+='<span class="race-word">'+word.join('')+'</span>';word=[];}};
@@ -11535,19 +11642,22 @@ const app={
       const liveWpm=b.started?Math.round((prefix/5)/mins):0;
       const liveAcc=b.keystrokes?Math.round(100*b.correct/b.keystrokes):100;
       const pct=Math.round(100*prefix/b.text.length);
-      body=`<div class="boss-card">
-        <div class="sprint-hud">
-          <div><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4)">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> mpm</span></div></div>
-          <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4)">PRÉCISION</div><div class="sprint-score-val sec">${liveAcc}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> %</span></div></div>
+      html=`<div class="bp-play">
+        <div class="bp-play-top"><button class="bp-quit" onclick="app.exitActiveGame()">← Abandonner</button><span class="bp-pill" style="margin:0">🏆 BOSS · SEMAINE ${b.challenge.isoWeek.replace(/^\d+-W0?/,'')}</span></div>
+        <div class="bp-hud">
+          <div><small>VITESSE</small><b>${liveWpm}<em> mpm</em></b></div>
+          <div class="mid"><small>PROGRESSION</small><b>${pct}<em> %</em></b></div>
+          <div class="r"><small>PRÉCISION</small><b>${liveAcc}<em> %</em></b></div>
         </div>
-        <div class="sprint-progress"><div class="sprint-progress-fill" style="width:${pct}%"></div></div>
-        <div class="race-text-box">${textHTML}</div>
-        <div class="sprint-hint">Tape le texte du défi. Corrige tes fautes pour avancer.</div>
+        <div class="bp-bar"><i style="width:${pct}%"></i></div>
+        <div class="bp-tbox">${textHTML}</div>
+        <div class="bp-hint">Tape le texte du défi. Corrige tes fautes pour avancer.</div>
       </div>`;
     } else if(b.phase==='submitting'){
-      body=`<div class="boss-card"><div class="empty-hint" style="padding:48px">Envoi de ton score…</div></div>`;
+      html=`<div class="bp-board bp-flat"><div class="bp-card dark"><div class="empty-hint" style="padding:48px">Envoi de ton score…</div></div></div>`;
     } else if(b.phase==='result'){
-      body=`<div class="boss-card">
+      html=`<div class="bp-play" style="padding-bottom:36px">
+        <div class="bp-resbox">
         ${this._gameResult({
           icon:'🏆',title:'Défi relevé !',
           record:b._isRecord?'Nouveau record personnel cette semaine !':null,
@@ -11561,11 +11671,11 @@ const app={
           primaryLabel:'Réessayer',primaryOnClick:'app.startBossAttempt()',
           secondaryLabel:'Classement',secondaryOnClick:'app.boss.phase=\'lobby\';app.renderCurrent()',
         })}
-        <h3 class="boss-lb-title">Classement de la semaine</h3>
-        <div class="lb-table">${this._bossLeaderboardHTML(b.lb,true)}</div>
-      </div>`;
+        </div></div>
+        <div class="bp-board bp-flat" style="background:var(--bg,#faf9f5);max-width:none;padding-top:36px"><div style="max-width:1264px;margin:0 auto">${this._bossBoardHTML(b.lb||{top:[],me:null})}</div></div>`;
     }
-    document.getElementById('page-games').innerHTML=`<div class="games-section">${head}<div style="max-width:760px;margin:0 auto;padding:0 24px">${body}</div></div>`;
+    const orange=b&&(b.phase==='playing'||b.phase==='result');
+    document.getElementById('page-games').innerHTML=`<div class="bp-page${orange?' bp-orange':''}">${html}</div>`;
   },
 
   /* ── DUEL 1v1 (temps réel) ── */
