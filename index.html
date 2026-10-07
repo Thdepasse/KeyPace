@@ -3068,7 +3068,7 @@ const OB_STEPS_ELEVE=[
 ];
 const OB_STEPS_PROF=[
   {sel:'#nav-home',            label:'Ton tableau de bord', title:'Accueil',            desc:'Vue d\'ensemble : nombre d\'élèves, vitesse moyenne, activité récente sur tes classes.'},
-  {sel:'#classes-create-btn',  label:'Ta première classe',  title:'Gestion de classes', desc:'Crée une classe pour obtenir un code à partager avec tes élèves. Une fois la classe créée, tu pourras aussi importer une liste par CSV et assigner des devoirs.', nav:'classes'},
+  {sel:'#classes-create-btn',  label:'Ta première classe',  title:'Gestion de classes', desc:'Crée une classe pour obtenir un code à partager avec tes élèves. Une fois la classe créée, tu pourras assigner des devoirs.', nav:'classes'},
   {sel:'#nav-avatar',          label:'Tes paramètres',      title:'Compte',            desc:'Accède à tes paramètres, réinitialise ton mot de passe ou retrouve ce guide via "Revoir le tutoriel".'},
 ];
 let _obStep=0;
@@ -14272,43 +14272,6 @@ const app={
     }
   },
 
-  async submitImport(classId){
-    const ta=document.getElementById('imp-csv');
-    const errEl=document.getElementById('imp-error');
-    const btn=document.getElementById('imp-submit');
-    const resEl=document.getElementById('imp-results');
-    errEl.style.display='none';
-    const lines=ta.value.split('\n').map(l=>l.trim()).filter(Boolean);
-    if(!lines.length){errEl.textContent='Colle au moins une ligne.';errEl.style.display='block';return;}
-    if(lines.length>200){errEl.textContent=`${lines.length} lignes collées, mais 200 maximum par import. Retire les lignes en trop et refais un second import pour le reste.`;errEl.style.display='block';return;}
-    const students=lines.map(l=>{const [username,email]=l.split(',').map(s=>(s||'').trim());return{username,email};});
-    btn.disabled=true;btn.textContent='Import en cours…';
-    try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'bulk-import-students',token:currentToken,classId,students})});
-      const d=await r.json();
-      if(!r.ok){errEl.textContent=d.error||'Erreur.';errEl.style.display='block';btn.disabled=false;btn.textContent='Importer';return;}
-      const created=d.results.filter(x=>x.status==='created');
-      const rest=d.results.filter(x=>x.status!=='created');
-      const list=created.map(x=>x.username+' / '+x.tempPassword).join('\n');
-      resEl.innerHTML=`
-        ${d.truncatedCount?`<div style="background:var(--light);border-radius:10px;padding:10px 12px;font-size:12.5px;margin-bottom:10px">⚠ ${d.truncatedCount} ligne${d.truncatedCount!==1?'s':''} au-delà de la 200e n'${d.truncatedCount!==1?'ont':'a'} pas été importée${d.truncatedCount!==1?'s':''}. Refais un import avec le reste.</div>`:''}
-        <div style="font-size:13px;font-weight:700;margin-bottom:8px">${created.length} compte${created.length!==1?'s':''} créé${created.length!==1?'s':''}${rest.length?(' · '+rest.length+' ignoré'+(rest.length!==1?'s':'')):''}</div>
-        ${created.length?`<div style="background:var(--light);border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;white-space:pre-wrap;max-height:160px;overflow-y:auto">${this._esc(list)}</div>
-        <button id="imp-copy-list" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:9px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer">Copier la liste (identifiant / mot de passe)</button>
-        <p style="font-size:11.5px;color:var(--muted);margin:8px 0 0;line-height:1.5">Communique à chaque élève son identifiant et son mot de passe temporaire : il pourra le changer une fois connecté.</p>`:''}
-        ${rest.length?`<div style="margin-top:10px;font-size:12px;color:var(--muted)">${rest.map(x=>this._esc(x.username)+' · '+this._esc(x.reason)).join('<br>')}</div>`:''}
-      `;
-      const copyBtn=document.getElementById('imp-copy-list');
-      if(copyBtn)copyBtn.addEventListener('click',()=>{navigator.clipboard.writeText(list);copyBtn.textContent='✓ Copié !';setTimeout(()=>{copyBtn.textContent='Copier la liste (identifiant / mot de passe)';},2000);});
-      btn.style.display='none';
-      ta.style.display='none';
-      if(created.length){
-        await this.loadEtab(true);
-        if(this._classesSub==='class'&&this._classViewingId===classId)this.viewClass(classId,{silent:true});
-      }
-    }catch{errEl.textContent='Erreur réseau.';errEl.style.display='block';btn.disabled=false;btn.textContent='Importer';}
-  },
-
   copyClassLink(link){
     navigator.clipboard.writeText(link).then(()=>{
       const btn=document.getElementById('copy-code-btn');
@@ -15288,26 +15251,6 @@ function promptModal({icon,title,placeholder,confirmText,value}){
     };
     input.addEventListener('keydown',e=>{if(e.key==='Enter')overlay.querySelector('#pm-confirm').click();});
   });
-}
-
-// Import CSV d'élèves : jusqu'ici chaque élève devait s'inscrire un par un
-// via lien (cf. FAQ établissement). Un compte par ligne est créé et ajouté
-// directement à la classe ; le mot de passe temporaire de chacun n'est
-// affiché qu'une fois, au prof de le communiquer.
-function openImportModal(classId){
-  const overlay=createOverlay(true);
-  overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:86vh;overflow-y:auto">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <h2 style="margin:0;font-size:19px;font-family:'Bricolage Grotesque',sans-serif"><span style="color:var(--accent)">${ICONS.clipboard}</span> Importer des élèves</h2>
-      <button onclick="this.closest('[style*=fixed]')._close()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
-    </div>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.5">Un élève par ligne : <code>nom_utilisateur,email</code> (email optionnel). Un compte est créé pour chacun et ajouté directement à la classe. Maximum 200 lignes par import ; au-delà, refais un second import pour le reste.</p>
-    <textarea id="imp-csv" placeholder="marie.dupont,marie@ecole.be&#10;lucas92" style="width:100%;min-height:140px;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--txt);outline:none;box-sizing:border-box;resize:vertical"></textarea>
-    <div id="imp-error" style="color:#E5484D;font-size:13px;margin-top:8px;display:none"></div>
-    <button id="imp-submit" style="width:100%;margin-top:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;cursor:pointer">Importer</button>
-    <div id="imp-results" style="margin-top:16px"></div>
-  </div>`;
-  document.getElementById('imp-submit').addEventListener('click',()=>app.submitImport(classId));
 }
 
 async function startClassJoin(code){

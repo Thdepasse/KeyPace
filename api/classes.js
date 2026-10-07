@@ -178,7 +178,7 @@ async function teacherOverview(req, res) {
 
   // Un prof (pas seulement l'admin établissement) doit pouvoir voir les
   // places restantes et l'échéance de licence, sans quoi il ne le découvre
-  // qu'au moment où un import CSV ou une inscription échoue.
+  // qu'au moment où une inscription échoue.
   if (user.institution_id) {
     const instR = await sb(`/institutions?id=eq.${user.institution_id}&select=name,seat_count,license_expires_at`);
     const institution = instR.data && instR.data[0];
@@ -345,119 +345,6 @@ async function classRemoveStudent(req, res) {
   return res.json({ ok: true });
 }
 
-// Import CSV : jusqu'ici les élèves devaient s'inscrire un par un via lien
-// (limite documentée dans la FAQ établissement : "sur notre roadmap"). Crée
-// un compte par ligne + ajoute directement à la classe. Un mot de passe
-// temporaire est généré par élève et renvoyé UNE SEULE FOIS dans la réponse
-// (jamais stocké en clair, seul son hash scrypt l'est) — au prof de le
-// communiquer. Même contrôle de sièges licenciés qu'une inscription normale.
-async function bulkImportStudents(req, res) {
-  const user = await userFromToken(req.body.token);
-  if (!user) return res.status(401).json({ error: 'Session invalide.' });
-  const { cls, error, status } = await loadClassForManage(user, req.body.classId);
-  if (error) return res.status(status).json({ error });
-
-  const allRows = Array.isArray(req.body.students) ? req.body.students : [];
-  const rows = allRows.slice(0, 200);
-  const truncatedCount = allRows.length - rows.length;
-  if (!rows.length) return res.status(400).json({ error: 'Aucun élève à importer.' });
-
-  let institution = null;
-  if (user.institution_id) {
-    const instR = await sb(`/institutions?id=eq.${user.institution_id}&select=*`);
-    institution = instR.data && instR.data[0];
-  }
-  // Même garde que l'inscription normale (api/register.js) : une licence
-  // expirée bloque tout nouveau rattachement, y compris par import CSV.
-  if (institution && institution.license_expires_at && new Date(institution.license_expires_at) < new Date()) {
-    return res.status(403).json({ error: "La licence de cet établissement a expiré. Contacte ton établissement pour la renouveler." });
-  }
-  let seatsUsed = 0;
-  if (institution) {
-    // archived=eq.false : un élève archivé libère son siège (même filtre que
-    // le tableau de bord établissement, qui montre ce siège comme disponible).
-    const seatsR = await sb(`/users?institution_id=eq.${user.institution_id}&role=eq.eleve&archived=eq.false&select=id`);
-    seatsUsed = seatsR.data ? seatsR.data.length : 0;
-  }
-
-  // Normalise chaque ligne en mémoire, puis vérifie les doublons en un seul
-  // aller-retour par colonne (au lieu d'un aller-retour par ligne) : sur un
-  // import de 200 élèves, ça remplace ~800 requêtes séquentielles par 2.
-  const normalized = rows.map((row) => ({
-    rawUsername: row.username,
-    username: String(row.username || '').trim().toLowerCase(),
-    email: String(row.email || '').trim().toLowerCase() || null,
-    // Optionnel : nom réel affiché au prof quand l'identifiant lui-même
-    // (matricule, ex. 260210@ecole.be) ne permet pas d'identifier l'élève.
-    fullName: String(row.fullName || '').trim() || null,
-  }));
-  const candidateUsernames = [...new Set(normalized.filter((n) => n.username).map((n) => n.username))];
-  const candidateEmails = [...new Set(normalized.filter((n) => n.email).map((n) => n.email))];
-  const [dupUR, dupER] = await Promise.all([
-    candidateUsernames.length
-      ? sb(`/users?username=in.(${candidateUsernames.map(encodeURIComponent).join(',')})&select=username`)
-      : Promise.resolve({ data: [] }),
-    candidateEmails.length
-      ? sb(`/users?email=in.(${candidateEmails.map(encodeURIComponent).join(',')})&select=email`)
-      : Promise.resolve({ data: [] }),
-  ]);
-  const takenUsernames = new Set((dupUR.data || []).map((u) => u.username));
-  const takenEmails = new Set((dupER.data || []).map((u) => u.email));
-
-  const results = [];
-  const toCreate = [];
-  const seenUsernames = new Set(), seenEmails = new Set();
-  for (const n of normalized) {
-    const { username, email, fullName } = n;
-    if (!username) { results.push({ username: n.rawUsername || '(vide)', status: 'error', reason: "Nom d'utilisateur manquant." }); continue; }
-    if (institution && seatsUsed + toCreate.length >= institution.seat_count) { results.push({ username, status: 'error', reason: 'Plus de places disponibles sur la licence.' }); continue; }
-    if (takenUsernames.has(username) || seenUsernames.has(username)) { results.push({ username, status: 'skipped', reason: "Nom d'utilisateur déjà pris." }); continue; }
-    if (email && (takenEmails.has(email) || seenEmails.has(email))) { results.push({ username, status: 'skipped', reason: 'Email déjà utilisé.' }); continue; }
-
-    seenUsernames.add(username);
-    if (email) seenEmails.add(email);
-    // 8 caractères lisibles (même alphabet que les codes d'invitation).
-    const tempPassword = genInviteCode().slice(0, 4) + genInviteCode().slice(0, 4);
-    // Reproduit exactement ce que fait le client normalement (sha256 du mot de
-    // passe) avant le re-hachage scrypt côté serveur — sinon le mot de passe
-    // temporaire ne fonctionnerait pas au premier login (formulaire standard).
-    const passwordHash = hashPassword(sha256hex(tempPassword));
-    toCreate.push({ id: crypto.randomUUID(), username, email, fullName, tempPassword, passwordHash });
-  }
-
-  if (toCreate.length) {
-    const createR = await sb('/users', {
-      method: 'POST',
-      body: JSON.stringify(toCreate.map((u) => ({
-        id: u.id,
-        username: u.username,
-        ...(u.email ? { email: u.email } : {}),
-        ...(u.fullName ? { full_name: u.fullName } : {}),
-        password_hash: u.passwordHash,
-        plan: institution ? 'expert' : 'free',
-        email_verified: true, // créé par l'enseignant, rien à confirmer (même base légale que le rattachement par domaine)
-        // Mot de passe temporaire connu du prof qui l'a communiqué : on force
-        // l'élève à en choisir un à lui dès sa première connexion.
-        must_change_password: true,
-        consent_at: new Date().toISOString(),
-        terms_version: 'v1',
-        ...(institution ? { institution_id: institution.id, role: 'eleve' } : {}),
-      }))),
-    });
-    if (!createR.ok) {
-      toCreate.forEach((u) => results.push({ username: u.username, status: 'error', reason: 'Erreur de création.' }));
-    } else {
-      await Promise.all([
-        sb('/progress', { method: 'POST', body: JSON.stringify(toCreate.map((u) => ({ user_id: u.id, data: {} }))) }),
-        sb('/class_members', { method: 'POST', body: JSON.stringify(toCreate.map((u) => ({ class_id: cls.id, student_id: u.id }))) }),
-      ]);
-      toCreate.forEach((u) => results.push({ username: u.username, status: 'created', tempPassword: u.tempPassword }));
-    }
-  }
-
-  return res.json({ results, truncatedCount });
-}
-
 /* ── Détail d'un élève (pour le prof qui gère la classe) ── */
 async function studentDetail(req, res) {
   const user = await userFromToken(req.body.token);
@@ -522,7 +409,7 @@ async function joinByCode(req, res) {
   // KeyPace (même sans lien avec l'école) dans la classe et lui donner accès
   // aux devoirs. Les classes de profs indépendants (institution_id null) ne
   // sont donc plus rejoignables par code du tout — un prof indépendant qui
-  // veut des élèves passe par l'import CSV, qui crée directement leur compte.
+  // veut des élèves doit demander à KeyPace de créer leurs comptes.
   const joinable = cls && cls.institution_id && cls.institution_id === user.institution_id;
   if (!joinable) {
     // Incrément par compare-and-swap (même raison qu'ailleurs : PostgREST n'a
@@ -1481,7 +1368,6 @@ module.exports = async function handler(req, res) {
       case 'class-restore': return await classRestore(req, res);
       case 'archived-classes': return await archivedClasses(req, res);
       case 'class-detail': return await classDetail(req, res);
-      case 'bulk-import-students': return await bulkImportStudents(req, res);
       case 'class-remove-student': return await classRemoveStudent(req, res);
       case 'student-detail': return await studentDetail(req, res);
       case 'join-code': return await joinByCode(req, res);
