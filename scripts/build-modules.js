@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const root = path.join(__dirname, '..');
-for (const key of ['cv', 'mail', 'mdp']) {
+for (const key of ['cv', 'mail', 'mdp', 'lettre']) {
   const src = fs.readFileSync(path.join(root, 'module-src', `${key}.src.js`), 'utf8');
   const out = `// GÉNÉRÉ par scripts/build-modules.js depuis module-src/${key}.src.js : ne pas modifier à la main.\nmodule.exports = ${JSON.stringify(src)};\n`;
   fs.writeFileSync(path.join(root, 'api', `_module-${key}.js`), out);

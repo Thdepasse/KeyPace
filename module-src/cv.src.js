@@ -762,7 +762,7 @@ function initEntrainer(el){
     /* 13 orthographe / typographie */
     const all = [f.titre, f.interets, f.competences, ...D.exp.flatMap(x => [x.r, x.o, x.desc]), ...D.edu.flatMap(x => [x.d, x.e])].join('\n');
     const issues = [];
-    const sm = all.match(SMS); if (sm) issues.push(`abréviation « ${sm[0]} »`);
+    const sm = norm2(all).match(SMS); if (sm) issues.push(`abréviation « ${sm[0]} »`);
     if (/ {2,}/.test(all)) issues.push('double espace');
     const rep = (norm2(all).match(/\b([a-z]{3,})\s+\1\b/) || [])[1]; if (rep) issues.push(`mot répété « ${rep} »`);
     const shout = (all.match(/\b[A-ZÀ-Ý]{5,}\b/) || [])[0]; if (shout && !/^(LINKEDIN|EXCEL|HTML|JAVASCRIPT|GITHUB)$/.test(shout)) issues.push(`MAJUSCULES « ${shout} »`);

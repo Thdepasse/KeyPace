@@ -1,4 +1,4 @@
-// Modules réservés aux comptes Expert (mail, CV, mot de passe…). Le contenu du module (son
+// Modules réservés aux comptes Expert (mail, CV, mot de passe, lettre…). Le contenu du module (son
 // JavaScript) n'est envoyé qu'après vérification de la session et du plan :
 // la page publique /cours/<module> n'est qu'une coquille vide sans ce code.
 // Appelé depuis api/track.js (POST /api/track?m=<clé>) : le plan Hobby plafonne
@@ -12,7 +12,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
 // require() à chemins littéraux : Vercel n'embarque que les fichiers qu'il voit ainsi.
-const MODULES = { cv: () => require('./_module-cv'), mail: () => require('./_module-mail'), mdp: () => require('./_module-mdp') };
+const MODULES = { cv: () => require('./_module-cv'), mail: () => require('./_module-mail'), mdp: () => require('./_module-mdp'), lettre: () => require('./_module-lettre') };
 
 async function sb(path) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
@@ -37,7 +37,7 @@ async function handle(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   // Contrôle de déploiement : confirme que les modules sont bien embarqués avec la fonction (renvoie leur taille, jamais leur contenu).
   if (req.method === 'GET' && req.query && req.query.check === '1') {
-    try { return res.status(200).json({ ok: true, sizes: { cv: MODULES.cv().length, mail: MODULES.mail().length, mdp: MODULES.mdp().length } }); }
+    try { return res.status(200).json({ ok: true, sizes: { cv: MODULES.cv().length, mail: MODULES.mail().length, mdp: MODULES.mdp().length, lettre: MODULES.lettre().length } }); }
     catch (e) { return res.status(500).json({ ok: false }); }
   }
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée.' });
