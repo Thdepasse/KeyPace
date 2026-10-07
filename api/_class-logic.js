@@ -173,8 +173,22 @@ function canManageClass(user, cls) {
     return !!cls.institution_id && !!user.institution_id && cls.institution_id === user.institution_id;
   }
   if (user.role === 'prof') {
+    // Plusieurs profs par classe (table class_teachers) : teacher_ids est posé
+    // par loadClassForManage. Sans lui (table pas encore migrée), on retombe
+    // sur le prof unique historique.
+    if (Array.isArray(cls.teacher_ids)) return cls.teacher_ids.includes(user.id);
     return cls.teacher_id === user.id;
   }
+  return false;
+}
+
+// Renommer, archiver ou restaurer une classe, et choisir ses profs : réservé
+// à l'établissement quand la classe en dépend. Un prof indépendant (classe
+// sans établissement) garde la main sur ses propres classes.
+function canAdministerClass(user, cls) {
+  if (!user || !cls) return false;
+  if (user.role === 'admin') return canManageClass(user, cls);
+  if (user.role === 'prof') return !cls.institution_id && canManageClass(user, cls);
   return false;
 }
 
@@ -411,6 +425,6 @@ function sanitizeEssayStats(raw) {
   };
 }
 
-module.exports = { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
+module.exports = { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
   ESSAY_TYPES, essayTypeDef, countWords, essayWordCount, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
   moduleMastery, studentModuleProgress, MODULE_NAMES };

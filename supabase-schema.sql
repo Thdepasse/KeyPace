@@ -931,3 +931,31 @@ create index if not exists student_reminders_pending_idx on student_reminders(st
 alter table student_reminders enable row level security;
 drop policy if exists "no_anon_access" on student_reminders;
 create policy "no_anon_access" on student_reminders for all to anon using (false) with check (false);
+
+-- ───────────────────────────────────────────────────────────────
+-- Plusieurs professeurs par classe. class_teachers est la source de vérité
+-- des droits d'un prof sur une classe ; classes.teacher_id reste le prof
+-- principal (compatibilité export RGPD, anciennes lectures).
+-- Seul l'établissement (role 'admin') ajoute/retire un prof d'une classe,
+-- via l'action class-teachers-set. Accès serverless only (RLS sans policy).
+-- Idempotent : relançable sans risque.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists class_teachers (
+  class_id uuid references classes(id) on delete cascade,
+  teacher_id uuid references users(id) on delete cascade,
+  added_at timestamptz default now(),
+  primary key (class_id, teacher_id)
+);
+create index if not exists class_teachers_teacher_idx on class_teachers(teacher_id);
+alter table class_teachers enable row level security;
+drop policy if exists "no_anon_access" on class_teachers;
+create policy "no_anon_access" on class_teachers for all to anon using (false) with check (false);
+
+-- Reprise de l'existant : le prof actuel de chaque classe devient son premier
+-- co-prof (les comptes établissement n'y figurent pas : ils pilotent par institution).
+insert into class_teachers (class_id, teacher_id)
+select c.id, c.teacher_id
+from classes c
+join users u on u.id = c.teacher_id
+where u.role = 'prof'
+on conflict do nothing;
