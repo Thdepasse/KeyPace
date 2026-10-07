@@ -8,7 +8,6 @@
           { "source": "/confidentialite", "destination": "/confidentialite.html" },
           { "source": "/cookies", "destination": "/cookies.html" },
           { "source": "/cgv", "destination": "/cgv.html" },
-          { "source": "/404", "destination": "/404.html" },
           { "source": "/clavier-azerty-belge", "destination": "/clavier-azerty-belge.html" },
           { "source": "/accueil", "destination": "/api/track?r=home" },
           { "source": "/test-frappe-en-ligne", "destination": "/api/track?r=test" },
@@ -50,8 +49,7 @@
           { "source": "/guide/raccourcis-clavier-windows", "destination": "/guide/raccourcis-clavier-windows.html" },
           { "source": "/guide", "destination": "/guide/index.html" },
           { "source": "/api/verify-email", "destination": "/api/register" },
-          { "source": "/api/confirm-parent-consent", "destination": "/api/register" },
-          { "source": "/((?!api/).*)", "destination": "/index.html" }
+          { "source": "/api/confirm-parent-consent", "destination": "/api/register" }
     ],
     "crons": [
           { "path": "/api/login?action=retention-sweep-cron", "schedule": "0 6 * * *" }
