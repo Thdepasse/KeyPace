@@ -5657,7 +5657,7 @@ function mount(host){
   }
   /* Leçon vers laquelle envoyer l'élève : la PREMIÈRE leçon qu'il n'a pas encore faite, même si l'étape conseillée pour son année est plus loin. */
   function doneLessons(){
-    if(!isLogged())return null;
+    if(!isLogged())return new Set(); /* sans compte : aucune leçon possible, on part de zéro */
     try{const d=new Set();ALL_LESSONS.forEach((l,i)=>{if(app.lessonRec(l.id).cleared)d.add(i+1)});return d}catch(e){return null}
   }
   function lessonTarget(zoneStart,zoneEnd){
@@ -5686,7 +5686,7 @@ function mount(host){
     const progKnown=new Set();YEARS.slice(0,idx).forEach(yy=>lessonSet((PROGRAMME_COMMUN[yy.l]||{}).lecons).forEach(n=>progKnown.add(n)));
     const progNow=lessonSet(c.lecons);progNow.forEach(n=>progKnown.delete(n));
     /* Élève connu : vert = leçons réellement faites, orange = objectif restant (ce que le programme attend d'ici la fin de cette année et qui n'est pas fait), gris = plus tard. Élève inconnu : on montre le programme. */
-    const done=doneLessons();
+    const done=doneLessons(),guest=!isLogged();
     const due=new Set([...progKnown,...progNow]);
     const known=done?new Set([...done].filter(n=>n>=1&&n<=TOTAL_LESSONS)):progKnown;
     const now=done?new Set([...due].filter(n=>!done.has(n))):progNow;
@@ -5697,7 +5697,7 @@ function mount(host){
     const nKnown=known.size,nNow=now.size,nLater=TOTAL_LESSONS-nKnown-nNow;
     const kr=runs(known),lr=runs(new Set(Array.from({length:TOTAL_LESSONS},(_,i)=>i+1).filter(n=>!known.has(n)&&!now.has(n))));
     const pl=n=>`${n} leçon${n>1?'s':''}`;
-    const legend=`<div class="lg known${nKnown?'':' none'}"><i></i><div><b>${done?'Déjà fait':'Au programme avant'}</b><span>${nKnown?`Leçons ${fmtRuns(kr)} · ${pl(nKnown)}`:(done?'Pas encore de leçon terminée':'Rien : tu pars de zéro')}</span></div></div>
+    const legend=`<div class="lg known${nKnown?'':' none'}"><i></i><div><b>${done?'Déjà fait':'Au programme avant'}</b><span>${nKnown?`Leçons ${fmtRuns(kr)} · ${pl(nKnown)}`:(done?(guest?'Crée un compte gratuit pour suivre ta progression':'Pas encore de leçon terminée'):'Rien : tu pars de zéro')}</span></div></div>
       <div class="lg now${nNow?'':' none'}"><i></i><div><b>${done?'Objectif restant':'À apprendre maintenant'}</b><span>${nNow?`Leçons ${fmtRuns(nr)} · ${pl(nNow)}`:(done?'Objectif atteint':'Aucune nouvelle leçon')}</span></div></div>
       <div class="lg later${nLater?'':' none'}"><i></i><div><b>Plus tard</b><span>${nLater?`Leçons ${fmtRuns(lr)} · ${pl(nLater)}`:'C’est la dernière étape'}</span></div></div>`;
     const nCatch=done?[...now].filter(n=>!progNow.has(n)).length:0;
@@ -5940,7 +5940,7 @@ function mount(host){
       const b1=root.querySelector('#sel1>button'),b2=root.querySelector('#sel2>button');
       b1.firstElementChild.textContent=NETS.find(n=>n.id===pNet).t;b1.classList.add('has');
       b2.firstElementChild.textContent=pYear.l;b2.classList.add('has');
-      syncGo();renderProgramme();pfold.classList.add('open');
+      syncGo(); /* le choix est retenu, mais le programme reste replié : il s'ouvre au clic sur « Voir mon programme » */
     }}catch(e){}
 
 }
