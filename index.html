@@ -5646,7 +5646,7 @@ function mount(host){
   menu2.innerHTML=['Primaire','Secondaire'].map(g=>`<h6>${g}</h6>`+YEARS.filter(y=>y.g===g).map(y=>`<button type="button" data-l="${y.l}" style="--c:${y.c}"><i></i>${y.l}</button>`).join('')).join('');
   const isExpert=()=>typeof getUserPlan==='function'&&getUserPlan()==='expert';
   const isLogged=()=>typeof currentUser!=='undefined'&&!!currentUser;
-  const MOD_HREF={mail:'/cours/ecrire-un-mail',cv:'/cours/ecrire-un-cv'};
+  const MOD_HREF={mail:'/cours/ecrire-un-mail',cv:'/cours/ecrire-un-cv','mot-de-passe':'/cours/creer-un-mot-de-passe'};
   const statusLabel=m=>m.live?(isExpert()?'Disponible':'Expert'):'Bientôt';
   const ctaLabel=m=>m.live?(isExpert()?'Commencer →':'Débloquer avec Expert'):'Bientôt';
   function openModule(id){
@@ -5774,7 +5774,7 @@ function mount(host){
    {id:'programmation-1',k:'pro',icon:'rocket',img:'images/keypace-mascot-bureau-complet.webp',cat:'Programmation',title:'Programmer : premiers pas',short:'Logigrammes, algorithmes, boucles et conditions.'},
    {id:'outils-creation',k:'num',icon:'layout',img:'images/keypace-mascot-cheer.webp',cat:'Outils numériques',title:'Choisir son outil de création',short:'Sélectionner le bon outil et en utiliser les fonctions principales.'},
    {id:'presentation',k:'ecr',icon:'layout',img:'images/keypace-mascots-duo-laptop.webp',cat:'Écriture',title:'Faire une présentation',short:'Un support de présentation clair pour appuyer un discours.'},
-   {id:'mot-de-passe',k:'num',icon:'lock',img:'images/keypace-perso-mot-de-passe.webp',cat:'Outils numériques',title:'Créer un mot de passe solide',short:'Lettres, chiffres et symboles : taper un mot de passe sûr et effacer ses traces.'},
+   {id:'mot-de-passe',k:'num',icon:'lock',img:'images/keypace-perso-mot-de-passe.webp',cat:'Outils numériques',title:'Créer un mot de passe solide',short:'Lettres, chiffres et symboles : taper un mot de passe sûr et effacer ses traces.',live:true,desc:"Longueur, mélange, phrase de passe, erreurs à éviter et bons réflexes sur un ordinateur partagé. Tu tries ensuite des exemples pour reconnaître ce qui résiste. Termine par un quiz final."},
    {id:'protection-donnees',k:'num',icon:'lock',img:'images/keypace-mascot-beanbag.webp',cat:'Outils numériques',title:'Protéger ses données',short:'Sauvegarde, mises à jour, cookies, hameçonnage, sites sécurisés.'},
    {id:'cyberharcelement',k:'num',icon:'user',img:'images/keypace-mascot-girl.webp',cat:'Outils numériques',title:'Réagir au cyberharcèlement',short:'Reconnaître les situations à risque et savoir comment réagir.'},
    {id:'etiquettes',k:'man',icon:'eye',img:'images/keypace-mascot-books.webp',cat:'Autres champs',title:'Lire une étiquette alimentaire',short:'Labels, allergènes et informations nutritionnelles.'},
@@ -5807,7 +5807,7 @@ function mount(host){
    {id:'relire',k:'lan',icon:'spell',img:'images/keypace-perso-ortho.webp',cat:'Langue',title:'Relire et corriger un texte',short:'Orthographe et ponctuation d’un texte professionnel.'},
    {id:'vitesse',k:'cla',icon:'keyboard',img:'images/keypace-test-vitesse-frappe.webp',cat:'Clavier',title:'Vitesse et précision',short:'Garder la précision en augmentant sa vitesse de frappe.'}
   ];
-  NEW_MODS.forEach(n=>{if(!MODS.find(m=>m.id===n.id))MODS.push(Object.assign(M(n.id,n.k,miniIcon(n.icon),n.img,n.cat,n.title,n.short+' Ce module arrive bientôt.',false),{short:n.short}))});
+  NEW_MODS.forEach(n=>{if(!MODS.find(m=>m.id===n.id))MODS.push(Object.assign(M(n.id,n.k,miniIcon(n.icon),n.img,n.cat,n.title,n.live?n.desc:n.short+' Ce module arrive bientôt.',!!n.live),{short:n.short}))});
   // sous-titre court pour les modules déjà existants rattachés au programme
   [['mail','Destinataire, objet, texte du message et pièce jointe.'],['word','Marges, puces, sauts de page, numéros et notes de bas de page : mettre en page un document.'],['raccourcis','Les raccourcis usuels avec Ctrl (ou Cmd) pour écrire plus vite.']].forEach(([id,s])=>{const m=MODS.find(x=>x.id===id);if(m)m.short=s});
   let curId='mail';
