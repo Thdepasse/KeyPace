@@ -13934,7 +13934,7 @@ const app={
                     <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em">VITESSE MOY.</div>
                     <div style="font-size:20px;font-weight:800;color:var(--txt);margin-top:2px">${c.agg.avgWpm!=null?c.agg.avgWpm:'-'}<span style="font-size:12px;color:var(--muted);font-weight:500"> mpm</span></div>
                   </div>
-                  ${c.institutional?'':`<button onclick="event.stopPropagation();app.deleteClass('${c.id}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:6px;border-radius:8px;line-height:1;opacity:.6" title="Archiver" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>`}
+                  <button onclick="event.stopPropagation();app.deleteClass('${c.id}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:6px;border-radius:8px;line-height:1;opacity:.6" title="Archiver" onmouseenter="this.style.opacity='1';this.style.color='#E5484D'" onmouseleave="this.style.opacity='.6';this.style.color='var(--muted)'">✕</button>
                 </div>
               </div>
             </div>`;
@@ -14032,7 +14032,7 @@ const app={
         ${classes.length===0?`<div style="text-align:center;padding:60px 20px;color:var(--muted)">Aucune classe archivée.</div>`:`<div style="display:flex;flex-direction:column;gap:10px">
           ${classes.map(c=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:14px">
             <div style="flex:1;font-size:15px;font-weight:700;color:var(--txt)">${this._esc(c.name)}</div>
-            ${c.canRestore===false?`<span style="font-size:12px;color:var(--muted)">Restauration par ton établissement</span>`:`<button onclick="app.restoreClass('${c.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer">Restaurer</button>`}
+            <button onclick="app.restoreClass('${c.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer">Restaurer</button>
           </div>`).join('')}
         </div>`}
       </div></div>`;
@@ -14214,7 +14214,7 @@ const app={
       <div class="stats-header" style="padding-bottom:24px">
         <button onclick="app.backFromClass()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">${isAdmin()?'‹ Retour':'← Toutes les classes'}</button>
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
-          <div><h1 style="margin-bottom:4px;display:flex;align-items:center;gap:10px">${d.name}${d.institutional?'':`<button onclick="app.renameClass('${d.id}','${this._esc(d.name).replace(/'/g,"\\'")}')" title="Renommer la classe" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:2px" onmouseenter="this.style.color='var(--accent)'" onmouseleave="this.style.color='var(--muted)'">${ICONS.pencil}</button>`}</h1><p style="margin:0">${students.length} élève${students.length!==1?'s':''}</p></div>
+          <div><h1 style="margin-bottom:4px;display:flex;align-items:center;gap:10px">${d.name}<button onclick="app.renameClass('${d.id}','${this._esc(d.name).replace(/'/g,"\\'")}')" title="Renommer la classe" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:2px" onmouseenter="this.style.color='var(--accent)'" onmouseleave="this.style.color='var(--muted)'">${ICONS.pencil}</button></h1><p style="margin:0">${students.length} élève${students.length!==1?'s':''}</p></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button onclick="app.exportClassCSV()" ${students.length?'':'disabled'} style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:${students.length?'pointer':'not-allowed'};color:var(--txt);opacity:${students.length?'1':'.5'}">⬇ CSV</button>
             <button onclick="app.exportClassPDF()" ${students.length?'':'disabled'} style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:${students.length?'pointer':'not-allowed'};color:var(--txt);opacity:${students.length?'1':'.5'}">⬇ PDF</button>

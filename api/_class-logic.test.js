@@ -166,15 +166,16 @@ test('canManageClass : plusieurs profs sur la même classe (teacher_ids)', () =>
   assert.equal(canManageClass(p1, { ...cls, teacher_ids: ['p2'] }), false);
 });
 
-test('canAdministerClass : renommer/archiver = établissement, ou prof indépendant', () => {
-  const prof = { id: 'p1', role: 'prof', institution_id: 'i1' };
+test('canAdministerClass : les profs de la classe et l\'établissement peuvent renommer/archiver', () => {
+  const p1 = { id: 'p1', role: 'prof', institution_id: 'i1' };
+  const p2 = { id: 'p2', role: 'prof', institution_id: 'i1' };
+  const p3 = { id: 'p3', role: 'prof', institution_id: 'i1' };
   const admin = { id: 'a1', role: 'admin', institution_id: 'i1' };
-  const instClass = { teacher_id: 'p1', teacher_ids: ['p1'], institution_id: 'i1' };
-  assert.equal(canAdministerClass(admin, instClass), true);
-  assert.equal(canAdministerClass(prof, instClass), false); // classe d'établissement
-  assert.equal(canAdministerClass(admin, { ...instClass, institution_id: 'i2' }), false);
-  const soloClass = { teacher_id: 'p1', institution_id: null };
-  assert.equal(canAdministerClass({ id: 'p1', role: 'prof', institution_id: null }, soloClass), true);
-  assert.equal(canAdministerClass({ id: 'p2', role: 'prof', institution_id: null }, soloClass), false);
-  assert.equal(canAdministerClass({ role: 'eleve', id: 's1' }, soloClass), false);
+  const cls = { teacher_id: 'p1', teacher_ids: ['p1', 'p2'], institution_id: 'i1' };
+  assert.equal(canAdministerClass(p1, cls), true);
+  assert.equal(canAdministerClass(p2, cls), true); // co-prof : mêmes droits
+  assert.equal(canAdministerClass(p3, cls), false); // pas sa classe
+  assert.equal(canAdministerClass(admin, cls), true);
+  assert.equal(canAdministerClass(admin, { ...cls, institution_id: 'i2' }), false);
+  assert.equal(canAdministerClass({ role: 'eleve', id: 's1' }, cls), false);
 });

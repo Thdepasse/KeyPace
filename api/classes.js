@@ -161,7 +161,7 @@ async function buildOverview(classes, now) {
     allData.push(...datas);
     const agg = aggregateClass(datas, now);
     const alerts = detectAlerts(members.map((m) => ({ username: m.username, data: pmap[m.student_id] || {} })), now);
-    out.push({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, memberCount: members.length, agg, alerts, institutional: !!cls.institution_id });
+    out.push({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, memberCount: members.length, agg, alerts });
   }
   return { classes: out, global: aggregateClass(allData, now), series: dailySeries(allData, now) };
 }
@@ -224,8 +224,7 @@ async function classCreate(req, res) {
   return res.json({ id: created.id, name: created.name, inviteCode: created.invite_code, memberCount: 0 });
 }
 
-// administer : renommer / archiver / restaurer, réservé à l'établissement
-// pour les classes qui en dépendent (voir canAdministerClass).
+// administer : renommer / archiver / restaurer (voir canAdministerClass).
 async function loadClassForManage(user, classId, { administer = false } = {}) {
   const r = await sb(`/classes?id=eq.${encodeURIComponent(classId)}&select=*`);
   const cls = r.data && r.data[0];
@@ -233,9 +232,7 @@ async function loadClassForManage(user, classId, { administer = false } = {}) {
   const lk = await sb(`/class_teachers?class_id=eq.${cls.id}&select=teacher_id`);
   if (lk.ok && Array.isArray(lk.data)) cls.teacher_ids = lk.data.map((x) => x.teacher_id);
   if (!canManageClass(user, cls)) return { error: 'Accès refusé.', status: 403 };
-  if (administer && !canAdministerClass(user, cls)) {
-    return { error: "Seul l'établissement peut modifier ou archiver cette classe.", status: 403 };
-  }
+  if (administer && !canAdministerClass(user, cls)) return { error: 'Accès refusé.', status: 403 };
   return { cls };
 }
 
@@ -286,9 +283,8 @@ async function archivedClasses(req, res) {
   const user = await userFromToken(req.body.token);
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
   if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
-  const classes = await listTeacherClasses(user, { archived: true, select: 'id,name,institution_id', order: 'created_at.desc' });
-  // canRestore : un prof d'établissement ne peut pas restaurer (voir canAdministerClass).
-  return res.json({ classes: classes.map((c) => ({ id: c.id, name: c.name, canRestore: user.role === 'admin' || !c.institution_id })) });
+  const classes = await listTeacherClasses(user, { archived: true, select: 'id,name', order: 'created_at.desc' });
+  return res.json({ classes: classes.map((c) => ({ id: c.id, name: c.name })) });
 }
 
 async function classDetail(req, res) {
@@ -331,7 +327,7 @@ async function classDetail(req, res) {
   // EST tout le progrès de la classe, il n'est "en retard" sur rien.
   const weakest = started.length >= 2 ? started.reduce((a, b) => (b.avgPct < a.avgPct ? b : a)) : null;
 
-  return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, institutional: !!cls.institution_id, students, agg: aggregateClass(datas, now), modules, weakestModule: weakest });
+  return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now), modules, weakestModule: weakest });
 }
 function alertRank(s) { return s.alertStuck ? 0 : s.alertInactive ? 1 : 2; }
 

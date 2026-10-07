@@ -182,14 +182,10 @@ function canManageClass(user, cls) {
   return false;
 }
 
-// Renommer, archiver ou restaurer une classe, et choisir ses profs : réservé
-// à l'établissement quand la classe en dépend. Un prof indépendant (classe
-// sans établissement) garde la main sur ses propres classes.
+// Renommer, archiver ou restaurer une classe : l'établissement (pour son
+// périmètre) ou n'importe lequel des profs de la classe.
 function canAdministerClass(user, cls) {
-  if (!user || !cls) return false;
-  if (user.role === 'admin') return canManageClass(user, cls);
-  if (user.role === 'prof') return !cls.institution_id && canManageClass(user, cls);
-  return false;
+  return canManageClass(user, cls);
 }
 
 // Établissement : seul un admin rattaché à une institution pilote ses profs.
