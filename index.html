@@ -7754,7 +7754,7 @@ const app={
       const seen=new Set(d.items.map(it=>it.author_name));
       const items=googleReviews.filter(g=>!seen.has(g.author_name)).concat(d.items);
       const total=Math.max(d.count,19);
-      el.querySelector('.reviews-summary').innerHTML=`<span class="reviews-avg">${d.average.toFixed(1)}</span> <span class="reviews-stars">${stars(d.average)}</span> sur ${total} avis 5 étoiles`;
+      el.querySelector('.reviews-summary').innerHTML=`<span class="reviews-avg">${d.average.toFixed(1)}</span> <span class="reviews-stars">${stars(d.average)}</span> sur ${total} avis`;
       this._initReviewsCarousel(el.querySelector('.reviews-grid'), items.slice(0,12), esc, stars);
       el.style.display='';
       let ld=document.getElementById('reviews-jsonld');
