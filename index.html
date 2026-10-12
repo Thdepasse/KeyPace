@@ -1727,6 +1727,148 @@ a.nav-link{text-decoration:none;display:inline-block}
 @media(max-width:860px){.sm-hero{grid-template-columns:1fr;gap:22px;padding:26px 22px}}
 @media(max-width:560px){.sm{padding:0 16px 40px}.sm-grid{grid-template-columns:1fr}}
 
+/* ── GRILLE RÉFLEXE : plein écran, papier et mascotte ── */
+body.sgr-open{overflow:hidden}
+body.sgr-open #cookie-consent-reopen{display:none!important}
+.sgr{position:fixed;inset:0;z-index:1800;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,#fff 0%,#faf9f5 50%,#f3ecdc 100%);color:#16140F;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.sgr *{-webkit-user-select:none;user-select:none}
+.sgr-bar{position:relative;z-index:6;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:max(10px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left));background:rgba(250,249,245,.92);border-bottom:1px solid #E7E1D5}
+.sgr-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;border:1px solid #E7E1D5;background:#fff;color:#16140F;box-shadow:0 2px 0 #E7E1D5;cursor:pointer;transition:background .15s}
+.sgr-btn:hover{background:#F4F1EA}
+.sgr-btn.sq{width:44px;padding:0}
+.sgr-btn.quit{background:#FFF1EC;border-color:#FFB199;color:#C23A1C;box-shadow:0 2px 0 #FFD3C4}
+.sgr-btn[hidden]{display:none}
+.sgr-btn:focus-visible,.sgr-go:focus-visible,.sgr-sec:focus-visible{outline:3px solid #FF4D2E;outline-offset:2px}
+.sgr-ttl{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;line-height:1.15}
+.sgr-ttl small{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.sgr-ttl b{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px}
+.sgr-bar-r{display:flex;gap:8px;flex-shrink:0}
+.sgr-stage{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;padding:12px 16px 0;gap:10px}
+.sgr-hud{width:100%;max-width:980px;display:flex;align-items:center;gap:22px;flex-shrink:0}
+.sgr-sc{display:flex;align-items:baseline;gap:6px;min-width:120px;background:#fff;border:1.5px solid #E7E1D5;border-radius:18px;padding:8px 18px;box-shadow:0 6px 14px -10px rgba(60,40,10,.4)}
+.sgr-sc b{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:44px;line-height:1}
+.sgr-sc small{font-size:13px;font-weight:700;color:var(--muted)}
+.sgr-sc{flex-wrap:wrap;transition:background .3s,border-color .3s,transform .3s}
+.sgr-sc.rec{background:#FFF6D6;border-color:#F0D78A;transform:scale(1.04)}
+.sgr-best{flex-basis:100%;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-height:14px;margin-top:2px}
+.sgr-sc .sgr-best b{font-family:inherit;font-size:inherit;font-weight:800;line-height:inherit;color:#3a3426}
+.sgr-best .g{color:#9A6B00}
+.sgr-prevtop{font-size:14px;color:var(--muted);margin-top:-8px}
+.sgr-prevtop b{font-family:'JetBrains Mono',monospace;color:#3a3426}
+.sgr-mid{flex:1;min-width:0}
+.sgr-tbar{height:14px;border-radius:8px;background:#EDE6D6;border:1px solid #E1D8C4;overflow:hidden}
+.sgr-tbar i{display:block;height:100%;width:100%;transform-origin:left;background:linear-gradient(90deg,#FFB199,var(--accent))}
+.sgr-tsec{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;margin-top:6px;display:flex;justify-content:space-between;color:var(--muted)}
+.sgr-tsec .lo{color:var(--danger)}
+.sgr-lv{display:flex;gap:7px;min-width:120px;justify-content:flex-end}
+.sgr-lv i{position:relative;width:24px;height:22px;display:block}
+.sgr-lv i::before{content:'♥';position:absolute;inset:0;font-style:normal;font-size:24px;line-height:22px;color:#E3DBC9}
+.sgr-lv i.on::before{color:var(--accent)}
+.sgr-hint{flex-shrink:0;text-align:center;font-size:15px;font-weight:700;min-height:22px;color:#7A7365}
+.sgr-combo{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;letter-spacing:.06em;color:#7A7365}
+.sgr-combo .pp{display:flex;gap:4px}
+.sgr-combo .pp i{width:22px;height:6px;border-radius:3px;display:block;background:#E3DBC9}
+.sgr-combo .pp i.on{background:#F2B01E}
+.sgr-combo b{color:#C77D00}
+.sgr-combo em{font-style:normal;font-weight:700;opacity:.6}
+.sgr-bw{position:relative;flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.sgr-board{--g:clamp(8px,1.2vw,16px);--k:min(calc((min(94vw,620px) - 2*var(--g))/3),calc((100vh - 340px - 2*var(--g))/3),170px);display:grid;grid-template-columns:repeat(3,var(--k));gap:var(--g)}
+.sgr-board .sgr-cap{background:rgba(255,255,255,.5);border:2px dashed #DDD3BF;box-shadow:none}
+.sgr-board .sgr-cell.t .sgr-cap{border:2px solid #169160;background:linear-gradient(160deg,#4EE0A0,#1FA971);box-shadow:0 14px 26px -12px rgba(31,169,113,.8),inset 0 -5px 0 rgba(0,0,0,.14)}
+.sgr-board .sgr-cell.x .sgr-cap{border:2px solid #C93A3E;background:linear-gradient(160deg,#F28B8B,#E5484D);box-shadow:0 14px 26px -12px rgba(229,72,77,.8),inset 0 -5px 0 rgba(0,0,0,.14)}
+.sgr-cell.in .lt{animation:sgrIn .18s ease-out}
+@keyframes sgrIn{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}
+.sgr-cell{position:relative;width:var(--k);height:var(--k)}
+.sgr-cap{position:absolute;inset:0;display:grid;place-items:center;border-radius:22%;background:#fff;border:2px solid #E7E1D5;box-shadow:0 10px 18px -12px rgba(60,40,10,.45),inset 0 -4px 0 #F1EADA;color:#2a2418;transition:transform .08s,background .12s,border-color .12s,box-shadow .12s}
+.sgr-cap .lt{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:calc(var(--k)*.46);line-height:1}
+.sgr-cap .tm{position:absolute;left:12%;right:12%;bottom:7%;height:max(4px,calc(var(--k)*.06));border-radius:3px;display:none;overflow:hidden;background:rgba(0,0,0,.18)}
+.sgr-cap .tm b{display:block;height:100%;width:calc(var(--r,1)*100%);background:#fff}
+.sgr-cap .x{position:absolute;right:9%;top:6%;font-style:normal;font-weight:800;font-size:calc(var(--k)*.2);display:none;color:#fff}
+.sgr-cell.t .sgr-cap{background:linear-gradient(160deg,#4EE0A0,#1FA971);border-color:#169160;color:#fff;box-shadow:0 14px 26px -12px rgba(31,169,113,.8),inset 0 -5px 0 rgba(0,0,0,.14);transform:translateY(-3px)}
+.sgr-cell.x .sgr-cap{background:linear-gradient(160deg,#F28B8B,#E5484D);border-color:#C93A3E;color:#fff;box-shadow:0 14px 26px -12px rgba(229,72,77,.8),inset 0 -5px 0 rgba(0,0,0,.14)}
+.sgr-cell.t .tm,.sgr-cell.x .tm{display:block}
+.sgr-cell.x .x{display:block}
+.sgr-cell.press .sgr-cap{transform:translateY(4px);box-shadow:0 4px 8px -6px rgba(60,40,10,.4),inset 0 -1px 0 #F1EADA}
+.sgr-count{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;opacity:0;z-index:7;text-align:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(90px,18vw,200px);line-height:1;color:var(--accent);text-shadow:0 8px 30px rgba(255,77,46,.25)}
+.sgr-count.pop{animation:sgrCnt .62s ease-out forwards}
+.sgr-count.cgo{font-size:clamp(40px,8vw,84px);color:var(--success)}
+@keyframes sgrCnt{0%{opacity:0;transform:scale(1.5)}25%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:scale(.9)}}
+.sgr-fx{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.sgr-pop{position:absolute;transform:translate(-50%,-50%);font-family:'JetBrains Mono',monospace;font-weight:800;font-size:28px;color:#169160;text-shadow:0 2px 0 #fff;white-space:nowrap;animation:sgrPop .75s ease-out forwards}
+.sgr-pop.bad{color:#C93A3E}
+@keyframes sgrPop{0%{opacity:0;transform:translate(-50%,-20%) scale(.7)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-190%) scale(1.05)}}
+.sgr-mascot{position:absolute;right:max(10px,2vw);bottom:0;z-index:3;pointer-events:none}
+.sgr-mw{position:relative}
+.sgr-mw img{display:block;height:clamp(110px,22vh,230px);width:auto;filter:drop-shadow(0 12px 14px rgba(60,40,10,.25));transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.sgr-mw.hop img{transform:translateY(-14px) rotate(-4deg)}
+.sgr-bubble{position:absolute;right:calc(100% - 20px);bottom:78%;width:max-content;max-width:min(240px,46vw);background:#fff;border:2px solid #E7E1D5;border-radius:18px 18px 4px 18px;padding:10px 14px;font-size:14px;font-weight:700;line-height:1.35;box-shadow:0 8px 18px -10px rgba(60,40,10,.4);opacity:0;transform:translateY(6px) scale(.96);transition:.2s}
+.sgr-bubble.on{opacity:1;transform:none}
+.sgr-ov{position:absolute;inset:0;z-index:8;display:flex;overflow-y:auto;background:rgba(250,249,245,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.sgr-card{margin:auto;width:calc(100% - 32px);max-width:760px;padding:26px 30px 28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;background:#fff;border:1.5px solid #E7E1D5;border-radius:28px;box-shadow:0 30px 60px -30px rgba(60,40,10,.45)}
+.sgr-card h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,5vw,50px);line-height:1;letter-spacing:-.01em}
+.sgr-kick{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent)}
+.sgr-cm{height:130px;width:auto;margin:-6px 0 -4px;filter:drop-shadow(0 10px 10px rgba(60,40,10,.2))}
+.sgr-rules{list-style:none;counter-reset:r;display:flex;flex-direction:column;gap:9px;text-align:left;width:100%;max-width:520px;color:#3a3426}
+.sgr-rules li{counter-increment:r;position:relative;padding:3px 0 3px 42px;font-size:16.5px;line-height:1.45}
+.sgr-rules li::before{content:counter(r);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:14px;background:#FFF1EC;border:1.5px solid #FFB199;color:var(--accent)}
+.sgr-legend{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;font-size:14px;font-weight:700;color:#3a3426}
+.sgr-legend span{display:inline-flex;align-items:center;gap:8px}
+.sgr-legend i{width:20px;height:20px;border-radius:6px;display:block}
+.sgr-meds{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.sgr-meds span{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:999px;border:1.5px solid #E1D8C4;color:#6F6757;background:#FBF8F0}
+.sgr-meds .b{color:#A85F2A;border-color:#E5BE98}.sgr-meds .s{color:#6b7584;border-color:#C3CAD4}.sgr-meds .g{color:#9A6B00;border-color:#E8CB78}.sgr-meds .r{color:var(--accent);border-color:#FFB199;background:#FFF1EC}
+.sgr-intro{margin:-4px 0 0;font-size:15.5px;color:#6F6757;max-width:520px;line-height:1.5}
+.sgr-pick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%}
+.sgr-lv-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px 10px;border-radius:16px;border:1.5px solid #E7E1D5;background:#fff;font-family:inherit;color:#16140F;cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .12s}
+.sgr-lv-card:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 18px -12px rgba(60,40,10,.45)}
+.sgr-lv-card.sel{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,.15);background:#FFF9F6}
+.sgr-lv-card.locked{opacity:.55;cursor:not-allowed;background:#F4F1EA}
+.sgr-lv-card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sgr-lv-card b{font-size:15px;font-weight:800}
+.sgr-lst{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:999px}
+.sgr-lst.todo{background:#F4F1EA;color:var(--muted)}.sgr-lst.done{background:rgba(31,169,113,.12);color:#1B8A5E}.sgr-lst.lock{background:rgba(22,20,15,.07);color:var(--muted)}
+.sgr-lt{font-style:normal;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-top:-2px}
+.sgr-mini{display:flex;flex-direction:column;gap:3px;height:34px;justify-content:center}
+.sgr-mr{display:flex;gap:2px}
+.sgr-mr i{width:7px;height:7px;border-radius:2px;background:#D9D1BF;display:block}
+.sgr-lv-card.sel .sgr-mr i{background:var(--accent)}
+.sgr-sub{font-size:14.5px;max-width:460px;color:#6F6757;line-height:1.5}
+.sgr-sub b{color:#3a3426}
+.sgr-warn{margin:0;padding:12px 14px;border-radius:12px;background:#FFF8EC;border:1px solid #F3D9A8;color:#6B5A3A;font-size:14px}
+.sgr-row2{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.sgr-go{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 34px;border:none;border-radius:16px;font-family:inherit;font-size:18px;font-weight:800;cursor:pointer;background:var(--accent);color:#fff;box-shadow:0 6px 0 #C23A1C,0 14px 22px -10px rgba(255,77,46,.6);transition:transform .1s,box-shadow .1s}
+.sgr-go:active{transform:translateY(4px);box-shadow:0 2px 0 #C23A1C}
+.sgr-go:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.sgr-sec{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 22px;border-radius:14px;border:1px solid #E7E1D5;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;background:#fff;color:#16140F;box-shadow:0 3px 0 #E7E1D5}
+.sgr-sec:hover{background:#F4F1EA}
+.sgr-keyh{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#B3AA98}
+.sgr-rec{font-weight:800;font-size:14px;color:#9A6B00;background:#FFF6D6;border:1px solid #F0D78A;border-radius:999px;padding:6px 16px}
+.sgr-stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.sgr-stats div{min-width:112px;padding:12px 16px;border-radius:14px;background:#FBF8F0;border:1px solid #EDE6D6}
+.sgr-stats b{display:block;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:26px}
+.sgr-stats small{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-top:2px}
+.sgr-final{display:flex;align-items:baseline;justify-content:center}
+.sgr-final b{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:64px;line-height:1;color:var(--accent)}
+.sgr-final span{font-size:17px;font-weight:700;color:var(--muted);margin-left:8px}
+.sgr-nx{width:100%;max-width:440px;text-align:left;font-size:15px}
+.sgr-nx .bar2{height:8px;border-radius:4px;margin-top:8px;overflow:hidden;background:#EDE6D6}
+.sgr-nx .bar2 i{display:block;height:100%;background:var(--accent)}
+.sgr-tip{max-width:460px;font-size:15px;line-height:1.55;padding:12px 16px;border-radius:14px;background:#FFF8EC;border:1px solid #F3D9A8;color:#6B5A3A}
+@media(max-width:640px){
+  .sgr-hud{gap:12px;flex-wrap:wrap}
+  .sgr-sc b{font-size:32px}
+  .sgr-mid{order:3;flex-basis:100%}
+  .sgr-btn span{display:none}
+  .sgr-ttl b{font-size:16px}
+  .sgr-card{padding:20px 16px}
+  .sgr-go{width:100%}
+  .sgr-mw img{height:96px}
+  .sgr-bubble{display:none}
+  .sgr-pick{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-height:620px){.sgr-mascot{display:none}.sgr-hint{display:none}}
+@media(prefers-reduced-motion:reduce){.sgr *{animation:none!important;transition:none!important}.sgr-count.pop{opacity:1}}
+
 /* ── PRÉCISION SOURIS : plein écran ── */
 body.sfs-open{overflow:hidden}
 body.sfs-open #cookie-consent-reopen{display:none!important}
@@ -3018,6 +3160,15 @@ const SYNTH_SOUNDS={
   life(ctx){const t=ctx.currentTime;_synthTone(ctx,{freq:660,dur:0.14,type:'triangle',gain:0.2,start:t});_synthTone(ctx,{freq:990,dur:0.2,type:'triangle',gain:0.2,start:t+0.09});},
   victory(ctx){const t=ctx.currentTime;[523.25,659.25,783.99,1046.5].forEach((f,i)=>_synthTone(ctx,{freq:f,dur:0.24,type:'triangle',gain:0.2,start:t+i*0.11}));},
   defeat(ctx){const t=ctx.currentTime;[440,349.23,293.66].forEach((f,i)=>_synthTone(ctx,{freq:f,freqEnd:f*0.85,dur:0.3,type:'sine',gain:0.15,start:t+i*0.15}));},
+  // Grille réflexe : série, erreurs, décompte
+  combo2(ctx){const t=ctx.currentTime;[659.25,880].forEach((f,i)=>_synthTone(ctx,{freq:f,dur:0.16,type:'triangle',gain:0.2,start:t+0.06+i*0.08}));},
+  combo3(ctx){const t=ctx.currentTime;[659.25,830.6,987.77,1318.5].forEach((f,i)=>_synthTone(ctx,{freq:f,dur:0.18,type:'triangle',gain:0.2,start:t+0.06+i*0.06}));},
+  trap(ctx){const t=ctx.currentTime;_synthTone(ctx,{freq:150,freqEnd:90,dur:0.3,type:'sawtooth',gain:0.13,start:t});_synthTone(ctx,{freq:160,freqEnd:95,dur:0.3,type:'square',gain:0.06,start:t});},
+  late(ctx){const t=ctx.currentTime;_synthTone(ctx,{freq:330,freqEnd:220,dur:0.22,type:'triangle',gain:0.17,start:t});_synthTone(ctx,{freq:247,freqEnd:165,dur:0.26,type:'triangle',gain:0.15,start:t+0.1});},
+  stray(ctx){const t=ctx.currentTime;_synthTone(ctx,{freq:300,dur:0.05,type:'square',gain:0.05,start:t});},
+  tick(ctx){const t=ctx.currentTime;_synthTone(ctx,{freq:520,dur:0.09,type:'sine',gain:0.18,start:t});},
+  go(ctx){const t=ctx.currentTime;_synthTone(ctx,{freq:700,dur:0.12,type:'triangle',gain:0.2,start:t});_synthTone(ctx,{freq:1050,dur:0.22,type:'triangle',gain:0.2,start:t+0.1});},
+  recordbeat(ctx){const t=ctx.currentTime;[784,987.77,1174.66,1568].forEach((f,i)=>_synthTone(ctx,{freq:f,dur:0.2,type:'sine',gain:0.2,start:t+i*0.07}));},
 };
 // Magic Tiles — détection du passage le plus intense d'un morceau réel : la
 // fenêtre de 0,5s à l'énergie RMS la plus forte sert de proxy raisonnable au
@@ -5428,7 +5579,7 @@ const GCINE_GAMES=[
   {key:'course',icon:'raceCar',name:'Course de dactylo',desc:"Tape un texte plus vite que les bots. Ta voiture avance à chaque mot juste : premier sur la ligne d'arrivée !",expert:false,category:'vitesse'},
   {key:'ghost',icon:'ghost',name:'Contre ton fantôme',desc:"Course sur un texte fixe contre un fantôme : l'enregistrement de ta propre meilleure course passée. Bats-toi toi-même !",expert:false,category:'vitesse'},
   {key:'souris',icon:'mouse',name:'Précision souris',desc:"12 niveaux qui montent en difficulté : viser, cliquer, glisser-déposer, puis le clavier (ZQSD) en renfort.",expert:false,category:'precision'},
-  {key:'sourisGrid',icon:'grid',name:'Grille réflexe',desc:"9 cases, une s'allume : tape sa lettre avant les pièges qui s'allument aussi.",expert:false,category:'precision'},
+  {key:'sourisGrid',icon:'grid',name:'Grille réflexe',desc:"Une touche s'allume : tape sa lettre avant qu'elle s'éteigne. 4 niveaux, une rangée du clavier à la fois, puis tout le clavier.",expert:false,category:'precision'},
   {key:'sourisHybrid',icon:'hand',name:'Duo souris + clavier',desc:"Vise à la souris, valide au clavier : une main sur chaque, une lettre à la fois.",expert:true,category:'precision'},
   {key:'sourisTiles',icon:'layers',name:'Magic Tiles',desc:"8 couloirs, ta rangée de repos QSDF JKLM : tape ou tiens la touche avant la ligne.",expert:false,category:'precision'},
   {key:'simon',icon:'brain',name:'Simon des mots',desc:"Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.",expert:false,category:'memoire'},
@@ -7201,7 +7352,7 @@ const app={
         if(e.key===' '&&this.sess&&this.sess.text){const ex=this.sess.text[this.sess.idx];if(ex&&'~`^¨'.includes(ex))e._composedKey=ex;}
       }else e._composedKey=(DEAD_COMPOSE[pk]||{})[e.key]||(e.key===' '?pk:e.key);
     }
-    if(e.key==='Escape'&&this.view==='games'&&this.activeGame){if(this._sfsEl()){this._sfsEsc();return;}this.exitActiveGame();return;}
+    if(e.key==='Escape'&&this.view==='games'&&this.activeGame){if(this._sfsEl()){this._sfsEsc();return;}if(this._sgrEl()){this._sgrEsc();return;}this.exitActiveGame();return;}
     if(this.view==='games'&&this.activeGame==='sprint'&&this.sprint&&this.sprint.on){this.sprintKey(e);return;}
     if(this.view==='games'&&this.activeGame==='frappe'&&this.game&&this.game.on){this.gameKey(e);return;}
     if(this.view==='games'&&this.activeGame==='course'&&this.course&&this.course.on){this.courseKey(e);return;}
@@ -7214,7 +7365,7 @@ const app={
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   exitActiveGame(){
-    this._sfsClose();
+    this._sfsClose();this._sgrClose();
     this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();
     if(this.duel)this.duelLeave();
     if(this.royale)this.royaleLeave();
@@ -7502,7 +7653,7 @@ const app={
     if(v==='classes'&&currentUser&&!isTeacher()&&!currentInstitutionName&&!currentHasClass)v='stats';
     this.view=v;
     maybeConvNudge(v);
-    if(v!=='games'){this._sfsClose(true);this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.royaleLeave();this.activeGame=null;this._gcineTeardown();}
+    if(v!=='games'){this._sfsClose(true);this._sgrClose(true);this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.royaleLeave();this.activeGame=null;this._gcineTeardown();}
     // Sans ça, le poll 25s de viewClass() continuait après avoir quitté la vue
     // "classes" par un onglet de nav (au lieu du bouton ← Retour), et renvoyait
     // de force l'utilisateur vers la liste des classes à chaque tick.
@@ -9301,7 +9452,7 @@ const app={
   },
 
   stopSouris(){
-    this._sfsStopLoop();
+    this._sfsStopLoop();this._sgrStopLoop();
     if(this._sourisLoop){clearInterval(this._sourisLoop);this._sourisLoop=null;}
     if(this._sourisKeyH){window.removeEventListener('keydown',this._sourisKeyH);window.removeEventListener('keyup',this._sourisKeyUpH);this._sourisKeyH=null;this._sourisKeyUpH=null;}
     this._sourisKeys=null;
@@ -9325,7 +9476,7 @@ const app={
   sourisKey(e){
     const s=this.souris;if(!s||s.phase!=='play')return;
     const track=s.track||'mouse';
-    if(track==='grid')return this._sourisGridKey(e);
+    if(track==='grid')return; // touches gérées par la couche plein écran (_sgrKeyDown)
     if(track==='hybrid')return this._sourisHybridKey(e);
     // 'tiles' : écouteurs keydown/keyup dédiés (tenues de touche), rien à faire ici.
     // 'mouse' : géré par son propre listener ZQSD, rien à faire ici.
@@ -9558,6 +9709,8 @@ const app={
     full:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
     x:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
     play:'<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>',
+    snd:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4 4 0 010 6M18 6.5a7.5 7.5 0 010 11"/></svg>',
+    mute:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>',
   },
 
   _sfsOpen(){
@@ -10524,155 +10677,504 @@ const app={
   },
 
   /* ═══════════════════════════════════════════════════════════════
-     VISÉE — GRILLE RÉFLEXE (piste "grid")
-     9 cases fixes (Q S D / F G H / J K L). Une case s'allume en vert
-     = cible à taper. Plus tard : deux cibles à la fois, puis une case
-     piège (rouge) qui ne doit surtout pas être tapée. 100% clavier.
+     VISÉE · GRILLE RÉFLEXE (piste "grid") : plein écran, design
+     "papier et mascotte". Une touche s'allume en vert : on tape sa
+     lettre. Dès quelques réussites une 2e touche s'allume, puis des
+     touches rouges (pièges) à ne pas taper. 100 % clavier.
+
+     4 niveaux, une rangée du clavier à la fois : le milieu (Q S D F G H J
+     K L M), le haut (A Z E R T Y U I O P), le bas (W X C V B N), puis tout le
+     clavier. On débloque le niveau suivant avec une médaille de bronze.
+
+     Même architecture que Précision souris : couche plein écran #sgr créée
+     une fois, éléments mis à jour sans réécrire la page, horloge de jeu
+     propre (la pause gèle vraiment le jeu), Échap = pause, deux sorties
+     visibles, le bouton Retour du navigateur ferme la couche.
      ═══════════════════════════════════════════════════════════════ */
-  _sourisGridLetters:['q','s','d','f','g','h','j','k','l'],
-  _sourisGridBrief(){
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
-        <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
-          <div style="color:var(--accent)">${ICONS.grid}</div>
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Grille réflexe</h2>
-          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:420px;margin:0">Une case s'allume en vert : tape sa lettre. Ça se corse vite : deux cases à la fois, puis des cases <b style="color:#E5484D">pièges</b> à ne surtout pas taper.</p>
-          <div style="display:flex;gap:26px;margin-top:4px">
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${this._sourisTiers.grid.bronze} · 🥈${this._sourisTiers.grid.silver} · 🥇${this._sourisTiers.grid.gold}</div></div>
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">VIES</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px;color:var(--accent)">♥♥♥</div></div>
-          </div>
-          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisGridStart()">Commencer</button>
-        </div>
+  // Réglages communs (durées en ms) ; chaque niveau peut les surcharger (tune).
+  // Calibrés par simulation de joueurs virtuels : voir scripts/grille-calibration.js
+  // (les seuils de médaille en découlent : ne pas les modifier sans relancer l'outil).
+  _sgrBase:{left:45000,spawnMs:260,dur0:2400,durMin:1400,durStep:25,twoFrom:5,trapFrom:12,lives:3,slots:9},
+  // pool : lettres tirées au dernier moment dans l'un des 9 emplacements vides.
+  // tiers : seuils de médaille du niveau.
+  _sgrLevels:[
+    {n:1,id:'r1',name:'Rangée du milieu',short:'Milieu',intro:'Les lettres de la rangée de repos (Q S D F G H J K L M) apparaissent au dernier moment, dans l’une des neuf cases.',
+     pool:'QSDFGHJKLM',tiers:{bronze:150,silver:245,gold:345},tune:{dur0:3000,durMin:1800,durStep:20}},
+    {n:2,id:'r2',name:'Rangée du haut',short:'Haut',intro:'Les lettres de la rangée du haut (A Z E R T Y U I O P) apparaissent au dernier moment. Tes doigts montent puis reviennent à leur place.',
+     pool:'AZERTYUIOP',tiers:{bronze:120,silver:205,gold:310},tune:{dur0:3000,durMin:1800,durStep:20}},
+    {n:3,id:'r3',name:'Rangée du bas',short:'Bas',intro:'Les lettres de la rangée du bas (W X C V B N) apparaissent au dernier moment. Tes doigts descendent, la rangée la plus difficile à atteindre.',
+     pool:'WXCVBN',tiers:{bronze:105,silver:175,gold:265},tune:{dur0:3200,durMin:2000,durStep:20}},
+    {n:4,id:'r4',name:'Tout le clavier',short:'Expert',intro:'Les lettres de tout le clavier apparaissent au dernier moment, n’importe lesquelles. À toi de retrouver la touche.',
+     pool:'AZERTYUIOPQSDFGHJKLMWXCVBN',tiers:{bronze:100,silver:230,gold:335},tune:{}},
+  ],
+  _sgrLevel(n){return this._sgrLevels[(n||1)-1]||this._sgrLevels[0];},
+  _sgrTuneOf(n){return Object.assign({},this._sgrBase,this._sgrLevel(n).tune);},
+  // Lettres jouables du niveau
+  _sgrPoolOf(n){return this._sgrLevel(n).pool.split('');},
+
+  _sgrEl(){return document.getElementById('sgr');},
+
+  // Ancien record unique (grille 3×3 sur la rangée du milieu) : repris comme record du niveau 1
+  _sgrMigrate(){
+    if(!this.stats)return;
+    const b=this.stats.sourisGridBest;
+    if(b&&typeof b.score==='number')this.stats.sourisGridBest={r1:b};
+  },
+  // Meilleur score d'un niveau, médaille ou non (un débutant sans bronze a aussi un record à battre)
+  _sgrTop(n){
+    const L=this._sgrLevel(n),st=this.stats||{};
+    const top=(st.sourisGridTop&&st.sourisGridTop[L.id])||0,med=(this._sgrBests()[L.id]||{}).score||0;
+    return Math.max(top,med);
+  },
+  _sgrBests(){this._sgrMigrate();const b=this.stats&&this.stats.sourisGridBest;return(b&&typeof b==='object')?b:{};},
+  _sgrUnlocked(){
+    const b=this._sgrBests();let u=1;
+    for(const l of this._sgrLevels){if(b[l.id])u=Math.max(u,Math.min(4,l.n+1));}
+    return u;
+  },
+  // Niveau conseillé : le premier niveau débloqué sans médaille, sinon le dernier débloqué
+  _sgrSuggest(){
+    const b=this._sgrBests(),u=this._sgrUnlocked();
+    for(let n=1;n<=u;n++){if(!b[this._sgrLevel(n).id])return n;}
+    return u;
+  },
+
+  _sgrOpen(){
+    if(this._sgrEl())return;
+    const I=this._sfsIc;
+    const o=document.createElement('div');
+    o.id='sgr';o.className='sgr';
+    o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Grille réflexe');
+    o.innerHTML=`<header class="sgr-bar">
+      <button class="sgr-btn" type="button" onclick="app._sgrQuit()">${I.back}<span>Jeux</span></button>
+      <div class="sgr-ttl"><small id="sgr-lvl">Précision</small><b id="sgr-name">Grille réflexe</b></div>
+      <div class="sgr-bar-r">
+        <button class="sgr-btn" id="sgr-pause" type="button" onclick="app._sgrPause()" title="Pause (Échap)" hidden>${I.pause}<span>Pause</span></button>
+        <button class="sgr-btn sq" id="sgr-snd" type="button" onclick="app._sgrToggleSound()">${isSoundMuted()?I.mute:I.snd}</button>
+        <button class="sgr-btn sq" id="sgr-fs" type="button" onclick="app._sgrToggleFs()" title="Plein écran du navigateur" aria-label="Plein écran du navigateur">${I.full}</button>
+        <button class="sgr-btn quit" type="button" onclick="app._sgrQuit()" title="Quitter et revenir aux jeux">${I.x}<span>Quitter</span></button>
       </div>
+    </header>
+    <div class="sgr-stage" id="sgr-stage">
+      <div class="sgr-hud">
+        <div class="sgr-sc" id="sgr-sc"><b id="sgr-score">0</b><small>pts</small><div class="sgr-best" id="sgr-best"></div></div>
+        <div class="sgr-mid"><div class="sgr-tbar"><i id="sgr-tb"></i></div><div class="sgr-tsec"><span id="sgr-ts">45 s</span><span class="sgr-combo" id="sgr-cb"></span></div></div>
+        <div class="sgr-lv" id="sgr-lv"></div>
+      </div>
+      <div class="sgr-hint" id="sgr-hint">Tape la lettre qui s’allume en vert</div>
+      <div class="sgr-bw">
+        <div class="sgr-board" id="sgr-board"></div>
+        <div class="sgr-fx" id="sgr-fx"></div>
+        <div class="sgr-count" id="sgr-count"></div>
+      </div>
+      <div class="sgr-mascot"><div class="sgr-mw"><div class="sgr-bubble" id="sgr-bub"></div><img id="sgr-mas" src="images/keypace-mascot-cheer.webp" alt=""></div></div>
     </div>`;
+    ['selectstart','dragstart','contextmenu'].forEach(ev=>o.addEventListener(ev,e=>e.preventDefault()));
+    document.body.appendChild(o);
+    document.body.classList.add('sgr-open');
+    this._sgrHudCache={};this._sgrBuiltLvl=0;this._sgrSyncSound();
+    this._sgrKD=(e)=>this._sgrKeyDown(e);
+    this._sgrAway=()=>{const s=this.souris;if(s&&s.phase==='play')this._sgrPause();};
+    this._sgrVis=()=>{if(document.hidden)this._sgrAway();};
+    this._sgrFsH=()=>{const b=document.getElementById('sgr-fs');if(b)b.setAttribute('aria-pressed',document.fullscreenElement?'true':'false');};
+    window.addEventListener('keydown',this._sgrKD);
+    window.addEventListener('blur',this._sgrAway);
+    document.addEventListener('visibilitychange',this._sgrVis);
+    document.addEventListener('fullscreenchange',this._sgrFsH);
+    try{history.pushState({kpSgr:1},'',location.href);this._sgrHist=true;}catch{this._sgrHist=false;}
   },
-  _sourisGridStart(){
+  // Plateau : 9 emplacements vides, identiques à tous les niveaux
+  _sgrBuildBoard(n){
+    const b=document.getElementById('sgr-board');if(!b)return;
+    const cell=(id)=>`<div class="sgr-cell" data-id="${id}"><div class="sgr-cap"><span class="lt"></span><i class="tm"><b></b></i><em class="x">✕</em></div></div>`;
+    b.innerHTML=Array.from({length:this._sgrBase.slots},(_,i)=>cell('s'+i)).join('');
+    this._sgrCells={};b.querySelectorAll('.sgr-cell').forEach(c=>{this._sgrCells[c.dataset.id]=c;});
+    this._sgrBuiltLvl=n;
+  },
+  _sgrClose(viaPop){
+    this._sgrStopLoop();
+    const o=this._sgrEl();
+    if(o)o.remove();
+    document.body.classList.remove('sgr-open');
+    if(this._sgrKD){
+      window.removeEventListener('keydown',this._sgrKD);window.removeEventListener('blur',this._sgrAway);
+      document.removeEventListener('visibilitychange',this._sgrVis);document.removeEventListener('fullscreenchange',this._sgrFsH);
+      this._sgrKD=this._sgrAway=this._sgrVis=this._sgrFsH=null;
+    }
+    this._sgrCells=null;this._sgrHudCache=null;this._sgrBuiltLvl=0;
+    try{if(document.fullscreenElement)document.exitFullscreen();}catch{}
+    if(this._sgrHist&&!viaPop){
+      this._sgrHist=false;
+      if(history.state&&history.state.kpSgr){
+        this._ignorePop=true;setTimeout(()=>{this._ignorePop=false;},600);
+        try{history.back();}catch{this._ignorePop=false;}
+      }
+    }
+    this._sgrHist=false;
+  },
+  _sgrStopLoop(){
+    if(this._sgrLoop){clearInterval(this._sgrLoop);this._sgrLoop=null;}
+    if(this._sgrCdT){clearTimeout(this._sgrCdT);this._sgrCdT=null;}
+    if(this._sgrCntT){clearTimeout(this._sgrCntT);this._sgrCntT=null;}
+    if(this._sgrBubT){clearTimeout(this._sgrBubT);this._sgrBubT=null;}
+  },
+  // Retour du navigateur
+  _sgrFromPop(){
+    this._sgrHist=false;
+    this._sgrClose(true);
     this.stopSouris();
-    this.souris={phase:'play',track:'grid',score:0,combo:0,bestCombo:0,lives:3,hits:0,misses:0,streakRun:0,bestStreak:0,
-      cells:this._sourisGridLetters.map(l=>({letter:l,state:null,life:0,dur:0})),sessionLeft:45000,spawnAcc:0};
-    this.renderSouris();
-    this._sourisLoop=setInterval(()=>this._sourisGridTick(),50);
+    this.exitActiveGame();
   },
-  _sourisGridDifficulty(){
-    const s=this.souris;
-    if(s.hits>=12)return{targets:2,traps:1};
-    if(s.hits>=5)return{targets:2,traps:0};
-    return{targets:1,traps:0};
+  _sgrQuit(){this._sgrClose();this.exitActiveGame();},
+  _sgrToggleFs(){
+    const o=this._sgrEl();if(!o)return;
+    try{
+      if(document.fullscreenElement)document.exitFullscreen();
+      else if(o.requestFullscreen)o.requestFullscreen();
+      else if(o.webkitRequestFullscreen)o.webkitRequestFullscreen();
+    }catch{}
   },
-  _sourisGridSpawn(){
-    const s=this.souris,diff=this._sourisGridDifficulty();
-    const dur=Math.max(1100,2000-s.hits*30);
-    const activeTargets=s.cells.filter(c=>c.state==='target').length;
-    let free=s.cells.filter(c=>!c.state);
-    if(activeTargets<diff.targets&&free.length){
-      const pick=free[Math.floor(Math.random()*free.length)];
-      pick.state='target';pick.life=dur;pick.dur=dur;
+  _sgrToggleSound(){
+    setSoundMuted(!isSoundMuted());
+    this._sgrSyncSound();
+    if(!isSoundMuted())playSound('hit');
+  },
+  _sgrSyncSound(){
+    const b=document.getElementById('sgr-snd');if(!b)return;
+    const m=isSoundMuted(),I=this._sfsIc;
+    b.innerHTML=m?I.mute:I.snd;
+    b.title=m?'Remettre le son':'Couper le son';b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed',m?'true':'false');
+  },
+  // Échap : pause, reprise, ou un cran en arrière
+  _sgrEsc(){
+    const s=this.souris;if(!s)return;
+    if(s.phase==='play')this._sgrPause();
+    else if(s.phase==='paused')this._sgrResume();
+    else if(s.phase==='countdown'&&s.fresh){this._sgrStopLoop();s.phase='brief';this._sgrRender();}
+    else if(s.phase==='countdown'){this._sgrStopLoop();s.phase='paused';this._sgrRender();}
+    else this._sgrQuit();
+  },
+  _sgrKeyDown(e){
+    const s=this.souris;if(!s||s.track!=='grid')return;
+    if(e.key==='Escape')return; // géré par le gestionnaire global
+    if(e.ctrlKey||e.metaKey||e.altKey)return;
+    const ph=s.phase;
+    if(ph==='play'&&e.key&&e.key.length===1){
+      const k=e.key.toUpperCase();
+      if(this._sgrPoolOf(s.lvl).includes(k)){e.preventDefault();this._sgrKey(k);}
+      return;
     }
-    const activeTraps=s.cells.filter(c=>c.state==='trap').length;
-    free=s.cells.filter(c=>!c.state);
-    if(activeTraps<diff.traps&&free.length){
-      const pick=free[Math.floor(Math.random()*free.length)];
-      pick.state='trap';pick.life=dur;pick.dur=dur;
+    if(e.code==='Space'||e.key===' '||e.key==='Enter'){
+      const ae=document.activeElement;
+      if(ae&&ae.tagName==='BUTTON')return;
+      if(ph==='brief'){e.preventDefault();this._sgrBegin();}
+      else if(ph==='paused'){e.preventDefault();this._sgrResume();}
+      else if(ph==='end'){e.preventDefault();this._sgrPrimary();}
     }
   },
-  _sourisGridTick(){
+
+  /* ── Rendu ──────────────────────────────────────────────────── */
+
+  _sgrRender(){
+    const s=this.souris;if(!s)return;
+    this._sgrOpen();
+    if(!s.lvl)s.lvl=this._sgrSuggest();
+    if(this._sgrBuiltLvl!==s.lvl)this._sgrBuildBoard(s.lvl);
+    const ph=s.phase,L=this._sgrLevel(s.lvl);
+    const set=(id,t)=>{const el=document.getElementById(id);if(el&&el.textContent!==t)el.textContent=t;};
+    set('sgr-lvl','Niveau '+L.n+' sur 4');set('sgr-name',L.name);
+    const pb=document.getElementById('sgr-pause');if(pb)pb.hidden=!(ph==='play'||(ph==='countdown'&&!s.fresh));
+    this._sgrCellsUpdate();this._sgrHud();
+    const ov=document.getElementById('sgr-ov');
+    if(ph==='brief'||ph==='paused'||ph==='end'){
+      if(!ov||ov.dataset.ph!==ph||ov.dataset.lvl!==String(s.lvl)){
+        if(ph==='brief')this._sgrShowBrief();else if(ph==='paused')this._sgrShowPause();else this._sgrShowEnd();
+      }
+    }else if(ov)ov.remove();
+  },
+  _sgrCellsUpdate(){
+    const s=this.souris;if(!s||!this._sgrCells)return;
+    const cells=s.cells||[];
+    for(const id in this._sgrCells){
+      const el=this._sgrCells[id],c=cells.find(x=>x.id===id);
+      const t=!!c&&c.state==='target',x=!!c&&c.state==='trap';
+      if(el._t!==t){el._t=t;el.classList.toggle('t',t);}
+      if(el._x!==x){el._x=x;el.classList.toggle('x',x);}
+      const lt=c&&c.state?c.letter:''; // la lettre n'existe qu'aux emplacements allumés
+      if(el._lt!==lt){el._lt=lt;el.querySelector('.lt').textContent=lt;if(lt){el.classList.remove('in');void el.offsetWidth;el.classList.add('in');}}
+      el.style.setProperty('--r',c&&c.state?Math.max(0,c.life/c.dur).toFixed(3):1);
+    }
+  },
+  _sgrHud(){
+    const s=this.souris,C=this._sgrHudCache;if(!s||!C)return;
+    const T=this._sgrTuneOf(s.lvl||1);
+    const set=(id,v,html)=>{if(C[id]===v)return;C[id]=v;const el=document.getElementById(id);if(el){if(html)el.innerHTML=v;else el.textContent=v;}};
+    set('sgr-score',String(s.score||0));
+    // Meilleur score du niveau : se transforme en « nouveau record » une fois dépassé
+    const bestTxt=s.beat?'<span class="g">★ Nouveau record</span>':(s.best>0?`Record <b>${s.best}</b>`:'');
+    set('sgr-best',bestTxt,true);
+    const scEl=document.getElementById('sgr-sc');if(scEl&&scEl.classList.contains('rec')!==!!s.beat)scEl.classList.toggle('rec',!!s.beat);
+    const tb=document.getElementById('sgr-tb');
+    if(tb)tb.style.transform=`scaleX(${Math.max(0,(s.left==null?T.left:s.left)/T.left).toFixed(3)})`;
+    const sec=Math.ceil(((s.left==null?T.left:s.left))/1000);
+    set('sgr-ts',sec<=10?`<span class="lo">${sec} s</span>`:sec+' s',true);
+    const lives=s.lives==null?T.lives:s.lives;
+    if(C.lives!==lives){C.lives=lives;const lv=document.getElementById('sgr-lv');if(lv)lv.innerHTML=[0,1,2].map(i=>`<i class="${i<lives?'on':''}"></i>`).join('');}
+    const combo=s.combo||0,mult=combo>=8?3:combo>=4?2:1,into=mult===3?4:(combo-(mult===2?4:0));
+    const pips=[0,1,2,3].map(i=>`<i class="${(mult===3||i<into)?'on':''}"></i>`).join('');
+    set('sgr-cb',`<span class="pp">${pips}</span><b>×${mult}</b>${mult<3?`<em>prochain ×${mult+1}</em>`:'<em>max</em>'}`,true);
+    if(s.phase==='play'){
+      const tr=(s.cells||[]).some(c=>c.state==='trap');
+      set('sgr-hint',tr?'Attention : ne tape pas les touches rouges':'Tape la lettre qui s’allume en vert');
+    }
+  },
+
+  _sgrShowCount(txt,go){
+    const el=document.getElementById('sgr-count');if(!el)return;
+    el.textContent=txt;el.className='sgr-count'+(go?' cgo':'');
+    void el.offsetWidth;el.classList.add('pop');
+    playSound(go?'go':'tick');
+    clearTimeout(this._sgrCntT);
+    this._sgrCntT=setTimeout(()=>{const e=document.getElementById('sgr-count');if(e){e.className='sgr-count';e.textContent='';}},go?900:620);
+  },
+  _sgrSay(txt,ms){
+    const b=document.getElementById('sgr-bub'),m=document.getElementById('sgr-mas');if(!b||!m)return;
+    b.textContent=txt;b.classList.add('on');
+    const mw=m.parentElement.parentElement;mw.classList.add('hop');
+    clearTimeout(this._sgrBubT);
+    this._sgrBubT=setTimeout(()=>{b.classList.remove('on');mw.classList.remove('hop');},ms||1800);
+  },
+  _sgrFxPos(id){
+    const el=this._sgrCells&&this._sgrCells[id],bw=document.querySelector('#sgr .sgr-bw');if(!el||!bw)return{x:0,y:0};
+    const r=el.getBoundingClientRect(),b=bw.getBoundingClientRect();
+    return{x:r.left-b.left+r.width/2,y:r.top-b.top+r.height/2};
+  },
+  _sgrPop(id,txt,bad){
+    const fx=document.getElementById('sgr-fx');if(!fx)return;
+    while(fx.childElementCount>6)fx.firstElementChild.remove();
+    const p=this._sgrFxPos(id),d=document.createElement('div');
+    d.className='sgr-pop'+(bad?' bad':'');d.style.left=p.x+'px';d.style.top=p.y+'px';d.textContent=txt;
+    fx.appendChild(d);setTimeout(()=>d.remove(),800);
+  },
+  _sgrPress(id){
+    const el=this._sgrCells&&this._sgrCells[id];if(!el)return;
+    el.classList.add('press');setTimeout(()=>el.classList.remove('press'),110);
+  },
+
+  /* ── Écrans : choix du niveau et règles, pause, fin ─────────── */
+
+  _sgrOv(html,ph){
+    const st=document.getElementById('sgr-stage');if(!st)return;
+    const old=document.getElementById('sgr-ov');if(old)old.remove();
+    const ov=document.createElement('div');ov.id='sgr-ov';ov.className='sgr-ov';ov.dataset.ph=ph;ov.dataset.lvl=String(this.souris.lvl);ov.innerHTML=html;
+    st.appendChild(ov);
+    const b=ov.querySelector('[data-focus]');if(b&&!b.disabled)b.focus({preventScroll:true});
+  },
+  _sgrPick(n){
+    const s=this.souris;if(!s||n>this._sgrUnlocked())return;
+    s.lvl=n;this._sgrRender();
+  },
+  _sgrMini(){return `<span class="sgr-mini">${[0,1,2].map(()=>`<span class="sgr-mr"><i></i><i></i><i></i></span>`).join('')}</span>`;},
+  _sgrShowBrief(){
+    const s=this.souris,L=this._sgrLevel(s.lvl),T=this._sgrTuneOf(s.lvl),I=this._sfsIc;
+    const bests=this._sgrBests(),unlocked=this._sgrUnlocked();
+    const best=this._sgrTop(L.n);
+    const needKb=matchMedia('(hover:none)').matches;
+    const tierName={gold:'Or',silver:'Argent',bronze:'Bronze'};
+    const picker=this._sgrLevels.map(l=>{
+      const open=l.n<=unlocked,b=bests[l.id],sel=l.n===s.lvl;
+      const st=!open?`<span class="sgr-lst lock">Valide le niveau ${l.n-1}</span>`:b?`<span class="sgr-lst done">${this._sfsMedalSvg(b.tier,16)}${tierName[b.tier]||'Validé'}</span>`:`<span class="sgr-lst todo">${sel?'Choisi':'À faire'}</span>`;
+      return `<button type="button" class="sgr-lv-card${sel?' sel':''}${open?'':' locked'}" ${open?`onclick="app._sgrPick(${l.n})"`:'disabled'} aria-label="Niveau ${l.n}, ${this._esc(l.name)}">
+        ${this._sgrMini()}<b>${this._esc(l.short)}</b><em class="sgr-lt">${l.pool.length>10?'26 lettres':l.pool}</em>${st}</button>`;
+    }).join('');
+    this._sgrOv(`<div class="sgr-card">
+      <img class="sgr-cm" src="images/keypace-mascot-cheer.webp" alt="">
+      <div class="sgr-kick">Niveau ${L.n} sur 4</div><h2>${this._esc(L.name)}</h2>
+      <p class="sgr-intro">${this._esc(L.intro)}</p>
+      <div class="sgr-pick">${picker}</div>
+      <ol class="sgr-rules"><li>Une case <b>s’allume en vert</b> et révèle une lettre : tape-la au clavier.</li><li>Elle s’éteint vite. Une touche verte ratée te coûte <b>1 vie</b>.</li><li>Après ${T.trapFrom} réussites, des <b>touches rouges</b> apparaissent : ne les tape pas.</li></ol>
+      <div class="sgr-legend"><span><i style="background:#1FA971"></i>Verte : à taper</span><span><i style="background:#E5484D"></i>Rouge : piège, ne tape pas</span></div>
+      <div class="sgr-meds"><span class="b">Bronze ${L.tiers.bronze}</span><span class="s">Argent ${L.tiers.silver}</span><span class="g">Or ${L.tiers.gold}</span><span>${T.lives} vies</span><span>${T.left/1000} secondes</span>${best?`<span class="r">Ton record ${best}</span>`:''}</div>
+      <p class="sgr-sub"><b>4 réussites de suite</b> doublent tes points, <b>8 de suite</b> les triplent. Une erreur ou une touche à côté remet le combo à zéro.</p>
+      ${needKb?'<p class="sgr-warn">Ce jeu se joue au clavier. Reviens sur un ordinateur pour y jouer.</p>':''}
+      <div class="sgr-row2"><button class="sgr-go" type="button" data-focus ${needKb?'disabled':''} onclick="app._sgrBegin()">${I.play}<span>Commencer</span></button></div>
+      <span class="sgr-keyh">ou appuie sur Espace</span></div>`,'brief');
+  },
+  _sgrShowPause(){
+    const I=this._sfsIc,L=this._sgrLevel(this.souris.lvl);
+    this._sgrOv(`<div class="sgr-card"><div class="sgr-kick">En pause</div><h2>${this._esc(L.name)}</h2>
+      <ol class="sgr-rules"><li>Tape la lettre de la touche <b>verte</b>.</li><li>Ne tape jamais les touches <b>rouges</b>.</li><li>Une touche verte ratée coûte <b>1 vie</b>.</li></ol>
+      <div class="sgr-row2"><button class="sgr-go" type="button" data-focus onclick="app._sgrResume()">${I.play}<span>Reprendre</span></button><button class="sgr-sec" type="button" onclick="app._sgrBegin()">Recommencer</button><button class="sgr-sec" type="button" onclick="app._sgrQuit()">Quitter vers les jeux</button></div>
+      <span class="sgr-keyh">Échap ou Espace pour reprendre</span></div>`,'paused');
+  },
+  _sgrShowEnd(){
+    const s=this.souris,L=this._sgrLevel(s.lvl),r=s._result||{},t=r.tier,tiers=L.tiers,I=this._sfsIc;
+    const tv={gold:['#FFD84D','#B98300','Médaille d’or'],silver:['#E3E7ED','#7D8794','Médaille d’argent'],bronze:['#E39A5B','#8F4F20','Médaille de bronze']}[t];
+    const medal=t?`<svg viewBox="0 0 64 64" width="92" height="92" aria-hidden="true"><path d="M19 3h10l5 15H24z" fill="#FF4D2E"/><path d="M45 3H35l-5 15h10z" fill="#C93A20"/><circle cx="32" cy="40" r="20" fill="${tv[0]}" stroke="${tv[1]}" stroke-width="2"/><path d="M32 28l3.4 6.9 7.6 1.1-5.5 5.3 1.3 7.6L32 45.4l-6.8 3.5 1.3-7.6-5.5-5.3 7.6-1.1z" fill="${tv[1]}" opacity=".55"/></svg>`
+      :`<img class="sgr-cm" src="images/keypace-mascot-cheer.webp" alt="">`;
+    const next=t==='gold'?null:t==='silver'?['or',tiers.gold]:t==='bronze'?['argent',tiers.silver]:['bronze',tiers.bronze];
+    const prog=next?`<div class="sgr-nx">${t?'Prochain palier':'Pour valider le niveau'} : <b>${next[0]} à ${next[1]} points</b>${s.score<next[1]?', il t’en manquait '+(next[1]-s.score):''}<div class="bar2"><i style="width:${Math.min(100,s.score/next[1]*100)}%"></i></div></div>`:'<div class="sgr-nx"><b>Or décroché.</b> Tu ne peux pas faire mieux sur ce niveau.</div>';
+    let tip='Bien joué. Enchaîne plus de réussites d’affilée pour faire monter le combo.';
+    if(s.traps>=2)tip='Tu as tapé des touches rouges. Regarde la couleur avant de taper : vert oui, rouge non.';
+    else if(s.expired>=3)tip='Des touches se sont éteintes avant ta frappe. Garde les yeux sur tout le clavier, pas seulement sur une touche.';
+    else if(s.stray>=4)tip='Plusieurs touches à côté ont cassé ton combo. Pose bien tes doigts sur la rangée de repos et ne tape que la lettre allumée.';
+    const mc=s.bestCombo>=8?3:s.bestCombo>=4?2:1;
+    const nextLvl=t&&L.n<4;
+    this._sgrOv(`<div class="sgr-card"><div>${medal}</div>
+      <h2>${t?tv[2]:'Pas cette fois'}</h2>
+      ${(s._newTop||r.isNewBest)?'<div class="sgr-rec">Nouveau record sur ce niveau !</div>':''}
+      <div class="sgr-final"><b>${s.score}</b><span>points</span></div>
+      ${(!s._newTop&&s._prevTop>0)?`<div class="sgr-prevtop">Ton record : <b>${s._prevTop}</b></div>`:''}
+      <div class="sgr-stats"><div><b>${s.hits}</b><small>réussites</small></div><div><b>${s._acc}%</b><small>précision</small></div><div><b>×${mc}</b><small>meilleur combo</small></div><div><b>${s.bestCombo}</b><small>meilleure série</small></div></div>
+      ${prog}<p class="sgr-tip">${tip}</p>
+      <div class="sgr-row2"><button class="sgr-go" type="button" data-focus onclick="app._sgrPrimary()">${I.play}<span>${nextLvl?'Niveau '+(L.n+1):'Rejouer'}</span></button><button class="sgr-sec" type="button" onclick="app._sgrRules()">${nextLvl?'Rejouer ou changer de niveau':'Règles et niveaux'}</button><button class="sgr-sec" type="button" onclick="app._sgrQuit()">Retour aux jeux</button></div></div>`,'end');
+    this._sgrSay(t?'Bravo, quel score !':'On recommence, tu vas y arriver !',3200);
+  },
+  _sgrRules(){const s=this.souris;if(!s)return;this._sgrStopLoop();s.phase='brief';this._sgrRender();},
+  // Bouton principal de l'écran de fin : niveau suivant si validé, sinon rejouer
+  _sgrPrimary(){
+    const s=this.souris;if(!s)return;
+    const L=this._sgrLevel(s.lvl),r=s._result||{};
+    if(r.tier&&L.n<4){s.lvl=L.n+1;this._sgrRules();}
+    else this._sgrBegin();
+  },
+
+  /* ── Déroulement d'une partie ───────────────────────────────── */
+
+  _sgrReset(){
+    const s=this.souris,T=this._sgrTuneOf(s.lvl||1);
+    const cells=Array.from({length:T.slots},(_,i)=>({id:'s'+i,letter:null,state:null,life:0,dur:0}));
+    Object.assign(s,{cells,score:0,combo:0,bestCombo:0,lives:T.lives,hits:0,misses:0,
+      traps:0,expired:0,stray:0,left:T.left,spawnAcc:0,clock:0,cd:3,_result:null,_acc:0,best:this._sgrTop(s.lvl||1),beat:false,_newTop:false});
+  },
+  _sgrBegin(){
+    const s=this.souris;if(!s||s.track!=='grid')return;
+    if(!s.lvl)s.lvl=this._sgrSuggest();
+    this._sgrStopLoop();this._sgrReset();s.fresh=true;
+    this._sgrCountdown(3,700);
+  },
+  _sgrResume(){
+    const s=this.souris;if(!s||s.phase!=='paused')return;
+    s.fresh=false;this._sgrCountdown(3,450);
+  },
+  _sgrCountdown(n,ms){
+    const s=this.souris;if(!s)return;
+    s.phase='countdown';s.cd=n;this._sgrRender();
+    const step=()=>{
+      const st=this.souris;if(!st||st.phase!=='countdown')return;
+      this._sgrShowCount(String(st.cd));
+      this._sgrCdT=setTimeout(()=>{
+        const s2=this.souris;if(!s2||s2.phase!=='countdown')return;
+        s2.cd--;if(s2.cd>0)step();else this._sgrGo();
+      },ms);
+    };step();
+  },
+  _sgrGo(){
+    const s=this.souris;if(!s)return;
+    s.phase='play';s.fresh=false;
+    this._sgrShowCount('C’est parti !',true);
+    if(!s.hits)this._sgrSay('Allez, on y va !',1400);
+    this._sgrRender();
+    this._sgrLoop=setInterval(()=>this._sgrTick(),50);
+  },
+  _sgrPause(){
     const s=this.souris;if(!s||s.phase!=='play')return;
-    s.sessionLeft-=50;
-    if(s.sessionLeft<=0){this._sourisGridEnd();return;}
-    s.cells.forEach(c=>{
-      if(!c.state||s.phase!=='play')return;
+    this._sgrStopLoop();s.phase='paused';this._sgrRender();
+  },
+  _sgrDur(){const s=this.souris,T=this._sgrTuneOf(s.lvl);return Math.max(T.durMin,T.dur0-s.hits*T.durStep);},
+  // Libère une case : elle redevient vide, sans lettre
+  _sgrClear(c){c.state=null;c.letter=null;},
+  _sgrSpawn(){
+    const s=this.souris,T=this._sgrTuneOf(s.lvl),d=s.hits>=T.trapFrom?{t:2,x:1}:s.hits>=T.twoFrom?{t:2,x:0}:{t:1,x:0},dur=this._sgrDur();
+    // La lettre est tirée à l'apparition dans les lettres du niveau, différente de celles déjà allumées
+    const light=(c,st)=>{
+      c.state=st;c.life=c.dur=dur;
+      const used=s.cells.filter(x=>x.state&&x!==c).map(x=>x.letter);
+      const pool=this._sgrPoolOf(s.lvl).filter(l=>!used.includes(l));
+      c.letter=pool[Math.floor(Math.random()*pool.length)];
+    };
+    let free=s.cells.filter(c=>!c.state);
+    if(s.cells.filter(c=>c.state==='target').length<d.t&&free.length)light(free[Math.floor(Math.random()*free.length)],'target');
+    free=s.cells.filter(c=>!c.state);
+    if(s.cells.filter(c=>c.state==='trap').length<d.x&&free.length)light(free[Math.floor(Math.random()*free.length)],'trap');
+  },
+  _sgrTick(){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    const T=this._sgrTuneOf(s.lvl);
+    s.clock+=50;s.left-=50;
+    if(s.left<=0){s.left=0;this._sgrEnd();return;}
+    for(const c of s.cells){
+      if(!c.state)continue;
       c.life-=50;
       if(c.life<=0){
         if(c.state==='target'){
-          s.misses++;s.combo=0;s.streakRun=0;playSound('miss');this._flashArena('#E5484D');
-          c.state=null;s.lives--;
-          if(s.lives<=0){this._sourisGridEnd();return;}
-        } else c.state=null;
+          s.misses++;s.expired++;s.combo=0;s.lives--;
+          playSound('late');this._sgrPop(c.id,'Trop tard',true);
+          this._sgrSay('Trop tard, vise plus vite la prochaine.',2000);
+          this._sgrClear(c);
+          if(s.lives<=0){s.lives=0;this._sgrEnd();return;}
+        }else this._sgrClear(c);
       }
-    });
-    if(s.phase!=='play')return;
-    s.spawnAcc+=50;
-    if(s.spawnAcc>=260){s.spawnAcc=0;this._sourisGridSpawn();}
-    this.renderSouris();
-  },
-  _sourisGridKey(e){
-    const k=(e._composedKey||e.key||'').toLowerCase();
-    if(k.length!==1)return;
-    const s=this.souris;
-    const cell=s.cells.find(c=>c.letter===k&&c.state);
-    if(!cell)return;
-    e.preventDefault();
-    if(cell.state==='trap'){
-      s.misses++;s.combo=0;s.streakRun=0;s.lives--;
-      playSound('miss');this._flashArena('#E5484D');
-      cell.state=null;
-      if(s.lives<=0){this._sourisGridEnd();return;}
-    } else {
-      const mult=s.combo>=8?3:s.combo>=4?2:1;
-      s.score+=1*mult;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
-      s.streakRun++;s.bestStreak=Math.max(s.bestStreak,s.streakRun);
-      playSound('hit');this._flashArena('#1FA971');
-      cell.state=null;
     }
-    this.renderSouris();
+    s.spawnAcc+=50;
+    if(s.spawnAcc>=T.spawnMs){s.spawnAcc=0;this._sgrSpawn();}
+    this._sgrCellsUpdate();this._sgrHud();
   },
-  _sourisGridEnd(){
-    if(this.souris.phase==='end')return;
-    this.stopSouris();
-    const s=this.souris;
-    const acc=(s.hits+s.misses)?Math.round(100*s.hits/(s.hits+s.misses)):0;
-    const res=this._sourisFinishTrack('grid',{score:s.score,thresholds:this._sourisTiers.grid,extra:{combo:s.bestCombo},sessionResult:{hits:s.hits,combo:s.bestCombo,streakRun:s.bestStreak}});
-    s.phase='end';s._result=res;s._acc=acc;
-    this.renderSouris();
+  // Hauteur du son de réussite : gamme pentatonique qui monte avec la série
+  // Dix notes (deux octaves de gamme pentatonique) qui montent sans jamais redescendre ; au-delà, la dernière octave se répète
+  _sgrPitch(n){const L=[1,1.122,1.26,1.498,1.682,2,2.245,2.52,2.996,3.364];return .5*L[n<10?n:5+(n%5)];},
+  _sgrKey(L){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    const c=s.cells.find(x=>x.letter===L&&x.state);
+    if(!c){ // touche à côté : seul le combo en pâtit
+      if(s.combo>0){this._sgrPop((s.cells.find(x=>x.state)||s.cells[0]).id,'Combo perdu',true);playSound('stray');}
+      s.combo=0;s.stray++;
+      this._sgrHud();return;
+    }
+    this._sgrPress(c.id);
+    if(c.state==='trap'){
+      s.misses++;s.traps++;s.combo=0;s.lives--;
+      playSound('trap');this._sgrPop(c.id,'Piège',true);
+      this._sgrSay('Oups, les touches rouges sont des pièges.',2200);
+      this._sgrClear(c);
+      if(s.lives<=0){s.lives=0;this._sgrEnd();return;}
+    }else{
+      const m=s.combo>=8?3:s.combo>=4?2:1;
+      s.score+=m;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
+      playSound('hit',{pitch:this._sgrPitch(s.combo-1)});this._sgrPop(c.id,'+'+m);
+      if(s.combo===4){playSound('combo2');this._sgrSay('Combo ×2, continue !');}
+      else if(s.combo===8){playSound('combo3');this._sgrSay('Combo ×3, incroyable !');}
+      else if(s.hits===1)this._sgrSay('Bien joué !');
+      else if(s.hits===this._sgrTuneOf(s.lvl).trapFrom)this._sgrSay('Les touches rouges arrivent, fais attention.',2400);
+      if(s.best>0&&!s.beat&&s.score>s.best){ // premier dépassement du record : une seule fois par partie
+        s.beat=true;setTimeout(()=>playSound('recordbeat'),180);this._sgrSay('Nouveau record !',2600);
+      }
+      this._sgrClear(c);
+    }
+    this._sgrCellsUpdate();this._sgrHud();
   },
-  _sourisGridRender(){
-    const s=this.souris;
-    if(s.phase==='brief')return this._sourisGridBrief();
-    if(s.phase==='end')return this._sourisGridEndScreen();
-    this._sourisGridArena();
+  _sgrEnd(){
+    const s=this.souris;if(!s||s.phase==='end')return;
+    this._sgrStopLoop();
+    s.cells.forEach(c=>this._sgrClear(c));
+    const tot=s.hits+s.misses,L=this._sgrLevel(s.lvl);
+    s._acc=tot?Math.round(100*s.hits/tot):0;
+    this._sgrMigrate();
+    // Meilleur score du niveau, indépendamment des médailles
+    const prevTop=this._sgrTop(s.lvl);
+    s._prevTop=prevTop;
+    if(this.stats&&currentUser&&s.score>prevTop){
+      this.stats.sourisGridTop=this.stats.sourisGridTop||{};
+      this.stats.sourisGridTop[L.id]=s.score;
+      s._newTop=prevTop>0; // un tout premier score n'est pas « un record battu »
+    }
+    s._result=this._sourisFinishTrack('grid',{score:s.score,thresholds:L.tiers,extra:{combo:s.bestCombo},subId:L.id});
+    playSound((s._result&&s._result.tier)||s._newTop?'victory':'defeat'); // record battu = bonne nouvelle, même sans médaille
+    s.phase='end';
+    this._sgrRender();
   },
-  _sourisGridArena(){
-    const s=this.souris;
-    const hearts=[0,1,2].map(i=>`<span style="font-size:19px;color:${i<s.lives?'var(--accent)':'rgba(255,255,255,0.18)'}">♥</span>`).join('');
-    const cellsHtml=s.cells.map(c=>{
-      const isTarget=c.state==='target', isTrap=c.state==='trap';
-      const bg=isTarget?'radial-gradient(circle at 35% 30%,rgba(31,169,113,.4),rgba(31,169,113,.12) 70%)':isTrap?'radial-gradient(circle at 35% 30%,rgba(229,72,77,.4),rgba(229,72,77,.12) 70%)':'rgba(255,255,255,.05)';
-      const bd=isTarget?'2.5px solid #1FA971':isTrap?'2.5px solid #E5484D':'1.5px dashed rgba(255,255,255,.16)';
-      const col=isTarget?'#1FA971':isTrap?'#E5484D':'rgba(255,255,255,.35)';
-      const op=c.state?Math.max(.35,c.life/c.dur):1;
-      return `<div style="aspect-ratio:1;border-radius:14px;background:${bg};border:${bd};display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:${col};opacity:${op};transition:background .1s,border-color .1s">${c.letter}</div>`;
-    }).join('');
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:520px;margin:0 auto;padding:0 24px">
-        <div class="game-arena" style="height:auto;padding:16px 20px 20px">
-          <div class="game-hud">
-            <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
-            <div style="display:flex;gap:1px">${hearts}</div>
-          </div>
-          <div style="font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);text-align:center;margin:6px 0 14px">${s.combo>1?'Combo ×'+s.combo+' · ':''}Tape la lettre qui s'allume en vert. Les cases sombres sont des pièges.</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">${cellsHtml}</div>
-        </div>
-        <div style="text-align:center;margin-top:10px"><button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button></div>
-      </div>
-    </div>`;
-  },
-  _sourisGridEndScreen(){
-    const s=this.souris,r=s._result;
-    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <div class="game-arena" style="height:auto;padding:28px 20px">
-          ${this._gameResult({
-            icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-            record:r.isNewBest?'Nouveau record sur cette piste !':null,
-            boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%'}],
-            primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisGridStart()',
-          })}
-        </div>
-      </div>
-    </div>`;
-  },
+  // Point d'entrée du routeur (renderSouris) : niveaux, règles, décompte, partie, pause, fin
+  _sourisGridRender(){this._sgrRender();},
 
 
   /* ═══════════════════════════════════════════════════════════════
@@ -16557,6 +17059,7 @@ app.init();
 window.addEventListener('popstate',()=>{
   if(app._ignorePop){app._ignorePop=false;return;}
   if(app._sfsEl&&app._sfsEl()){app._sfsFromPop();return;} // Retour ferme le jeu plein ecran, pas la page
+  if(app._sgrEl&&app._sgrEl()){app._sgrFromPop();return;}
   const v=VIEW_FROM_PATH[normPath(location.pathname)]||(isTeacher()?'home':'test');
   app._popping=true;try{app.renderView(v);}finally{app._popping=false;}
 });
