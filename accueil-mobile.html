@@ -217,7 +217,7 @@ h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:27px;l
     </div>
 
     <div class="cta-stack">
-      <button class="btn btn-main" onclick="shareLink()">📩 Envoyer le lien à mon ordinateur</button>
+      <button class="btn btn-main" onclick="openSheet('sh-link')">📩 Envoyer le lien à mon ordinateur</button>
       <button class="btn btn-ghost" onclick="goTo(event,'etab')">🏫 Je représente un établissement</button>
       <p class="cta-hint">Gratuit pour commencer, aucune installation.</p>
     </div>
@@ -288,6 +288,26 @@ h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:27px;l
   </div>
 
   <div class="scrim" id="scrim" onclick="closeSheet()"></div>
+
+  <!-- Feuille : envoyer le lien par mail -->
+  <div class="sheet" id="sh-link" role="dialog" aria-modal="true" aria-label="Recevoir le lien par mail">
+    <div class="grab"></div>
+    <div data-form>
+      <h3>Reçois le lien par mail.</h3>
+      <p>Ouvre-le sur ton ordinateur et teste KeyPace gratuitement.</p>
+      <input type="email" id="lk-email" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="send" placeholder="ton.adresse@email.be" onkeydown="if(event.key==='Enter')submitLink()">
+      <input type="text" id="lk-web" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+      <div class="err" id="lk-err"></div>
+      <button class="btn btn-main" id="lk-btn" onclick="submitLink()">Envoyer le lien</button>
+    </div>
+    <div class="ok-state" data-ok hidden>
+      <div class="tick">📩</div>
+      <h3>C'est parti !</h3>
+      <p>Mail envoyé à <b id="lk-sent"></b>. Regarde ta boîte de réception (et les indésirables) : le lien t'attend.</p>
+      <button class="btn btn-ghost" onclick="openSheet('sh-link')">Ce n'est pas la bonne adresse ? Corriger</button>
+      <button class="btn btn-ghost" onclick="closeSheet()">Fermer</button>
+    </div>
+  </div>
 
   <!-- Feuille : établissement -->
   <div class="sheet" id="sh-school" role="dialog" aria-modal="true" aria-label="Démo établissement">
@@ -429,6 +449,32 @@ async function submitSchool(){
     if(!r.ok){er.textContent=d.error||'Erreur, réessayez.';btn.disabled=false;btn.textContent='Envoyer ma demande';return}
     s.querySelector('[data-form]').hidden=true;s.querySelector('[data-ok]').hidden=false;
   }catch(e){er.textContent='Erreur réseau, réessayez.';btn.disabled=false;btn.textContent='Envoyer ma demande'}
+}
+var LK_DOMAINS=['gmail.com','hotmail.com','hotmail.be','hotmail.fr','outlook.com','outlook.be','live.be','live.com','yahoo.com','yahoo.fr','icloud.com','skynet.be','telenet.be','proximus.be','belgacom.net','voo.be','msn.com','me.com'];
+function lkDist(a,b){var m=[],i,j;for(i=0;i<=a.length;i++){m[i]=[i]}for(j=0;j<=b.length;j++){m[0][j]=j}for(i=1;i<=a.length;i++)for(j=1;j<=b.length;j++){m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]===b[j-1]?0:1));if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1])m[i][j]=Math.min(m[i][j],m[i-2][j-2]+1)}return m[a.length][b.length]}
+function lkSuggest(email){
+  var d=email.split('@')[1].toLowerCase();
+  if(LK_DOMAINS.indexOf(d)>-1)return null;
+  for(var i=0;i<LK_DOMAINS.length;i++){if(lkDist(d,LK_DOMAINS[i])<=1)return email.split('@')[0]+'@'+LK_DOMAINS[i]}
+  return null;
+}
+var lkAsked=null;
+async function submitLink(){
+  var s=document.getElementById('sh-link'),er=document.getElementById('lk-err'),btn=document.getElementById('lk-btn'),inp=document.getElementById('lk-email');
+  var email=inp.value.trim().replace(/\s+/g,'');
+  inp.value=email;er.textContent='';
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)){er.textContent='Cette adresse email semble incomplète. Exemple : prenom@gmail.com';return}
+  var sug=lkSuggest(email);
+  if(sug&&lkAsked!==email){lkAsked=email;er.textContent='Tu voulais écrire '+sug+' ? Corrige l\'adresse, ou appuie encore sur Envoyer si elle est bonne.';return}
+  btn.disabled=true;btn.textContent='Envoi…';
+  try{
+    var r=await fetch('/api/institutions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'send-link',email:email,website:document.getElementById('lk-web').value})});
+    var d=await r.json().catch(function(){return {}});
+    btn.disabled=false;btn.textContent='Envoyer le lien';
+    if(!r.ok){er.textContent=d.error||'Erreur, réessaie.';return}
+    document.getElementById('lk-sent').textContent=email;
+    s.querySelector('[data-form]').hidden=true;s.querySelector('[data-ok]').hidden=false;
+  }catch(e){er.textContent='Erreur réseau, réessaie.';btn.disabled=false;btn.textContent='Envoyer le lien'}
 }
 function shareLink(){
   var u='https://keypace.be/',t='KeyPace : apprendre à taper sur un vrai clavier';

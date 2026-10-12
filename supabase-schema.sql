@@ -959,3 +959,16 @@ from classes c
 join users u on u.id = c.teacher_id
 where u.role = 'prof'
 on conflict do nothing;
+
+-- Limite d'envoi du mail « m'envoyer le lien » (version mobile, api/institutions.js
+-- action=send-link) : 2 par adresse et par jour, 5 par IP et par heure.
+-- Accès via la clé service uniquement ; RLS sans policy => anon refusé.
+create table if not exists link_mail_requests (
+  id uuid default gen_random_uuid() primary key,
+  email text not null,
+  ip text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists link_mail_requests_email_idx on link_mail_requests(email, created_at desc);
+create index if not exists link_mail_requests_ip_idx on link_mail_requests(ip, created_at desc);
+alter table link_mail_requests enable row level security;
