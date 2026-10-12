@@ -1757,7 +1757,7 @@ body.sgr-open #cookie-consent-reopen{display:none!important}
 .sgr-prevtop b{font-family:'JetBrains Mono',monospace;color:#3a3426}
 .sgr-mid{flex:1;min-width:0}
 .sgr-tbar{height:14px;border-radius:8px;background:#EDE6D6;border:1px solid #E1D8C4;overflow:hidden}
-.sgr-tbar i{display:block;height:100%;width:100%;transform-origin:left;background:linear-gradient(90deg,#FFB199,var(--accent))}
+.sgr-tbar i{display:block;height:100%;width:100%;transform-origin:left;transition:transform .06s linear;background:linear-gradient(90deg,#FFB199,var(--accent))}
 .sgr-tsec{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;margin-top:6px;display:flex;justify-content:space-between;color:var(--muted)}
 .sgr-tsec .lo{color:var(--danger)}
 .sgr-lv{display:flex;gap:7px;min-width:120px;justify-content:flex-end}
@@ -1772,7 +1772,8 @@ body.sgr-open #cookie-consent-reopen{display:none!important}
 .sgr-combo b{color:#C77D00}
 .sgr-combo em{font-style:normal;font-weight:700;opacity:.6}
 .sgr-bw{position:relative;flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
-.sgr-board{--g:clamp(8px,1.2vw,16px);--k:min(calc((min(94vw,620px) - 2*var(--g))/3),calc((100vh - 340px - 2*var(--g))/3),170px);display:grid;grid-template-columns:repeat(3,var(--k));gap:var(--g)}
+.sgr-bw{--g:clamp(8px,1.2vw,16px);--k:min(calc((min(94vw,620px) - 2*var(--g))/3),calc((100vh - 340px - 2*var(--g))/3),170px);--bd:calc(var(--k)*3 + var(--g)*2)}
+.sgr-board{display:grid;grid-template-columns:repeat(3,var(--k));gap:var(--g)}
 .sgr-board .sgr-cap{background:rgba(255,255,255,.5);border:2px dashed #DDD3BF;box-shadow:none}
 .sgr-board .sgr-cell.t .sgr-cap{border:2px solid #169160;background:linear-gradient(160deg,#4EE0A0,#1FA971);box-shadow:0 14px 26px -12px rgba(31,169,113,.8),inset 0 -5px 0 rgba(0,0,0,.14)}
 .sgr-board .sgr-cell.x .sgr-cap{border:2px solid #C93A3E;background:linear-gradient(160deg,#F28B8B,#E5484D);box-shadow:0 14px 26px -12px rgba(229,72,77,.8),inset 0 -5px 0 rgba(0,0,0,.14)}
@@ -1782,32 +1783,43 @@ body.sgr-open #cookie-consent-reopen{display:none!important}
 .sgr-cap{position:absolute;inset:0;display:grid;place-items:center;border-radius:22%;background:#fff;border:2px solid #E7E1D5;box-shadow:0 10px 18px -12px rgba(60,40,10,.45),inset 0 -4px 0 #F1EADA;color:#2a2418;transition:transform .08s,background .12s,border-color .12s,box-shadow .12s}
 .sgr-cap .lt{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:calc(var(--k)*.46);line-height:1}
 .sgr-cap .tm{position:absolute;left:12%;right:12%;bottom:7%;height:max(4px,calc(var(--k)*.06));border-radius:3px;display:none;overflow:hidden;background:rgba(0,0,0,.18)}
-.sgr-cap .tm b{display:block;height:100%;width:calc(var(--r,1)*100%);background:#fff}
+.sgr-cap .tm b{display:block;height:100%;width:calc(var(--r,1)*100%);background:#fff;transition:width .06s linear}
 .sgr-cap .x{position:absolute;right:9%;top:6%;font-style:normal;font-weight:800;font-size:calc(var(--k)*.2);display:none;color:#fff}
 .sgr-cell.t .sgr-cap{background:linear-gradient(160deg,#4EE0A0,#1FA971);border-color:#169160;color:#fff;box-shadow:0 14px 26px -12px rgba(31,169,113,.8),inset 0 -5px 0 rgba(0,0,0,.14);transform:translateY(-3px)}
 .sgr-cell.x .sgr-cap{background:linear-gradient(160deg,#F28B8B,#E5484D);border-color:#C93A3E;color:#fff;box-shadow:0 14px 26px -12px rgba(229,72,77,.8),inset 0 -5px 0 rgba(0,0,0,.14)}
 .sgr-cell.t .tm,.sgr-cell.x .tm{display:block}
 .sgr-cell.x .x{display:block}
+.sgr-cell.ok .sgr-cap::after,.sgr-cell.bad .sgr-cap::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;animation:sgrRing .32s ease-out forwards}
+.sgr-cell.ok .sgr-cap::after{box-shadow:0 0 0 0 rgba(31,169,113,.6)}
+.sgr-cell.bad .sgr-cap::after{box-shadow:0 0 0 0 rgba(229,72,77,.6)}
+@keyframes sgrRing{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(1.18);box-shadow:0 0 0 14px transparent}}
 .sgr-cell.press .sgr-cap{transform:translateY(4px);box-shadow:0 4px 8px -6px rgba(60,40,10,.4),inset 0 -1px 0 #F1EADA}
 .sgr-count{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;opacity:0;z-index:7;text-align:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(90px,18vw,200px);line-height:1;color:var(--accent);text-shadow:0 8px 30px rgba(255,77,46,.25)}
 .sgr-count.pop{animation:sgrCnt .62s ease-out forwards}
+.sgr-count.cgo.pop{animation-duration:.5s}
 .sgr-count.cgo{font-size:clamp(40px,8vw,84px);color:var(--success)}
+@keyframes sgrOv{from{opacity:0}to{opacity:1}}
+@keyframes sgrCardIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes sgrCnt{0%{opacity:0;transform:scale(1.5)}25%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:scale(.9)}}
 .sgr-fx{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}
-.sgr-pop{position:absolute;transform:translate(-50%,-50%);font-family:'JetBrains Mono',monospace;font-weight:800;font-size:28px;color:#169160;text-shadow:0 2px 0 #fff;white-space:nowrap;animation:sgrPop .75s ease-out forwards}
+.sgr-pop{will-change:transform,opacity;position:absolute;transform:translate(-50%,-50%);font-family:'JetBrains Mono',monospace;font-weight:800;font-size:28px;color:#169160;text-shadow:0 2px 0 #fff;white-space:nowrap;animation:sgrPop .75s ease-out forwards}
 .sgr-pop.bad{color:#C93A3E}
 @keyframes sgrPop{0%{opacity:0;transform:translate(-50%,-20%) scale(.7)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-190%) scale(1.05)}}
-.sgr-mascot{position:absolute;right:max(10px,2vw);bottom:0;z-index:3;pointer-events:none}
-.sgr-mw{position:relative}
-.sgr-mw img{display:block;height:clamp(110px,22vh,230px);width:auto;filter:drop-shadow(0 12px 14px rgba(60,40,10,.25));transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
-.sgr-mw.hop img{transform:translateY(-14px) rotate(-4deg)}
-.sgr-bubble{position:absolute;right:calc(100% - 20px);bottom:78%;width:max-content;max-width:min(240px,46vw);background:#fff;border:2px solid #E7E1D5;border-radius:18px 18px 4px 18px;padding:10px 14px;font-size:14px;font-weight:700;line-height:1.35;box-shadow:0 8px 18px -10px rgba(60,40,10,.4);opacity:0;transform:translateY(6px) scale(.96);transition:.2s}
+/* largeur = la place libre à côté de la grille (au plus 185 px) : il rétrécit au lieu de disparaître */
+.sgr-boy{will-change:transform;position:absolute;left:calc(50% + var(--bd)/2 + 22px);bottom:0;width:max(0px,min(185px,calc((100% - var(--bd))/2 - 36px)));z-index:3;pointer-events:none;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.sgr-poses{position:relative;width:100%;aspect-ratio:2/3}
+.sgr-poses img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:bottom;opacity:0;transition:opacity .12s linear;filter:drop-shadow(0 14px 14px rgba(60,40,10,.25))}
+.sgr-poses img.on{opacity:1}
+.sgr-boy.hop{transform:translateY(-14px) rotate(-3deg)}
+.sgr-bubble{position:absolute;left:6%;bottom:96%;width:max-content;max-width:min(220px,40vw);background:#fff;border:2px solid #E7E1D5;border-radius:18px 18px 18px 4px;padding:10px 14px;font-size:14px;font-weight:700;line-height:1.35;box-shadow:0 8px 18px -10px rgba(60,40,10,.4);opacity:0;transform:translateY(6px) scale(.96);transition:.2s}
 .sgr-bubble.on{opacity:1;transform:none}
-.sgr-ov{position:absolute;inset:0;z-index:8;display:flex;overflow-y:auto;background:rgba(250,249,245,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.sgr-card{margin:auto;width:calc(100% - 32px);max-width:760px;padding:26px 30px 28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;background:#fff;border:1.5px solid #E7E1D5;border-radius:28px;box-shadow:0 30px 60px -30px rgba(60,40,10,.45)}
+.sgr-stage.ov .sgr-boy{visibility:hidden}
+.sgr-ov{animation:sgrOv .2s ease-out;position:absolute;inset:0;z-index:8;display:flex;overflow-y:auto;background:rgba(250,249,245,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.sgr-card{animation:sgrCardIn .3s cubic-bezier(.2,.9,.3,1.1);margin:auto;width:calc(100% - 32px);max-width:760px;padding:26px 30px 28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;background:#fff;border:1.5px solid #E7E1D5;border-radius:28px;box-shadow:0 30px 60px -30px rgba(60,40,10,.45)}
 .sgr-card h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,5vw,50px);line-height:1;letter-spacing:-.01em}
 .sgr-kick{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent)}
-.sgr-cm{height:130px;width:auto;margin:-6px 0 -4px;filter:drop-shadow(0 10px 10px rgba(60,40,10,.2))}
+.sgr-cm{height:158px;width:auto;margin:-8px 0 -2px;filter:drop-shadow(0 10px 10px rgba(60,40,10,.2))}
+.sgr-top{display:flex;align-items:flex-end;justify-content:center;gap:16px}
 .sgr-rules{list-style:none;counter-reset:r;display:flex;flex-direction:column;gap:9px;text-align:left;width:100%;max-width:520px;color:#3a3426}
 .sgr-rules li{counter-increment:r;position:relative;padding:3px 0 3px 42px;font-size:16.5px;line-height:1.45}
 .sgr-rules li::before{content:counter(r);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:14px;background:#FFF1EC;border:1.5px solid #FFB199;color:var(--accent)}
@@ -1862,12 +1874,11 @@ body.sgr-open #cookie-consent-reopen{display:none!important}
   .sgr-ttl b{font-size:16px}
   .sgr-card{padding:20px 16px}
   .sgr-go{width:100%}
-  .sgr-mw img{height:96px}
-  .sgr-bubble{display:none}
   .sgr-pick{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media(max-height:620px){.sgr-mascot{display:none}.sgr-hint{display:none}}
-@media(prefers-reduced-motion:reduce){.sgr *{animation:none!important;transition:none!important}.sgr-count.pop{opacity:1}}
+@media(max-width:560px){.sgr-boy{display:none}}
+@media(max-height:620px){.sgr-hint{display:none}}
+@media(prefers-reduced-motion:reduce){.sgr *,.sgr *::after{animation:none!important;transition:none!important}.sgr-count.pop{opacity:1}}
 
 /* ── PRÉCISION SOURIS : plein écran ── */
 body.sfs-open{overflow:hidden}
@@ -2085,6 +2096,7 @@ body.sfs-open #cookie-consent-reopen{display:none!important}
 @keyframes sfsBig{from{opacity:1;transform:translate(-50%,-50%)}to{opacity:0;transform:translate(-50%,-130%)}}
 .sfs-count{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(80px,16vw,170px);color:#fff;text-shadow:0 0 50px rgba(255,140,90,.7);pointer-events:none;opacity:0;z-index:5;text-align:center;line-height:1}
 .sfs-count.pop{animation:sfsCount .62s ease-out forwards}
+.sfs-count.go.pop{animation-duration:.5s}
 .sfs-count.go{font-size:clamp(40px,8vw,84px);color:#FFD84D}
 @keyframes sfsCount{0%{opacity:0;transform:scale(1.5)}25%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:scale(.9)}}
 .sfs-foot{flex-shrink:0;display:flex;align-items:center;gap:30px;flex-wrap:wrap;padding:4px 4px 0}
@@ -9778,6 +9790,7 @@ const app={
     if(this._sfsCdT){clearTimeout(this._sfsCdT);this._sfsCdT=null;}
     if(this._sfsFlashT){clearTimeout(this._sfsFlashT);this._sfsFlashT=null;}
     if(this._sfsCntT){clearTimeout(this._sfsCntT);this._sfsCntT=null;}
+    {const e=document.getElementById('sfs-count');if(e){e.className='sfs-count';e.textContent='';}} // aucun message ne reste affiché si on interrompt le décompte
   },
 
   // Retour du navigateur (appelé par l'écouteur popstate)
@@ -10065,12 +10078,17 @@ const app={
     this._sfsRender();
     const step=()=>{
       const st=this.souris;if(!st||st.phase!=='countdown')return;
-      this._sfsShowCount(String(st.cd));
-      this._sfsCdT=setTimeout(()=>{
-        const s2=this.souris;if(!s2||s2.phase!=='countdown')return;
-        s2.cd--;
-        if(s2.cd>0)step();else this._sfsGo();
-      },ms);
+      if(st.cd>0){
+        this._sfsShowCount(String(st.cd));
+        this._sfsCdT=setTimeout(()=>{
+          const s2=this.souris;if(!s2||s2.phase!=='countdown')return;
+          s2.cd--;step();
+        },ms);
+      }else{
+        // « C'est parti ! » s'affiche pendant le décompte : la partie ne démarre qu'une fois le message disparu
+        this._sfsShowCount('C’est parti !',true);
+        this._sfsCdT=setTimeout(()=>{const s2=this.souris;if(!s2||s2.phase!=='countdown')return;this._sfsGo();},540);
+      }
     };
     step();
   },
@@ -10079,13 +10097,12 @@ const app={
     el.textContent=txt;el.className='sfs-count'+(go?' go':'');
     void el.offsetWidth;el.classList.add('pop');
     clearTimeout(this._sfsCntT);
-    this._sfsCntT=setTimeout(()=>{const e=document.getElementById('sfs-count');if(e){e.className='sfs-count';e.textContent='';}},go?900:620);
+    this._sfsCntT=setTimeout(()=>{const e=document.getElementById('sfs-count');if(e){e.className='sfs-count';e.textContent='';}},go?520:620);
   },
 
   _sfsGo(){
     const s=this.souris;if(!s)return;
     s.phase='play';s.fresh=false;
-    this._sfsShowCount('C’est parti !',true);
     this._sfsRender();
     this._sfsRefreshGeo();
     this._sfsLoop=setInterval(()=>this._sfsTick(),50);
@@ -10766,12 +10783,14 @@ const app={
         <div class="sgr-board" id="sgr-board"></div>
         <div class="sgr-fx" id="sgr-fx"></div>
         <div class="sgr-count" id="sgr-count"></div>
+        <div class="sgr-boy" id="sgr-boy"><div class="sgr-bubble" id="sgr-bub"></div><div class="sgr-poses" id="sgr-poses">${[2,5,6,7,10,13,14,16].map(n=>`<img data-n="${n}" class="${n===7?'on':''}" src="images/keypace-pose-${n}.webp" alt="">`).join('')}</div></div>
       </div>
-      <div class="sgr-mascot"><div class="sgr-mw"><div class="sgr-bubble" id="sgr-bub"></div><img id="sgr-mas" src="images/keypace-mascot-cheer.webp" alt=""></div></div>
     </div>`;
     ['selectstart','dragstart','contextmenu'].forEach(ev=>o.addEventListener(ev,e=>e.preventDefault()));
     document.body.appendChild(o);
     document.body.classList.add('sgr-open');
+    this._sgrCurPose=7;
+    setTimeout(()=>[3,8,11,12].forEach(n=>{new Image().src=this._sgrPoseUrl(n);}),1200);
     this._sgrHudCache={};this._sgrBuiltLvl=0;this._sgrSyncSound();
     this._sgrKD=(e)=>this._sgrKeyDown(e);
     this._sgrAway=()=>{const s=this.souris;if(s&&s.phase==='play')this._sgrPause();};
@@ -10816,7 +10835,9 @@ const app={
     if(this._sgrLoop){clearInterval(this._sgrLoop);this._sgrLoop=null;}
     if(this._sgrCdT){clearTimeout(this._sgrCdT);this._sgrCdT=null;}
     if(this._sgrCntT){clearTimeout(this._sgrCntT);this._sgrCntT=null;}
+    {const e=document.getElementById('sgr-count');if(e){e.className='sgr-count';e.textContent='';}} // aucun message ne reste affiché si on interrompt le décompte
     if(this._sgrBubT){clearTimeout(this._sgrBubT);this._sgrBubT=null;}
+    if(this._sgrPoseT){clearTimeout(this._sgrPoseT);this._sgrPoseT=null;}
   },
   // Retour du navigateur
   _sgrFromPop(){
@@ -10881,6 +10902,7 @@ const app={
     if(!s.lvl)s.lvl=this._sgrSuggest();
     if(this._sgrBuiltLvl!==s.lvl)this._sgrBuildBoard(s.lvl);
     const ph=s.phase,L=this._sgrLevel(s.lvl);
+    const stg=document.getElementById('sgr-stage');if(stg)stg.classList.toggle('ov',ph==='brief'||ph==='paused'||ph==='end');
     const set=(id,t)=>{const el=document.getElementById(id);if(el&&el.textContent!==t)el.textContent=t;};
     set('sgr-lvl','Niveau '+L.n+' sur 4');set('sgr-name',L.name);
     const pb=document.getElementById('sgr-pause');if(pb)pb.hidden=!(ph==='play'||(ph==='countdown'&&!s.fresh));
@@ -10917,12 +10939,16 @@ const app={
     const tb=document.getElementById('sgr-tb');
     if(tb)tb.style.transform=`scaleX(${Math.max(0,(s.left==null?T.left:s.left)/T.left).toFixed(3)})`;
     const sec=Math.ceil(((s.left==null?T.left:s.left))/1000);
+    if(s.phase==='play'&&sec===10&&!s._tenSaid){s._tenSaid=true;this._sgrSay('Dix dernières secondes !',2200,5);}
     set('sgr-ts',sec<=10?`<span class="lo">${sec} s</span>`:sec+' s',true);
     const lives=s.lives==null?T.lives:s.lives;
-    if(C.lives!==lives){C.lives=lives;const lv=document.getElementById('sgr-lv');if(lv)lv.innerHTML=[0,1,2].map(i=>`<i class="${i<lives?'on':''}"></i>`).join('');}
+    if(C.lives!==lives){
+      if(lives===1&&C.lives>1&&s.phase==='play')this._sgrSay('Plus qu’une vie, concentre-toi !',2400,14);
+      C.lives=lives;const lv=document.getElementById('sgr-lv');if(lv)lv.innerHTML=[0,1,2].map(i=>`<i class="${i<lives?'on':''}"></i>`).join('');}
     const combo=s.combo||0,mult=combo>=8?3:combo>=4?2:1,into=mult===3?4:(combo-(mult===2?4:0));
     const pips=[0,1,2,3].map(i=>`<i class="${(mult===3||i<into)?'on':''}"></i>`).join('');
     set('sgr-cb',`<span class="pp">${pips}</span><b>×${mult}</b>${mult<3?`<em>prochain ×${mult+1}</em>`:'<em>max</em>'}`,true);
+    this._sgrApplyIdle();
     if(s.phase==='play'){
       const tr=(s.cells||[]).some(c=>c.state==='trap');
       set('sgr-hint',tr?'Attention : ne tape pas les touches rouges':'Tape la lettre qui s’allume en vert');
@@ -10935,14 +10961,38 @@ const app={
     void el.offsetWidth;el.classList.add('pop');
     playSound(go?'go':'tick');
     clearTimeout(this._sgrCntT);
-    this._sgrCntT=setTimeout(()=>{const e=document.getElementById('sgr-count');if(e){e.className='sgr-count';e.textContent='';}},go?900:620);
+    this._sgrCntT=setTimeout(()=>{const e=document.getElementById('sgr-count');if(e){e.className='sgr-count';e.textContent='';}},go?520:620);
   },
-  _sgrSay(txt,ms){
-    const b=document.getElementById('sgr-bub'),m=document.getElementById('sgr-mas');if(!b||!m)return;
-    b.textContent=txt;b.classList.add('on');
-    const mw=m.parentElement.parentElement;mw.classList.add('hop');
+  // Le garçon, sur le côté de la grille : sa pose suit les actions et l'état de la partie
+  _sgrPoseUrl(n){return 'images/keypace-pose-'+n+'.webp';},
+  // Pose de repos selon l'état : pause 16, une seule vie 14, record battu 13, dix dernières secondes 5, sinon bras croisés 7
+  _sgrIdlePose(){
+    const s=this.souris;if(!s)return 7;
+    if(s.phase==='paused')return 16;
+    if(s.lives===1)return 14;
+    if(s.beat)return 13;
+    if(s.phase==='play'&&s.left!=null&&s.left<=10000)return 5;
+    return 7;
+  },
+  // Toutes les poses du garçon sont empilées dans la page : changer de pose = fondu entre deux images déjà décodées
+  _sgrShowPose(n){
+    const box=document.getElementById('sgr-poses');if(!box||this._sgrCurPose===n)return;
+    this._sgrCurPose=n;
+    box.querySelectorAll('img').forEach(i=>i.classList.toggle('on',+i.dataset.n===n));
+  },
+  _sgrApplyIdle(){if(this._sgrPoseT)return;this._sgrShowPose(this._sgrIdlePose());},
+  // Pose temporaire (ms) puis retour à la pose de repos ; ms=0 : elle reste
+  _sgrPose(n,ms){
+    clearTimeout(this._sgrPoseT);this._sgrPoseT=null;
+    this._sgrShowPose(n);
+    if(ms)this._sgrPoseT=setTimeout(()=>{this._sgrPoseT=null;this._sgrApplyIdle();},ms);
+  },
+  _sgrSay(txt,ms,pose){
+    const b=document.getElementById('sgr-bub'),bx=document.getElementById('sgr-boy');if(!b||!bx)return;
+    b.textContent=txt;b.classList.add('on');bx.classList.add('hop');
+    if(pose)this._sgrPose(pose,ms||1800);
     clearTimeout(this._sgrBubT);
-    this._sgrBubT=setTimeout(()=>{b.classList.remove('on');mw.classList.remove('hop');},ms||1800);
+    this._sgrBubT=setTimeout(()=>{b.classList.remove('on');bx.classList.remove('hop');},ms||1800);
   },
   _sgrFxPos(id){
     const el=this._sgrCells&&this._sgrCells[id],bw=document.querySelector('#sgr .sgr-bw');if(!el||!bw)return{x:0,y:0};
@@ -10956,9 +11006,10 @@ const app={
     d.className='sgr-pop'+(bad?' bad':'');d.style.left=p.x+'px';d.style.top=p.y+'px';d.textContent=txt;
     fx.appendChild(d);setTimeout(()=>d.remove(),800);
   },
-  _sgrPress(id){
+  _sgrPress(id,kind){
     const el=this._sgrCells&&this._sgrCells[id];if(!el)return;
     el.classList.add('press');setTimeout(()=>el.classList.remove('press'),110);
+    if(kind){el.classList.remove('ok','bad');void el.offsetWidth;el.classList.add(kind);clearTimeout(el._ft);el._ft=setTimeout(()=>el.classList.remove('ok','bad'),340);}
   },
 
   /* ── Écrans : choix du niveau et règles, pause, fin ─────────── */
@@ -10988,7 +11039,7 @@ const app={
         ${this._sgrMini()}<b>${this._esc(l.short)}</b><em class="sgr-lt">${l.pool.length>10?'26 lettres':l.pool}</em>${st}</button>`;
     }).join('');
     this._sgrOv(`<div class="sgr-card">
-      <img class="sgr-cm" src="images/keypace-mascot-cheer.webp" alt="">
+      <img class="sgr-cm" src="${this._sgrPoseUrl(3)}" alt="">
       <div class="sgr-kick">Niveau ${L.n} sur 4</div><h2>${this._esc(L.name)}</h2>
       <p class="sgr-intro">${this._esc(L.intro)}</p>
       <div class="sgr-pick">${picker}</div>
@@ -11002,7 +11053,7 @@ const app={
   },
   _sgrShowPause(){
     const I=this._sfsIc,L=this._sgrLevel(this.souris.lvl);
-    this._sgrOv(`<div class="sgr-card"><div class="sgr-kick">En pause</div><h2>${this._esc(L.name)}</h2>
+    this._sgrOv(`<div class="sgr-card"><img class="sgr-cm" src="${this._sgrPoseUrl(11)}" alt=""><div class="sgr-kick">En pause</div><h2>${this._esc(L.name)}</h2>
       <ol class="sgr-rules"><li>Tape la lettre de la touche <b>verte</b>.</li><li>Ne tape jamais les touches <b>rouges</b>.</li><li>Une touche verte ratée coûte <b>1 vie</b>.</li></ol>
       <div class="sgr-row2"><button class="sgr-go" type="button" data-focus onclick="app._sgrResume()">${I.play}<span>Reprendre</span></button><button class="sgr-sec" type="button" onclick="app._sgrBegin()">Recommencer</button><button class="sgr-sec" type="button" onclick="app._sgrQuit()">Quitter vers les jeux</button></div>
       <span class="sgr-keyh">Échap ou Espace pour reprendre</span></div>`,'paused');
@@ -11011,7 +11062,8 @@ const app={
     const s=this.souris,L=this._sgrLevel(s.lvl),r=s._result||{},t=r.tier,tiers=L.tiers,I=this._sfsIc;
     const tv={gold:['#FFD84D','#B98300','Médaille d’or'],silver:['#E3E7ED','#7D8794','Médaille d’argent'],bronze:['#E39A5B','#8F4F20','Médaille de bronze']}[t];
     const medal=t?`<svg viewBox="0 0 64 64" width="92" height="92" aria-hidden="true"><path d="M19 3h10l5 15H24z" fill="#FF4D2E"/><path d="M45 3H35l-5 15h10z" fill="#C93A20"/><circle cx="32" cy="40" r="20" fill="${tv[0]}" stroke="${tv[1]}" stroke-width="2"/><path d="M32 28l3.4 6.9 7.6 1.1-5.5 5.3 1.3 7.6L32 45.4l-6.8 3.5 1.3-7.6-5.5-5.3 7.6-1.1z" fill="${tv[1]}" opacity=".55"/></svg>`
-      :`<img class="sgr-cm" src="images/keypace-mascot-cheer.webp" alt="">`;
+      :'';
+    const girl=`<img class="sgr-cm" src="${this._sgrPoseUrl(t||s._newTop?8:12)}" alt="">`; // fille : idée à la victoire, haussement d'épaules sinon
     const next=t==='gold'?null:t==='silver'?['or',tiers.gold]:t==='bronze'?['argent',tiers.silver]:['bronze',tiers.bronze];
     const prog=next?`<div class="sgr-nx">${t?'Prochain palier':'Pour valider le niveau'} : <b>${next[0]} à ${next[1]} points</b>${s.score<next[1]?', il t’en manquait '+(next[1]-s.score):''}<div class="bar2"><i style="width:${Math.min(100,s.score/next[1]*100)}%"></i></div></div>`:'<div class="sgr-nx"><b>Or décroché.</b> Tu ne peux pas faire mieux sur ce niveau.</div>';
     let tip='Bien joué. Enchaîne plus de réussites d’affilée pour faire monter le combo.';
@@ -11020,7 +11072,7 @@ const app={
     else if(s.stray>=4)tip='Plusieurs touches à côté ont cassé ton combo. Pose bien tes doigts sur la rangée de repos et ne tape que la lettre allumée.';
     const mc=s.bestCombo>=8?3:s.bestCombo>=4?2:1;
     const nextLvl=t&&L.n<4;
-    this._sgrOv(`<div class="sgr-card"><div>${medal}</div>
+    this._sgrOv(`<div class="sgr-card"><div class="sgr-top">${girl}${medal}</div>
       <h2>${t?tv[2]:'Pas cette fois'}</h2>
       ${(s._newTop||r.isNewBest)?'<div class="sgr-rec">Nouveau record sur ce niveau !</div>':''}
       <div class="sgr-final"><b>${s.score}</b><span>points</span></div>
@@ -11028,7 +11080,6 @@ const app={
       <div class="sgr-stats"><div><b>${s.hits}</b><small>réussites</small></div><div><b>${s._acc}%</b><small>précision</small></div><div><b>×${mc}</b><small>meilleur combo</small></div><div><b>${s.bestCombo}</b><small>meilleure série</small></div></div>
       ${prog}<p class="sgr-tip">${tip}</p>
       <div class="sgr-row2"><button class="sgr-go" type="button" data-focus onclick="app._sgrPrimary()">${I.play}<span>${nextLvl?'Niveau '+(L.n+1):'Rejouer'}</span></button><button class="sgr-sec" type="button" onclick="app._sgrRules()">${nextLvl?'Rejouer ou changer de niveau':'Règles et niveaux'}</button><button class="sgr-sec" type="button" onclick="app._sgrQuit()">Retour aux jeux</button></div></div>`,'end');
-    this._sgrSay(t?'Bravo, quel score !':'On recommence, tu vas y arriver !',3200);
   },
   _sgrRules(){const s=this.souris;if(!s)return;this._sgrStopLoop();s.phase='brief';this._sgrRender();},
   // Bouton principal de l'écran de fin : niveau suivant si validé, sinon rejouer
@@ -11045,7 +11096,7 @@ const app={
     const s=this.souris,T=this._sgrTuneOf(s.lvl||1);
     const cells=Array.from({length:T.slots},(_,i)=>({id:'s'+i,letter:null,state:null,life:0,dur:0}));
     Object.assign(s,{cells,score:0,combo:0,bestCombo:0,lives:T.lives,hits:0,misses:0,
-      traps:0,expired:0,stray:0,left:T.left,spawnAcc:0,clock:0,cd:3,_result:null,_acc:0,best:this._sgrTop(s.lvl||1),beat:false,_newTop:false});
+      traps:0,expired:0,stray:0,left:T.left,spawnAcc:0,clock:0,cd:3,_result:null,_acc:0,best:this._sgrTop(s.lvl||1),beat:false,_newTop:false,_tenSaid:false});
   },
   _sgrBegin(){
     const s=this.souris;if(!s||s.track!=='grid')return;
@@ -11062,18 +11113,24 @@ const app={
     s.phase='countdown';s.cd=n;this._sgrRender();
     const step=()=>{
       const st=this.souris;if(!st||st.phase!=='countdown')return;
-      this._sgrShowCount(String(st.cd));
-      this._sgrCdT=setTimeout(()=>{
-        const s2=this.souris;if(!s2||s2.phase!=='countdown')return;
-        s2.cd--;if(s2.cd>0)step();else this._sgrGo();
-      },ms);
+      if(st.cd>0){
+        this._sgrShowCount(String(st.cd));
+        this._sgrPose(2,ms+80);
+        this._sgrCdT=setTimeout(()=>{
+          const s2=this.souris;if(!s2||s2.phase!=='countdown')return;
+          s2.cd--;step();
+        },ms);
+      }else{
+        // « C'est parti ! » s'affiche pendant le décompte : la partie ne démarre qu'une fois le message disparu
+        this._sgrShowCount('C’est parti !',true);
+        this._sgrSay('Allez, on y va !',520,2);
+        this._sgrCdT=setTimeout(()=>{const s2=this.souris;if(!s2||s2.phase!=='countdown')return;this._sgrGo();},540);
+      }
     };step();
   },
   _sgrGo(){
     const s=this.souris;if(!s)return;
     s.phase='play';s.fresh=false;
-    this._sgrShowCount('C’est parti !',true);
-    if(!s.hits)this._sgrSay('Allez, on y va !',1400);
     this._sgrRender();
     this._sgrLoop=setInterval(()=>this._sgrTick(),50);
   },
@@ -11109,8 +11166,8 @@ const app={
       if(c.life<=0){
         if(c.state==='target'){
           s.misses++;s.expired++;s.combo=0;s.lives--;
-          playSound('late');this._sgrPop(c.id,'Trop tard',true);
-          this._sgrSay('Trop tard, vise plus vite la prochaine.',2000);
+          playSound('late');this._sgrPop(c.id,'Trop tard',true);this._sgrPress(c.id,'bad');
+          this._sgrSay('Trop tard, vise plus vite la prochaine.',2000,14);
           this._sgrClear(c);
           if(s.lives<=0){s.lives=0;this._sgrEnd();return;}
         }else this._sgrClear(c);
@@ -11131,23 +11188,24 @@ const app={
       s.combo=0;s.stray++;
       this._sgrHud();return;
     }
-    this._sgrPress(c.id);
+    this._sgrPress(c.id,c.state==='trap'?'bad':'ok');
     if(c.state==='trap'){
       s.misses++;s.traps++;s.combo=0;s.lives--;
       playSound('trap');this._sgrPop(c.id,'Piège',true);
-      this._sgrSay('Oups, les touches rouges sont des pièges.',2200);
+      this._sgrSay('Oups, les touches rouges sont des pièges.',2200,10);
       this._sgrClear(c);
       if(s.lives<=0){s.lives=0;this._sgrEnd();return;}
     }else{
       const m=s.combo>=8?3:s.combo>=4?2:1;
       s.score+=m;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
       playSound('hit',{pitch:this._sgrPitch(s.combo-1)});this._sgrPop(c.id,'+'+m);
-      if(s.combo===4){playSound('combo2');this._sgrSay('Combo ×2, continue !');}
-      else if(s.combo===8){playSound('combo3');this._sgrSay('Combo ×3, incroyable !');}
-      else if(s.hits===1)this._sgrSay('Bien joué !');
-      else if(s.hits===this._sgrTuneOf(s.lvl).trapFrom)this._sgrSay('Les touches rouges arrivent, fais attention.',2400);
+      this._sgrPose(13,700); // pouce levé à chaque réussite
+      if(s.combo===4){playSound('combo2');this._sgrSay('Combo ×2, continue !',1900,13);}
+      else if(s.combo===8){playSound('combo3');this._sgrSay('Combo ×3, incroyable !',2000,6);}
+      else if(s.hits===1)this._sgrSay('Bien joué !',1500,13);
+      else if(s.hits===this._sgrTuneOf(s.lvl).trapFrom)this._sgrSay('Les touches rouges arrivent, fais attention.',2400,5);
       if(s.best>0&&!s.beat&&s.score>s.best){ // premier dépassement du record : une seule fois par partie
-        s.beat=true;setTimeout(()=>playSound('recordbeat'),180);this._sgrSay('Nouveau record !',2600);
+        s.beat=true;setTimeout(()=>playSound('recordbeat'),180);this._sgrSay('Nouveau record !',2600,6);
       }
       this._sgrClear(c);
     }
