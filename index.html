@@ -1678,63 +1678,347 @@ a.nav-link{text-decoration:none;display:inline-block}
   .course-lane-name{width:96px;font-size:11px}
 }
 
-/* PRÉCISION SOURIS (Visée) — écran d'accroche */
-.gsouris-intro{position:relative;padding:56px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;overflow:hidden}
-.gsouris-intro-ring{position:absolute;left:50%;top:50%;border:1px solid rgba(255,77,46,.22);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0}
-.gsouris-intro-ring.a{width:520px;height:520px}
-.gsouris-intro-ring.b{width:360px;height:360px;border-color:rgba(255,77,46,.32)}
-.gsouris-intro-kicker{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;letter-spacing:.4em;text-transform:uppercase;color:#FF9868}
-.gsouris-intro-title{position:relative;z-index:1;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(44px,9vw,88px);line-height:.94;letter-spacing:-.01em;text-transform:uppercase;color:#fff;margin:0;text-shadow:0 0 40px rgba(255,140,90,.5)}
-.gsouris-intro-sub{position:relative;z-index:1;color:rgba(255,255,255,.62);font-size:16px;line-height:1.6;max-width:440px;margin:0}
-.gsouris-intro-chips{position:relative;z-index:1;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:4px 0 6px}
-.gsouris-intro-chip{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.16);border-radius:999px;padding:9px 18px}
-.gsouris-intro-chip.accent{color:var(--accent);border-color:rgba(255,77,46,.5);background:rgba(255,77,46,.1)}
-/* HUD en jeu */
-.gsouris-life{width:13px;height:13px;transform:rotate(45deg);border-radius:3px;background:rgba(255,255,255,.14);display:inline-block}
-.gsouris-life.on{background:linear-gradient(160deg,#FF9868,#FF4D2E);box-shadow:0 0 8px rgba(255,77,46,.55)}
-.gsouris-section{position:relative;z-index:1;display:flex;align-items:center;gap:14px;margin-bottom:10px}
-.gsouris-section::before,.gsouris-section::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,77,46,.4))}
-.gsouris-section::after{background:linear-gradient(90deg,rgba(255,77,46,.4),transparent)}
-.gsouris-section span{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11.5px;letter-spacing:.12em;color:#FF9868;white-space:nowrap}
-/* Reticle décoratif (survol) */
-.gsouris-reticle{position:absolute;inset:0;pointer-events:none;z-index:0}
-.gsouris-reticle-dash{position:absolute;left:50%;top:52%;width:130px;height:130px;transform:translate(-50%,-50%);border:1.5px dashed rgba(255,255,255,.1);border-radius:50%}
-.gsouris-chevron{position:absolute;width:10px;height:10px;border-top:2px solid rgba(255,255,255,.16);border-right:2px solid rgba(255,255,255,.16)}
-.gsouris-chevron.up{left:50%;top:14%;transform:translate(-50%,0) rotate(-45deg)}
-.gsouris-chevron.down{left:50%;bottom:16%;transform:translate(-50%,0) rotate(135deg)}
-.gsouris-chevron.left{left:6%;top:50%;transform:translate(0,-50%) rotate(-135deg)}
-.gsouris-chevron.right{right:6%;top:50%;transform:translate(0,-50%) rotate(45deg)}
-/* Cible cercles concentriques (survol, et depuis peu tous les niveaux à
-   clic/ZQSD — même langage visuel partout, voir _sourisPaint) */
-.gsouris-target{position:absolute;aspect-ratio:1;transform:translate(-50%,-50%)}
-.gsouris-target-ring{position:absolute;inset:0;border:2px solid rgba(255,255,255,.18);border-radius:50%}
-.gsouris-target-prog{position:absolute;inset:9%;border-radius:50%}
-.gsouris-target-core{position:absolute;inset:22%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FF9868,#FF4D2E 70%);box-shadow:0 0 22px rgba(255,77,46,.55)}
-.gsouris-target-dot{position:absolute;inset:44%;border-radius:50%;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.85)}
-.gsouris-target-lock{position:absolute;left:50%;top:100%;margin-top:8px;transform:translateX(-50%);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:rgba(255,255,255,.5)}
-/* Cœur de précision (niveaux "cœur de cible") et croix de piège, posés au
-   centre de la cible à anneaux ci-dessus, par-dessus le petit point blanc */
-.gsouris-target-heart{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:#FFD84D;box-shadow:0 0 8px #FFD84D;z-index:1}
-.gsouris-target-mark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-weight:800;font-size:15px;text-shadow:0 2px 6px rgba(0,0,0,.5);z-index:1}
-.gsouris-bonus-label{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:11px;letter-spacing:.04em;color:#FFD84D}
-/* Popup "TOUCHÉ" */
-.gsouris-judge{position:absolute;text-align:center;z-index:6;pointer-events:none;animation:gsourisPop .22s ease-out;transform:translate(-50%,-120%)}
-.gsouris-judge-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:rgba(255,255,255,.5);text-transform:uppercase}
-.gsouris-judge-pill{display:inline-flex;align-items:center;gap:6px;margin-top:2px;border-radius:999px;padding:5px 14px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff;background:rgba(255,77,46,.9)}
-.gsouris-judge-pill.bonus{background:rgba(255,216,77,.92);color:#16140F}
-.gsouris-judge-pill.bad{background:rgba(229,72,77,.92)}
-@keyframes gsourisPop{0%{transform:translate(-50%,-90%) scale(.7);opacity:0}100%{transform:translate(-50%,-120%) scale(1);opacity:1}}
-/* Pied de partie : stats live + PTS DE L'OR + rejouer */
-.gsouris-footer{position:relative;z-index:1;display:flex;align-items:center;gap:26px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
-.gsouris-stat-label{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.1em;display:block;margin-bottom:2px}
-.gsouris-stat-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;color:#fff}
-.gsouris-stat-val.accent{color:var(--accent)}
-.gsouris-footer-right{margin-left:auto;display:flex;align-items:center;gap:14px}
-.gsouris-gold-left{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;color:rgba(255,255,255,.45)}
-.gsouris-replay{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:13px;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:8px 14px;cursor:pointer}
-.gsouris-replay:hover{background:rgba(255,255,255,.14)}
-@media(prefers-reduced-motion:reduce){.gsouris-judge{animation:none}}
-@media(max-width:640px){.gsouris-intro-title{font-size:clamp(34px,11vw,60px)}.gsouris-footer{gap:16px}.gsouris-footer-right{margin-left:0;width:100%;justify-content:space-between}}
+/* ── Précision souris : menu des niveaux ── */
+.sm{max-width:1120px;margin:0 auto;padding:0 24px 48px}
+.sm-top{padding:4px 0 14px}
+.sm-back{background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;color:var(--muted);padding:8px 0;min-height:44px}
+.sm-back:hover{color:var(--txt)}
+.sm-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:32px;align-items:center;background:#16140F;color:#fff;border-radius:26px;padding:34px 36px;margin-bottom:34px;position:relative;overflow:hidden}
+.sm-hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.05) 1.1px,transparent 1.1px);background-size:18px 18px;pointer-events:none}
+.sm-hero>*{position:relative}
+.sm-kick{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#FF9868;margin-bottom:8px}
+.sm-hero h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(34px,4.6vw,52px);line-height:1;letter-spacing:-.01em;margin:0 0 14px;color:#fff}
+.sm-hero p{margin:0 0 16px;font-size:15.5px;line-height:1.6;color:rgba(255,255,255,.72);max-width:520px}
+.sm-hero p b{color:#fff}
+.sm-meds{display:flex;gap:10px;flex-wrap:wrap}
+.sm-med{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:rgba(255,255,255,.75);padding:5px 12px 5px 8px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)}
+.sm-med b{font-family:'JetBrains Mono',monospace;color:#fff;font-size:14px}
+.sm-prog-t{font-size:15px;color:rgba(255,255,255,.75);margin-bottom:10px}
+.sm-prog-t b{font-family:'JetBrains Mono',monospace;font-size:26px;color:#fff;margin-right:4px}
+.sm-segs{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-bottom:20px}
+.sm-seg{height:12px;border-radius:4px;background:rgba(255,255,255,.14);display:block}
+.sm-seg.done{background:#1FA971}.sm-seg.bronze{background:#E39A5B}.sm-seg.silver{background:#D5DAE2}.sm-seg.gold{background:#FFD84D}
+.sm-seg.now{background:rgba(255,77,46,.55);box-shadow:0 0 0 2px #FF4D2E}
+.sm-cta{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;min-height:64px;padding:12px 22px;border:none;border-radius:18px;background:var(--accent);color:#fff;font-family:inherit;font-size:18px;font-weight:800;text-align:left;cursor:pointer;box-shadow:0 10px 26px rgba(255,77,46,.38);transition:transform .15s,box-shadow .15s}
+.sm-cta:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(255,77,46,.48)}
+.sm-cta small{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin-bottom:2px}
+.sm-ch{margin-bottom:28px}
+.sm-ch-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.sm-ch-h h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin:0}
+.sm-ch-h span{font-size:14px;color:var(--muted)}
+.sm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.sm-card{display:flex;align-items:center;gap:16px;padding:16px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;font-family:inherit;text-align:left;cursor:pointer;color:var(--txt);transition:transform .15s,box-shadow .15s,border-color .15s}
+.sm-card:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 14px 28px -14px rgba(22,20,15,.35);border-color:#FFB199}
+.sm-card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sm-card.next{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,.14)}
+.sm-card.locked{opacity:.6;cursor:not-allowed;background:var(--light)}
+.sm-ic{flex-shrink:0;width:68px;height:68px;border-radius:18px;background:#16140F;display:grid;place-items:center}
+.sm-ic .sw{transform:scale(1.35)}
+.sm-card.locked .sm-ic{filter:grayscale(.85)}
+.sm-tx{display:flex;flex-direction:column;min-width:0;gap:1px}
+.sm-tx small{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sm-tx b{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;line-height:1.15}
+.sm-tx em{font-style:normal;font-size:13px;color:#7A7365;line-height:1.35;margin-top:2px}
+.sm-st{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;font-weight:800;align-self:flex-start;padding:3px 10px 3px 8px;border-radius:999px}
+.sm-st.todo{background:var(--light);color:var(--muted)}
+.sm-st.now{background:rgba(255,77,46,.12);color:var(--accent)}
+.sm-st.done{background:rgba(31,169,113,.12);color:#1B8A5E}
+.sm-st.lock{background:rgba(22,20,15,.07);color:var(--muted)}
+@media(max-width:860px){.sm-hero{grid-template-columns:1fr;gap:22px;padding:26px 22px}}
+@media(max-width:560px){.sm{padding:0 16px 40px}.sm-grid{grid-template-columns:1fr}}
+
+/* ── PRÉCISION SOURIS : plein écran ── */
+body.sfs-open{overflow:hidden}
+body.sfs-open #cookie-consent-reopen{display:none!important}
+.sfs{position:fixed;inset:0;z-index:1800;display:flex;flex-direction:column;background:#16140F;color:#fff;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.sfs *{-webkit-user-select:none;user-select:none}
+.sfs::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.05) 1.1px,transparent 1.1px);background-size:18px 18px;pointer-events:none}
+.sfs-bar{position:relative;z-index:4;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:max(10px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left));border-bottom:1px solid rgba(255,255,255,.09);background:rgba(22,20,15,.94)}
+.sfs-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s}
+.sfs-btn:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3)}
+.sfs-btn.sq{width:44px;padding:0}
+.sfs-btn.quit{background:rgba(255,77,46,.16);border-color:rgba(255,77,46,.5);color:#FFB199}
+.sfs-btn.quit:hover{background:rgba(255,77,46,.3);color:#fff}
+.sfs-btn[hidden]{display:none}
+.sfs-btn:focus-visible,.sfs-go:focus-visible,.sfs-sec:focus-visible,.sfs-replay:focus-visible{outline:3px solid #FFD84D;outline-offset:2px}
+.sfs-ttl{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;line-height:1.15}
+.sfs-ttl small{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#FF9868}
+.sfs-ttl b{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.sfs-bar-r{display:flex;gap:8px;flex-shrink:0}
+.sfs-stage{position:relative;z-index:1;flex:1;min-height:0;display:flex;flex-direction:column}
+
+/* règles */
+.sfs-brief{flex:1;min-height:0;overflow-y:auto;display:flex}
+.sfs-brief-in{margin:auto;width:100%;max-width:1080px;padding:28px 24px 36px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:44px;align-items:center}
+.sfs-brief-demo{min-width:0}
+.sfs-kick{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#FF9868;margin-bottom:8px}
+.sfs-h{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(34px,5vw,56px);line-height:1;letter-spacing:-.01em;margin:0 0 20px;color:#fff}
+.sfs-h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;line-height:1.05;margin:0 0 18px}
+.sfs-steps{list-style:none;counter-reset:st;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:10px}
+.sfs-steps li{counter-increment:st;position:relative;padding:4px 0 4px 44px;min-height:32px;display:block;font-size:17px;line-height:1.4;color:rgba(255,255,255,.88)}
+.sfs-steps li::before{content:counter(st);position:absolute;left:0;top:1px;width:32px;height:32px;border-radius:50%;background:rgba(255,77,46,.18);border:1.5px solid rgba(255,77,46,.6);color:#FF9868;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px;display:grid;place-items:center}
+.sfs-steps b{color:#fff}
+.sfs-steps.small li{font-size:14px;padding:3px 0 3px 36px;min-height:26px}
+.sfs-steps.small li::before{width:26px;height:26px;font-size:13px}
+.sfs-leg{list-style:none;margin:0 0 14px;padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px}
+.sfs-leg li{display:flex;align-items:center;gap:12px;font-size:14.5px;line-height:1.3;color:rgba(255,255,255,.85)}
+.sfs-leg.small{padding:10px 12px;gap:8px 12px}
+.sfs-leg.small li{font-size:13px}
+.sfs-risk{margin:0 0 16px;font-size:15px;line-height:1.5;color:rgba(255,255,255,.72);padding-left:14px;border-left:3px solid #E5484D}
+.sfs-risk b{color:#fff}
+.sfs-risk.small{font-size:13px;margin:0}
+.sfs-goal{margin:0 0 20px}
+.sfs-goal-t{font-size:15px;color:rgba(255,255,255,.75);margin-bottom:8px}
+.sfs-goal-t b{color:#fff}
+.sfs-meds{display:flex;gap:8px;flex-wrap:wrap}
+.sfs-meds .m{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:999px;border:1.5px solid;background:rgba(255,255,255,.04)}
+.sfs-meds .m.b{color:#E39A5B;border-color:rgba(227,154,91,.55)}
+.sfs-meds .m.s{color:#D5DAE2;border-color:rgba(213,218,226,.5)}
+.sfs-meds .m.g{color:#FFD84D;border-color:rgba(255,216,77,.6)}
+.sfs-meds .m.v{color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.22)}
+.sfs-warn{margin:0 0 16px;padding:12px 14px;border-radius:12px;background:rgba(255,216,77,.12);border:1px solid rgba(255,216,77,.4);color:#FFE9A0;font-size:14px}
+.sfs-cta{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.sfs-go{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 34px;border:none;border-radius:16px;background:var(--accent);color:#fff;font-family:inherit;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 10px 26px rgba(255,77,46,.38);transition:transform .15s,box-shadow .15s}
+.sfs-go:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(255,77,46,.48)}
+.sfs-go:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.sfs-sec{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 24px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s}
+.sfs-sec:hover{background:rgba(255,255,255,.15)}
+.sfs-key{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.42)}
+
+/* pastilles de légende */
+.sw{flex-shrink:0;width:34px;height:34px;display:grid;place-items:center;position:relative;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:11px;color:#fff}
+.sw.t{border-radius:50%;border:2px solid rgba(255,255,255,.22)}
+.sw.t i{position:absolute;inset:20%;border-radius:50%}
+.sw.t.o i{background:radial-gradient(circle at 35% 30%,#FF9868,#FF4D2E 70%)}
+.sw.t.g i{background:radial-gradient(circle at 35% 30%,#4EE0A0,#1FA971 70%)}
+.sw.t.r i{background:radial-gradient(circle at 35% 30%,#F28B8B,#E5484D 70%)}
+.sw.t.d i{background:radial-gradient(circle at 35% 30%,#F0BE7E,#D98A3D 70%)}
+.sw.t u{position:absolute;inset:38%;border-radius:50%;background:#FFD84D;box-shadow:0 0 6px #FFD84D}
+.sw.t s{position:absolute;inset:40%;border-radius:50%;background:#fff;text-decoration:none}
+.sw.t b{position:relative;font-size:12px}
+.sw.b{border-radius:50%;border:2px solid #fff}
+.sw.b.x2{background:#3B82F6}.sw.b.tm{background:#A855F7}.sw.b.jk{background:#FFD84D;color:#16140F;font-size:15px}
+.sw.sq{border-radius:9px}.sw.sq.g{background:#1FA971}.sw.sq.b{background:#3B82F6}.sw.sq.i{background:#818CF8}
+.sw.pad{border-radius:50%;border:3px solid #1FA971;background:rgba(31,169,113,.2)}
+.sw.haz{border-radius:50%;border:2px solid rgba(229,72,77,.8);background:rgba(229,72,77,.25)}
+
+/* scènes animées */
+.sfs-demo{position:relative;width:100%;aspect-ratio:16/11;border-radius:22px;overflow:hidden;background:#1B1812;border:1px solid rgba(255,255,255,.12);box-shadow:0 24px 50px -24px rgba(0,0,0,.7)}
+.sfs-demo::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.06) 1.1px,transparent 1.1px);background-size:18px 18px}
+.d-cap{position:absolute;left:0;right:0;bottom:0;padding:11px 14px;text-align:center;font-size:13.5px;font-weight:700;color:rgba(255,255,255,.85);background:linear-gradient(transparent,rgba(0,0,0,.55))}
+.d-t{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);transform:translate(-50%,-50%);border-radius:50%;display:grid;place-items:center}
+.d-t::before{content:'';position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,255,255,.2)}
+.d-t .d-c{position:absolute;inset:22%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4EE0A0,#1FA971 70%);box-shadow:0 0 18px rgba(31,169,113,.5)}
+.d-t.o .d-c{background:radial-gradient(circle at 35% 30%,#FF9868,#FF4D2E 70%);box-shadow:0 0 18px rgba(255,77,46,.5)}
+.d-t.r .d-c{background:radial-gradient(circle at 35% 30%,#F28B8B,#E5484D 70%);box-shadow:0 0 18px rgba(229,72,77,.5)}
+.d-t.d .d-c{background:radial-gradient(circle at 35% 30%,#F0BE7E,#D98A3D 70%);box-shadow:0 0 18px rgba(217,138,61,.5)}
+.d-t .d-dot{position:absolute;inset:42%;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff}
+.d-t .d-heart{position:absolute;inset:36%;border-radius:50%;background:#FFD84D;box-shadow:0 0 10px #FFD84D}
+.d-t .d-x{position:relative;color:#fff;font-size:22px;font-weight:800;text-shadow:0 2px 6px rgba(0,0,0,.5)}
+.d-t.b::before{border-color:#fff}
+.d-t.b{background:#3B82F6;box-shadow:0 0 22px #3B82F6}
+.d-t.b.tm{background:#A855F7;box-shadow:0 0 22px #A855F7}
+.d-t.b.jk{background:#FFD84D;box-shadow:0 0 22px #FFD84D;color:#16140F}
+.d-t.b em{position:relative;font-style:normal;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:18px;color:#fff}
+.d-t.b.jk em{color:#16140F;font-size:24px}
+.d-t.b .d-c{display:none}
+.d-prog,.d-shrink{position:absolute;inset:0;transform:rotate(-90deg)}
+.d-prog circle,.d-shrink circle{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:289;transform-origin:50% 50%}
+.d-prog circle{stroke:#fff;stroke-dashoffset:289;animation:dFill 3.6s linear infinite}
+.d-shrink circle{stroke:#4EE0A0;stroke-dashoffset:0;animation:dShrink 3.6s linear infinite}
+@keyframes dFill{0%,24%{stroke-dashoffset:289}62%,100%{stroke-dashoffset:0}}
+@keyframes dShrink{0%{stroke-dashoffset:0}26%,100%{stroke-dashoffset:90}}
+.d-cursor{position:absolute;z-index:3;left:var(--cx);top:var(--cy);margin:-3px 0 0 -3px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));animation:dCur 3.6s ease-in-out infinite}
+@keyframes dCur{0%{left:8%;top:84%;opacity:0}8%{opacity:1}24%,90%{left:var(--cx);top:var(--cy);opacity:1}100%{left:var(--cx);top:var(--cy);opacity:0}}
+.gone-late{animation:dGoneLate 3.6s linear infinite}
+@keyframes dGoneLate{0%,64%{opacity:1;transform:translate(-50%,-50%) scale(1)}72%,92%{opacity:0;transform:translate(-50%,-50%) scale(.5)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.gone-early{animation:dGoneEarly 3.6s linear infinite}
+@keyframes dGoneEarly{0%,30%{opacity:1;transform:translate(-50%,-50%) scale(1)}38%,92%{opacity:0;transform:translate(-50%,-50%) scale(.5)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.d-pop{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);font-family:'JetBrains Mono',monospace;font-weight:800;font-size:28px;color:#fff;opacity:0;text-shadow:0 3px 12px rgba(0,0,0,.6)}
+.d-pop.gold{color:#FFD84D}.d-pop.blue{color:#6EA5FF}
+.d-pop.late{animation:dPopLate 3.6s linear infinite}
+.d-pop.early{animation:dPopEarly 3.6s linear infinite}
+@keyframes dPopLate{0%,64%{opacity:0;top:var(--y)}70%{opacity:1}92%{opacity:0;top:calc(var(--y) - 9%)}100%{opacity:0}}
+@keyframes dPopEarly{0%,30%{opacity:0;top:var(--y)}36%{opacity:1}70%{opacity:0;top:calc(var(--y) - 9%)}100%{opacity:0}}
+.d-press{position:absolute;left:var(--x);top:var(--y);width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:2px solid #fff;opacity:0;animation:dPress 3.6s linear infinite}
+@keyframes dPress{0%,26%{opacity:0;transform:scale(.4)}30%{opacity:.9}44%,100%{opacity:0;transform:scale(3.4)}}
+.d-lab{position:absolute;left:var(--x);top:var(--y);transform:translateX(-50%);font-size:12.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#4EE0A0;white-space:nowrap}
+.d-lab.no{color:#FF8B8B}
+.d-zone{position:absolute;left:var(--x);width:var(--w);top:56%;bottom:16%;border-radius:12px;border:2px dashed;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.d-zone.g{border-color:rgba(31,169,113,.7);background:rgba(31,169,113,.12);color:#4EE0A0}
+.d-zone.b{border-color:rgba(59,130,246,.7);background:rgba(59,130,246,.12);color:#6EA5FF}
+.d-piece{position:absolute;left:var(--x);top:var(--y);width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:12px;background:linear-gradient(160deg,#1FA971,#1FA971cc);box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),0 6px 18px rgba(0,0,0,.4);animation:dPiece 3.6s ease-in-out infinite}
+@keyframes dPiece{0%,8%{left:70%;top:24%;opacity:0}14%{left:70%;top:24%;opacity:1}26%{left:70%;top:24%}62%,88%{left:27%;top:68%;opacity:1}100%{left:27%;top:68%;opacity:0}}
+.sfs-demo.dd .d-cursor{animation:dCurDrag 3.6s ease-in-out infinite}
+@keyframes dCurDrag{0%,8%{left:70%;top:24%;opacity:0}14%{left:70%;top:24%;opacity:1}26%{left:70%;top:24%}62%,88%{left:27%;top:68%;opacity:1}100%{left:27%;top:68%;opacity:0}}
+.d-pop.drag{animation:dPopLate 3.6s linear infinite;--y:46%}
+.d-haz{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);border-radius:50%;border:2px solid rgba(229,72,77,.8);background:rgba(229,72,77,.22);animation:dHaz 3.6s ease-in-out infinite}
+@keyframes dHaz{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,18px)}}
+.d-player{position:absolute;left:var(--x);top:var(--y);width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:#fff;box-shadow:0 0 16px rgba(255,255,255,.7);animation:dPlayer 3.6s ease-in-out infinite}
+.d-player i{position:absolute;top:15px;width:5px;height:5px;border-radius:50%;background:#16140F}
+.d-player i:first-child{left:11px}.d-player i:last-child{right:11px}
+@keyframes dPlayer{0%,10%{left:24%;top:60%}50%,100%{left:72%;top:44%}}
+.sfs-demo.dm .d-cursor{display:none}
+.d-keys{position:absolute;left:14px;bottom:50px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.d-keys div{display:flex;gap:4px}
+.d-keys kbd{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-bottom-width:3px;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:14px;color:#fff}
+.d-keys kbd.k-d{animation:dKey 3.6s ease-in-out infinite}
+@keyframes dKey{0%,8%{background:rgba(255,255,255,.1)}12%,46%{background:var(--accent);border-color:var(--accent)}52%,100%{background:rgba(255,255,255,.1)}}
+
+/* jeu */
+.sfs-play{flex:1;min-height:0;display:flex;flex-direction:column;padding:12px max(16px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));gap:8px}
+.sfs-hud{display:flex;align-items:flex-start;gap:24px;flex-shrink:0}
+.sfs-score{display:flex;align-items:baseline;gap:6px;min-width:110px}
+.sfs-score b{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:40px;line-height:1}
+.sfs-score small{font-size:13px;font-weight:700;color:rgba(255,255,255,.5)}
+.sfs-goalbar{flex:1;min-width:0;padding-top:10px}
+.sfs-track{position:relative;height:12px;border-radius:6px;background:rgba(255,255,255,.14)}
+.sfs-track>i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--accent);transition:width .2s}
+.sfs-track>i[data-tier="bronze"]{background:#E39A5B}.sfs-track>i[data-tier="silver"]{background:#D5DAE2}.sfs-track>i[data-tier="gold"]{background:#FFD84D}
+.sfs-track .mk{position:absolute;top:-4px;width:4px;height:20px;border-radius:2px;margin-left:-2px;background:rgba(255,255,255,.4)}
+.sfs-track .mk.b{background:#E39A5B}.sfs-track .mk.s{background:#D5DAE2}.sfs-track .mk.g{background:#FFD84D}
+.sfs-track .mk.on{box-shadow:0 0 10px currentColor}
+.sfs-marks{position:relative;height:20px;margin-top:6px}
+.sfs-marks span{position:absolute;transform:translateX(-50%);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11.5px;color:rgba(255,255,255,.45)}
+.sfs-marks span.b.on{color:#E39A5B}.sfs-marks span.s.on{color:#D5DAE2}.sfs-marks span.g.on{color:#FFD84D}
+.sfs-marks span:last-child{transform:translateX(-100%)}
+.sfs-right{display:flex;align-items:center;gap:18px;min-width:150px;justify-content:flex-end}
+.sfs-time{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:40px;line-height:1;min-width:58px;text-align:right}
+.sfs-time.low{color:#E5484D}
+.sfs-lives{display:flex;gap:7px}
+.sfs-life{width:18px;height:18px;transform:rotate(45deg);border-radius:4px;background:rgba(255,255,255,.14);display:inline-block}
+.sfs-life.on{background:linear-gradient(160deg,#FF9868,#FF4D2E);box-shadow:0 0 10px rgba(255,77,46,.6)}
+.sfs-lives.hit{animation:sfsShake .35s}
+@keyframes sfsShake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.sfs-timebar{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;flex-shrink:0}
+.sfs-timebar i{display:block;height:100%;background:rgba(255,255,255,.45)}
+.sfs-hintbar{flex-shrink:0;text-align:center;font-size:15px;font-weight:700;color:#FFB199;letter-spacing:.01em;min-height:22px}
+.sfs-arena{position:relative;flex:1;min-height:200px;border-radius:22px;background:#1B1812;border:1px solid rgba(255,255,255,.1);overflow:hidden;transition:box-shadow .1s}
+.sfs-arena::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.05) 1.1px,transparent 1.1px);background-size:18px 18px;pointer-events:none}
+.sfs-arena.f-good{box-shadow:inset 0 0 0 3px #1FA971}.sfs-arena.f-bad{box-shadow:inset 0 0 0 3px #E5484D}.sfs-arena.f-gold{box-shadow:inset 0 0 0 3px #FFD84D}.sfs-arena.f-blue{box-shadow:inset 0 0 0 3px #3B82F6}.sfs-arena.f-violet{box-shadow:inset 0 0 0 3px #A855F7}
+.sfs-layer,.sfs-fx{position:absolute;inset:0;pointer-events:none}
+.sfs-layer>*{position:absolute;transform:translate(-50%,-50%);pointer-events:none}
+.sfs-t{border-radius:50%}
+.sfs-t i{position:absolute;display:block}
+.sfs-t .r{inset:0;border:2px solid rgba(255,255,255,.22);border-radius:50%}
+.sfs-t .p{inset:9%;border-radius:50%}
+.sfs-t .c{inset:22%;border-radius:50%}
+.sfs-t .d{inset:42%;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff}
+.sfs-t .h{border-radius:50%;background:#FFD84D;box-shadow:0 0 10px #FFD84D;display:none}
+.sfs-t .m{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-weight:800;font-size:18px;text-shadow:0 2px 6px rgba(0,0,0,.5);display:none}
+.sfs-t .tg,.sfs-bonus span{position:absolute;left:50%;top:100%;margin-top:8px;transform:translateX(-50%);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12px;letter-spacing:.06em;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+.sfs-t .tg:empty,.sfs-bonus span:empty{display:none}
+.sfs-bonus{border-radius:50%;border:2px solid #fff;display:grid;place-items:center;color:#fff}
+.sfs-bonus em{font-style:normal;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px}
+.sfs-bonus span{color:#FFD84D}
+.sfs-pad{border-radius:50%;border:3px solid #1FA971;display:grid;place-items:center;color:#fff}
+.sfs-pad b{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12px;letter-spacing:.06em}
+.sfs-haz{border-radius:50%;border:2px solid rgba(229,72,77,.75);background:rgba(229,72,77,.22)}
+.sfs-piece{box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),0 6px 18px rgba(0,0,0,.4)}
+.sfs-piece.grab{outline:3px solid #fff;z-index:2}
+.sfs-piece::after{content:attr(data-tag);position:absolute;left:50%;top:100%;margin-top:8px;transform:translateX(-50%);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12px;letter-spacing:.06em;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+.sfs-zone{top:58%;height:calc(42% - 6px);box-sizing:border-box;border:2px dashed var(--zc);background:color-mix(in srgb,var(--zc) 11%,transparent);border-radius:14px;display:flex;align-items:center;justify-content:center}
+.sfs-zone span{font-weight:800;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--zc)}
+.sfs-layer>.sfs-zone{transform:none}
+.sfs-pl{border-radius:50%;background:#fff;box-shadow:0 0 16px rgba(255,255,255,.7);z-index:3}
+.sfs-pl i{position:absolute;top:38%;width:11%;height:11%;border-radius:50%;background:#16140F}
+.sfs-pl i:first-child{left:27%}.sfs-pl i:last-child{right:27%}
+.sfs-mult{background:#3B82F6;color:#fff;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:14px;padding:6px 14px;border-radius:999px}
+.sfs-layer>.sfs-mult{left:auto;right:14px;top:14px;transform:none}
+.sfs-chain{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.45);padding:7px 14px;border-radius:999px}
+.sfs-chain span{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2)}
+.sfs-chain span.on{background:#FFD84D}
+.sfs-layer>.sfs-chain{left:50%;top:auto;bottom:14px;transform:translateX(-50%)}
+.sfs-chain em{font-style:normal;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.65);margin-left:4px}
+.sfs-judge{position:absolute;text-align:center;transform:translate(-50%,-130%);animation:sfsPop .24s ease-out;pointer-events:none;z-index:6}
+.sfs-judge .jt{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;color:rgba(255,255,255,.78);text-transform:uppercase;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.sfs-judge .jp{display:inline-block;margin-top:2px;border-radius:999px;padding:5px 14px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff;background:rgba(31,169,113,.92)}
+.sfs-judge .jp.bonus{background:rgba(255,216,77,.95);color:#16140F}
+.sfs-judge .jp.bad{background:rgba(229,72,77,.95)}
+.sfs-judge.ripple{transform:translate(-50%,-50%);animation:none}
+.sfs-judge.ripple i{display:block;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:2px solid rgba(255,255,255,.55);animation:sfsRip .4s ease-out forwards}
+@keyframes sfsRip{from{transform:scale(.4);opacity:1}to{transform:scale(2.2);opacity:0}}
+@keyframes sfsPop{0%{transform:translate(-50%,-100%) scale(.7);opacity:0}100%{transform:translate(-50%,-130%) scale(1);opacity:1}}
+.sfs-big{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);font-family:'JetBrains Mono',monospace;font-weight:800;font-size:44px;color:#FFD84D;text-shadow:0 4px 18px rgba(0,0,0,.6);animation:sfsBig .9s ease-out forwards;pointer-events:none}
+@keyframes sfsBig{from{opacity:1;transform:translate(-50%,-50%)}to{opacity:0;transform:translate(-50%,-130%)}}
+.sfs-count{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(80px,16vw,170px);color:#fff;text-shadow:0 0 50px rgba(255,140,90,.7);pointer-events:none;opacity:0;z-index:5;text-align:center;line-height:1}
+.sfs-count.pop{animation:sfsCount .62s ease-out forwards}
+.sfs-count.go{font-size:clamp(40px,8vw,84px);color:#FFD84D}
+@keyframes sfsCount{0%{opacity:0;transform:scale(1.5)}25%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:scale(.9)}}
+.sfs-foot{flex-shrink:0;display:flex;align-items:center;gap:30px;flex-wrap:wrap;padding:4px 4px 0}
+.sfs-foot small{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:2px}
+.sfs-foot b{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:20px}
+.sfs-foot b.acc{color:var(--accent)}
+.sfs-foot .r{margin-left:auto;display:flex;align-items:center;gap:16px}
+.sfs-foot .r span{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12.5px;color:rgba(255,255,255,.5)}
+.sfs-replay{min-height:40px;padding:0 16px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
+.sfs-replay:hover{background:rgba(255,255,255,.14)}
+
+/* pause */
+.sfs-pause{position:absolute;inset:0;z-index:7;display:flex;overflow-y:auto;background:rgba(22,20,15,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.sfs-pause-card{margin:auto;width:100%;max-width:880px;padding:28px 24px}
+.sfs-pause-body{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:32px;align-items:start}
+.sfs-pause-btns{display:flex;flex-direction:column;gap:10px;align-items:stretch}
+.sfs-pause-btns .sfs-key{text-align:center;margin-top:6px}
+.sfs-pause-rules{padding:18px 18px 16px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.sfs-rules-t{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:12px}
+.sfs-pause-rules .sfs-leg{margin:12px 0 10px;background:none;border:none;padding:0}
+
+/* fin */
+.sfs-end{flex:1;min-height:0;overflow-y:auto;display:flex}
+.sfs-end-in{margin:auto;width:100%;max-width:640px;padding:28px 24px 40px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.sfs-medal{margin-bottom:8px}
+.sfs-end .sfs-h{margin-bottom:10px}
+.sfs-final{display:flex;align-items:baseline;gap:8px;margin-bottom:18px}
+.sfs-final b{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:64px;line-height:1;color:var(--accent)}
+.sfs-final span{font-size:17px;font-weight:700;color:rgba(255,255,255,.55)}
+.sfs-stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
+.sfs-stats>div{min-width:112px;padding:12px 16px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.sfs-stats b{display:block;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:26px}
+.sfs-stats small{display:block;font-size:12px;font-weight:700;color:rgba(255,255,255,.5);margin-top:2px}
+.sfs-next{width:100%;max-width:460px;margin-bottom:16px}
+.sfs-next-t{font-size:15px;color:rgba(255,255,255,.75);margin-bottom:8px}
+.sfs-next-t b{color:#fff}
+.sfs-next-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}
+.sfs-next-bar i{display:block;height:100%;border-radius:4px;background:var(--accent)}
+.sfs-tip{max-width:460px;margin:0 0 24px;font-size:15px;line-height:1.55;color:rgba(255,255,255,.7);padding:12px 16px;border-radius:14px;background:rgba(255,216,77,.08);border:1px solid rgba(255,216,77,.25)}
+.sfs-end-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+@media(max-width:860px){
+  .sfs-brief-in{grid-template-columns:1fr;gap:22px;padding:18px 18px 30px}
+  .sfs-brief-demo{max-width:520px;margin:0 auto;width:100%}
+  .sfs-pause-body{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .sfs-bar{gap:8px;padding-left:12px;padding-right:12px}
+  .sfs-btn{padding:0 12px;font-size:13px}
+  .sfs-btn.quit span,#sfs-pause span,#sfs-back-l{display:none}
+  .sfs-btn{min-width:44px}
+  .sfs-ttl b{font-size:16px}
+  .sfs-leg{grid-template-columns:1fr}
+  .sfs-steps li{font-size:15.5px}
+  .sfs-hud{gap:12px;flex-wrap:wrap}
+  .sfs-score b,.sfs-time{font-size:30px}
+  .sfs-goalbar{order:3;flex-basis:100%;padding-top:0}
+  .sfs-right{min-width:0;margin-left:auto}
+  .sfs-foot{gap:16px}
+  .sfs-foot .r{margin-left:0;width:100%;justify-content:space-between}
+  .sfs-go{width:100%}
+  .sfs-final b{font-size:52px}
+}
+@media(max-height:560px){
+  .sfs-hintbar{display:none}
+  .sfs-score b,.sfs-time{font-size:28px}
+  .sfs-foot{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .sfs *{animation:none!important;transition:none!important}
+  .sfs-count.pop{opacity:1}
+  .d-cursor{opacity:1}
+  .d-pop,.d-press{display:none}
+  .d-prog circle{stroke-dashoffset:0}
+  .d-shrink circle{stroke-dashoffset:90}
+}
 
 /* MAGIC TILES */
 .tiles-hud{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
@@ -6917,7 +7201,7 @@ const app={
         if(e.key===' '&&this.sess&&this.sess.text){const ex=this.sess.text[this.sess.idx];if(ex&&'~`^¨'.includes(ex))e._composedKey=ex;}
       }else e._composedKey=(DEAD_COMPOSE[pk]||{})[e.key]||(e.key===' '?pk:e.key);
     }
-    if(e.key==='Escape'&&this.view==='games'&&this.activeGame){this.exitActiveGame();return;}
+    if(e.key==='Escape'&&this.view==='games'&&this.activeGame){if(this._sfsEl()){this._sfsEsc();return;}this.exitActiveGame();return;}
     if(this.view==='games'&&this.activeGame==='sprint'&&this.sprint&&this.sprint.on){this.sprintKey(e);return;}
     if(this.view==='games'&&this.activeGame==='frappe'&&this.game&&this.game.on){this.gameKey(e);return;}
     if(this.view==='games'&&this.activeGame==='course'&&this.course&&this.course.on){this.courseKey(e);return;}
@@ -6930,6 +7214,7 @@ const app={
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
   },
   exitActiveGame(){
+    this._sfsClose();
     this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();
     if(this.duel)this.duelLeave();
     if(this.royale)this.royaleLeave();
@@ -7217,7 +7502,7 @@ const app={
     if(v==='classes'&&currentUser&&!isTeacher()&&!currentInstitutionName&&!currentHasClass)v='stats';
     this.view=v;
     maybeConvNudge(v);
-    if(v!=='games'){this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.royaleLeave();this.activeGame=null;this._gcineTeardown();}
+    if(v!=='games'){this._sfsClose(true);this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();this.stopSimon();this.stopSouris();this.stopBoss();this.duelLeave();this.royaleLeave();this.activeGame=null;this._gcineTeardown();}
     // Sans ça, le poll 25s de viewClass() continuait après avoir quitté la vue
     // "classes" par un onglet de nav (au lieu du bouton ← Retour), et renvoyait
     // de force l'utilisateur vers la liste des classes à chaque tick.
@@ -8898,51 +9183,51 @@ const app={
     {n:1,icon:'👆',name:'Survol',tag:'Vise avec la souris',
      brief:'Des cercles apparaissent. <b>Pose le curseur dessus</b> et garde-le un instant : pas besoin de cliquer.',
      newThing:'Déplacer la souris avec précision.',
-     dur:30,bronze:18,silver:26,gold:34},
+     dur:30,bronze:18,silver:30,gold:38},
     {n:2,icon:'🖱️',name:'Clic',tag:'Vise et clique',
      brief:'Cette fois il faut <b>cliquer</b> sur les cibles. Elles rétrécissent avec le temps : sois rapide.',
      newThing:'Le clic, et des cibles qui disparaissent.',
-     dur:30,bronze:25,silver:37,gold:48},
+     dur:30,bronze:16,silver:28,gold:38},
     {n:3,icon:'🎯',name:'Le cœur de cible',tag:'Vise le centre',
      brief:'Chaque cible a un <b style="color:#FFD84D">cœur doré</b>, plus petit que la cible. Le toucher rapporte <b>3 points</b> au lieu d’un, et <b>5 cœurs d’affilée rendent une vie</b>.',
      newThing:'La précision paie : vise le centre, pas le bord.',
-     dur:32,bronze:80,silver:115,gold:155},
+     dur:32,bronze:30,silver:54,gold:80},
     {n:4,icon:'⚡',name:'Cibles express',tag:'Réagis vite',
      brief:'Les cibles ne restent qu’un <b>court instant</b>. Enchaîne sans hésiter pour garder le rythme.',
      newThing:'La vitesse de réaction pure.',
-     dur:30,bronze:74,silver:110,gold:145},
+     dur:30,bronze:26,silver:48,gold:70},
     {n:5,icon:'⚠️',name:'Pièges',tag:'Ne clique pas n’importe quoi',
      brief:'Les <b style="color:#1FA971">vertes</b> rapportent, les <b style="color:#E5484D">rouges</b> te coûtent des points. Mais toutes ne se ressemblent pas : <b>lis avant de cliquer</b>.',
      newThing:'Distinguer le bon du piège : le rouge se déguise.',
-     dur:34,bronze:34,silver:50,gold:66},
+     dur:34,bronze:22,silver:40,gold:52},
     {n:6,icon:'💎',name:'Bonus & choix',tag:'Choisis bien',
      brief:'Des cibles spéciales apparaissent : <b style="color:#3B82F6">bleue</b> = points doublés un temps, <b style="color:#A855F7">violette</b> = +2 s au chrono, <b style="color:#FFD84D">dorée</b> = jackpot bref. Elles disparaissent vite : <b>vaut-il mieux la chasser ou rester sur les vertes ?</b>',
      newThing:'Arbitrer : chaque bonus coûte le temps de l’attraper.',
-     dur:34,bronze:130,silver:190,gold:255},
+     dur:34,bronze:32,silver:60,gold:100},
     {n:7,icon:'⏱️',name:'Pièges express',tag:'Décide vite et bien',
      brief:'Pièges déguisés <b>et</b> cibles pressées, avec les bonus. La lecture doit être instantanée.',
      newThing:'Discriminer sous pression de temps.',
-     dur:34,bronze:70,silver:105,gold:135},
+     dur:34,bronze:18,silver:34,gold:52},
     {n:8,icon:'✋',name:'Glisser-déposer',tag:'Attrape et dépose',
      brief:'Attrape chaque forme et <b>fais-la glisser</b> dans la zone de sa couleur, sans lâcher le bouton.',
      newThing:'Maintenir le clic en déplaçant la souris.',
-     dur:34,bronze:35,silver:50,gold:62},
+     dur:34,bronze:14,silver:23,gold:34},
     {n:9,icon:'🎨',name:'Tri rapide',tag:'Trie sous pression',
      brief:'Comme le glisser-déposer, mais <b>trois couleurs</b> et un chrono plus serré. Range vite et juste.',
      newThing:'Trier plusieurs catégories à la fois.',
-     dur:34,bronze:35,silver:50,gold:62},
+     dur:34,bronze:13,silver:21,gold:32},
     {n:10,icon:'🕹️',name:'ZQSD seul',tag:'Apprends à te déplacer',
      brief:'Pose la souris. Déplace ton personnage avec <b>Z Q S D</b> pour <b>entrer dans les cercles verts</b> et esquiver les zones rouges.',
      newThing:'Le clavier pour bouger, main gauche seule.',
-     dur:34,bronze:10,silver:14,gold:19},
+     dur:34,bronze:14,silver:22,gold:27},
     {n:11,icon:'🎮',name:'Souris + clavier',tag:'Tout en même temps',
      brief:'Déplace-toi avec <b>Z Q S D</b> pour esquiver les zones rouges, <b>tout en cliquant</b> les cibles et leurs cœurs.',
      newThing:'Les deux mains à la fois, comme un vrai jeu.',
-     dur:36,bronze:74,silver:110,gold:145},
+     dur:36,bronze:28,silver:54,gold:76},
     {n:12,icon:'🔥',name:'Chaos',tag:'La totale',
      brief:'Tout, en même temps, plus vite : cœurs, pièges déguisés, bonus, déplacement et zones mobiles. Le test ultime de la coordination.',
      newThing:'Maîtrise complète : rien ne t’est épargné.',
-     dur:40,bronze:68,silver:100,gold:130},
+     dur:40,bronze:17,silver:38,gold:56},
   ],
 
   // Capacités par niveau : la logique lit cette table, jamais un numéro en dur.
@@ -9016,6 +9301,7 @@ const app={
   },
 
   stopSouris(){
+    this._sfsStopLoop();
     if(this._sourisLoop){clearInterval(this._sourisLoop);this._sourisLoop=null;}
     if(this._sourisKeyH){window.removeEventListener('keydown',this._sourisKeyH);window.removeEventListener('keyup',this._sourisKeyUpH);this._sourisKeyH=null;this._sourisKeyUpH=null;}
     this._sourisKeys=null;
@@ -9032,10 +9318,8 @@ const app={
     if(track==='grid')return this._sourisGridRender();
     if(track==='hybrid')return this._sourisHybridRender();
     if(track==='tiles')return this._sourisTilesRender();
-    if(s.phase==='mouseMenu'){return this._sourisRenderMenu();}
-    if(s.phase==='brief'){return this._sourisRenderBrief();}
-    if(s.phase==='over'||s.phase==='win'){return this._sourisRenderEnd();}
-    this._sourisRenderArena();
+    if(s.phase==='mouseMenu'){this._sfsClose();return this._sourisRenderMenu();}
+    this._sfsRender(); // brief, decompte, partie, pause, fin : couche plein ecran
   },
 
   sourisKey(e){
@@ -9047,298 +9331,102 @@ const app={
     // 'mouse' : géré par son propre listener ZQSD, rien à faire ici.
   },
 
+  // Thèmes du menu : regroupent les 12 niveaux par ce qu'on y apprend
+  _sfsChapters:[
+    {t:'Viser',d:'Survol, clic, précision, vitesse',from:1,to:4},
+    {t:'Décider',d:'Pièges et bonus : lis avant de cliquer',from:5,to:7},
+    {t:'Glisser',d:'Attrape et dépose au bon endroit',from:8,to:9},
+    {t:'Au clavier',d:'Z Q S D pour te déplacer',from:10,to:12},
+  ],
+  // Icône de niveau : le même dessin que l'élément principal du niveau
+  _sfsLevelSwatch:{1:'orange',2:'good',3:'heart',4:'good',5:'bad',6:'x2',7:'dis',8:'pg',9:'pi',10:'pad',11:'haz',12:'jack'},
+  _sfsMedalSvg(tier,px){
+    const c={gold:['#FFD84D','#B98300'],silver:['#E3E7ED','#7D8794'],bronze:['#E39A5B','#8F4F20']}[tier];
+    if(!c)return '';
+    return `<svg viewBox="0 0 24 24" width="${px}" height="${px}" aria-hidden="true"><path d="M7 1.5h4l1.2 5H8.2z" fill="#FF4D2E"/><path d="M17 1.5h-4l-1.2 5h4z" fill="#C93A20"/><circle cx="12" cy="15" r="7.6" fill="${c[0]}" stroke="${c[1]}" stroke-width="1.2"/><path d="M12 10.6l1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4z" fill="${c[1]}" opacity=".55"/></svg>`;
+  },
+
   _sourisRenderMenu(){
     const unlocked=this._sourisUnlocked();
     const best=this._sourisBest();
     const tiers=(this.stats&&this.stats.sourisTiers)||{};
-    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'};
-    const golds=Object.values(tiers).filter(t=>t==='gold').length;
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:1120px;margin:0 auto;padding:0 24px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;margin:0;flex:1">Précision souris · 12 niveaux</h2>
-        <div style="font-size:13px;color:var(--muted);font-weight:600">${best}/12 franchis${golds?' · '+golds+' 🥇':''}</div>
-      </div>
-      <div class="game-selector">
-        ${this._sourisLevels.map(lv=>{
-          const open=lv.n<=unlocked, done=lv.n<=best, tier=tiers[lv.n];
-          return `<div class="game-sel-card" onclick="${open?`app.selectSouris(${lv.n})`:''}" style="${open?'':'opacity:.45;cursor:not-allowed'};position:relative">
-            <div class="game-sel-icon">${open?lv.icon:'🔒'}</div>
-            <div class="game-sel-name">Niv. ${lv.n} · ${lv.name} ${tier?medal[tier]:''}</div>
-            <div class="game-sel-desc">${lv.tag}. ${this._esc(lv.newThing)}</div>
-            <span class="game-sel-tag free" style="${done?'background:rgba(31,169,113,.15);color:#1FA971':''}">${tier?medal[tier]+' '+tier.toUpperCase():open?'À FAIRE':'VERROUILLÉ'}</span>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-  },
-
-  _sourisRenderBrief(){
-    const s=this.souris, l=this._sourisLevels[s.lvl-1];
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:900px;margin:0 auto;padding:0 24px">
-        <button onclick="app.souris={phase:'mouseMenu'};app.renderSouris()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Niveaux</button>
-        <div class="game-arena" style="height:auto;padding:0">
-          <div class="gsouris-intro">
-            <div class="gsouris-intro-ring a"></div>
-            <div class="gsouris-intro-ring b"></div>
-            <div class="gsouris-intro-kicker">Précision souris</div>
-            <h2 class="gsouris-intro-title">${this._esc(l.name)}</h2>
-            <p class="gsouris-intro-sub">${l.brief}</p>
-            <div class="gsouris-intro-chips">
-              <div class="gsouris-intro-chip accent">${l.dur||30} secondes</div>
-              <div class="gsouris-intro-chip">${s.lives||3} vies</div>
-              <div class="gsouris-intro-chip">Or à ${l.gold} pts</div>
-            </div>
-            <button class="btn-primary" id="gsouris-brief-go" autofocus onclick="app.startSouris()">Entrer dans la salle ›</button>
-            <div class="gidle-espace">OU APPUIE SUR ESPACE</div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-    // `autofocus` sur du HTML injecté via innerHTML n'est pas garanti par
-    // tous les navigateurs : sans ce focus explicite, "OU APPUIE SUR ESPACE"
-    // pouvait rester une fausse promesse (rien de focusé = rien n'écoute Espace).
-    const goBtn=document.getElementById('gsouris-brief-go');
-    if(goBtn)goBtn.focus();
-  },
-
-  _sourisRenderEnd(){
-    const s=this.souris, l=this._sourisLevels[s.lvl-1];
-    const win=s.phase==='win';
-    const acc=(s.hit+s.miss)?Math.round(s.hit/(s.hit+s.miss)*100):0;
-    const last=s.lvl>=12;
-    const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[s.tier]||'';
-    const tierLabel={gold:'Médaille d’or',silver:'Médaille d’argent',bronze:'Médaille de bronze'}[s.tier]||'';
-    const nextTier=s.tier==='bronze'?('argent à '+l.silver+' pts'):s.tier==='silver'?('or à '+l.gold+' pts'):'';
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <div class="game-arena" style="height:auto;padding:48px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
-          <div style="font-size:60px;line-height:1">${win?(medal||'🎉'):'💥'}</div>
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#fff;margin:0">${win?(last?'Chaos vaincu !':tierLabel):'Palier manqué'}</h2>
-          <div class="game-final">${s.score} pts</div>
-          <p style="color:rgba(255,255,255,.7);font-size:14.5px;margin:0">${s.hit} réussite${s.hit>1?'s':''} · ${acc}% de précision${s.cores?' · '+s.cores+' cœur'+(s.cores>1?'s':''):''}${s.regen?' · +'+s.regen+' ♥ régénérée'+(s.regen>1?'s':''):''}</p>
-          ${win&&nextTier?`<div style="font-size:12.5px;color:rgba(255,255,255,.55)">Prochain palier : ${nextTier}</div>`:''}
-          ${!win?`<div style="font-size:13px;color:rgba(255,255,255,.6)">Il fallait ${l.bronze} pts (bronze)${s.score>=l.bronze*0.7?', tu y étais presque !':' pour valider ce niveau.'}</div>`:''}
-          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center">
-            ${win&&!last?`<button class="game-play-btn" onclick="app.selectSouris(${s.lvl+1})">Niveau ${s.lvl+1} →</button>`:''}
-            <button class="res-btn sec" style="flex:none;padding:13px 26px" onclick="app.selectSouris(${s.lvl})">${win&&s.tier!=='gold'?'Viser mieux':'Rejouer'}</button>
-            <button class="res-btn sec" style="flex:none;padding:13px 26px" onclick="app.souris={phase:'mouseMenu'};app.renderSouris()">Niveaux</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  },
-
-  _sourisRenderArena(){
-    const s=this.souris, l=this._sourisLevels[s.lvl-1], cap=this._sourisCaps(s.lvl);
-    const lives=[0,1,2].map(i=>`<span class="gsouris-life${i<s.lives?' on':''}"></span>`).join('');
-    const sec=Math.ceil((s.tLeft||0)/1000);
-    const tpct=Math.max(0,Math.min(100,(s.tLeft||0)/((l.dur||30)*1000)*100));
-    const gpct=(v)=>Math.min(100,v/l.gold*100);
-    const spct=Math.min(100,s.score/l.gold*100);
-    const tier=this._sourisTier(l,s.score);
-    const barCol=tier==='gold'?'#FFD84D':tier==='silver'?'#C0C7D0':tier==='bronze'?'#CD7F44':'var(--accent)';
-    const mark=(v,col)=>`<div style="position:absolute;left:${gpct(v)}%;top:-3px;bottom:-3px;width:2px;background:${col}"></div>`;
-    const hint=cap.pads?'Z Q S D pour entrer dans les cercles verts':cap.move&&cap.click?'Z Q S D pour bouger · clique les cibles et leurs cœurs':cap.move?'Z Q S D pour bouger':cap.sort3?'Trie chaque forme dans sa couleur':cap.drag?'Attrape et dépose dans la bonne zone':cap.bonus?'Attrape les bonus… ou reste sur les vertes ?':cap.disguise?'Méfie-toi : certains rouges se déguisent en orange':cap.traps?'Vertes oui, rouges non · vise le cœur':cap.core?'Vise le cœur doré : 3 pts, 5 d’affilée = +1 ♥':cap.click?'Clique les cibles':'Maintiens la cible';
-    const acc=(s.hit+s.miss)?Math.round(100*s.hit/(s.hit+s.miss)):100;
-    document.getElementById('page-games').innerHTML=`<div class="games-section">
-      <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <div class="game-arena" style="height:auto;padding:16px 20px 20px;display:flex;flex-direction:column;cursor:${cap.click||cap.drag?'crosshair':'default'}">
-          <div class="game-hud">
-            <div class="game-score-val" style="min-width:70px">${s.score} <span style="font-size:12px">pts</span></div>
-            <div style="flex:1;margin:0 16px">
-              <div style="position:relative;height:8px;background:rgba(255,255,255,.14);border-radius:4px">
-                <div style="height:100%;width:${spct}%;background:${barCol};border-radius:4px;transition:width .2s"></div>
-                ${mark(l.bronze,'#CD7F44')}${mark(l.silver,'#C0C7D0')}${mark(l.gold,'#FFD84D')}
-              </div>
-              <div style="display:flex;justify-content:space-between;font-size:10.5px;color:rgba(255,255,255,.55);font-weight:700;margin-top:4px"><span>🥉${l.bronze}</span><span>🥈${l.silver}</span><span>🥇${l.gold}</span></div>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:${sec<=5?'#E5484D':'#fff'};min-width:42px;text-align:right">${sec}s</div>
-              <div style="display:flex;gap:4px">${lives}</div>
-            </div>
-          </div>
-          <div style="position:relative;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin:10px 0 10px;overflow:hidden"><div style="height:100%;width:${tpct}%;background:${sec<=5?'#E5484D':'rgba(255,255,255,.4)'};transition:width .05s linear"></div></div>
-          <div class="gsouris-section"><span>${this._esc(l.name.toUpperCase())} · ${this._esc(hint.toUpperCase())}</span></div>
-          <div id="souris-arena" style="position:relative;flex:1;min-height:300px;user-select:none"></div>
-          <div class="gsouris-footer">
-            <div><span class="gsouris-stat-label">PRÉCISION</span><span class="gsouris-stat-val">${acc}%</span></div>
-            <div><span class="gsouris-stat-label">TEMPS DE RÉACTION</span><span class="gsouris-stat-val">${s.lastReaction?s.lastReaction+'ms':'–'}</span></div>
-            <div><span class="gsouris-stat-label">SÉRIE</span><span class="gsouris-stat-val accent">${s.streak||0}</span></div>
-            <div class="gsouris-footer-right">
-              <span class="gsouris-gold-left">${Math.max(0,l.gold-s.score)} PTS DE L'OR</span>
-              <button class="gsouris-replay" onclick="app.startSouris()">↺ Rejouer</button>
-            </div>
-          </div>
-        </div>
-        <div style="text-align:center;margin-top:10px"><button class="btn-quit" onclick="app.stopSouris();app.souris={phase:'mouseMenu'};app.renderSouris()" title="Quitter la partie (Échap)">✕ Quitter</button></div>
-      </div>
-    </div>`;
-    this._sourisArena=document.getElementById('souris-arena');
-    this._sourisBindArena();
-    this._sourisPaint();
-  },
-
-  /* ── Boucle ─────────────────────────────────────────────────── */
-
-  startSouris(){
-    const s=this.souris, l=this._sourisLevels[s.lvl-1];
-    this.stopSouris();
-    Object.assign(s,{phase:'play',score:0,lives:3,hit:0,miss:0,t0:Date.now(),targets:[],drag:null,tick:0,streak:0,cores:0,regen:0,hazards:[],tLeft:(l.dur||30)*1000,mult:1,multUntil:0,lastReaction:0});
-    const c=this._sourisCaps(s.lvl);
-    if(c.move||c.pads){
-      s.player={x:50,y:50};
-      s.hazards=[];
-      this._sourisKeys={z:false,q:false,s:false,d:false};
-      this._sourisKeyH=(e)=>{const k=e.key.toLowerCase();if(k in this._sourisKeys){this._sourisKeys[k]=true;e.preventDefault();}};
-      this._sourisKeyUpH=(e)=>{const k=e.key.toLowerCase();if(k in this._sourisKeys)this._sourisKeys[k]=false;};
-      window.addEventListener('keydown',this._sourisKeyH);
-      window.addEventListener('keyup',this._sourisKeyUpH);
-    }
-    this.renderSouris();
-    this._sourisLoop=setInterval(()=>this._sourisTick(),50);
-  },
-
-  _sourisBindArena(){
-    const a=this._sourisArena;if(!a)return;
-    const s=this.souris;
-    a.onmousemove=(e)=>{
-      const r=a.getBoundingClientRect();
-      s.mx=(e.clientX-r.left)/r.width*100;
-      s.my=(e.clientY-r.top)/r.height*100;
-      if(s.drag){e.preventDefault();s.drag.x=s.mx;s.drag.y=s.my;}
+    const lv=this._sourisLevels;
+    const tierName={gold:'Or',silver:'Argent',bronze:'Bronze'};
+    const counts={gold:0,silver:0,bronze:0};
+    lv.forEach(l=>{if(l.n<=best&&counts[tiers[l.n]]!=null)counts[tiers[l.n]]++;});
+    // Niveau conseillé : le premier niveau ouvert pas encore validé, sinon le
+    // premier sans médaille d'or, sinon le premier
+    let next=null;
+    for(const l of lv){if(l.n<=unlocked&&l.n>best){next=l;break;}}
+    if(!next)next=lv.find(l=>tiers[l.n]!=='gold')||lv[0];
+    const allDone=best>=12;
+    const allGold=allDone&&lv.every(l=>tiers[l.n]==='gold');
+    const seg=lv.map(l=>{
+      const t=l.n<=best?(tiers[l.n]||'done'):'';
+      return `<i class="sm-seg ${t}${l.n===next.n&&!allDone?' now':''}" title="Niveau ${l.n}"></i>`;
+    }).join('');
+    const medals=['gold','silver','bronze'].map(t=>`<span class="sm-med ${t}">${this._sfsMedalSvg(t,20)}<b>${counts[t]}</b> ${tierName[t].toLowerCase()}</span>`).join('');
+    const card=(l)=>{
+      const open=l.n<=unlocked,done=l.n<=best,tier=tiers[l.n];
+      const isNext=!allDone&&l.n===next.n;
+      const status=!open?`<span class="sm-st lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>Valide le niveau ${l.n-1}</span>`
+        :done?(tier?`<span class="sm-st done">${this._sfsMedalSvg(tier,18)}${tierName[tier]}</span>`:'<span class="sm-st done">Validé</span>')
+        :isNext?'<span class="sm-st now">Prochain niveau</span>':'<span class="sm-st todo">À faire</span>';
+      return `<button type="button" class="sm-card${isNext?' next':''}${open?'':' locked'}" ${open?`onclick="app.selectSouris(${l.n})"`:'disabled'} aria-label="Niveau ${l.n}, ${this._esc(l.name)}">
+        <span class="sm-ic">${this._sfsSwatch(this._sfsLevelSwatch[l.n])}</span>
+        <span class="sm-tx"><small>Niveau ${l.n}</small><b>${this._esc(l.name)}</b><em>${this._esc(l.tag)}</em>${status}</span>
+      </button>`;
     };
-    const c=this._sourisCaps(s.lvl);
-    // Même raison que le glisser-déposer plus bas : sans preventDefault, des
-    // clics rapides et rapprochés sont lus par le navigateur comme un geste
-    // de sélection de texte (curseur en I, surbrillance bleue qui apparaît)
-    // au lieu d'un simple clic sur la cible.
-    if(c.click)a.onmousedown=(e)=>{e.preventDefault();this._sourisClick();};
-    if(c.drag){
-      // Sans preventDefault, un mousedown+mousemove sur du texte (ex. les
-      // libellés VERTE/BLEUE) déclenche la sélection native du navigateur
-      // au lieu de laisser le glisser-déposer JS gérer le geste.
-      a.onmousedown=(e)=>{
-        e.preventDefault();
-        const t=this._sourisAt(s.mx,s.my);
-        if(t){s.drag=t;t.grabbed=true;}
-      };
-      a.onmouseup=()=>{
-        if(!s.drag)return;
-        const t=s.drag;t.grabbed=false;s.drag=null;
-        const z=this._sourisZoneAt(t.x,t.y);
-        if(z===t.color){
-          s.score++;s.hit++;s.streak=(s.streak||0)+1;s.lastReaction=Date.now()-t.born;
-          s.targets=s.targets.filter(x=>x!==t);playSound('hit');this._sourisFlash('#1FA971');
-          this._sourisJudgePop('TOUCHÉ','+1 · SÉRIE '+s.streak);
-        } else {
-          s.miss++;s.streak=0;s.score=Math.max(0,s.score-1);
-          playSound('miss');this._sourisFlash('#E5484D');t.x=t.hx;t.y=t.hy;
-          this._sourisJudgePop('RATÉ','−1','bad');
-        }
-      };
-    }
+    const chapters=this._sfsChapters.map(ch=>`<section class="sm-ch">
+      <div class="sm-ch-h"><h3>${ch.t}</h3><span>${ch.d}</span></div>
+      <div class="sm-grid">${lv.filter(l=>l.n>=ch.from&&l.n<=ch.to).map(card).join('')}</div>
+    </section>`).join('');
+    const cta=allGold?`<button type="button" class="sm-cta" onclick="app.selectSouris(1)">Rejouer depuis le début</button>`
+      :`<button type="button" class="sm-cta" onclick="app.selectSouris(${next.n})"><span><small>${allDone?'Viser mieux':(best?'Continuer':'Commencer')}</small>Niveau ${next.n} · ${this._esc(next.name)}</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>`;
+    document.getElementById('page-games').innerHTML=`<div class="games-section"><div class="sm">
+      <div class="sm-top">
+        <button type="button" class="sm-back" onclick="app.exitActiveGame()">← Jeux</button>
+      </div>
+      <div class="sm-hero">
+        <div class="sm-hero-l">
+          <div class="sm-kick">Jeu de précision</div>
+          <h2>Précision souris</h2>
+          <p>Vise, clique, glisse, puis ajoute le clavier. Chaque niveau dure environ 30 secondes avec 3 vies. Ton score décide de la médaille : <b>le bronze valide le niveau</b> et débloque le suivant.</p>
+          <div class="sm-meds">${medals}</div>
+        </div>
+        <div class="sm-hero-r">
+          <div class="sm-prog-t"><b>${best}</b> sur 12 niveaux validés</div>
+          <div class="sm-segs">${seg}</div>
+          ${cta}
+        </div>
+      </div>
+      ${chapters}
+    </div></div>`;
   },
 
-  _sourisAt(x,y){
-    const s=this.souris;
-    return (s.targets||[]).find(t=>{
-      const dx=(t.x-x)*1.6, dy=t.y-y;   // arène large : corriger l'aspect
-      return Math.sqrt(dx*dx+dy*dy)<t.r;
-    });
-  },
+  /* ═══════════════════════════════════════════════════════════════
+     PRÉCISION SOURIS · EXPÉRIENCE PLEIN ÉCRAN (piste "mouse", 12 niveaux)
 
-  _sourisZoneAt(x,y){
-    if(y<58)return null;
-    if(this._sourisCaps(this.souris.lvl).sort3){
-      return x<33.3?'#1FA971':x<66.6?'#3B82F6':'#818CF8';
-    }
-    return x<50?'#1FA971':'#3B82F6';
-  },
+     Tout se passe dans une couche plein écran (#sfs) posée sur le site :
+     règles illustrées, décompte, partie, pause, fin. Deux sorties toujours
+     visibles en haut (← Niveaux, ✕ Quitter), Échap met en pause, le bouton
+     Retour du navigateur ferme la couche.
 
-  _sourisClick(){
-    const s=this.souris, c=this._sourisCaps(s.lvl);
-    const t=this._sourisAt(s.mx,s.my);
-    if(!t){s.miss++;s.streak=0;this._sourisFlash('rgba(255,255,255,.12)');return;}
-    if(t.bonus){
-      s.targets=s.targets.filter(x=>x!==t);
-      s.hit++;playSound('hit');
-      if(t.bonus==='points'){s.mult=2;s.multUntil=Date.now()+5000;this._sourisFlash('#3B82F6');this._sourisPop('×2 !','#3B82F6');}
-      else if(t.bonus==='time'){s.tLeft=(s.tLeft||0)+2000;this._sourisFlash('#A855F7');this._sourisPop('+2s','#A855F7');}
-      else if(t.bonus==='jackpot'){const g=8;s.score+=g;this._sourisFlash('#FFD84D');this._sourisPop('+'+g,'#FFD84D');}
-      return;
-    }
-    if(t.bad){
-      s.miss++;s.streak=0;
-      s.score=Math.max(0,s.score-2);
-      playSound('miss');this._sourisFlash('#E5484D');
-      this._sourisJudgePop('PIÈGE','−2','bad');
-      s.targets=s.targets.filter(x=>x!==t);
-      return;
-    }
-    const mult=(s.mult&&Date.now()<s.multUntil)?s.mult:1;
-    const core=!!c.core&&this._sourisInCore(t,s.mx,s.my);
-    const pts=(core?3:1)*mult;
-    s.score+=pts;
-    s.hit++;playSound('hit');
-    s.lastReaction=Date.now()-t.born;
-    if(core){
-      s.streak=(s.streak||0)+1;
-      s.cores=(s.cores||0)+1;
-      if(s.streak>0&&s.streak%5===0&&s.lives<3){
-        s.lives++;s.regen=(s.regen||0)+1;
-        this._sourisFlash('#FFD84D');this._sourisRegenPop();
-      }else this._sourisFlash('#FFD84D');
-    }else if(c.core){
-      // Niveaux à cœur : seul un cœur enchaîne la série, un bord la casse.
-      s.streak=0;
-      this._sourisFlash('#1FA971');
-    }else{
-      // Niveaux sans cœur (Clic, etc.) : chaque cible réussie enchaîne.
-      s.streak=(s.streak||0)+1;
-      this._sourisFlash('#1FA971');
-    }
-    // Même retour de jugement partout (voir _sourisJudgePop) : avant, cliquer
-    // une cible aux niveaux 2-7/11/12 ne donnait qu'un flash de bordure, sans
-    // le "+1"/"+3" que le niveau 1 affiche déjà au survol.
-    this._sourisJudgePop('TOUCHÉ','+'+pts+' · SÉRIE '+s.streak);
-    s.targets=s.targets.filter(x=>x!==t);
-  },
-
-  _sourisInCore(t,x,y){
-    const c=this._sourisCaps(this.souris.lvl);
-    const frac=c.smaller?0.26:0.30;
-    const dx=(t.x-x)*1.6, dy=t.y-y;
-    return Math.sqrt(dx*dx+dy*dy)<=t.r*frac;
-  },
-
-  // Déclaratif (comme _sourisHoverPop) : _sourisPaint() réécrit tout le
-  // canevas à chaque tick, donc un nœud ajouté ici disparaîtrait avant même
-  // sa transition CSS. On stocke l'état, _sourisPaint() dessine la position/
-  // opacité courantes à partir de `until`.
-  _sourisPop(txt,color){
-    const s=this.souris;
-    s.pop={txt,color,x:s.mx||50,y:s.my||50,born:Date.now(),until:Date.now()+640};
-  },
-
-  // Le cœur : tiers central du rayon (aire ~11% du disque) — il faut vraiment viser.
-  _sourisRegenPop(){
-    const s=this.souris;
-    s.regenPop={born:Date.now(),until:Date.now()+760};
-  },
-
-  _sourisFlash(color){
-    const a=this._sourisArena;if(!a)return;
-    a.style.boxShadow='inset 0 0 0 3px '+color;
-    setTimeout(()=>{if(a)a.style.boxShadow='';},120);
-  },
-
-  _sourisLoseLife(){
-    const s=this.souris;
-    s.lives--;
-    if(s.lives<=0){s.tier=null;s.phase='over';this.stopSouris();this.renderSouris();}
-  },
+     Choix techniques (ils corrigent les anciens bugs de clic) :
+     - la couche et l'arène sont créées une fois ; seuls les éléments de
+       jeu sont mis à jour (avant : toute la page réécrite 20 fois par
+       seconde, d'où sélections de texte parasites et clics perdus) ;
+     - clics lus sur l'événement lui-même (pointer events), jamais sur une
+       position gardée en mémoire ;
+     - zones de clic calculées en pixels, égales à ce qu'on voit (avant :
+       correction d'aspect fixe 1,6 qui rendait le bord des cibles
+       incliquable) ; une petite marge pardonne les clics limites ;
+     - horloge de jeu propre (s.clock) : la pause gèle vraiment cibles,
+       bonus et zones ;
+     - souris sortie de l'arène = plus de survol ; glisser relâché hors
+       de l'arène = la forme revient, sans pénalité.
+     Les règles de score, de vies et de seuils de médailles sont inchangées.
+     ═══════════════════════════════════════════════════════════════ */
 
   _sourisTier(l,score){
     if(score>=l.gold)return 'gold';
@@ -9347,367 +9435,1084 @@ const app={
     return null;
   },
 
+  // Fiche pédagogique de chaque niveau : scène animée, 3 gestes, légende des
+  // éléments à l'écran, ce qui coûte une vie ou des points, consigne courte
+  // affichée pendant la partie. Les textes décrivent exactement la logique
+  // de _sfsTick / _sfsClick (à garder alignés).
+  _sfsGuide:{
+    1:{scene:'hover',hint:'Pose le curseur sur un cercle et garde-le jusqu’à ce que l’anneau soit plein',
+       how:['Un cercle apparaît : <b>pose ton curseur dessus</b>, sans cliquer.','Garde-le immobile jusqu’à ce que <b>l’anneau blanc soit plein</b>.','Plus ta série est longue, plus le verrouillage est rapide.'],
+       legend:[['orange','Cercle à valider : 1 point'],['dot','Point blanc au centre : 3 points'],['x2','Cercle bleu : points doublés pendant 5 s']],
+       risk:'Un cercle qui disparaît avant d’être validé te coûte <b>1 vie</b>.'},
+    2:{scene:'click',hint:'Clique chaque cible avant qu’elle disparaisse',
+       how:['<b>Clique</b> sur chaque cible qui apparaît.','Elle <b>rétrécit</b> : quand l’anneau est vide, elle disparaît.','Vise la cible : un clic dans le vide casse ta série.'],
+       legend:[['good','Cible verte : 1 point']],
+       risk:'Une cible qui disparaît avant ton clic te coûte <b>1 vie</b>.'},
+    3:{scene:'core',hint:'Le cœur doré vaut 3 points, 5 cœurs d’affilée rendent une vie',
+       how:['Clique les cibles comme au niveau précédent.','Le <b>cœur doré</b> au centre vaut <b>3 points</b> au lieu d’un.','<b>5 cœurs d’affilée</b> te rendent une vie.'],
+       legend:[['good','Cible verte : 1 point'],['heart','Cœur doré : 3 points']],
+       risk:'Une cible qui disparaît te coûte <b>1 vie</b>. Toucher le bord au lieu du cœur casse ta série.'},
+    4:{scene:'click',hint:'Cibles rapides : enchaîne sans hésiter',
+       how:['Les cibles sont <b>plus petites</b> et disparaissent <b>plus vite</b>.','Enchaîne les clics sans hésiter.','Le cœur doré vaut toujours 3 points.'],
+       legend:[['good','Cible verte : 1 point'],['heart','Cœur doré : 3 points']],
+       risk:'Une cible qui disparaît te coûte <b>1 vie</b>.'},
+    5:{scene:'traps',hint:'Vert : clique. Rouge ou orange : ne touche pas',
+       how:['<b>Vert</b> : clique.','<b>Rouge avec une croix</b> : ne touche pas.','<b>Orange</b> : c’est un rouge déguisé, ne touche pas non plus.'],
+       legend:[['good','Cible verte : à cliquer'],['bad','Rouge avec croix : piège'],['dis','Orange : piège déguisé']],
+       risk:'Cliquer un piège te coûte <b>2 points</b>. Une cible verte qui disparaît te coûte <b>1 vie</b>.'},
+    6:{scene:'bonus',hint:'Les bonus sont brefs : bleu ×2, violet +2 s, doré +8 points',
+       how:['Des <b>cibles spéciales</b> apparaissent un court instant.','Les attraper rapporte gros, mais elles disparaissent vite.','À toi de choisir : un bonus ou les cibles vertes ?'],
+       legend:[['x2','Bleu : points ×2 pendant 5 s'],['time','Violet : 2 secondes en plus'],['jack','Doré : 8 points']],
+       risk:'Rater un bonus ne coûte rien. Une cible verte qui disparaît te coûte <b>1 vie</b>.'},
+    7:{scene:'traps',hint:'Vert et bonus : clique. Rouge ou orange : ne touche pas',
+       how:['Des cibles <b>pressées</b>, des <b>pièges déguisés</b> et des bonus en même temps.','Lis la couleur d’un coup d’œil avant de cliquer.','Vert et bonus : oui. Rouge et orange : non.'],
+       legend:[['good','Cible verte : à cliquer'],['bad','Rouge ou orange : piège'],['x2','Bonus : à attraper']],
+       risk:'Cliquer un piège te coûte <b>2 points</b>. Une cible verte qui disparaît te coûte <b>1 vie</b>.'},
+    8:{scene:'drag',hint:'Glisse chaque forme dans la zone de sa couleur',
+       how:['<b>Appuie</b> sur une forme et garde le bouton enfoncé.','<b>Glisse-la</b> jusqu’à la zone de la même couleur, en bas.','<b>Lâche</b> : bonne zone, 1 point. Mauvaise zone, 1 point en moins.'],
+       legend:[['pg','Forme verte : zone verte'],['pb','Forme bleue : zone bleue']],
+       risk:'Une forme laissée plus de <b>8 secondes</b> te coûte <b>1 vie</b>.'},
+    9:{scene:'drag',hint:'Glisse chaque forme dans la zone de sa couleur : vert, bleu ou indigo',
+       how:['<b>Appuie</b> sur une forme et garde le bouton enfoncé.','<b>Glisse-la</b> dans la zone de sa couleur : il y en a maintenant trois.','<b>Lâche</b> : bonne zone, 1 point. Mauvaise zone, 1 point en moins.'],
+       legend:[['pg','Verte'],['pb','Bleue'],['pi','Indigo']],
+       risk:'Une forme laissée plus de <b>8 secondes</b> te coûte <b>1 vie</b>.'},
+    10:{scene:'move',hint:'Z Q S D (ou les flèches) : entre dans les cercles verts, évite les zones rouges',
+       how:['<b>Z Q S D</b> (ou les flèches) déplacent ton personnage. La souris ne sert pas.','Entre dans un <b>cercle vert</b> et reste dedans un instant.','Évite les <b>zones rouges</b> qui se déplacent.'],
+       legend:[['pad','Cercle vert : 1 point'],['haz','Zone rouge : 1 vie en moins']],
+       risk:'Toucher une zone rouge te coûte <b>1 vie</b>. Un cercle vert qui disparaît ne coûte rien.'},
+    11:{scene:'move',hint:'Z Q S D pour bouger et éviter le rouge, la souris pour cliquer',
+       how:['<b>Z Q S D</b> (ou les flèches) déplacent ton personnage pour éviter les zones rouges.','<b>La souris</b> clique les cibles et leurs cœurs.','Les deux mains en même temps.'],
+       legend:[['good','Cible verte : 1 point'],['heart','Cœur doré : 3 points'],['haz','Zone rouge : 1 point en moins']],
+       risk:'Une cible qui disparaît te coûte <b>1 vie</b>. Une zone rouge touchée te coûte 1 point.'},
+    12:{scene:'traps',hint:'Tout en même temps : clique, esquive, attrape les bonus',
+       how:['Tout ce que tu as appris, <b>en même temps et plus vite</b>.','Clique les vertes et les bonus, évite les rouges et les orange.','Déplace-toi avec Z Q S D pour éviter les zones rouges.'],
+       legend:[['good','Verte : à cliquer'],['bad','Rouge ou orange : piège'],['x2','Bonus : à attraper'],['haz','Zone rouge : à éviter']],
+       risk:'Cible verte perdue : <b>1 vie</b>. Piège cliqué : 2 points. Zone rouge touchée : 1 point.'},
+  },
 
-  _sourisTimeUp(){
-    const s=this.souris, l=this._sourisLevels[s.lvl-1];
+  // Pastille de la légende (miniature fidèle de l’élément du jeu)
+  _sfsSwatch(k){
+    const m={orange:'<span class="sw t o"><i></i></span>',good:'<span class="sw t g"><i></i></span>',
+      heart:'<span class="sw t g"><i></i><u></u></span>',dot:'<span class="sw t o"><i></i><s></s></span>',
+      bad:'<span class="sw t r"><i></i><b>✕</b></span>',dis:'<span class="sw t d"><i></i></span>',
+      x2:'<span class="sw b x2">×2</span>',time:'<span class="sw b tm">+2s</span>',jack:'<span class="sw b jk">★</span>',
+      pg:'<span class="sw sq g"></span>',pb:'<span class="sw sq b"></span>',pi:'<span class="sw sq i"></span>',
+      pad:'<span class="sw pad"></span>',haz:'<span class="sw haz"></span>'};
+    return m[k]||'';
+  },
+
+  // Scène animée « comment ça marche » (CSS pur, boucle de 3,6 s)
+  _sfsDemo(kind){
+    const cur='<svg class="d-cursor" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 2l15 9-6.5 1.6L9.6 19z" fill="#fff" stroke="#16140F" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+    const tg=(cls,x,y,s,inner)=>`<div class="d-t ${cls}" style="--x:${x}%;--y:${y}%;--s:${s}px"><i class="d-c"></i>${inner||''}</div>`;
+    const wrap=(cx,cy,body,cap,extra)=>`<div class="sfs-demo ${extra||''}" style="--cx:${cx}%;--cy:${cy}%" aria-hidden="true">${body}${cur}<div class="d-cap">${cap}</div></div>`;
+    const pop=(x,y,txt,cls)=>`<span class="d-pop ${cls||''}" style="--x:${x}%;--y:${y}%">${txt}</span>`;
+    switch(kind){
+      case 'hover':
+        return wrap(50,47,
+          tg('o gone-late',50,46,104,'<svg class="d-prog" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/></svg><i class="d-dot"></i>')+pop(50,22,'+1','late'),
+          'Reste sur le cercle jusqu’à ce que l’anneau soit plein','dh');
+      case 'click':
+        return wrap(50,48,
+          tg('g gone-early',50,48,96,'<svg class="d-shrink" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/></svg>')+'<span class="d-press" style="--x:50%;--y:48%"></span>'+pop(50,22,'+1','early'),
+          'Clique avant que l’anneau soit vide','dc');
+      case 'core':
+        return wrap(50,48,
+          tg('g gone-early',50,48,112,'<svg class="d-shrink" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/></svg><i class="d-heart"></i>')+'<span class="d-press" style="--x:50%;--y:48%"></span>'+pop(50,20,'+3','early gold'),
+          'Le cœur doré vaut 3 points','dc');
+      case 'traps':
+        return wrap(22,46,
+          tg('g gone-early',22,46,84)+tg('r',50,46,84,'<b class="d-x">✕</b>')+tg('d',78,46,84)+
+          '<span class="d-lab" style="--x:22%;--y:78%">Clique</span><span class="d-lab no" style="--x:50%;--y:78%">Évite</span><span class="d-lab no" style="--x:78%;--y:78%">Évite aussi</span>'+
+          '<span class="d-press" style="--x:22%;--y:46%"></span>'+pop(22,16,'+1','early'),
+          'Vert : oui. Rouge et orange : non','dt');
+      case 'bonus':
+        return wrap(22,46,
+          tg('b x2 gone-early',22,46,76,'<em>×2</em>')+tg('b tm',50,46,76,'<em>+2s</em>')+tg('b jk',78,46,76,'<em>★</em>')+
+          '<span class="d-lab" style="--x:22%;--y:78%">Points ×2</span><span class="d-lab" style="--x:50%;--y:78%">+2 secondes</span><span class="d-lab" style="--x:78%;--y:78%">Jackpot</span>'+
+          '<span class="d-press" style="--x:22%;--y:46%"></span>'+pop(22,16,'×2','early blue'),
+          'Les bonus durent peu : attrape-les vite','dt');
+      case 'drag':
+        return wrap(27,68,
+          '<div class="d-zone g" style="--x:6%;--w:42%"><span>Verte</span></div><div class="d-zone b" style="--x:52%;--w:42%"><span>Bleue</span></div>'+
+          '<div class="d-piece" style="--x:27%;--y:68%"></div>'+pop(27,48,'+1','drag'),
+          'Appuie, glisse, puis lâche dans la zone de la même couleur','dd');
+      case 'move':
+        return wrap(60,44,
+          '<div class="d-t pad" style="--x:72%;--y:44%;--s:84px"><svg class="d-prog" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/></svg></div>'+
+          '<div class="d-haz" style="--x:40%;--y:30%;--s:90px"></div>'+
+          '<div class="d-player" style="--x:68%;--y:46%"><i></i><i></i></div>'+
+          '<div class="d-keys"><kbd>Z</kbd><div><kbd>Q</kbd><kbd>S</kbd><kbd class="k-d">D</kbd></div></div>'+pop(72,20,'+1','late'),
+          'Z Q S D déplacent ton personnage','dm');
+    }
+    return '';
+  },
+
+  /* ── Couche plein écran ─────────────────────────────────────── */
+
+  _sfsEl(){return document.getElementById('sfs');},
+
+  _sfsIc:{
+    back:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+    pause:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="4" width="5" height="16" rx="1.5"/><rect x="14" y="4" width="5" height="16" rx="1.5"/></svg>',
+    full:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+    x:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    play:'<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>',
+  },
+
+  _sfsOpen(){
+    if(this._sfsEl())return;
+    const I=this._sfsIc;
+    const o=document.createElement('div');
+    o.id='sfs';o.className='sfs';
+    o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Précision souris');
+    o.innerHTML=`<header class="sfs-bar">
+      <button class="sfs-btn" id="sfs-back" type="button" onclick="app._sfsBack()">${I.back}<span id="sfs-back-l">Niveaux</span></button>
+      <div class="sfs-ttl"><small id="sfs-lvl"></small><b id="sfs-name"></b></div>
+      <div class="sfs-bar-r">
+        <button class="sfs-btn" id="sfs-pause" type="button" onclick="app._sfsPause()" title="Pause (Échap)" hidden>${I.pause}<span>Pause</span></button>
+        <button class="sfs-btn sq" id="sfs-fs" type="button" onclick="app._sfsToggleFs()" title="Plein écran du navigateur" aria-label="Plein écran du navigateur">${I.full}</button>
+        <button class="sfs-btn quit" type="button" onclick="app._sfsQuit()" title="Quitter et revenir aux jeux">${I.x}<span>Quitter</span></button>
+      </div>
+    </header><div class="sfs-stage" id="sfs-stage"></div>`;
+    // Aucune sélection de texte, aucun glisser natif, aucun menu contextuel
+    ['selectstart','dragstart','contextmenu'].forEach(ev=>o.addEventListener(ev,e=>e.preventDefault()));
+    document.body.appendChild(o);
+    document.body.classList.add('sfs-open');
+    this._sfsKeys={z:false,q:false,s:false,d:false};
+    this._sfsKD=(e)=>this._sfsKeyDown(e);
+    this._sfsKU=(e)=>this._sfsKeyUp(e);
+    this._sfsAway=()=>{const s=this.souris;if(s&&s.phase==='play')this._sfsPause();};
+    this._sfsVis=()=>{if(document.hidden)this._sfsAway();};
+    this._sfsFsH=()=>this._sfsSyncFs();
+    this._sfsPM=(e)=>{this._sfsLastPt={x:e.clientX,y:e.clientY};};
+    window.addEventListener('pointermove',this._sfsPM,{passive:true});
+    window.addEventListener('keydown',this._sfsKD);
+    window.addEventListener('keyup',this._sfsKU);
+    window.addEventListener('blur',this._sfsAway);
+    document.addEventListener('visibilitychange',this._sfsVis);
+    document.addEventListener('fullscreenchange',this._sfsFsH);
+    // Bouton Retour du navigateur : ferme la couche au lieu de quitter la page
+    try{history.pushState({kpSfs:1},'',location.href);this._sfsHist=true;}catch{this._sfsHist=false;}
+  },
+
+  _sfsClose(viaPop){
+    this._sfsStopLoop();
+    this._sfsDropShell();
+    const o=this._sfsEl();
+    if(o)o.remove();
+    document.body.classList.remove('sfs-open');
+    if(this._sfsKD){
+      window.removeEventListener('keydown',this._sfsKD);window.removeEventListener('keyup',this._sfsKU);
+      window.removeEventListener('blur',this._sfsAway);document.removeEventListener('visibilitychange',this._sfsVis);
+      window.removeEventListener('pointermove',this._sfsPM);this._sfsPM=null;this._sfsLastPt=null;
+      document.removeEventListener('fullscreenchange',this._sfsFsH);
+      this._sfsKD=this._sfsKU=this._sfsAway=this._sfsVis=this._sfsFsH=null;
+    }
+    try{if(document.fullscreenElement)document.exitFullscreen();}catch{}
+    if(this._sfsHist&&!viaPop){
+      this._sfsHist=false;
+      if(history.state&&history.state.kpSfs){
+        this._ignorePop=true;setTimeout(()=>{this._ignorePop=false;},600);
+        try{history.back();}catch{this._ignorePop=false;}
+      }
+    }
+    this._sfsHist=false;
+  },
+
+  _sfsStopLoop(){
+    if(this._sfsLoop){clearInterval(this._sfsLoop);this._sfsLoop=null;}
+    if(this._sfsCdT){clearTimeout(this._sfsCdT);this._sfsCdT=null;}
+    if(this._sfsFlashT){clearTimeout(this._sfsFlashT);this._sfsFlashT=null;}
+    if(this._sfsCntT){clearTimeout(this._sfsCntT);this._sfsCntT=null;}
+  },
+
+  // Retour du navigateur (appelé par l'écouteur popstate)
+  _sfsFromPop(){
+    this._sfsHist=false;
+    this._sfsClose(true);
     this.stopSouris();
+    if(this.activeGame==='souris'){this.souris={phase:'mouseMenu'};this.renderSouris();}
+  },
+
+  _sfsBack(){this._sfsToMenu();},
+  _sfsToMenu(){
+    this._sfsClose();this.stopSouris();
+    this.souris={phase:'mouseMenu'};this.renderSouris();
+    window.scrollTo({top:0,behavior:'instant'});
+  },
+  _sfsQuit(){this._sfsClose();this.exitActiveGame();},
+
+  _sfsToggleFs(){
+    const o=this._sfsEl();if(!o)return;
+    try{
+      if(document.fullscreenElement)document.exitFullscreen();
+      else if(o.requestFullscreen)o.requestFullscreen();
+      else if(o.webkitRequestFullscreen)o.webkitRequestFullscreen();
+    }catch{}
+  },
+  _sfsSyncFs(){
+    const b=document.getElementById('sfs-fs');
+    if(b)b.setAttribute('aria-pressed',document.fullscreenElement?'true':'false');
+  },
+
+  // Échap : un cran en arrière, jamais de perte brutale de la partie
+  _sfsEsc(){
+    const s=this.souris;if(!s)return;
+    if(s.phase==='play')this._sfsPause();
+    else if(s.phase==='paused')this._sfsResume();
+    else if(s.phase==='countdown'&&s.fresh){this._sfsStopLoop();s.phase='brief';this._sfsRender();}
+    else if(s.phase==='countdown'){this._sfsStopLoop();s.phase='paused';this._sfsRender();}
+    else this._sfsToMenu();
+  },
+
+  _sfsKeyOf(e){
+    const M={KeyW:'z',KeyA:'q',KeyS:'s',KeyD:'d',ArrowUp:'z',ArrowLeft:'q',ArrowDown:'s',ArrowRight:'d'};
+    if(M[e.code])return M[e.code];
+    return null;
+  },
+  _sfsKeyDown(e){
+    const s=this.souris;if(!s||(s.track&&s.track!=='mouse'))return;
+    const k=this._sfsKeyOf(e);
+    if(k&&(s.phase==='play'||s.phase==='countdown')&&this._sourisCaps(s.lvl).move){this._sfsKeys[k]=true;e.preventDefault();return;}
+    if(e.code==='Space'||e.key===' '||e.key==='Enter'){
+      const ae=document.activeElement;
+      if(ae&&ae.tagName==='BUTTON')return; // le bouton gère déjà Espace/Entrée
+      if(s.phase==='brief'){e.preventDefault();this._sfsBegin();}
+      else if(s.phase==='paused'){e.preventDefault();this._sfsResume();}
+      else if(s.phase==='win'||s.phase==='over'){e.preventDefault();this._sfsPrimary();}
+    }
+  },
+  _sfsKeyUp(e){
+    const k=this._sfsKeyOf(e);
+    if(k&&this._sfsKeys)this._sfsKeys[k]=false;
+  },
+
+  /* ── Rendu par phase ────────────────────────────────────────── */
+
+  _sfsRender(){
+    const s=this.souris;if(!s)return;
+    this._sfsOpen();
+    const l=this._sourisLevels[s.lvl-1],ph=s.phase;
+    const set=(id,t)=>{const el=document.getElementById(id);if(el)el.textContent=t;};
+    set('sfs-lvl','Niveau '+s.lvl+' sur 12');set('sfs-name',l.name);
+    const pb=document.getElementById('sfs-pause');if(pb)pb.hidden=!(ph==='play'||(ph==='countdown'&&!s.fresh));
+        if(ph==='brief'){this._sfsDropShell();this._sfsRenderBrief();}
+    else if(ph==='over'||ph==='win'){this._sfsDropShell();this._sfsRenderEnd();}
+    else{
+      this._sfsEnsureShell();
+      this._sfsPaint();this._sfsHud();
+      const pc=document.getElementById('sfs-pausecard');
+      if(ph==='paused'){if(!pc)this._sfsRenderPause();}
+      else if(pc)pc.remove();
+    }
+  },
+
+  _sfsLegendHtml(g){
+    return g.legend.map(([k,t])=>`<li>${this._sfsSwatch(k)}<span>${t}</span></li>`).join('');
+  },
+
+  _sfsRenderBrief(){
+    const s=this.souris,l=this._sourisLevels[s.lvl-1],g=this._sfsGuide[s.lvl];
+    const needKb=!!this._sourisCaps(s.lvl).move&&matchMedia('(hover:none)').matches;
+    const stage=document.getElementById('sfs-stage');
+    stage.innerHTML=`<div class="sfs-brief"><div class="sfs-brief-in">
+      <div class="sfs-brief-demo">${this._sfsDemo(g.scene)}</div>
+      <div class="sfs-brief-txt">
+        <div class="sfs-kick">Comment jouer</div>
+        <h2 class="sfs-h">${this._esc(l.name)}</h2>
+        <ol class="sfs-steps">${g.how.map(h=>`<li>${h}</li>`).join('')}</ol>
+        <ul class="sfs-leg">${this._sfsLegendHtml(g)}</ul>
+        <p class="sfs-risk">${g.risk}</p>
+        <div class="sfs-goal">
+          <div class="sfs-goal-t">Pour valider le niveau : <b>${l.bronze} points</b> en ${l.dur||30} secondes</div>
+          <div class="sfs-meds"><span class="m b">Bronze ${l.bronze}</span><span class="m s">Argent ${l.silver}</span><span class="m g">Or ${l.gold}</span><span class="m v">3 vies</span></div>
+        </div>
+        ${needKb?'<p class="sfs-warn">Ce niveau se joue au clavier (Z Q S D). Reviens sur un ordinateur pour y jouer.</p>':''}
+        <div class="sfs-cta">
+          <button class="sfs-go" id="sfs-go" type="button" ${needKb?'disabled':''} onclick="app._sfsBegin()">${this._sfsIc.play}<span>Commencer</span></button>
+          <span class="sfs-key">ou appuie sur Espace</span>
+        </div>
+      </div></div></div>`;
+    const b=document.getElementById('sfs-go');if(b&&!needKb)b.focus({preventScroll:true});
+  },
+
+  // Coque de jeu : créée une seule fois par partie
+  _sfsEnsureShell(){
+    if(document.getElementById('souris-arena'))return;
+    const s=this.souris,l=this._sourisLevels[s.lvl-1],g=this._sfsGuide[s.lvl];
+    const pos=(v)=>Math.min(100,v/l.gold*100);
+    const stage=document.getElementById('sfs-stage');
+    stage.innerHTML=`<div class="sfs-play">
+      <div class="sfs-hud">
+        <div class="sfs-score"><b id="sfs-score">0</b><small>pts</small></div>
+        <div class="sfs-goalbar">
+          <div class="sfs-track"><i id="sfs-fill"></i>
+            <span class="mk b" data-v="${l.bronze}" style="left:${pos(l.bronze)}%"></span>
+            <span class="mk s" data-v="${l.silver}" style="left:${pos(l.silver)}%"></span>
+            <span class="mk g" data-v="${l.gold}" style="left:${pos(l.gold)}%"></span>
+          </div>
+          <div class="sfs-marks">
+            <span class="b" style="left:${pos(l.bronze)}%">Bronze ${l.bronze}</span>
+            <span class="s" style="left:${pos(l.silver)}%">Argent ${l.silver}</span>
+            <span class="g" style="left:${pos(l.gold)}%">Or ${l.gold}</span>
+          </div>
+        </div>
+        <div class="sfs-right"><div class="sfs-time" id="sfs-time">${l.dur||30}</div><div class="sfs-lives" id="sfs-lives"></div></div>
+      </div>
+      <div class="sfs-timebar"><i id="sfs-tfill"></i></div>
+      <div class="sfs-hintbar">${g.hint}</div>
+      <div class="sfs-arena" id="souris-arena" style="touch-action:none">
+        <div class="sfs-layer" id="sfs-layer"></div>
+        <div class="sfs-fx" id="sfs-fx"></div>
+        <div class="sfs-count" id="sfs-count"></div>
+      </div>
+      <div class="sfs-foot">
+        <div><small>Précision</small><b id="sfs-acc">100%</b></div>
+        <div><small>Série</small><b id="sfs-streak" class="acc">0</b></div>
+        <div><small>Réaction</small><b id="sfs-react">-</b></div>
+        <div class="r"><span id="sfs-gold"></span><button class="sfs-replay" type="button" onclick="app._sfsRestart()">Recommencer</button></div>
+      </div>
+    </div>`;
+    const a=document.getElementById('souris-arena');
+    this._sfsLayer=document.getElementById('sfs-layer');
+    this._sfsNodes=new Map();
+    const c=this._sourisCaps(s.lvl);
+    a.style.cursor=(c.click||c.drag)?'crosshair':'default';
+    a.addEventListener('pointerdown',(e)=>this._sfsPDown(e));
+    a.addEventListener('pointermove',(e)=>this._sfsPMove(e));
+    a.addEventListener('pointerup',(e)=>this._sfsPUp(e,false));
+    a.addEventListener('pointercancel',(e)=>this._sfsPUp(e,true));
+    a.addEventListener('pointerleave',()=>{const st=this.souris;if(st&&!st.drag){st.px=null;st.py=null;}});
+    this._sfsRefreshGeo();
+    if(window.ResizeObserver){this._sfsRO=new ResizeObserver(()=>{this._sfsRefreshGeo();});this._sfsRO.observe(a);}
+    this._sfsHudCache={};
+  },
+
+  _sfsDropShell(){
+    if(this._sfsRO){this._sfsRO.disconnect();this._sfsRO=null;}
+    this._sfsLayer=null;this._sfsNodes=null;this._sfsHudCache=null;
+  },
+
+  _sfsRenderPause(){
+    const s=this.souris,l=this._sourisLevels[s.lvl-1],g=this._sfsGuide[s.lvl];
+    const stage=document.getElementById('sfs-stage');
+    const d=document.createElement('div');
+    d.id='sfs-pausecard';d.className='sfs-pause';
+    d.innerHTML=`<div class="sfs-pause-card">
+      <div class="sfs-kick">En pause</div>
+      <h3 class="sfs-h2">${this._esc(l.name)}</h3>
+      <div class="sfs-pause-body">
+        <div class="sfs-pause-btns">
+          <button class="sfs-go" id="sfs-resume" type="button" onclick="app._sfsResume()">${this._sfsIc.play}<span>Reprendre</span></button>
+          <button class="sfs-sec" type="button" onclick="app._sfsRestart()">Recommencer le niveau</button>
+          <button class="sfs-sec" type="button" onclick="app._sfsToMenu()">Choisir un autre niveau</button>
+          <button class="sfs-sec" type="button" onclick="app._sfsQuit()">Quitter vers les jeux</button>
+          <span class="sfs-key">Échap ou Espace pour reprendre</span>
+        </div>
+        <div class="sfs-pause-rules">
+          <div class="sfs-rules-t">Rappel des règles</div>
+          <ol class="sfs-steps small">${g.how.map(h=>`<li>${h}</li>`).join('')}</ol>
+          <ul class="sfs-leg small">${this._sfsLegendHtml(g)}</ul>
+          <p class="sfs-risk small">${g.risk}</p>
+        </div>
+      </div></div>`;
+    stage.appendChild(d);
+    const b=document.getElementById('sfs-resume');if(b)b.focus({preventScroll:true});
+  },
+
+  _sfsRenderEnd(){
+    const s=this.souris,l=this._sourisLevels[s.lvl-1];
+    const win=s.phase==='win',last=s.lvl>=12;
+    const tot=s.hit+s.miss,acc=tot?Math.round(s.hit/tot*100):0;
+    const tiers={gold:['#FFD84D','#E0A800','Médaille d’or'],silver:['#E3E7ED','#9AA3AF','Médaille d’argent'],bronze:['#E39A5B','#A85F2A','Médaille de bronze']};
+    const T=tiers[s.tier];
+    const medal=win?`<svg viewBox="0 0 64 64" width="96" height="96" aria-hidden="true"><defs><linearGradient id="sfsmg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${T[0]}"/><stop offset="1" stop-color="${T[1]}"/></linearGradient></defs><path d="M19 3h10l5 15H24z" fill="#FF4D2E"/><path d="M45 3H35l-5 15h10z" fill="#C93A20"/><circle cx="32" cy="40" r="20" fill="url(#sfsmg)" stroke="rgba(255,255,255,.45)" stroke-width="2"/><path d="M32 28l3.4 6.9 7.6 1.1-5.5 5.3 1.3 7.6L32 45.4l-6.8 3.5 1.3-7.6-5.5-5.3 7.6-1.1z" fill="rgba(255,255,255,.88)"/></svg>`
+      :`<svg viewBox="0 0 64 64" width="96" height="96" aria-hidden="true"><circle cx="32" cy="32" r="22" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="3" stroke-dasharray="6 5"/><circle cx="32" cy="32" r="9" fill="none" stroke="#FF4D2E" stroke-width="3"/><circle cx="32" cy="32" r="2.5" fill="#FF4D2E"/></svg>`;
+    const title=win?(last?'Chaos vaincu !':T[2]):'Pas cette fois';
+    // Barre vers le prochain palier
+    const nextVal=!win?l.bronze:s.tier==='bronze'?l.silver:s.tier==='silver'?l.gold:null;
+    const nextName=!win?'bronze':s.tier==='bronze'?'argent':s.tier==='silver'?'or':null;
+    const prog=nextVal?`<div class="sfs-next"><div class="sfs-next-t">${win?'Prochain palier':'Pour valider le niveau'} : <b>${nextName} à ${nextVal} points</b>${s.score<nextVal?', il t’en manquait '+(nextVal-s.score):''}</div><div class="sfs-next-bar"><i style="width:${Math.min(100,s.score/nextVal*100)}%"></i></div></div>`:'<div class="sfs-next"><div class="sfs-next-t"><b>Or décroché.</b> Tu ne peux pas faire mieux sur ce niveau.</div></div>';
+    // Conseil : la cause la plus fréquente de points perdus
+    const adv=[];
+    if(s.expired>=3)adv.push('Des cibles ont disparu avant ton clic. Garde les yeux sur toute l’arène, pas seulement sur une cible.');
+    if(s.trapHits>=2)adv.push('Tu as cliqué des pièges. Regarde la couleur avant de cliquer : vert oui, rouge et orange non.');
+    if(s.wrongDrops>=2)adv.push('Plusieurs formes ont été déposées dans la mauvaise zone. Vérifie la couleur avant de lâcher.');
+    if(s.hazardHits>=2)adv.push('Les zones rouges t’ont touché. Garde un œil sur elles en te déplaçant.');
+    if(tot>=8&&acc<65)adv.push('Beaucoup de clics à côté. Ralentis un peu et vise le centre des cibles.');
+    const cw=this._sourisCaps(s.lvl);
+    const tip=adv[0]||(win?(cw.core?'Bien joué. Vise le cœur doré ou enchaîne plus vite pour monter d’une médaille.':cw.hover?'Bien joué. Garde ta série pour verrouiller plus vite et vise le point blanc au centre.':'Bien joué. Enchaîne plus vite et sans erreur pour monter d’une médaille.'):'Tu y es presque. Relis les règles, puis relance : la deuxième tentative est souvent bien meilleure.');
+    const primary=win&&!last?'Niveau '+(s.lvl+1):'Rejouer';
+    const stage=document.getElementById('sfs-stage');
+    stage.innerHTML=`<div class="sfs-end"><div class="sfs-end-in">
+      <div class="sfs-medal">${medal}</div>
+      <h2 class="sfs-h">${title}</h2>
+      <div class="sfs-final"><b>${s.score}</b><span>points</span></div>
+      <div class="sfs-stats">
+        <div><b>${s.hit}</b><small>réussite${s.hit>1?'s':''}</small></div>
+        <div><b>${acc}%</b><small>précision</small></div>
+        <div><b>${s.bestStreak||0}</b><small>meilleure série</small></div>
+        ${s.cores?`<div><b>${s.cores}</b><small>cœur${s.cores>1?'s':''} doré${s.cores>1?'s':''}</small></div>`:''}
+      </div>
+      ${prog}
+      <p class="sfs-tip">${tip}</p>
+      <div class="sfs-end-btns">
+        <button class="sfs-go" id="sfs-primary" type="button" onclick="app._sfsPrimary()">${this._sfsIc.play}<span>${primary}</span></button>
+        <button class="sfs-sec" type="button" onclick="${win&&!last?'app._sfsRestart()':'app._sfsRules()'}">${win&&!last?(s.tier!=='gold'?'Viser mieux':'Rejouer'):'Revoir les règles'}</button>
+        <button class="sfs-sec" type="button" onclick="app._sfsToMenu()">Tous les niveaux</button>
+      </div>
+    </div></div>`;
+    const b=document.getElementById('sfs-primary');if(b)b.focus({preventScroll:true});
+  },
+
+  _sfsRules(){const s=this.souris;if(!s)return;this._sfsStopLoop();s.phase='brief';this._sfsRender();},
+
+  // Bouton principal de l'écran de fin : niveau suivant, sinon rejouer
+  _sfsPrimary(){
+    const s=this.souris;if(!s)return;
+    if(s.phase==='win'&&s.lvl<12)this.selectSouris(s.lvl+1); // règles du niveau suivant
+    else this._sfsRestart();
+  },
+
+  /* ── Déroulement d'une partie ───────────────────────────────── */
+
+  _sfsReset(){
+    const s=this.souris,l=this._sourisLevels[s.lvl-1];
+    Object.assign(s,{score:0,lives:3,hit:0,miss:0,streak:0,bestStreak:0,cores:0,regen:0,targets:[],hazards:[],drag:null,tick:0,clock:0,uid:0,
+      mult:1,multUntil:0,tLeft:(l.dur||30)*1000,lastReaction:0,expired:0,trapHits:0,wrongDrops:0,hazardHits:0,invUntil:0,
+      px:null,py:null,mx:null,my:null,coach:{},tier:null,player:{x:50,y:50}});
+  },
+
+  // Depuis les règles : on part de zéro avec le décompte
+  _sfsBegin(){
+    const s=this.souris;if(!s||(s.phase!=='brief'&&s.phase!=='over'&&s.phase!=='win'&&s.phase!=='paused'))return;
+    this._sfsStopLoop();this._sfsDropShell();
+    this._sfsReset();
+    s.fresh=true;
+    this._sfsCountdown(3,700);
+  },
+  // Depuis la pause ou la fin : même chose
+  _sfsRestart(){
+    const s=this.souris;if(!s)return;
+    this._sfsStopLoop();this._sfsDropShell();
+    this._sfsReset();
+    s.fresh=true;
+    this._sfsCountdown(3,700);
+  },
+  _sfsResume(){
+    const s=this.souris;if(!s||s.phase!=='paused')return;
+    s.fresh=false;
+    this._sfsCountdown(3,450);
+  },
+
+  _sfsCountdown(n,ms){
+    const s=this.souris;if(!s)return;
+    s.phase='countdown';s.cd=n;
+    this._sfsRender();
+    const step=()=>{
+      const st=this.souris;if(!st||st.phase!=='countdown')return;
+      this._sfsShowCount(String(st.cd));
+      this._sfsCdT=setTimeout(()=>{
+        const s2=this.souris;if(!s2||s2.phase!=='countdown')return;
+        s2.cd--;
+        if(s2.cd>0)step();else this._sfsGo();
+      },ms);
+    };
+    step();
+  },
+  _sfsShowCount(txt,go){
+    const el=document.getElementById('sfs-count');if(!el)return;
+    el.textContent=txt;el.className='sfs-count'+(go?' go':'');
+    void el.offsetWidth;el.classList.add('pop');
+    clearTimeout(this._sfsCntT);
+    this._sfsCntT=setTimeout(()=>{const e=document.getElementById('sfs-count');if(e){e.className='sfs-count';e.textContent='';}},go?900:620);
+  },
+
+  _sfsGo(){
+    const s=this.souris;if(!s)return;
+    s.phase='play';s.fresh=false;
+    this._sfsShowCount('C’est parti !',true);
+    this._sfsRender();
+    this._sfsRefreshGeo();
+    this._sfsLoop=setInterval(()=>this._sfsTick(),50);
+  },
+
+  _sfsPause(){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    this._sfsStopLoop();
+    if(s.drag)this._sfsCancelDrag();
+    s.px=null;s.py=null;
+    Object.keys(this._sfsKeys||{}).forEach(k=>{this._sfsKeys[k]=false;});
+    s.phase='paused';
+    this._sfsRender();
+  },
+
+  /* ── Géométrie en pixels ────────────────────────────────────── */
+
+  // K = pixels par « unité de rayon ». Les rayons des niveaux (3 à 7) sont
+  // exprimés en unités ; la taille réelle suit l'arène, bornée pour rester
+  // jouable aussi bien sur petit écran qu'en plein écran.
+  _sfsRefreshGeo(){
+    const s=this.souris,a=document.getElementById('souris-arena');if(!s||!a)return;
+    const r=a.getBoundingClientRect();
+    const W=r.width||640,H=r.height||380;
+    s.geo={W,H,K:Math.max(5,Math.min(9.4,Math.min(W,H*1.6)/100))};
+  },
+  _sfsG(){const s=this.souris;if(!s.geo)this._sfsRefreshGeo();return s.geo||{W:640,H:380,K:6.4};},
+
+  // Rayon visible d'une cible (les cibles à clic rétrécissent avec le temps)
+  _sfsRad(t){
+    const s=this.souris,g=this._sfsG();
+    let f=1;
+    if(!t.bonus&&!t.pad&&!t.piece&&!this._sourisCaps(s.lvl).hover){
+      const left=Math.max(0,1-(s.clock-t.born)/t.life);f=.7+left*.3;
+    }
+    return t.r*g.K*f;
+  },
+
+  // Cible sous le curseur (la plus proche du centre si plusieurs se touchent).
+  // Marge de 8 px : un clic limite sur le bord compte.
+  _sfsTargetAt(px,py,margin){
+    const s=this.souris;if(px==null||py==null)return null;
+    const g=this._sfsG(),m=margin==null?8:margin;
+    let best=null,bd=1e9;
+    (s.targets||[]).forEach(t=>{
+      const d=Math.hypot(px-t.x/100*g.W,py-t.y/100*g.H),rv=this._sfsRad(t);
+      if(d<=rv+m&&d-rv<bd){bd=d-rv;best=t;}
+    });
+    return best;
+  },
+  _sfsInCore(t,px,py,frac){
+    const g=this._sfsG(),d=Math.hypot(px-t.x/100*g.W,py-t.y/100*g.H);
+    return d<=this._sfsRad(t)*frac+3;
+  },
+  _sfsDistPct(ax,ay,bx,by){ // distance en px entre deux points donnés en %
+    const g=this._sfsG();return Math.hypot((ax-bx)/100*g.W,(ay-by)/100*g.H);
+  },
+
+  // Emplacement libre (en %) sans chevauchement avec les autres cibles
+  _sfsSpot(r,opt){
+    const s=this.souris,g=this._sfsG(),rp=r*g.K,pad=rp+14;
+    const o=opt||{};
+    const x0=pad/g.W*100,x1=100-x0;
+    const y0=Math.max(pad/g.H*100,o.yMin||0),y1=Math.min(100-pad/g.H*100,o.yMax==null?100:o.yMax);
+    let x=50,y=50;
+    for(let i=0;i<28;i++){
+      x=x0+Math.random()*Math.max(1,x1-x0);
+      y=y0+Math.random()*Math.max(1,y1-y0);
+      const ok=(s.targets||[]).every(t=>this._sfsDistPct(t.x,t.y,x,y)>t.r*g.K+rp+10);
+      if(ok)break;
+    }
+    return{x,y};
+  },
+
+  /* ── Pointeur ───────────────────────────────────────────────── */
+
+  _sfsPoint(e){
+    const s=this.souris,a=document.getElementById('souris-arena');if(!s||!a)return;
+    const r=a.getBoundingClientRect();
+    s.px=e.clientX-r.left;s.py=e.clientY-r.top;
+    s.mx=s.px/r.width*100;s.my=s.py/r.height*100;
+  },
+  // Position du curseur recalculée à chaque tick : une cible qui apparaît sous
+  // une souris immobile est bien vue, même sans mouvement après le décompte.
+  _sfsSyncPointer(){
+    const s=this.souris,a=document.getElementById('souris-arena'),p=this._sfsLastPt;
+    if(!s||!a||!p||s.drag)return;
+    const r=a.getBoundingClientRect();
+    const inside=p.x>=r.left&&p.x<=r.right&&p.y>=r.top&&p.y<=r.bottom;
+    if(inside){s.px=p.x-r.left;s.py=p.y-r.top;s.mx=s.px/r.width*100;s.my=s.py/r.height*100;}
+    else{s.px=null;s.py=null;}
+  },
+  _sfsPDown(e){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    e.preventDefault();
+    this._sfsPoint(e);
+    const c=this._sourisCaps(s.lvl);
+    try{e.currentTarget.setPointerCapture(e.pointerId);}catch{}
+    if(c.drag){
+      const t=this._sfsTargetAt(s.px,s.py,10);
+      if(t){s.drag=t;t.grabbed=true;t.gox=t.x-s.mx;t.goy=t.y-s.my;}
+    }else if(c.click)this._sfsClick();
+  },
+  _sfsPMove(e){
+    const s=this.souris;if(!s||s.phase!=='play')return;
+    this._sfsPoint(e);
+    if(s.drag){
+      e.preventDefault();
+      s.drag.x=Math.max(3,Math.min(97,s.mx+(s.drag.gox||0)));
+      s.drag.y=Math.max(4,Math.min(96,s.my+(s.drag.goy||0)));
+    }
+  },
+  _sfsPUp(e,cancel){
+    const s=this.souris;if(!s||!s.drag)return;
+    if(cancel||s.mx<0||s.mx>100||s.my<0||s.my>100){this._sfsCancelDrag();return;}
+    this._sfsDrop();
+  },
+  _sfsCancelDrag(){
+    const s=this.souris;if(!s||!s.drag)return;
+    const t=s.drag;t.grabbed=false;s.drag=null;t.x=t.hx;t.y=t.hy;
+  },
+  _sfsZoneAt(x,y){
+    if(y<58)return null;
+    if(this._sourisCaps(this.souris.lvl).sort3)return x<33.3?'#1FA971':x<66.6?'#3B82F6':'#818CF8';
+    return x<50?'#1FA971':'#3B82F6';
+  },
+  _sfsDrop(){
+    const s=this.souris,t=s.drag;if(!t)return;
+    t.grabbed=false;s.drag=null;
+    const z=this._sfsZoneAt(t.x,t.y);
+    if(z===t.color){
+      s.score++;s.hit++;this._sfsStreak(1);s.lastReaction=s.clock-t.born;
+      s.targets=s.targets.filter(x=>x!==t);
+      playSound('hit');this._sfsFlash('good');
+      this._sfsFx('Bien rangé','+1 · série '+s.streak,'',t.x,t.y);
+    }else{
+      s.miss++;s.streak=0;s.wrongDrops++;s.score=Math.max(0,s.score-1);
+      playSound('miss');this._sfsFlash('bad');
+      this._sfsFx('Mauvaise zone','−1','bad',t.x,t.y);
+      t.x=t.hx;t.y=t.hy;
+    }
+  },
+  _sfsStreak(n){const s=this.souris;s.streak=(s.streak||0)+n;if(s.streak>(s.bestStreak||0))s.bestStreak=s.streak;},
+
+  /* ── Clic (niveaux 2 à 7, 11, 12) ───────────────────────────── */
+
+  _sfsClick(){
+    const s=this.souris,c=this._sourisCaps(s.lvl);
+    const t=this._sfsTargetAt(s.px,s.py);
+    if(!t){
+      s.miss++;s.streak=0;
+      this._sfsFx('Raté','','miss',s.mx,s.my,true);
+      return;
+    }
+    if(t.bonus){
+      s.targets=s.targets.filter(x=>x!==t);
+      s.hit++;playSound('hit');
+      if(t.bonus==='points'){s.mult=2;s.multUntil=s.clock+5000;this._sfsFlash('blue');this._sfsFx('Points ×2','pendant 5 s','bonus',t.x,t.y);}
+      else if(t.bonus==='time'){s.tLeft=(s.tLeft||0)+2000;this._sfsFlash('violet');this._sfsFx('+2 secondes','','bonus',t.x,t.y);}
+      else if(t.bonus==='jackpot'){s.score+=8;this._sfsFlash('gold');this._sfsFx('Jackpot','+8','bonus',t.x,t.y);}
+      return;
+    }
+    if(t.bad){
+      s.miss++;s.streak=0;s.trapHits++;
+      s.score=Math.max(0,s.score-2);
+      playSound('miss');this._sfsFlash('bad');
+      this._sfsFx('Piège','−2','bad',t.x,t.y);
+      s.targets=s.targets.filter(x=>x!==t);
+      return;
+    }
+    const mult=(s.mult>1&&s.clock<s.multUntil)?s.mult:1;
+    const core=!!c.core&&this._sfsInCore(t,s.px,s.py,c.smaller?0.26:0.30);
+    const pts=(core?3:1)*mult;
+    s.score+=pts;s.hit++;playSound('hit');
+    s.lastReaction=s.clock-t.born;
+    if(core){
+      this._sfsStreak(1);s.cores=(s.cores||0)+1;
+      if(s.streak%5===0&&s.lives<3){s.lives++;s.regen=(s.regen||0)+1;this._sfsFlash('gold');this._sfsFxBig('+1 vie');}
+      else this._sfsFlash('gold');
+    }else if(c.core){
+      s.streak=0;this._sfsFlash('good'); // niveaux à cœur : seul un cœur enchaîne
+    }else{
+      this._sfsStreak(1);this._sfsFlash('good');
+    }
+    this._sfsFx(core?'Plein cœur':'Touché','+'+pts+' · série '+s.streak,core?'bonus':'',t.x,t.y);
+    s.targets=s.targets.filter(x=>x!==t);
+  },
+
+  _sfsLoseLife(){
+    const s=this.souris;
+    s.lives--;
+    const el=document.getElementById('sfs-lives');
+    if(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');}
+    if(s.lives<=0){
+      s.lives=0;s.tier=null;s.phase='over';
+      this._sfsStopLoop();
+      try{track('game_completed',{game:'souris',level:s.lvl,score:s.score,tier:null});}catch{}
+      this._sfsRender();
+    }
+  },
+
+  // Fin du chrono : sauvegarde identique à l'ancienne version
+  _sfsFinish(){
+    const s=this.souris,l=this._sourisLevels[s.lvl-1];
+    this._sfsStopLoop();
     s.tier=this._sourisTier(l,s.score);
     s.phase=s.tier?'win':'over';
     try{track('game_completed',{game:'souris',level:s.lvl,score:s.score,tier:s.tier||null});}catch{}
     if(s.tier&&currentUser&&this.stats){
       const wasUnlocked=s.lvl<=(this.stats.sourisBest||0);
-      const prevTierRank={bronze:1,silver:2,gold:3}[(this.stats.sourisTiers||{})[s.lvl]]||0;
+      const rank={bronze:1,silver:2,gold:3};
+      const prevTierRank=rank[(this.stats.sourisTiers||{})[s.lvl]]||0;
       if(s.lvl>(this.stats.sourisBest||0)){this.stats.sourisBest=s.lvl;}
       this.stats.sourisTiers=this.stats.sourisTiers||{};
-      const rank={bronze:1,silver:2,gold:3};
       const newTierRank=rank[s.tier]||0;
       if(newTierRank>prevTierRank)this.stats.sourisTiers[s.lvl]=s.tier;
       saveStats(this.stats);
-      // Confettis : premier passage d'un niveau (débloque le suivant) ou
-      // amélioration de médaille (bronze→argent→or) — un "palier franchi" à
-      // chaque fois, jamais célébré jusqu'ici.
       if(!wasUnlocked)this._celebrateGame(null,'levelup');
       else if(newTierRank>prevTierRank)this._celebrateGame(null,'record');
     }
-    this.renderSouris();
+    this._sfsRender();
   },
 
-  // Place une nouvelle cible sans qu'elle chevauche une cible existante :
-  // sinon le clic peut viser visuellement une cible mais en toucher une
-  // autre cachée dessous (bug de hit-test).
-  _sourisFreeSpot(xr,yr,r){
-    const s=this.souris;
-    let x=xr[0],y=yr[0],guard=0,ok=false;
-    while(!ok&&guard++<20){
-      x=xr[0]+Math.random()*(xr[1]-xr[0]);
-      y=yr[0]+Math.random()*(yr[1]-yr[0]);
-      ok=(s.targets||[]).every(o=>{
-        const dx=(o.x-x)*1.6,dy=o.y-y;
-        return Math.sqrt(dx*dx+dy*dy)>(o.r||4)+r+2;
-      });
-    }
-    return{x,y};
+  /* ── Apparition des cibles ──────────────────────────────────── */
+
+  _sfsCoach(s,key,label){
+    s.coach[key]=(s.coach[key]||0)+1;
+    return s.coach[key]<=3?label:'';
   },
-  _sourisSpawn(){
-    const s=this.souris, c=this._sourisCaps(s.lvl);
+  _sfsSpawn(){
+    const s=this.souris,c=this._sourisCaps(s.lvl);
     const rnd=(a,b)=>a+Math.random()*(b-a);
+    const id=++s.uid,T=this._sfsT(s.lvl);
     if(c.drag){
       const palette=c.sort3?['#1FA971','#3B82F6','#818CF8']:['#1FA971','#3B82F6'];
       const color=palette[Math.floor(Math.random()*palette.length)];
-      const{x,y}=this._sourisFreeSpot([12,88],[8,42],4.6);
-      s.targets.push({x,y,hx:x,hy:y,r:4.6,color,shape:Math.random()<.5?'circle':'square',born:Date.now()});
+      const{x,y}=this._sfsSpot(T.r[0],{yMax:42});
+      s.targets.push({id,x,y,hx:x,hy:y,r:T.r[0],piece:true,life:T.life,color,shape:Math.random()<.5?'circle':'square',born:s.clock,tag:this._sfsCoach(s,'drag','GLISSE')});
       return;
     }
     if(c.pads){
-      const{x,y}=this._sourisFreeSpot([12,88],[12,88],7);
-      s.targets.push({x,y,r:7,pad:true,born:Date.now(),life:6000,hover:0});
+      const{x,y}=this._sfsSpot(T.padR);
+      s.targets.push({id,x,y,r:T.padR,pad:true,born:s.clock,life:T.padLife,hover:0,tag:this._sfsCoach(s,'pad','ENTRE ICI')});
       return;
     }
-    if(c.bonus&&Math.random()<.14&&!(s.targets||[]).some(t=>t.bonus)){
+    if(c.bonus&&Math.random()<T.bonusP&&!(s.targets||[]).some(t=>t.bonus)){
       const kinds=[
-        {bonus:'points',color:'#3B82F6',icon:'×2',life:2200},
-        {bonus:'time',color:'#A855F7',icon:'+2s',life:2400},
-        {bonus:'jackpot',color:'#FFD84D',icon:'★',life:1500},
+        {bonus:'points',color:'#3B82F6',icon:'×2',life:T.bonusLife[0],lab:'POINTS ×2'},
+        {bonus:'time',color:'#A855F7',icon:'+2s',life:T.bonusLife[1],lab:'+2 SECONDES'},
+        {bonus:'jackpot',color:'#FFD84D',icon:'★',life:T.bonusLife[2],lab:'JACKPOT'},
       ];
       const k=kinds[Math.floor(Math.random()*kinds.length)];
-      const{x,y}=this._sourisFreeSpot([12,88],[12,88],4.4);
-      s.targets.push({x,y,r:4.4,born:Date.now(),hover:0,...k});
+      const{x,y}=this._sfsSpot(4.4);
+      s.targets.push({id,x,y,r:4.4,born:s.clock,hover:0,bonus:k.bonus,color:k.color,icon:k.icon,life:k.life,tag:this._sfsCoach(s,'b'+k.bonus,k.lab)});
       return;
     }
-    // Niveau survol : une cible bonus dorée, verrouillage éclair, ×2 pts 5s.
-    if(c.hover&&Math.random()<.1&&!(s.targets||[]).some(t=>t.bonus)){
-      const{x,y}=this._sourisFreeSpot([10,90],[12,88],5.2);
-      s.targets.push({x,y,r:5.2,bonus:'points',color:'#3B82F6',icon:'×2',label:'×2 RAPIDE',born:Date.now(),life:2600,hover:0});
+    if(c.hover&&Math.random()<T.bonusP&&!(s.targets||[]).some(t=>t.bonus)){
+      const{x,y}=this._sfsSpot(5.2);
+      s.targets.push({id,x,y,r:5.2,bonus:'points',color:'#3B82F6',icon:'×2',born:s.clock,life:2600,hover:0,tag:this._sfsCoach(s,'bhov','BONUS ×2')});
       return;
     }
-    const bad=!!c.traps&&Math.random()<(c.fast?.34:.3);
-    const base=c.fast?rnd(2.6,4.0):rnd(3.4,5.4);
-    const r=c.hover?7:base;
-    const{x,y}=this._sourisFreeSpot([8,92],[10,90],r);
+    const bad=!!c.traps&&Math.random()<T.badP;
+    const r=rnd(T.r[0],T.r[1]);
+    const{x,y}=this._sfsSpot(r);
+    const key=c.hover?'hov':bad?'bad':'ok';
+    const label=c.hover?'POSE LE CURSEUR':bad?'ÉVITE':'CLIQUE';
     s.targets.push({
-      x, y, r,
-      bad,
+      id,x,y,r,bad,
       disguised:bad&&!!c.disguise&&Math.random()<.6,
-      born:Date.now(),
-      life:c.hover?4200:c.fast?1900:(c.move?4600:(c.traps?3600:3000)),
+      born:s.clock,
+      life:T.life,
       hover:0,
+      tag:this._sfsCoach(s,key,label),
     });
   },
 
-  _sourisTick(){
+  // Réglages de difficulté par niveau (rayons en unités, durées en ms).
+  // maxT : cibles simultanées · rate : ticks (50 ms) entre deux apparitions
+  // life : durée de vie d'une cible · r : rayon [min,max] · badP : part de
+  // pièges · bonusP : chance d'un bonus · bonusLife : durées [x2, +2 s, jackpot]
+  // padR/padLife/padHold : cercles du niveau 10 · haz : zones rouges mobiles
+  // {n max, r rayon, v vitesse max, every ticks entre deux apparitions} ·
+  // padHaz : zones du niveau 10 {r, v, inv}. Calibrés par simulation de joueurs
+  // virtuels (loi de Fitts) : voir scripts/souris-calibration.js. Les seuils de
+  // médaille (_sourisLevels) en découlent, ne pas les modifier sans relancer l'outil.
+  _sfsTune:{
+    1:{maxT:2,rate:14,life:4200,r:[7,7],bonusP:.1,hoverFrom:800,hoverTo:400},
+    2:{maxT:2,rate:10,life:4000,r:[3.4,5.4]},
+    3:{maxT:2,rate:10,life:4000,r:[3.4,5.4]},
+    4:{maxT:2,rate:10,life:3600,r:[3.0,4.4]},
+    5:{maxT:3,rate:10,life:5000,r:[3.4,5.4],badP:.3},
+    6:{maxT:2,rate:10,life:4000,r:[3.4,5.4],bonusP:.14,bonusLife:[2600,2800,1800]},
+    7:{maxT:2,rate:10,life:3400,r:[2.8,4.0],badP:.34,bonusP:.14,bonusLife:[3000,3200,2200]},
+    8:{maxT:3,rate:10,life:8000,r:[4.6,4.6]},
+    9:{maxT:3,rate:10,life:8000,r:[4.6,4.6]},
+    10:{maxT:3,rate:18,padR:8,padLife:6500,padHold:300,padHaz:{r:5,v:.35,inv:2000}},
+    11:{maxT:2,rate:12,life:4600,r:[3.4,5.4],haz:{n:2,r:8,v:.9,every:60}},
+    12:{maxT:2,rate:12,life:3800,r:[3.0,4.4],badP:.34,bonusP:.14,bonusLife:[3000,3200,2200],haz:{n:2,r:8,v:.9,every:60}},
+  },
+  _sfsT(lvl){return this._sfsTune[lvl]||this._sfsTune[2];},
+  _sfsHoverReq(s){const T=this._sfsT(s.lvl);return Math.max(T.hoverTo||400,(T.hoverFrom||800)-(s.streak||0)*40);},
+
+  /* ── Boucle de jeu (50 ms) ──────────────────────────────────── */
+
+  _sfsTick(){
     const s=this.souris;if(!s||s.phase!=='play')return;
-    s.tick++;
-    const c=this._sourisCaps(s.lvl);
-    const now=Date.now();
+    s.tick++;s.clock+=50;
+    this._sfsSyncPointer();
+    const c=this._sourisCaps(s.lvl),now=s.clock;
     s.tLeft-=50;
-    if(s.tLeft<=0){s.tLeft=0;return this._sourisTimeUp();}
+    if(s.tLeft<=0){s.tLeft=0;this._sfsFinish();return;}
 
     // Apparition
-    const maxT=c.drag?3:c.pads?2:c.hover?2:3;
-    const rate=c.hover?14:c.pads?26:(c.move?12:10);
-    if((s.targets||[]).length<maxT&&s.tick%rate===0)this._sourisSpawn();
+    const T=this._sfsT(s.lvl);
+    if((s.targets||[]).length<T.maxT&&s.tick%T.rate===0)this._sfsSpawn();
 
-    // Niveau survol : rester sur la cible la valide. Le temps de verrouillage
-    // se resserre avec la série (800ms → plancher 400ms) : récompense les
-    // séries en demandant plus de précision de tenue, jamais plus vite que
-    // ce plancher pour rester jouable.
+    // Niveau 1 : rester sur la cible la valide (verrouillage de 0,8 s qui
+    // descend à 0,4 s avec la série)
     if(c.hover){
-      const t=this._sourisAt(s.mx,s.my);
+      const t=this._sfsTargetAt(s.px,s.py,4);
       (s.targets||[]).forEach(x=>{if(x!==t)x.hover=0;});
       if(t){
         if(!t._firstHoverAt)t._firstHoverAt=now;
         t.hover+=50;
-        const req=t.bonus?Math.max(200,this._sourisHoverReq(s)/2):this._sourisHoverReq(s);
+        const req=t.bonus?Math.max(200,this._sfsHoverReq(s)/2):this._sfsHoverReq(s);
         if(t.hover>=req){
           s.targets=s.targets.filter(x=>x!==t);
           s.lastReaction=t._firstHoverAt-t.born;
           if(t.bonus){
             s.mult=2;s.multUntil=now+5000;s.hit++;
-            playSound('hit');this._sourisFlash('#3B82F6');
-            this._sourisJudgePop('BONUS','×2 · 5s','bonus');
-          } else {
-            const mult=(s.mult&&now<s.multUntil)?s.mult:1;
-            const core=this._sourisHoverInCore(t,s.mx,s.my);
+            playSound('hit');this._sfsFlash('blue');
+            this._sfsFx('Bonus','×2 pendant 5 s','bonus',t.x,t.y);
+          }else{
+            const mult=(s.mult>1&&now<s.multUntil)?s.mult:1;
+            const core=this._sfsInCore(t,s.px,s.py,0.16);
             const pts=(core?3:1)*mult;
             s.score+=pts;s.hit++;
             if(core)s.cores=(s.cores||0)+1;
-            s.streak=(s.streak||0)+1;
-            playSound('hit');this._sourisFlash(core?'#FFD84D':'#1FA971');
-            this._sourisJudgePop('TOUCHÉ','+'+pts+' · SÉRIE '+s.streak);
+            this._sfsStreak(1);
+            playSound('hit');this._sfsFlash(core?'gold':'good');
+            this._sfsFx(core?'Plein centre':'Validé','+'+pts+' · série '+s.streak,core?'bonus':'',t.x,t.y);
           }
         }
       }
     }
 
-    // Glisser-déposer : une pièce jamais déposée finit par disparaître (coûte une vie)
+    // Glisser-déposer : une forme jamais déposée finit par disparaître
     if(c.drag){
-      const gone=(s.targets||[]).filter(t=>now-t.born>8000&&t!==s.drag);
-      if(gone.length)playSound('miss');
-      gone.forEach(()=>{s.miss++;s.streak=0;this._sourisLoseLife();});
-      s.targets=(s.targets||[]).filter(t=>!(now-t.born>8000&&t!==s.drag));
+      const gone=(s.targets||[]).filter(t=>now-t.born>T.life&&t!==s.drag);
+      if(gone.length){
+        playSound('miss');
+        s.targets=s.targets.filter(t=>!gone.includes(t));
+        for(const t of gone){s.miss++;s.streak=0;s.expired++;this._sfsFx('Trop tard','−1 vie','bad',t.x,t.y);this._sfsLoseLife();if(s.phase!=='play')return;}
+      }
     }
-    // Expiration : laisser filer une cible utile coûte une vie — y compris au
-    // niveau 1 (avant : jamais, alors que ses 3 cœurs affichés à l'écran
-    // laissaient croire le contraire). Le clavier (pads, niveau ZQSD) reste
-    // à part : là, c'est les zones dangereuses qui coûtent une vie, pas un
-    // cercle raté. Une cible bonus n'est jamais punitive — la rater ne coûte
-    // ni vie ni série.
+    // Expiration : une cible utile qui disparaît coûte une vie (pas les
+    // pièges, pas les bonus, pas les cercles du niveau 10)
     if(!c.drag){
       const gone=(s.targets||[]).filter(t=>now-t.born>t.life&&!t.bad&&!t.bonus);
-      if(gone.length)playSound('miss');
-      gone.forEach(()=>{
-        s.miss++;s.streak=0;
-        if(!c.pads)this._sourisLoseLife();
-      });
       s.targets=(s.targets||[]).filter(t=>now-t.born<=t.life);
+      if(gone.length)playSound('miss');
+      for(const t of gone){
+        s.miss++;s.streak=0;
+        if(!c.pads){s.expired++;this._sfsFx('Disparue','−1 vie','bad',t.x,t.y);this._sfsLoseLife();if(s.phase!=='play')return;}
+      }
     }
 
-    // Déplacement ZQSD
-    if(c.move&&s.phase==='play'){
-      const k=this._sourisKeys||{};
-      const sp=1.7;
-      if(k.z)s.player.y-=sp; if(k.s)s.player.y+=sp;
-      if(k.q)s.player.x-=sp; if(k.d)s.player.x+=sp;
+    // Déplacement (Z Q S D ou flèches)
+    if(c.move){
+      const k=this._sfsKeys||{},sp=1.7;
+      if(k.z)s.player.y-=sp;if(k.s)s.player.y+=sp;
+      if(k.q)s.player.x-=sp;if(k.d)s.player.x+=sp;
       s.player.x=Math.max(3,Math.min(97,s.player.x));
       s.player.y=Math.max(4,Math.min(96,s.player.y));
     }
 
-    // Cercles à atteindre au clavier (niveau ZQSD seul)
-    if(c.pads&&s.phase==='play'){
-      const p=s.player;
+    // Cercles à atteindre au clavier (niveau 10)
+    if(c.pads){
+      const p=s.player,g=this._sfsG();
       (s.targets||[]).forEach(t=>{
-        const dx=(t.x-p.x)*1.6, dy=t.y-p.y;
-        if(Math.sqrt(dx*dx+dy*dy)<t.r){
+        if(this._sfsDistPct(t.x,t.y,p.x,p.y)<t.r*g.K){
           if(!t._enteredAt)t._enteredAt=now;
           t.hover+=50;
-          if(t.hover>=400){
-            s.score++;s.hit++;s.streak=(s.streak||0)+1;
+          if(t.hover>=T.padHold){
+            s.score++;s.hit++;this._sfsStreak(1);
             s.lastReaction=t._enteredAt-t.born;
             s.targets=s.targets.filter(x=>x!==t);
-            playSound('hit');this._sourisFlash('#1FA971');
-            this._sourisJudgePop('TOUCHÉ','+1 · SÉRIE '+s.streak,undefined,t.x,t.y);
+            playSound('hit');this._sfsFlash('good');
+            this._sfsFx('Atteint','+1 · série '+s.streak,'',t.x,t.y);
           }
-        } else t.hover=0;
+        }else t.hover=0;
       });
     }
 
-    // Zones dangereuses mobiles
-    if(c.hazards&&s.phase==='play'){
-      if(s.tick%60===0&&s.hazards.length<2){
-        s.hazards.push({x:Math.random()*100,y:Math.random()*100,r:8,vx:(Math.random()-.5)*.9,vy:(Math.random()-.5)*.9});
-      }
-      s.hazards.forEach(h=>{
-        h.x+=h.vx;h.y+=h.vy;
-        if(h.x<5||h.x>95)h.vx*=-1;
-        if(h.y<5||h.y>95)h.vy*=-1;
-        const dx=(h.x-s.player.x)*1.6,dy=h.y-s.player.y;
-        if(Math.sqrt(dx*dx+dy*dy)<h.r&&!s._inv){
-          s._inv=true;setTimeout(()=>{s._inv=false;},1400);
-          s.score=Math.max(0,s.score-1);s.streak=0;
-          playSound('miss');this._sourisFlash('#E5484D');
-          this._sourisJudgePop('ZONE','−1','bad',s.player.x,s.player.y);
-        }
-      });
+    // Zones rouges mobiles (niveaux 11 et 12) : 1 point en moins au contact
+    if(c.hazards&&!c.pads){
+      if(s.tick%T.haz.every===0&&s.hazards.length<T.haz.n)s.hazards.push({id:++s.uid,x:Math.random()*100,y:Math.random()*100,r:T.haz.r,vx:(Math.random()-.5)*T.haz.v,vy:(Math.random()-.5)*T.haz.v});
+      this._sfsMoveHazards(false);
+    }
+    // Zones rouges du niveau 10 : 1 vie en moins au contact
+    if(c.pads){
+      if(!s.hazards.length){for(let i=0;i<2;i++)s.hazards.push({id:++s.uid,x:30+i*40,y:50,r:T.padHaz.r,vx:0,vy:(i?T.padHaz.v:-T.padHaz.v)});}
+      this._sfsMoveHazards(true);
+      if(s.phase!=='play')return;
     }
 
-    // Zones dangereuses fixes (niveau ZQSD seul) : elles ne tuent pas, elles gênent
-    if(c.pads&&s.phase==='play'){
-      if(!s.hazards.length){
-        for(let i=0;i<2;i++)s.hazards.push({x:30+i*40,y:50,r:9,vx:0,vy:(i?.7:-.7)});
-      }
-      s.hazards.forEach(h=>{
-        h.y+=h.vy;
-        if(h.y<12||h.y>88)h.vy*=-1;
-        const dx=(h.x-s.player.x)*1.6,dy=h.y-s.player.y;
-        if(Math.sqrt(dx*dx+dy*dy)<h.r&&!s._inv){
-          s._inv=true;setTimeout(()=>{s._inv=false;},1400);
-          playSound('miss');this._sourisLoseLife();this._sourisFlash('#E5484D');
-          this._sourisJudgePop('ZONE','−1 ♥','bad',s.player.x,s.player.y);
-        }
-      });
-    }
-
-    // Rendu complet (pas juste le canevas des cibles) : le score, le chrono,
-    // la barre de progression et les vies doivent bouger en direct pendant
-    // la partie, pas seulement à l'écran de fin.
-    if(s.phase==='play')this._sourisRenderArena();
+    this._sfsPaint();
+    this._sfsHud();
   },
 
-  _sourisHoverReq(s){return Math.max(400,800-(s.streak||0)*40);},
-
-  // Vrai si le curseur est resté dans le petit disque blanc central au
-  // moment du verrouillage : ×3 points, comme le cœur de cible du niveau 3.
-  _sourisHoverInCore(t,x,y){
-    const dx=(t.x-x)*1.6, dy=t.y-y;
-    return Math.sqrt(dx*dx+dy*dy)<=t.r*0.12;
+  _sfsMoveHazards(lifeCost){
+    const s=this.souris,g=this._sfsG();
+    for(const h of s.hazards){
+      h.x+=h.vx;h.y+=h.vy;
+      if(lifeCost){if(h.y<12||h.y>88)h.vy*=-1;}
+      else{if(h.x<5||h.x>95)h.vx*=-1;if(h.y<5||h.y>95)h.vy*=-1;}
+      if(this._sfsDistPct(h.x,h.y,s.player.x,s.player.y)<h.r*g.K&&s.clock>=s.invUntil){
+        s.invUntil=s.clock+((lifeCost?this._sfsT(s.lvl).padHaz.inv:this._sfsT(s.lvl).haz.inv)||1400);
+        s.hazardHits++;
+        playSound('miss');this._sfsFlash('bad');
+        if(lifeCost){this._sfsFx('Zone rouge','−1 vie','bad',s.player.x,s.player.y);this._sfsLoseLife();if(s.phase!=='play')return;}
+        else{s.score=Math.max(0,s.score-1);s.streak=0;this._sfsFx('Zone rouge','−1','bad',s.player.x,s.player.y);}
+      }
+    }
   },
 
-  // État déclaratif (comme les autres jeux de cette session) : le canevas
-  // est réécrit en entier à chaque tick, donc un nœud DOM ajouté ici serait
-  // effacé au tick suivant. On stocke plutôt le popup dans l'état et
-  // _sourisPaint() le dessine tant que `until` n'est pas dépassé.
-  // Popup de jugement partagé par TOUS les niveaux (avant : réservé au
-  // survol, donc cliquer une cible aux niveaux 2-7/11/12 ne donnait aucun
-  // retour à l'écran). kind: undefined (bon)/'bonus'/'bad'. x/y par défaut
-  // au curseur ; passer une position explicite pour les niveaux où le
-  // curseur n'a pas de sens (cercles ZQSD, glisser-déposer raté).
-  _sourisJudgePop(title,sub,kind,x,y){
+  /* ── Retours visuels ────────────────────────────────────────── */
+
+  _sfsFlash(kind){
+    const a=document.getElementById('souris-arena');if(!a)return;
+    a.classList.remove('f-good','f-bad','f-gold','f-blue','f-violet');
+    void a.offsetWidth;a.classList.add('f-'+kind);
+    clearTimeout(this._sfsFlashT);
+    this._sfsFlashT=setTimeout(()=>{if(a)a.classList.remove('f-good','f-bad','f-gold','f-blue','f-violet');},160);
+  },
+  _sfsFx(title,sub,kind,x,y,ripple){
+    const fx=document.getElementById('sfs-fx');if(!fx)return;
+    while(fx.childElementCount>7)fx.firstElementChild.remove();
+    const d=document.createElement('div');
+    d.className='sfs-judge'+(ripple?' ripple':'');
+    d.style.left=Math.max(12,Math.min(88,x==null?50:x))+'%';
+    d.style.top=Math.max(16,Math.min(92,y==null?50:y))+'%';
+    d.innerHTML=ripple?'<i></i>':`<div class="jt">${title}</div>${sub?`<div class="jp ${kind||''}">${sub}</div>`:''}`;
+    fx.appendChild(d);
+    setTimeout(()=>d.remove(),ripple?420:760);
+  },
+  _sfsFxBig(txt){
+    const fx=document.getElementById('sfs-fx');if(!fx)return;
+    const d=document.createElement('div');d.className='sfs-big';d.textContent=txt;
+    fx.appendChild(d);setTimeout(()=>d.remove(),900);
+  },
+
+  /* ── Mise à jour de l'affichage (sans toucher à l'arène) ────── */
+
+  _sfsHud(){
+    const s=this.souris,l=this._sourisLevels[s.lvl-1];
+    const C=this._sfsHudCache;if(!C)return;
+    const set=(id,v,prop)=>{if(C[id]===v)return;C[id]=v;const el=document.getElementById(id);if(el){if(prop)el.style[prop]=v;else el.textContent=v;}};
+    set('sfs-score',String(s.score));
+    const sec=Math.ceil((s.tLeft||0)/1000);
+    set('sfs-time',String(sec));
+    const tm=document.getElementById('sfs-time');if(tm)tm.classList.toggle('low',sec<=5);
+    set('sfs-fill',Math.min(100,s.score/l.gold*100).toFixed(1)+'%','width');
+    set('sfs-tfill',Math.max(0,Math.min(100,(s.tLeft||0)/((l.dur||30)*1000)*100)).toFixed(1)+'%','width');
+    const fill=document.getElementById('sfs-fill');
+    if(fill){const t=this._sourisTier(l,s.score);fill.dataset.tier=t||'';}
+    document.querySelectorAll('.sfs-track .mk').forEach(m=>m.classList.toggle('on',s.score>=+m.dataset.v));
+    document.querySelectorAll('.sfs-marks span').forEach((m,i)=>m.classList.toggle('on',s.score>=[l.bronze,l.silver,l.gold][i]));
+    const lv=document.getElementById('sfs-lives');
+    if(lv&&C.lives!==s.lives){C.lives=s.lives;lv.innerHTML=[0,1,2].map(i=>`<span class="sfs-life${i<s.lives?' on':''}"></span>`).join('');}
+    const tot=s.hit+s.miss;
+    set('sfs-acc',(tot?Math.round(100*s.hit/tot):100)+'%');
+    set('sfs-streak',String(s.streak||0));
+    set('sfs-react',s.lastReaction?s.lastReaction+' ms':'-');
+    set('sfs-gold',Math.max(0,l.gold-s.score)>0?(l.gold-s.score)+' pts pour l’or':'Or atteint');
+  },
+
+  // Réconciliation des éléments de jeu : un nœud par cible/zone/joueur,
+  // créé une fois puis déplacé (jamais détruit tant que l'objet existe).
+  _sfsNode(key,html){
+    let el=this._sfsNodes.get(key);
+    if(!el){
+      const d=document.createElement('div');d.innerHTML=html;el=d.firstElementChild;
+      this._sfsLayer.appendChild(el);this._sfsNodes.set(key,el);
+    }
+    return el;
+  },
+  _sfsPaint(){
     const s=this.souris;
-    s.judge={title,sub,kind,x:x??(s.mx||50),y:y??(s.my||50),until:Date.now()+650};
-  },
+    if(!s||!this._sfsLayer)return;
+    const c=this._sourisCaps(s.lvl),g=this._sfsG(),now=s.clock;
+    const seen=new Set();
+    const put=(key,html)=>{seen.add(key);return this._sfsNode(key,html);};
+    const place=(el,x,y,d)=>{el.style.left=x+'%';el.style.top=y+'%';if(d!=null){el.style.width=d+'px';el.style.height=d+'px';}};
 
-  _sourisPaint(){
-    const a=this._sourisArena, s=this.souris;
-    if(!a||!s||s.phase!=='play')return;
-    const c=this._sourisCaps(s.lvl);
-    const now=Date.now();
-    let html='';
-    // Décor de réticule : avant réservé au survol, ce qui faisait paraître
-    // l'arène "nue" sur tous les autres niveaux — purement décoratif
-    // (pointer-events:none, z-index 0) donc sans risque à afficher partout.
-    html+=`<div class="gsouris-reticle">
-      <div class="gsouris-reticle-dash"></div>
-      <span class="gsouris-chevron up"></span><span class="gsouris-chevron down"></span>
-      <span class="gsouris-chevron left"></span><span class="gsouris-chevron right"></span>
-    </div>`;
     if(c.drag){
-      const zones=c.sort3
-        ?[['#1FA971','VERTE',0,33.3],['#3B82F6','BLEUE',33.3,66.6],['#818CF8','INDIGO',66.6,100]]
-        :[['#1FA971','VERTE',0,50],['#3B82F6','BLEUE',50,100]];
-      zones.forEach(([col,lbl,l,r])=>{
-        html+=`<div style="position:absolute;left:${l}%;right:${100-r}%;top:58%;bottom:0;background:${col}1a;border:2px dashed ${col}88;border-radius:12px;margin:5px;display:flex;align-items:center;justify-content:center;color:${col};font-weight:800;font-size:12px;letter-spacing:.05em">${lbl}</div>`;
+      const zones=c.sort3?[['#1FA971','Verte',0,33.3],['#3B82F6','Bleue',33.3,66.6],['#818CF8','Indigo',66.6,100]]:[['#1FA971','Verte',0,50],['#3B82F6','Bleue',50,100]];
+      zones.forEach(([col,lbl,a,b],i)=>{
+        const el=put('z'+i,`<div class="sfs-zone"><span></span></div>`);
+        if(!el._init){el._init=1;el.style.cssText=`left:calc(${a}% + 6px);width:calc(${b-a}% - 12px);--zc:${col}`;el.firstElementChild.textContent=lbl;}
       });
     }
     (s.hazards||[]).forEach(h=>{
-      html+=`<div style="position:absolute;left:${h.x}%;top:${h.y}%;width:${h.r*2}%;aspect-ratio:1;transform:translate(-50%,-50%);background:rgba(229,72,77,.22);border:2px solid rgba(229,72,77,.65);border-radius:50%"></div>`;
+      const el=put('h'+h.id,'<div class="sfs-haz"></div>');
+      place(el,h.x,h.y,h.r*g.K*2);
     });
     (s.targets||[]).forEach(t=>{
       const age=now-t.born;
-      if(c.drag){
-        const sz=t.r*2;
-        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${sz}%;aspect-ratio:1;transform:translate(-50%,-50%);background:linear-gradient(160deg,${t.color},${t.color}cc);border-radius:${t.shape==='circle'?'50%':'8px'};box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),0 6px 18px rgba(0,0,0,.4)${t.grabbed?';outline:3px solid #fff':''};cursor:${t.grabbed?'grabbing':'grab'}"></div>`;
+      if(t.piece){
+        const el=put('t'+t.id,'<div class="sfs-piece"></div>');
+        place(el,t.x,t.y,t.r*g.K*2);
+        el.style.background=`linear-gradient(160deg,${t.color},${t.color}cc)`;
+        el.style.borderRadius=t.shape==='circle'?'50%':'12px';
+        el.classList.toggle('grab',!!t.grabbed);
+        el.dataset.tag=t.tag||'';
         return;
       }
       if(t.pad){
         const fill=t.hover?Math.min(1,t.hover/400):0;
-        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${t.r*2}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #1FA971;background:rgba(31,169,113,${.12+fill*.5});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">${fill>0?Math.round(fill*100)+'%':''}</div>`;
+        const el=put('t'+t.id,'<div class="sfs-pad"><b></b></div>');
+        place(el,t.x,t.y,t.r*g.K*2);
+        el.style.background=`rgba(31,169,113,${(.14+fill*.5).toFixed(2)})`;
+        el.firstElementChild.textContent=fill>0?Math.round(fill*100)+'%':(t.tag||'');
         return;
       }
       if(t.bonus){
-        const left=Math.max(0,1-age/t.life);
-        const pulse=0.85+0.15*Math.sin(now/90);
-        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${t.r*2}%;aspect-ratio:1;transform:translate(-50%,-50%) scale(${pulse});border-radius:50%;background:${t.color};box-shadow:0 0 22px ${t.color};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;border:2px solid #fff">${t.icon}</div>`;
-        html+=`<div style="position:absolute;left:${t.x}%;top:${t.y}%;width:${t.r*2.6}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2px solid ${t.color};opacity:${left*.6};pointer-events:none"></div>`;
-        if(t.label)html+=`<div class="gsouris-bonus-label" style="left:${t.x}%;top:${t.y+t.r*1.15}%">${t.label}</div>`;
+        const el=put('t'+t.id,'<div class="sfs-bonus"><em></em><span></span></div>');
+        const pulse=.9+.1*Math.sin(now/90);
+        place(el,t.x,t.y,t.r*g.K*2);
+        el.style.background=t.color;el.style.boxShadow=`0 0 24px ${t.color}`;el.style.transform=`translate(-50%,-50%) scale(${pulse.toFixed(3)})`;
+        el.firstElementChild.textContent=t.icon;
+        el.lastElementChild.textContent=t.hover>0&&c.hover?'':(t.tag||'');
         return;
       }
+      // Cible à anneaux (survol et clic)
+      const el=put('t'+t.id,'<div class="sfs-t"><i class="r"></i><i class="p"></i><i class="c"></i><i class="d"></i><i class="h"></i><b class="m">✕</b><span class="tg"></span></div>');
+      const rv=this._sfsRad(t);
+      place(el,t.x,t.y,rv*2);
+      const prog=el.querySelector('.p'),core=el.querySelector('.c'),heart=el.querySelector('.h'),mark=el.querySelector('.m'),tag=el.querySelector('.tg'),dot=el.querySelector('.d');
       if(c.hover){
-        // Cible "réticule" à cercles concentriques : l'anneau de progression
-        // se remplit (conic-gradient) jusqu'au temps de verrouillage requis,
-        // masqué au centre par le cœur plein pour ne garder que l'anneau.
-        const req=this._sourisHoverReq(s);
-        const pct=Math.min(100,Math.round((t.hover/req)*100));
-        html+=`<div class="gsouris-target" style="left:${t.x}%;top:${t.y}%;width:${t.r*2}%">
-          <div class="gsouris-target-ring"></div>
-          <div class="gsouris-target-prog" style="background:conic-gradient(#fff ${pct}%,transparent 0)"></div>
-          <div class="gsouris-target-core"></div>
-          <div class="gsouris-target-dot"></div>
-          ${t.hover>0?`<div class="gsouris-target-lock">VERROUILLAGE ${(req/1000).toFixed(1)}s</div>`:''}
-        </div>`;
-        return;
+        const req=this._sfsHoverReq(s);
+        const pct=Math.min(100,Math.round(t.hover/req*100));
+        prog.style.background=`conic-gradient(#fff ${pct}%,transparent 0)`;
+        core.style.background='radial-gradient(circle at 35% 30%,#FF9868,#FF4D2E 70%)';core.style.boxShadow='0 0 20px rgba(255,77,46,.55)';
+        dot.style.display='block';heart.style.display='none';mark.style.display='none';
+        tag.textContent=t.hover>0?'':(t.tag||'');
+      }else{
+        const left=Math.max(0,1-age/t.life);
+        const col=t.bad?(t.disguised?'#D98A3D':'#E5484D'):'#1FA971';
+        const grad=t.bad?(t.disguised?'radial-gradient(circle at 35% 30%,#F0BE7E,#D98A3D 70%)':'radial-gradient(circle at 35% 30%,#F28B8B,#E5484D 70%)'):'radial-gradient(circle at 35% 30%,#4EE0A0,#1FA971 70%)';
+        prog.style.background=`conic-gradient(${col} ${Math.round(left*100)}%,transparent 0)`;
+        core.style.background=grad;core.style.boxShadow=`0 0 20px ${col}88`;
+        dot.style.display='none'; // point blanc = bonus du niveau 1 seulement (ailleurs : cœur doré ou rien)
+        const frac=c.smaller?0.26:0.30;
+        const showHeart=!!c.core&&!t.bad;
+        heart.style.display=showHeart?'block':'none';
+        if(showHeart)heart.style.inset=(50-frac*50)+'%';
+        mark.style.display=(t.bad&&!t.disguised)?'block':'none';
+        tag.textContent=t.tag||'';
       }
-      // Même cible à anneaux concentriques que le survol (ring/prog/core/dot)
-      // au lieu de l'ancien disque plat : avant, seul le niveau 1 avait cette
-      // DA, les autres avaient de simples ronds unis qui juraient à côté.
-      // L'anneau de progression se VIDE à mesure que le temps s'écoule
-      // (miroir du remplissage du verrouillage en survol), en plus du léger
-      // rétrécissement déjà utilisé comme repère d'urgence.
-      const left=Math.max(0,1-age/t.life);
-      const sz=t.r*2*(.7+left*.3);
-      const ringCol=t.bad?(t.disguised?'#D98A3D':'#E5484D'):'#1FA971';
-      const grad=t.bad?(t.disguised?'radial-gradient(circle at 35% 30%,#F0BE7E,#D98A3D 70%)':'radial-gradient(circle at 35% 30%,#F28B8B,#E5484D 70%)'):'radial-gradient(circle at 35% 30%,#4EE0A0,#1FA971 70%)';
-      const mark=t.bad&&!t.disguised?'<div class="gsouris-target-mark">✕</div>':'';
-      const frac=c.smaller?0.26:0.30;
-      const heart=(c.core&&!t.bad)?`<div class="gsouris-target-heart" style="width:${frac*2*100}%;height:${frac*2*100}%"></div>`:'';
-      html+=`<div class="gsouris-target" style="left:${t.x}%;top:${t.y}%;width:${sz}%">
-        <div class="gsouris-target-ring"></div>
-        <div class="gsouris-target-prog" style="background:conic-gradient(${ringCol} ${Math.round(left*100)}%,transparent 0)"></div>
-        <div class="gsouris-target-core" style="background:${grad};box-shadow:0 0 20px ${ringCol}88"></div>
-        <div class="gsouris-target-dot"></div>
-        ${heart}${mark}
-      </div>`;
     });
-    if(s.judge&&s.judge.until>now){
-      const j=s.judge;
-      html+=`<div class="gsouris-judge" style="left:${j.x}%;top:${j.y}%">
-        <div class="gsouris-judge-text">${j.title}</div>
-        <div class="gsouris-judge-pill${j.kind?' '+j.kind:''}">${j.sub}</div>
-      </div>`;
-    }
-    if(s.pop&&s.pop.until>now){
-      const p=s.pop, frac=Math.max(0,Math.min(1,(now-p.born)/(p.until-p.born)));
-      html+=`<div style="position:absolute;left:${p.x}%;top:${p.y-frac*12}%;transform:translate(-50%,-50%);color:${p.color};font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;text-shadow:0 3px 12px rgba(0,0,0,.6);opacity:${1-frac};pointer-events:none;z-index:6">${p.txt}</div>`;
-    }
-    if(s.regenPop&&s.regenPop.until>now){
-      const p=s.regenPop, frac=Math.max(0,Math.min(1,(now-p.born)/(p.until-p.born)));
-      html+=`<div style="position:absolute;left:50%;top:${38-frac*14}%;transform:translate(-50%,-50%);color:#FFD84D;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:34px;text-shadow:0 4px 18px rgba(0,0,0,.6);opacity:${1-frac};pointer-events:none;z-index:5">+1 ♥</div>`;
-    }
-    if(c.move||c.pads){
-      html+=`<div style="position:absolute;left:${s.player.x}%;top:${s.player.y}%;width:5%;aspect-ratio:1;transform:translate(-50%,-50%);background:#fff;border-radius:50%;box-shadow:0 0 14px rgba(255,255,255,.7);opacity:${s._inv?.4:1};display:flex;align-items:center;justify-content:center;font-size:12px">🙂</div>`;
+    if(c.move){
+      const el=put('pl','<div class="sfs-pl"><i></i><i></i></div>');
+      place(el,s.player.x,s.player.y,g.K*9);
+      el.style.opacity=s.clock<s.invUntil?(Math.floor(s.clock/150)%2?'.35':'.9'):'1';
     }
     if(s.mult>1&&now<s.multUntil){
-      html+=`<div style="position:absolute;left:12px;top:10px;background:#3B82F6;color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:14px;font-family:JetBrains Mono,monospace">×${s.mult} ${Math.ceil((s.multUntil-now)/1000)}s</div>`;
+      const el=put('mult','<div class="sfs-mult"></div>');
+      el.textContent='×'+s.mult+'  '+Math.ceil((s.multUntil-now)/1000)+' s';
     }
     if(c.core&&(s.streak||0)>0){
-      // Le compte de série est déjà affiché dans le pied de partie ; ces
-      // points ne montrent que la progression fine vers le prochain +1 ♥.
-      const dots=[0,1,2,3,4].map(i=>`<span style="width:7px;height:7px;border-radius:50%;background:${i<(s.streak%5||5)?'#FFD84D':'rgba(255,255,255,.2)'}"></span>`).join('');
-      html+=`<div style="position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);padding:6px 12px;border-radius:20px">
-        ${dots}
-        ${s.lives>=3?'<span style="font-size:10px;color:rgba(255,255,255,.45)">vies au max</span>':'<span style="font-size:10px;color:rgba(255,255,255,.6)">5 = +1 ♥</span>'}
-      </div>`;
+      const el=put('chain','<div class="sfs-chain"></div>');
+      const n=s.streak%5||5;
+      el.innerHTML=[0,1,2,3,4].map(i=>`<span class="${i<n?'on':''}"></span>`).join('')+`<em>${s.lives>=3?'vies au max':'5 cœurs = 1 vie'}</em>`;
     }
-    a.innerHTML=html;
+    // Retire ce qui n'existe plus
+    for(const [k,el] of this._sfsNodes){
+      if(!seen.has(k)){el.remove();this._sfsNodes.delete(k);}
+    }
   },
 
   _sourisTiers:{grid:{bronze:35,silver:65,gold:100},hybrid:{bronze:35,silver:60,gold:90},tiles:{bronze:60,silver:110,gold:170}},
@@ -15750,6 +16555,8 @@ app.init();
   go(_validViews.includes(_vp)?_vp:(isTeacher()?'home':'test'));
 }
 window.addEventListener('popstate',()=>{
+  if(app._ignorePop){app._ignorePop=false;return;}
+  if(app._sfsEl&&app._sfsEl()){app._sfsFromPop();return;} // Retour ferme le jeu plein ecran, pas la page
   const v=VIEW_FROM_PATH[normPath(location.pathname)]||(isTeacher()?'home':'test');
   app._popping=true;try{app.renderView(v);}finally{app._popping=false;}
 });
