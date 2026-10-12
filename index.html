@@ -7640,7 +7640,7 @@ const app={
       <div class="trust">
         <div class="trust-inner">
           <div class="trust-hdr">
-            <div class="trust-title">Déjà adopté par <b style="color:var(--accent)">7 établissements</b></div>
+            <div class="trust-title">Déjà adopté par <b style="color:var(--accent)">9 établissements</b></div>
             <div class="trust-sub">Des établissements de tailles et de réseaux différents, du secondaire à l'administration communale.</div>
           </div>
           <div class="trust-row-mask">
@@ -7742,8 +7742,20 @@ const app={
       if(!d.count){el.style.display='none';return;}
       const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
       const stars=n=>'★'.repeat(Math.round(n))+'☆'.repeat(5-Math.round(n));
-      el.querySelector('.reviews-summary').innerHTML=`<span class="reviews-avg">${d.average.toFixed(1)}</span> <span class="reviews-stars">${stars(d.average)}</span> sur ${d.count} avis`;
-      this._initReviewsCarousel(el.querySelector('.reviews-grid'), d.items.slice(0,12), esc, stars);
+      // Avis Google 5/5 publiables (prénom seul, accord reçu), en plus des avis natifs.
+      // Total Google déclaré : 19 avis 5 étoiles (à mettre à jour à la main).
+      const googleReviews=[
+        {author_name:'Rudy',rating:5,comment:"J'ai fait l'expérience d'un site très clair, dynamique et motivant dans l'apprentissage de la pratique du clavier et ses applications. À recommander +++"},
+        {author_name:'Alexandre',rating:5,comment:"J'ai énormément appris en m'amusant !"},
+        {author_name:'Baptiste',rating:5,comment:"Super projet ! Très simple d'utilisation."},
+        {author_name:'Nora',rating:5,comment:"Super idée ! Très utile."},
+        {author_name:'Marine',rating:5,comment:"Super site ! Les leçons sont adaptées à tous les niveaux et j'ai adoré les jeux !"}
+      ];
+      const seen=new Set(d.items.map(it=>it.author_name));
+      const items=googleReviews.filter(g=>!seen.has(g.author_name)).concat(d.items);
+      const total=Math.max(d.count,19);
+      el.querySelector('.reviews-summary').innerHTML=`<span class="reviews-avg">${d.average.toFixed(1)}</span> <span class="reviews-stars">${stars(d.average)}</span> sur ${total} avis 5 étoiles`;
+      this._initReviewsCarousel(el.querySelector('.reviews-grid'), items.slice(0,12), esc, stars);
       el.style.display='';
       let ld=document.getElementById('reviews-jsonld');
       if(!ld){ld=document.createElement('script');ld.type='application/ld+json';ld.id='reviews-jsonld';document.head.appendChild(ld);}
@@ -7752,8 +7764,8 @@ const app={
         '@type':'Course',
         name:'Cours de dactylographie AZERTY',
         provider:{'@type':'Organization',name:'KeyPace',url:'https://keypace.be'},
-        aggregateRating:{'@type':'AggregateRating',ratingValue:d.average,reviewCount:d.count},
-        review:d.items.slice(0,10).map(it=>({'@type':'Review',author:{'@type':'Person',name:it.author_name},reviewRating:{'@type':'Rating',ratingValue:it.rating,bestRating:5,worstRating:1},reviewBody:it.comment})),
+        aggregateRating:{'@type':'AggregateRating',ratingValue:d.average,reviewCount:total},
+        review:items.slice(0,10).map(it=>({'@type':'Review',author:{'@type':'Person',name:it.author_name},reviewRating:{'@type':'Rating',ratingValue:it.rating,bestRating:5,worstRating:1},reviewBody:it.comment})),
       });
     }catch(e){el.style.display='none';}
   },
