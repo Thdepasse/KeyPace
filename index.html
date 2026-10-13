@@ -7346,6 +7346,18 @@ const app={
       if(e.code==='BracketLeft'&&e.shiftKey)d='¨';
       else if(e.code==='Equal'&&getKbLayoutId()==='nf')d=e.shiftKey?'¨':'^';
       else if(!d&&e.altKey&&getKbLayoutId()==='mac'){if(e.code==='KeyI')d='^';else if(e.code==='KeyU')d='¨';} // Mac : Option+i / Option+u
+      // ~ et ` (touches mortes) : si c'est justement le caractère attendu, on le compte tout de suite.
+      // Sinon « `code » ou « ~/dossier » décalait tout le texte, et un ` en fin de texte ne se validait jamais.
+      // L'espace qui valide habituellement la touche morte devient facultative (cf. _deadSp dans typeKey).
+      if(!d&&this.sess&&!this.sess.finished&&!this.sess.vocal&&(this.view==='test'||(this.view==='lessons'))){
+        const ex=this.sess.text&&this.sess.text[this.sess.idx];
+        if(ex&&'~`'.includes(ex)){
+          const s0=this.sess;
+          this.typeKey({key:ex,code:e.code||'',repeat:false,altKey:false,ctrlKey:false,shiftKey:false,target:e.target,preventDefault(){},getModifierState(){return false;}});
+          if(!s0.finished)s0._deadSp={at:s0.idx};
+          e.preventDefault();return;
+        }
+      }
       this._pendingDeadKey=d||'?';this._kbRefresh();return;
     }
     if(DEAD_COMPOSE[e.key]&&e.key.length===1){this._pendingDeadKey=e.key;this._kbRefresh();return;}
@@ -7394,6 +7406,12 @@ const app={
     if(k.length!==1)return;
     e.preventDefault();
     const s=this.sess;
+    // Espace qui valide une touche morte (~ ou `) déjà comptée : ignorée, ou comptée comme l'espace du texte (une 2e est alors facultative).
+    const _ds=s._deadSp;s._deadSp=null;
+    if(_ds&&_ds.at===s.idx&&k===' '){
+      if(s.text[s.idx]!==' ')return;
+      s._deadSp={at:s.idx+1};
+    }
     // Touche à ignorer : espace intérieure après un " pris pour «, ou e après un o pris pour œ.
     if(s._skipNext&&s._skipNext.at===s.idx){
       if(k===s._skipNext.ch){s._skipNext=null;return;}
