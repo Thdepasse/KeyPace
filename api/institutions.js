@@ -98,6 +98,56 @@ async function clearAdminKeyFailures(existing) {
   if (existing && existing.failed_attempts) await sb(`/admin_key_attempts?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify({ failed_attempts: 0 }) });
 }
 
+// Mail d'invitation envoyé depuis la version mobile (« m'envoyer le lien »).
+function linkInviteEmail(url) {
+  const step = (n, t, d) => `<tr><td width="36" valign="top" style="padding:0 0 16px"><div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:#FF4D2E;color:#fff;font-weight:800;font-size:14px;text-align:center">${n}</div></td><td valign="top" style="padding:0 0 16px 10px"><div style="font-size:15.5px;font-weight:700;color:#16140F;line-height:1.3">${t}</div><div style="font-size:14px;color:#7A7365;line-height:1.5;margin-top:2px">${d}</div></td></tr>`;
+  return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#faf9f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#16140F">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0">Ouvre ce lien sur ton ordinateur : 65 leçons et des jeux de frappe, gratuits pour commencer.</div>
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#faf9f5;padding:32px 12px">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #E7E1D5;border-radius:28px;overflow:hidden">
+        <tr><td bgcolor="#FF4D2E" style="background:#FF4D2E;background-image:linear-gradient(135deg,#FF8A5C 0%,#FF4D2E 55%,#E8391D 100%);padding:26px 36px 0">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.03em">Key<span style="opacity:.85">Pace</span></td>
+            <td align="right" style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.06em;text-transform:uppercase"><span style="background:rgba(255,255,255,.22);padding:5px 12px;border-radius:20px">Gratuit pour commencer</span></td>
+          </tr></table>
+          <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:18px 0 0">
+            <img src="${APP_URL}/images/keypace-mascots-duo-laptop.png" width="300" alt="Les mascottes KeyPace devant un ordinateur" style="display:block;width:300px;max-width:88%;height:auto;border:0">
+          </td></tr></table>
+        </td></tr>
+        <tr><td style="padding:34px 38px 6px;text-align:center">
+          <p style="margin:0 0 12px;font-size:30px;font-weight:800;letter-spacing:-0.03em;line-height:1.1">Prêt à taper plus vite&nbsp;?</p>
+          <p style="margin:0;font-size:16.5px;line-height:1.6;color:#4a4639">Tu as demandé le lien depuis ton téléphone. Ouvre-le sur ton <b>ordinateur</b> ou une tablette avec clavier : c'est là que ça se passe.</p>
+        </td></tr>
+        <tr><td align="center" style="padding:26px 38px 8px">
+          <a href="${url}" style="display:inline-block;background:#FF4D2E;color:#ffffff;font-weight:800;font-size:17px;text-decoration:none;padding:17px 38px;border-radius:15px;box-shadow:0 12px 24px -10px rgba(255,77,46,.6)">Tester KeyPace&nbsp;→</a>
+          <p style="margin:12px 0 0;font-size:13px;color:#8A8275">Gratuit pour commencer, aucune installation.</p>
+        </td></tr>
+        <tr><td style="padding:26px 38px 6px">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8F6F1;border-radius:20px"><tr><td style="padding:24px 24px 8px">
+            <p style="margin:0 0 16px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#A39C8D">En trois étapes</p>
+            <table width="100%" cellpadding="0" cellspacing="0">
+              ${step(1, 'Ouvre le lien sur ton ordinateur', 'Clique sur le bouton ci-dessus depuis ta boîte mail.')}
+              ${step(2, 'Lance ta première leçon', '65 leçons progressives, à ton rythme, pour apprendre les dix doigts.')}
+              ${step(3, 'Entraîne-toi avec les jeux', 'Précision, mémoire, vitesse : tu progresses sans t\'en rendre compte.')}
+            </table>
+          </td></tr></table>
+        </td></tr>
+        <tr><td align="center" style="padding:20px 38px 30px">
+          <p style="margin:0;font-size:14px;color:#7A7365;line-height:1.6"><span style="color:#F5A623;letter-spacing:2px">★★★★★</span><br><b style="color:#16140F">19 avis 5 étoiles</b> · adopté par 9 établissements</p>
+        </td></tr>
+        <tr><td bgcolor="#F8F5F0" style="background:#F8F5F0;border-top:1px solid #E7E1D5;padding:20px 38px;text-align:center">
+          <p style="margin:0 0 8px;font-size:12px;color:#8A8275;line-height:1.6">Le bouton ne fonctionne pas ? Copie ce lien dans ton navigateur :<br><a href="${url}" style="color:#FF4D2E;word-break:break-all">${url}</a></p>
+          <p style="margin:0;font-size:12px;color:#B5AE9F;line-height:1.6">Tu reçois ce mail une seule fois, parce que tu as demandé le lien sur keypace.be.<br>Une question ? Réponds-nous ou écris à <a href="mailto:contact@keypace.be" style="color:#FF4D2E;text-decoration:none">contact@keypace.be</a>.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
 module.exports = async function handler(req, res) {
   setCorsOrigin(req, res);
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -174,6 +224,35 @@ module.exports = async function handler(req, res) {
     }
 
     return res.status(201).json({ ...institution, adminInvite });
+  }
+
+  // POST action=send-link → version mobile : « m'envoyer le lien ». Envoie à
+  // l'adresse saisie un mail d'invitation à tester KeyPace sur ordinateur.
+  // Endpoint ouvert, donc limité (même adresse : 2/jour, même IP : 5/heure) et
+  // fermé par défaut si la table de comptage est indisponible.
+  if (req.body && req.body.action === 'send-link') {
+    const to = String(req.body.email || '').trim().toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(to) || to.length > 254) return res.status(400).json({ error: 'Adresse email invalide.' });
+    if (req.body.website) return res.json({ ok: true }); // champ piège anti-robot
+    if (!RESEND_API_KEY) return res.status(500).json({ error: 'Email non configuré.' });
+
+    const ip = clientIp(req);
+    const since = (ms) => new Date(Date.now() - ms).toISOString();
+    const byEmail = await sb(`/link_mail_requests?email=eq.${encodeURIComponent(to)}&created_at=gte.${encodeURIComponent(since(24 * 3600e3))}&select=id`);
+    const byIp = await sb(`/link_mail_requests?ip=eq.${encodeURIComponent(ip)}&created_at=gte.${encodeURIComponent(since(3600e3))}&select=id`);
+    if (!byEmail.ok || !byIp.ok) return res.status(503).json({ error: 'Service momentanément indisponible.' });
+    if (byEmail.data.length >= 2 || byIp.data.length >= 5) return res.status(429).json({ error: 'Trop de demandes. Réessaie plus tard.' });
+    await sb('/link_mail_requests', { method: 'POST', body: JSON.stringify({ email: to, ip }) });
+
+    const resend = new Resend(RESEND_API_KEY);
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject: 'Ton lien KeyPace : teste-le sur ton ordinateur',
+      html: linkInviteEmail(`${APP_URL}/?utm_source=mail&utm_medium=mobile&utm_campaign=lien-ordinateur`),
+    });
+    if (error) { console.error('send-link error:', error.message || error); return res.status(502).json({ error: "Impossible d'envoyer l'email. Réessaie." }); }
+    return res.json({ ok: true });
   }
 
   // POST action=contact → formulaire de contact licence

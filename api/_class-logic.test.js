@@ -2,7 +2,7 @@
 // Lancer : node --test api/_class-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canActAsAdmin, institutionProfSummary, moduleMastery, studentModuleProgress, MODULE_NAMES } = require('./_class-logic');
+const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, moduleMastery, studentModuleProgress, MODULE_NAMES } = require('./_class-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -152,4 +152,30 @@ test('institutionProfSummary : agrège par prof + dernière activité', () => {
   assert.equal(b.studentCount, 0);
   assert.equal(b.avgWpm, null);
   assert.equal(b.lastActivity, null);
+});
+
+test('canManageClass : plusieurs profs sur la même classe (teacher_ids)', () => {
+  const p1 = { id: 'p1', role: 'prof', institution_id: 'i1' };
+  const p2 = { id: 'p2', role: 'prof', institution_id: 'i1' };
+  const p3 = { id: 'p3', role: 'prof', institution_id: 'i1' };
+  const cls = { teacher_id: 'p1', teacher_ids: ['p1', 'p2'], institution_id: 'i1' };
+  assert.equal(canManageClass(p1, cls), true);
+  assert.equal(canManageClass(p2, cls), true);
+  assert.equal(canManageClass(p3, cls), false);
+  // Retiré par l'établissement : teacher_ids fait foi, pas l'ancien teacher_id.
+  assert.equal(canManageClass(p1, { ...cls, teacher_ids: ['p2'] }), false);
+});
+
+test('canAdministerClass : les profs de la classe et l\'établissement peuvent renommer/archiver', () => {
+  const p1 = { id: 'p1', role: 'prof', institution_id: 'i1' };
+  const p2 = { id: 'p2', role: 'prof', institution_id: 'i1' };
+  const p3 = { id: 'p3', role: 'prof', institution_id: 'i1' };
+  const admin = { id: 'a1', role: 'admin', institution_id: 'i1' };
+  const cls = { teacher_id: 'p1', teacher_ids: ['p1', 'p2'], institution_id: 'i1' };
+  assert.equal(canAdministerClass(p1, cls), true);
+  assert.equal(canAdministerClass(p2, cls), true); // co-prof : mêmes droits
+  assert.equal(canAdministerClass(p3, cls), false); // pas sa classe
+  assert.equal(canAdministerClass(admin, cls), true);
+  assert.equal(canAdministerClass(admin, { ...cls, institution_id: 'i2' }), false);
+  assert.equal(canAdministerClass({ role: 'eleve', id: 's1' }, cls), false);
 });

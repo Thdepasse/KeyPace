@@ -285,10 +285,10 @@ function startRecDemo(){
 }
 function quizBanner(n){
   const all = n === PARTS.length, best = getBest();
-  if (!all) return `<section class="qbanner locked"><img src="/images/keypace-mascot-cheer.webp" alt="">
+  if (!all) return `<section class="qbanner locked"><img src="/images/keypace-pose-6.webp" alt="">
     <div class="qb-txt"><span class="qb-tag">Quiz final · 🔒 Verrouillé</span><h2>Le quiz des CV</h2><p>Termine les 4 parties pour le débloquer. Il reprend tout le module, question après question, au hasard.</p></div>
     <div class="qb-act"><div class="qb-prog"><i style="width:${n/4*100}%"></i></div><span style="font-size:12.5px;color:var(--muted)">${n}/4 parties terminées</span></div></section>`;
-  return `<section class="qbanner"><img src="/images/keypace-mascot-cheer.webp" alt="">
+  return `<section class="qbanner"><img src="/images/keypace-pose-6.webp" alt="">
     <div class="qb-txt"><span class="qb-tag">Module terminé, bravo !</span><h2>Teste-toi avec le quiz <em>des CV</em></h2><p>${FQ_COUNT} questions tirées au hasard dans toutes les parties, une à la fois. Tu peux rejouer autant de fois que tu veux.</p>
       <div class="qb-meta"><span>${FQ_COUNT} questions</span><span>Au hasard</span>${best ? `<span>Meilleur score : ${best}/${FQ_COUNT}</span>` : ''}</div></div>
     <div class="qb-act"><button class="btn primary" onclick="location.hash='cv/quiz'" style="font-size:16px;padding:14px 26px">Jouer →</button></div></section>`;
@@ -762,7 +762,7 @@ function initEntrainer(el){
     /* 13 orthographe / typographie */
     const all = [f.titre, f.interets, f.competences, ...D.exp.flatMap(x => [x.r, x.o, x.desc]), ...D.edu.flatMap(x => [x.d, x.e])].join('\n');
     const issues = [];
-    const sm = all.match(SMS); if (sm) issues.push(`abréviation « ${sm[0]} »`);
+    const sm = norm2(all).match(SMS); if (sm) issues.push(`abréviation « ${sm[0]} »`);
     if (/ {2,}/.test(all)) issues.push('double espace');
     const rep = (norm2(all).match(/\b([a-z]{3,})\s+\1\b/) || [])[1]; if (rep) issues.push(`mot répété « ${rep} »`);
     const shout = (all.match(/\b[A-ZÀ-Ý]{5,}\b/) || [])[0]; if (shout && !/^(LINKEDIN|EXCEL|HTML|JAVASCRIPT|GITHUB)$/.test(shout)) issues.push(`MAJUSCULES « ${shout} »`);
