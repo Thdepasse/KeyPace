@@ -174,7 +174,7 @@ function route(){
 window.addEventListener('hashchange', route);
 document.addEventListener('click', e => {
   const g = e.target.closest('[data-go]');
-  if (g){ if (g.dataset.go === 'cours'){ location.href = '/?view=lessons'; return; } location.hash = g.dataset.go === 'hub' ? 'lettre' : g.dataset.go; return; }
+  if (g){ if (g.dataset.go === 'cours'){ location.href = '/cours-dactylo-en-ligne'; return; } location.hash = g.dataset.go === 'hub' ? 'lettre' : g.dataset.go; return; }
   if (e.target.id === 'restart'){ const p = PARTS.find(x => '#lettre/'+x.n === location.hash); if (p) renderLesson(p); return; }
   if (e.target.id === 'reset-all'){ if (confirm("Effacer ta progression dans ce module ? Tu pourras tout refaire depuis le début.")){ done = {}; store.set(done); try{ localStorage.removeItem(BEST_KEY); }catch(err){} renderHub(); } return; }
   if (e.target.id === 'finish'){ const p = PARTS.find(x => '#lettre/'+x.n === location.hash); if (p){ completePart(p.k); location.hash = 'cv'; } }

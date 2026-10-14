@@ -22,7 +22,7 @@
 → **Non.** La navigation (`go(view)` → `renderView`) **ne change jamais l'URL** : tous les `history.replaceState` remettent `location.pathname` (ils suppriment les query params, ne créent pas de route) — `index.html:8016` (`go`), `:1647`, `:8021`, `:8108`. **Toutes les fonctionnalités vivent sur `/`.** URLs réellement distinctes : uniquement `/` + 5 pages légales (`/conditions`, `/cgv`, `/confidentialite`, `/cookies`, `/mentions-legales`) via `vercel.json`. → **≈ 6 URLs indexables**, zéro pour le cœur produit.
 
 **Sitemap / robots / canonical / hreflang ?**
-→ `sitemap.xml` **présent** mais ne liste que 6 URLs (`sitemap.xml`). `robots.txt` **présent**, cohérent (Allow /, bots IA autorisés, `Disallow: /api/`, lien sitemap). `canonical` **présent mais figé sur `/`** pour toute la SPA (`index.html:13`) → toute « vue » se canonicalise vers `/`. `hreflang` **incomplet** : seulement `fr` + `x-default`, tous vers `/` (`index.html:14,16`) → **`fr-BE` et `fr-FR` manquants**. Les pages légales **n'ont ni canonical ni hreflang** (`conditions.html:6-8`).
+→ `sitemap.xml` **présent** mais ne listait que 6 URLs au moment de l'audit (depuis, il en compte 44 : voir le journal « Passe d'octobre 2026 »). `robots.txt` **présent**, cohérent (Allow /, bots IA autorisés, `Disallow: /api/`, lien sitemap). `canonical` **présent mais figé sur `/`** pour toute la SPA (`index.html:13`) → toute « vue » se canonicalise vers `/`. `hreflang` **incomplet** : seulement `fr` + `x-default`, tous vers `/` (`index.html:14,16`) → **`fr-BE` et `fr-FR` manquants**. Les pages légales **n'ont ni canonical ni hreflang** (`conditions.html:6-8`).
 
 **Titles et meta descriptions uniques par page ou globaux ?**
 → **Globaux pour le crawler.** `index.html` a un seul `<title>` + une seule meta description statiques (`index.html:6-7`). `renderView` met bien à jour `document.title` et la meta par vue en JS (objet `_meta`), mais comme l'URL ne change pas et que le rendu est CSR, le crawler voit un **titre unique sur `/`**. Les pages légales ont chacune leur `<title>`/description (`conditions.html:7-8`). ✅ pour les légales, ❌ pour le produit.
@@ -112,3 +112,11 @@ Décisions actées : voie B (pages statiques) ; `/` reste la home, cibles = nouv
 - Design system / palette `#FF4D2E` conservés dans les futures pages.
 - Toute URL modifiée → 301 (aucune modification d'URL existante prévue ; les cibles sont neuves).
 - Ce document est mis à jour au fil des phases.
+
+### Passe d'octobre 2026 (optimisations continues)
+- **Sitemap** : 44 URLs (les 18 guides, /ecoles, /a-propos, les 4 modules). `scripts/gen-sitemap.js` recalcule les `<lastmod>` d'après le dernier commit de chaque page (à lancer avant de committer des pages).
+- **Liens propres** : les `/?view=lessons|test|games|stats` des pages statiques (menu, boutons, fil d'Ariane) pointent vers `/cours-dactylo-en-ligne`, `/test-frappe-en-ligne`, `/jeux-dactylo-en-ligne`, `/progres` : plus d'URL à paramètre à crawler.
+- **Titres/descriptions** : tous les titres ≤ 60 caractères et descriptions ≤ 160 (primaire/secondaire/supérieur, modules, accueil).
+- **Modules (/cours/…)** : ils n'étaient liés depuis aucune page ; ajout d'une section sur `/cours-dactylographie` et sur le hub `/guide`. Chaque module affiche maintenant un « Au programme » indexable (le contenu réel reste réservé aux comptes Expert), un `Course` JSON-LD, et le titre ne dit plus « gratuit » (modules Expert).
+- **À faire côté DNS (hors code)** : `www.keypace.be` ne résout pas ; ajouter le domaine dans Vercel avec redirection vers `keypace.be`.
+
