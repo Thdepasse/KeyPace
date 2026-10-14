@@ -83,9 +83,10 @@
     else { renderBanner(); }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
+  // Chargé en tête du <body> (accueil) : le body existe déjà, on n'attend pas la fin du document.
+  if (document.body || document.readyState !== 'loading') {
     init();
+  } else {
+    document.addEventListener('DOMContentLoaded', init);
   }
 })();

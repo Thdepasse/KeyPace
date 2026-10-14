@@ -120,3 +120,17 @@ Décisions actées : voie B (pages statiques) ; `/` reste la home, cibles = nouv
 - **Modules (/cours/…)** : ils n'étaient liés depuis aucune page ; ajout d'une section sur `/cours-dactylographie` et sur le hub `/guide`. Chaque module affiche maintenant un « Au programme » indexable (le contenu réel reste réservé aux comptes Expert), un `Course` JSON-LD, et le titre ne dit plus « gratuit » (modules Expert).
 - **À faire côté DNS (hors code)** : `www.keypace.be` ne résout pas ; ajouter le domaine dans Vercel avec redirection vers `keypace.be`.
 
+
+### Performance de l'accueil (octobre 2026)
+Mesures Lighthouse mobile (réseau et CPU bridés, `--throttling-method=devtools`) sur la vue accueil :
+
+| | avant | après |
+|---|---|---|
+| Score | 0,78 | 0,99 à 1 |
+| LCP | 3,1 s | 1,5 s |
+| CLS | 0,307 | 0,003 |
+| FCP | 0,9 s | 0,9 à 1,0 s |
+
+- **CLS** : le pied de page statique était repoussé quand l'appli remplissait la vue. Il reste masqué (`html.kp-boot footer`) jusqu'au premier rendu (`go()`), avec un filet de sécurité à 4 s et un repli `<noscript>`.
+- **LCP** : le bandeau cookies était l'élément le plus grand et n'apparaissait qu'à la fin du chargement (script `defer`, donc après les 1,1 Mo de JS). `cookie-consent.js` est maintenant chargé juste après la barre de navigation et s'exécute sans attendre `DOMContentLoaded`.
+- **Piste non retenue** : minifier le JS/CSS inline ne gagne que 17 % en brotli (le poids vient surtout de gabarits HTML et de données). Un vrai gain demanderait de découper `app` (704 Ko) en modules chargés à la demande : chantier lourd, à planifier séparément.

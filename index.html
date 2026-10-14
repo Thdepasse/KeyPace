@@ -18,7 +18,6 @@
 </script>
 
 <!-- Consentement cookies + Google Analytics (chargé seulement après accord, voir /cookies) -->
-<script src="/cookie-consent.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KeyPace : dactylographie AZERTY gratuite en français</title>
 <meta name="description" content="KeyPace : apprenez à taper vite sur clavier AZERTY avec 65 leçons progressives, test de vitesse et jeux de frappe. Gratuit, en français, sans installation.">
@@ -272,7 +271,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet"></noscript>
+<script>document.documentElement.classList.add('kp-boot');setTimeout(function(){document.documentElement.classList.remove('kp-boot')},4000)</script>
+<noscript><style>html.kp-boot footer{visibility:visible!important}</style></noscript>
 <style>
+html.kp-boot footer{visibility:hidden}
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA;--danger:#E5484D;--success:#1FA971;--warning:#E5722B}
 body{background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',Arial,sans-serif;color:var(--txt);min-height:100vh;-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -2635,7 +2637,6 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 </style>
 </head>
 <body>
-
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="auth-modal">
   <div class="modal-box">
@@ -2837,6 +2838,8 @@ footer{border-top:1px solid var(--border);margin-top:10px}
     <button class="nav-burger" id="nav-burger" onclick="toggleNavMenu(event)" aria-label="Menu">☰</button>
   </div>
 </nav>
+<!-- Consentement cookies + Google Analytics (juste après la nav : le bandeau s'affiche sans attendre la fin du script de l'appli) -->
+<script src="/cookie-consent.js"></script>
 
 <div id="page-home"><noscript>
   <main>
@@ -17131,6 +17134,7 @@ app.init();
   // premier login, manquant ici) — cette vue ne lui sert à rien puisque la
   // nav Test/Cours/Jeux/Progrès est masquée pour ce rôle.
   go(_validViews.includes(_vp)?_vp:(isTeacher()?'home':'test'));
+  document.documentElement.classList.remove('kp-boot');
 }
 window.addEventListener('popstate',()=>{
   if(app._ignorePop){app._ignorePop=false;return;}
