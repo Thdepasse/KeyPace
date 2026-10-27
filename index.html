@@ -2636,20 +2636,22 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 }
 
 /* ── Choix du test ── */
-.tc-page{min-height:60vh;background:#F4F1EC;padding:clamp(32px,6vw,80px) clamp(20px,5vw,64px) 56px;font-family:'Bricolage Grotesque',system-ui,sans-serif;color:#1A1410;-webkit-font-smoothing:antialiased}
-.tc-col{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:clamp(36px,5vw,56px)}
+.tc-page{min-height:60vh;background:#F4F1EC;padding:clamp(32px,5vw,72px) clamp(20px,4vw,72px) 56px;font-family:'Bricolage Grotesque',system-ui,sans-serif;color:#1A1410;-webkit-font-smoothing:antialiased}
+.tc-col{width:100%;max-width:none;margin:0 auto;display:flex;flex-direction:column;gap:clamp(36px,5vw,56px)}
 .tc-head{display:flex;flex-direction:column;gap:18px}
 .tc-eyebrow{font-size:14px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#E8401F}
-.tc-h1{margin:0;font-size:clamp(24px,5.4vw,68px);line-height:1.05;letter-spacing:-.045em;font-weight:800;white-space:nowrap}
+.tc-h1{margin:0;font-size:clamp(24px,5.5vw,112px);line-height:1.05;letter-spacing:-.045em;font-weight:800;white-space:nowrap}
 .tc-h1 .tc-pill{display:inline-block;background:#FF4D2E;color:#fff;padding:0 .16em .06em;border-radius:.18em;box-shadow:0 .09em 0 #B8301A;transform:rotate(-2deg)}
 .tc-sub{margin:0;font-size:clamp(18px,1.6vw,21px);line-height:1.45;color:#6B6157;white-space:nowrap}
 .tc-cards{display:flex;flex-direction:column;gap:28px}
 .tc-card{cursor:pointer;background:#fff;border:1.5px solid #E4DDD3;border-bottom:8px solid #D8CFC3;border-radius:32px;padding:clamp(24px,3.4vw,44px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:clamp(24px,3vw,44px);box-shadow:0 24px 50px -32px rgba(26,20,16,.35);transition:transform .12s,border-bottom-width .12s}
 .tc-card.tc-press{transform:translateY(4px);border-bottom-width:2px}
-.tc-left{display:flex;flex-direction:column;gap:22px}
+.tc-left{display:flex;flex-direction:column;gap:22px;justify-content:center}
+.tc-titlerow{display:flex;align-items:center;gap:20px}
 .tc-key{display:grid;place-items:center;width:60px;height:60px;flex:none;background:#F4F1EC;border:1.5px solid #E4DDD3;border-bottom:7px solid #D8CFC3;border-radius:16px;font-size:28px;font-weight:800}
 .tc-card h2{margin:0;font-size:clamp(34px,3.6vw,48px);line-height:1;letter-spacing:-.035em;font-weight:800}
-.tc-desc{margin:0;font-size:18px;line-height:1.5;color:#6B6157;text-wrap:pretty}
+.tc-desc{margin:0;font-size:18px;line-height:1.5;color:#6B6157;text-wrap:pretty;padding-left:80px}
+@media (max-width:700px){.tc-desc{padding-left:0}}
 .tc-right{display:flex;flex-direction:column;gap:20px;justify-content:space-between}
 .tc-box{background:#F8F6F2;border:1.5px solid #ECE6DD;border-radius:20px;padding:22px 24px;display:flex;flex-direction:column;gap:18px}
 .tc-typing{font-family:'JetBrains Mono',monospace;font-size:clamp(20px,2vw,26px);font-weight:700;line-height:1.5;display:flex;flex-wrap:wrap}
@@ -8526,8 +8528,7 @@ const app={
       <div class="tc-cards">
         <article class="tc-card" data-n="1">
           <div class="tc-left">
-            <span class="tc-key">1</span>
-            <h2>Je recopie une phrase</h2>
+            <div class="tc-titlerow"><span class="tc-key">1</span><h2>Je recopie une phrase</h2></div>
             <p class="tc-desc">Le chrono démarre à ta première touche et s'arrête à la dernière lettre. Rien à régler.</p>
           </div>
           <div class="tc-right">
@@ -8540,8 +8541,7 @@ const app={
         </article>
         <article class="tc-card" data-n="2">
           <div class="tc-left">
-            <span class="tc-key">2</span>
-            <h2>Je tape en temps limité</h2>
+            <div class="tc-titlerow"><span class="tc-key">2</span><h2>Je tape en temps limité</h2></div>
             <p class="tc-desc">Tu choisis une durée et tu tapes sans t'arrêter. Plus c'est long, plus le résultat reflète ta vitesse réelle et ta régularité.</p>
           </div>
           <div class="tc-right">
