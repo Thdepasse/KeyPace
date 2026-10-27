@@ -42,6 +42,18 @@ module.exports = {
       "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"BreadcrumbList\",\n  \"itemListElement\": [\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 1,\n      \"name\": \"Accueil\",\n      \"item\": \"https://keypace.be/\"\n    },\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 2,\n      \"name\": \"Jeux de frappe\",\n      \"item\": \"https://keypace.be/jeux-dactylo-en-ligne\"\n    }\n  ]\n}"
     ]
   },
+  "testchoix": {
+    "path": "/test",
+    "title": "Choisis ton test de frappe : une phrase ou un chrono | KeyPace",
+    "description": "Une phrase à recopier ou un test chronométré de 30 secondes à 10 minutes : choisis le test de frappe qui te convient et découvre ta vitesse et ta précision.",
+    "ogTitle": "Choisis ton test de frappe KeyPace",
+    "ogDescription": "Une phrase à recopier ou un test chronométré : découvre ta vitesse et ta précision.",
+    "twTitle": "Choisis ton test de frappe KeyPace",
+    "twDescription": "Une phrase à recopier ou un test chronométré : découvre ta vitesse et ta précision.",
+    "ogType": "website",
+    "index": false,
+    "jsonld": []
+  },
   "testtime": {
     "path": "/test-dactylographie-chronometre",
     "title": "Test de frappe chronométré en ligne : 30 s, 1, 3, 5 ou 10 min | KeyPace",
