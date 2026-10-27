@@ -13314,7 +13314,17 @@ const app={
     const prevBestScore=b.lb&&b.lb.me?b.lb.me.score:0;
     b.phase='submitting';this.renderCurrent();
     try{
-      const sub=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-submit',token:currentToken,wpm,accuracy:acc,timeMs:b.endTime-b.startTime})}).then(r=>r.json());
+      const postSubmit=()=>fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-submit',token:currentToken,wpm,accuracy:acc,timeMs:b.endTime-b.startTime})}).then(r=>r.json());
+      let sub=await postSubmit();
+      // Le token tourne à chaque session-login (réglages, SSO) : un autre onglet
+      // a pu en émettre un plus récent. On reprend celui du localStorage et on
+      // réessaie une fois avant d'abandonner le score.
+      if(sub&&sub.error==='Session invalide.'){
+        try{
+          const stored=JSON.parse(localStorage.getItem('klak_session')||'{}').token;
+          if(stored&&stored!==currentToken){currentToken=stored;sub=await postSubmit();}
+        }catch{}
+      }
       b._submitErr=sub.error||null;b._serverScore=sub.score;
       try{track('game_completed',{game:'boss',wpm,acc,score:sub.score});}catch{}
       const lb=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'boss-leaderboard',token:currentToken})}).then(r=>r.json());
