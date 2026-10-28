@@ -45,9 +45,16 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'Paiement indisponible : STRIPE_PRICE_ID absente côté serveur.' });
   }
 
+  try {
+
+  // Dans le try : une réponse inattendue de Supabase faisait planter la
+  // fonction en page HTML, que le front affichait comme "Erreur réseau".
   const r = await sb(
     `/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username,email,stripe_customer_id`
   );
+  // Panne Supabase ≠ session invalide : le front déconnecte sur un 401, il ne
+  // faut pas qu'un incident passager éjecte l'utilisateur.
+  if (!r.ok) return res.status(503).json({ error: 'Service momentanément indisponible, réessaie dans un instant.' });
   const user = r.data && r.data[0];
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
@@ -59,8 +66,6 @@ module.exports = async function handler(req, res) {
   });
   const appUrl = (process.env.APP_URL || 'https://keypace.be').trim();
   const priceId = (process.env.STRIPE_PRICE_ID || '').trim();
-
-  try {
 
   // ── Confirmation serveur d'un paiement (appelée au retour du checkout) ──
   // Ne dépend pas du webhook : on interroge Stripe directement.
@@ -154,6 +159,7 @@ module.exports = async function handler(req, res) {
   res.json({ url: session.url });
   } catch (e) {
     // Toute erreur Stripe/serveur remonte en JSON clair (au lieu d'un crash 500 opaque).
-    return res.status(500).json({ error: 'Stripe : ' + (e && e.message ? e.message : 'erreur inconnue') });
+    const isStripe = e && typeof e.type === 'string' && e.type.startsWith('Stripe');
+    return res.status(500).json({ error: (isStripe ? 'Stripe : ' : 'Erreur serveur : ') + (e && e.message ? e.message : 'erreur inconnue') });
   }
 };

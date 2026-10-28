@@ -3820,17 +3820,59 @@ function canAccessLesson(lessonId){
 function canAccessGame(){return !!currentUser;}
 
 /* ── UPGRADE ── */
+// Un seul jeton de session par compte, et session-login le fait tourner : un
+// autre onglet a pu le remplacer dans le localStorage pendant que celui-ci
+// gardait l'ancien en mémoire. On reprend le plus récent avant de facturer.
+function _syncTokenFromStorage(){
+  try{
+    const s=JSON.parse(localStorage.getItem('klak_session')||'{}');
+    if(s.token&&s.username===currentUser&&s.token!==currentToken)currentToken=s.token;
+  }catch{}
+}
+// Session refusée par le serveur (expirée, ou remplacée par une connexion sur
+// un autre appareil) : avant, l'utilisateur restait affiché comme connecté et
+// ne voyait que "Session invalide", sans issue. On le déconnecte proprement
+// et on rouvre la connexion, en relançant l'action une fois reconnecté.
+function _reloginForBilling(msg,cb){
+  const u=currentUser;
+  closeModal('upgrade-modal');
+  logout();
+  openAuth('login',msg,cb);
+  const f=document.getElementById('auth-username');if(f&&u)f.value=u;
+}
+// Une réponse non-JSON (page d'erreur Vercel, délai dépassé) faisait croire à
+// une "Erreur réseau" : on remonte plutôt le code HTTP réel.
+async function _billingCall(body){
+  const r=await fetch('/api/billing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,token:currentToken})});
+  let d;try{d=await r.json();}catch{d={error:'Erreur serveur ('+r.status+'). Réessaie dans un instant.'};}
+  return {status:r.status,d};
+}
+function _resetPayBtn(){
+  const btn=document.getElementById('stripe-pay-btn');
+  if(btn){btn.disabled=false;btn.textContent='Passer à Expert : Payer →';}
+}
 async function startCheckout(){
   if(!currentUser){openAuth('register','Crée un compte pour passer à Expert.');return;}
   const btn=document.getElementById('stripe-pay-btn');
   btn.disabled=true;btn.textContent='Redirection…';
+  _syncTokenFromStorage();
   try{
-    const r=await fetch('/api/billing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'checkout',token:currentToken})});
-    const d=await r.json();
-    if(d.url){try{track('checkout_started');}catch{}window.location.href=d.url;}
-    else{btn.disabled=false;btn.textContent='Passer à Expert : Payer →';alert('Erreur paiement : '+( d.error||'réessaie.'));}
-  }catch{btn.disabled=false;btn.textContent='Passer à Expert : Payer →';alert('Erreur réseau.');}
+    const {status,d}=await _billingCall({action:'checkout'});
+    if(d.url){try{track('checkout_started');}catch{}window.location.href=d.url;return;}
+    _resetPayBtn();
+    if(status===401){
+      _reloginForBilling('Ta session a expiré. Reconnecte-toi pour finaliser ton passage à Expert.',()=>{
+        if(getUserPlan()==='expert')return;
+        openModal('upgrade-modal',{silent:true});startCheckout();
+      });
+      return;
+    }
+    alert('Erreur paiement : '+(d.error||'réessaie.'));
+  }catch{_resetPayBtn();alert('Erreur réseau. Vérifie ta connexion et réessaie.');}
 }
+// Retour arrière depuis Stripe : le navigateur restaure souvent la page depuis
+// son cache (bfcache) avec le bouton encore désactivé sur "Redirection…".
+window.addEventListener('pageshow',e=>{if(e.persisted)_resetPayBtn();});
 
 function showEmailPendingBanner(username){
   const existing=document.getElementById('email-pending-banner');
@@ -3882,6 +3924,7 @@ function handleVerificationReturn(){
 async function handlePaymentReturn(){
   const params=new URLSearchParams(location.search);
   if(params.get('payment')==='success'&&currentToken){
+    _syncTokenFromStorage();
     let d={};
     const sid=params.get('session_id');
     // 1) Confirmation directe de la session (indépendante du webhook) : active tout de suite.
@@ -14434,10 +14477,11 @@ const app={
   async openBillingPortal(btn){
     if(!currentToken)return;
     const old=btn.textContent;btn.disabled=true;btn.textContent='Ouverture…';
+    _syncTokenFromStorage();
     try{
-      const r=await fetch('/api/billing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'portal',token:currentToken})});
-      const d=await r.json();
-      if(!r.ok||!d.url)throw new Error(d.error||'Erreur');
+      const {status,d}=await _billingCall({action:'portal'});
+      if(status===401){btn.disabled=false;btn.textContent=old;_reloginForBilling('Ta session a expiré. Reconnecte-toi pour gérer ton abonnement.');return;}
+      if(!d.url)throw new Error(d.error||'Erreur');
       location.href=d.url;
     }catch(e){btn.disabled=false;btn.textContent=old;alert(e.message||'Impossible d\'ouvrir le portail de facturation.');}
   },
