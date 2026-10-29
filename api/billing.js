@@ -1,5 +1,6 @@
 const Stripe = require('stripe');
 const { setCorsOrigin } = require('./_cors');
+const { notifyTeam, checkoutClickedEmail } = require('./_notify');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
@@ -155,6 +156,11 @@ module.exports = async function handler(req, res) {
     success_url: `${appUrl}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${appUrl}?payment=cancel`,
   });
+
+  // Alerte interne : mesure l'intérêt réel pour Expert (clic sur Payer, que le
+  // paiement aboutisse ou non). Attendue avant de répondre car Vercel gèle la
+  // fonction après la réponse, mais plafonnée à 2 s et sans effet sur le paiement.
+  await notifyTeam(checkoutClickedEmail({ username: user.username, email: user.email }));
 
   res.json({ url: session.url });
   } catch (e) {

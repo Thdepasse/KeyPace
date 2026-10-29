@@ -1,4 +1,5 @@
 const Stripe = require('stripe');
+const { notifyTeam, subscribedEmail } = require('./_notify');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
@@ -26,6 +27,31 @@ function readRawBody(req) {
     req.on('end', () => resolve(Buffer.concat(chunks)));
     req.on('error', reject);
   });
+}
+
+// Alerte interne "Nouvel abonné". Stripe peut renvoyer le même événement
+// (réessai, ou réponse lente) : on mémorise sur le client Stripe l'abonnement
+// déjà annoncé pour ne pas envoyer le mail en double. Ne lève jamais : le
+// passage en Expert est déjà fait, une alerte ratée ne doit pas le remettre en cause.
+async function announceSubscriber(stripe, cs) {
+  try {
+    if (!cs.customer) return;
+    const key = cs.subscription || cs.id;
+    const customer = await stripe.customers.retrieve(cs.customer);
+    if (customer && customer.metadata && customer.metadata.expert_annonce === key) return;
+    const u = await sb(`/users?stripe_customer_id=eq.${encodeURIComponent(cs.customer)}&select=username,email`);
+    const user = (u.ok && u.data && u.data[0]) || {};
+    const sent = await notifyTeam(subscribedEmail({
+      username: user.username,
+      email: user.email || (cs.customer_details && cs.customer_details.email),
+      amount: cs.amount_total,
+      currency: cs.currency,
+      discount: cs.total_details && cs.total_details.amount_discount,
+    }));
+    if (sent) await stripe.customers.update(cs.customer, { metadata: { expert_annonce: key } });
+  } catch (e) {
+    console.error('announceSubscriber:', e && e.message);
+  }
 }
 
 // Vercel: bodyParser désactivé pour obtenir le corps brut (signature Stripe)
@@ -73,6 +99,7 @@ module.exports = async function handler(req, res) {
     // Paiement initial réussi → activation immédiate
     case 'checkout.session.completed':
       await setPlan(event.data.object.customer, 'expert');
+      await announceSubscriber(stripe, event.data.object);
       break;
 
     // Fin d'abonnement (résiliation arrivée à échéance, ou impayé définitif
