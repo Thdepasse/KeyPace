@@ -1,6 +1,7 @@
 // Nettoyage de `progress.data` avant écriture (étape 1a du plan clavier/langues).
 // Le blob est écrit par le client : on ne lui fait pas confiance pour les champs
 // qui ne lui appartiennent pas, ni pour les valeurs impossibles. Logique pure, sans réseau.
+const { COURSE_IDS, COURSE_ID_RE } = require('./_courses-registry');
 const MAX_WPM = 300;                   // même ordre de grandeur que CERT_MAX_PLAUSIBLE_WPM (api/classes.js)
 const MAX_FUTURE_MS = 24 * 3600 * 1000; // tolérance pour une horloge d'ordinateur d'école décalée
 const MAX_BYTES = 500 * 1024;          // plafond de sécurité d'un bloc (le plus gros relevé fait ~5 Ko)
@@ -17,12 +18,24 @@ const KNOWN_KEYS = new Set([
   'tireurBest', 'sourisDuoBest', 'sourisSoloBest', 'sourisWavesBest', 'sourisHub', 'sourisTilesGlossaryAutoSeen',
 ]);
 // Champs possédés par le serveur : jamais lus depuis le client, valeur enregistrée conservée.
-const SERVER_OWNED = ['role', 'classes', 'courses'];
+// `courses` est traité à part (cours du registre seulement, nettoyés comme le bloc principal).
+const SERVER_OWNED = ['role', 'classes'];
 
 const isObj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
 const num = (v) => typeof v === 'number' && Number.isFinite(v);
 
-function sanitizeProgress(input, prev, now = Date.now()) {
+function sanitizeCourses(input, prev, now, courseIds, note) {
+  const out = isObj(prev) ? { ...prev } : {};
+  if (!isObj(input)) return out;
+  for (const [id, c] of Object.entries(input)) {
+    if (!COURSE_ID_RE.test(id) || !courseIds.includes(id) || !isObj(c)) { note('courses[]'); continue; }
+    const { courses: _ignored, ...inner } = c; // pas de cours dans un cours
+    out[id] = sanitizeProgress(inner, out[id], now, courseIds).data;
+  }
+  return out;
+}
+
+function sanitizeProgress(input, prev, now = Date.now(), courseIds = COURSE_IDS) {
   const data = { ...input };
   const prevData = isObj(prev) ? prev : {};
   const dropped = [];
@@ -32,7 +45,9 @@ function sanitizeProgress(input, prev, now = Date.now()) {
     if (prevData[k] !== undefined) data[k] = prevData[k];
     else delete data[k];
   }
-  const unknownKeys = Object.keys(data).filter((k) => !KNOWN_KEYS.has(k) && !SERVER_OWNED.includes(k));
+  const courses = sanitizeCourses(input.courses, prevData.courses, now, courseIds, note);
+  if (Object.keys(courses).length) data.courses = courses; else delete data.courses;
+  const unknownKeys = Object.keys(data).filter((k) => !KNOWN_KEYS.has(k) && !SERVER_OWNED.includes(k) && k !== 'courses');
 
   if (data.tests !== undefined) {
     if (!Array.isArray(data.tests)) { data.tests = prevData.tests || []; note('tests'); }

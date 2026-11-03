@@ -100,6 +100,20 @@ function mergeProgress(prev, inc) {
   // goals, sourisHybridHand : dernier écrit gagne (la valeur envoyée). Absents côté client : valeur du serveur.
   for (const k of ['goals', 'sourisHybridHand']) if (p[k] !== undefined && inc[k] === undefined) set(k, p[k]);
   for (const k of LEGACY_KEEP) if (p[k] !== undefined) set(k, p[k]);
+  // Cours supplémentaires : mêmes règles, cours par cours (récursif, un seul niveau).
+  if (isObj(p.courses) || isObj(inc.courses)) {
+    const pc = isObj(p.courses) ? p.courses : {}, ic = isObj(inc.courses) ? inc.courses : {};
+    const merged = {};
+    for (const id of new Set([...Object.keys(pc), ...Object.keys(ic)])) {
+      if (isObj(pc[id]) && isObj(ic[id])) {
+        const r = mergeProgress(pc[id], ic[id]);
+        merged[id] = r.data;
+        r.changes.forEach((c) => changes.push(`courses/${id}/${c}`));
+      } else merged[id] = ic[id] !== undefined ? ic[id] : pc[id];
+    }
+    if (JSON.stringify(merged) !== JSON.stringify(inc.courses)) changes.push('courses');
+    out.courses = merged;
+  }
   return { data: out, changes };
 }
 
