@@ -19,9 +19,11 @@
   .hint{color:var(--mut);font-size:14px} .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
   progress{width:100%} .ok{color:#1e9e5a;font-weight:700}
   #kbd{margin:12px 0 0;user-select:none;overflow-x:auto}
-  .kr{display:flex;gap:3px;margin-bottom:3px;min-width:560px}
-  .kk{flex:0 0 auto;width:38px;height:36px;border:1px solid var(--bd);border-bottom-width:3px;border-radius:6px;background:var(--card);display:flex;align-items:center;justify-content:center;font:600 13px/1 ui-monospace,monospace;color:var(--fg)}
-  .kk.w15{width:58px}.kk.w2{width:78px}.kk.w25{width:96px}.kk.sp{width:236px}.kk.ghost{visibility:hidden}
+  .kr{display:flex;gap:3px;margin-bottom:3px;min-width:700px}
+  .kk{position:relative;flex:0 0 auto;width:42px;height:44px;border:1px solid var(--bd);border-bottom-width:3px;border-radius:6px;background:var(--card);display:flex;align-items:center;justify-content:center;font:600 13px/1 ui-monospace,monospace;color:var(--fg)}
+  .kk.w15{width:64px}.kk.w2{width:84px}.kk.w25{width:100px}.kk.sp{width:250px}.kk.ghost{visibility:hidden}
+  .kk .kb{font-size:15px}.kk .ks{position:absolute;top:3px;left:5px;font-size:10px;color:var(--mut);font-weight:500}.kk .kc{position:absolute;bottom:2px;right:5px;font-size:9px;color:var(--mut);font-weight:500;opacity:.9}
+  .kk.mod .kb{font-size:13px}
   .kk.mod{color:var(--mut);font-size:12px}
   .kk.want{border-color:var(--ac);background:#ff4d2e22;box-shadow:0 0 0 2px var(--ac)}
   .kk.hit{border-color:#1e9e5a;background:#1e9e5a33}
@@ -126,15 +128,36 @@
     [['ShiftLeft', '⇧', 'w15 mod shiftk'], 'IntlBackslash', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash', ['ShiftRight', '⇧', 'w25 mod shiftk']],
     [['ControlLeft', '⌃', 'w15 mod'], ['AltLeft', '⌥', 'w15 mod optk'], ['MetaLeft', '⌘', 'w15 mod'], ['Space', 'espace', 'sp'], ['MetaRight', '⌘', 'w15 mod'], ['AltRight', '⌥', 'w15 mod optk']],
   ];
-  const keyLabel = (code) => { const c = $('caps').value; const t = KEYCAPS[c] && KEYCAPS[c][code]; if (c !== 'none' && t) return t; const q = /^Key[A-Z]$/.test(code) ? code.slice(3) : QLAB[code]; return q || code; };
+  // Libellés du clavier TESTÉ (gros) ; les inscriptions réelles de l'utilisateur apparaissent en petit, en bas à droite.
+  const US_SHIFT = { Backquote: '~', Digit1: '!', Digit2: '@', Digit3: '#', Digit4: '$', Digit5: '%', Digit6: '^', Digit7: '&', Digit8: '*', Digit9: '(', Digit0: ')', Minus: '_', Equal: '+', BracketLeft: '{', BracketRight: '}', Semicolon: ':', Quote: '"', Backslash: '|', IntlBackslash: '|', Comma: '<', Period: '>', Slash: '?' };
+  const UK_BASE = { ...QLAB, Backslash: '#', IntlBackslash: '\\' };
+  const UK_SHIFT = { ...US_SHIFT, Backquote: '¬', Digit2: '"', Digit3: '£', Quote: '@', Backslash: '~', IntlBackslash: '|' };
+  function testedLayout() {
+    const l = (meta && meta.layout) || $('layout').value;
+    if (/AZERTY France/.test(l)) return { kind: 'caps', caps: 'fr' };
+    if (/AZERTY Belgique/.test(l)) return { kind: 'caps', caps: 'be' };
+    if (/UK|British/.test(l)) return { kind: 'qwerty', base: UK_BASE, shift: UK_SHIFT, name: 'Royaume-Uni' };
+    return { kind: 'qwerty', base: QLAB, shift: US_SHIFT, name: 'États-Unis' };
+  }
+  const letterOf = (code) => (/^Key[A-Z]$/.test(code) ? code.slice(3) : null);
+  function labelsFor(code) {
+    const t = testedLayout(); const mine = $('caps').value !== 'none' ? (KEYCAPS[$('caps').value] || {})[code] : null;
+    if (t.kind === 'caps') { const c = (KEYCAPS[t.caps] || {})[code]; return { big: c || code, small: null, shift: null }; }
+    const big = letterOf(code) || t.base[code] || code;
+    return { big, shift: letterOf(code) ? null : (t.shift[code] || null), small: mine && mine !== big && mine.toLowerCase() !== big.toLowerCase() ? mine : null };
+  }
   function drawKeyboard() {
     const host = $('kbd'); host.innerHTML = '';
     ROWS.forEach((row) => { const r = document.createElement('div'); r.className = 'kr';
-      row.forEach((k) => { const el = document.createElement('div'); let code = k, lab = null, cls = '';
-        if (Array.isArray(k)) { code = k[0]; lab = k[1]; cls = k[2] || ''; }
-        el.className = 'kk ' + cls; el.dataset.code = code; el.textContent = lab || keyLabel(code); r.appendChild(el); });
+      row.forEach((k) => { const el = document.createElement('div'); let code = k, fixed = null, cls = '';
+        if (Array.isArray(k)) { code = k[0]; fixed = k[1]; cls = k[2] || ''; }
+        el.className = 'kk ' + cls; el.dataset.code = code;
+        if (fixed) el.innerHTML = '<span class="kb">' + fixed + '</span>';
+        else { const L = labelsFor(code); el.innerHTML = (L.shift ? '<span class="ks">' + L.shift.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</span>' : '') + '<span class="kb">' + L.big.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</span>' + (L.small ? '<span class="kc">' + L.small.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</span>' : ''); }
+        r.appendChild(el); });
       host.appendChild(r); });
-    $('kbdnote').textContent = 'Clavier dessiné avec les inscriptions que tu as indiquées. Forme ISO (Entrée en L). Orange : où appuyer. Vert : bonne touche. Rouge : autre touche.';
+    const t = testedLayout();
+    $('kbdnote').textContent = (t.kind === 'qwerty' ? 'Clavier testé : QWERTY ' + t.name + ' (lettre en gros, symbole avec Maj en petit en haut). En petit en bas à droite : l\'inscription de TA touche, pour la retrouver. ' : 'Clavier testé : AZERTY, avec les inscriptions indiquées. ') + 'Forme ISO (Entrée en L). Orange : où appuyer. Vert : bonne touche. Rouge : autre touche.';
   }
   function paint(pressedCode, ok) {
     const host = $('kbd');
@@ -148,7 +171,13 @@
     if (pressedCode) { const el = host.querySelector('[data-code="' + pressedCode + '"]'); if (el) { el.classList.add(ok ? 'hit' : 'miss', 'flash'); setTimeout(() => el.classList.remove('flash'), 150); } }
   }
   const capName = (code) => { if (code === 'Space') return 'Espace'; const c = (KEYCAPS[$('caps').value] || {})[code]; return c ? '« ' + c + ' »' : code.replace('Key', '').replace('Digit', 'chiffre '); };
-  const stepText = (st) => (st.mods.length ? st.mods.map((m) => M[m]).join(' + ') + ' + ' : '') + 'touche ' + capName(st.code);
+  const stepText = (st) => {
+    const mods = st.mods.length ? st.mods.map((m) => M[m]).join(' + ') + ' + ' : '';
+    if (st.code === 'Space') return mods + 'touche Espace';
+    const L = labelsFor(st.code); const mine = $('caps').value !== 'none' ? (KEYCAPS[$('caps').value] || {})[st.code] : null;
+    const big = L.big;
+    return mods + 'touche « ' + big + ' »' + (mine && mine.toLowerCase() !== big.toLowerCase() ? ' (chez toi : « ' + mine + ' »)' : '');
+  };
   const gestureHTML = (ch) => {
     const set = HINTS[meta.os + '|' + meta.layout]; if (!set) return null;
     const h = set[ch]; if (h === undefined) return null;
