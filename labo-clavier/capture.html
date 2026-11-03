@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Labo clavier : capture sur matériel réel</title>
+<style>
+  :root{--bg:#f4f1ec;--fg:#1a1410;--mut:#6b6157;--ac:#ff4d2e;--card:#fff;--bd:#e4ddd3}
+  @media (prefers-color-scheme:dark){:root{--bg:#171512;--fg:#f1ece4;--mut:#a79d90;--card:#201d19;--bd:#38322b}}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif}
+  main{max-width:760px;margin:0 auto;padding:24px 16px 80px}
+  h1{font-size:26px;margin:0 0 4px} p.sub{color:var(--mut);margin:0 0 20px}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin:0 0 16px}
+  label{display:block;font-weight:600;margin:10px 0 4px} select,input,textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)}
+  button{font:inherit;font-weight:700;padding:10px 16px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--fg);cursor:pointer}
+  button.primary{background:var(--ac);border-color:var(--ac);color:#fff}
+  .target{font-size:42px;font-weight:800;text-align:center;margin:8px 0}
+  .hint{color:var(--mut);font-size:14px} .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  progress{width:100%} .ok{color:#1e9e5a;font-weight:700}
+</style>
+</head>
+<body>
+<main>
+  <h1>Labo clavier</h1>
+  <p class="sub">Cet outil enregistre ce que fait ton clavier, touche par touche. Rien n'est envoyé : tout reste dans ta page, tu télécharges un fichier à la fin.</p>
+
+  <div class="card" id="setup">
+    <label for="os">Système</label>
+    <select id="os"><option>Windows</option><option>macOS</option><option>Linux</option><option>ChromeOS</option><option>Autre</option></select>
+    <label for="layout">Réglage du clavier dans le système (celui que tu as choisi dans les paramètres)</label>
+    <select id="layout"><option>US</option><option>US International</option><option>US International AltGr</option><option>UK</option><option>UK Étendu</option><option>AZERTY France</option><option>AZERTY Belgique</option><option>Mac U.S.</option><option>Mac British</option><option>Mac ABC Étendu</option><option>Autre</option></select>
+    <label for="layoutOther">Si « Autre », précise le nom exact</label>
+    <input id="layoutOther" placeholder="par exemple : Néerlandais (Pays-Bas)">
+    <label for="form">Forme physique du clavier</label>
+    <select id="form"><option>ISO (Entrée en L)</option><option>ANSI (Entrée en rectangle)</option><option>JIS</option><option>Je ne sais pas</option></select>
+    <label for="printed">Lettres imprimées sur les touches</label>
+    <select id="printed"><option>QWERTY</option><option>AZERTY</option><option>Autre</option></select>
+    <label for="device">Appareil (modèle, sans numéro de série)</label>
+    <input id="device" placeholder="par exemple : MacBook Air 2022, clavier belge">
+    <div class="row"><button class="primary" id="start">Commencer</button></div>
+    <p class="hint">Environ 3 minutes. Tu tapes les caractères demandés avec la méthode que tu utiliserais d'habitude. Si un caractère est impossible, dis-le : c'est une information précieuse.</p>
+  </div>
+
+  <div class="card" id="run" hidden>
+    <progress id="bar" value="0" max="1"></progress>
+    <div class="hint" id="count"></div>
+    <div class="target" id="target"></div>
+    <div class="hint" id="instr"></div>
+    <label for="field">Tape ici</label>
+    <textarea id="field" rows="2" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
+    <div class="row"><button id="redo">Effacer et recommencer</button><button id="impossible">C'est impossible</button><button class="primary" id="next">Suivant</button></div>
+  </div>
+
+  <div class="card" id="done" hidden>
+    <p class="ok">Terminé.</p>
+    <p>Télécharge le fichier, puis donne-le à la personne qui s'occupe de KeyPace.</p>
+    <div class="row"><button class="primary" id="download">Télécharger la trace</button></div>
+  </div>
+</main>
+<script>
+(() => {
+  const STEPS = [
+    ...['é','è','à','ù','ç','ê','â','î','ô','û','ë','ï','œ','æ','É','È','«','»','€'].map(c => ({ target: c, kind: 'char' })),
+    ...["'", '"', '`', '~', '^', '@', '#', '[', ']', '{', '}', '|', '\\', '/', ';', ':'].map(c => ({ target: c, kind: 'char' })),
+    { target: "l'été", kind: 'text' }, { target: "c'est où ?", kind: 'text' }, { target: 'qu\'il', kind: 'text' }, { target: 'ça va "bien"', kind: 'text' }
+  ];
+  const $ = (id) => document.getElementById(id);
+  const field = $('field');
+  let i = 0, t0 = 0, events = [], results = [], meta = {};
+
+  const rec = (e) => {
+    const base = { t: Math.round(performance.now() - t0), type: e.type };
+    if (e.type.startsWith('key')) Object.assign(base, { key: e.key, code: e.code, location: e.location, shift: e.shiftKey, ctrl: e.ctrlKey, alt: e.altKey, meta: e.metaKey, repeat: e.repeat, composing: e.isComposing, altGraph: !!(e.getModifierState && e.getModifierState('AltGraph')), capsLock: !!(e.getModifierState && e.getModifierState('CapsLock')) });
+    else if (e.type.startsWith('composition')) Object.assign(base, { data: e.data });
+    else Object.assign(base, { data: e.data, inputType: e.inputType, value: field.value });
+    events.push(base);
+  };
+  ['keydown', 'keyup', 'keypress', 'compositionstart', 'compositionupdate', 'compositionend', 'beforeinput', 'input'].forEach((n) => field.addEventListener(n, rec, true));
+
+  function show() {
+    const s = STEPS[i];
+    $('bar').max = STEPS.length; $('bar').value = i;
+    $('count').textContent = `Étape ${i + 1} sur ${STEPS.length}`;
+    $('target').textContent = s.target;
+    $('instr').textContent = s.kind === 'char' ? 'Fais apparaître ce caractère dans la case, avec ta méthode habituelle (touche directe, AltGr, Option, touche morte...).' : 'Tape ce texte comme tu le ferais d\'habitude.';
+    field.value = ''; events = []; t0 = performance.now(); field.focus();
+  }
+  function commit(impossible) {
+    results.push({ target: STEPS[i].target, kind: STEPS[i].kind, produced: field.value, impossible: !!impossible, events: events.slice() });
+    i++;
+    if (i >= STEPS.length) { $('run').hidden = true; $('done').hidden = false; } else show();
+  }
+  $('start').onclick = async () => {
+    const lay = $('layout').value === 'Autre' ? ($('layoutOther').value.trim() || 'Autre') : $('layout').value;
+    meta = { schema: 1, capturedAt: new Date().toISOString(), os: $('os').value, layout: lay, form: $('form').value, printed: $('printed').value, device: $('device').value.trim(),
+      userAgent: navigator.userAgent, platform: navigator.platform, language: navigator.language, languages: navigator.languages, layoutMap: null };
+    try { if (navigator.keyboard && navigator.keyboard.getLayoutMap) { const m = await navigator.keyboard.getLayoutMap(); meta.layoutMap = Object.fromEntries(m.entries()); } } catch (e) {}
+    $('setup').hidden = true; $('run').hidden = false; show();
+  };
+  $('redo').onclick = () => { field.value = ''; events = []; t0 = performance.now(); field.focus(); };
+  $('impossible').onclick = () => commit(true);
+  $('next').onclick = () => { if (!field.value) { alert('La case est vide. Fais apparaître le caractère, ou clique sur « C\'est impossible ».'); return; } commit(false); };
+  $('download').onclick = () => {
+    const name = ['trace', meta.os, meta.layout, meta.form.split(' ')[0], new Date().toISOString().slice(0, 10)].join('-').replace(/[^A-Za-z0-9._-]+/g, '_') + '.json';
+    const blob = new Blob([JSON.stringify({ meta, steps: results }, null, 1)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  };
+})();
+</script>
+</body>
+</html>
