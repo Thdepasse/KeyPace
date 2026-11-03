@@ -722,11 +722,10 @@ async function migrateSelf(req, res) {
   const data = (pr.data && pr.data[0] && pr.data[0].data) || {};
   const legacyClasses = Array.isArray(data.classes) ? data.classes : [];
 
-  // Promeut en prof si l'ancien rôle jsonb l'indiquait (ou s'il a déjà des classes).
-  if (user.role !== 'prof' && user.role !== 'admin' && (data.role === 'etablissement' || legacyClasses.length)) {
-    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ role: 'prof' }) });
-    user.role = 'prof';
-  }
+  // Jamais de promotion depuis `progress.data` : ce blob est écrit par le
+  // client (save-progress), donc `role` et `classes` y sont falsifiables. Le
+  // rôle ne vient que de users.role ; ici on migre seulement les anciennes
+  // classes d'un compte déjà prof ou admin.
   if (!canActAsTeacher(user)) return res.json({ migrated: 0, role: user.role });
 
   // Évite de re-migrer si des classes existent déjà en table pour ce prof.

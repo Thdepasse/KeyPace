@@ -63,6 +63,14 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  // `role` et `classes` sont d'anciens champs lus côté serveur (api/classes.js,
+  // migration des anciennes classes). Ils ne doivent jamais venir du client :
+  // on garde la valeur déjà enregistrée, ou on les retire.
+  for (const k of ['role', 'classes']) {
+    if (prevData && prevData[k] !== undefined) data[k] = prevData[k];
+    else delete data[k];
+  }
+
   // Sinon => écriture en upsert (insère la ligne si elle n'existe pas encore)
   await sb(`/progress?on_conflict=user_id`, {
     method: 'POST',
