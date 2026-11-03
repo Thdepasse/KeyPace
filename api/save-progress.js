@@ -1,4 +1,5 @@
 const { setCorsOrigin } = require('./_cors');
+const { sanitizeProgress, MAX_BYTES } = require('./_progress-sanitize');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
@@ -24,7 +25,8 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { token, data } = req.body || {};
+  const { token } = req.body || {};
+  let { data } = req.body || {};
   if (!token) return res.status(400).json({ error: 'Token manquant.' });
 
   const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id`);
@@ -37,6 +39,9 @@ module.exports = async function handler(req, res) {
     const row = pr.data && pr.data[0];
     return res.json({ ok: true, id: user.id, data: (row && row.data) || {} });
   }
+
+  if (typeof data !== 'object' || Array.isArray(data)) return res.status(400).json({ error: 'Données invalides.' });
+  if (JSON.stringify(data).length > MAX_BYTES) return res.status(413).json({ error: 'Données trop volumineuses.' });
 
   // Garde-fou : une écriture ne doit jamais effacer des leçons déjà validées.
   // Ça arrive si le client sauvegarde avant d'avoir fini de charger la vraie
@@ -63,12 +68,12 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // `role` et `classes` sont d'anciens champs lus côté serveur (api/classes.js,
-  // migration des anciennes classes). Ils ne doivent jamais venir du client :
-  // on garde la valeur déjà enregistrée, ou on les retire.
-  for (const k of ['role', 'classes']) {
-    if (prevData && prevData[k] !== undefined) data[k] = prevData[k];
-    else delete data[k];
+  // Nettoyage : champs du serveur (role, classes, courses) conservés, valeurs impossibles
+  // écartées champ par champ (la valeur enregistrée est gardée), clés inconnues signalées.
+  const clean = sanitizeProgress(data, prevData);
+  data = clean.data;
+  if (clean.dropped.length || clean.unknownKeys.length) {
+    console.warn('save-progress nettoyage', JSON.stringify({ user: user.id, ecartes: clean.dropped.length, champs: [...new Set(clean.dropped)], clesInconnues: clean.unknownKeys }));
   }
 
   // Sinon => écriture en upsert (insère la ligne si elle n'existe pas encore)
