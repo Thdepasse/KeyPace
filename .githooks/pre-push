@@ -1,0 +1,13 @@
+#!/bin/sh
+# Hook facultatif : lance les gates avant un push vers main. À activer une fois par clone :
+#   git config core.hooksPath .githooks
+# Filet seulement : `git push --no-verify` le contourne, et il ne protège pas un autre poste.
+while read local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main)
+      echo "pre-push : gates avant déploiement sur main..."
+      npm run gates --silent || { echo "pre-push : gates ROUGES, push annulé."; exit 1; }
+      ;;
+  esac
+done
+exit 0

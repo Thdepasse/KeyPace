@@ -1,0 +1,343 @@
+{
+ "schemaVersion": 1,
+ "id": "azerty-be",
+ "family": "azerty",
+ "variant": "be",
+ "label": "Belge",
+ "note": "Diffère du français sur 2 touches : <b>§</b> et <b>!</b> remplacent <b>-</b> et <b>_</b> sur la rangée des chiffres.",
+ "rows": [
+  [
+   {
+    "c": "Digit1",
+    "l": "1",
+    "s": "&",
+    "f": "lp",
+    "g": "|"
+   },
+   {
+    "c": "Digit2",
+    "l": "2",
+    "s": "é",
+    "f": "lr",
+    "g": "@"
+   },
+   {
+    "c": "Digit3",
+    "l": "3",
+    "s": "\"",
+    "f": "lm",
+    "g": "#"
+   },
+   {
+    "c": "Digit4",
+    "l": "4",
+    "s": "'",
+    "f": "li"
+   },
+   {
+    "c": "Digit5",
+    "l": "5",
+    "s": "(",
+    "f": "li"
+   },
+   {
+    "c": "Digit6",
+    "l": "6",
+    "s": "§",
+    "f": "ri",
+    "g": "^"
+   },
+   {
+    "c": "Digit7",
+    "l": "7",
+    "s": "è",
+    "f": "ri"
+   },
+   {
+    "c": "Digit8",
+    "l": "8",
+    "s": "!",
+    "f": "rm"
+   },
+   {
+    "c": "Digit9",
+    "l": "9",
+    "s": "ç",
+    "f": "rr",
+    "g": "{"
+   },
+   {
+    "c": "Digit0",
+    "l": "0",
+    "s": "à",
+    "f": "rp",
+    "g": "}"
+   }
+  ],
+  [
+   {
+    "c": "KeyQ",
+    "l": "A",
+    "f": "lp"
+   },
+   {
+    "c": "KeyW",
+    "l": "Z",
+    "f": "lr"
+   },
+   {
+    "c": "KeyE",
+    "l": "E",
+    "f": "lm"
+   },
+   {
+    "c": "KeyR",
+    "l": "R",
+    "f": "li"
+   },
+   {
+    "c": "KeyT",
+    "l": "T",
+    "f": "li"
+   },
+   {
+    "c": "KeyY",
+    "l": "Y",
+    "f": "ri"
+   },
+   {
+    "c": "KeyU",
+    "l": "U",
+    "f": "ri"
+   },
+   {
+    "c": "KeyI",
+    "l": "I",
+    "f": "rm"
+   },
+   {
+    "c": "KeyO",
+    "l": "O",
+    "f": "rr"
+   },
+   {
+    "c": "KeyP",
+    "l": "P",
+    "f": "rp"
+   }
+  ],
+  [
+   {
+    "c": "KeyA",
+    "l": "Q",
+    "f": "lp"
+   },
+   {
+    "c": "KeyS",
+    "l": "S",
+    "f": "lr"
+   },
+   {
+    "c": "KeyD",
+    "l": "D",
+    "f": "lm"
+   },
+   {
+    "c": "KeyF",
+    "l": "F",
+    "f": "li",
+    "home": true
+   },
+   {
+    "c": "KeyG",
+    "l": "G",
+    "f": "li"
+   },
+   {
+    "c": "KeyH",
+    "l": "H",
+    "f": "ri"
+   },
+   {
+    "c": "KeyJ",
+    "l": "J",
+    "f": "ri",
+    "home": true
+   },
+   {
+    "c": "KeyK",
+    "l": "K",
+    "f": "rm"
+   },
+   {
+    "c": "KeyL",
+    "l": "L",
+    "f": "rr"
+   },
+   {
+    "c": "Semicolon",
+    "l": "M",
+    "f": "rp"
+   }
+  ],
+  [
+   {
+    "c": "IntlBackslash",
+    "l": "<",
+    "s": ">",
+    "f": "lp",
+    "g": "\\"
+   },
+   {
+    "c": "KeyZ",
+    "l": "W",
+    "f": "lp"
+   },
+   {
+    "c": "KeyX",
+    "l": "X",
+    "f": "lr"
+   },
+   {
+    "c": "KeyC",
+    "l": "C",
+    "f": "lm"
+   },
+   {
+    "c": "KeyV",
+    "l": "V",
+    "f": "li"
+   },
+   {
+    "c": "KeyB",
+    "l": "B",
+    "f": "li"
+   },
+   {
+    "c": "KeyN",
+    "l": "N",
+    "f": "ri"
+   },
+   {
+    "c": "KeyM",
+    "l": ",",
+    "s": "?",
+    "f": "ri"
+   },
+   {
+    "c": "Comma",
+    "l": ";",
+    "s": ".",
+    "f": "rm"
+   },
+   {
+    "c": "Period",
+    "l": ":",
+    "s": "/",
+    "f": "rr"
+   },
+   {
+    "c": "Slash",
+    "l": "=",
+    "s": "+",
+    "f": "rp",
+    "g": "~"
+   }
+  ]
+ ],
+ "extra": {
+  "tlde": [
+   {
+    "c": "Backquote",
+    "l": "²",
+    "s": "³",
+    "f": "lp",
+    "nd": true
+   }
+  ],
+  "ae": [
+   {
+    "c": "Minus",
+    "l": ")",
+    "s": "°",
+    "f": "rp",
+    "nd": true
+   },
+   {
+    "c": "Equal",
+    "l": "-",
+    "s": "_",
+    "f": "rp",
+    "nd": true
+   }
+  ],
+  "ad": [
+   {
+    "c": "BracketLeft",
+    "l": "^",
+    "s": "¨",
+    "f": "rp",
+    "g": "["
+   },
+   {
+    "c": "BracketRight",
+    "l": "$",
+    "s": "*",
+    "f": "rp",
+    "g": "]"
+   }
+  ],
+  "ac": [
+   {
+    "c": "Quote",
+    "l": "ù",
+    "s": "%",
+    "f": "rp"
+   },
+   {
+    "c": "Backslash",
+    "l": "µ",
+    "s": "£",
+    "f": "rp",
+    "g": "`"
+   }
+  ]
+ },
+ "how": {
+  "ù": "touche ù (à droite du M)",
+  "-": "touche - (à droite du ), sans Maj)",
+  "â": "touche ^ (à droite du P), puis la voyelle",
+  "î": "touche ^ (à droite du P), puis la voyelle",
+  "ô": "touche ^ (à droite du P), puis la voyelle",
+  "û": "touche ^ (à droite du P), puis la voyelle",
+  "ê": "touche ^ (à droite du P), puis la voyelle",
+  "ë": "Maj + touche ^ (à droite du P), puis la voyelle",
+  "ï": "Maj + touche ^ (à droite du P), puis la voyelle",
+  "@": "AltGr + 2",
+  "#": "AltGr + 3",
+  "[": "AltGr + ^ (touche à droite du P)",
+  "]": "AltGr + $",
+  "|": "AltGr + 1",
+  "/": "Maj + :",
+  "*": "Maj + $",
+  "=": "touche = (rangée du bas, à droite)",
+  "+": "Maj + =",
+  "%": "Maj + ù",
+  "_": "Maj + - (touche à droite du 0)",
+  "{": "AltGr + 9",
+  "}": "AltGr + 0",
+  "<": "touche < (à gauche du W)",
+  ">": "Maj + <",
+  "\"": "touche 3, sans Maj",
+  "~": "AltGr + =, puis espace",
+  "\\": "AltGr + <",
+  "`": "AltGr + µ, puis espace",
+  "(": "touche 5, sans Maj",
+  ")": "touche ) (à droite du 0), sans Maj",
+  "«": "pas de touche sur ton clavier : tape le guillemet droit \" (accepté)",
+  "»": "pas de touche sur ton clavier : tape le guillemet droit \" (accepté)",
+  "œ": "Tape o puis e : c'est accepté. Sinon, Alt + 0156 au pavé numérique (Windows)",
+  "æ": "Tape a puis e : c'est accepté. Sinon, Alt + 0230 au pavé numérique (Windows)",
+  "É": "Maj + é donne « 2 » : c'est accepté. Sinon, Alt + 0201 au pavé numérique (Windows)"
+ }
+}

@@ -1,0 +1,373 @@
+{
+ "schemaVersion": 1,
+ "id": "azerty-nf",
+ "family": "azerty",
+ "variant": "nf",
+ "label": "Norme NF Z71-300",
+ "note": "Norme officielle depuis 2019 : <b>différente</b> de l'AZERTY historique que la plupart des claviers vendus utilisent encore. Les chiffres s'obtiennent avec <b>Maj</b> (les lettres accentuées à/é/è/ê sont en accès direct), et plusieurs lettres changent de position.",
+ "rows": [
+  [
+   {
+    "c": "Digit1",
+    "l": "1",
+    "s": "à",
+    "f": "lp",
+    "g": "§"
+   },
+   {
+    "c": "Digit2",
+    "l": "2",
+    "s": "é",
+    "f": "lr",
+    "g": "´"
+   },
+   {
+    "c": "Digit3",
+    "l": "3",
+    "s": "è",
+    "f": "lm",
+    "g": "`"
+   },
+   {
+    "c": "Digit4",
+    "l": "4",
+    "s": "ê",
+    "f": "li",
+    "g": "&"
+   },
+   {
+    "c": "Digit5",
+    "l": "5",
+    "s": "(",
+    "f": "li",
+    "g": "["
+   },
+   {
+    "c": "Digit6",
+    "l": "6",
+    "s": ")",
+    "f": "ri",
+    "g": "]"
+   },
+   {
+    "c": "Digit7",
+    "l": "7",
+    "s": "‘",
+    "f": "ri",
+    "g": "¯"
+   },
+   {
+    "c": "Digit8",
+    "l": "8",
+    "s": "’",
+    "f": "rm",
+    "g": "_"
+   },
+   {
+    "c": "Digit9",
+    "l": "9",
+    "s": "«",
+    "f": "rr",
+    "g": "“"
+   },
+   {
+    "c": "Digit0",
+    "l": "0",
+    "s": "»",
+    "f": "rp",
+    "g": "”"
+   }
+  ],
+  [
+   {
+    "c": "KeyQ",
+    "l": "A",
+    "f": "lp",
+    "g": "æ"
+   },
+   {
+    "c": "KeyW",
+    "l": "Z",
+    "f": "lr",
+    "g": "£"
+   },
+   {
+    "c": "KeyE",
+    "l": "E",
+    "f": "lm",
+    "g": "€"
+   },
+   {
+    "c": "KeyR",
+    "l": "R",
+    "f": "li",
+    "g": "®"
+   },
+   {
+    "c": "KeyT",
+    "l": "T",
+    "f": "li",
+    "g": "{"
+   },
+   {
+    "c": "KeyY",
+    "l": "Y",
+    "f": "ri",
+    "g": "}"
+   },
+   {
+    "c": "KeyU",
+    "l": "U",
+    "f": "ri",
+    "g": "ù"
+   },
+   {
+    "c": "KeyI",
+    "l": "I",
+    "f": "rm",
+    "g": "˙"
+   },
+   {
+    "c": "KeyO",
+    "l": "O",
+    "f": "rr",
+    "g": "œ"
+   },
+   {
+    "c": "KeyP",
+    "l": "P",
+    "f": "rp",
+    "g": "%"
+   }
+  ],
+  [
+   {
+    "c": "KeyA",
+    "l": "Q",
+    "f": "lp",
+    "g": "θ"
+   },
+   {
+    "c": "KeyS",
+    "l": "S",
+    "f": "lr",
+    "g": "ß"
+   },
+   {
+    "c": "KeyD",
+    "l": "D",
+    "f": "lm",
+    "g": "$"
+   },
+   {
+    "c": "KeyF",
+    "l": "F",
+    "f": "li",
+    "home": true,
+    "g": "¤"
+   },
+   {
+    "c": "KeyG",
+    "l": "G",
+    "f": "li",
+    "g": "µ"
+   },
+   {
+    "c": "KeyH",
+    "l": "H",
+    "f": "ri"
+   },
+   {
+    "c": "KeyJ",
+    "l": "J",
+    "f": "ri",
+    "home": true
+   },
+   {
+    "c": "KeyK",
+    "l": "K",
+    "f": "rm"
+   },
+   {
+    "c": "KeyL",
+    "l": "L",
+    "f": "rr",
+    "g": "|"
+   },
+   {
+    "c": "Semicolon",
+    "l": "M",
+    "f": "rp",
+    "g": "∞"
+   }
+  ],
+  [
+   {
+    "c": "IntlBackslash",
+    "l": "<",
+    "s": ">",
+    "f": "lp",
+    "g": "≤"
+   },
+   {
+    "c": "KeyZ",
+    "l": "W",
+    "f": "lp",
+    "g": "ʒ"
+   },
+   {
+    "c": "KeyX",
+    "l": "X",
+    "f": "lr",
+    "g": "©"
+   },
+   {
+    "c": "KeyC",
+    "l": "C",
+    "f": "lm",
+    "g": "ç"
+   },
+   {
+    "c": "KeyV",
+    "l": "V",
+    "f": "li",
+    "g": "¸"
+   },
+   {
+    "c": "KeyB",
+    "l": "B",
+    "f": "li"
+   },
+   {
+    "c": "KeyN",
+    "l": "N",
+    "f": "ri",
+    "g": "~"
+   },
+   {
+    "c": "KeyM",
+    "l": ".",
+    "s": "?",
+    "f": "ri",
+    "g": "¿"
+   },
+   {
+    "c": "Comma",
+    "l": ",",
+    "s": "!",
+    "f": "rm",
+    "g": "¡"
+   },
+   {
+    "c": "Period",
+    "l": ":",
+    "s": "…",
+    "f": "rr",
+    "g": "·"
+   },
+   {
+    "c": "Slash",
+    "l": ";",
+    "s": "=",
+    "f": "rp",
+    "g": "≃"
+   }
+  ]
+ ],
+ "extra": {
+  "tlde": [
+   {
+    "c": "Backquote",
+    "l": "@",
+    "s": "#",
+    "f": "lp",
+    "nd": true
+   }
+  ],
+  "ae": [
+   {
+    "c": "Minus",
+    "l": "'",
+    "s": "\"",
+    "f": "rp",
+    "g": "°",
+    "nd": true
+   },
+   {
+    "c": "Equal",
+    "l": "^",
+    "s": "¨",
+    "f": "rp",
+    "nd": true
+   }
+  ],
+  "ad": [
+   {
+    "c": "BracketLeft",
+    "l": "-",
+    "s": "–",
+    "f": "rp"
+   },
+   {
+    "c": "BracketRight",
+    "l": "+",
+    "s": "±",
+    "f": "rp"
+   }
+  ],
+  "ac": [
+   {
+    "c": "Quote",
+    "l": "/",
+    "s": "\\",
+    "f": "rp",
+    "g": "÷"
+   },
+   {
+    "c": "Backslash",
+    "l": "*",
+    "s": "½",
+    "f": "rp",
+    "g": "×"
+   }
+  ]
+ },
+ "how": {
+  "ù": "AltGr + U",
+  "-": "touche - (à droite du P)",
+  "'": "touche ' (à droite du 0), sans Maj",
+  "â": "touche ^ (à gauche de Retour arrière), puis la voyelle",
+  "î": "touche ^ (à gauche de Retour arrière), puis la voyelle",
+  "ô": "touche ^ (à gauche de Retour arrière), puis la voyelle",
+  "û": "touche ^ (à gauche de Retour arrière), puis la voyelle",
+  "ê": "Maj + touche 4",
+  "ë": "Maj + touche ^ (à gauche de Retour arrière), puis la voyelle",
+  "ï": "Maj + touche ^ (à gauche de Retour arrière), puis la voyelle",
+  "@": "touche à gauche du 1",
+  "#": "Maj + touche à gauche du 1",
+  "[": "AltGr + 5",
+  "]": "AltGr + 6",
+  "|": "AltGr + L",
+  "/": "touche / (à droite du M)",
+  "*": "touche * (à droite du /)",
+  "=": "Maj + ;",
+  "+": "touche + (en haut à droite)",
+  "%": "AltGr + P",
+  "_": "AltGr + 8",
+  "{": "AltGr + T",
+  "}": "AltGr + Y",
+  "<": "touche < (à gauche du W)",
+  ">": "Maj + <",
+  "\"": "Maj + touche ' (à droite du 0)",
+  "~": "AltGr + N",
+  "\\": "Maj + /",
+  "`": "AltGr + è, puis espace",
+  "(": "touche 5",
+  ")": "touche 6",
+  "«": "touche 9",
+  "»": "touche 0",
+  "œ": "AltGr + O",
+  "æ": "AltGr + A",
+  "É": "AltGr + Maj + é. Maj + é donne « 2 » : c'est accepté"
+ }
+}

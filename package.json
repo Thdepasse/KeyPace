@@ -2,7 +2,8 @@
   "name": "keypace",
   "version": "1.0.0",
   "scripts": {
-    "test": "node --test api/*.test.js"
+    "test": "node --test api/*.test.js",
+    "gates": "node scripts/gates.js"
   },
   "dependencies": {
     "resend": "^6.14.0",

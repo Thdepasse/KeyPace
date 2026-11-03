@@ -1,0 +1,344 @@
+{
+ "schemaVersion": 1,
+ "id": "azerty-mac",
+ "family": "azerty",
+ "variant": "mac",
+ "label": "Mac",
+ "note": "Diffère du français sur 3 touches (comme le belge) : <b>§</b>/<b>!</b> remplacent <b>-</b>/<b>_</b>, et <b>=</b>/<b>+</b> remplace <b>!</b>/<b>§</b> en bas à droite ; <b>œ</b> s'obtient avec <b>Option (⌥) + O</b>.",
+ "rows": [
+  [
+   {
+    "c": "Digit1",
+    "l": "1",
+    "s": "&",
+    "f": "lp"
+   },
+   {
+    "c": "Digit2",
+    "l": "2",
+    "s": "é",
+    "f": "lr"
+   },
+   {
+    "c": "Digit3",
+    "l": "3",
+    "s": "\"",
+    "f": "lm"
+   },
+   {
+    "c": "Digit4",
+    "l": "4",
+    "s": "'",
+    "f": "li"
+   },
+   {
+    "c": "Digit5",
+    "l": "5",
+    "s": "(",
+    "f": "li",
+    "g": "{",
+    "gs": "["
+   },
+   {
+    "c": "Digit6",
+    "l": "6",
+    "s": "§",
+    "f": "ri"
+   },
+   {
+    "c": "Digit7",
+    "l": "7",
+    "s": "è",
+    "f": "ri",
+    "g": "«",
+    "gs": "»"
+   },
+   {
+    "c": "Digit8",
+    "l": "8",
+    "s": "!",
+    "f": "rm"
+   },
+   {
+    "c": "Digit9",
+    "l": "9",
+    "s": "ç",
+    "f": "rr"
+   },
+   {
+    "c": "Digit0",
+    "l": "0",
+    "s": "à",
+    "f": "rp"
+   }
+  ],
+  [
+   {
+    "c": "KeyQ",
+    "l": "A",
+    "f": "lp",
+    "g": "æ"
+   },
+   {
+    "c": "KeyW",
+    "l": "Z",
+    "f": "lr"
+   },
+   {
+    "c": "KeyE",
+    "l": "E",
+    "f": "lm"
+   },
+   {
+    "c": "KeyR",
+    "l": "R",
+    "f": "li"
+   },
+   {
+    "c": "KeyT",
+    "l": "T",
+    "f": "li"
+   },
+   {
+    "c": "KeyY",
+    "l": "Y",
+    "f": "ri"
+   },
+   {
+    "c": "KeyU",
+    "l": "U",
+    "f": "ri"
+   },
+   {
+    "c": "KeyI",
+    "l": "I",
+    "f": "rm"
+   },
+   {
+    "c": "KeyO",
+    "l": "O",
+    "f": "rr",
+    "g": "œ"
+   },
+   {
+    "c": "KeyP",
+    "l": "P",
+    "f": "rp"
+   }
+  ],
+  [
+   {
+    "c": "KeyA",
+    "l": "Q",
+    "f": "lp"
+   },
+   {
+    "c": "KeyS",
+    "l": "S",
+    "f": "lr"
+   },
+   {
+    "c": "KeyD",
+    "l": "D",
+    "f": "lm"
+   },
+   {
+    "c": "KeyF",
+    "l": "F",
+    "f": "li",
+    "home": true
+   },
+   {
+    "c": "KeyG",
+    "l": "G",
+    "f": "li"
+   },
+   {
+    "c": "KeyH",
+    "l": "H",
+    "f": "ri"
+   },
+   {
+    "c": "KeyJ",
+    "l": "J",
+    "f": "ri",
+    "home": true
+   },
+   {
+    "c": "KeyK",
+    "l": "K",
+    "f": "rm"
+   },
+   {
+    "c": "KeyL",
+    "l": "L",
+    "f": "rr",
+    "gs": "|"
+   },
+   {
+    "c": "Semicolon",
+    "l": "M",
+    "f": "rp"
+   }
+  ],
+  [
+   {
+    "c": "IntlBackslash",
+    "l": "<",
+    "s": ">",
+    "f": "lp"
+   },
+   {
+    "c": "KeyZ",
+    "l": "W",
+    "f": "lp"
+   },
+   {
+    "c": "KeyX",
+    "l": "X",
+    "f": "lr"
+   },
+   {
+    "c": "KeyC",
+    "l": "C",
+    "f": "lm"
+   },
+   {
+    "c": "KeyV",
+    "l": "V",
+    "f": "li"
+   },
+   {
+    "c": "KeyB",
+    "l": "B",
+    "f": "li"
+   },
+   {
+    "c": "KeyN",
+    "l": "N",
+    "f": "ri",
+    "gs": "~"
+   },
+   {
+    "c": "KeyM",
+    "l": ",",
+    "s": "?",
+    "f": "ri"
+   },
+   {
+    "c": "Comma",
+    "l": ";",
+    "s": ".",
+    "f": "rm"
+   },
+   {
+    "c": "Period",
+    "l": ":",
+    "s": "/",
+    "f": "rr",
+    "gs": "\\"
+   },
+   {
+    "c": "Slash",
+    "l": "=",
+    "s": "+",
+    "f": "rp"
+   }
+  ]
+ ],
+ "extra": {
+  "tlde": [
+   {
+    "c": "Backquote",
+    "l": "@",
+    "s": "#",
+    "f": "lp",
+    "nd": true
+   }
+  ],
+  "ae": [
+   {
+    "c": "Minus",
+    "l": ")",
+    "s": "°",
+    "f": "rp",
+    "g": "}",
+    "gs": "]",
+    "nd": true
+   },
+   {
+    "c": "Equal",
+    "l": "-",
+    "s": "_",
+    "f": "rp",
+    "nd": true
+   }
+  ],
+  "ad": [
+   {
+    "c": "BracketLeft",
+    "l": "^",
+    "s": "¨",
+    "f": "rp"
+   },
+   {
+    "c": "BracketRight",
+    "l": "$",
+    "s": "*",
+    "f": "rp",
+    "g": "€"
+   }
+  ],
+  "ac": [
+   {
+    "c": "Quote",
+    "l": "ù",
+    "s": "%",
+    "f": "rp"
+   },
+   {
+    "c": "Backslash",
+    "l": "`",
+    "s": "£",
+    "f": "rp"
+   }
+  ]
+ },
+ "how": {
+  "ù": "touche ù (à droite du M)",
+  "-": "touche - (à droite du ), sans Maj)",
+  "â": "touche ^ (à droite du P), puis la voyelle",
+  "î": "touche ^ (à droite du P), puis la voyelle",
+  "ô": "touche ^ (à droite du P), puis la voyelle",
+  "û": "touche ^ (à droite du P), puis la voyelle",
+  "ê": "touche ^ (à droite du P), puis la voyelle",
+  "ë": "Maj + touche ^ (à droite du P), puis la voyelle",
+  "ï": "Maj + touche ^ (à droite du P), puis la voyelle",
+  "@": "touche à gauche du 1",
+  "#": "Maj + touche à gauche du 1",
+  "[": "Option + Maj + 5",
+  "]": "Option + Maj + ) (touche à droite du 0)",
+  "|": "Option + Maj + L",
+  "/": "Maj + :",
+  "*": "Maj + $",
+  "=": "touche = (rangée du bas, à droite)",
+  "+": "Maj + =",
+  "%": "Maj + ù",
+  "_": "Maj + -",
+  "{": "Option + 5",
+  "}": "Option + ) (touche à droite du 0)",
+  "<": "touche < (à gauche du W)",
+  ">": "Maj + <",
+  "\"": "touche 3, sans Maj",
+  "~": "Option + Maj + N",
+  "\\": "Option + Maj + :",
+  "`": "touche accent grave, puis espace",
+  "(": "touche 5, sans Maj",
+  ")": "touche ) (à droite du 0), sans Maj",
+  "«": "Option + 7",
+  "»": "Option + Maj + 7",
+  "œ": "Option + O",
+  "æ": "Option + A",
+  "É": "Option + Maj + é. Maj + é donne « 2 » : c'est accepté"
+ }
+}
