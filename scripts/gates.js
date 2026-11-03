@@ -36,7 +36,12 @@ function g1() {
   for (const [fam, list] of Object.entries(families)) {
     for (const x of list.slice(1)) if (!sameLetters(list[0].d, x.d)) errs.push(`${x.f} : lettres différentes de ${list[0].f} dans la famille ${fam} (regroupement refusé)`);
   }
-  return errs.length ? { ok: false, detail: errs.slice(0, 12).join('\n') } : { ok: true, detail: `${defs.length} dispositions` };
+  // Deux familles différentes ne doivent JAMAIS avoir les mêmes lettres aux mêmes touches physiques.
+  const fams = Object.keys(families);
+  for (let i = 0; i < fams.length; i++) for (let j = i + 1; j < fams.length; j++) {
+    if (sameLetters(families[fams[i]][0].d, families[fams[j]][0].d)) errs.push(`les familles ${fams[i]} et ${fams[j]} ont les mêmes lettres : l'une est mal classée`);
+  }
+  return errs.length ? { ok: false, detail: errs.slice(0, 12).join('\n') } : { ok: true, detail: `${defs.length} dispositions, ${fams.length} familles (${fams.map((f) => f + ' ' + families[f].length).join(', ')})` };
 }
 
 // ── G8 : les gates eux-mêmes doivent savoir échouer ──
@@ -267,6 +272,9 @@ const GATES = process.env.GATES_FAKE_RED
     { id: 'P5', name: 'Zones sensibles de index.html inchangées', run: p5 },
     { id: 'P6', name: 'Migrations SQL sûres', run: p6 },
     { id: 'P7', name: 'Aucun secret dans ce qui part', run: p7 },
+    { id: 'Q1', name: 'QWERTY : désaccords entre Microsoft et xkeyboard-config connus et relus', run: () => require('./qwerty-gates').q1(UPDATE) },
+    { id: 'Q2', name: 'QWERTY : caractères de nos textes tapables ou impossibles, par variante', run: () => require('./qwerty-gates').q2(UPDATE) },
+    { id: 'Q3', name: 'QWERTY : le vrai moteur face aux touches mortes (apostrophe, accents)', run: () => require('./qwerty-gates').q3(UPDATE) },
     { id: 'U1', name: 'Chaque leçon se termine sur chaque disposition (66 x 4)', run: () => usage().u1() },
     { id: 'U2', name: 'Ce que le client envoie est accepté tel quel par le serveur', run: () => usage().u2() },
     { id: 'U3', name: 'Un visiteur sans compte peut taper, rien n\'est envoyé', run: () => usage().u3() },

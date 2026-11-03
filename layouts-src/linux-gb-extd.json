@@ -1,0 +1,397 @@
+{
+ "schemaVersion": 2,
+ "id": "linux-gb-extd",
+ "family": "qwerty",
+ "variant": "uk-extended",
+ "os": "Linux",
+ "label": "Linux : Royaume-Uni étendu",
+ "status": "brouillon",
+ "sources": [
+  {
+   "name": "xkeyboard-config",
+   "url": "https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config",
+   "commit": "2ec770a0085bf776de749e185ca40e50213fb21f",
+   "file": "symbols/gb",
+   "section": "extd",
+   "read": "2026-11-03"
+  }
+ ],
+ "unverified": [
+  "Essai sur matériel réel (règle 5 du plan) : aucune trace enregistrée."
+ ],
+ "keys": {
+  "Digit1": {
+   "l": "1",
+   "s": "!",
+   "g": "¹",
+   "gs": "¡",
+   "f": "lp"
+  },
+  "Digit2": {
+   "l": "2",
+   "s": "\"",
+   "g": null,
+   "gs": "½",
+   "f": "lr",
+   "dead": {
+    "g": "diaeresis"
+   }
+  },
+  "Digit3": {
+   "l": "3",
+   "s": "£",
+   "g": "³",
+   "gs": "⅓",
+   "f": "lm"
+  },
+  "Digit4": {
+   "l": "4",
+   "s": "$",
+   "g": "€",
+   "gs": "¼",
+   "f": "li"
+  },
+  "Digit5": {
+   "l": "5",
+   "s": "%",
+   "g": "½",
+   "gs": "⅜",
+   "f": "li"
+  },
+  "Digit6": {
+   "l": "6",
+   "s": "^",
+   "g": null,
+   "gs": null,
+   "f": "ri",
+   "dead": {
+    "g": "circumflex"
+   }
+  },
+  "Digit7": {
+   "l": "7",
+   "s": "&",
+   "g": "{",
+   "gs": "⅞",
+   "f": "ri"
+  },
+  "Digit8": {
+   "l": "8",
+   "s": "*",
+   "g": "[",
+   "gs": "™",
+   "f": "rm"
+  },
+  "Digit9": {
+   "l": "9",
+   "s": "(",
+   "g": "]",
+   "gs": "±",
+   "f": "rr"
+  },
+  "Digit0": {
+   "l": "0",
+   "s": ")",
+   "g": "}",
+   "gs": "°",
+   "f": "rp"
+  },
+  "Minus": {
+   "l": "-",
+   "s": "_",
+   "g": "\\",
+   "gs": "¿",
+   "f": "rp"
+  },
+  "Equal": {
+   "l": "=",
+   "s": "+",
+   "g": null,
+   "gs": null,
+   "f": "rp",
+   "dead": {
+    "g": "cedilla",
+    "gs": "ogonek"
+   }
+  },
+  "KeyQ": {
+   "l": "q",
+   "s": "Q",
+   "g": "@",
+   "gs": "Ω",
+   "f": "lp"
+  },
+  "KeyW": {
+   "l": "w",
+   "s": "W",
+   "g": "ẃ",
+   "gs": "Ẃ",
+   "f": "lr"
+  },
+  "KeyE": {
+   "l": "e",
+   "s": "E",
+   "g": "é",
+   "gs": "É",
+   "f": "lm"
+  },
+  "KeyR": {
+   "l": "r",
+   "s": "R",
+   "g": "¶",
+   "gs": "®",
+   "f": "li"
+  },
+  "KeyT": {
+   "l": "t",
+   "s": "T",
+   "g": "ŧ",
+   "gs": "Ŧ",
+   "f": "li"
+  },
+  "KeyY": {
+   "l": "y",
+   "s": "Y",
+   "g": "ý",
+   "gs": "Ý",
+   "f": "ri"
+  },
+  "KeyU": {
+   "l": "u",
+   "s": "U",
+   "g": "ú",
+   "gs": "Ú",
+   "f": "ri"
+  },
+  "KeyI": {
+   "l": "i",
+   "s": "I",
+   "g": "í",
+   "gs": "Í",
+   "f": "rm"
+  },
+  "KeyO": {
+   "l": "o",
+   "s": "O",
+   "g": "ó",
+   "gs": "Ó",
+   "f": "rr"
+  },
+  "KeyP": {
+   "l": "p",
+   "s": "P",
+   "g": "þ",
+   "gs": "Þ",
+   "f": "rp"
+  },
+  "BracketLeft": {
+   "l": "[",
+   "s": "{",
+   "g": null,
+   "gs": null,
+   "f": "rp",
+   "dead": {
+    "g": "diaeresis",
+    "gs": "abovering"
+   }
+  },
+  "BracketRight": {
+   "l": "]",
+   "s": "}",
+   "g": null,
+   "gs": "|",
+   "f": "rp"
+  },
+  "KeyA": {
+   "l": "a",
+   "s": "A",
+   "g": "á",
+   "gs": "Á",
+   "f": "lp"
+  },
+  "KeyS": {
+   "l": "s",
+   "s": "S",
+   "g": "ß",
+   "gs": "ẞ",
+   "f": "lr"
+  },
+  "KeyD": {
+   "l": "d",
+   "s": "D",
+   "g": "ð",
+   "gs": "Ð",
+   "f": "lm"
+  },
+  "KeyF": {
+   "l": "f",
+   "s": "F",
+   "g": "đ",
+   "gs": "ª",
+   "f": "li",
+   "home": true
+  },
+  "KeyG": {
+   "l": "g",
+   "s": "G",
+   "g": "ŋ",
+   "gs": "Ŋ",
+   "f": "li"
+  },
+  "KeyH": {
+   "l": "h",
+   "s": "H",
+   "g": "ħ",
+   "gs": "Ħ",
+   "f": "ri"
+  },
+  "KeyJ": {
+   "l": "j",
+   "s": "J",
+   "g": null,
+   "gs": null,
+   "f": "ri",
+   "home": true,
+   "dead": {
+    "g": "hook",
+    "gs": "horn"
+   }
+  },
+  "KeyK": {
+   "l": "k",
+   "s": "K",
+   "g": "ĸ",
+   "gs": "&",
+   "f": "rm"
+  },
+  "KeyL": {
+   "l": "l",
+   "s": "L",
+   "g": "ł",
+   "gs": "Ł",
+   "f": "rr"
+  },
+  "Semicolon": {
+   "l": ";",
+   "s": ":",
+   "g": null,
+   "gs": null,
+   "f": "rp",
+   "dead": {
+    "g": "acute",
+    "gs": "doubleacute"
+   }
+  },
+  "Quote": {
+   "l": "'",
+   "s": "@",
+   "g": null,
+   "gs": "`",
+   "f": "rp",
+   "dead": {
+    "g": "acute"
+   }
+  },
+  "Backquote": {
+   "l": null,
+   "s": "¬",
+   "g": "¦",
+   "gs": null,
+   "f": "lp",
+   "dead": {
+    "l": "grave"
+   }
+  },
+  "Backslash": {
+   "l": "#",
+   "s": "~",
+   "g": null,
+   "gs": "\\",
+   "f": "rp",
+   "dead": {
+    "g": "tilde"
+   }
+  },
+  "KeyZ": {
+   "l": "z",
+   "s": "Z",
+   "g": "«",
+   "gs": "<",
+   "f": "lp"
+  },
+  "KeyX": {
+   "l": "x",
+   "s": "X",
+   "g": "»",
+   "gs": ">",
+   "f": "lr"
+  },
+  "KeyC": {
+   "l": "c",
+   "s": "C",
+   "g": "ç",
+   "gs": "Ç",
+   "f": "lm"
+  },
+  "KeyV": {
+   "l": "v",
+   "s": "V",
+   "g": "„",
+   "gs": "‚",
+   "f": "li"
+  },
+  "KeyB": {
+   "l": "b",
+   "s": "B",
+   "g": "“",
+   "gs": "‘",
+   "f": "li"
+  },
+  "KeyN": {
+   "l": "n",
+   "s": "N",
+   "g": "”",
+   "gs": "’",
+   "f": "ri"
+  },
+  "KeyM": {
+   "l": "m",
+   "s": "M",
+   "g": "µ",
+   "gs": "º",
+   "f": "ri"
+  },
+  "Comma": {
+   "l": ",",
+   "s": "<",
+   "g": "•",
+   "gs": "×",
+   "f": "rm"
+  },
+  "Period": {
+   "l": ".",
+   "s": ">",
+   "g": "·",
+   "gs": "÷",
+   "f": "rr"
+  },
+  "Slash": {
+   "l": "/",
+   "s": "?",
+   "g": null,
+   "gs": null,
+   "f": "rp",
+   "dead": {
+    "g": "belowdot",
+    "gs": "abovedot"
+   }
+  },
+  "IntlBackslash": {
+   "l": "\\",
+   "s": "|",
+   "g": null,
+   "gs": null,
+   "f": "lp"
+  }
+ }
+}

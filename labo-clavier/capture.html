@@ -18,6 +18,15 @@
   .target{font-size:42px;font-weight:800;text-align:center;margin:8px 0}
   .hint{color:var(--mut);font-size:14px} .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
   progress{width:100%} .ok{color:#1e9e5a;font-weight:700}
+  #kbd{margin:12px 0 0;user-select:none;overflow-x:auto}
+  .kr{display:flex;gap:3px;margin-bottom:3px;min-width:560px}
+  .kk{flex:0 0 auto;width:38px;height:36px;border:1px solid var(--bd);border-bottom-width:3px;border-radius:6px;background:var(--card);display:flex;align-items:center;justify-content:center;font:600 13px/1 ui-monospace,monospace;color:var(--fg)}
+  .kk.w15{width:58px}.kk.w2{width:78px}.kk.w25{width:96px}.kk.sp{width:236px}.kk.ghost{visibility:hidden}
+  .kk.mod{color:var(--mut);font-size:12px}
+  .kk.want{border-color:var(--ac);background:#ff4d2e22;box-shadow:0 0 0 2px var(--ac)}
+  .kk.hit{border-color:#1e9e5a;background:#1e9e5a33}
+  .kk.miss{border-color:#c0392b;background:#c0392b33}
+  .kk.flash{transform:translateY(2px)}
 </style>
 </head>
 <body>
@@ -29,13 +38,19 @@
     <label for="os">Système</label>
     <select id="os"><option>Windows</option><option>macOS</option><option>Linux</option><option>ChromeOS</option><option>Autre</option></select>
     <label for="layout">Réglage du clavier dans le système (celui que tu as choisi dans les paramètres)</label>
-    <select id="layout"><option>US</option><option>US International</option><option>US International AltGr</option><option>UK</option><option>UK Étendu</option><option>AZERTY France</option><option>AZERTY Belgique</option><option>Mac U.S.</option><option>Mac British</option><option>Mac ABC Étendu</option><option>Autre</option></select>
+    <select id="layout"><option>US</option><option>US International</option><option>US International AltGr</option><option>UK</option><option>UK Étendu</option><option>AZERTY France</option><option>AZERTY Belgique</option><option>Mac U.S.</option><option>Mac U.S. International - PC</option><option>Mac British</option><option>Mac ABC Étendu</option><option>Autre</option></select>
     <label for="layoutOther">Si « Autre », précise le nom exact</label>
     <input id="layoutOther" placeholder="par exemple : Néerlandais (Pays-Bas)">
     <label for="form">Forme physique du clavier</label>
     <select id="form"><option>ISO (Entrée en L)</option><option>ANSI (Entrée en rectangle)</option><option>JIS</option><option>Je ne sais pas</option></select>
     <label for="printed">Lettres imprimées sur les touches</label>
     <select id="printed"><option>QWERTY</option><option>AZERTY</option><option>Autre</option></select>
+    <label for="caps">Inscriptions de ton clavier (pour t'aider à trouver les touches)</label>
+    <select id="caps"><option value="mac">AZERTY Mac (belge ou français)</option><option value="be">AZERTY belge (PC)</option><option value="fr">AZERTY français (PC)</option><option value="nf">AZERTY norme NF</option><option value="none">Je lis les touches en QWERTY</option></select>
+    <details class="hint"><summary>Tu as un clavier AZERTY et tu veux tester un QWERTY ? Comment faire</summary>
+      <p>Le système, pas les lettres imprimées, décide de ce que chaque touche fait. Ajoute un clavier dans les réglages de ton système, passe dessus, puis choisis le même réglage ci-dessus. Sur un Mac : Réglages Système, Clavier, Sources de saisie, Modifier, bouton +, puis choisis par exemple « U.S. » ou « U.S. International - PC » (les noms peuvent varier selon la version de macOS). Passe d'un clavier à l'autre avec le menu des claviers dans la barre du haut. Sous Windows : Paramètres, Heure et langue, Langue et région, Options de langue, Ajouter un clavier ; bascule avec Windows + Espace.</p>
+      <p>Les gestes proposés pendant le test sont <b>indicatifs</b>. Si l'un ne marche pas chez toi, fais comme tu peux et ne t'inquiète pas : savoir ce qui se passe vraiment est justement le but.</p>
+    </details>
     <label for="device">Appareil (modèle, sans numéro de série)</label>
     <input id="device" placeholder="par exemple : MacBook Air 2022, clavier belge">
     <div class="row"><button class="primary" id="start">Commencer</button></div>
@@ -47,6 +62,10 @@
     <div class="hint" id="count"></div>
     <div class="target" id="target"></div>
     <div class="hint" id="instr"></div>
+    <div class="card" id="gesture" style="margin:10px 0 0" hidden></div>
+    <div class="card" id="live" style="margin:10px 0 0" hidden></div>
+    <div id="kbd" aria-label="Clavier à l'écran"></div>
+    <div class="hint" id="kbdnote" style="margin-top:6px"></div>
     <label for="field">Tape ici</label>
     <textarea id="field" rows="2" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
     <div class="row"><button id="redo">Effacer et recommencer</button><button id="impossible">C'est impossible</button><button class="primary" id="next">Suivant</button></div>
@@ -65,6 +84,77 @@
     ...["'", '"', '`', '~', '^', '@', '#', '[', ']', '{', '}', '|', '\\', '/', ';', ':'].map(c => ({ target: c, kind: 'char' })),
     { target: "l'été", kind: 'text' }, { target: "c'est où ?", kind: 'text' }, { target: 'qu\'il', kind: 'text' }, { target: 'ça va "bien"', kind: 'text' }
   ];
+  // Inscriptions des touches selon le clavier physique de l'utilisateur (issues de layouts-src/azerty-*.json).
+  const KEYCAPS = {"fr":{"Digit1":"&","Digit2":"é","Digit3":"\"","Digit4":"'","Digit5":"(","Digit6":"-","Digit7":"è","Digit8":"_","Digit9":"ç","Digit0":"à","KeyQ":"A","KeyW":"Z","KeyE":"E","KeyR":"R","KeyT":"T","KeyY":"Y","KeyU":"U","KeyI":"I","KeyO":"O","KeyP":"P","KeyA":"Q","KeyS":"S","KeyD":"D","KeyF":"F","KeyG":"G","KeyH":"H","KeyJ":"J","KeyK":"K","KeyL":"L","Semicolon":"M","IntlBackslash":"<","KeyZ":"W","KeyX":"X","KeyC":"C","KeyV":"V","KeyB":"B","KeyN":"N","KeyM":",","Comma":";","Period":":","Slash":"!","Backquote":"²","Minus":")","Equal":"=","BracketLeft":"^","BracketRight":"$","Quote":"ù","Backslash":"*"},"be":{"Digit1":"&","Digit2":"é","Digit3":"\"","Digit4":"'","Digit5":"(","Digit6":"§","Digit7":"è","Digit8":"!","Digit9":"ç","Digit0":"à","KeyQ":"A","KeyW":"Z","KeyE":"E","KeyR":"R","KeyT":"T","KeyY":"Y","KeyU":"U","KeyI":"I","KeyO":"O","KeyP":"P","KeyA":"Q","KeyS":"S","KeyD":"D","KeyF":"F","KeyG":"G","KeyH":"H","KeyJ":"J","KeyK":"K","KeyL":"L","Semicolon":"M","IntlBackslash":"<","KeyZ":"W","KeyX":"X","KeyC":"C","KeyV":"V","KeyB":"B","KeyN":"N","KeyM":",","Comma":";","Period":":","Slash":"=","Backquote":"²","Minus":")","Equal":"-","BracketLeft":"^","BracketRight":"$","Quote":"ù","Backslash":"µ"},"mac":{"Digit1":"&","Digit2":"é","Digit3":"\"","Digit4":"'","Digit5":"(","Digit6":"§","Digit7":"è","Digit8":"!","Digit9":"ç","Digit0":"à","KeyQ":"A","KeyW":"Z","KeyE":"E","KeyR":"R","KeyT":"T","KeyY":"Y","KeyU":"U","KeyI":"I","KeyO":"O","KeyP":"P","KeyA":"Q","KeyS":"S","KeyD":"D","KeyF":"F","KeyG":"G","KeyH":"H","KeyJ":"J","KeyK":"K","KeyL":"L","Semicolon":"M","IntlBackslash":"<","KeyZ":"W","KeyX":"X","KeyC":"C","KeyV":"V","KeyB":"B","KeyN":"N","KeyM":",","Comma":";","Period":":","Slash":"=","Backquote":"@","Minus":")","Equal":"-","BracketLeft":"^","BracketRight":"$","Quote":"ù","Backslash":"`"},"nf":{"Digit1":"à","Digit2":"é","Digit3":"è","Digit4":"ê","Digit5":"(","Digit6":")","Digit7":"‘","Digit8":"’","Digit9":"«","Digit0":"»","KeyQ":"A","KeyW":"Z","KeyE":"E","KeyR":"R","KeyT":"T","KeyY":"Y","KeyU":"U","KeyI":"I","KeyO":"O","KeyP":"P","KeyA":"Q","KeyS":"S","KeyD":"D","KeyF":"F","KeyG":"G","KeyH":"H","KeyJ":"J","KeyK":"K","KeyL":"L","Semicolon":"M","IntlBackslash":"<","KeyZ":"W","KeyX":"X","KeyC":"C","KeyV":"V","KeyB":"B","KeyN":"N","KeyM":".","Comma":",","Period":":","Slash":";","Backquote":"@","Minus":"'","Equal":"^","BracketLeft":"-","BracketRight":"+","Quote":"/","Backslash":"*"}};
+  const M = { Shift: '⇧', Option: '⌥', AltGr: 'AltGr (⌥ de droite)' };
+  const K = (code, ...mods) => ({ code, mods });
+  // Gestes INDICATIFS par réglage. Windows : tables de Microsoft Learn (kbdusx, kbduk, kbdukx), lues le 2026-11-03.
+  // Mac U.S. : émulation xkeyboard-config et connaissance générale, à confirmer avec le Visualiseur de clavier d'Apple.
+  const NONE = 'none';
+  const DEADV = (dead, vowel) => [dead, K(vowel)];
+  const mkIntl = () => { const H = { 'é': [[K('KeyE', 'AltGr')], [K('Quote'), K('KeyE')]], 'è': [[K('Backquote'), K('KeyE')]], 'à': [[K('Backquote'), K('KeyA')]], 'ù': [[K('Backquote'), K('KeyU')]], 'ç': [[K('Comma', 'AltGr')], [K('Quote'), K('KeyC')]],
+      'ê': [DEADV(K('Digit6', 'Shift'), 'KeyE')], 'â': [DEADV(K('Digit6', 'Shift'), 'KeyA')], 'î': [DEADV(K('Digit6', 'Shift'), 'KeyI')], 'ô': [DEADV(K('Digit6', 'Shift'), 'KeyO')], 'û': [DEADV(K('Digit6', 'Shift'), 'KeyU')],
+      'ë': [DEADV(K('Quote', 'Shift'), 'KeyE')], 'ï': [DEADV(K('Quote', 'Shift'), 'KeyI')], 'œ': NONE, 'æ': [[K('KeyZ', 'AltGr')]], 'É': [[K('KeyE', 'AltGr', 'Shift')]], 'È': [[K('Backquote'), K('KeyE', 'Shift')]],
+      '«': [[K('BracketLeft', 'AltGr')]], '»': [[K('BracketRight', 'AltGr')]], '€': [[K('Digit5', 'AltGr')]], "'": [[K('Quote'), K('Space')]], '"': [[K('Quote', 'Shift'), K('Space')]], '`': [[K('Backquote'), K('Space')]], '~': [[K('Backquote', 'Shift'), K('Space')]], '^': [[K('Digit6', 'Shift'), K('Space')]] };
+    return H; };
+  const BASIC = { '@': [[K('Digit2', 'Shift')]], '#': [[K('Digit3', 'Shift')]], '[': [[K('BracketLeft')]], ']': [[K('BracketRight')]], '{': [[K('BracketLeft', 'Shift')]], '}': [[K('BracketRight', 'Shift')]], '|': [[K('Backslash', 'Shift')]], '\\': [[K('Backslash')]], '/': [[K('Slash')]], ';': [[K('Semicolon')]], ':': [[K('Semicolon', 'Shift')]] };
+  const UK = { 'é': [[K('KeyE', 'AltGr')]], '€': [[K('Digit4', 'AltGr')]], "'": [[K('Quote')]], '"': [[K('Digit2', 'Shift')]], '@': [[K('Quote', 'Shift')]], '#': [[K('Backslash')]], '~': [[K('Backslash', 'Shift')]], '`': [[K('Backquote')]], '^': [[K('Digit6', 'Shift')]], '[': [[K('BracketLeft')]], ']': [[K('BracketRight')]], '{': [[K('BracketLeft', 'Shift')]], '}': [[K('BracketRight', 'Shift')]], '\\': [[K('IntlBackslash')]], '|': [[K('IntlBackslash', 'Shift')]], '/': [[K('Slash')]], ';': [[K('Semicolon')]], ':': [[K('Semicolon', 'Shift')]],
+    'è': NONE, 'à': NONE, 'ù': NONE, 'ç': NONE, 'ê': NONE, 'â': NONE, 'î': NONE, 'ô': NONE, 'û': NONE, 'ë': NONE, 'ï': NONE, 'œ': NONE, 'æ': NONE, 'É': [[K('KeyE', 'AltGr', 'Shift')]], 'È': NONE, '«': NONE, '»': NONE };
+  const UKX = { ...UK, '`': [[K('Backquote'), K('Space')]], 'è': [[K('Backquote'), K('KeyE')]], 'à': [[K('Backquote'), K('KeyA')]], 'ù': [[K('Backquote'), K('KeyU')]], 'È': [[K('Backquote'), K('KeyE', 'Shift')]], 'ç': [[K('KeyC', 'AltGr')]],
+    'ê': [DEADV(K('Digit6', 'AltGr'), 'KeyE')], 'â': [DEADV(K('Digit6', 'AltGr'), 'KeyA')], 'î': [DEADV(K('Digit6', 'AltGr'), 'KeyI')], 'ô': [DEADV(K('Digit6', 'AltGr'), 'KeyO')], 'û': [DEADV(K('Digit6', 'AltGr'), 'KeyU')],
+    'ë': [DEADV(K('Digit2', 'AltGr'), 'KeyE')], 'ï': [DEADV(K('Digit2', 'AltGr'), 'KeyI')] };
+  const MAC = { 'é': [[K('KeyE', 'Option'), K('KeyE')]], 'è': [[K('Backquote', 'Option'), K('KeyE')]], 'à': [[K('Backquote', 'Option'), K('KeyA')]], 'ù': [[K('Backquote', 'Option'), K('KeyU')]], 'ç': [[K('KeyC', 'Option')]],
+    'ê': [[K('KeyI', 'Option'), K('KeyE')]], 'â': [[K('KeyI', 'Option'), K('KeyA')]], 'î': [[K('KeyI', 'Option'), K('KeyI')]], 'ô': [[K('KeyI', 'Option'), K('KeyO')]], 'û': [[K('KeyI', 'Option'), K('KeyU')]],
+    'ë': [[K('KeyU', 'Option'), K('KeyE')]], 'ï': [[K('KeyU', 'Option'), K('KeyI')]], 'œ': [[K('KeyQ', 'Option')]], 'æ': [[K('Quote', 'Option')]], 'É': [[K('KeyE', 'Option'), K('KeyE', 'Shift')]], 'È': [[K('Backquote', 'Option'), K('KeyE', 'Shift')]],
+    '«': [[K('Backslash', 'Option')]], '»': [[K('Backslash', 'Option', 'Shift')]], '€': [[K('Digit2', 'Option', 'Shift')]], "'": [[K('Quote')]], '"': [[K('Quote', 'Shift')]], '`': [[K('Backquote')]], '~': [[K('Backquote', 'Shift')]], '^': [[K('Digit6', 'Shift')]] };
+  const HINTS = {
+    'macOS|Mac U.S.': { ...BASIC, ...MAC },
+    'Windows|US International': { ...BASIC, ...mkIntl() },
+    'Windows|UK': UK,
+    'Windows|UK Étendu': UKX,
+  };
+  // Touches dont la place change selon le clavier (ANSI ou ISO, Mac, portables) : l'écho en direct fait foi, pas l'inscription.
+  const VARIABLE_ZONE = new Set(['Backslash', 'IntlBackslash', 'Quote', 'BracketRight', 'Backquote']);
+  const PURE_MODS = new Set(['Shift', 'Control', 'Alt', 'AltGraph', 'Meta', 'CapsLock', 'OS']);
+  let expect = null, ptr = 0;
+  // Clavier dessiné (forme ISO) : montre où appuyer et ce que le navigateur détecte.
+  const QLAB = { Backquote: '`', Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4', Digit5: '5', Digit6: '6', Digit7: '7', Digit8: '8', Digit9: '9', Digit0: '0', Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']', Semicolon: ';', Quote: "'", Backslash: '\\', IntlBackslash: '<>', Comma: ',', Period: '.', Slash: '/' };
+  const ROWS = [
+    ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', ['Backspace', '⌫', 'w15']],
+    [['Tab', 'tab', 'w15'], 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', ['Enter', '↵', 'w15']],
+    [['CapsLock', 'caps', 'w15'], 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote', 'Backslash'],
+    [['ShiftLeft', '⇧', 'w15 mod shiftk'], 'IntlBackslash', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash', ['ShiftRight', '⇧', 'w25 mod shiftk']],
+    [['ControlLeft', '⌃', 'w15 mod'], ['AltLeft', '⌥', 'w15 mod optk'], ['MetaLeft', '⌘', 'w15 mod'], ['Space', 'espace', 'sp'], ['MetaRight', '⌘', 'w15 mod'], ['AltRight', '⌥', 'w15 mod optk']],
+  ];
+  const keyLabel = (code) => { const c = $('caps').value; const t = KEYCAPS[c] && KEYCAPS[c][code]; if (c !== 'none' && t) return t; const q = /^Key[A-Z]$/.test(code) ? code.slice(3) : QLAB[code]; return q || code; };
+  function drawKeyboard() {
+    const host = $('kbd'); host.innerHTML = '';
+    ROWS.forEach((row) => { const r = document.createElement('div'); r.className = 'kr';
+      row.forEach((k) => { const el = document.createElement('div'); let code = k, lab = null, cls = '';
+        if (Array.isArray(k)) { code = k[0]; lab = k[1]; cls = k[2] || ''; }
+        el.className = 'kk ' + cls; el.dataset.code = code; el.textContent = lab || keyLabel(code); r.appendChild(el); });
+      host.appendChild(r); });
+    $('kbdnote').textContent = 'Clavier dessiné avec les inscriptions que tu as indiquées. Forme ISO (Entrée en L). Orange : où appuyer. Vert : bonne touche. Rouge : autre touche.';
+  }
+  function paint(pressedCode, ok) {
+    const host = $('kbd');
+    host.querySelectorAll('.kk').forEach((el) => el.classList.remove('want', 'hit', 'miss'));
+    if (expect && ptr < expect.length) {
+      const w = expect[ptr];
+      const el = host.querySelector('[data-code="' + w.code + '"]'); if (el) el.classList.add('want');
+      if (w.mods.includes('Shift')) host.querySelectorAll('.shiftk').forEach((e) => e.classList.add('want'));
+      if (w.mods.includes('Option') || w.mods.includes('AltGr')) host.querySelectorAll('.optk').forEach((e) => e.classList.add('want'));
+    }
+    if (pressedCode) { const el = host.querySelector('[data-code="' + pressedCode + '"]'); if (el) { el.classList.add(ok ? 'hit' : 'miss', 'flash'); setTimeout(() => el.classList.remove('flash'), 150); } }
+  }
+  const capName = (code) => { if (code === 'Space') return 'Espace'; const c = (KEYCAPS[$('caps').value] || {})[code]; return c ? '« ' + c + ' »' : code.replace('Key', '').replace('Digit', 'chiffre '); };
+  const stepText = (st) => (st.mods.length ? st.mods.map((m) => M[m]).join(' + ') + ' + ' : '') + 'touche ' + capName(st.code);
+  const gestureHTML = (ch) => {
+    const set = HINTS[meta.os + '|' + meta.layout]; if (!set) return null;
+    const h = set[ch]; if (h === undefined) return null;
+    if (h === NONE) return 'Selon la documentation, ce réglage <b>ne permet pas</b> de faire ce caractère. Essaie quand même, puis clique sur « C\'est impossible » si rien n\'apparaît.';
+    return 'Geste attendu (indicatif) : <b>' + h.map((alt) => alt.map(stepText).join(', puis ')).join('</b><br>ou : <b>') + '</b>';
+  };
   const $ = (id) => document.getElementById(id);
   const field = $('field');
   let i = 0, t0 = 0, events = [], results = [], meta = {};
@@ -75,7 +165,23 @@
     else if (e.type.startsWith('composition')) Object.assign(base, { data: e.data });
     else Object.assign(base, { data: e.data, inputType: e.inputType, value: field.value });
     events.push(base);
+    if (e.type === 'keydown' && !e.repeat && !PURE_MODS.has(e.key)) liveEcho(e);
   };
+  function liveEcho(e) {
+    const L = $('live');
+    const ag = !!(e.getModifierState && e.getModifierState('AltGraph')) || (e.ctrlKey && e.altKey);
+    let line = 'Touche pressée : code <b>' + e.code + '</b>, caractère « <b>' + (e.key === 'Dead' ? 'touche morte' : e.key) + '</b> »' + (e.altKey ? ', ⌥/Alt' : '') + (e.shiftKey ? ', ⇧' : '') + (ag ? ', AltGr' : '');
+    if (expect && ptr < expect.length) {
+      const want = expect[ptr];
+      const modsOk = want.mods.every((m) => (m === 'Shift' ? e.shiftKey : m === 'Option' ? e.altKey : m === 'AltGr' ? ag : true));
+      paint(e.code, e.code === want.code && modsOk);
+      if (e.code === want.code && modsOk) line += '<br><span class="ok">✓ bonne touche</span>';
+      else if (e.code !== want.code) line += '<br>✗ ce n\'est pas la touche attendue (attendu : code <b>' + want.code + '</b>, soit la touche « ' + (capName(want.code).replace(/[«»] ?/g, '').trim() || want.code) + ' » si ton clavier est classique). Cherche-la, ou continue avec ta méthode : ce que tu fais est enregistré tel quel.';
+      else line += '<br>✗ la touche est la bonne mais il manque un modificateur (⇧, ⌥ ou AltGr).';
+      ptr++; setTimeout(() => paint(), 400);
+    } else paint(e.code, false);
+    L.hidden = false; L.innerHTML = line;
+  }
   ['keydown', 'keyup', 'keypress', 'compositionstart', 'compositionupdate', 'compositionend', 'beforeinput', 'input'].forEach((n) => field.addEventListener(n, rec, true));
 
   function show() {
@@ -84,6 +190,17 @@
     $('count').textContent = `Étape ${i + 1} sur ${STEPS.length}`;
     $('target').textContent = s.target;
     $('instr').textContent = s.kind === 'char' ? 'Fais apparaître ce caractère dans la case, avec ta méthode habituelle (touche directe, AltGr, Option, touche morte...).' : 'Tape ce texte comme tu le ferais d\'habitude.';
+    const g = $('gesture');
+    expect = null; ptr = 0; $('live').hidden = true; drawKeyboard();
+    if (s.kind === 'char') { const html = gestureHTML(s.target); g.hidden = !html; g.innerHTML = html || '';
+      const set = HINTS[meta.os + '|' + meta.layout]; const h = set && set[s.target]; if (Array.isArray(h)) expect = h[0].map((st) => ({ code: st.code, mods: st.mods }));
+      paint();
+      if (Array.isArray(h) && h.some((alt) => alt.some((st) => VARIABLE_ZONE.has(st.code)))) g.innerHTML += '<div class="hint" style="margin-top:6px">Attention : une des touches de ce geste <b>change de place selon le clavier</b> (ANSI ou ISO, Mac, portable). Si tu hésites, appuie et regarde l\'écho juste en dessous : il te dit si c\'est la bonne touche.</div>'; }
+    else {
+      const accents = [...new Set([...s.target].filter((c) => /[^\u0000-\u007f]/.test(c)))];
+      const parts = accents.map((c) => ({ c, h: gestureHTML(c) })).filter((x) => x.h);
+      g.hidden = !parts.length; g.innerHTML = parts.map((x) => '<div><b>' + x.c + '</b> : ' + x.h + '</div>').join('');
+    }
     field.value = ''; events = []; t0 = performance.now(); field.focus();
   }
   function commit(impossible) {
@@ -98,7 +215,7 @@
     try { if (navigator.keyboard && navigator.keyboard.getLayoutMap) { const m = await navigator.keyboard.getLayoutMap(); meta.layoutMap = Object.fromEntries(m.entries()); } } catch (e) {}
     $('setup').hidden = true; $('run').hidden = false; show();
   };
-  $('redo').onclick = () => { field.value = ''; events = []; t0 = performance.now(); field.focus(); };
+  $('redo').onclick = () => { ptr = 0; $('live').hidden = true; paint(); field.value = ''; events = []; t0 = performance.now(); field.focus(); };
   $('impossible').onclick = () => commit(true);
   $('next').onclick = () => { if (!field.value) { alert('La case est vide. Fais apparaître le caractère, ou clique sur « C\'est impossible ».'); return; } commit(false); };
   $('download').onclick = () => {

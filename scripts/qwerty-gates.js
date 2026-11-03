@@ -1,0 +1,119 @@
+// Gates sur les modèles de dispositions QWERTY (layouts-src/*.json, schéma 2). Plan, 4.21.
+//  Q1 : les désaccords entre sources (Windows/Microsoft et Linux/xkeyboard-config) sont connus et relus ;
+//  Q2 : pour chaque variante, quels caractères de NOS textes sont tapables, par quel geste, lesquels sont impossibles ;
+//  Q3 : ce que fait le VRAI moteur quand l'OS envoie une touche morte (apostrophe, accents).
+// Les résultats sont comparés à une référence : tout changement doit être déclaré (--update-baseline).
+const fs = require('fs');
+const path = require('path');
+const { compose } = require('./keysyms');
+const { loadApp } = require('./engine-harness');
+
+const root = path.join(__dirname, '..');
+const loadAll = () => fs.readdirSync(path.join(root, 'layouts-src')).filter((f) => f.endsWith('.json')).map((f) => JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', f), 'utf8'))).filter((d) => d.schemaVersion === 2);
+const PAIRS = [['windows-us-intl', 'linux-us-intl'], ['windows-uk', 'linux-gb'], ['windows-uk-extended', 'linux-gb-extd']];
+const LEVELS = ['l', 's', 'g', 'gs'];
+
+// Q1 : désaccords entre deux sources pour des dispositions équivalentes
+function disagreements() {
+  const byId = Object.fromEntries(loadAll().map((d) => [d.id, d]));
+  const out = {};
+  for (const [a, b] of PAIRS) {
+    if (!byId[a] || !byId[b]) { out[`${a} / ${b}`] = ['fichier absent']; continue; }
+    const diffs = [];
+    for (const code of new Set([...Object.keys(byId[a].keys), ...Object.keys(byId[b].keys)])) {
+      const ka = byId[a].keys[code] || {}, kb = byId[b].keys[code] || {};
+      for (const lv of LEVELS) {
+        // Une touche morte se compare par son accent (Microsoft note aussi le signe de la touche, xkeyboard-config non).
+        const eff = (k, l) => (k.dead && k.dead[l] ? `morte:${k.dead[l]}` : k[l] || null);
+        const va = eff(ka, lv), vb = eff(kb, lv);
+        if (va !== vb) diffs.push(`${code}.${lv}: ${va === null ? '(rien)' : va} | ${vb === null ? '(rien)' : vb}`);
+      }
+    }
+    out[`${a} / ${b}`] = diffs.sort();
+  }
+  return out;
+}
+
+// Chaînes de tous nos textes (leçons, textes de test, certificat) : les caractères réellement demandés à un élève.
+function allTexts() {
+  const h = loadApp();
+  h.run("currentUser='t';currentToken='t';_statsLoaded=true;app.stats=mergeStats();app.view='lessons';");
+  const texts = h.run('ALL_LESSONS.map(l=>l.id)').map((id) => h.run(`(app.sess=app.makeSession('lesson',${JSON.stringify(id)}),app.sess.text)`));
+  texts.push(h.run('CERT_TEXT')); for (let i = 0; i < h.run('PASSAGES.length'); i++) texts.push(h.run(`adaptQuotes(PASSAGES[${i}])`));
+  return texts;
+}
+
+// Comment taper un caractère sur une variante : { route, detail } ou null
+function reach(def, ch) {
+  const direct = [], altgr = [], deadLit = [], viaDead = [];
+  for (const [code, k] of Object.entries(def.keys)) {
+    ['l', 's'].forEach((lv) => { if (k[lv] === ch && !(k.dead && k.dead[lv])) direct.push(code + '.' + lv); if (k[lv] === ch && k.dead && k.dead[lv]) deadLit.push(code + '.' + lv); });
+    ['g', 'gs'].forEach((lv) => { if (k[lv] === ch && !(k.dead && k.dead[lv])) altgr.push(code + '.' + lv); if (k[lv] === ch && k.dead && k.dead[lv]) deadLit.push(code + '.' + lv); });
+  }
+  if (ch === ' ') return { route: 'directe', detail: 'Space' };
+  if (direct.length) return { route: 'directe', detail: direct[0] };
+  if (altgr.length) return { route: 'AltGr/Option', detail: altgr[0] };
+  if (deadLit.length) return { route: 'touche morte puis Espace', detail: deadLit[0] };
+  // composition : une touche morte + une lettre directe
+  const deads = []; for (const [code, k] of Object.entries(def.keys)) for (const [lv, kind] of Object.entries(k.dead || {})) deads.push({ code, lv, kind });
+  for (const d of deads) for (const [bc, bk] of Object.entries(def.keys)) for (const lv of ['l', 's']) {
+    if (bk[lv] && [...bk[lv]].length === 1 && !(bk.dead && bk.dead[lv]) && compose(d.kind, bk[lv]) === ch) return { route: 'touche morte puis lettre', detail: `${d.code}.${d.lv} (${d.kind}) puis ${bc}.${lv}` };
+  }
+  return null;
+}
+
+function typability() {
+  const texts = allTexts(); const freq = {};
+  for (const t of texts) for (const c of t) freq[c] = (freq[c] || 0) + 1;
+  const out = {};
+  for (const def of loadAll()) {
+    const impossible = [], viaDead = [], deadSpace = [], altgr = [];
+    for (const ch of Object.keys(freq).sort()) {
+      if (ch === '\n') continue;
+      const r = reach(def, ch);
+      if (!r) impossible.push(ch);
+      else if (r.route === 'touche morte puis lettre') viaDead.push(ch);
+      else if (r.route === 'touche morte puis Espace') deadSpace.push(ch);
+      else if (r.route === 'AltGr/Option') altgr.push(ch);
+    }
+    out[def.id] = { impossible, viaDead, deadSpace, altgr };
+  }
+  return { out, freq, nTexts: texts.length };
+}
+
+// Q3 : le vrai moteur face aux touches mortes envoyées par le système
+const EVT = (o) => `({key:${JSON.stringify(o.key)},code:${JSON.stringify(o.code || '')},repeat:false,altKey:${!!o.alt},ctrlKey:false,shiftKey:${!!o.shift},metaKey:false,target:null,preventDefault(){},stopPropagation(){},getModifierState(){return false}})`;
+function engineRun(h, text, events) {
+  h.run("currentUser='t';currentToken='t';_statsLoaded=true;app.stats=mergeStats();app.view='test';app.sess={mode:'test',lessonId:null,text:" + JSON.stringify(text) + ",idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false};");
+  for (const e of events) { h.advance(150); h.run('app.handleKey(' + EVT(e) + ')'); }
+  return { finished: h.run('app.sess.finished'), faults: h.run('app.sess.keystrokes-app.sess.correct') };
+}
+function deadKeyEngine() {
+  const h = loadApp(); const r = {};
+  const dk = (code) => ({ key: 'Dead', code });
+  // « l'eau » sur une disposition où l'apostrophe est une touche morte (États-Unis international)
+  r["l'eau : apostrophe, e (le système compose é)"] = engineRun(h, "l'eau", [{ key: 'l' }, dk('Quote'), { key: 'é' }, { key: 'a' }, { key: 'u' }]);
+  r["l'eau : apostrophe, Espace, e (Espace donne l'apostrophe)"] = engineRun(h, "l'eau", [{ key: 'l' }, dk('Quote'), { key: "'" }, { key: 'e' }, { key: 'a' }, { key: 'u' }]);
+  r["l'eau : apostrophe, Espace (le navigateur envoie Espace)"] = engineRun(h, "l'eau", [{ key: 'l' }, dk('Quote'), { key: ' ' }, { key: 'e' }, { key: 'a' }, { key: 'u' }]);
+  r['é par touche morte : apostrophe puis e'] = engineRun(h, 'é', [dk('Quote'), { key: 'é' }]);
+  r['è par touche morte : accent grave puis e'] = engineRun(h, 'è', [dk('Backquote'), { key: 'è' }]);
+  r['ê par touche morte : Maj+6 puis e'] = engineRun(h, 'ê', [dk('Digit6'), { key: 'ê' }]);
+  r['ë par touche morte : Maj+apostrophe puis e'] = engineRun(h, 'ë', [dk('Quote'), { key: 'ë' }]);
+  r['guillemet droit par touche morte puis Espace'] = engineRun(h, '"', [dk('Quote'), { key: '"' }]);
+  return r;
+}
+
+function readBaseline() { const p = path.join(root, 'scripts', 'gates-baseline.json'); return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : {}; }
+function writeBaselineKey(k, v) { const p = path.join(root, 'scripts', 'gates-baseline.json'); fs.writeFileSync(p, JSON.stringify({ ...readBaseline(), [k]: v }, null, 1) + '\n'); }
+
+function runGate(name, compute, summary, update) {
+  const now = JSON.parse(JSON.stringify(compute())); const b = readBaseline();
+  if (update || !b[name]) { writeBaselineKey(name, now); return { ok: true, detail: (update ? 'référence mise à jour : ' : 'référence créée : ') + summary(now) }; }
+  const same = JSON.stringify(now) === JSON.stringify(b[name]);
+  return same ? { ok: true, detail: summary(now) } : { ok: false, detail: `${name} a changé par rapport à la référence relue (${summary(now)}). Si voulu et relu : npm run gates -- --update-baseline`, now, before: b[name] };
+}
+
+const q1 = (update) => runGate('qwertyDisagreements', disagreements, (n) => Object.entries(n).map(([k, v]) => `${k} : ${v.length}`).join(' ; '), update);
+const q2 = (update) => runGate('qwertyTypability', () => typability().out, (n) => Object.entries(n).map(([k, v]) => `${k}: ${v.impossible.length} impossibles`).join(' | '), update);
+const q3 = (update) => runGate('qwertyDeadKeyEngine', deadKeyEngine, (n) => `${Object.values(n).filter((x) => x.finished && x.faults === 0).length}/${Object.keys(n).length} séquences acceptées sans faute`, update);
+module.exports = { q1, q2, q3, disagreements, typability, deadKeyEngine, reach };

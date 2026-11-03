@@ -60,5 +60,467 @@
   "nf/port_avec": "99:626742320",
   "nf/port_sans": "80:1976536660",
   "nf/port_ultra": "78:3287467030"
+ },
+ "qwertyDisagreements": {
+  "windows-us-intl / linux-us-intl": [
+   "Backquote.g: (rien) | `",
+   "Backquote.gs: (rien) | ~",
+   "BracketLeft.gs: (rien) | “",
+   "BracketRight.gs: (rien) | ”",
+   "Digit0.gs: (rien) | morte:abovering",
+   "Digit2.gs: (rien) | morte:doubleacute",
+   "Digit3.gs: (rien) | morte:macron",
+   "Digit5.gs: (rien) | morte:cedilla",
+   "Digit6.gs: (rien) | ^",
+   "Digit7.gs: (rien) | morte:horn",
+   "Digit8.gs: (rien) | morte:ogonek",
+   "Digit9.gs: (rien) | morte:breve",
+   "KeyF.g: (rien) | ë",
+   "KeyF.gs: (rien) | Ë",
+   "KeyJ.g: (rien) | ï",
+   "KeyJ.gs: (rien) | Ï",
+   "KeyK.g: (rien) | œ",
+   "KeyK.gs: (rien) | Œ",
+   "KeyM.gs: (rien) | ±",
+   "KeyR.gs: (rien) | ™",
+   "KeyX.g: (rien) | ·",
+   "KeyX.gs: (rien) | morte:stroke",
+   "Minus.gs: (rien) | morte:belowdot",
+   "Period.g: (rien) | morte:abovedot",
+   "Period.gs: (rien) | morte:caron",
+   "Quote.g: ´ | '",
+   "Quote.gs: ¨ | \"",
+   "Slash.gs: (rien) | morte:hook"
+  ],
+  "windows-uk / linux-gb": [
+   "Backquote.g: ¦ | |",
+   "Backquote.gs: (rien) | |",
+   "Backslash.g: \\ | morte:grave",
+   "Backslash.gs: | | morte:breve",
+   "BracketLeft.g: (rien) | morte:diaeresis",
+   "BracketLeft.gs: (rien) | morte:abovering",
+   "BracketRight.g: (rien) | morte:tilde",
+   "BracketRight.gs: (rien) | morte:macron",
+   "Comma.g: (rien) | •",
+   "Comma.gs: (rien) | ×",
+   "Digit0.g: (rien) | }",
+   "Digit0.gs: (rien) | °",
+   "Digit1.g: (rien) | ¹",
+   "Digit1.gs: (rien) | ¡",
+   "Digit2.g: (rien) | ²",
+   "Digit2.gs: (rien) | ⅛",
+   "Digit3.g: (rien) | ³",
+   "Digit4.gs: (rien) | ¼",
+   "Digit5.g: (rien) | ½",
+   "Digit5.gs: (rien) | ⅜",
+   "Digit6.g: (rien) | ¾",
+   "Digit6.gs: (rien) | ⅝",
+   "Digit7.g: (rien) | {",
+   "Digit7.gs: (rien) | ⅞",
+   "Digit8.g: (rien) | [",
+   "Digit8.gs: (rien) | ™",
+   "Digit9.g: (rien) | ]",
+   "Digit9.gs: (rien) | ±",
+   "Equal.g: (rien) | morte:cedilla",
+   "Equal.gs: (rien) | morte:ogonek",
+   "IntlBackslash.g: (rien) | |",
+   "IntlBackslash.gs: (rien) | ¦",
+   "KeyA.g: á | æ",
+   "KeyA.gs: Á | Æ",
+   "KeyB.g: (rien) | “",
+   "KeyB.gs: (rien) | ‘",
+   "KeyC.g: (rien) | ¢",
+   "KeyC.gs: (rien) | ©",
+   "KeyD.g: (rien) | ð",
+   "KeyD.gs: (rien) | Ð",
+   "KeyE.g: é | (rien)",
+   "KeyE.gs: É | (rien)",
+   "KeyF.g: (rien) | đ",
+   "KeyF.gs: (rien) | ª",
+   "KeyG.g: (rien) | ŋ",
+   "KeyG.gs: (rien) | Ŋ",
+   "KeyH.g: (rien) | ħ",
+   "KeyH.gs: (rien) | Ħ",
+   "KeyI.g: í | →",
+   "KeyI.gs: Í | ı",
+   "KeyJ.g: (rien) | morte:hook",
+   "KeyJ.gs: (rien) | morte:horn",
+   "KeyK.g: (rien) | ĸ",
+   "KeyK.gs: (rien) | &",
+   "KeyL.g: (rien) | ł",
+   "KeyL.gs: (rien) | Ł",
+   "KeyM.g: (rien) | µ",
+   "KeyM.gs: (rien) | º",
+   "KeyN.g: (rien) | ”",
+   "KeyN.gs: (rien) | ’",
+   "KeyO.g: ó | ø",
+   "KeyO.gs: Ó | Ø",
+   "KeyP.g: (rien) | þ",
+   "KeyP.gs: (rien) | Þ",
+   "KeyQ.g: (rien) | @",
+   "KeyQ.gs: (rien) | Ω",
+   "KeyR.g: (rien) | ¶",
+   "KeyR.gs: (rien) | ®",
+   "KeyS.g: (rien) | ß",
+   "KeyS.gs: (rien) | ẞ",
+   "KeyT.g: (rien) | ŧ",
+   "KeyT.gs: (rien) | Ŧ",
+   "KeyU.g: ú | ↓",
+   "KeyU.gs: Ú | ↑",
+   "KeyV.g: (rien) | „",
+   "KeyV.gs: (rien) | ‚",
+   "KeyW.g: (rien) | ſ",
+   "KeyW.gs: (rien) | §",
+   "KeyX.g: (rien) | »",
+   "KeyX.gs: (rien) | >",
+   "KeyY.g: (rien) | ←",
+   "KeyY.gs: (rien) | ¥",
+   "KeyZ.g: (rien) | «",
+   "KeyZ.gs: (rien) | <",
+   "Minus.g: (rien) | \\",
+   "Minus.gs: (rien) | ¿",
+   "Period.g: (rien) | ·",
+   "Period.gs: (rien) | ÷",
+   "Quote.g: (rien) | morte:circumflex",
+   "Quote.gs: (rien) | morte:caron",
+   "Semicolon.g: (rien) | morte:acute",
+   "Semicolon.gs: (rien) | morte:doubleacute",
+   "Slash.g: (rien) | morte:belowdot",
+   "Slash.gs: (rien) | morte:abovedot"
+  ],
+  "windows-uk-extended / linux-gb-extd": [
+   "BracketLeft.g: (rien) | morte:diaeresis",
+   "BracketLeft.gs: (rien) | morte:abovering",
+   "Comma.g: (rien) | •",
+   "Comma.gs: (rien) | ×",
+   "Digit0.g: (rien) | }",
+   "Digit0.gs: (rien) | °",
+   "Digit1.g: (rien) | ¹",
+   "Digit1.gs: (rien) | ¡",
+   "Digit2.gs: (rien) | ½",
+   "Digit3.g: (rien) | ³",
+   "Digit3.gs: (rien) | ⅓",
+   "Digit4.gs: (rien) | ¼",
+   "Digit5.g: (rien) | ½",
+   "Digit5.gs: (rien) | ⅜",
+   "Digit7.g: (rien) | {",
+   "Digit7.gs: (rien) | ⅞",
+   "Digit8.g: (rien) | [",
+   "Digit8.gs: (rien) | ™",
+   "Digit9.g: (rien) | ]",
+   "Digit9.gs: (rien) | ±",
+   "Equal.g: (rien) | morte:cedilla",
+   "Equal.gs: (rien) | morte:ogonek",
+   "KeyB.g: (rien) | “",
+   "KeyB.gs: (rien) | ‘",
+   "KeyD.g: (rien) | ð",
+   "KeyD.gs: (rien) | Ð",
+   "KeyF.g: (rien) | đ",
+   "KeyF.gs: (rien) | ª",
+   "KeyG.g: (rien) | ŋ",
+   "KeyG.gs: (rien) | Ŋ",
+   "KeyH.g: (rien) | ħ",
+   "KeyH.gs: (rien) | Ħ",
+   "KeyJ.g: (rien) | morte:hook",
+   "KeyJ.gs: (rien) | morte:horn",
+   "KeyK.g: (rien) | ĸ",
+   "KeyK.gs: (rien) | &",
+   "KeyL.g: (rien) | ł",
+   "KeyL.gs: (rien) | Ł",
+   "KeyM.g: (rien) | µ",
+   "KeyM.gs: (rien) | º",
+   "KeyN.g: (rien) | ”",
+   "KeyN.gs: (rien) | ’",
+   "KeyP.g: (rien) | þ",
+   "KeyP.gs: (rien) | Þ",
+   "KeyQ.g: (rien) | @",
+   "KeyQ.gs: (rien) | Ω",
+   "KeyR.g: (rien) | ¶",
+   "KeyR.gs: (rien) | ®",
+   "KeyS.g: (rien) | ß",
+   "KeyS.gs: (rien) | ẞ",
+   "KeyT.g: (rien) | ŧ",
+   "KeyT.gs: (rien) | Ŧ",
+   "KeyV.g: (rien) | „",
+   "KeyV.gs: (rien) | ‚",
+   "KeyX.g: (rien) | »",
+   "KeyX.gs: (rien) | >",
+   "KeyZ.g: (rien) | «",
+   "KeyZ.gs: (rien) | <",
+   "Minus.g: (rien) | \\",
+   "Minus.gs: (rien) | ¿",
+   "Period.g: (rien) | ·",
+   "Period.gs: (rien) | ÷",
+   "Semicolon.g: (rien) | morte:acute",
+   "Semicolon.gs: (rien) | morte:doubleacute",
+   "Slash.g: (rien) | morte:belowdot",
+   "Slash.gs: (rien) | morte:abovedot"
+  ]
+ },
+ "qwertyTypability": {
+  "linux-gb-extd": {
+   "impossible": [
+    "œ"
+   ],
+   "viaDead": [
+    "à",
+    "â",
+    "è",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "`",
+    "«",
+    "»",
+    "É",
+    "ç",
+    "é"
+   ]
+  },
+  "linux-gb": {
+   "impossible": [
+    "œ"
+   ],
+   "viaDead": [
+    "É",
+    "à",
+    "â",
+    "ç",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "«",
+    "»"
+   ]
+  },
+  "linux-us-altgr-intl": {
+   "impossible": [],
+   "viaDead": [
+    "à",
+    "â",
+    "è",
+    "ê",
+    "î",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "«",
+    "»",
+    "É",
+    "ç",
+    "é",
+    "ë",
+    "ï",
+    "œ"
+   ]
+  },
+  "linux-us-intl": {
+   "impossible": [],
+   "viaDead": [
+    "à",
+    "â",
+    "è",
+    "ê",
+    "î",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "\"",
+    "'",
+    "`",
+    "~",
+    "«",
+    "»",
+    "É",
+    "ç",
+    "é",
+    "ë",
+    "ï",
+    "œ"
+   ]
+  },
+  "mac-us": {
+   "impossible": [],
+   "viaDead": [
+    "É",
+    "à",
+    "â",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "«",
+    "»",
+    "ç",
+    "œ"
+   ]
+  },
+  "windows-uk-extended": {
+   "impossible": [
+    "«",
+    "»",
+    "œ"
+   ],
+   "viaDead": [
+    "à",
+    "â",
+    "è",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "`",
+    "É",
+    "ç",
+    "é"
+   ]
+  },
+  "windows-uk": {
+   "impossible": [
+    "«",
+    "»",
+    "à",
+    "â",
+    "ç",
+    "è",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û",
+    "œ"
+   ],
+   "viaDead": [],
+   "deadSpace": [],
+   "altgr": [
+    "É",
+    "é"
+   ]
+  },
+  "windows-us-intl": {
+   "impossible": [
+    "œ"
+   ],
+   "viaDead": [
+    "à",
+    "â",
+    "è",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [
+    "\"",
+    "'",
+    "`",
+    "~"
+   ],
+   "altgr": [
+    "«",
+    "»",
+    "É",
+    "ç",
+    "é"
+   ]
+  },
+  "windows-us": {
+   "impossible": [
+    "«",
+    "»",
+    "É",
+    "à",
+    "â",
+    "ç",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û",
+    "œ"
+   ],
+   "viaDead": [],
+   "deadSpace": [],
+   "altgr": []
+  }
+ },
+ "qwertyDeadKeyEngine": {
+  "l'eau : apostrophe, e (le système compose é)": {
+   "finished": false,
+   "faults": 3
+  },
+  "l'eau : apostrophe, Espace, e (Espace donne l'apostrophe)": {
+   "finished": true,
+   "faults": 0
+  },
+  "l'eau : apostrophe, Espace (le navigateur envoie Espace)": {
+   "finished": true,
+   "faults": 1
+  },
+  "é par touche morte : apostrophe puis e": {
+   "finished": true,
+   "faults": 0
+  },
+  "è par touche morte : accent grave puis e": {
+   "finished": true,
+   "faults": 0
+  },
+  "ê par touche morte : Maj+6 puis e": {
+   "finished": true,
+   "faults": 0
+  },
+  "ë par touche morte : Maj+apostrophe puis e": {
+   "finished": true,
+   "faults": 0
+  },
+  "guillemet droit par touche morte puis Espace": {
+   "finished": true,
+   "faults": 0
+  }
  }
 }
