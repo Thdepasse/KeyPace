@@ -1,5 +1,6 @@
 const { setCorsOrigin } = require('./_cors');
 const { sanitizeProgress, MAX_BYTES } = require('./_progress-sanitize');
+const { mergeProgress } = require('./_progress-merge');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
@@ -43,45 +44,82 @@ module.exports = async function handler(req, res) {
   if (typeof data !== 'object' || Array.isArray(data)) return res.status(400).json({ error: 'Données invalides.' });
   if (JSON.stringify(data).length > MAX_BYTES) return res.status(413).json({ error: 'Données trop volumineuses.' });
 
-  // Garde-fou : une écriture ne doit jamais effacer des leçons déjà validées.
-  // Ça arrive si le client sauvegarde avant d'avoir fini de charger la vraie
-  // progression (bug côté client déjà corrigé, mais on protège aussi ici :
-  // un ancien onglet resté ouvert, un cache non rafraîchi, etc. peuvent
-  // encore envoyer un blob incomplet). On ne bloque qu'une VRAIE régression
-  // du nombre de leçons ; l'ajout ou le maintien du même nombre passe toujours.
-  const prevRow = await sb(`/progress?user_id=eq.${user.id}&select=data`);
-  const prevData = prevRow.data && prevRow.data[0] && prevRow.data[0].data;
-  if (prevData) {
-    const prevLessons = Object.keys(prevData.lessons || {}).length;
-    const nextLessons = Object.keys((data && data.lessons) || {}).length;
-    if (prevLessons > 0 && nextLessons < prevLessons) {
-      return res.status(409).json({ error: 'Sauvegarde refusée : régression de progression détectée.' });
-    }
+  // Mode de la fusion serveur (étape 1b, voir docs/PLAN-clavier-qwerty.md) :
+  //   off     : comportement d'avant (le client remplace le bloc) ;
+  //   observe : on calcule la fusion et on journalise ce qu'elle aurait évité, sans rien changer à l'écriture ;
+  //   active  : on écrit la fusion, avec comparaison atomique sur `rev` (réessai, puis 409).
+  const mode = ['off', 'observe', 'active'].includes(process.env.PROGRESS_MERGE_MODE) ? process.env.PROGRESS_MERGE_MODE : 'observe';
+  const readRow = async () => {
+    const pr = await sb(`/progress?user_id=eq.${user.id}&select=data,rev`);
+    return (pr.data && pr.data[0]) || null;
+  };
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const row = await readRow();
+    const prevData = row && row.data;
+    let next = { ...data };
+
     // Fusionne assignmentsDone plutôt que d'écraser : essaySubmit() (api/classes.js)
     // pose sa propre marque "devoir fait" directement en base, sans jamais
     // transiter par le client. Si l'élève enchaîne sur un autre exercice avant
     // de recharger la page, ce client (qui ignore encore cette marque) écrase
-    // et efface tout le blob `data` en écrivant le sien — le devoir "essai"
+    // et efface tout le blob `data` en écrivant le sien : le devoir "essai"
     // redevient alors "non fait" malgré une copie bien rendue et notée.
-    if (prevData.assignmentsDone) {
-      data.assignmentsDone = { ...prevData.assignmentsDone, ...(data.assignmentsDone || {}) };
+    if (prevData && prevData.assignmentsDone) {
+      next.assignmentsDone = { ...prevData.assignmentsDone, ...(next.assignmentsDone || {}) };
     }
+
+    // Nettoyage : champs du serveur (role, classes, courses) conservés, valeurs impossibles
+    // écartées champ par champ (la valeur enregistrée est gardée), clés inconnues signalées.
+    const clean = sanitizeProgress(next, prevData);
+    next = clean.data;
+    if (attempt === 0 && (clean.dropped.length || clean.unknownKeys.length)) {
+      console.warn('save-progress nettoyage', JSON.stringify({ user: user.id, ecartes: clean.dropped.length, champs: [...new Set(clean.dropped)], clesInconnues: clean.unknownKeys }));
+    }
+
+    // Fusion : ce que le client enverrait de moins que le serveur.
+    let merged = null;
+    if (prevData && mode !== 'off') {
+      merged = mergeProgress(prevData, next);
+      if (merged.changes.length && attempt === 0) {
+        console.warn('save-progress fusion', JSON.stringify({ mode, user: user.id, champs: merged.changes }));
+      }
+    }
+    const candidate = mode === 'active' && merged ? merged.data : next;
+
+    // Garde-fou : une écriture ne doit jamais effacer des leçons déjà validées.
+    // Ça arrive si le client sauvegarde avant d'avoir fini de charger la vraie
+    // progression (bug côté client déjà corrigé, mais on protège aussi ici :
+    // un ancien onglet resté ouvert, un cache non rafraîchi, etc. peuvent
+    // encore envoyer un blob incomplet). On ne bloque qu'une VRAIE régression
+    // du nombre de leçons ; l'ajout ou le maintien du même nombre passe toujours.
+    if (prevData) {
+      const prevLessons = Object.keys(prevData.lessons || {}).length;
+      const nextLessons = Object.keys(candidate.lessons || {}).length;
+      if (prevLessons > 0 && nextLessons < prevLessons) {
+        return res.status(409).json({ error: 'Sauvegarde refusée : régression de progression détectée.' });
+      }
+    }
+
+    const body = { data: candidate, updated_at: new Date().toISOString() };
+    if (mode === 'active' && row && typeof row.rev === 'number') {
+      // Comparaison atomique : n'écrit que si personne n'a écrit depuis la lecture.
+      const w = await sb(`/progress?user_id=eq.${user.id}&rev=eq.${row.rev}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ ...body, rev: row.rev + 1 }),
+      });
+      if (w.ok && Array.isArray(w.data) && w.data.length) return res.json({ ok: true });
+      continue; // quelqu'un a écrit entre-temps : on relit et on refusionne
+    }
+
+    // Sinon => écriture en upsert (insère la ligne si elle n'existe pas encore)
+    await sb(`/progress?on_conflict=user_id`, {
+      method: 'POST',
+      headers: { Prefer: 'resolution=merge-duplicates' },
+      body: JSON.stringify({ user_id: user.id, ...body }),
+    });
+    return res.json({ ok: true });
   }
-
-  // Nettoyage : champs du serveur (role, classes, courses) conservés, valeurs impossibles
-  // écartées champ par champ (la valeur enregistrée est gardée), clés inconnues signalées.
-  const clean = sanitizeProgress(data, prevData);
-  data = clean.data;
-  if (clean.dropped.length || clean.unknownKeys.length) {
-    console.warn('save-progress nettoyage', JSON.stringify({ user: user.id, ecartes: clean.dropped.length, champs: [...new Set(clean.dropped)], clesInconnues: clean.unknownKeys }));
-  }
-
-  // Sinon => écriture en upsert (insère la ligne si elle n'existe pas encore)
-  await sb(`/progress?on_conflict=user_id`, {
-    method: 'POST',
-    headers: { Prefer: 'resolution=merge-duplicates' },
-    body: JSON.stringify({ user_id: user.id, data, updated_at: new Date().toISOString() }),
-  });
-
-  res.json({ ok: true });
+  console.warn('save-progress conflit persistant', JSON.stringify({ user: user.id }));
+  return res.status(409).json({ error: 'Conflit de sauvegarde, réessaie.' });
 };
