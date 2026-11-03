@@ -238,7 +238,19 @@ async function retentionSweep(req, res) {
     await sb(`/users?id=eq.${u.id}`, { method: 'DELETE' });
   }
 
-  return res.json({ ok: true, warned, deleted: toDelete.length });
+  // Historique des progressions (étape 1c) : purge à 90 jours, et alerte si des versions ont été
+  // gardées depuis hier (= des sauvegardes ont fait reculer des données). Jamais bloquant.
+  let historyPurged = null, historyLastDay = null;
+  try {
+    const cut90 = new Date(now - 90 * 24 * 60 * 60 * 1000).toISOString();
+    const del = await sb(`/progress_history?saved_at=lt.${cut90}&select=id`, { method: 'DELETE' });
+    historyPurged = del.ok && Array.isArray(del.data) ? del.data.length : null;
+    const day = await sb(`/progress_history?saved_at=gt.${new Date(now - 24 * 60 * 60 * 1000).toISOString()}&select=user_id,reason`);
+    historyLastDay = day.ok && Array.isArray(day.data) ? day.data.length : null;
+    if (historyLastDay) console.warn('progress_history : versions gardées sur 24 h', historyLastDay);
+  } catch (e) { console.warn('progress_history purge ignorée', e && e.message); }
+
+  return res.json({ ok: true, warned, deleted: toDelete.length, historyPurged, historyLastDay });
 }
 
 module.exports = async function handler(req, res) {

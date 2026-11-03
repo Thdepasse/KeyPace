@@ -1,6 +1,7 @@
 const { setCorsOrigin } = require('./_cors');
 const { sanitizeProgress, MAX_BYTES } = require('./_progress-sanitize');
 const { mergeProgress } = require('./_progress-merge');
+const { archiveReasons, toEvict, alreadyKept, counts } = require('./_progress-history');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
@@ -17,6 +18,23 @@ async function sb(path, opts = {}) {
   });
   const text = await r.text();
   return { ok: r.ok, status: r.status, data: text ? JSON.parse(text) : null };
+}
+
+async function archivePrevious(userId, prevData, reasons) {
+  if (!reasons.length) return;
+  const kept = await sb(`/progress_history?user_id=eq.${userId}&select=id,lessons_count,tests_count,saved_at`);
+  if (!kept.ok || !Array.isArray(kept.data)) return;
+  if (alreadyKept(kept.data, prevData)) return;
+  const c = counts(prevData);
+  const ins = await sb('/progress_history', {
+    method: 'POST',
+    body: JSON.stringify({ user_id: userId, data: prevData, lessons_count: c.lessons, tests_count: c.tests, reason: reasons.join(' ').slice(0, 200) }),
+  });
+  if (!ins.ok) return;
+  const rows = [...kept.data, { id: (ins.data && ins.data[0] && ins.data[0].id) || -1, lessons_count: c.lessons, tests_count: c.tests, saved_at: new Date().toISOString() }];
+  const evict = toEvict(rows).filter((id) => id !== -1);
+  if (evict.length) await sb(`/progress_history?id=in.(${evict.join(',')})&select=id`, { method: 'DELETE' });
+  console.warn('save-progress historique', JSON.stringify({ user: userId, raisons: reasons }));
 }
 
 module.exports = async function handler(req, res) {
@@ -99,6 +117,13 @@ module.exports = async function handler(req, res) {
       if (prevLessons > 0 && nextLessons < prevLessons) {
         return res.status(409).json({ error: 'Sauvegarde refusée : régression de progression détectée.' });
       }
+    }
+
+    // Historique : si cette écriture fait reculer des données, on garde la version actuelle.
+    // Jamais bloquant : un échec ici (table absente, réseau) ne doit pas empêcher la sauvegarde.
+    if (prevData) {
+      try { await archivePrevious(user.id, prevData, archiveReasons(prevData, candidate)); }
+      catch (e) { console.warn('save-progress historique ignoré', e && e.message); }
     }
 
     const body = { data: candidate, updated_at: new Date().toISOString() };
