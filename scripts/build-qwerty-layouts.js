@@ -86,7 +86,7 @@ function main() {
   defs.push({ id: 'linux-us-altgr-intl', os: 'Linux', variant: 'us-altgr-intl', label: 'Linux : États-Unis international, touches mortes par AltGr', keys: x('us', 'altgr-intl').keys, sources: [xkSrc('us', 'altgr-intl')], unverified: [HW] });
   defs.push({ id: 'linux-gb', os: 'Linux', variant: 'uk', label: 'Linux : Royaume-Uni', keys: x('gb', 'basic').keys, sources: [xkSrc('gb', 'basic')], unverified: [HW] });
   defs.push({ id: 'linux-gb-extd', os: 'Linux', variant: 'uk-extended', label: 'Linux : Royaume-Uni étendu', keys: x('gb', 'extd').keys, sources: [xkSrc('gb', 'extd')], unverified: [HW] });
-  defs.push({ id: 'mac-us', os: 'macOS', variant: 'us', label: 'macOS : U.S. (émulation xkeyboard-config)', keys: x('us', 'mac').keys, sources: [xkSrc('us', 'mac')], unverified: ['Apple : le Visualiseur de clavier n\'a pas été lu ; ces données sont l\'émulation « English (Macintosh) » de xkeyboard-config, pas la donnée d\'Apple', HW] });
+  defs.push({ id: 'xkb-us-mac', os: 'Linux', variant: 'us-mac-emulation', label: 'Linux : émulation Macintosh (xkeyboard-config us(mac)), pas la donnée d\'Apple', keys: x('us', 'mac').keys, sources: [xkSrc('us', 'mac')], unverified: ['Émulation de la disposition Apple par xkeyboard-config : comparée aux données d\'Apple (modèle mac-us), jamais utilisée comme source pour macOS', HW] });
 
   fs.mkdirSync(out, { recursive: true });
   for (const d of defs) {

@@ -272,6 +272,7 @@ const GATES = process.env.GATES_FAKE_RED
     { id: 'P5', name: 'Zones sensibles de index.html inchangées', run: p5 },
     { id: 'P6', name: 'Migrations SQL sûres', run: p6 },
     { id: 'P7', name: 'Aucun secret dans ce qui part', run: p7 },
+    { id: 'A1', name: 'AZERTY : nos modèles confrontés à Apple et à CLDR (Windows, macOS)', run: () => require('./qwerty-gates').a1(UPDATE) },
     { id: 'Q1', name: 'QWERTY : désaccords entre Microsoft et xkeyboard-config connus et relus', run: () => require('./qwerty-gates').q1(UPDATE) },
     { id: 'Q2', name: 'QWERTY : caractères de nos textes tapables ou impossibles, par variante', run: () => require('./qwerty-gates').q2(UPDATE) },
     { id: 'Q3', name: 'QWERTY : le vrai moteur face aux touches mortes (apostrophe, accents)', run: () => require('./qwerty-gates').q3(UPDATE) },

@@ -10,7 +10,9 @@ const { loadApp } = require('./engine-harness');
 
 const root = path.join(__dirname, '..');
 const loadAll = () => fs.readdirSync(path.join(root, 'layouts-src')).filter((f) => f.endsWith('.json')).map((f) => JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', f), 'utf8'))).filter((d) => d.schemaVersion === 2);
-const PAIRS = [['windows-us-intl', 'linux-us-intl'], ['windows-uk', 'linux-gb'], ['windows-uk-extended', 'linux-gb-extd']];
+const PAIRS = [['windows-us-intl', 'linux-us-intl'], ['windows-uk', 'linux-gb'], ['windows-uk-extended', 'linux-gb-extd'], ['mac-us', 'xkb-us-mac'], ['windows-us-intl', 'mac-us-intl-pc'],
+  // recoupement avec CLDR (2021) : deux sources indépendantes pour un même système
+  ['windows-us-intl', 'cldr-windows-us-intl'], ['windows-uk', 'cldr-windows-uk'], ['windows-uk-extended', 'cldr-windows-uk-extended'], ['mac-us', 'cldr-mac-us'], ['mac-abc-extended', 'cldr-mac-abc-extended'], ['mac-british', 'cldr-mac-british'], ['linux-us-intl', 'chromeos-us-intl']];
 const LEVELS = ['l', 's', 'g', 'gs'];
 
 // Q1 : désaccords entre deux sources pour des dispositions équivalentes
@@ -54,8 +56,16 @@ function reach(def, ch) {
   if (direct.length) return { route: 'directe', detail: direct[0] };
   if (altgr.length) return { route: 'AltGr/Option', detail: altgr[0] };
   if (deadLit.length) return { route: 'touche morte puis Espace', detail: deadLit[0] };
-  // composition : une touche morte + une lettre directe
+  // composition : une touche morte + une lettre directe (table du système si le modèle en fournit une, sinon Unicode)
   const deads = []; for (const [code, k] of Object.entries(def.keys)) for (const [lv, kind] of Object.entries(k.dead || {})) deads.push({ code, lv, kind });
+  if (def.compose) {
+    for (const d of deads) {
+      const table = def.compose[d.code + '.' + d.lv] || {};
+      if (table[' '] === ch) return { route: 'touche morte puis Espace', detail: `${d.code}.${d.lv}` };
+      for (const [base, res] of Object.entries(table)) if (res === ch && base !== ' ') for (const [bc, bk] of Object.entries(def.keys)) for (const lv of ['l', 's']) if (bk[lv] === base && !(bk.dead && bk.dead[lv])) return { route: 'touche morte puis lettre', detail: `${d.code}.${d.lv} (${d.kind}) puis ${bc}.${lv}` };
+    }
+    return null;
+  }
   for (const d of deads) for (const [bc, bk] of Object.entries(def.keys)) for (const lv of ['l', 's']) {
     if (bk[lv] && [...bk[lv]].length === 1 && !(bk.dead && bk.dead[lv]) && compose(d.kind, bk[lv]) === ch) return { route: 'touche morte puis lettre', detail: `${d.code}.${d.lv} (${d.kind}) puis ${bc}.${lv}` };
   }
@@ -100,7 +110,37 @@ function deadKeyEngine() {
   r['ê par touche morte : Maj+6 puis e'] = engineRun(h, 'ê', [dk('Digit6'), { key: 'ê' }]);
   r['ë par touche morte : Maj+apostrophe puis e'] = engineRun(h, 'ë', [dk('Quote'), { key: 'ë' }]);
   r['guillemet droit par touche morte puis Espace'] = engineRun(h, '"', [dk('Quote'), { key: '"' }]);
+  // Firefox (bogue 1599021, ouvert) : après une touche morte, la valeur de touche peut contenir deux caractères (« ^e »).
+  r['Firefox : accent mort puis lettre en une seule valeur « ^e » pour ê'] = engineRun(h, 'ê', [dk('BracketLeft'), { key: '^e' }]);
+  r['Firefox : apostrophe morte puis lettre en une seule valeur « \'e » pour é'] = engineRun(h, 'é', [dk('Quote'), { key: "'e" }]);
+  r['Firefox : touche morte puis Espace, valeur « ^ » seule'] = engineRun(h, '^', [dk('BracketLeft'), { key: '^' }]);
   return r;
+}
+
+// A1 : nos modèles AZERTY Mac confrontés aux dispositions d'Apple (Belgian, French), lues par l'API du système
+function azertyVsApple() {
+  const ref = (n) => JSON.parse(fs.readFileSync(path.join(root, 'layouts-ref', n + '.json'), 'utf8'));
+  // [notre modèle AZERTY, disposition de référence] : Apple (API du système) et CLDR (2021, Windows et macOS)
+  const COMPARES = [['azerty-mac', 'apple-belgian'], ['azerty-mac', 'apple-french'], ['azerty-mac', 'cldr-osx-fr-be'], ['azerty-fr', 'cldr-windows-fr'], ['azerty-be', 'cldr-windows-fr-be'], ['azerty-be', 'cldr-windows-nl-be']];
+  const out = {};
+  for (const [ourId, name] of COMPARES) {
+    const mine = JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', ourId + '.json'), 'utf8'));
+    const mineKeys = {}; for (const k of [...mine.rows.flat(), ...Object.values(mine.extra).flat()]) mineKeys[k.c] = k;
+    const apple = ref(name).keys; const diffs = [];
+    // Notre modèle ne note que les caractères VÉRIFIÉS (jamais inventés) : il doit être un SOUS-ENSEMBLE de la référence.
+    // Une différence = un caractère de notre modèle que la référence ne place pas sur cette touche (erreur possible).
+    const norm = (c) => c.toLowerCase();
+    for (const code of Object.keys(mineKeys)) {
+      const a = apple[code] || {}, m = mineKeys[code];
+      const sa = new Set(['l', 's', 'g', 'gs'].map((l) => a[l]).filter(Boolean).map(norm));
+      const sm = new Set(['l', 's', 'g', 'gs'].map((l) => m[l]).filter(Boolean).map(norm));
+      if (a.dead) for (const c of ['^', '¨', '´', '`', '~', 'ˆ', '˜', '\u0301', '\u0300', '\u0302', '\u0308', '\u0303']) { sm.delete(c); sa.delete(c); }
+      const ours = [...sm].filter((c) => !sa.has(c)).sort().join('');
+      if (ours) diffs.push(`${code} : notre modèle place « ${ours} » mais la référence ne le place pas sur cette touche (référence : ${[...sa].sort().join('') || '(rien)'})`);
+    }
+    out[`${ourId} contre ${name}`] = diffs.sort();
+  }
+  return out;
 }
 
 function readBaseline() { const p = path.join(root, 'scripts', 'gates-baseline.json'); return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : {}; }
@@ -113,7 +153,8 @@ function runGate(name, compute, summary, update) {
   return same ? { ok: true, detail: summary(now) } : { ok: false, detail: `${name} a changé par rapport à la référence relue (${summary(now)}). Si voulu et relu : npm run gates -- --update-baseline`, now, before: b[name] };
 }
 
+const a1 = (update) => runGate('azertyVsApple', azertyVsApple, (n) => Object.entries(n).map(([k, v]) => `${k} : ${v.length} différence(s)`).join(' ; '), update);
 const q1 = (update) => runGate('qwertyDisagreements', disagreements, (n) => Object.entries(n).map(([k, v]) => `${k} : ${v.length}`).join(' ; '), update);
 const q2 = (update) => runGate('qwertyTypability', () => typability().out, (n) => Object.entries(n).map(([k, v]) => `${k}: ${v.impossible.length} impossibles`).join(' | '), update);
 const q3 = (update) => runGate('qwertyDeadKeyEngine', deadKeyEngine, (n) => `${Object.values(n).filter((x) => x.finished && x.faults === 0).length}/${Object.keys(n).length} séquences acceptées sans faute`, update);
-module.exports = { q1, q2, q3, disagreements, typability, deadKeyEngine, reach };
+module.exports = { a1, azertyVsApple, q1, q2, q3, disagreements, typability, deadKeyEngine, reach };

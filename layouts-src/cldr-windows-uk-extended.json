@@ -1,0 +1,502 @@
+{
+ "schemaVersion": 2,
+ "id": "cldr-windows-uk-extended",
+ "family": "qwerty",
+ "variant": "uk-extended",
+ "os": "Windows",
+ "label": "Windows : Royaume-Uni étendu (CLDR, recoupement)",
+ "status": "brouillon",
+ "cldrName": "United Kingdom Extended",
+ "sources": [
+  {
+   "name": "CLDR (consortium Unicode), version release-40 de 2021",
+   "url": "https://github.com/unicode-org/cldr/tree/release-40/keyboards",
+   "file": "windows/en-GB-t-k0-windows-extended.xml",
+   "read": "2026-11-04"
+  }
+ ],
+ "unverified": [
+  "Donnée de 2021 (CLDR release-40) : peut avoir changé depuis",
+  "Essai sur matériel réel (règle 5 du plan) : aucune trace enregistrée."
+ ],
+ "keys": {
+  "Backquote": {
+   "l": "`",
+   "s": "¬",
+   "g": "¦",
+   "gs": null,
+   "f": "lp",
+   "dead": {
+    "l": "grave"
+   }
+  },
+  "Digit1": {
+   "l": "1",
+   "s": "!",
+   "g": null,
+   "gs": null,
+   "f": "lp"
+  },
+  "Digit2": {
+   "l": "2",
+   "s": "\"",
+   "g": "¨",
+   "gs": null,
+   "f": "lr",
+   "dead": {
+    "g": "diaeresis"
+   }
+  },
+  "Digit3": {
+   "l": "3",
+   "s": "£",
+   "g": null,
+   "gs": null,
+   "f": "lm"
+  },
+  "Digit4": {
+   "l": "4",
+   "s": "$",
+   "g": "€",
+   "gs": null,
+   "f": "li"
+  },
+  "Digit5": {
+   "l": "5",
+   "s": "%",
+   "g": null,
+   "gs": null,
+   "f": "li"
+  },
+  "Digit6": {
+   "l": "6",
+   "s": "^",
+   "g": "^",
+   "gs": null,
+   "f": "ri",
+   "dead": {
+    "s": "circumflex",
+    "g": "circumflex"
+   }
+  },
+  "Digit7": {
+   "l": "7",
+   "s": "&",
+   "g": null,
+   "gs": null,
+   "f": "ri"
+  },
+  "Digit8": {
+   "l": "8",
+   "s": "*",
+   "g": null,
+   "gs": null,
+   "f": "rm"
+  },
+  "Digit9": {
+   "l": "9",
+   "s": "(",
+   "g": null,
+   "gs": null,
+   "f": "rr"
+  },
+  "Digit0": {
+   "l": "0",
+   "s": ")",
+   "g": null,
+   "gs": null,
+   "f": "rp"
+  },
+  "Minus": {
+   "l": "-",
+   "s": "_",
+   "g": null,
+   "gs": null,
+   "f": "rp"
+  },
+  "Equal": {
+   "l": "=",
+   "s": "+",
+   "g": null,
+   "gs": null,
+   "f": "rp"
+  },
+  "KeyQ": {
+   "l": "q",
+   "s": "Q",
+   "g": null,
+   "gs": null,
+   "f": "lp"
+  },
+  "KeyW": {
+   "l": "w",
+   "s": "W",
+   "g": "ẃ",
+   "gs": "Ẃ",
+   "f": "lr"
+  },
+  "KeyE": {
+   "l": "e",
+   "s": "E",
+   "g": "é",
+   "gs": "É",
+   "f": "lm"
+  },
+  "KeyR": {
+   "l": "r",
+   "s": "R",
+   "g": null,
+   "gs": null,
+   "f": "li"
+  },
+  "KeyT": {
+   "l": "t",
+   "s": "T",
+   "g": null,
+   "gs": null,
+   "f": "li"
+  },
+  "KeyY": {
+   "l": "y",
+   "s": "Y",
+   "g": "ý",
+   "gs": "Ý",
+   "f": "ri"
+  },
+  "KeyU": {
+   "l": "u",
+   "s": "U",
+   "g": "ú",
+   "gs": "Ú",
+   "f": "ri"
+  },
+  "KeyI": {
+   "l": "i",
+   "s": "I",
+   "g": "í",
+   "gs": "Í",
+   "f": "rm"
+  },
+  "KeyO": {
+   "l": "o",
+   "s": "O",
+   "g": "ó",
+   "gs": "Ó",
+   "f": "rr"
+  },
+  "KeyP": {
+   "l": "p",
+   "s": "P",
+   "g": null,
+   "gs": null,
+   "f": "rp"
+  },
+  "BracketLeft": {
+   "l": "[",
+   "s": "{",
+   "g": null,
+   "gs": null,
+   "f": "rp"
+  },
+  "BracketRight": {
+   "l": "]",
+   "s": "}",
+   "g": null,
+   "gs": "|",
+   "f": "rp"
+  },
+  "KeyA": {
+   "l": "a",
+   "s": "A",
+   "g": "á",
+   "gs": "Á",
+   "f": "lp"
+  },
+  "KeyS": {
+   "l": "s",
+   "s": "S",
+   "g": null,
+   "gs": null,
+   "f": "lr"
+  },
+  "KeyD": {
+   "l": "d",
+   "s": "D",
+   "g": null,
+   "gs": null,
+   "f": "lm"
+  },
+  "KeyF": {
+   "l": "f",
+   "s": "F",
+   "g": null,
+   "gs": null,
+   "f": "li",
+   "home": true
+  },
+  "KeyG": {
+   "l": "g",
+   "s": "G",
+   "g": null,
+   "gs": null,
+   "f": "li"
+  },
+  "KeyH": {
+   "l": "h",
+   "s": "H",
+   "g": null,
+   "gs": null,
+   "f": "ri"
+  },
+  "KeyJ": {
+   "l": "j",
+   "s": "J",
+   "g": null,
+   "gs": null,
+   "f": "ri",
+   "home": true
+  },
+  "KeyK": {
+   "l": "k",
+   "s": "K",
+   "g": null,
+   "gs": null,
+   "f": "rm"
+  },
+  "KeyL": {
+   "l": "l",
+   "s": "L",
+   "g": null,
+   "gs": null,
+   "f": "rr"
+  },
+  "Semicolon": {
+   "l": ";",
+   "s": ":",
+   "g": null,
+   "gs": null,
+   "f": "rp"
+  },
+  "Quote": {
+   "l": "'",
+   "s": "@",
+   "g": "´",
+   "gs": "`",
+   "f": "rp",
+   "dead": {
+    "g": "acute",
+    "gs": "grave"
+   }
+  },
+  "Backslash": {
+   "l": "#",
+   "s": "~",
+   "g": "~",
+   "gs": "\\",
+   "f": "rp",
+   "dead": {
+    "s": "tilde",
+    "g": "tilde"
+   }
+  },
+  "IntlBackslash": {
+   "l": "\\",
+   "s": "|",
+   "g": null,
+   "gs": null,
+   "f": "lp"
+  },
+  "KeyZ": {
+   "l": "z",
+   "s": "Z",
+   "g": null,
+   "gs": null,
+   "f": "lp"
+  },
+  "KeyX": {
+   "l": "x",
+   "s": "X",
+   "g": null,
+   "gs": null,
+   "f": "lr"
+  },
+  "KeyC": {
+   "l": "c",
+   "s": "C",
+   "g": "ç",
+   "gs": "Ç",
+   "f": "lm"
+  },
+  "KeyV": {
+   "l": "v",
+   "s": "V",
+   "g": null,
+   "gs": null,
+   "f": "li"
+  },
+  "KeyB": {
+   "l": "b",
+   "s": "B",
+   "g": null,
+   "gs": null,
+   "f": "li"
+  },
+  "KeyN": {
+   "l": "n",
+   "s": "N",
+   "g": null,
+   "gs": null,
+   "f": "ri"
+  },
+  "KeyM": {
+   "l": "m",
+   "s": "M",
+   "g": null,
+   "gs": null,
+   "f": "ri"
+  },
+  "Comma": {
+   "l": ",",
+   "s": "<",
+   "g": null,
+   "gs": null,
+   "f": "rm"
+  },
+  "Period": {
+   "l": ".",
+   "s": ">",
+   "g": null,
+   "gs": null,
+   "f": "rr"
+  },
+  "Slash": {
+   "l": "/",
+   "s": "?",
+   "g": null,
+   "gs": null,
+   "f": "rp"
+  }
+ },
+ "compose": {
+  "Backquote.l": {
+   " ": "`",
+   "a": "à",
+   "A": "À",
+   "e": "è",
+   "E": "È",
+   "i": "ì",
+   "I": "Ì",
+   "o": "ò",
+   "O": "Ò",
+   "u": "ù",
+   "U": "Ù",
+   "w": "ẁ",
+   "W": "Ẁ",
+   "y": "ỳ",
+   "Y": "Ỳ"
+  },
+  "Digit2.g": {
+   " ": "¨",
+   "a": "ä",
+   "A": "Ä",
+   "e": "ë",
+   "E": "Ë",
+   "i": "ï",
+   "I": "Ï",
+   "o": "ö",
+   "O": "Ö",
+   "u": "ü",
+   "U": "Ü",
+   "w": "ẅ",
+   "W": "Ẅ",
+   "y": "ÿ",
+   "Y": "Ÿ"
+  },
+  "Digit6.s": {
+   " ": "^",
+   "a": "â",
+   "A": "Â",
+   "e": "ê",
+   "E": "Ê",
+   "i": "î",
+   "I": "Î",
+   "o": "ô",
+   "O": "Ô",
+   "u": "û",
+   "U": "Û",
+   "w": "ŵ",
+   "W": "Ŵ",
+   "y": "ŷ",
+   "Y": "Ŷ"
+  },
+  "Digit6.g": {
+   " ": "^",
+   "a": "â",
+   "A": "Â",
+   "e": "ê",
+   "E": "Ê",
+   "i": "î",
+   "I": "Î",
+   "o": "ô",
+   "O": "Ô",
+   "u": "û",
+   "U": "Û",
+   "w": "ŵ",
+   "W": "Ŵ",
+   "y": "ŷ",
+   "Y": "Ŷ"
+  },
+  "Quote.g": {
+   " ": "´",
+   "a": "á",
+   "A": "Á",
+   "e": "é",
+   "E": "É",
+   "i": "í",
+   "I": "Í",
+   "o": "ó",
+   "O": "Ó",
+   "u": "ú",
+   "U": "Ú",
+   "w": "ẃ",
+   "W": "Ẃ",
+   "y": "ý",
+   "Y": "Ý"
+  },
+  "Quote.gs": {
+   " ": "`",
+   "a": "à",
+   "A": "À",
+   "e": "è",
+   "E": "È",
+   "i": "ì",
+   "I": "Ì",
+   "o": "ò",
+   "O": "Ò",
+   "u": "ù",
+   "U": "Ù",
+   "w": "ẁ",
+   "W": "Ẁ",
+   "y": "ỳ",
+   "Y": "Ỳ"
+  },
+  "Backslash.s": {
+   " ": "~",
+   "a": "ã",
+   "A": "Ã",
+   "n": "ñ",
+   "N": "Ñ",
+   "o": "õ",
+   "O": "Õ"
+  },
+  "Backslash.g": {
+   " ": "~",
+   "a": "ã",
+   "A": "Ã",
+   "n": "ñ",
+   "N": "Ñ",
+   "o": "õ",
+   "O": "Õ"
+  }
+ }
+}

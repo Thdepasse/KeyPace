@@ -255,9 +255,467 @@
    "Semicolon.gs: (rien) | morte:doubleacute",
    "Slash.g: (rien) | morte:belowdot",
    "Slash.gs: (rien) | morte:abovedot"
+  ],
+  "mac-us / xkb-us-mac": [
+   "Backquote.g: § | morte:grave",
+   "Backquote.gs: ± | morte:horn",
+   "Backquote.l: § | `",
+   "Backquote.s: ± | ~",
+   "Comma.gs: ¯ | morte:macron",
+   "IntlBackslash.g: morte:grave | (rien)",
+   "IntlBackslash.gs: ` | (rien)",
+   "IntlBackslash.l: ` | (rien)",
+   "IntlBackslash.s: ~ | (rien)",
+   "KeyD.gs: Î | ð",
+   "KeyF.gs: Ï | morte:hook",
+   "KeyG.gs: ˝ | morte:doubleacute",
+   "KeyH.g: ˙ | morte:abovedot",
+   "KeyH.gs: Ó | morte:belowdot",
+   "KeyJ.gs: Ô | ½",
+   "KeyK.g: ˚ | morte:abovering",
+   "KeyL.gs: Ò | Þ",
+   "KeyM.gs: Â | ¾",
+   "KeyS.gs: Í | morte:stroke",
+   "KeyT.gs: ˇ | morte:caron",
+   "KeyX.gs: ˛ | morte:ogonek",
+   "KeyY.gs: Á | ¼",
+   "KeyZ.gs: ¸ | morte:cedilla",
+   "Period.gs: ˘ | morte:breve",
+   "Semicolon.gs: Ú | þ"
+  ],
+  "windows-us-intl / mac-us-intl-pc": [
+   "Backquote.g: (rien) | §",
+   "Backquote.gs: (rien) | ±",
+   "Backquote.l: morte:grave | §",
+   "Backquote.s: morte:tilde | ±",
+   "Backslash.g: ¬ | «",
+   "Backslash.gs: ¦ | »",
+   "BracketLeft.g: « | “",
+   "BracketLeft.gs: (rien) | ”",
+   "BracketRight.g: » | ‘",
+   "BracketRight.gs: (rien) | ’",
+   "Comma.g: ç | ≤",
+   "Comma.gs: Ç | ¯",
+   "Digit0.g: ’ | º",
+   "Digit0.gs: (rien) | ‚",
+   "Digit1.gs: ¹ | ⁄",
+   "Digit2.g: ² | ™",
+   "Digit2.gs: (rien) | €",
+   "Digit3.g: ³ | £",
+   "Digit3.gs: (rien) | ‹",
+   "Digit4.g: ¤ | ¢",
+   "Digit4.gs: £ | ›",
+   "Digit5.g: € | ∞",
+   "Digit5.gs: (rien) | ﬁ",
+   "Digit6.g: ¼ | §",
+   "Digit6.gs: (rien) | ﬂ",
+   "Digit7.g: ½ | ¶",
+   "Digit7.gs: (rien) | ‡",
+   "Digit8.g: ¾ | •",
+   "Digit8.gs: (rien) | °",
+   "Digit9.g: ‘ | ª",
+   "Digit9.gs: (rien) | ·",
+   "Equal.g: × | ≠",
+   "Equal.gs: ÷ | ±",
+   "IntlBackslash.g: (rien) | morte:grave",
+   "IntlBackslash.gs: (rien) | `",
+   "IntlBackslash.l: \\ | morte:grave",
+   "IntlBackslash.s: | | morte:tilde",
+   "KeyA.g: á | å",
+   "KeyA.gs: Á | Å",
+   "KeyB.g: (rien) | ∫",
+   "KeyB.gs: (rien) | ı",
+   "KeyC.g: © | ç",
+   "KeyC.gs: ¢ | Ç",
+   "KeyD.g: ð | ∂",
+   "KeyD.gs: Ð | Î",
+   "KeyE.g: é | morte:acute",
+   "KeyE.gs: É | ´",
+   "KeyF.g: (rien) | ƒ",
+   "KeyF.gs: (rien) | Ï",
+   "KeyG.g: (rien) | ©",
+   "KeyG.gs: (rien) | ˝",
+   "KeyH.g: (rien) | ˙",
+   "KeyH.gs: (rien) | Ó",
+   "KeyI.g: í | morte:circumflex",
+   "KeyI.gs: Í | ˆ",
+   "KeyJ.g: (rien) | ∆",
+   "KeyJ.gs: (rien) | Ô",
+   "KeyK.g: (rien) | ˚",
+   "KeyK.gs: (rien) | ",
+   "KeyL.g: ø | ¬",
+   "KeyL.gs: Ø | Ò",
+   "KeyM.gs: (rien) | Â",
+   "KeyN.g: ñ | morte:tilde",
+   "KeyN.gs: Ñ | ˜",
+   "KeyO.g: ó | ø",
+   "KeyO.gs: Ó | Ø",
+   "KeyP.g: ö | π",
+   "KeyP.gs: Ö | ∏",
+   "KeyQ.g: ä | œ",
+   "KeyQ.gs: Ä | Œ",
+   "KeyR.gs: (rien) | ‰",
+   "KeyS.gs: § | Í",
+   "KeyT.g: þ | †",
+   "KeyT.gs: Þ | ˇ",
+   "KeyU.g: ú | morte:diaeresis",
+   "KeyU.gs: Ú | ¨",
+   "KeyV.g: (rien) | √",
+   "KeyV.gs: (rien) | ◊",
+   "KeyW.g: å | ∑",
+   "KeyW.gs: Å | „",
+   "KeyX.g: (rien) | ≈",
+   "KeyX.gs: (rien) | ˛",
+   "KeyY.g: ü | ¥",
+   "KeyY.gs: Ü | Á",
+   "KeyZ.g: æ | Ω",
+   "KeyZ.gs: Æ | ¸",
+   "Minus.g: ¥ | –",
+   "Minus.gs: (rien) | —",
+   "Period.g: (rien) | ≥",
+   "Period.gs: (rien) | ˘",
+   "Quote.g: ´ | æ",
+   "Quote.gs: ¨ | Æ",
+   "Semicolon.g: ¶ | …",
+   "Semicolon.gs: ° | Ú",
+   "Slash.g: ¿ | ÷",
+   "Slash.gs: (rien) | ¿"
+  ],
+  "windows-us-intl / cldr-windows-us-intl": [],
+  "windows-uk / cldr-windows-uk": [],
+  "windows-uk-extended / cldr-windows-uk-extended": [
+   "Backslash.s: ~ | morte:tilde",
+   "Digit6.s: ^ | morte:circumflex",
+   "Quote.gs: ` | morte:grave"
+  ],
+  "mac-us / cldr-mac-us": [
+   "Backquote.g: § | morte:grave",
+   "Backquote.gs: ± | morte:grave",
+   "Backquote.l: § | morte:grave",
+   "Backquote.s: ± | ~",
+   "IntlBackslash.g: morte:grave | §",
+   "IntlBackslash.gs: ` | ±",
+   "IntlBackslash.l: ` | §",
+   "IntlBackslash.s: ~ | ±",
+   "KeyE.gs: ´ | morte:acute",
+   "KeyI.gs: ˆ | morte:circumflex",
+   "KeyN.gs: ˜ | morte:tilde",
+   "KeyU.gs: ¨ | morte:diaeresis"
+  ],
+  "mac-abc-extended / cldr-mac-abc-extended": [
+   "Backquote.g: § | morte:grave",
+   "Backquote.gs: ± | ̀",
+   "Backquote.l: § | morte:grave",
+   "Backquote.s: ± | ~",
+   "Comma.l: , | morte:autre",
+   "IntlBackslash.g: morte:grave | §",
+   "IntlBackslash.gs: ̀ | ±",
+   "IntlBackslash.l: ` | §",
+   "IntlBackslash.s: ~ | ±",
+   "KeyF.gs: morte:autre |  ̰",
+   "KeyS.gs: morte:autre |  ̑",
+   "KeyY.gs: morte:autre |  ̏",
+   "Minus.l: - | morte:autre",
+   "Period.l: . | morte:belowdot"
+  ],
+  "mac-british / cldr-mac-british": [
+   "Backquote.g: (rien) | morte:grave",
+   "Backquote.gs: (rien) | Ÿ",
+   "Backquote.l: § | morte:grave",
+   "Backquote.s: ± | morte:tilde",
+   "Digit6.s: ^ | morte:circumflex",
+   "IntlBackslash.g: morte:grave | °",
+   "IntlBackslash.gs: Ÿ | (rien)",
+   "IntlBackslash.l: ` | §",
+   "IntlBackslash.s: ~ | ±"
+  ],
+  "linux-us-intl / chromeos-us-intl": [
+   "IntlBackslash.l: \\ | (rien)",
+   "IntlBackslash.s: | | (rien)",
+   "KeyB.g: (rien) | b",
+   "KeyB.gs: (rien) | B",
+   "KeyF.g: ë | f",
+   "KeyF.gs: Ë | F",
+   "KeyG.g: (rien) | g",
+   "KeyG.gs: (rien) | G",
+   "KeyH.g: (rien) | h",
+   "KeyH.gs: (rien) | H",
+   "KeyJ.g: ï | j",
+   "KeyJ.gs: Ï | J",
+   "KeyM.gs: ± | µ",
+   "KeyR.gs: ™ | ®",
+   "KeyV.g: (rien) | v",
+   "KeyV.gs: (rien) | V",
+   "KeyX.g: · | x",
+   "KeyX.gs: morte:stroke | X"
   ]
  },
  "qwertyTypability": {
+  "chromeos-uk": {
+   "impossible": [
+    "`",
+    "œ"
+   ],
+   "viaDead": [
+    "à",
+    "â",
+    "è",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "«",
+    "»",
+    "É",
+    "ç",
+    "é"
+   ]
+  },
+  "chromeos-us-intl": {
+   "impossible": [],
+   "viaDead": [
+    "à",
+    "â",
+    "è",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "\"",
+    "'",
+    "`",
+    "~",
+    "«",
+    "»",
+    "É",
+    "ç",
+    "é",
+    "œ"
+   ]
+  },
+  "chromeos-us": {
+   "impossible": [
+    "«",
+    "»",
+    "É",
+    "à",
+    "â",
+    "ç",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û",
+    "œ"
+   ],
+   "viaDead": [],
+   "deadSpace": [],
+   "altgr": []
+  },
+  "cldr-mac-abc-extended": {
+   "impossible": [],
+   "viaDead": [
+    "É",
+    "à",
+    "â",
+    "ç",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [
+    ",",
+    "-",
+    ".",
+    "`"
+   ],
+   "altgr": [
+    "«",
+    "»",
+    "œ"
+   ]
+  },
+  "cldr-mac-british": {
+   "impossible": [],
+   "viaDead": [
+    "É",
+    "à",
+    "â",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [
+    "`",
+    "~"
+   ],
+   "altgr": [
+    "#",
+    "«",
+    "»",
+    "ç",
+    "œ"
+   ]
+  },
+  "cldr-mac-us": {
+   "impossible": [],
+   "viaDead": [
+    "É",
+    "à",
+    "â",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [
+    "`"
+   ],
+   "altgr": [
+    "«",
+    "»",
+    "ç",
+    "œ"
+   ]
+  },
+  "cldr-windows-uk-extended": {
+   "impossible": [
+    "«",
+    "»",
+    "œ"
+   ],
+   "viaDead": [
+    "à",
+    "â",
+    "è",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [
+    "`",
+    "~"
+   ],
+   "altgr": [
+    "É",
+    "ç",
+    "é"
+   ]
+  },
+  "cldr-windows-uk": {
+   "impossible": [
+    "«",
+    "»",
+    "à",
+    "â",
+    "ç",
+    "è",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û",
+    "œ"
+   ],
+   "viaDead": [],
+   "deadSpace": [],
+   "altgr": [
+    "É",
+    "é"
+   ]
+  },
+  "cldr-windows-us-intl": {
+   "impossible": [
+    "œ"
+   ],
+   "viaDead": [
+    "à",
+    "â",
+    "è",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [
+    "\"",
+    "'",
+    "`",
+    "~"
+   ],
+   "altgr": [
+    "«",
+    "»",
+    "É",
+    "ç",
+    "é"
+   ]
+  },
+  "cldr-windows-us": {
+   "impossible": [
+    "«",
+    "»",
+    "É",
+    "à",
+    "â",
+    "ç",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û",
+    "œ"
+   ],
+   "viaDead": [],
+   "deadSpace": [],
+   "altgr": []
+  },
   "linux-gb-extd": {
    "impossible": [
     "œ"
@@ -358,6 +816,132 @@
     "é",
     "ë",
     "ï",
+    "œ"
+   ]
+  },
+  "mac-abc-extended": {
+   "impossible": [],
+   "viaDead": [
+    "É",
+    "à",
+    "â",
+    "ç",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "«",
+    "»",
+    "œ"
+   ]
+  },
+  "mac-abc": {
+   "impossible": [],
+   "viaDead": [
+    "É",
+    "à",
+    "â",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "«",
+    "»",
+    "ç",
+    "œ"
+   ]
+  },
+  "mac-british-pc": {
+   "impossible": [],
+   "viaDead": [
+    "É",
+    "à",
+    "â",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "«",
+    "»",
+    "ç",
+    "œ"
+   ]
+  },
+  "mac-british": {
+   "impossible": [],
+   "viaDead": [
+    "É",
+    "à",
+    "â",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "#",
+    "«",
+    "»",
+    "ç",
+    "œ"
+   ]
+  },
+  "mac-us-intl-pc": {
+   "impossible": [],
+   "viaDead": [
+    "É",
+    "à",
+    "â",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [
+    "\"",
+    "'",
+    "~"
+   ],
+   "altgr": [
+    "`",
+    "«",
+    "»",
+    "ç",
     "œ"
    ]
   },
@@ -487,6 +1071,30 @@
    "viaDead": [],
    "deadSpace": [],
    "altgr": []
+  },
+  "xkb-us-mac": {
+   "impossible": [],
+   "viaDead": [
+    "É",
+    "à",
+    "â",
+    "è",
+    "é",
+    "ê",
+    "ë",
+    "î",
+    "ï",
+    "ô",
+    "ù",
+    "û"
+   ],
+   "deadSpace": [],
+   "altgr": [
+    "«",
+    "»",
+    "ç",
+    "œ"
+   ]
   }
  },
  "qwertyDeadKeyEngine": {
@@ -521,6 +1129,29 @@
   "guillemet droit par touche morte puis Espace": {
    "finished": true,
    "faults": 0
+  },
+  "Firefox : accent mort puis lettre en une seule valeur « ^e » pour ê": {
+   "finished": false,
+   "faults": 0
+  },
+  "Firefox : apostrophe morte puis lettre en une seule valeur « 'e » pour é": {
+   "finished": false,
+   "faults": 0
+  },
+  "Firefox : touche morte puis Espace, valeur « ^ » seule": {
+   "finished": false,
+   "faults": 0
   }
+ },
+ "azertyVsApple": {
+  "azerty-mac contre apple-belgian": [],
+  "azerty-mac contre apple-french": [],
+  "azerty-mac contre cldr-osx-fr-be": [
+   "Backquote : notre modèle place « #@ » mais la référence ne le place pas sur cette touche (référence : <>≤≥)",
+   "IntlBackslash : notre modèle place « <> » mais la référence ne le place pas sur cette touche (référence : #@ÿ•)"
+  ],
+  "azerty-fr contre cldr-windows-fr": [],
+  "azerty-be contre cldr-windows-fr-be": [],
+  "azerty-be contre cldr-windows-nl-be": []
  }
 }

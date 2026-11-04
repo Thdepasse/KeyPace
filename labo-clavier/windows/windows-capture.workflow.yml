@@ -1,0 +1,36 @@
+# Lancement PONCTUEL d'une capture sur de vraies machines Windows (GitHub Actions). NON TESTÉ au moment de l'écriture.
+# À coller dans GitHub : dépôt, onglet Actions, « New workflow », « set up a workflow yourself », puis valider.
+# Il ne se lance jamais seul : seulement avec le bouton « Run workflow ». À supprimer ensuite si tu ne le veux plus.
+name: Capture clavier Windows (ponctuel)
+on: workflow_dispatch
+jobs:
+  capture:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { model: windows-us-intl,     layout: "US International", lang: en-US, tip: "0409:00020409" }
+          - { model: windows-us,          layout: "US",               lang: en-US, tip: "0409:00000409" }
+          - { model: windows-uk,          layout: "UK",               lang: en-GB, tip: "0809:00000809" }
+          - { model: windows-uk-extended, layout: "UK Étendu",        lang: en-GB, tip: "0809:00000452" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Activer la disposition à tester
+        shell: pwsh
+        run: |
+          $l = New-WinUserLanguageList ${{ matrix.lang }}
+          $l[0].InputMethodTips.Clear()
+          $l[0].InputMethodTips.Add('${{ matrix.tip }}')
+          Set-WinUserLanguageList $l -Force
+          Get-WinUserLanguageList | Format-List LanguageTag, InputMethodTips
+      - name: Capture avec de vraies frappes
+        shell: pwsh
+        run: node labo-clavier/windows/run-capture.js --model ${{ matrix.model }} --os Windows --layout "${{ matrix.layout }}" --inject windows --out traces-out
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: capture-${{ matrix.model }}
+          path: traces-out/

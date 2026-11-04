@@ -9,7 +9,7 @@ const http = require('http');
 const { spawn } = require('child_process');
 
 const root = path.join(__dirname, '..');
-const CHROME = process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const CHROME = process.env.CHROME_PATH || (process.platform === 'win32' ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome');
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.ico': 'image/x-icon', '.mp3': 'audio/mpeg', '.woff2': 'font/woff2' };
 
 function serve() {
@@ -29,10 +29,10 @@ function serve() {
   return new Promise((r) => server.listen(0, '127.0.0.1', () => r({ server, port: server.address().port })));
 }
 
-async function launch() {
+async function launch(opts = {}) {
   if (!fs.existsSync(CHROME)) throw new Error(`Chrome introuvable (${CHROME}) : définir CHROME_PATH`);
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kp-chrome-'));
-  const proc = spawn(CHROME, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${dir}`, '--no-first-run', '--no-default-browser-check', '--disable-gpu', '--window-size=1280,900', 'about:blank'], { stdio: ['ignore', 'ignore', 'pipe'] });
+  const proc = spawn(CHROME, [...(opts.headed ? [] : ['--headless=new']), '--remote-debugging-port=0', `--user-data-dir=${dir}`, '--no-first-run', '--no-default-browser-check', '--disable-gpu', '--window-size=1280,900', 'about:blank'], { stdio: ['ignore', 'ignore', 'pipe'] });
   const ws = await new Promise((resolve, reject) => {
     let buf = ''; const t = setTimeout(() => reject(new Error('Chrome ne répond pas')), 20000);
     proc.stderr.on('data', (d) => { buf += d; const m = /DevTools listening on (ws:\/\/\S+)/.exec(buf); if (m) { clearTimeout(t); resolve(m[1]); } });

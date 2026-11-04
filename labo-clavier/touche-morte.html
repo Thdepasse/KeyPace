@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Labo clavier : test des touches mortes</title>
+<style>
+  :root{--bg:#f4f1ec;--fg:#1a1410;--mut:#6b6157;--ac:#ff4d2e;--card:#fff;--bd:#e4ddd3}
+  @media (prefers-color-scheme:dark){:root{--bg:#171512;--fg:#f1ece4;--mut:#a79d90;--card:#201d19;--bd:#38322b}}
+  body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.5 system-ui,sans-serif}
+  main{max-width:680px;margin:0 auto;padding:24px 16px 80px}
+  h1{font-size:26px;margin:0 0 4px} .sub{color:var(--mut);margin:0 0 18px}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;margin:0 0 14px}
+  .big{font-size:22px;font-weight:800;margin:6px 0 12px}
+  input{width:100%;box-sizing:border-box;font:inherit;font-size:22px;padding:12px;border-radius:10px;border:2px solid var(--ac);background:var(--bg);color:var(--fg)}
+  button{font:inherit;font-weight:700;padding:10px 16px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--fg);cursor:pointer;margin-top:10px}
+  button.primary{background:var(--ac);border-color:var(--ac);color:#fff}
+  table{width:100%;border-collapse:collapse;font-size:15px} td,th{border-bottom:1px solid var(--bd);padding:8px 6px;text-align:left;vertical-align:top}
+  code{background:var(--bg);padding:1px 6px;border-radius:6px} .ok{color:#1e9e5a;font-weight:700}
+  .hint{color:var(--mut);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Test des touches mortes</h1>
+  <p class="sub">Une touche morte (comme le <b>^</b> de ton clavier) n'écrit rien toute seule : elle attend la touche suivante. Ce test regarde ce que ton <b>navigateur</b> reçoit. Il dure une minute et ne demande aucun réglage. Rien n'est envoyé, tout reste dans ta page.</p>
+
+  <div class="card" id="run">
+    <div class="hint" id="count"></div>
+    <div class="big" id="instr"></div>
+    <input id="field" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Zone de test">
+    <div class="hint" id="help"></div>
+    <button id="redo">Recommencer ce test</button> <button id="skip">Cette touche n'existe pas sur mon clavier</button>
+  </div>
+
+  <div class="card" id="done" hidden>
+    <p class="ok">Terminé.</p>
+    <div id="verdict"></div>
+    <button class="primary" id="download">Télécharger le résultat</button>
+    <p class="hint">Copie le tableau ci-dessus ou envoie-moi le fichier. Refais le test dans chaque navigateur (Chrome, Safari, Firefox si tu l'as).</p>
+  </div>
+</main>
+<script>
+(() => {
+  const TESTS = [
+    { id: 'dead-espace', text: 'Appuie sur la touche ^ (à droite du P sur un clavier AZERTY belge ou français), puis sur la barre d\'espace.', help: 'Tu dois voir un ^ apparaître dans la case.', need: 2 },
+    { id: 'dead-e', text: 'Efface la case, puis appuie sur ^, puis sur la lettre e.', help: 'Tu dois voir ê.', need: 2, clear: true },
+    { id: 'dead-trema', text: 'Efface la case, puis appuie sur Maj + ^ (le tréma), puis sur la lettre e.', help: 'Tu dois voir ë.', need: 2, clear: true },
+    { id: 'dead-k', text: 'Efface la case, puis appuie sur ^, puis sur la lettre k.', help: 'Un ^ puis un k doivent apparaître : « ^k ». Cette lettre ne se combine pas.', need: 2, clear: true },
+    { id: 'dead-dead', text: 'Efface la case, puis appuie deux fois de suite sur la touche ^.', help: 'Tu dois voir ^^.', need: 2, clear: true },
+  ];
+  const $ = (id) => document.getElementById(id);
+  const field = $('field');
+  let i = 0, ev = [], results = [], t0 = performance.now();
+  const rec = (e) => {
+    const b = { t: Math.round(performance.now() - t0), type: e.type };
+    if (e.type.startsWith('key')) Object.assign(b, { key: e.key, code: e.code, shift: e.shiftKey, alt: e.altKey, composing: e.isComposing });
+    else if (e.type.startsWith('composition')) b.data = e.data;
+    else { b.data = e.data; b.inputType = e.inputType; b.value = field.value; }
+    ev.push(b);
+    if (e.type === 'keydown' && !['Shift', 'Alt', 'Control', 'Meta', 'CapsLock'].includes(e.key) && !e.repeat) {
+      if (ev.filter((x) => x.type === 'keydown' && !['Shift', 'Alt', 'Control', 'Meta', 'CapsLock'].includes(x.key)).length >= TESTS[i].need) setTimeout(next, 250);
+    }
+  };
+  ['keydown', 'keyup', 'keypress', 'compositionstart', 'compositionupdate', 'compositionend', 'beforeinput', 'input'].forEach((n) => field.addEventListener(n, rec, true));
+  function show() { const t = TESTS[i]; $('count').textContent = 'Test ' + (i + 1) + ' sur ' + TESTS.length; $('instr').textContent = t.text; $('help').textContent = t.help; ev = []; t0 = performance.now(); if (t.clear) field.value = ''; field.focus(); }
+  function next() { results.push({ id: TESTS[i].id, text: TESTS[i].text, produced: field.value, events: ev.slice() }); i++; if (i >= TESTS.length) finish(); else show(); }
+  const keysOf = (r) => r.events.filter((e) => e.type === 'keydown' && !['Shift', 'Alt', 'Control', 'Meta', 'CapsLock'].includes(e.key)).map((e) => e.key);
+  const fmt = (k) => (k === ' ' ? 'Espace' : k === 'Dead' ? 'touche morte' : '« ' + k + ' »');
+  function finish() {
+    $('run').hidden = true; $('done').hidden = false;
+    const ua = navigator.userAgent;
+    const rows = results.map((r) => { const k = keysOf(r); return '<tr><td><code>' + r.id + '</code></td><td>' + (k.length ? k.map(fmt).join(' puis ') : 'aucune touche reçue') + '</td><td>' + (r.produced || '(vide)') + '</td></tr>'; }).join('');
+    $('verdict').innerHTML = '<p><b>Navigateur :</b> ' + ua.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</p><table><tr><th>Test</th><th>Valeurs de touche reçues par le navigateur</th><th>Texte obtenu</th></tr>' + rows + '</table>';
+  }
+  $('redo').onclick = () => { field.value = ''; ev = []; t0 = performance.now(); field.focus(); };
+  $('skip').onclick = () => { results.push({ id: TESTS[i].id, text: TESTS[i].text, produced: '', skipped: true, events: [] }); i++; if (i >= TESTS.length) finish(); else show(); };
+  $('download').onclick = () => {
+    const blob = new Blob([JSON.stringify({ schema: 1, capturedAt: new Date().toISOString(), userAgent: navigator.userAgent, platform: navigator.platform, language: navigator.language, results }, null, 1)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'touche-morte-' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); a.remove();
+  };
+  show();
+})();
+</script>
+</body>
+</html>
