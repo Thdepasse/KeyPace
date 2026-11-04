@@ -150,69 +150,6 @@
   "7. Accents directs AZERTY": "7. Les accents"
  },
  "tutos": {
-  "h6": {
-   "intro": "Tu connais désormais deux rangées entières. Cette révision mélange toutes les lettres de la rangée du haut.",
-   "rules": [
-    {
-     "icon": "🔁",
-     "t": "Repos et haut sans à-coups",
-     "d": "L'enjeu n'est plus chaque touche, mais la transition entre les rangées. Le passage du repos vers le haut doit être fluide."
-    },
-    {
-     "icon": "🤚",
-     "t": "Les poignets restent posés",
-     "d": "Ne soulève pas les poignets pour changer de rangée : seuls les doigts montent et descendent."
-    },
-    {
-     "icon": "📖",
-     "t": "Lis par groupes",
-     "d": "Essaie de lire deux ou trois mots d'avance. Ton cerveau prépare les doigts pendant que tu tapes."
-    }
-   ],
-   "tip": "Objectif : enchaîner repos et rangée du haut sans regarder, avec un mouvement souple des doigts."
-  },
-  "h3": {
-   "intro": "W et O complètent la rangée du haut côté annulaires. Tu vas former des mots plus variés.",
-   "rules": [
-    {
-     "icon": "⬆️",
-     "t": "Les annulaires montent",
-     "d": "L'annulaire gauche monte sur W, l'annulaire droit sur O. Ces doigts sont moins forts : un petit mouvement précis suffit."
-    },
-    {
-     "icon": "👀",
-     "t": "Entraîne l'anticipation",
-     "d": "Lis le mot suivant pendant que tu tapes le mot en cours. C'est cette anticipation qui rend la frappe fluide et continue."
-    },
-    {
-     "icon": "🔤",
-     "t": "Des mots variés",
-     "d": "four, roue, soleil, kiwi... Tu enchaînes des mots de plus en plus riches. Respecte bien les espaces."
-    }
-   ],
-   "tip": "Objectif : taper W et O proprement et commencer à anticiper le mot suivant."
-  },
-  "h4": {
-   "intro": "Q et P sont les touches des auriculaires sur la rangée du haut. Avec elles, les mots deviennent vraiment riches.",
-   "rules": [
-    {
-     "icon": "⬆️",
-     "t": "Les auriculaires montent",
-     "d": "L'auriculaire gauche atteint Q, le droit atteint P. C'est l'un des mouvements les plus exigeants : va lentement."
-    },
-    {
-     "icon": "🧘",
-     "t": "Stabilise le poignet",
-     "d": "Ne décolle pas toute la main pour aider l'auriculaire. Le poignet reste stable, seul le petit doigt s'étire."
-    },
-    {
-     "icon": "📚",
-     "t": "Des mots plus longs",
-     "d": "pure, papa, appui, loup... Le vocabulaire s'élargit. Vise des mots plus longs sans regarder."
-    }
-   ],
-   "tip": "Objectif : maîtriser Q et P sans casser ta position, même si l'auriculaire manque encore de force."
-  },
   "b1": {
    "intro": "Tu attaques la rangée du bas. C et M sont tes premières touches sous la rangée de repos.",
    "rules": [
@@ -3350,7 +3287,13 @@
   "r3",
   "r4",
   "r5",
-  "r6"
+  "r6",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6"
  ],
  "curriculum": {
   "modules": [
@@ -3541,104 +3484,108 @@
    },
    {
     "name": "2. Rangée du haut",
+    "row": "haut",
     "lessons": [
      {
       "id": "h1",
-      "title": "R et U, premiers vrais mots",
+      "title": "R et U, les index vers le haut",
       "keys": "r u",
-      "tip": "R est tapé par l'index gauche (il s'étire vers le haut), U par l'index droit. Félicitations : avec ces deux touches tu peux déjà former de vrais mots français ! Garde les yeux sur l'écran.",
-      "text": "la jus sa jus dur surf dur surf durs dur jus durs dur durs fur jus la jus sur surf",
+      "teaches": "ru",
+      "tip": "R est tapé par l'index gauche, U par l'index droit : les index quittent leurs touches de repos pour monter d'une rangée, puis redescendent aussitôt. Garde les autres doigts posés sur leur rangée.",
       "tuto": {
-       "intro": "Tu montes sur la rangée du haut. Avec R et U, tu vas taper tes tout premiers vrais mots français.",
+       "intro": "Tu passes à la rangée du haut, celle qui est juste au-dessus de ta rangée de repos. On commence par les index : R pour la main gauche, U pour la main droite.",
        "rules": [
         {
          "icon": "⬆️",
-         "t": "Les index montent",
-         "d": "L'index gauche s'étire vers le haut pour R, l'index droit pour U. Le doigt monte d'une rangée puis redescend aussitôt sur F ou J."
+         "t": "L'index monte, puis redescend",
+         "d": "L'index gauche monte sur R, juste au-dessus de F. L'index droit monte sur U, juste au-dessus de J. Après chaque frappe, il retourne sur son relief."
         },
         {
-         "icon": "⚓",
-         "t": "Garde la base",
-         "d": "Seul l'index bouge : les sept autres doigts restent posés sur la rangée de repos. C'est ton filet de sécurité pour ne pas regarder."
+         "icon": "🖐️",
+         "t": "Les autres doigts ne bougent pas",
+         "d": "Pendant qu'un index monte, les sept autres doigts restent posés sur la rangée de repos. C'est ce qui te permet de retrouver tes touches sans regarder."
         },
         {
-         "icon": "💬",
-         "t": "De vrais mots",
-         "d": "sur, dur, mur, jus... Tu peux déjà écrire des mots entiers. Lis le mot en entier avant de le taper, plutôt que lettre par lettre."
+         "icon": "🔤",
+         "t": "Les premiers vrais mots",
+         "d": "Avec R et U, tu peux déjà écrire sur, dur, jus ou lard. Lis le mot en entier avant de le taper."
         }
        ],
-       "tip": "Objectif : monter sur R et U sans quitter des yeux ta position de repos ni y décoller les autres doigts."
-      }
+       "tip": "Objectif : monter sur R et U avec les index, puis revenir sur F et J sans regarder."
+      },
+      "text": "ru ur ru ur ruru urur rruu uurr fr ju dr ku sr lu ur as ru sur dur jus lard gras fard ras hurla jura surf"
      },
      {
       "id": "h2",
-      "title": "E et I, le français prend forme",
+      "title": "E et I, les majeurs du haut",
       "keys": "e i",
-      "tip": "E est la lettre la plus fréquente du français : ton majeur gauche sera très sollicité. I est au majeur droit. Dès cette leçon, tu peux écrire des centaines de mots réels : profites-en pour fluidifier le mouvement.",
-      "text": "duel le aide lis ski rire lire ail ride fier fleur sel air il dire si hier leur laisser des",
+      "teaches": "ei",
+      "tip": "E est tapé par le majeur gauche, I par le majeur droit, juste au-dessus de D et de K. Le majeur monte tout droit et redescend sur sa touche de repos.",
       "tuto": {
-       "intro": "E et I rejoignent la partie. E est la lettre la plus fréquente du français : ce sera ta touche la plus utilisée.",
+       "intro": "E et I se tapent avec les majeurs, au-dessus de D et de K. Ce sont deux lettres très fréquentes en français : tu les croiseras sans cesse.",
        "rules": [
         {
          "icon": "⬆️",
-         "t": "Les majeurs montent",
-         "d": "Le majeur gauche monte sur E, le majeur droit sur I. Comme pour R et U, c'est un aller-retour rapide vers la rangée du haut."
+         "t": "Le majeur monte tout droit",
+         "d": "Le majeur gauche monte sur E, juste au-dessus de D. Le majeur droit monte sur I, juste au-dessus de K. Il redescend aussitôt sur sa touche de repos."
         },
         {
-         "icon": "🔥",
-         "t": "E, la reine du français",
-         "d": "Le E revient sans arrêt dans les mots. Soigne particulièrement ce geste : bien le maîtriser change toute ta vitesse."
+         "icon": "⚓",
+         "t": "Garde tes index ancrés",
+         "d": "Les index restent sur F et J pendant que les majeurs travaillent : ce sont tes repères pour revenir sans regarder."
         },
         {
-         "icon": "💬",
-         "t": "Le vocabulaire explose",
-         "d": "les, des, lire, dire, fier... Des centaines de mots deviennent possibles. Cherche la fluidité plutôt que la performance."
+         "icon": "🔤",
+         "t": "Des mots plus riches",
+         "d": "Avec E et I, les mots se multiplient : les, des, rire, lire, aide, elle. Tape-les doucement, lettre après lettre."
         }
        ],
-       "tip": "Objectif : automatiser E et I avec un mouvement souple et un retour systématique au repos."
-      }
+       "tip": "Objectif : taper E et I sans lever les autres doigts, et revenir sur D et K à chaque fois."
+      },
+      "text": "ei ie ei ie eiei ieie eeii iiee de si le fe ki ie sel les des ses rue rire lire dire sale elle ride fier hier air aide"
      },
      {
       "id": "h3",
-      "title": "W et O, des mots plus variés",
+      "title": "W et O, les annulaires du haut",
       "keys": "w o",
-      "tip": "W est à l'annulaire gauche (rangée du haut), O à l'annulaire droit. Tu commences à former des mots plus variés. Essaie de lire le mot suivant pendant que tu tapes le mot en cours : c'est ce qu'on appelle l'anticipation.",
-      "text": "lourd soleil ou four iwi roue sourd foi ours roi sol iw duo sole jour ow kiwi loi dose jouer sous alors dos",
+      "teaches": "wo",
+      "tip": "W est tapé par l'annulaire gauche, O par l'annulaire droit, au-dessus de S et de L. Les annulaires sont moins agiles : va doucement et garde le poignet stable.",
       "tuto": {
-       "intro": "W et O complètent la rangée du haut côté annulaires. Tu vas former des mots plus variés.",
+       "intro": "W et O se tapent avec les annulaires, au-dessus de S et de L. Le O est très courant ; le W est rare en français, mais il faut le connaître.",
        "rules": [
         {
          "icon": "⬆️",
          "t": "Les annulaires montent",
-         "d": "L'annulaire gauche monte sur W, l'annulaire droit sur O. Ces doigts sont moins forts : un petit mouvement précis suffit."
+         "d": "L'annulaire gauche monte sur W, au-dessus de S. L'annulaire droit monte sur O, au-dessus de L. Un petit mouvement précis suffit."
         },
         {
-         "icon": "👀",
-         "t": "Entraîne l'anticipation",
-         "d": "Lis le mot suivant pendant que tu tapes le mot en cours. C'est cette anticipation qui rend la frappe fluide et continue."
+         "icon": "🐢",
+         "t": "Doucement avec les annulaires",
+         "d": "Ces doigts sont moins agiles que les index et les majeurs. Vise la régularité : un geste lent et juste vaut mieux qu'un geste rapide et faux."
         },
         {
          "icon": "🔤",
-         "t": "Des mots variés",
-         "d": "four, roue, soleil, kiwi... Tu enchaînes des mots de plus en plus riches. Respecte bien les espaces."
+         "t": "Un W pas comme les autres",
+         "d": "On le trouve dans kiwi ou week. Il est rare : c'est pour cela qu'on l'entraîne avec des suites de lettres en plus des mots."
         }
        ],
-       "tip": "Objectif : taper W et O proprement et commencer à anticiper le mot suivant."
-      }
+       "tip": "Objectif : taper W et O proprement avec les annulaires, sans tordre la main."
+      },
+      "text": "wo ow wo ow wowo owow wwoo oowo wa wi we wu os of ol ow kiwi week sol sou fou four jour lourd sourd flou dos rose"
      },
      {
       "id": "h4",
       "title": "Q et P, les auriculaires du haut",
       "keys": "q p",
-      "tip": "Q est à l'auriculaire gauche (haut), P à l'auriculaire droit. Les auriculaires sur la rangée du haut demandent un léger étirement : garde le poignet stable et laisse le doigt faire le travail.",
-      "text": "jupe produire perdre risque pure papa loup passer appui frappe parler appel plage pleurer que qui propre quoi page parole",
+      "teaches": "qp",
+      "tip": "Q est tapé par l'auriculaire gauche, P par l'auriculaire droit, tout au bout de la rangée. Garde le poignet stable et laisse seulement le petit doigt s'étirer.",
       "tuto": {
-       "intro": "Q et P sont les touches des auriculaires sur la rangée du haut. Avec elles, les mots deviennent vraiment riches.",
+       "intro": "Q et P se tapent avec les auriculaires, aux deux extrémités de la rangée du haut. Ce sont les doigts les plus faibles : on leur laisse le temps.",
        "rules": [
         {
          "icon": "⬆️",
          "t": "Les auriculaires montent",
-         "d": "L'auriculaire gauche atteint Q, le droit atteint P. C'est l'un des mouvements les plus exigeants : va lentement."
+         "d": "L'auriculaire gauche monte sur Q, au-dessus de A. L'auriculaire droit monte sur P, au-dessus de point-virgule. Le geste est exigeant : va lentement."
         },
         {
          "icon": "🧘",
@@ -3646,48 +3593,50 @@
          "d": "Ne décolle pas toute la main pour aider l'auriculaire. Le poignet reste stable, seul le petit doigt s'étire."
         },
         {
-         "icon": "📚",
-         "t": "Des mots plus longs",
-         "d": "pure, papa, appui, loup... Le vocabulaire s'élargit. Vise des mots plus longs sans regarder."
+         "icon": "🔤",
+         "t": "Q est presque toujours suivi de U",
+         "d": "En français, le Q est presque toujours suivi d'un U : que, qui, quoi, quel. Apprends-les comme un seul geste."
         }
        ],
        "tip": "Objectif : maîtriser Q et P sans casser ta position, même si l'auriculaire manque encore de force."
-      }
+      },
+      "text": "qp pq qp pq qpqp pqpq qqpp ppqq qu pu qa po qe pi que qui quoi quel pour par pas papa plus pire pied paire pause"
      },
      {
       "id": "h5",
-      "title": "T et Y, phrases naturelles",
+      "title": "T et Y, les index intérieurs du haut",
       "keys": "t y",
-      "tip": "T et Y sont tous les deux tapés par les index (T par le gauche qui s'étire, Y par le droit). C'est un mouvement symétrique. À ce stade, essaie de maintenir un rythme régulier plutôt que de te précipiter.",
-      "text": "titre lettre sortie tuyau repartir tout tour rat tu saut style yoga rester royal toit tas type art stylo utile",
+      "teaches": "ty",
+      "tip": "T est tapé par l'index gauche, Y par l'index droit : les index s'étirent vers le centre pour les atteindre. Reviens sur F et J juste après la frappe.",
       "tuto": {
-       "intro": "T et Y terminent la rangée du haut. Ce sont encore les index qui travaillent, vers le centre-haut du clavier.",
+       "intro": "T et Y sont au centre de la rangée du haut. Ce sont tes index qui s'étirent vers l'intérieur pour les atteindre : T pour la main gauche, Y pour la main droite.",
        "rules": [
         {
-         "icon": "👐",
-         "t": "Un geste symétrique",
-         "d": "L'index gauche s'étire vers T, l'index droit vers Y. Les deux mains font le même mouvement en miroir."
-        },
-        {
-         "icon": "🎵",
-         "t": "Cherche le rythme",
-         "d": "À ce stade, vise une cadence régulière plutôt que des pics de vitesse. Un rythme stable réduit les fautes."
+         "icon": "👉",
+         "t": "Les index s'étirent",
+         "d": "L'index gauche monte et glisse vers la droite pour T. L'index droit monte et glisse vers la gauche pour Y. Le mouvement reste petit."
         },
         {
          "icon": "⚓",
-         "t": "Toujours le retour",
-         "d": "Après T ou Y, l'index revient sur F ou J. Ce réflexe de retour est la clé pour ne jamais perdre tes repères."
+         "t": "Reviens sur F et J",
+         "d": "Juste après T ou Y, ramène l'index sur sa touche de repos. Ce sont des touches un peu éloignées : ne perds pas ta position."
+        },
+        {
+         "icon": "🔤",
+         "t": "Des phrases commencent",
+         "d": "Avec le T, tu peux écrire tu, tout, tour, style, tuyau, et même une petite phrase : tu pars et elle reste."
         }
        ],
-       "tip": "Objectif : intégrer T et Y dans un mouvement fluide et régulier des deux index."
-      }
+       "tip": "Objectif : atteindre T et Y avec les index sans déplacer les autres doigts, puis revenir sur F et J."
+      },
+      "text": "ty yt ty yt tyty ytyt ttyy yyt te ta ty tu to ti tas tes tout toit tour tuyau stylo style type yoyo jury tu pars et elle reste"
      },
      {
       "id": "h6",
       "title": "Révision : toute la rangée du haut",
       "keys": "q w e r t y u i o p",
-      "tip": "Tu maîtrises maintenant deux rangées complètes. Pendant cette révision, concentre-toi sur la fluidité entre les rangées : le passage repos → haut doit se faire sans lever les poignets du bureau.",
-      "text": "sort art toit route doigt air plus tous et ris pierre produire quoi tour pied kiwi apporter tuyau retirer hier pratique risque type fur",
+      "teaches": "",
+      "tip": "Tu maîtrises maintenant deux rangées complètes. Pendant cette révision, concentre-toi sur la fluidité entre les rangées : le passage repos puis haut doit se faire sans lever les poignets du bureau.",
       "tuto": {
        "intro": "Tu connais désormais deux rangées entières. Cette révision mélange toutes les lettres de la rangée du haut.",
        "rules": [
@@ -3708,7 +3657,8 @@
         }
        ],
        "tip": "Objectif : enchaîner repos et rangée du haut sans regarder, avec un mouvement souple des doigts."
-      }
+      },
+      "text": "qwerty uiop poiuy trewq tu pars et elle reste tout le jour pour que tu quittes le toit"
      }
     ]
    },
@@ -5252,77 +5202,6 @@
   ]
  },
  "lessons": {
-  "h1": {
-   "title": "R et U, premiers vrais mots",
-   "keys": "r u",
-   "tip": "R est tapé par l'index gauche (il s'étire vers le haut), U par l'index droit. Félicitations : avec ces deux touches tu peux déjà former de vrais mots français ! Garde les yeux sur l'écran.",
-   "module": "2. Rangée du haut",
-   "moduleIdx": 1,
-   "kind": "words",
-   "learned": "fjdksla;ghru",
-   "newKeys": "ru",
-   "text": "la jus sa jus dur surf dur surf durs dur jus durs dur durs fur jus la jus sur surf"
-  },
-  "h2": {
-   "title": "E et I, le français prend forme",
-   "keys": "e i",
-   "tip": "E est la lettre la plus fréquente du français : ton majeur gauche sera très sollicité. I est au majeur droit. Dès cette leçon, tu peux écrire des centaines de mots réels : profites-en pour fluidifier le mouvement.",
-   "module": "2. Rangée du haut",
-   "moduleIdx": 1,
-   "kind": "words",
-   "learned": "fjdksla;ghruei",
-   "newKeys": "ei",
-   "text": "duel le aide lis ski rire lire ail ride fier fleur sel air il dire si hier leur laisser des"
-  },
-  "h3": {
-   "title": "W et O, des mots plus variés",
-   "keys": "w o",
-   "tip": "W est à l'annulaire gauche (rangée du haut), O à l'annulaire droit. Tu commences à former des mots plus variés. Essaie de lire le mot suivant pendant que tu tapes le mot en cours : c'est ce qu'on appelle l'anticipation.",
-   "module": "2. Rangée du haut",
-   "moduleIdx": 1,
-   "kind": "words",
-   "learned": "fjdksla;ghrueiwo",
-   "newKeys": "wo",
-   "fill": [
-    "ow",
-    "iwi",
-    "iw"
-   ],
-   "text": "lourd soleil ou four iwi roue sourd foi ours roi sol iw duo sole jour ow kiwi loi dose jouer sous alors dos"
-  },
-  "h4": {
-   "title": "Q et P, les auriculaires du haut",
-   "keys": "q p",
-   "tip": "Q est à l'auriculaire gauche (haut), P à l'auriculaire droit. Les auriculaires sur la rangée du haut demandent un léger étirement : garde le poignet stable et laisse le doigt faire le travail.",
-   "module": "2. Rangée du haut",
-   "moduleIdx": 1,
-   "kind": "words",
-   "learned": "fjdksla;ghrueiwoqp",
-   "newKeys": "qp",
-   "text": "jupe produire perdre risque pure papa loup passer appui frappe parler appel plage pleurer que qui propre quoi page parole"
-  },
-  "h5": {
-   "title": "T et Y, phrases naturelles",
-   "keys": "t y",
-   "tip": "T et Y sont tous les deux tapés par les index (T par le gauche qui s'étire, Y par le droit). C'est un mouvement symétrique. À ce stade, essaie de maintenir un rythme régulier plutôt que de te précipiter.",
-   "module": "2. Rangée du haut",
-   "moduleIdx": 1,
-   "kind": "words",
-   "learned": "fjdksla;ghrueiwoqpty",
-   "newKeys": "ty",
-   "text": "titre lettre sortie tuyau repartir tout tour rat tu saut style yoga rester royal toit tas type art stylo utile"
-  },
-  "h6": {
-   "title": "Révision : toute la rangée du haut",
-   "keys": "q w e r t y u i o p",
-   "tip": "Tu maîtrises maintenant deux rangées complètes. Pendant cette révision, concentre-toi sur la fluidité entre les rangées : le passage repos → haut doit se faire sans lever les poignets du bureau.",
-   "module": "2. Rangée du haut",
-   "moduleIdx": 1,
-   "kind": "words",
-   "learned": "fjdksla;ghrueiwoqpty",
-   "newKeys": "",
-   "text": "sort art toit route doigt air plus tous et ris pierre produire quoi tour pied kiwi apporter tuyau retirer hier pratique risque type fur"
-  },
   "b1": {
    "title": "C et M, la rangée du bas",
    "keys": "c m",
