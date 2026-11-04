@@ -328,6 +328,9 @@ async function run(opts = {}) {
         const intro = await ev("(()=>{app._showIntro=true;app.renderView('lessons');const t=document.getElementById('page-lessons').innerText;app._showIntro=false;return t})()");
         if (!/A·S·D·F/.test(intro) || /Q·S·D·F/.test(intro)) problems.push('BR8 : l\'écran d\'introduction cite encore la position de repos AZERTY (Q·S·D·F) en cours QWERTY');
         await ev("app.renderView('test');true");
+        const badge = await ev("(()=>{app._skipModulesHub=true;app.sess=null;app._showIntro=false;go('lessons');const t=document.getElementById('page-lessons').innerText;const ok={badge:/Cours QWERTY \\(bêta\\)/.test(t),r4:/A et point-virgule/.test(t),azerty:/Q et M/.test(t)};app._skipModulesHub=false;return ok})()");
+        if (!badge.badge) problems.push('BR8 : la page des leçons n\'affiche pas « Cours QWERTY (bêta) » en cours QWERTY');
+        if (!badge.r4 || badge.azerty) problems.push(`BR8 : la liste des leçons du cours QWERTY n'est pas celle du QWERTY (A et point-virgule : ${badge.r4}, Q et M : ${badge.azerty})`);
         await shot('pastille-clavier-qwerty.png');
         await ev("[...document.querySelectorAll('#nav-kb-menu .kb-layout-btn')].find(b=>b.dataset.kbLayout==='mac-us').click();true"); await sleep(150);
         if ((await ev("document.getElementById('nav-kb-text').textContent")) !== 'QWERTY · Mac US') problems.push('BR8 : choisir Mac US ne met pas à jour la pastille');

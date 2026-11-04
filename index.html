@@ -4883,6 +4883,12 @@ function kpCloseKbChip(refocus){
   menu.hidden=true;btn.setAttribute('aria-expanded','false');
   if(refocus===true)btn.focus();else if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
 }
+/* Quand l'élève travaille un autre cours que le cours par défaut, la page des leçons le dit clairement (cours et clavier). */
+function kpCourseBadgeHTML(){
+  if(kpCurrentFamily()!=='qwerty')return'';
+  const q=KB_QWERTY[getKbLayoutId()];
+  return' <span style="display:inline-block;vertical-align:middle;margin-left:8px;padding:3px 10px;border-radius:999px;background:rgba(255,77,46,.1);color:var(--accent);font:700 12px/1.4 inherit;letter-spacing:.03em">Cours QWERTY (bêta)'+(q?' · '+q.short:'')+'</span>';
+}
 function kpKeyboardChipHTML(){
   if(kpFamiliesOffered().length<2)return'';
   const l=getKbLayoutId();
@@ -10001,7 +10007,7 @@ const app={
     </div>`:'';
 
     document.getElementById('page-lessons').innerHTML=`<div class="lessons-section">
-      <div class="lessons-header"><button onclick="app.backToModulesHub()" style="background:none;border:none;color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;padding:0;margin-bottom:10px;font-family:inherit">← Tous les modules</button><h2>La base de la dactylographie</h2><p>Progresse étape par étape · <span style="color:var(--accent);font-weight:700">${FREE_LESSON_IDS.length} leçons gratuites</span> · ${ALL_LESSONS.length-FREE_LESSON_IDS.length} leçons Expert</p></div>
+      <div class="lessons-header"><button onclick="app.backToModulesHub()" style="background:none;border:none;color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;padding:0;margin-bottom:10px;font-family:inherit">← Tous les modules</button><h2>La base de la dactylographie${kpCourseBadgeHTML()}</h2><p>Progresse étape par étape · <span style="color:var(--accent);font-weight:700">${FREE_LESSON_IDS.length} leçons gratuites</span> · ${ALL_LESSONS.length-FREE_LESSON_IDS.length} leçons Expert</p></div>
       ${guestBanner}${goalsHtml}${currentUser?modsHTML:`<div class="gate-teased">${modsHTML}</div>`}
     </div>`;
   },
