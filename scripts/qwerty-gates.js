@@ -311,7 +311,7 @@ function q7() {
   const h = loadApp();
   const az = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.map(l=>({id:l.id,keys:l.keys,module:l.module,tuto:l.tuto})))'));
   const errs = [];
-  const AZ_PHRASES = /AZERTY|touche (0|2|7|9)\b|droite du P|droite du M|près de Entrée|sur la touche \d|Q à gauche|\bQ ou M\b/i;
+  const AZ_PHRASES = /AZERTY|azerty|touche (0|2|7|9)\b|droite du P\b|droite du M\b|près de Entrée|sur la touche \d|Q à gauche|\bQ ou M\b/; // sensible à la casse : « droite du P » est la touche P, pas « droite du point »
   const flat = (t) => t ? [t.intro, t.tip, ...(t.rules || []).flatMap((r) => [r.t, r.d])].join(' ') : '';
   const required = new Set();
   for (const l of az) {
@@ -395,7 +395,7 @@ function q9() {
   const us = JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', 'windows-us.json'), 'utf8'));
   const codeOf = (ch) => Object.keys(us.keys).find((c) => us.keys[c].l === ch);
   const variants = kb.VARIANTS.map((v) => JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', v.id + '.json'), 'utf8')));
-  const AZ = /AZERTY|touche (0|2|7|9)\b|droite du P|droite du M|près de Entrée|Q à gauche|\bQ ou M\b/i;
+  const AZ = /AZERTY|azerty|touche (0|2|7|9)\b|droite du P\b|droite du M\b|près de Entrée|Q à gauche|\bQ ou M\b/; // sensible à la casse (voir Q7)
   const flatT = (t) => [t.intro, t.tip, ...(t.rules || []).flatMap((r) => [r.t, r.d])].join(' ');
   const ACCENTS = 'éèêëàâîïôûùçœæ';
   let learned = ''; const ids = new Set(); let nLessons = 0, prefix = true;
@@ -406,7 +406,7 @@ function q9() {
       if (!prefix) errs.push(`${l.id} : module écrit à la main après un module non refondu : le cumul des touches enseignées n'est plus connu`);
       nLessons++;
       if (typeof l.teaches !== 'string') { errs.push(`${l.id} : champ teaches absent`); continue; }
-      if (l.teaches.length && m.kind !== 'accents' && m.kind !== 'majuscules' && (!m.row || !ROWS[m.row])) errs.push(`${l.id} : rangée du module absente ou inconnue`); // un module sans nouvelle touche n'a pas de rangée
+      if (l.teaches.length && m.kind !== 'accents' && m.kind !== 'majuscules' && m.kind !== 'ponctuation' && (!m.row || !ROWS[m.row])) errs.push(`${l.id} : rangée du module absente ou inconnue`); // un module sans nouvelle touche n'a pas de rangée
       for (const ch of l.teaches) {
         if (m.kind === 'majuscules') {
           // module de majuscules : chaque majuscule enseignée a sa minuscule déjà enseignée ; la main déclarée (gauche = Maj droite, droite = Maj gauche)
@@ -424,6 +424,11 @@ function q9() {
             const trop = sans.filter((v) => !['windows-us', 'windows-uk'].includes(v));
             if (trop.length) errs.push(`${l.id} : « ${ch} » sans geste sur ${trop.join(', ')} alors que ces claviers savent produire les accents`);
           }
+        } else if (m.kind === 'ponctuation') {
+          // signe de ponctuation : pas de rangée (Maj, touche directe ou touche morte selon le signe) ; il doit avoir un geste sur CHAQUE variante
+          // (l'apostrophe est une touche morte sur US international : touche puis Espace, déduit du modèle).
+          if (!/[^\p{L}\p{N}\s]/u.test(ch)) errs.push(`${l.id} : « ${ch} » n'est pas un signe de ponctuation`);
+          for (const def of variants) if (!gestureFor(def, ch)) errs.push(`${l.id} : « ${ch} » sans geste sur ${def.id}`);
         } else if (m.kind === 'accents') {
           // module d'accents : pas de rangée ; le geste dépend de la variante (touche morte, AltGr, Option) et certaines n'en ont pas (US simple, UK) :
           // la gate U10 rejoue chaque leçon sur les variantes, avec les accents tolérés quand il n'y a pas de geste.

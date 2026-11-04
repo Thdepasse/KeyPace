@@ -392,8 +392,14 @@ async function u12() {
   const acc1 = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id==="ac1"))'));
   if (/AZERTY/.test(JSON.stringify(acc1.tuto))) errs.push('ac1 : le tutoriel cite encore l\'AZERTY');
   if (/AZERTY/.test(mods())) errs.push('un nom de module cite encore l\'AZERTY');
-  const maj1 = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id==="pon1"))'));
-  if (JSON.stringify(maj1.text) !== JSON.stringify(JSON.parse(before).find((x) => x[0] === 'pon1')[5])) errs.push('pon1 (reprise) a changé');
+  // une leçon encore reprise du cours AZERTY (la première qui n'est pas écrite à la main) doit être inchangée ; plus aucune : rien à vérifier
+  const hwIds = new Set(course.handwritten || []);
+  const rowsBefore = JSON.parse(before);
+  const reused = rowsBefore.find((x) => !hwIds.has(x[0]) && typeof x[5] === 'string' && (course.curriculum.modules.flatMap((m) => m.lessons).find((l) => l.id === x[0]) || {}).text !== undefined);
+  if (reused) {
+    const cur = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id===' + JSON.stringify(reused[0]) + '))'));
+    if (!cur || cur.text !== reused[5]) errs.push(reused[0] + ' (reprise) a changé');
+  }
   h.run("kpApplyCourseData('fr/azerty',null)");
   if (snap() !== before || mods() !== beforeMods) errs.push('retour au cours par défaut : le programme n\'est pas identique à l\'origine');
   if (h.run("kpApplyCourseData('fr/qwerty',{schema:2,id:'fr/qwerty',lessons:{}})")) errs.push('un fichier de cours de mauvais schéma est accepté');

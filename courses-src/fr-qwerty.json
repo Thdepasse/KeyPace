@@ -91,7 +91,6 @@
   "flu6"
  ],
  "reuse": [
-  "pon1",
   "num1",
   "num2",
   "num3",
@@ -134,27 +133,6 @@
   "7. Accents directs AZERTY": "7. Les accents"
  },
  "tutos": {
-  "pon2": {
-   "intro": "Le point d'interrogation et le point d'exclamation donnent le ton : une question, une émotion.",
-   "rules": [
-    {
-     "icon": "⇧",
-     "t": "Avec Maj",
-     "d": "Sur un clavier QWERTY, ? et ! se font avec Maj. Maintiens Maj de la main opposée, puis frappe le signe. Le geste exact de ton clavier est indiqué juste en dessous."
-    },
-    {
-     "icon": "␣",
-     "t": "Espace avant, en français",
-     "d": "En français, on met une espace avant ? et ! (contrairement à l'anglais) : mot, espace, signe."
-    },
-    {
-     "icon": "🎭",
-     "t": "Le bon ton",
-     "d": "? pour interroger, ! pour exclamer. Un seul suffit : évite les points d'exclamation à répétition."
-    }
-   ],
-   "tip": "Objectif : taper ? et ! avec l'espace française avant le signe."
-  },
   "num3": {
    "intro": "Au tour des annulaires : 2 à gauche, 9 à droite. On approche des bords de la rangée.",
    "rules": [
@@ -3009,7 +2987,14 @@
   "maj3",
   "maj4",
   "maj5",
-  "maj6"
+  "maj6",
+  "pon1",
+  "pon2",
+  "pon3",
+  "pon4",
+  "pon5",
+  "pon6",
+  "pon7"
  ],
  "retiredAz": [
   "acc1",
@@ -4173,170 +4158,211 @@
     ]
    },
    {
-    "name": "6. Ponctuation complète",
+    "name": "7. Ponctuation complète",
+    "kind": "ponctuation",
     "lessons": [
      {
       "id": "pon1",
-      "title": "Le point et la virgule",
-      "keys": ". ,",
-      "text": "il pleut, il vente, il neige. la nuit tombe, le froid arrive, on rentre chez soi. vite, vite, rentrons.",
+      "title": "Le deux-points : Maj + point-virgule",
+      "keys": ":",
+      "teaches": ":",
+      "tip": "Le deux-points est sur la même touche que le point-virgule : tu tiens Maj avec l'auriculaire gauche et tu tapes la touche avec l'auriculaire droit.",
       "tuto": {
-       "intro": "Le point et la virgule sont les deux signes les plus utilisés. Bien les placer rend n'importe quel texte lisible.",
-       "rules": [
-        {
-         "icon": "✍️",
-         "t": "Collés au mot",
-         "d": "Le point et la virgule se collent au mot qui précède (pas d'espace avant), puis une espace suit."
-        },
-        {
-         "icon": "🛑",
-         "t": "Le point ferme la phrase",
-         "d": "Après un point, la phrase suivante prend une majuscule. La virgule, elle, marque une courte pause."
-        },
-        {
-         "icon": "🎵",
-         "t": "Garde le rythme",
-         "d": "La ponctuation fait partie de la frappe : ne t'arrête pas net, enchaîne le signe puis l'espace."
-        }
-       ],
-       "tip": "Objectif : placer point et virgule sans espace avant, une espace après."
-      }
-     },
-     {
-      "id": "pon2",
-      "title": "Question et exclamation",
-      "keys": "? !",
-      "text": "viens ici ! attention ! quel beau jour ! vraiment ? super ! bravo ! encore ? tu veux jouer ? oui ! allons vite !",
-      "tuto": {
-       "intro": "Le point d'interrogation et le point d'exclamation donnent le ton : une question, une émotion.",
+       "intro": "Le deux-points introduit une liste ou une explication. Sur QWERTY, il partage la touche du point-virgule : il s'obtient avec Maj. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
          "icon": "⇧",
-         "t": "Avec Maj",
-         "d": "Sur un clavier QWERTY, ? et ! se font avec Maj. Maintiens Maj de la main opposée, puis frappe le signe. Le geste exact de ton clavier est indiqué juste en dessous."
+         "t": "Maj + la touche du point-virgule",
+         "d": "Tiens Maj avec l'auriculaire gauche (la main opposée), tape la touche du point-virgule avec l'auriculaire droit, puis relâche."
         },
         {
          "icon": "␣",
-         "t": "Espace avant, en français",
-         "d": "En français, on met une espace avant ? et ! (contrairement à l'anglais) : mot, espace, signe."
+         "t": "Une espace avant, en français",
+         "d": "En français, on met une espace avant : ; ? et ! (contrairement à l'anglais) : mot, espace, signe, espace. C'est une habitude à prendre dès maintenant."
         },
         {
-         "icon": "🎭",
-         "t": "Le bon ton",
-         "d": "? pour interroger, ! pour exclamer. Un seul suffit : évite les points d'exclamation à répétition."
+         "icon": "🎯",
+         "t": "Annonce une liste",
+         "d": "voici la liste : pain, lait, riz. Le deux-points annonce ce qui suit : une liste, une explication, une citation."
         }
        ],
-       "tip": "Objectif : taper ? et ! avec l'espace française avant le signe."
-      }
+       "tip": "Objectif : taper le deux-points avec Maj + point-virgule, avec une espace avant."
+      },
+      "text": "a : b : c : d. voici la liste : pain, lait, riz ; beurre, sel, sucre. trois mots : calme, force. Regarde : tout est là."
+     },
+     {
+      "id": "pon2",
+      "title": "L'apostrophe",
+      "keys": "'",
+      "teaches": "'",
+      "tip": "L'apostrophe est la touche à droite du point-virgule, à l'auriculaire droit. Sur un clavier US international, c'est une touche morte : tape-la, puis la barre d'espace.",
+      "tuto": {
+       "intro": "L'apostrophe remplace une lettre supprimée : l'école, d'abord, c'est, aujourd'hui. Elle est très fréquente en français. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "🔤",
+         "t": "À droite du point-virgule",
+         "d": "Elle se tape avec l'auriculaire droit, sur la touche juste à droite du point-virgule, sans Maj."
+        },
+        {
+         "icon": "⏳",
+         "t": "Attention : touche morte",
+         "d": "Sur US international, l'apostrophe est une touche morte : tape-la puis la barre d'espace, sinon elle s'associe à la lettre suivante pour faire un accent (é, á…). Sur un clavier US simple, elle est directe."
+        },
+        {
+         "icon": "✍️",
+         "t": "Elle colle aux deux mots",
+         "d": "On tape l'avant, l'apostrophe, l'après, sans aucune espace : l'été, qu'il, aujourd'hui."
+        }
+       ],
+       "tip": "Objectif : taper l'apostrophe avec le bon geste de ton clavier, sans espace autour."
+      },
+      "text": "l'école d'Éric c'est qu'il n'a l'air d'un ami, j'ai l'idée d'un fruit. aujourd'hui, c'est l'été. s'il te plaît."
      },
      {
       "id": "pon3",
-      "title": "Deux-points et point-virgule",
-      "keys": ": ;",
-      "text": "voici la liste : pain, lait, riz ; beurre, sel, sucre ; eau, jus, miel. trois mots : calme, force, patience.",
+      "title": "Le tiret",
+      "keys": "-",
+      "teaches": "-",
+      "tip": "Le tiret est la touche à droite du 0, tout en haut à droite : l'auriculaire droit y monte, sans Maj. Il relie les mots composés.",
       "tuto": {
-       "intro": "Les deux-points annoncent, le point-virgule relie. Deux outils pour structurer des phrases plus riches.",
+       "intro": "Le tiret relie les mots composés (peut-être, vingt-cinq, week-end) et les verbes à leur pronom (dis-moi). Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
-         "icon": "📋",
-         "t": "Les deux-points annoncent",
-         "d": "Ils introduisent une liste, une explication ou une citation. En français, une espace avant et après."
+         "icon": "⬆️",
+         "t": "Tout en haut à droite",
+         "d": "L'auriculaire droit monte sur la touche à droite du 0, sans Maj. C'est la touche du tiret."
         },
         {
-         "icon": "🔗",
-         "t": "Le point-virgule relie",
-         "d": "Il sépare deux idées proches sans couper la phrase. Espace avant et après, comme les deux-points."
+         "icon": "✍️",
+         "t": "Il colle aux deux mots",
+         "d": "Pas d'espace autour du tiret : peut-être, vingt-cinq, week-end, après-midi."
         },
         {
-         "icon": "⌨️",
-         "t": "Deux touches voisines",
-         "d": "Sur ce clavier, ; et : sont côte à côte à droite. Repère-les bien pour ne pas les confondre."
+         "icon": "🔠",
+         "t": "Ne le confonds pas avec le tiret bas",
+         "d": "Le tiret du 6 (_) demande Maj : il sert plus tard dans les symboles. Ici, c'est le simple tiret."
         }
        ],
-       "tip": "Objectif : utiliser deux-points et point-virgule avec les espaces françaises."
-      }
+       "tip": "Objectif : monter sur le tiret avec l'auriculaire droit et revenir au repos."
+      },
+      "text": "peut-être est-ce vingt-cinq arc-en-ciel après-midi porte-monnaie week-end chou-fleur. Peut-être, ce week-end, vingt-cinq amis."
      },
      {
       "id": "pon4",
-      "title": "L'apostrophe et le tiret",
-      "keys": "' -",
-      "text": "c'est l'heure qu'il aime. l'ami de paul arrive tout seul. vingt-cinq enfants jouent dans la rue. peut-on y aller ?",
+      "title": "Le point d'interrogation : Maj + barre oblique",
+      "keys": "?",
+      "teaches": "?",
+      "tip": "Le point d'interrogation est sur la même touche que la barre oblique : tu tiens Maj avec l'auriculaire gauche et tu tapes la touche avec l'auriculaire droit.",
       "tuto": {
-       "intro": "L'apostrophe et le trait d'union sont partout en français : l'eau, c'est, vingt-cinq.",
+       "intro": "Le point d'interrogation termine une question. Sur QWERTY, il partage la touche de la barre oblique : il s'obtient avec Maj. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
-         "icon": "✂️",
-         "t": "L'apostrophe colle",
-         "d": "Elle remplace une voyelle élidée et se colle aux deux mots, sans espace : l'ami, d'accord, c'est."
+         "icon": "⇧",
+         "t": "Maj + la touche de la barre oblique",
+         "d": "Tiens Maj avec l'auriculaire gauche, tape la touche de la barre oblique avec l'auriculaire droit, puis relâche."
         },
         {
-         "icon": "➖",
-         "t": "Le trait d'union relie",
-         "d": "Il joint deux mots ou des nombres : vingt-cinq, peut-être, est-ce. Sans espace autour."
+         "icon": "␣",
+         "t": "Une espace avant, en français",
+         "d": "En français, on met une espace avant : ; ? et ! (contrairement à l'anglais) : mot, espace, signe, espace. C'est une habitude à prendre dès maintenant."
         },
         {
-         "icon": "🔎",
-         "t": "Deux signes discrets",
-         "d": "Petits mais très fréquents. Repère bien leur position pour les taper sans ralentir."
+         "icon": "🎭",
+         "t": "Pour interroger",
+         "d": "Où es-tu ? Que fais-tu ? Un seul point d'interrogation suffit à la fin de la question."
         }
        ],
-       "tip": "Objectif : placer apostrophe et trait d'union collés, sans espace autour."
-      }
+       "tip": "Objectif : taper ? avec Maj + barre oblique, avec une espace avant le signe."
+      },
+      "text": "Où es-tu ? Que fais-tu ? Quel âge as-tu ? Viens-tu ce soir ? Pourquoi pas ? Vraiment ? Qui est là ? Et toi ? Encore ?"
      },
      {
       "id": "pon5",
-      "title": "Guillemets et parenthèses",
-      "keys": "« » ( )",
-      "text": "il dit : « bonjour ». elle dit : « merci ». le total (trois) est juste. bonne nuit (enfin) !",
+      "title": "Le point d'exclamation : Maj + 1",
+      "keys": "!",
+      "teaches": "!",
+      "tip": "Le point d'exclamation est sur la touche 1, en haut à gauche : tu tiens Maj avec l'auriculaire droit et tu tapes 1 avec l'auriculaire gauche.",
       "tuto": {
-       "intro": "Les guillemets encadrent les citations, les parenthèses ajoutent une précision. On apprend à les ouvrir et les fermer.",
+       "intro": "Le point d'exclamation donne le ton : une émotion, un ordre, une surprise. Sur QWERTY, il est sur la touche 1 : il s'obtient avec Maj. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
-         "icon": "💬",
-         "t": "Guillemets français",
-         "d": "En français on utilise « et » avec une espace à l'intérieur : « bonjour ». Ils vont toujours par paire."
-        },
-        {
-         "icon": "🧩",
-         "t": "Parenthèses par paire",
-         "d": "Une parenthèse ouverte se ferme toujours. Pas d'espace juste à l'intérieur : (comme ceci)."
-        },
-        {
          "icon": "⇧",
-         "t": "Souvent avec Shift",
-         "d": "Parenthèses et guillemets demandent souvent Shift. Pense à maintenir Shift de la main opposée."
+         "t": "Maj + la touche 1",
+         "d": "Tiens Maj avec l'auriculaire droit (la main opposée), tape la touche 1 avec l'auriculaire gauche, puis relâche."
+        },
+        {
+         "icon": "␣",
+         "t": "Une espace avant, en français",
+         "d": "En français, on met une espace avant : ; ? et ! (contrairement à l'anglais) : mot, espace, signe, espace. C'est une habitude à prendre dès maintenant."
+        },
+        {
+         "icon": "🎭",
+         "t": "Sans en abuser",
+         "d": "Attention ! Bravo ! Un seul point d'exclamation suffit : évite les points d'exclamation à répétition."
         }
        ],
-       "tip": "Objectif : ouvrir et fermer guillemets et parenthèses par paire, sans en oublier."
-      }
+       "tip": "Objectif : taper ! avec Maj + 1, avec une espace avant le signe."
+      },
+      "text": "Attention ! Viens vite ! C'est beau ! Bravo ! Super ! Quelle surprise ! Au secours ! Ça alors ! Merci ! Courage !"
      },
      {
       "id": "pon6",
-      "title": "Ponctuation en texte réel",
-      "keys": "toute la ponctuation",
-      "text": "« Viens vite ! » dit-il. Elle dit : « J'arrive ; attends-moi. » Vingt-cinq minutes plus tard (enfin), elle arriva.",
+      "title": "Parenthèses et guillemets",
+      "keys": "( ) \"",
+      "teaches": "()\"",
+      "tip": "Les parenthèses sont sur les touches 9 et 0, les guillemets droits sur la touche de l'apostrophe : tous passent par Maj, tenue avec l'auriculaire gauche.",
       "tuto": {
-       "intro": "On réunit toute la ponctuation dans un vrai texte. C'est l'épreuve qui ressemble le plus à l'écriture réelle.",
+       "intro": "Les parenthèses isolent une précision, les guillemets encadrent une parole. Sur QWERTY, tous trois passent par Maj, avec des touches de la main droite. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
-         "icon": "🧩",
-         "t": "Tout en même temps",
-         "d": "Guillemets, virgules, points, deux-points... Tout arrive ensemble. Reste calme et applique les règles d'espace."
+         "icon": "⇧",
+         "t": "Maj + 9, Maj + 0 et Maj + apostrophe",
+         "d": "Tiens Maj avec l'auriculaire gauche. La parenthèse ouvrante est sur 9, la fermante sur 0, le guillemet droit sur la touche de l'apostrophe."
         },
         {
-         "icon": "🇫🇷",
-         "t": "Les espaces françaises",
-         "d": "Rappel : une espace avant ; : ? ! » et après la plupart des signes. Pas d'espace avant la virgule ni le point."
+         "icon": "🔁",
+         "t": "On ouvre, on ferme",
+         "d": "Chaque parenthèse ou guillemet ouvert se referme. Entraîne-toi à enchaîner l'ouverture, le texte, puis la fermeture sans hésiter."
         },
         {
-         "icon": "📖",
-         "t": "Lis pour anticiper",
-         "d": "Repère la ponctuation à venir en lisant le texte d'avance : tu prépares le bon doigt et le bon Shift."
+         "icon": "💬",
+         "t": "Les guillemets droits",
+         "d": "Ils entourent une parole : Il dit : \"bonjour\". Le guillemet français « » n'a pas de touche sur QWERTY : le guillemet droit est accepté à sa place."
         }
        ],
-       "tip": "Objectif : ponctuer un texte réel proprement, en respectant les espaces françaises."
+       "tip": "Objectif : taper ( ) et \" avec Maj, en ouvrant puis en refermant."
       },
-      "howText": true
+      "text": "Il dit : \"bonjour\". Elle répond : \"merci\" (enfin). Le résultat (trois) est juste (vraiment) ! \"Viens\" (vite) ! (oui) (non)"
+     },
+     {
+      "id": "pon7",
+      "title": "Ponctuation en texte réel",
+      "keys": "toute la ponctuation",
+      "teaches": "",
+      "tip": "Tu réunis toute la ponctuation dans un vrai texte. Repère à l'avance le signe qui vient, et prépare Maj si besoin.",
+      "tuto": {
+       "intro": "Tu réunis toute la ponctuation dans un texte vivant : tirets, apostrophes, guillemets, parenthèses, points d'exclamation et d'interrogation.",
+       "rules": [
+        {
+         "icon": "🧭",
+         "t": "Repère le signe qui vient",
+         "d": "Avant d'atteindre un signe, sache lequel c'est : direct (apostrophe, tiret, virgule, point) ou avec Maj (? ! : ( ) \")."
+        },
+        {
+         "icon": "⇧",
+         "t": "Maj de la main opposée",
+         "d": "Chaque signe avec Maj se tape avec la touche Maj opposée à la touche du signe : c'est la même règle que pour les majuscules."
+        },
+        {
+         "icon": "✅",
+         "t": "Un texte propre",
+         "d": "Une ponctuation juste rend un texte lisible et professionnel. Prends ton temps, la vitesse viendra."
+        }
+       ],
+       "tip": "Objectif : enchaîner toute la ponctuation dans un texte, sans casser ton rythme."
+      },
+      "text": "\"Viens vite !\" dit-il. Elle répondit : \"J'arrive ; attends-moi.\" Vingt-cinq minutes plus tard (enfin), elle arriva. Qui ? Éric !"
      }
     ]
    },
@@ -4946,51 +4972,6 @@
   ]
  },
  "lessons": {
-  "pon2": {
-   "title": "Question et exclamation",
-   "keys": "? !",
-   "module": "6. Ponctuation complète",
-   "moduleIdx": 5,
-   "kind": "adapted",
-   "text": "viens ici ! attention ! quel beau jour ! vraiment ? super ! bravo ! encore ? tu veux jouer ? oui ! allons vite !",
-   "why": "où es-tu ? retiré (ù) ; fais-tu et c'est retirés : tiret et apostrophe ne sont enseignés qu'en pon4"
-  },
-  "pon3": {
-   "title": "Deux-points et point-virgule",
-   "keys": ": ;",
-   "module": "6. Ponctuation complète",
-   "moduleIdx": 5,
-   "kind": "adapted",
-   "text": "voici la liste : pain, lait, riz ; beurre, sel, sucre ; eau, jus, miel. trois mots : calme, force, patience.",
-   "why": "café, thé, règles, brièveté… remplacés par des mots sans accent"
-  },
-  "pon4": {
-   "title": "L'apostrophe et le tiret",
-   "keys": "' -",
-   "module": "6. Ponctuation complète",
-   "moduleIdx": 5,
-   "kind": "adapted",
-   "text": "c'est l'heure qu'il aime. l'ami de paul arrive tout seul. vingt-cinq enfants jouent dans la rue. peut-on y aller ?",
-   "why": "d'où, l'idée, d'aujourd'hui, élèves, présents retirés (accents)"
-  },
-  "pon5": {
-   "title": "Guillemets et parenthèses",
-   "keys": "« » ( )",
-   "module": "6. Ponctuation complète",
-   "moduleIdx": 5,
-   "kind": "adapted",
-   "text": "il dit : « bonjour ». elle dit : « merci ». le total (trois) est juste. bonne nuit (enfin) !",
-   "why": "répond, résultat, journée (accents) et (42) (chiffres, appris au module 10) retirés"
-  },
-  "pon6": {
-   "title": "Ponctuation en texte réel",
-   "keys": "toute la ponctuation",
-   "module": "6. Ponctuation complète",
-   "moduleIdx": 5,
-   "kind": "adapted",
-   "text": "« Viens vite ! » dit-il. Elle dit : « J'arrive ; attends-moi. » Vingt-cinq minutes plus tard (enfin), elle arriva.",
-   "why": "répondit (é) remplacé par dit"
-  },
   "flu6": {
    "title": "Sprint de vitesse : texte long",
    "keys": "vitesse maximale",
