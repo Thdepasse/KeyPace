@@ -391,11 +391,12 @@ function q9() {
   const { gestureFor } = require('./gesture');
   const data = JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'));
   const errs = []; const hand = new Set(data.handwritten || []);
-  const ROWS = { repos: ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon'], haut: ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP'], bas: ['KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash'], chiffres: ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0'] };
+  const ROWS = { repos: ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote'], haut: ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash'], bas: ['KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash'], chiffres: ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal'] };
   const us = JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', 'windows-us.json'), 'utf8'));
   const codeOf = (ch) => Object.keys(us.keys).find((c) => us.keys[c].l === ch);
   const variants = kb.VARIANTS.map((v) => JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', v.id + '.json'), 'utf8')));
-  const AZ = /AZERTY|azerty|touche (0|2|7|9)\b|droite du P\b|droite du M\b|près de Entrée|Q à gauche|\bQ ou M\b/; // sensible à la casse (voir Q7)
+  // Dans le contenu écrit pour le QWERTY, « touche 2 » ou « à droite du P » sont justes (le 2 porte @, les crochets sont à droite du P) : on ne cherche que de vrais indices d'AZERTY.
+  const AZ = /AZERTY|azerty|\bQ ou M\b|Q à gauche|touche \^|près de Entrée/;
   const flatT = (t) => [t.intro, t.tip, ...(t.rules || []).flatMap((r) => [r.t, r.d])].join(' ');
   const ACCENTS = 'éèêëàâîïôûùçœæ';
   let learned = ''; const ids = new Set(); let nLessons = 0, prefix = true;
@@ -406,7 +407,7 @@ function q9() {
       if (!prefix) errs.push(`${l.id} : module écrit à la main après un module non refondu : le cumul des touches enseignées n'est plus connu`);
       nLessons++;
       if (typeof l.teaches !== 'string') { errs.push(`${l.id} : champ teaches absent`); continue; }
-      if (l.teaches.length && m.kind !== 'accents' && m.kind !== 'majuscules' && m.kind !== 'ponctuation' && (!m.row || !ROWS[m.row])) errs.push(`${l.id} : rangée du module absente ou inconnue`); // un module sans nouvelle touche n'a pas de rangée
+      if (l.teaches.length && m.kind !== 'accents' && m.kind !== 'majuscules' && m.kind !== 'ponctuation' && m.kind !== 'symboles' && (!m.row || !ROWS[m.row])) errs.push(`${l.id} : rangée du module absente ou inconnue`); // un module sans nouvelle touche n'a pas de rangée
       for (const ch of l.teaches) {
         if (m.kind === 'majuscules') {
           // module de majuscules : chaque majuscule enseignée a sa minuscule déjà enseignée ; la main déclarée (gauche = Maj droite, droite = Maj gauche)
@@ -424,6 +425,19 @@ function q9() {
             const trop = sans.filter((v) => !['windows-us', 'windows-uk'].includes(v));
             if (trop.length) errs.push(`${l.id} : « ${ch} » sans geste sur ${trop.join(', ')} alors que ces claviers savent produire les accents`);
           }
+        } else if (m.kind === 'symboles') {
+          // symbole : on retrouve sa touche physique (modèle windows-us, niveau de base ou Maj), qui doit être sur la rangée déclarée PAR LA LEÇON,
+          // tapée par un des doigts déclarés (règle : ligne par ligne, doigt par doigt) ; geste obligatoire sur les 8 variantes
+          // (^ ~ ` sont des touches mortes sur US international : touche puis Espace, déduit des modèles).
+          const sc = Object.keys(us.keys).find((c) => us.keys[c].l === ch || us.keys[c].s === ch);
+          if (!sc) { errs.push(`${l.id} : « ${ch} » introuvable sur le clavier de référence`); }
+          else {
+            const rowName = l.row || m.row;
+            if (!rowName || !ROWS[rowName]) errs.push(`${l.id} : rangée absente ou inconnue pour « ${ch} »`);
+            else if (!ROWS[rowName].includes(sc)) errs.push(`${l.id} : « ${ch} » n'est pas sur la rangée « ${rowName} » (touche ${sc})`);
+            if (!Array.isArray(l.fingers) || !l.fingers.includes(us.keys[sc].f)) errs.push(`${l.id} : « ${ch} » est tapé par le doigt « ${us.keys[sc].f} », la leçon annonce ${JSON.stringify(l.fingers)}`);
+          }
+          for (const def of variants) if (!gestureFor(def, ch)) errs.push(`${l.id} : « ${ch} » sans geste sur ${def.id}`);
         } else if (m.kind === 'ponctuation') {
           // signe de ponctuation : pas de rangée (Maj, touche directe ou touche morte selon le signe) ; il doit avoir un geste sur CHAQUE variante
           // (l'apostrophe est une touche morte sur US international : touche puis Espace, déduit du modèle).

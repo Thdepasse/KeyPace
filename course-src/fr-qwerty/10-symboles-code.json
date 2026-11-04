@@ -1,0 +1,173 @@
+{
+ "replaces": [
+  12
+ ],
+ "position": 10,
+ "name": "10. Crochets, accolades et code",
+ "kind": "symboles",
+ "lessons": [
+  {
+   "id": "sym7",
+   "title": "[ ] : les crochets",
+   "keys": "[ ]",
+   "teaches": "[]",
+   "row": "haut",
+   "fingers": [
+    "rp"
+   ],
+   "tip": "Les crochets sont à droite du P, tout au bout de la rangée du haut : l'auriculaire droit y monte, sans Maj.",
+   "tuto": {
+    "intro": "Les crochets [ ] se tapent avec l'auriculaire droit, sur les deux touches à droite du P. Ils servent dans le code (tableau[0]) et pour les compléments entre crochets. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+    "rules": [
+     {
+      "icon": "⬆️",
+      "t": "À droite du P",
+      "d": "L'auriculaire droit s'étire au-delà du P : [ est juste à droite, ] juste après. Aucune touche Maj n'est nécessaire."
+     },
+     {
+      "icon": "🔁",
+      "t": "On ouvre, on ferme",
+      "d": "Chaque crochet ouvert se referme. Enchaîne : ouvrir, taper, fermer."
+     },
+     {
+      "icon": "💻",
+      "t": "Dans le code",
+      "d": "tableau[0], liste[fin], index[i] : le crochet désigne la case d'une liste."
+     }
+    ],
+    "tip": "Objectif : taper [ et ] avec l'auriculaire droit sans quitter ta position de repos."
+   },
+   "text": "[a] [b] [0] tableau[0] liste[fin] [1] [2] index[i] [3] valeurs[x] [oui] [non] [fin]"
+  },
+  {
+   "id": "sym8",
+   "title": "{ } : les accolades",
+   "keys": "{ }",
+   "teaches": "{}",
+   "row": "haut",
+   "fingers": [
+    "rp"
+   ],
+   "tip": "Les accolades sont sur les mêmes touches que les crochets, avec Maj : l'auriculaire droit monte, l'auriculaire gauche tient Maj.",
+   "tuto": {
+    "intro": "Les accolades { } partagent les touches des crochets : on les obtient avec Maj. On les rencontre dans le code et les feuilles de style. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+    "rules": [
+     {
+      "icon": "⇧",
+      "t": "Maj de la main opposée",
+      "d": "Comme pour les majuscules : tiens Maj avec l'auriculaire de la main qui ne tape pas la touche. Maj + la touche du chiffre donne le symbole."
+     },
+     {
+      "icon": "🔁",
+      "t": "On ouvre, on ferme",
+      "d": "Comme les crochets : une accolade ouverte se referme. Prends l'habitude de les taper par paire."
+     },
+     {
+      "icon": "💻",
+      "t": "Dans le code",
+      "d": "{style: bold}, {x: 1} : les accolades délimitent un bloc de code ou un objet."
+     }
+    ],
+    "tip": "Objectif : taper { et } avec Maj et l'auriculaire droit."
+   },
+   "text": "{a} {b} {code} {style: bold} {x: 1} {y: 2} {fin} {ok} {debut} {oui} {non}"
+  },
+  {
+   "id": "sym9",
+   "title": "\\ et | : barre oblique inverse et barre verticale",
+   "keys": "\\ |",
+   "teaches": "\\|",
+   "row": "haut",
+   "fingers": [
+    "rp"
+   ],
+   "tip": "La barre oblique inverse et la barre verticale sont sur la touche juste au-dessus de Entrée, à l'auriculaire droit ; la barre verticale demande Maj.",
+   "tuto": {
+    "intro": "La barre oblique inverse \\ et la barre verticale | partagent une même touche, tout au bout de la rangée du haut, au-dessus de Entrée. La barre verticale s'obtient avec Maj. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+    "rules": [
+     {
+      "icon": "⬆️",
+      "t": "Au-dessus d'Entrée",
+      "d": "L'auriculaire droit s'étire au bout de la rangée du haut, après les crochets. \\ se tape seul, | avec Maj."
+     },
+     {
+      "icon": "📁",
+      "t": "Les chemins Windows",
+      "d": "C:\\Users\\Theo : la barre oblique inverse sépare les dossiers sous Windows, alors que la barre oblique simple / les sépare ailleurs."
+     },
+     {
+      "icon": "➡️",
+      "t": "La barre verticale",
+      "d": "a | b relie deux commandes ou sépare deux choix : droite | gauche."
+     }
+    ],
+    "tip": "Objectif : taper \\ et | avec l'auriculaire droit, avec Maj pour la barre verticale."
+   },
+   "text": "C:\\Users\\Theo a|b a||b c\\d \\n \\t droite | gauche /home | grep \\\\ || C:\\Windows"
+  },
+  {
+   "id": "sym10",
+   "title": "< > : les chevrons",
+   "keys": "< >",
+   "teaches": "<>",
+   "row": "bas",
+   "fingers": [
+    "rm",
+    "rr"
+   ],
+   "tip": "Les chevrons sont sur les touches de la virgule et du point, avec Maj : le majeur et l'annulaire droits descendent, l'auriculaire gauche tient Maj.",
+   "tuto": {
+    "intro": "Les chevrons < > se tapent avec Maj sur les touches de la virgule et du point. On les voit dans les balises HTML : <p>texte</p>. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+    "rules": [
+     {
+      "icon": "⇧",
+      "t": "Maj de la main opposée",
+      "d": "Comme pour les majuscules : tiens Maj avec l'auriculaire de la main qui ne tape pas la touche. Maj + la touche du chiffre donne le symbole."
+     },
+     {
+      "icon": "🏷️",
+      "t": "Les balises HTML",
+      "d": "<p>texte</p> : le chevron ouvrant, le nom de la balise, le chevron fermant. La barre oblique / ferme la balise."
+     },
+     {
+      "icon": "🔁",
+      "t": "Ouvrir, fermer",
+      "d": "Chaque balise ouverte se referme avec la barre oblique. Entraîne-toi à enchaîner les deux."
+     }
+    ],
+    "tip": "Objectif : taper < et > avec Maj et les doigts de la main droite."
+   },
+   "text": "<html> </html> <p>texte</p> <div> </div> <b>gras</b> <i>fin</i> <a> </a> <h1>titre</h1> <br> <ul> </ul>"
+  },
+  {
+   "id": "sym11",
+   "title": "Révision : tous les symboles en texte",
+   "keys": "tous symboles",
+   "teaches": "",
+   "howText": true,
+   "tip": "On réunit tous les symboles dans un texte mêlant adresse, web, code et prix. Repère le geste avant chaque symbole : direct, Maj ou touche morte.",
+   "tuto": {
+    "intro": "On réunit tous les symboles dans un texte mêlant email, web, code et pourcentages. Le grand mélange ! Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+    "rules": [
+     {
+      "icon": "🧩",
+      "t": "Tous les combos",
+      "d": "Maj, touches mortes, signes directs : chaque symbole a son geste. Mobilise tout ce que tu as appris dans les deux modules."
+     },
+     {
+      "icon": "🧭",
+      "t": "Repère le geste",
+      "d": "Avant chaque symbole, identifie : direct, Maj ou touche morte ? Ce réflexe te fait gagner du temps."
+     },
+     {
+      "icon": "💻",
+      "t": "Le clavier complet",
+      "d": "Maîtriser les symboles, c'est taper une adresse, un bout de code ou une formule sans jamais bloquer."
+     }
+    ],
+    "tip": "Objectif : enchaîner tous les symboles dans un texte réel, chaque geste au bon moment."
+   },
+   "text": "contact@site.fr (2024) http://url.be #tag {css: bold} <html> 50%=ok a+b=c [fin] ~/home \"valeur\" 3*4 C:\\Users a|b"
+  }
+ ]
+}

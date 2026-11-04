@@ -91,15 +91,6 @@
   "flu6"
  ],
  "reuse": [
-  "sym1",
-  "sym2",
-  "sym3",
-  "sym4",
-  "sym5",
-  "sym6",
-  "sym7",
-  "sym8",
-  "sym9",
   "flu1",
   "flu2",
   "flu3",
@@ -370,7 +361,9 @@
     "!": "Maj + 1",
     "\"": "Maj + '",
     "#": "Maj + 3",
+    "$": "Maj + 4",
     "%": "Maj + 5",
+    "&": "Maj + 7",
     "'": "touche '",
     "(": "Maj + 9",
     ")": "Maj + 0",
@@ -723,7 +716,9 @@
     "!": "Maj + 1",
     "\"": "Maj + ' (touche morte), puis Espace",
     "#": "Maj + 3",
+    "$": "Maj + 4",
     "%": "Maj + 5",
+    "&": "Maj + 7",
     "'": "touche ' (touche morte), puis Espace",
     "(": "Maj + 9",
     ")": "Maj + 0",
@@ -1035,7 +1030,9 @@
     "!": "Maj + 1",
     "\"": "Maj + 2",
     "#": "touche #",
+    "$": "Maj + 4",
     "%": "Maj + 5",
+    "&": "Maj + 7",
     "'": "touche '",
     "(": "Maj + 9",
     ")": "Maj + 0",
@@ -1358,7 +1355,9 @@
     "!": "Maj + 1",
     "\"": "Maj + 2",
     "#": "touche #",
+    "$": "Maj + 4",
     "%": "Maj + 5",
+    "&": "Maj + 7",
     "'": "touche '",
     "(": "Maj + 9",
     ")": "Maj + 0",
@@ -1739,7 +1738,9 @@
     "!": "Maj + 1",
     "\"": "Maj + '",
     "#": "Maj + 3",
+    "$": "Maj + 4",
     "%": "Maj + 5",
+    "&": "Maj + 7",
     "'": "touche '",
     "(": "Maj + 9",
     ")": "Maj + 0",
@@ -2120,7 +2121,9 @@
     "!": "Maj + 1",
     "\"": "Maj + null (touche morte), puis Espace",
     "#": "Maj + 3",
+    "$": "Maj + 4",
     "%": "Maj + 5",
+    "&": "Maj + 7",
     "'": "touche null (touche morte), puis Espace",
     "(": "Maj + 9",
     ")": "Maj + 0",
@@ -2507,7 +2510,9 @@
     "!": "Maj + 1",
     "\"": "Maj + '",
     "#": "Option (⌥) + 3",
+    "$": "Maj + 4",
     "%": "Maj + 5",
+    "&": "Maj + 7",
     "'": "touche '",
     "(": "Maj + 9",
     ")": "Maj + 0",
@@ -2869,7 +2874,9 @@
     "!": "Maj + 1",
     "\"": "Maj + AltGr + null",
     "#": "Maj + 3",
+    "$": "Maj + 4",
     "%": "Maj + 5",
+    "&": "Maj + 7",
     "'": "AltGr + null",
     "(": "Maj + 9",
     ")": "Maj + 0",
@@ -2972,7 +2979,18 @@
   "num3",
   "num4",
   "num5",
-  "num6"
+  "num6",
+  "sym1",
+  "sym2",
+  "sym3",
+  "sym4",
+  "sym5",
+  "sym6",
+  "sym7",
+  "sym8",
+  "sym9",
+  "sym10",
+  "sym11"
  ],
  "retiredAz": [
   "acc1",
@@ -4525,246 +4543,364 @@
     ]
    },
    {
-    "name": "11. Symboles courants",
+    "name": "9. Symboles de la rangée des chiffres",
+    "kind": "symboles",
     "lessons": [
      {
       "id": "sym1",
-      "title": "@ et # : email et hashtag",
-      "keys": "@ #",
-      "text": "contact@keypace.be #keypace @user info@site.com #top @jean #apprendre #clavier @monde contact@mail.fr",
+      "title": "$ % ^ & : les index",
+      "keys": "$ % ^ &",
+      "teaches": "$%^&",
+      "row": "chiffres",
+      "fingers": [
+       "li",
+       "ri"
+      ],
+      "tip": "Ces quatre symboles sont sur les touches 4, 5, 6 et 7 avec Maj : les index les atteignent, comme pour les chiffres.",
       "tuto": {
-       "intro": "Les symboles comme @ et # demandent une combinaison de touches qui change selon les claviers : le geste du tien est indiqué juste en dessous.",
+       "intro": "Les symboles de la rangée des chiffres s'obtiennent avec Maj. On commence par ceux des index : $ et % sur 4 et 5 pour la main gauche, ^ et & sur 6 et 7 pour la main droite. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
-         "icon": "⌨️",
-         "t": "Les touches spéciales",
-         "d": "Selon ton clavier, un symbole se tape en direct, avec Maj, ou avec AltGr (la touche à droite de la barre d'espace, à maintenir avec le pouce droit)."
+         "icon": "⇧",
+         "t": "Maj de la main opposée",
+         "d": "Comme pour les majuscules : tiens Maj avec l'auriculaire de la main qui ne tape pas la touche. Maj + la touche du chiffre donne le symbole."
         },
         {
-         "icon": "📧",
-         "t": "@ pour les emails",
-         "d": "L'arobase relie le nom et le domaine d'une adresse : contact@keypace.be. Indispensable au quotidien."
+         "icon": "📍",
+         "t": "Les mêmes touches que les chiffres",
+         "d": "Tu connais déjà ces touches : 4 5 6 7. Seul change l'appui sur Maj. L'index monte, tape, redescend sur F ou J."
         },
         {
-         "icon": "#️⃣",
-         "t": "# le hashtag",
-         "d": "Le croisillon sert aux mots-clés et au code."
+         "icon": "⏳",
+         "t": "Touche morte sur US international",
+         "d": "Sur un clavier US international, ^ ~ et ` sont des touches mortes : tape le signe, puis la barre d'espace, pour qu'il s'affiche seul."
         }
        ],
-       "tip": "Objectif : produire @ et # avec le bon geste, sans casser ta position de repos."
-      }
+       "tip": "Objectif : taper $ % ^ & avec Maj et les index, sans regarder."
+      },
+      "text": "$$ %% ^^ && $% ^& $%^& 20$ 45$ 10% 50% 3^2 5^3 7& a&b Tom&Anna R&D 30% 60$ 2^4"
      },
      {
       "id": "sym2",
-      "title": "Parenthèses () et crochets []",
-      "keys": "( ) [ ]",
-      "text": "(bonjour) [monde] fonctions(x) tableau[0] résultat(42) liste[fin] (ok) [a-z] valeur(2+3) index[i]",
+      "title": "# et * : les majeurs",
+      "keys": "# *",
+      "teaches": "#*",
+      "row": "chiffres",
+      "fingers": [
+       "lm",
+       "rm"
+      ],
+      "tip": "Le dièse est sur la touche 3, l'étoile sur la touche 8, avec Maj : ce sont les majeurs qui montent.",
       "tuto": {
-       "intro": "Parenthèses et crochets vont par paire : on apprend à toujours ouvrir ET fermer.",
+       "intro": "Les majeurs couvrent le dièse # (touche 3, main gauche) et l'étoile * (touche 8, main droite). Le dièse ouvre un mot-clé, l'étoile sert aux calculs et aux listes. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
-         "icon": "🧩",
-         "t": "Toujours par paire",
-         "d": "Une parenthèse ou un crochet ouvert se ferme toujours. Tape la paire, puis reviens écrire au milieu."
+         "icon": "⇧",
+         "t": "Maj de la main opposée",
+         "d": "Comme pour les majuscules : tiens Maj avec l'auriculaire de la main qui ne tape pas la touche. Maj + la touche du chiffre donne le symbole."
         },
         {
-         "icon": "⌨️",
-         "t": "Parenthèses en direct",
-         "d": "( et ) se tapent directement, sans Maj, sur la rangée des chiffres."
+         "icon": "🏷️",
+         "t": "Le dièse des mots-clés",
+         "d": "#clavier #keypace #aide : un mot précédé de # est un mot-clé. Tape le dièse, puis le mot, sans espace."
         },
         {
-         "icon": "⌨️",
-         "t": "Les crochets",
-         "d": "Les crochets [ ] demandent une combinaison de touches (le geste de ton clavier est indiqué plus haut). Utiles pour le code et les listes."
+         "icon": "✖️",
+         "t": "L'étoile",
+         "d": "3*4 se lit « trois fois quatre ». On la retrouve aussi comme repère ou comme joker."
         }
        ],
-       "tip": "Objectif : ouvrir et fermer parenthèses et crochets, sans en oublier."
-      }
+       "tip": "Objectif : taper # et * avec Maj et les majeurs."
+      },
+      "text": "## ** #* *# #a #b #1 #2 #clavier #keypace #aide 3*4 5*6 7*8 *important* #a *b #fin 2*9 #ok"
      },
      {
       "id": "sym3",
-      "title": "/ et | : chemins et pipes",
-      "keys": "/ |",
-      "text": "http://site.fr chemin/vers/fichier cat fichier | grep mot droite | gauche /home/user a/b | c/d /var/log",
+      "title": "@ : l'arobase",
+      "keys": "@",
+      "teaches": "@",
+      "row": "chiffres",
+      "fingers": [
+       "lr"
+      ],
+      "tip": "L'arobase est sur la touche 2, avec Maj : l'annulaire gauche monte, avec Maj droite.",
       "tuto": {
-       "intro": "La barre oblique / et la barre verticale | servent aux adresses web, chemins de fichiers et commandes.",
+       "intro": "L'arobase relie le nom d'une personne et le domaine d'une adresse mail : jean@mail.be. Sur QWERTY, elle est sur la touche 2, avec Maj. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
-         "icon": "🌐",
-         "t": "Le slash /",
-         "d": "La barre oblique sépare les parties d'une URL ou d'un chemin : http://site.fr, dossier/fichier."
+         "icon": "⇧",
+         "t": "Maj de la main opposée",
+         "d": "Comme pour les majuscules : tiens Maj avec l'auriculaire de la main qui ne tape pas la touche. Maj + la touche du chiffre donne le symbole."
         },
         {
-         "icon": "⌨️",
-         "t": "Le pipe |",
-         "d": "La barre verticale demande une combinaison de touches. En informatique, elle relie deux commandes : cat fichier | grep mot."
+         "icon": "📧",
+         "t": "Le cœur d'une adresse mail",
+         "d": "contact@keypace.be : le nom, @, puis le domaine. Aucune espace n'est permise dans une adresse."
         },
         {
-         "icon": "💻",
-         "t": "Symboles de l'informatique",
-         "d": "Ces deux signes sont partout dès qu'on touche au web ou au terminal. Repère bien leur combinaison."
+         "icon": "🐢",
+         "t": "L'annulaire s'étire",
+         "d": "L'annulaire est moins agile que l'index : monte doucement sur le 2, tiens Maj avec l'auriculaire droit."
         }
        ],
-       "tip": "Objectif : taper / et | pour les chemins et les commandes."
-      }
+       "tip": "Objectif : taper @ avec Maj + 2, dans des adresses complètes."
+      },
+      "text": "@@ @a @b contact@keypace.be info@site.fr jean@mail.be marie@ecole.be @jean @marie @paul @anna paul@mail.be"
      },
      {
       "id": "sym4",
-      "title": "* = + : calculs et code",
-      "keys": "* = +",
-      "text": "2*3=6 a+b=c x*y+z=0 total=prix*quantité résultat=a+b+c valeur*2=8 score=temps*précision vitesse+1=ok",
+      "title": "_ + = : les auriculaires de droite",
+      "keys": "_ + =",
+      "teaches": "_+=",
+      "row": "chiffres",
+      "fingers": [
+       "rp"
+      ],
+      "tip": "Le tiret bas, le plus et le égal sont sur les touches à droite du 0 : l'auriculaire droit monte tout au bout de la rangée.",
       "tuto": {
-       "intro": "Les opérateurs * = + servent aux calculs et au code. On les enchaîne dans des expressions.",
+       "intro": "Tout au bout de la rangée des chiffres, l'auriculaire droit atteint trois signes : le tiret bas _ (Maj + tiret), le plus + (Maj + égal) et le égal = (sans Maj). Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
-         "icon": "🧮",
-         "t": "Les opérateurs",
-         "d": "* pour multiplier, + pour additionner, = pour le résultat ou l'affectation : 2*3=6, a+b=c."
+         "icon": "⬆️",
+         "t": "L'auriculaire s'étire",
+         "d": "Les touches à droite du 0 sont les plus éloignées : étire seulement l'auriculaire, le poignet reste stable."
         },
         {
          "icon": "⇧",
-         "t": "Où sont + et = ?",
-         "d": "Leur position change selon les claviers : regarde le geste de ton clavier, indiqué plus haut."
-        },
-        {
-         "icon": "🔗",
-         "t": "Sans espace dans les formules",
-         "d": "Dans une expression simple, on colle souvent les opérateurs : x*y+z. Repère le rythme touche par touche."
-        }
-       ],
-       "tip": "Objectif : enchaîner * = + dans des expressions, sans hésiter sur le bon geste."
-      }
-     },
-     {
-      "id": "sym5",
-      "title": "% et _ : taux et variables",
-      "keys": "% _",
-      "text": "50% 75% ma_variable nom_fichier 100% style_css mon_pseudo classe_active taux_erreur score_max_wpm",
-      "tuto": {
-       "intro": "Le pourcentage % et le tiret bas _ (underscore) reviennent souvent dans les chiffres et les noms techniques.",
-       "rules": [
-        {
-         "icon": "📊",
-         "t": "Le pourcentage %",
-         "d": "Il se colle au nombre : 50%, 100%."
-        },
-        {
-         "icon": "➿",
-         "t": "Le tiret bas _",
-         "d": "L'underscore relie des mots sans espace dans les noms techniques : ma_variable, nom_fichier."
+         "t": "Deux avec Maj, un sans",
+         "d": "_ et + demandent Maj (avec l'auriculaire gauche) ; = se tape seul. Le tiret simple vu plus haut est la touche du _ sans Maj."
         },
         {
          "icon": "💻",
-         "t": "Usage technique",
-         "d": "% et _ sont surtout utiles en informatique et dans les données. Mémorise leur position pour ne pas ralentir."
+         "t": "Variables et calculs",
+         "d": "ma_variable, nom_fichier, a+b=c : le tiret bas relie les mots dans les noms de code, le plus et le égal font les calculs."
         }
        ],
-       "tip": "Objectif : placer % et _ sans regarder."
-      }
+       "tip": "Objectif : atteindre _ + = avec l'auriculaire droit, en revenant au repos."
+      },
+      "text": "a+b=c x_y ma_variable nom_fichier 2+3=5 prix+taxe=total score_max a_b+c_d 4+4=8 un_deux 1+1=2 9=9"
+     },
+     {
+      "id": "sym5",
+      "title": "` et ~ : les auriculaires de gauche",
+      "keys": "` ~",
+      "teaches": "`~",
+      "row": "chiffres",
+      "fingers": [
+       "lp"
+      ],
+      "tip": "L'accent grave isolé et le tilde sont sur la touche en haut à gauche, sous Échap : l'auriculaire gauche l'atteint, avec Maj pour le tilde.",
+      "tuto": {
+       "intro": "Tout en haut à gauche, l'auriculaire gauche atteint la touche de l'accent grave isolé ` et du tilde ~ (avec Maj). On les retrouve dans le code et sur les chemins de fichiers : ~/documents. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "L'auriculaire gauche monte",
+         "d": "Cette touche est à gauche du 1. L'auriculaire gauche l'atteint ; le tilde demande Maj avec l'auriculaire droit."
+        },
+        {
+         "icon": "⏳",
+         "t": "Touche morte sur US international",
+         "d": "Sur un clavier US international, ^ ~ et ` sont des touches mortes : tape le signe, puis la barre d'espace, pour qu'il s'affiche seul."
+        },
+        {
+         "icon": "💻",
+         "t": "Dans le code et les chemins",
+         "d": "`code` entoure un bout de code ; ~/documents désigne le dossier personnel. Deux signes, un seul geste d'étirement."
+        }
+       ],
+       "tip": "Objectif : taper ` et ~ avec l'auriculaire gauche, avec le bon geste de ton clavier."
+      },
+      "text": "`code` ~/documents `npm install` ~user `variable` ~/bureau `a` ~root `fin` ~/home `ok` ~/musique"
+     },
+     {
+      "id": "sym6",
+      "title": "Révision : les symboles de la rangée des chiffres",
+      "keys": "$ % ^ & # * @ _ + = ` ~",
+      "teaches": "",
+      "howText": true,
+      "tip": "Tu réunis tous les symboles de la rangée des chiffres dans un texte. Repère le doigt et la touche Maj avant d'attaquer le signe.",
+      "tuto": {
+       "intro": "Tu réunis les symboles de la rangée des chiffres dans un texte : adresses, prix, calculs, noms de variables, chemins. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "🧭",
+         "t": "Identifie le signe avant de le taper",
+         "d": "Quel doigt ? Quelle main pour Maj ? Ce réflexe te fait gagner du temps sur tous les symboles."
+        },
+        {
+         "icon": "🔁",
+         "t": "Maj, symbole, relâche",
+         "d": "Le mouvement est toujours le même : Maj de la main opposée, la touche, puis tu relâches les deux."
+        },
+        {
+         "icon": "✅",
+         "t": "La précision d'abord",
+         "d": "Un symbole faux casse une adresse ou une commande. Ralentis sur ceux qui te résistent."
+        }
+       ],
+       "tip": "Objectif : enchaîner tous les symboles de la rangée des chiffres dans un texte réel."
+      },
+      "text": "contact@site.fr $20 50% a&b #tag 3*4 x_y 2+3=5 `code` ~/home 3^2 info@keypace.be 10% a+b=c"
      }
     ]
    },
    {
-    "name": "12. Symboles avancés",
+    "name": "10. Crochets, accolades et code",
+    "kind": "symboles",
     "lessons": [
      {
-      "id": "sym6",
-      "title": "{} et <> : code et HTML",
-      "keys": "{ } < >",
-      "text": "{code: true} <html> </html> {style: \"bold\"} <div class=\"main\"> </div> {return x+y} <p>texte</p>",
-      "tuto": {
-       "intro": "Les accolades {} et chevrons <> sont les symboles du code et du HTML. Eux aussi vont par paire.",
-       "rules": [
-        {
-         "icon": "⌨️",
-         "t": "Les accolades",
-         "d": "Les accolades { } encadrent des blocs de code : {code}. Leur geste dépend de ton clavier (indiqué plus haut)."
-        },
-        {
-         "icon": "🔠",
-         "t": "Chevrons à gauche",
-         "d": "Les chevrons sont sur la touche à gauche du W : < en direct, > avec Shift. Ils ouvrent et ferment les balises HTML."
-        },
-        {
-         "icon": "🧩",
-         "t": "Toujours fermer",
-         "d": "Comme les parenthèses, accolades et balises s'ouvrent ET se ferment : &lt;p&gt;texte&lt;/p&gt;, {return x}."
-        }
-       ],
-       "tip": "Objectif : ouvrir et fermer accolades et chevrons."
-      }
-     },
-     {
       "id": "sym7",
-      "title": "\"\" et ~ : chaînes et chemins",
-      "keys": "\" ~",
-      "text": "\"bonjour\" \"monde\" ~/documents ~user \"valeur\": true ~/bureau \"clé\": \"données\" ~root \"résultat\": 42",
+      "title": "[ ] : les crochets",
+      "keys": "[ ]",
+      "teaches": "[]",
+      "row": "haut",
+      "fingers": [
+       "rp"
+      ],
+      "tip": "Les crochets sont à droite du P, tout au bout de la rangée du haut : l'auriculaire droit y monte, sans Maj.",
       "tuto": {
-       "intro": "Les guillemets droits et le tilde ~ servent aux chaînes de caractères et aux chemins système.",
+       "intro": "Les crochets [ ] se tapent avec l'auriculaire droit, sur les deux touches à droite du P. Ils servent dans le code (tableau[0]) et pour les compléments entre crochets. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
-         "icon": "⌨️",
-         "t": "Guillemets droits",
-         "d": "Le guillemet droit (\") entoure les chaînes en code. Son geste dépend de ton clavier (indiqué plus haut)."
+         "icon": "⬆️",
+         "t": "À droite du P",
+         "d": "L'auriculaire droit s'étire au-delà du P : [ est juste à droite, ] juste après. Aucune touche Maj n'est nécessaire."
         },
         {
-         "icon": "〜",
-         "t": "Le tilde ~",
-         "d": "Le tilde désigne le dossier personnel sous Linux et Mac : ~/documents."
+         "icon": "🔁",
+         "t": "On ouvre, on ferme",
+         "d": "Chaque crochet ouvert se referme. Enchaîne : ouvrir, taper, fermer."
         },
         {
          "icon": "💻",
-         "t": "Surtout en code",
-         "d": "Ces deux signes sont rares à l'écrit courant mais essentiels en programmation et au terminal."
+         "t": "Dans le code",
+         "d": "tableau[0], liste[fin], index[i] : le crochet désigne la case d'une liste."
         }
        ],
-       "tip": "Objectif : taper le guillemet droit et ~ sans hésiter."
-      }
+       "tip": "Objectif : taper [ et ] avec l'auriculaire droit sans quitter ta position de repos."
+      },
+      "text": "[a] [b] [0] tableau[0] liste[fin] [1] [2] index[i] [3] valeurs[x] [oui] [non] [fin]"
      },
      {
       "id": "sym8",
-      "title": "\\ et ` : code et terminal",
-      "keys": "\\ `",
-      "text": "C:\\Users\\theo `code inline` \\n \\t `variable` C:\\Windows `npm install` \\r\\n `git commit -m \"fix\"`",
+      "title": "{ } : les accolades",
+      "keys": "{ }",
+      "teaches": "{}",
+      "row": "haut",
+      "fingers": [
+       "rp"
+      ],
+      "tip": "Les accolades sont sur les mêmes touches que les crochets, avec Maj : l'auriculaire droit monte, l'auriculaire gauche tient Maj.",
       "tuto": {
-       "intro": "L'antislash et l'accent grave (le backtick) sont des symboles purement techniques, fréquents en code.",
+       "intro": "Les accolades { } partagent les touches des crochets : on les obtient avec Maj. On les rencontre dans le code et les feuilles de style. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
-         "icon": "⌨️",
-         "t": "L'antislash",
-         "d": "Il sépare les dossiers sous Windows et marque les caractères spéciaux en code."
+         "icon": "⇧",
+         "t": "Maj de la main opposée",
+         "d": "Comme pour les majuscules : tiens Maj avec l'auriculaire de la main qui ne tape pas la touche. Maj + la touche du chiffre donne le symbole."
         },
         {
-         "icon": "⌨️",
-         "t": "Le backtick",
-         "d": "L'accent grave seul entoure le code en ligne et les variables en programmation. Sur la plupart des claviers, il faut taper la touche puis la barre d'espace."
+         "icon": "🔁",
+         "t": "On ouvre, on ferme",
+         "d": "Comme les crochets : une accolade ouverte se referme. Prends l'habitude de les taper par paire."
         },
         {
          "icon": "💻",
-         "t": "Réservés au technique",
-         "d": "Tu ne t'en serviras qu'en code ou au terminal. Mémorise-les si tu programmes, sinon retiens juste leur existence."
+         "t": "Dans le code",
+         "d": "{style: bold}, {x: 1} : les accolades délimitent un bloc de code ou un objet."
         }
        ],
-       "tip": "Objectif : situer l'antislash et le backtick et les taper sans regarder."
-      }
+       "tip": "Objectif : taper { et } avec Maj et l'auriculaire droit."
+      },
+      "text": "{a} {b} {code} {style: bold} {x: 1} {y: 2} {fin} {ok} {debut} {oui} {non}"
      },
      {
       "id": "sym9",
+      "title": "\\ et | : barre oblique inverse et barre verticale",
+      "keys": "\\ |",
+      "teaches": "\\|",
+      "row": "haut",
+      "fingers": [
+       "rp"
+      ],
+      "tip": "La barre oblique inverse et la barre verticale sont sur la touche juste au-dessus de Entrée, à l'auriculaire droit ; la barre verticale demande Maj.",
+      "tuto": {
+       "intro": "La barre oblique inverse \\ et la barre verticale | partagent une même touche, tout au bout de la rangée du haut, au-dessus de Entrée. La barre verticale s'obtient avec Maj. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Au-dessus d'Entrée",
+         "d": "L'auriculaire droit s'étire au bout de la rangée du haut, après les crochets. \\ se tape seul, | avec Maj."
+        },
+        {
+         "icon": "📁",
+         "t": "Les chemins Windows",
+         "d": "C:\\Users\\Theo : la barre oblique inverse sépare les dossiers sous Windows, alors que la barre oblique simple / les sépare ailleurs."
+        },
+        {
+         "icon": "➡️",
+         "t": "La barre verticale",
+         "d": "a | b relie deux commandes ou sépare deux choix : droite | gauche."
+        }
+       ],
+       "tip": "Objectif : taper \\ et | avec l'auriculaire droit, avec Maj pour la barre verticale."
+      },
+      "text": "C:\\Users\\Theo a|b a||b c\\d \\n \\t droite | gauche /home | grep \\\\ || C:\\Windows"
+     },
+     {
+      "id": "sym10",
+      "title": "< > : les chevrons",
+      "keys": "< >",
+      "teaches": "<>",
+      "row": "bas",
+      "fingers": [
+       "rm",
+       "rr"
+      ],
+      "tip": "Les chevrons sont sur les touches de la virgule et du point, avec Maj : le majeur et l'annulaire droits descendent, l'auriculaire gauche tient Maj.",
+      "tuto": {
+       "intro": "Les chevrons < > se tapent avec Maj sur les touches de la virgule et du point. On les voit dans les balises HTML : <p>texte</p>. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Maj de la main opposée",
+         "d": "Comme pour les majuscules : tiens Maj avec l'auriculaire de la main qui ne tape pas la touche. Maj + la touche du chiffre donne le symbole."
+        },
+        {
+         "icon": "🏷️",
+         "t": "Les balises HTML",
+         "d": "<p>texte</p> : le chevron ouvrant, le nom de la balise, le chevron fermant. La barre oblique / ferme la balise."
+        },
+        {
+         "icon": "🔁",
+         "t": "Ouvrir, fermer",
+         "d": "Chaque balise ouverte se referme avec la barre oblique. Entraîne-toi à enchaîner les deux."
+        }
+       ],
+       "tip": "Objectif : taper < et > avec Maj et les doigts de la main droite."
+      },
+      "text": "<html> </html> <p>texte</p> <div> </div> <b>gras</b> <i>fin</i> <a> </a> <h1>titre</h1> <br> <ul> </ul>"
+     },
+     {
+      "id": "sym11",
       "title": "Révision : tous les symboles en texte",
       "keys": "tous symboles",
-      "text": "contact@site.fr (2024) http://url.be #tag {css: bold} <html> 50%=ok a+b=c [fin] ~/home \"valeur\"",
+      "teaches": "",
+      "howText": true,
+      "tip": "On réunit tous les symboles dans un texte mêlant adresse, web, code et prix. Repère le geste avant chaque symbole : direct, Maj ou touche morte.",
       "tuto": {
-       "intro": "On réunit tous les symboles dans un texte mêlant email, web, code et pourcentages. Le grand mélange !",
+       "intro": "On réunit tous les symboles dans un texte mêlant email, web, code et pourcentages. Le grand mélange ! Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
          "icon": "🧩",
          "t": "Tous les combos",
-         "d": "Shift, AltGr, touches mortes... Chaque symbole a son geste. Mobilise tout ce que tu as appris dans les deux modules."
+         "d": "Maj, touches mortes, signes directs : chaque symbole a son geste. Mobilise tout ce que tu as appris dans les deux modules."
         },
         {
          "icon": "🧭",
          "t": "Repère le geste",
-         "d": "Avant chaque symbole, identifie : direct, Shift ou AltGr ? Ce réflexe te fait gagner du temps."
+         "d": "Avant chaque symbole, identifie : direct, Maj ou touche morte ? Ce réflexe te fait gagner du temps."
         },
         {
          "icon": "💻",
@@ -4772,9 +4908,9 @@
          "d": "Maîtriser les symboles, c'est taper une adresse, un bout de code ou une formule sans jamais bloquer."
         }
        ],
-       "tip": "Objectif : enchaîner tous les symboles dans un texte réel, chaque combo au bon moment."
+       "tip": "Objectif : enchaîner tous les symboles dans un texte réel, chaque geste au bon moment."
       },
-      "howText": true
+      "text": "contact@site.fr (2024) http://url.be #tag {css: bold} <html> 50%=ok a+b=c [fin] ~/home \"valeur\" 3*4 C:\\Users a|b"
      }
     ]
    },
