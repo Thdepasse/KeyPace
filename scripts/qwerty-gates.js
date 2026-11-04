@@ -102,18 +102,23 @@ function deadKeyEngine() {
   const h = loadApp(); const r = {};
   const dk = (code) => ({ key: 'Dead', code });
   // « l'eau » sur une disposition où l'apostrophe est une touche morte (États-Unis international)
-  r["l'eau : apostrophe, e (le système compose é)"] = engineRun(h, "l'eau", [{ key: 'l' }, dk('Quote'), { key: 'é' }, { key: 'a' }, { key: 'u' }]);
-  r["l'eau : apostrophe, Espace, e (Espace donne l'apostrophe)"] = engineRun(h, "l'eau", [{ key: 'l' }, dk('Quote'), { key: "'" }, { key: 'e' }, { key: 'a' }, { key: 'u' }]);
+  r["l'eau : apostrophe puis e donne é : faute attendue (il fallait l'apostrophe)"] = engineRun(h, "l'eau", [{ key: 'l' }, dk('Quote'), { key: 'é' }, { key: 'a' }, { key: 'u' }]);
+  r["l'eau : apostrophe, Espace, e (Espace donne l'apostrophe)"] = engineRun(h, "l'eau", [{ key: 'l' }, dk('Quote'), { key: "'", code: 'Space' }, { key: 'e' }, { key: 'a' }, { key: 'u' }]);
   r["l'eau : apostrophe, Espace (le navigateur envoie Espace)"] = engineRun(h, "l'eau", [{ key: 'l' }, dk('Quote'), { key: ' ' }, { key: 'e' }, { key: 'a' }, { key: 'u' }]);
   r['é par touche morte : apostrophe puis e'] = engineRun(h, 'é', [dk('Quote'), { key: 'é' }]);
   r['è par touche morte : accent grave puis e'] = engineRun(h, 'è', [dk('Backquote'), { key: 'è' }]);
   r['ê par touche morte : Maj+6 puis e'] = engineRun(h, 'ê', [dk('Digit6'), { key: 'ê' }]);
   r['ë par touche morte : Maj+apostrophe puis e'] = engineRun(h, 'ë', [dk('Quote'), { key: 'ë' }]);
-  r['guillemet droit par touche morte puis Espace'] = engineRun(h, '"', [dk('Quote'), { key: '"' }]);
+  r['guillemet droit par touche morte puis Espace'] = engineRun(h, '"', [{ key: 'Dead', code: 'Quote', shift: true }, { key: '"', code: 'Space' }]);
   // Firefox (bogue 1599021, ouvert) : après une touche morte, la valeur de touche peut contenir deux caractères (« ^e »).
   r['Firefox : accent mort puis lettre en une seule valeur « ^e » pour ê'] = engineRun(h, 'ê', [dk('BracketLeft'), { key: '^e' }]);
   r['Firefox : apostrophe morte puis lettre en une seule valeur « \'e » pour é'] = engineRun(h, 'é', [dk('Quote'), { key: "'e" }]);
   r['Firefox : touche morte puis Espace, valeur « ^ » seule'] = engineRun(h, '^', [dk('BracketLeft'), { key: '^' }]);
+  // Touche morte puis lettre sans accent possible : Chrome envoie la lettre seule, le champ reçoit l'accent PUIS la lettre.
+  r["l'k : apostrophe morte puis k (Chrome : la lettre seule)"] = engineRun(h, "l'k", [{ key: 'l' }, dk('Quote'), { key: 'k', code: 'KeyK' }]);
+  r["l'k : apostrophe morte puis k (Safari : « 'k » en une valeur)"] = engineRun(h, "l'k", [{ key: 'l' }, dk('Quote'), { key: "'k", code: 'KeyK' }]);
+  r["deux apostrophes de suite : touche morte pressee deux fois"] = engineRun(h, "''", [dk('Quote'), dk('Quote')]);
+  r["tilde puis Espace : valeur ~ avec le code Espace"] = engineRun(h, '~', [{ key: 'Dead', code: 'Backquote', shift: true }, { key: '~', code: 'Space' }]);
   return r;
 }
 

@@ -283,6 +283,7 @@ const GATES = process.env.GATES_FAKE_RED
     { id: 'U5', name: 'Tous les textes de test et du certificat se terminent (4 dispositions)', run: () => usage().u5() },
     { id: 'U6', name: 'Les gestes sans touche sont découverts par le moteur, pas supposés', run: () => usage().u6() },
     { id: 'U7', name: 'Chaque écran s\'affiche pour chaque type de compte', run: () => usage().u7() },
+    { id: 'U8', name: 'Accents : exigés, bandeau d\'aide, toléré, certificat exigeant (D5)', run: () => usage().u8() },
     { id: 'T1', name: 'Traces de matériel réel rejouées dans le moteur (G6)', run: () => require('./traces-gate').run() },
     { id: 'B1', name: 'Vrai navigateur : chargement, écrans, 26 claviers, vraies frappes', run: b1 },
   ];

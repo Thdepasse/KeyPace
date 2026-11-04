@@ -4555,6 +4555,37 @@ function kbAttr(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/
    est accepté à la place (cf. typeKey). Réglage 'droits' : afficher " à la place. */
 function getQuoteStyle(){try{const v=localStorage.getItem('kp_quotes');if(v==='fr'||v==='droits')return v;}catch{}return'fr';}
 function setQuoteStyle(v){try{localStorage.setItem('kp_quotes',v);}catch{}}
+/* Accents (D5) : par défaut ils sont exigés. Mode « toléré » (par appareil, comme le clavier) : la lettre sans accent
+   est acceptée à la place de la lettre accentuée ; le test porte alors tolerant:true et le certificat reste exigeant. */
+function getAccentMode(){try{return localStorage.getItem('kp_accents')==='tolerant'?'tolerant':'exact';}catch{return'exact';}}
+function setAccentMode(v){try{localStorage.setItem('kp_accents',v==='tolerant'?'tolerant':'exact');}catch{}}
+function kpAccentBase(c){
+  if(!c||c.length!==1)return c;
+  const b=c.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  return b.length===1&&b!==c&&/[a-zA-Z]/.test(b)?b:c;
+}
+/* Bandeau discret (sans fenêtre bloquante) quand l'élève rate plusieurs fois la même lettre accentuée en tapant la lettre nue. */
+let _kpAccBannerShown=false;
+function kpAccentBannerShow(ch){
+  if(_kpAccBannerShown||getAccentMode()!=='exact')return;
+  try{
+    _kpAccBannerShown=true;
+    let n=document.getElementById('kp-acc-banner');
+    if(n)n.remove();
+    n=document.createElement('div');n.id='kp-acc-banner';n.setAttribute('role','status');n.dataset.ch=ch;
+    n.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:min(560px,calc(100vw - 24px));background:#3A352B;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.4;z-index:9999;box-shadow:0 6px 24px rgba(0,0,0,.25)';
+    n.innerHTML='<div id="kp-acc-text"></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" id="kp-acc-how" style="padding:6px 12px;border-radius:8px;border:0;cursor:pointer;font:inherit">Voir comment faire</button><button type="button" id="kp-acc-skip" style="padding:6px 12px;border-radius:8px;border:0;cursor:pointer;font:inherit">Continuer sans accents</button><button type="button" id="kp-acc-close" aria-label="Fermer" style="padding:6px 10px;border-radius:8px;border:0;cursor:pointer;font:inherit;background:transparent;color:#fff">✕</button></div>';
+    document.body.appendChild(n);
+    n.querySelector('#kp-acc-text').textContent='Tu n\'arrives pas à taper « '+ch+' » ?';
+    n.querySelector('#kp-acc-how').onclick=()=>{
+      const H=KB_HOW[getKbLayoutId()]||{};
+      n.querySelector('#kp-acc-text').textContent=H[ch]?('« '+ch+' » : '+H[ch]+'.'):'Vérifie la disposition de ton clavier dans Réglages, rubrique Clavier, et dans les réglages de ton ordinateur.';
+    };
+    n.querySelector('#kp-acc-skip').onclick=()=>{setAccentMode('tolerant');n.remove();kbNotice('Accents tolérés : la lettre sans accent est acceptée. Tu peux changer ça dans Réglages, rubrique Accents.');};
+    n.querySelector('#kp-acc-close').onclick=()=>n.remove();
+    setTimeout(()=>{try{n.remove();}catch{}},30000);
+  }catch{}
+}
 
 /* Gestes par disposition. Sources : fichiers de disposition xkeyboard-config
    (français, belge, Mac) et fr_azerty_afnor (NF Z71-300) ; tilde belge confirmé
@@ -5604,6 +5635,11 @@ const WORDS=GAME_TIERS[0].words;
 // Dead key composition for AZERTY (handles ^ as '^' not 'Dead' on some setups)
 const DEAD_COMPOSE={'^':{a:'â',e:'ê',i:'î',o:'ô',u:'û',A:'Â',E:'Ê',I:'Î',O:'Ô',U:'Û'},'¨':{a:'ä',e:'ë',i:'ï',o:'ö',u:'ü',y:'ÿ',A:'Ä',E:'Ë',I:'Ï',O:'Ö',U:'Ü'}};
 const CODE_TO_DEAD={'BracketLeft':'^','BracketRight':'¨'};
+// Claviers QWERTY « international » : accent que la touche morte inscrit seule (sans lettre composable), par code physique [sans Maj, avec Maj].
+// Aucune de ces touches n'est morte sur les 4 AZERTY du site : cette table ne sert donc qu'aux dispositions QWERTY.
+const DEAD_ACCENT_BY_CODE={'Quote':["'",'"'],'Backquote':['`','~'],'Digit6':[null,'^']};
+// Accents composables par une touche morte ou une valeur à deux caractères (Safari/Firefox : « 'e »), en plus de DEAD_COMPOSE.
+const DEAD_COMPOSE_EXT={"'":{a:'á',e:'é',i:'í',o:'ó',u:'ú',y:'ý',c:'ç',A:'Á',E:'É',I:'Í',O:'Ó',U:'Ú',Y:'Ý',C:'Ç'},'´':{a:'á',e:'é',i:'í',o:'ó',u:'ú',y:'ý',A:'Á',E:'É',I:'Í',O:'Ó',U:'Ú',Y:'Ý'},'`':{a:'à',e:'è',i:'ì',o:'ò',u:'ù',A:'À',E:'È',I:'Ì',O:'Ò',U:'Ù'},'~':{a:'ã',n:'ñ',o:'õ',A:'Ã',N:'Ñ',O:'Õ'}};
 const SPRINT_WORDS=["le","la","les","un","une","de","des","et","ou","dans","sur","avec","pour","par","pas","ne","se","ce","ma","ta","sa","qui","que","quoi","où","tout","bien","très","faire","voir","aller","venir","avoir","être","dire","vouloir","pouvoir","savoir","prendre","mettre","partir","sortir","entrer","rester","trouver","donner","penser","parler","aimer","vivre","tenir","tomber","ouvrir","fermer","lire","écrire","taper","apprendre","comprendre","répondre","attendre","perdre","gagner","jouer","courir","marcher","chanter","danser","rire","pleurer","manger","boire","dormir","réveiller","travailler","voyager","revenir","passer","laisser","suivre","montrer","décider","commencer","finir","continuer","arriver","repartir","rentrer","retourner"];
 /* Banque de mots accentués + tiers de difficulté pour les jeux (réutilise WORDS/SPRINT_WORDS) */
 const TIREUR_ACCENTS=["école","élève","fenêtre","château","préféré","règle","forêt","crème","théâtre","numéro","côté","énergie","français","intérêt","élément","problème","éléphant","lumière","révéler","différent"];
@@ -7429,16 +7465,16 @@ const app={
     // Safari (Mac) et Firefox : touche morte + lettre sans accent possible (^ puis k) arrive en UNE touche à deux
     // caractères (key = "^k"). Mesuré sur du matériel réel (traces/mac-safari-26-touches-mortes.json) : on la rejoue
     // comme deux frappes, l'accent puis la lettre, exactement ce qui s'inscrit dans un champ de texte.
-    if(!e._direct&&e.key&&[...e.key].length===2&&'^¨~`´'.includes(e.key[0])&&!e.ctrlKey&&!e.metaKey){
+    if(!e._direct&&e.key&&[...e.key].length===2&&'^¨~`´\'"'.includes(e.key[0])&&!e.ctrlKey&&!e.metaKey){
       const _cs=[...e.key];this._pendingDeadKey=null;e.preventDefault&&e.preventDefault();
-      const _cp=(DEAD_COMPOSE[_cs[0]]||{})[_cs[1]];
+      const _cp=(DEAD_COMPOSE[_cs[0]]||(_cs[0]==='"'?DEAD_COMPOSE['¨']:DEAD_COMPOSE_EXT[_cs[0]])||{})[_cs[1]];
       if(_cp)this._directKey(e,_cp);else{this._directKey(e,_cs[0]);this._directKey(e,_cs[1]);}
       return;
     }
     // Touche morte pressée deux fois (^^) : Chrome renvoie « Dead » une 2e fois, Safari renvoie key = "^" (code de la
     // touche morte). Dans les deux cas le champ reçoit l'accent deux fois, rien ne reste en attente.
-    if(!e._direct&&this._pendingDeadKey&&this._pendingDeadKey!=='?'&&e.key===this._pendingDeadKey&&e.code!=='Space'){
-      const _pk=this._pendingDeadKey;this._pendingDeadKey=null;e.preventDefault&&e.preventDefault();
+    if(!e._direct&&this._pendingDeadKey&&this._pendingDeadAcc&&e.key===this._pendingDeadAcc&&e.code!=='Space'){
+      const _pk=this._pendingDeadAcc;this._pendingDeadKey=null;e.preventDefault&&e.preventDefault();
       this._directKey(e,_pk);this._directKey(e,_pk);this._kbRefresh();return;
     }
     // Touche morte puis Espace : Chrome et Safari donnent directement le caractère (key = "^", code = Space).
@@ -7467,15 +7503,16 @@ const app={
       }
       // Deuxième touche morte alors qu'une autre attend : la première s'inscrit telle quelle (^ puis ¨ donne ^¨),
       // la même deux fois donne l'accent doublé (^^) et rien n'attend plus.
-      const _p0=this._pendingDeadKey;
-      if(d&&_p0&&_p0!=='?'){
+      const _p0=this._pendingDeadKey?this._pendingDeadAcc:null;
+      const _da=d||(DEAD_ACCENT_BY_CODE[e.code]||[])[e.shiftKey?1:0]||null;
+      if(_da&&_p0){
         this._pendingDeadKey=null;this._directKey(e,_p0);
-        if(d===_p0)this._directKey(e,d);else this._pendingDeadKey=d;
+        if(_da===_p0)this._directKey(e,_da);else{this._pendingDeadKey=d||'?';this._pendingDeadAcc=_da;}
         this._kbRefresh();return;
       }
-      this._pendingDeadKey=d||'?';this._kbRefresh();return;
+      this._pendingDeadKey=d||'?';this._pendingDeadAcc=_da;this._kbRefresh();return;
     }
-    if(DEAD_COMPOSE[e.key]&&e.key.length===1&&!e._direct&&!e._composedKey){this._pendingDeadKey=e.key;this._kbRefresh();return;}
+    if(DEAD_COMPOSE[e.key]&&e.key.length===1&&!e._direct&&!e._composedKey){this._pendingDeadKey=e.key;this._pendingDeadAcc=e.key;this._kbRefresh();return;}
     // Une touche de modification (Maj pour une majuscule, AltGr…) arrivant après la touche morte
     // ne doit pas l'annuler : Ê, Ë… restent possibles.
     if(this._pendingDeadKey&&['Shift','Control','Alt','AltGraph','Meta','CapsLock'].includes(e.key))return;
@@ -7488,7 +7525,10 @@ const app={
     if(this._pendingDeadKey){
       const pk=this._pendingDeadKey;this._pendingDeadKey=null;
       if(pk==='?'){
-        if(e.key===' '&&this.sess&&this.sess.text){const ex=this.sess.text[this.sess.idx];if(ex&&'~`^¨'.includes(ex))e._composedKey=ex;}
+        const _ac=this._pendingDeadAcc;
+        if(_ac&&e.key===' ')e._composedKey=_ac; // accent connu (QWERTY international) : Espace l'inscrit tel quel
+        else if(_ac&&e.key&&e.key.length===1&&/^[\x21-\x7e]$/.test(e.key)&&!e._direct)this._directKey(e,_ac); // lettre sans accent possible : accent puis lettre
+        else if(e.key===' '&&this.sess&&this.sess.text){const ex=this.sess.text[this.sess.idx];if(ex&&'~`^¨'.includes(ex))e._composedKey=ex;}
       }else{
         const _tb=DEAD_COMPOSE[pk]||{};
         // Combinaison impossible (^ puis k) : Chrome renvoie la lettre seule, mais le champ reçoit l'accent PUIS la lettre.
@@ -7555,6 +7595,12 @@ const app={
     }
     // œ / æ : « oe » / « ae » (deux lettres) est accepté quand l'élève n'a pas la touche.
     if(!_ok&&((expected==='œ'&&k==='o')||(expected==='Œ'&&k==='O')||(expected==='æ'&&k==='a')||(expected==='Æ'&&k==='A'))){_ok=true;s._skipNext={at:s.idx+1,ch:'e',lig:s.idx};}
+    // Accents (D5) : la lettre nue à la place d'une lettre accentuée. Toléré si l'élève l'a choisi (jamais pour le certificat) ;
+    // sinon on compte l'échec : au 3e sur la même lettre, un bandeau discret propose de l'aide.
+    if(!_ok&&expected){const _ab=kpAccentBase(expected);if(_ab!==expected&&k===_ab){
+      if(getAccentMode()==='tolerant'&&!s.cert){_ok=true;s._tolerant=true;}
+      else if(!s.cert){s._accFail=s._accFail||{};s._accFail[expected]=(s._accFail[expected]||0)+1;if(s._accFail[expected]>=3)kpAccentBannerShow(expected);}
+    }}
     if(_ok){s.typed[s.idx]='c';s.correct++;}else{
       s.typed[s.idx]='w';
       // Verr. Maj : la bonne lettre, mais dans l'autre casse, alors que Verr. Maj est active.
@@ -7590,7 +7636,7 @@ const app={
     // perso"/dictée à ses propres tentatives passées sur CE devoir, plutôt
     // qu'au record d'un test de vitesse libre (conditions différentes).
     const assignmentId=this.sess&&this.sess.custom?this.sess.assignmentId:null;
-    this.stats.tests.push({t:Date.now(),wpm:res.wpm,acc:res.acc,mode,...(lessonId?{lessonId}:{}),...(assignmentId?{assignmentId}:{}),...gazeExtra});
+    this.stats.tests.push({t:Date.now(),wpm:res.wpm,acc:res.acc,mode,...(this.sess&&this.sess._tolerant?{tolerant:true}:{}),...(lessonId?{lessonId}:{}),...(assignmentId?{assignmentId}:{}),...gazeExtra});
     // Devoir « texte personnalisé » : marque ce devoir comme fait (statut côté prof/élève).
     if(this.sess&&this.sess.assignmentId){
       if(!this.stats.assignmentsDone)this.stats.assignmentsDone={};
@@ -14368,6 +14414,14 @@ const app={
             <button class="settings-btn${getQuoteStyle()==='fr'?' active':''}" onclick="app.setQuotes('fr')">« Français »</button>
             <button class="settings-btn${getQuoteStyle()==='droits'?' active':''}" onclick="app.setQuotes('droits')">"Droits"</button>
           </div>
+          <div class="settings-row-info" style="margin-top:4px">
+            <strong>Accents</strong>
+            <span>Exigés : tu apprends à taper é, è, ê… avec ton clavier. Tolérés : la lettre sans accent est acceptée (ton score est marqué « accents tolérés », et le certificat reste exigeant). Ce réglage vaut pour cet appareil.</span>
+          </div>
+          <div id="accent-btns" style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="settings-btn${getAccentMode()==='exact'?' active':''}" onclick="app.setAccents('exact')">Exigés</button>
+            <button class="settings-btn${getAccentMode()==='tolerant'?' active':''}" onclick="app.setAccents('tolerant')">Tolérés</button>
+          </div>
           <div id="kb-layout-preview" style="width:100%;overflow-x:auto">${kbFullPreviewHTML(getKbLayoutId(),getKbFormFactorId())}</div>
         </div>
       </div>
@@ -14484,6 +14538,7 @@ const app={
       if(!isMusicMuted())this._sourisAudio.volume=0.35;
     }
   },
+  setAccents(v){setAccentMode(v);const b=document.querySelectorAll('#accent-btns .settings-btn');if(b.length===2){b[0].classList.toggle('active',v==='exact');b[1].classList.toggle('active',v==='tolerant');}},
   setQuotes(v){setQuoteStyle(v);const b=document.querySelectorAll('#quote-btns .settings-btn');if(b.length===2){b[0].classList.toggle('active',v==='fr');b[1].classList.toggle('active',v==='droits');}},
   setKbLayout(id){
     if(!KB_LAYOUTS[id])return;

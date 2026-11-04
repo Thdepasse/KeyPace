@@ -217,4 +217,34 @@ async function u7() {
   return errs.length ? { ok: false, detail: errs.slice(0, 8).join('\n') } : { ok: true, detail: `${n} affichages (écrans x types de compte x compte vide ou rempli) sans erreur` };
 }
 
-module.exports = { u1, u2, u3, u4, u5, u6, u7, typableSet, plan };
+
+// U8 : accents (D5). Exigés par défaut ; au 3e échec sur la même lettre le bandeau est proposé ; en mode toléré la lettre nue passe
+// (test marqué tolerant:true) sauf au certificat ; une mauvaise lettre accentuée reste une faute.
+function u8() {
+  const errs = [];
+  const start = (h, text, extra) => { h.run("currentUser='t';currentToken='t';currentUserId='u';_statsLoaded=true;app.stats=mergeStats();app.view='test';app.sess={mode:'test',lessonId:null,text:" + JSON.stringify(text) + ",idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false" + (extra || '') + "};__b=[];"); };
+  const mk = () => { const h = loadApp(); h.run('var __b=[];kpAccentBannerShow=function(c){__b.push(c);};'); return h; };
+  const faults = (h) => h.run('app.sess.keystrokes-app.sess.correct');
+  // 1. exigés : e pour é est une faute, é correct
+  let h = mk(); start(h, 'été'); press(h, { key: 'e' }); if (faults(h) !== 1) errs.push('exigés : e pour é devrait être une faute');
+  h = mk(); start(h, 'été'); for (const k of ['é', 't', 'é']) press(h, { key: k });
+  if (!h.run('app.sess.finished') || faults(h) !== 0 || h.run('__b.length')) errs.push('exigés : é tapé juste doit passer sans bandeau');
+  // 2. bandeau au 3e échec seulement
+  h = mk(); start(h, 'ééé'); press(h, { key: 'e' }); press(h, { key: 'e' });
+  if (h.run('__b.length')) errs.push('bandeau trop tôt (2 échecs)');
+  press(h, { key: 'e' }); if (h.run('JSON.stringify(__b)') !== '["é"]') errs.push('bandeau attendu au 3e échec sur é, obtenu ' + h.run('JSON.stringify(__b)'));
+  // une faute qui n'est pas la lettre nue ne compte pas
+  h = mk(); start(h, 'ééé'); for (let i = 0; i < 3; i++) press(h, { key: 'x' }); if (h.run('__b.length')) errs.push('une frappe quelconque ne doit pas déclencher le bandeau');
+  // 3. toléré
+  h = mk(); h.run("localStorage.setItem('kp_accents','tolerant')"); start(h, 'été'); for (const k of ['e', 't', 'e']) press(h, { key: k });
+  if (!h.run('app.sess.finished') || faults(h) !== 0) errs.push('toléré : la lettre nue devrait passer sans faute');
+  else if (!h.run('app.stats.tests.length&&app.stats.tests[app.stats.tests.length-1].tolerant===true')) errs.push('toléré : le test enregistré doit porter tolerant:true');
+  h = mk(); h.run("localStorage.setItem('kp_accents','tolerant')"); start(h, 'été'); for (const k of ['é', 't', 'é']) press(h, { key: k });
+  if (h.run('app.stats.tests.length&&app.stats.tests[app.stats.tests.length-1].tolerant===true')) errs.push('toléré : un test sans lettre nue ne doit pas être marqué tolerant');
+  h = mk(); h.run("localStorage.setItem('kp_accents','tolerant')"); start(h, 'è'); press(h, { key: 'é' }); if (faults(h) !== 1) errs.push('toléré : é à la place de è reste une faute');
+  h = mk(); h.run("localStorage.setItem('kp_accents','tolerant')"); start(h, 'É'); press(h, { key: 'e' }); if (faults(h) !== 1) errs.push('toléré : e minuscule pour É reste une faute');
+  // 4. certificat : jamais toléré
+  h = mk(); h.run("localStorage.setItem('kp_accents','tolerant')"); start(h, 'été', ',cert:true'); press(h, { key: 'e' }); if (faults(h) !== 1) errs.push('certificat : la tolérance ne doit pas s\'appliquer');
+  return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: 'exigés par défaut, bandeau au 3e échec, toléré marqué tolerant:true, certificat toujours exigeant' };
+}
+module.exports = { u1, u2, u3, u4, u5, u6, u7, u8, typableSet, plan };

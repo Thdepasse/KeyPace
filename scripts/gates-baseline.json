@@ -1,5 +1,5 @@
 {
- "indexBytes": 1394729,
+ "indexBytes": 1400457,
  "functions": [
   "billing.js",
   "classes.js",
@@ -15,10 +15,10 @@
   "webhook.js"
  ],
  "protected": {
-  "typeKey": "064e8966c8119851",
-  "handleKey": "4ef22ca5235bc5ef",
+  "typeKey": "956db04e79d3dc06",
+  "handleKey": "b66b1a44282cd39b",
   "computeResult": "01f81d7702edf492",
-  "recordResult": "18759661e28ebd0c",
+  "recordResult": "37d04eda35a47235",
   "_recordKey": "8a642d02a3a0c0b0",
   "_ttFinish": "41ea0a7fc1076230",
   "flushStats": "1262d075ebe4bb80",
@@ -1098,7 +1098,7 @@
   }
  },
  "qwertyDeadKeyEngine": {
-  "l'eau : apostrophe, e (le système compose é)": {
+  "l'eau : apostrophe puis e donne é : faute attendue (il fallait l'apostrophe)": {
    "finished": false,
    "faults": 3
   },
@@ -1108,7 +1108,7 @@
   },
   "l'eau : apostrophe, Espace (le navigateur envoie Espace)": {
    "finished": true,
-   "faults": 1
+   "faults": 0
   },
   "é par touche morte : apostrophe puis e": {
    "finished": true,
@@ -1135,10 +1135,26 @@
    "faults": 0
   },
   "Firefox : apostrophe morte puis lettre en une seule valeur « 'e » pour é": {
-   "finished": false,
+   "finished": true,
    "faults": 0
   },
   "Firefox : touche morte puis Espace, valeur « ^ » seule": {
+   "finished": true,
+   "faults": 0
+  },
+  "l'k : apostrophe morte puis k (Chrome : la lettre seule)": {
+   "finished": true,
+   "faults": 0
+  },
+  "l'k : apostrophe morte puis k (Safari : « 'k » en une valeur)": {
+   "finished": true,
+   "faults": 0
+  },
+  "deux apostrophes de suite : touche morte pressee deux fois": {
+   "finished": true,
+   "faults": 0
+  },
+  "tilde puis Espace : valeur ~ avec le code Espace": {
    "finished": true,
    "faults": 0
   }
