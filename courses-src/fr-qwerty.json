@@ -22,6 +22,39 @@
   "b5",
   "b6"
  ],
+ "reuse": [
+  "w1",
+  "w2",
+  "w3",
+  "w4",
+  "w5",
+  "maj1",
+  "maj2",
+  "maj4",
+  "pon1",
+  "flu1",
+  "flu2",
+  "flu3",
+  "flu4",
+  "flu5"
+ ],
+ "introOrder": [
+  "w1",
+  "w2",
+  "w3",
+  "w4",
+  "w5",
+  "maj1",
+  "maj2",
+  "maj3",
+  "maj4",
+  "pon1",
+  "pon2",
+  "pon3",
+  "pon4",
+  "pon5",
+  "pon6"
+ ],
  "lessons": {
   "r1": {
    "title": "F et J, les index",
@@ -229,6 +262,69 @@
     "ya"
    ],
    "text": "ajouter conserver pratique effacer texte bronze ski utiliser calculer wo ya explorer enseigner permettre descendre renforcer marcher robotique jouer chercher douze"
+  },
+  "maj3": {
+   "title": "Noms propres et villes",
+   "keys": "majuscules",
+   "module": "5. Majuscules",
+   "moduleIdx": 4,
+   "kind": "adapted",
+   "text": "Paris Lyon Bruxelles Berlin Tokyo Rome Marie Jean Sophie Pierre Hugo Luc Anna Emma Paul Clara",
+   "why": "Genève (accent grave) retiré : accents appris au module 7"
+  },
+  "pon2": {
+   "title": "Question et exclamation",
+   "keys": "? !",
+   "module": "6. Ponctuation complète",
+   "moduleIdx": 5,
+   "kind": "adapted",
+   "text": "viens ici ! attention ! quel beau jour ! vraiment ? super ! bravo ! encore ? tu veux jouer ? oui ! allons vite !",
+   "why": "où es-tu ? retiré (ù) ; fais-tu et c'est retirés : tiret et apostrophe ne sont enseignés qu'en pon4"
+  },
+  "pon3": {
+   "title": "Deux-points et point-virgule",
+   "keys": ": ;",
+   "module": "6. Ponctuation complète",
+   "moduleIdx": 5,
+   "kind": "adapted",
+   "text": "voici la liste : pain, lait, riz ; beurre, sel, sucre ; eau, jus, miel. trois mots : calme, force, patience.",
+   "why": "café, thé, règles, brièveté… remplacés par des mots sans accent"
+  },
+  "pon4": {
+   "title": "L'apostrophe et le tiret",
+   "keys": "' -",
+   "module": "6. Ponctuation complète",
+   "moduleIdx": 5,
+   "kind": "adapted",
+   "text": "c'est l'heure qu'il aime. l'ami de paul arrive tout seul. vingt-cinq enfants jouent dans la rue. peut-on y aller ?",
+   "why": "d'où, l'idée, d'aujourd'hui, élèves, présents retirés (accents)"
+  },
+  "pon5": {
+   "title": "Guillemets et parenthèses",
+   "keys": "« » ( )",
+   "module": "6. Ponctuation complète",
+   "moduleIdx": 5,
+   "kind": "adapted",
+   "text": "il dit : « bonjour ». elle dit : « merci ». le total (trois) est juste. bonne nuit (enfin) !",
+   "why": "répond, résultat, journée (accents) et (42) (chiffres, appris au module 10) retirés"
+  },
+  "pon6": {
+   "title": "Ponctuation en texte réel",
+   "keys": "toute la ponctuation",
+   "module": "6. Ponctuation complète",
+   "moduleIdx": 5,
+   "kind": "adapted",
+   "text": "« Viens vite ! » dit-il. Elle dit : « J'arrive ; attends-moi. » Vingt-cinq minutes plus tard (enfin), elle arriva.",
+   "why": "répondit (é) remplacé par dit"
+  },
+  "flu6": {
+   "title": "Sprint de vitesse : texte long",
+   "keys": "vitesse maximale",
+   "module": "13. Vitesse et fluidité",
+   "moduleIdx": 12,
+   "kind": "adapted",
+   "text": "Écrire vite s'apprend avec de la régularité ; entraîne-toi chaque jour, garde les yeux sur l'écran, et laisse tes doigts trouver leur place tout seuls sur le clavier QWERTY. Bonne chance !",
+   "why": "le texte citait le clavier AZERTY"
   }
  }
 }

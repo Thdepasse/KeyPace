@@ -218,4 +218,39 @@ function q4() {
   }
   return errs.length ? { ok: false, detail: errs.slice(0, 10).join('\n') } : { ok: true, detail: `${data.order.length} leçons (6 suites de lettres, 12 de mots), touches vérifiées contre azerty-fr et windows-us ; mots différents par leçon : ${summary.join(' ')} ; compléments : ${data.order.filter((i) => data.lessons[i].fill).map((i) => i + ' (' + data.lessons[i].fill.length + ')').join(' ') || 'aucun'}` };
 }
-module.exports = { q4, a1, azertyVsApple, q1, q2, q3, disagreements, typability, deadKeyEngine, reach };
+
+// Q5 : phrases, majuscules, ponctuation (modules 4 à 6) et fluidité du cours français sur QWERTY. Un texte ne doit employer que des
+// signes déjà appris au moment où il est tapé : lettres (toutes apprises dès b5), majuscules (dès maj1), ? ! (pon2), : (pon3),
+// ' et - (pon4), « » ( ) (pon5). Aucun accent ni chiffre avant leur module : sur QWERTY l'accent demande un geste de touche morte.
+// Les leçons reprises telles quelles du cours AZERTY (liste REUSE) sont lues dans le vrai programme du site.
+function q5() {
+  const gen = require('./build-qwerty-lessons');
+  const data = JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'));
+  const { loadApp } = require('./engine-harness');
+  const h = loadApp();
+  const az = Object.fromEntries(JSON.parse(h.run('JSON.stringify(ALL_LESSONS.map(l=>[l.id,l.text]))')));
+  const errs = [];
+  if (JSON.stringify(data.reuse) !== JSON.stringify(gen.REUSE)) errs.push('liste reuse du fichier différente du générateur');
+  let allowed = new Set([...'abcdefghijklmnopqrstuvwxyz', ' ', ',', '.', ';', '/']);
+  let caps = false; const counts = [];
+  for (const id of gen.INTRO_ORDER) {
+    const intro = gen.INTRO[id];
+    if (intro === 'CAPS') caps = true; else if (intro) for (const c of intro) allowed.add(c);
+    const adapted = data.lessons[id];
+    const text = adapted ? adapted.text : (gen.REUSE.includes(id) ? az[id] : null);
+    if (text == null) { errs.push(`${id} : ni reprise ni adaptée`); continue; }
+    for (const c of text) {
+      const ok = allowed.has(c) || (caps && /[A-Z]/.test(c));
+      if (!ok) { errs.push(`${id} : « ${c} » pas encore appris (${text.slice(Math.max(0, text.indexOf(c) - 12), text.indexOf(c) + 12)})`); break; }
+    }
+    if (intro && intro !== 'CAPS') for (const c of intro) if (!text.includes(c) && c !== '"') errs.push(`${id} : n'emploie pas « ${c} » qu'elle enseigne`);
+    if (adapted && !adapted.why) errs.push(`${id} : adaptation sans motif écrit`);
+    counts.push(id);
+  }
+  // flu6 adaptée : doit exister et ne plus citer l'AZERTY
+  if (!data.lessons.flu6 || /AZERTY/i.test(data.lessons.flu6.text)) errs.push('flu6 : texte absent ou cite encore AZERTY');
+  for (const id of gen.REUSE) if (!az[id]) errs.push(`${id} : leçon reprise introuvable dans le programme`);
+  if (JSON.stringify(data) !== JSON.stringify(gen.build())) errs.push('le fichier diffère de ce que produit le générateur');
+  return errs.length ? { ok: false, detail: errs.slice(0, 10).join('\n') } : { ok: true, detail: `${counts.length} leçons (modules 4 à 6) sans signe avant son apprentissage ; ${gen.REUSE.length} reprises du cours AZERTY, ${Object.values(data.lessons).filter((l) => l.kind === 'adapted').length} adaptées` };
+}
+module.exports = { q5, q4, a1, azertyVsApple, q1, q2, q3, disagreements, typability, deadKeyEngine, reach };

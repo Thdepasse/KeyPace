@@ -38,6 +38,24 @@ const SEQ = [
 // Paires usuelles pour la barre oblique (b5) : uniquement des mots français réels.
 const SLASH_PAIRS = ['oui/non', 'vrai/faux', 'haut/bas', 'jour/nuit', 'bon/mal', 'grand/petit', 'blanc/noir', 'sec/humide'];
 
+// Leçons des modules 4 à 6 et 13 : phrases et ponctuation. Elles ne dépendent pas de l'ordre des touches (mêmes ensembles de lettres
+// par main sur AZERTY et QWERTY), donc la plupart sont reprises telles quelles du cours AZERTY (liste REUSE, vérifiée par la gate Q5).
+// Seuls les textes qui contiennent un accent AVANT le module des accents sont réécrits sans accent : sur AZERTY l'accent est une
+// touche directe, sur QWERTY il demande un geste (touche morte) que l'élève n'a pas encore appris.
+const REUSE = ['w1', 'w2', 'w3', 'w4', 'w5', 'maj1', 'maj2', 'maj4', 'pon1', 'flu1', 'flu2', 'flu3', 'flu4', 'flu5'];
+const ADAPTED = {
+  maj3: { text: 'Paris Lyon Bruxelles Berlin Tokyo Rome Marie Jean Sophie Pierre Hugo Luc Anna Emma Paul Clara', why: 'Genève (accent grave) retiré : accents appris au module 7' },
+  pon2: { text: 'viens ici ! attention ! quel beau jour ! vraiment ? super ! bravo ! encore ? tu veux jouer ? oui ! allons vite !', why: 'où es-tu ? retiré (ù) ; fais-tu et c\'est retirés : tiret et apostrophe ne sont enseignés qu\'en pon4' },
+  pon3: { text: 'voici la liste : pain, lait, riz ; beurre, sel, sucre ; eau, jus, miel. trois mots : calme, force, patience.', why: 'café, thé, règles, brièveté… remplacés par des mots sans accent' },
+  pon4: { text: "c'est l'heure qu'il aime. l'ami de paul arrive tout seul. vingt-cinq enfants jouent dans la rue. peut-on y aller ?", why: "d'où, l'idée, d'aujourd'hui, élèves, présents retirés (accents)" },
+  pon5: { text: 'il dit : « bonjour ». elle dit : « merci ». le total (trois) est juste. bonne nuit (enfin) !', why: 'répond, résultat, journée (accents) et (42) (chiffres, appris au module 10) retirés' },
+  pon6: { text: "« Viens vite ! » dit-il. Elle dit : « J'arrive ; attends-moi. » Vingt-cinq minutes plus tard (enfin), elle arriva.", why: 'répondit (é) remplacé par dit' },
+  flu6: { text: "Écrire vite s'apprend avec de la régularité ; entraîne-toi chaque jour, garde les yeux sur l'écran, et laisse tes doigts trouver leur place tout seuls sur le clavier QWERTY. Bonne chance !", why: 'le texte citait le clavier AZERTY' },
+};
+// Signes appris, de leçon en leçon, pour les modules 4 à 6 (vérifié par la gate Q5). Les lettres sont toutes apprises dès b5.
+const INTRO_ORDER = ['w1', 'w2', 'w3', 'w4', 'w5', 'maj1', 'maj2', 'maj3', 'maj4', 'pon1', 'pon2', 'pon3', 'pon4', 'pon5', 'pon6'];
+const INTRO = { maj1: 'CAPS', pon2: '?!', pon3: ':', pon4: "'-", pon5: '«»()"' }; // ',' '.' ';' viennent des leçons r4, b3, b4
+
 function rngFor(seedStr) {
   let h = 2166136261 >>> 0; for (const c of seedStr) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
   let a = h >>> 0;
@@ -143,10 +161,14 @@ function build() {
       text,
     };
   });
+  for (const [id, a] of Object.entries(ADAPTED)) {
+    const src = azById[id];
+    lessons[id] = { title: src.title, keys: src.keys, tip: src.tip, module: src.module, moduleIdx: src.moduleIdx, kind: 'adapted', text: a.text, why: a.why };
+  }
   return {
     schema: 1, id: 'fr/qwerty',
     note: 'Généré par scripts/build-qwerty-lessons.js (mots filtrés, aucun texte écrit à la main sauf titres et conseils des leçons qui changent). À relire avant ouverture du cours.',
-    order: SEQ.map((s) => s.id), lessons,
+    order: SEQ.map((s) => s.id), reuse: REUSE, introOrder: INTRO_ORDER, lessons,
   };
 }
 
@@ -156,4 +178,4 @@ if (require.main === module) {
   fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');
   for (const id of out.order) console.log(id.padEnd(3), String(out.lessons[id].keys).padEnd(22), out.lessons[id].text.slice(0, 90));
 }
-module.exports = { build, SEQ, SLASH_PAIRS, OUT, wordPool };
+module.exports = { build, SEQ, SLASH_PAIRS, OUT, wordPool, REUSE, ADAPTED, INTRO_ORDER, INTRO };
