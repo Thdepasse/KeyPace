@@ -117,18 +117,15 @@
   .segs .pr.on{color:var(--accent);font-size:16px}
   .segs .th{position:absolute;top:32px;transform:translateX(-50%);font-size:12px;font-weight:700;color:#a39c8d}
 
-  .cr-prices{margin-top:18px;display:grid;gap:14px}
-  .cr-was{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-  .cr-was .lbl{font:700 11px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-  .cr-was .pv{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:clamp(26px,3.4vw,34px);letter-spacing:-.03em;line-height:1;color:var(--muted)}
-  .cr-was .pv s{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:rgba(138,130,117,.75);text-underline-offset:0}
-  .cr-was .pv span{font-size:.55em;letter-spacing:0;font-weight:700;margin-left:6px}
-  .cr-was small{flex-basis:100%;font-size:13.5px;font-weight:500;color:var(--muted);margin-top:-4px}
-  .cr-mano{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-  .cr-mano img{height:46px;width:auto;display:block}
-  .cr-mano b{display:block;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:clamp(19px,2.4vw,24px);letter-spacing:-.03em;line-height:1.15}
-  .cr-mano small{display:block;font-size:13px;color:var(--muted);margin-top:3px}
-  .cr-fr{font-size:14px;color:var(--muted);margin:0;line-height:1.5}
+  .cr-bill{display:grid;gap:26px;margin-top:22px;max-width:620px}
+  .cr-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .cr-row .k{font:700 11px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .cr-row b{display:block;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:clamp(34px,5vw,48px);letter-spacing:-.04em;line-height:1}
+  .cr-row .sub{font-size:14px;color:var(--muted);margin-top:6px;line-height:1.45}
+  .cr-mano img{height:46px;width:auto;display:block;flex:none}
+  .cr-mano b{color:var(--accent)}
+  .cr-mano + .cr-row{margin-top:0}
+  .cr-fr{font-size:14px;color:var(--muted);margin:16px 0 0;line-height:1.5}
 
   .cr-cgu{display:flex;align-items:flex-start;gap:12px;margin-top:26px;font-size:15px;font-weight:600;line-height:1.4;cursor:pointer}
   .cr-cgu input{width:22px;height:22px;margin:0;flex:none;accent-color:var(--accent);cursor:pointer}
@@ -255,14 +252,14 @@
             <div class="segs" id="cr-segs"></div>
           </div>
 
-          <div class="cr-prices">
-            <div class="cr-was" id="cr-was"></div>
-            <div class="cr-mano" id="cr-mano">
+          <div class="cr-bill" id="cr-bill">
+            <div class="cr-row"><div><div class="k" id="cr-k1">Prix catalogue</div><b id="cr-total"></b><div class="sub" id="cr-per"></div></div></div>
+            <div class="cr-row cr-mano" id="cr-mano">
               <img src="/images/keypace-manolo-eligible.png" alt="Éligible à la subvention MANOLO, Fédération Wallonie-Bruxelles" width="223" height="46">
-              <div><b>Pris en charge par <em>la subvention</em></b><small>Sous réserve d'éligibilité, vérifiée avec vous.</small></div>
+              <div><div class="k">Avec la subvention, à votre charge</div><b>≈ 0 €</b><div class="sub">Si votre école est éligible, nous le vérifions avec vous.</div></div>
             </div>
-            <p class="cr-fr" id="cr-fr" hidden>La subvention MANOLO concerne les établissements de la Fédération Wallonie-Bruxelles. Le tarif ci-dessus s'applique tel quel.</p>
           </div>
+          <p class="cr-fr" id="cr-fr" hidden>La subvention MANOLO concerne les établissements de la Fédération Wallonie-Bruxelles. Le tarif ci-dessus s'applique tel quel.</p>
 
           <label class="cr-cgu"><input type="checkbox" id="cr-cgu"><span>J'accepte les <a href="/conditions" target="_blank" rel="noopener">conditions d'utilisation</a> et la <a href="/confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</span></label>
           <div class="cr-hp" aria-hidden="true"><label>Site web <input id="cr-hp" type="text" tabindex="-1" autocomplete="off"></label></div>
@@ -384,10 +381,9 @@ document.addEventListener('click',e=>{const nl=document.getElementById('nav-link
     segs(k);
     $('cr-ptag').style.left=pos(n);
     $('cr-ptag').innerHTML=eurs(t.p)+'<small>par élève</small>';
-    var total=eur(t.p*n)+' pour '+n+' élève'+(n>1?'s':'');
-    $('cr-was').innerHTML=be
-      ?'<span class="lbl">Prix catalogue</span><span class="pv"><s>'+eurs(t.p)+'</s><span>par élève</span></span><small>'+total+'</small>'
-      :'<span class="lbl">Tarif</span><span class="pv" style="color:var(--txt)">'+eurs(t.p)+'<span>par élève</span></span><small>'+total+'</small>';
+    $('cr-k1').textContent=be?'Prix catalogue':'Prix pour votre école';
+    $('cr-total').textContent=eurs(t.p*n);
+    $('cr-per').textContent='pour '+n+' élève'+(n>1?'s':'')+' · '+eurs(t.p)+' par élève';
     $('cr-mano').hidden=!be; $('cr-fr').hidden=be;
     var b=$('cr-bub');
     if(k<TIERS.length-1){var nx=TIERS[k+1]; b.innerHTML='À partir de <b>'+nx.min+' élèves</b>, le prix passe à <b>'+eurs(nx.p)+'</b> par élève.';}
