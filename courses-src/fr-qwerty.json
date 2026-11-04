@@ -91,11 +91,6 @@
   "flu6"
  ],
  "reuse": [
-  "w1",
-  "w2",
-  "w3",
-  "w4",
-  "w5",
   "maj1",
   "maj2",
   "maj4",
@@ -3215,7 +3210,12 @@
   "b3",
   "b4",
   "b5",
-  "b6"
+  "b6",
+  "w1",
+  "w2",
+  "w3",
+  "w4",
+  "w5"
  ],
  "curriculum": {
   "modules": [
@@ -3771,7 +3771,8 @@
       "id": "w1",
       "title": "Rythme et syllabes",
       "keys": "toutes lettres",
-      "text": "acteur mais risque hier nom axe porte ris tri fleur arbre papa rude roue acteur sortir non appui dur",
+      "teaches": "",
+      "tip": "Tu as toutes les lettres en main. Tape des syllabes à intervalle régulier, comme un métronome : la régularité compte plus que la vitesse.",
       "tuto": {
        "intro": "Tu as toutes les lettres en main. Place maintenant au rythme : enchaîner des syllabes régulières pour fluidifier ta frappe.",
        "rules": [
@@ -3792,13 +3793,15 @@
         }
        ],
        "tip": "Objectif : trouver un rythme régulier et fluide sur des syllabes simples."
-      }
+      },
+      "text": "ba be bi bo bu, ca ce ci co cu, da de di do du, fa fe fi fo fu. ga go gu la le li lo lu ma me mi mo mu"
      },
      {
       "id": "w2",
       "title": "Mots outils essentiels",
       "keys": "vocabulaire",
-      "text": "roue mais doute but meute appui gaz rime vie union somme si pole tous raz yoga somme sac sortie rime",
+      "teaches": "",
+      "tip": "Les petits mots (le, la, des, et, mais…) reviennent dans toutes les phrases. Les taper d'un seul élan te fait gagner partout.",
       "tuto": {
        "intro": "Les petits mots outils (le, la, des, et, mais...) reviennent dans toutes les phrases. Les automatiser, c'est gagner partout.",
        "rules": [
@@ -3819,13 +3822,15 @@
         }
        ],
        "tip": "Objectif : taper les mots outils sans hésitation, comme des réflexes."
-      }
+      },
+      "text": "le la les un une des du de et ou mais donc car ni que qui quoi dans sur sous avec sans pour par vers chez il elle on nous vous"
      },
      {
       "id": "w3",
       "title": "Mots fréquents du quotidien",
       "keys": "vocabulaire",
-      "text": "car une bord les rue taxi miel seul index nom donc se jupe vent tramway nom dome brave ami pour wagon",
+      "teaches": "",
+      "tip": "Un mot répété assez souvent finit par se taper tout seul. Garde ton rythme sur toute la ligne, même sur un mot plus long.",
       "tuto": {
        "intro": "On élargit aux mots courants du quotidien. Plus ton stock de mots automatiques grandit, plus ta frappe devient fluide.",
        "rules": [
@@ -3846,20 +3851,22 @@
         }
        ],
        "tip": "Objectif : enchaîner des mots courants avec aisance et régularité."
-      }
+      },
+      "text": "maison table chaise porte livre stylo bureau jour nuit matin soir temps main pain eau sel sucre lait riz pomme poire"
      },
      {
       "id": "w4",
       "title": "Vocabulaire de la vie courante",
       "keys": "vocabulaire",
-      "text": "vie donc acteur bourse sole y nom bien lieu racine car bronze avec route bas odeur miel doute crise",
+      "teaches": "",
+      "tip": "Des mots plus longs : découpe-les en petits gestes, garde une frappe propre plutôt que pressée, et laisse ton regard capter la fin du mot pendant que tu tapes le début.",
       "tuto": {
-       "intro": "Des mots plus longs et concrets. C'est l'occasion de tenir ton rythme sur des mots de plusieurs syllabes.",
+       "intro": "Des verbes et des mots plus longs. C'est l'occasion de tenir ton rythme sur des mots de plusieurs syllabes.",
        "rules": [
         {
          "icon": "🔗",
          "t": "Découpe en syllabes",
-         "d": "Un mot long se tape comme une suite de petits gestes. mai-son, jar-din, cui-sine : pense par morceaux."
+         "d": "Un mot long se tape comme une suite de petits gestes : man-ger, par-ler, ou-vrir. Pense par morceaux."
         },
         {
          "icon": "🎯",
@@ -3873,13 +3880,15 @@
         }
        ],
        "tip": "Objectif : taper des mots plus longs sans casser ton rythme ni ta précision."
-      }
+      },
+      "text": "manger boire dormir lire courir parler jouer ranger ouvrir fermer finir partir venir voir vouloir pouvoir savoir faire dire"
      },
      {
       "id": "w5",
       "title": "Premières phrases naturelles",
       "keys": "fluidité",
-      "text": "quand meute crise vue et dure bruit cause coude des meute seul nuance des moue spirale dose sourd pour",
+      "teaches": "",
+      "tip": "Tu passes aux vraies phrases. L'enjeu n'est plus la touche, mais la fluidité d'un bout à l'autre : tape par groupes de mots, avec la virgule et le point bien collés.",
       "tuto": {
        "intro": "Tu passes aux vraies phrases. L'enjeu n'est plus la touche, mais la fluidité d'un bout à l'autre de la phrase.",
        "rules": [
@@ -3896,11 +3905,12 @@
         {
          "icon": "✍️",
          "t": "Ponctue proprement",
-         "d": "Le point se colle au dernier mot, puis une espace avant la majuscule suivante."
+         "d": "La virgule et le point se collent au mot qui précède, puis une espace suit. Les majuscules arrivent plus tard : pour l'instant, on écrit en minuscules."
         }
        ],
        "tip": "Objectif : taper des phrases entières d'un mouvement continu et fluide."
-      }
+      },
+      "text": "nous avons un bon bureau. tu viens avec nous, mais il reste ici. elle lit un livre, puis elle ouvre la porte."
      }
     ]
    },

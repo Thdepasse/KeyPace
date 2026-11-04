@@ -231,12 +231,14 @@ function q5() {
   const h = loadApp();
   const az = Object.fromEntries(JSON.parse(h.run('JSON.stringify(ALL_LESSONS.map(l=>[l.id,l.text||l.genNum||""]))')));
   const errs = [];
-  if (JSON.stringify(data.reuse) !== JSON.stringify(gen.REUSE)) errs.push('liste reuse du fichier différente du générateur');
+  const hand = new Set(data.handwritten || []); // leçons écrites à la main : vérifiées par Q9, plus lues dans le programme AZERTY
+  if (JSON.stringify(data.reuse) !== JSON.stringify(gen.REUSE.filter((id) => !hand.has(id)))) errs.push('liste reuse du fichier différente du générateur');
   let allowed = new Set([...'abcdefghijklmnopqrstuvwxyz', ' ', ',', '.', ';', '/']);
   let caps = false; const counts = [];
   for (const id of gen.INTRO_ORDER) {
     const intro = gen.INTRO[id];
     if (intro === 'CAPS') caps = true; else if (intro) for (const c of intro) allowed.add(c);
+    if (hand.has(id)) { counts.push(id); continue; }
     const adapted = data.lessons[id];
     const text = adapted ? adapted.text : (gen.REUSE.includes(id) ? az[id] : null);
     if (text == null) { errs.push(`${id} : ni reprise ni adaptée`); continue; }
@@ -250,9 +252,9 @@ function q5() {
   }
   // flu6 adaptée : doit exister et ne plus citer l'AZERTY
   if (!data.lessons.flu6 || /AZERTY/i.test(data.lessons.flu6.text)) errs.push('flu6 : texte absent ou cite encore AZERTY');
-  for (const id of gen.REUSE) if (az[id] === undefined) errs.push(`${id} : leçon reprise introuvable dans le programme`);
+  for (const id of gen.REUSE.filter((x) => !hand.has(x))) if (az[id] === undefined) errs.push(`${id} : leçon reprise introuvable dans le programme`);
   if (JSON.stringify(data) !== JSON.stringify(gen.build())) errs.push('le fichier diffère de ce que produit le générateur');
-  return errs.length ? { ok: false, detail: errs.slice(0, 10).join('\n') } : { ok: true, detail: `${counts.length} leçons (modules 4 à 6) sans signe avant son apprentissage ; ${gen.REUSE.length} reprises du cours AZERTY, ${Object.values(data.lessons).filter((l) => l.kind === 'adapted').length} adaptées` };
+  return errs.length ? { ok: false, detail: errs.slice(0, 10).join('\n') } : { ok: true, detail: `${counts.length} leçons (modules 4 à 6) sans signe avant son apprentissage ; ${data.reuse.length} reprises du cours AZERTY, ${Object.values(data.lessons).filter((l) => l.kind === 'adapted').length} adaptées` };
 }
 
 // Q6 : le cours QWERTY couvre TOUT le programme (66 leçons, chacune générée, reprise ou adaptée, une seule fois, même ordre de modules
@@ -394,7 +396,7 @@ function q9() {
       if (!prefix) errs.push(`${l.id} : module écrit à la main après un module non refondu : le cumul des touches enseignées n'est plus connu`);
       nLessons++;
       if (typeof l.teaches !== 'string') { errs.push(`${l.id} : champ teaches absent`); continue; }
-      if (!m.row || !ROWS[m.row]) errs.push(`${l.id} : rangée du module absente ou inconnue`);
+      if (l.teaches.length && (!m.row || !ROWS[m.row])) errs.push(`${l.id} : rangée du module absente ou inconnue`); // un module sans nouvelle touche n'a pas de rangée
       for (const ch of l.teaches) {
         const code = codeOf(ch);
         if (!code) { errs.push(`${l.id} : « ${ch} » introuvable sur le clavier de référence`); continue; }

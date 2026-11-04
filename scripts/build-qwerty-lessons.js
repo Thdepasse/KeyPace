@@ -213,7 +213,7 @@ function build() {
   return {
     schema: 1, id: 'fr/qwerty',
     note: 'Généré par scripts/build-qwerty-lessons.js (mots filtrés, aucun texte écrit à la main sauf titres et conseils des leçons qui changent). À relire avant ouverture du cours.',
-    order: SEQ.map((s) => s.id), courseOrder: azCourseOrder, reuse: REUSE, introOrder: INTRO_ORDER, moduleNames: T.moduleNames, tutos, keyboards, handwritten, curriculum, lessons,
+    order: SEQ.map((s) => s.id), courseOrder: azCourseOrder, reuse: REUSE.filter((id) => !handwritten.includes(id)), introOrder: INTRO_ORDER, moduleNames: T.moduleNames, tutos, keyboards, handwritten, curriculum, lessons,
   };
 }
 
