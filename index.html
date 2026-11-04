@@ -7426,6 +7426,25 @@ const app={
     // Ni quand une fenêtre modale est ouverte (auth, upgrade, réglages, tuto…).
     if([...document.querySelectorAll('.modal-overlay,.settings-overlay')].some(m=>m.classList.contains('open')))return;
     if(document.getElementById('lesson-tuto-modal').classList.contains('open'))return;
+    // Safari (Mac) et Firefox : touche morte + lettre sans accent possible (^ puis k) arrive en UNE touche à deux
+    // caractères (key = "^k"). Mesuré sur du matériel réel (traces/mac-safari-26-touches-mortes.json) : on la rejoue
+    // comme deux frappes, l'accent puis la lettre, exactement ce qui s'inscrit dans un champ de texte.
+    if(!e._direct&&e.key&&[...e.key].length===2&&'^¨~`´'.includes(e.key[0])&&!e.ctrlKey&&!e.metaKey){
+      const _cs=[...e.key];this._pendingDeadKey=null;e.preventDefault&&e.preventDefault();
+      const _cp=(DEAD_COMPOSE[_cs[0]]||{})[_cs[1]];
+      if(_cp)this._directKey(e,_cp);else{this._directKey(e,_cs[0]);this._directKey(e,_cs[1]);}
+      return;
+    }
+    // Touche morte pressée deux fois (^^) : Chrome renvoie « Dead » une 2e fois, Safari renvoie key = "^" (code de la
+    // touche morte). Dans les deux cas le champ reçoit l'accent deux fois, rien ne reste en attente.
+    if(!e._direct&&this._pendingDeadKey&&this._pendingDeadKey!=='?'&&e.key===this._pendingDeadKey&&e.code!=='Space'){
+      const _pk=this._pendingDeadKey;this._pendingDeadKey=null;e.preventDefault&&e.preventDefault();
+      this._directKey(e,_pk);this._directKey(e,_pk);this._kbRefresh();return;
+    }
+    // Touche morte puis Espace : Chrome et Safari donnent directement le caractère (key = "^", code = Space).
+    if(!e._direct&&this._pendingDeadKey&&e.code==='Space'&&e.key&&e.key.length===1&&e.key!==' '){
+      this._pendingDeadKey=null;e._composedKey=e.key;
+    }
     // Centralised dead-key composition (^+u→û etc.) for all modes
     if(e.key==='Dead'){
       // AZERTY : ^ et ¨ (Maj) sont sur la même touche ; NF : touche à gauche du Retour arrière.
@@ -7446,9 +7465,17 @@ const app={
           e.preventDefault();return;
         }
       }
+      // Deuxième touche morte alors qu'une autre attend : la première s'inscrit telle quelle (^ puis ¨ donne ^¨),
+      // la même deux fois donne l'accent doublé (^^) et rien n'attend plus.
+      const _p0=this._pendingDeadKey;
+      if(d&&_p0&&_p0!=='?'){
+        this._pendingDeadKey=null;this._directKey(e,_p0);
+        if(d===_p0)this._directKey(e,d);else this._pendingDeadKey=d;
+        this._kbRefresh();return;
+      }
       this._pendingDeadKey=d||'?';this._kbRefresh();return;
     }
-    if(DEAD_COMPOSE[e.key]&&e.key.length===1){this._pendingDeadKey=e.key;this._kbRefresh();return;}
+    if(DEAD_COMPOSE[e.key]&&e.key.length===1&&!e._direct&&!e._composedKey){this._pendingDeadKey=e.key;this._kbRefresh();return;}
     // Une touche de modification (Maj pour une majuscule, AltGr…) arrivant après la touche morte
     // ne doit pas l'annuler : Ê, Ë… restent possibles.
     if(this._pendingDeadKey&&['Shift','Control','Alt','AltGraph','Meta','CapsLock'].includes(e.key))return;
@@ -7462,7 +7489,12 @@ const app={
       const pk=this._pendingDeadKey;this._pendingDeadKey=null;
       if(pk==='?'){
         if(e.key===' '&&this.sess&&this.sess.text){const ex=this.sess.text[this.sess.idx];if(ex&&'~`^¨'.includes(ex))e._composedKey=ex;}
-      }else e._composedKey=(DEAD_COMPOSE[pk]||{})[e.key]||(e.key===' '?pk:e.key);
+      }else{
+        const _tb=DEAD_COMPOSE[pk]||{};
+        // Combinaison impossible (^ puis k) : Chrome renvoie la lettre seule, mais le champ reçoit l'accent PUIS la lettre.
+        if(e.key&&e.key.length===1&&/^[\x21-\x7e]$/.test(e.key)&&!_tb[e.key]&&!Object.values(_tb).includes(e.key)&&!e._direct)this._directKey(e,pk);
+        else e._composedKey=_tb[e.key]||(e.key===' '?pk:e.key);
+      }
     }
     if(e.key==='Escape'&&this.view==='games'&&this.activeGame){if(this._sfsEl()){this._sfsEsc();return;}if(this._sgrEl()){this._sgrEsc();return;}this.exitActiveGame();return;}
     if(this.view==='games'&&this.activeGame==='sprint'&&this.sprint&&this.sprint.on){this.sprintKey(e);return;}
@@ -7475,6 +7507,10 @@ const app={
     if(this.view==='games'&&SOURIS_GAMES.includes(this.activeGame)&&this.souris&&this.souris.phase==='play'){this.sourisKey(e);return;}
     if(this.view==='testtime'){this.ttKey(e);return;}
     if((this.view==='test'||(this.view==='lessons'&&this.sess))&&this.sess&&!this.sess.finished)this.typeKey(e);
+  },
+  // Rejoue un caractère déjà composé par le navigateur comme une frappe à part entière (même routage que handleKey).
+  _directKey(e,c){
+    this.handleKey({key:c,code:e.code||'',repeat:false,altKey:false,ctrlKey:false,shiftKey:false,metaKey:false,target:e.target,_direct:true,_composedKey:c,preventDefault(){},stopPropagation(){},getModifierState(){return false;}});
   },
   exitActiveGame(){
     this._sfsClose();this._sgrClose();

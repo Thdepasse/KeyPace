@@ -1,0 +1,260 @@
+{
+ "meta": {
+  "schema": 1,
+  "os": "macOS",
+  "layout": "azerty-clavier-de-l-utilisateur (Mac, touche ^ = code BracketLeft)",
+  "form": "clavier du Mac de l'utilisateur, forme non precisee",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+  "capturedAt": "2026-11-04T11:35:19.168Z",
+  "language": "fr-BE",
+  "note": "Source : labo-clavier/touche-morte.html (capture du 2026-11-04). Seuls keydown/keyup sont conserves ; les evenements de composition et input ne sont pas rejoues."
+ },
+ "steps": [
+  {
+   "target": "^",
+   "produced": "^",
+   "events": [
+    {
+     "t": 10638,
+     "type": "keydown",
+     "key": "Shift",
+     "code": "ShiftLeft",
+     "shift": true,
+     "alt": false,
+     "composing": false
+    },
+    {
+     "t": 10831,
+     "type": "keyup",
+     "key": "Shift",
+     "code": "ShiftLeft",
+     "shift": false,
+     "alt": false,
+     "composing": false
+    },
+    {
+     "t": 10988,
+     "type": "keydown",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": false,
+     "alt": false,
+     "composing": false
+    },
+    {
+     "t": 11061,
+     "type": "keyup",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": false,
+     "alt": false,
+     "composing": true
+    },
+    {
+     "t": 11766,
+     "type": "keydown",
+     "key": "^",
+     "code": "Space",
+     "shift": false,
+     "alt": false,
+     "composing": true
+    },
+    {
+     "t": 11844,
+     "type": "keyup",
+     "key": " ",
+     "code": "Space",
+     "shift": false,
+     "alt": false,
+     "composing": false
+    }
+   ]
+  },
+  {
+   "target": "ê",
+   "produced": "ê",
+   "events": [
+    {
+     "t": 2657,
+     "type": "keydown",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": false,
+     "alt": false,
+     "composing": false
+    },
+    {
+     "t": 2713,
+     "type": "keyup",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": false,
+     "alt": false,
+     "composing": true
+    },
+    {
+     "t": 3042,
+     "type": "keydown",
+     "key": "ê",
+     "code": "KeyE",
+     "shift": false,
+     "alt": false,
+     "composing": true
+    },
+    {
+     "t": 3127,
+     "type": "keyup",
+     "key": "e",
+     "code": "KeyE",
+     "shift": false,
+     "alt": false,
+     "composing": false
+    }
+   ]
+  },
+  {
+   "target": "ë",
+   "produced": "ë",
+   "events": [
+    {
+     "t": 4917,
+     "type": "keydown",
+     "key": "Shift",
+     "code": "ShiftLeft",
+     "shift": true,
+     "alt": false,
+     "composing": false
+    },
+    {
+     "t": 6188,
+     "type": "keydown",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": true,
+     "alt": false,
+     "composing": false
+    },
+    {
+     "t": 6271,
+     "type": "keyup",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": true,
+     "alt": false,
+     "composing": true
+    },
+    {
+     "t": 6419,
+     "type": "keyup",
+     "key": "Shift",
+     "code": "ShiftLeft",
+     "shift": false,
+     "alt": false,
+     "composing": true
+    },
+    {
+     "t": 7118,
+     "type": "keydown",
+     "key": "ë",
+     "code": "KeyE",
+     "shift": false,
+     "alt": false,
+     "composing": true
+    },
+    {
+     "t": 7186,
+     "type": "keyup",
+     "key": "e",
+     "code": "KeyE",
+     "shift": false,
+     "alt": false,
+     "composing": false
+    }
+   ]
+  },
+  {
+   "target": "^k",
+   "produced": "^k",
+   "events": [
+    {
+     "t": 2808,
+     "type": "keydown",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": false,
+     "alt": false,
+     "composing": false
+    },
+    {
+     "t": 2863,
+     "type": "keyup",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": false,
+     "alt": false,
+     "composing": true
+    },
+    {
+     "t": 3540,
+     "type": "keydown",
+     "key": "k",
+     "code": "KeyK",
+     "shift": false,
+     "alt": false,
+     "composing": true
+    },
+    {
+     "t": 3620,
+     "type": "keyup",
+     "key": "k",
+     "code": "KeyK",
+     "shift": false,
+     "alt": false,
+     "composing": false
+    }
+   ]
+  },
+  {
+   "target": "^^",
+   "produced": "^^",
+   "events": [
+    {
+     "t": 5938,
+     "type": "keydown",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": false,
+     "alt": false,
+     "composing": false
+    },
+    {
+     "t": 6006,
+     "type": "keyup",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": false,
+     "alt": false,
+     "composing": true
+    },
+    {
+     "t": 6133,
+     "type": "keydown",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": false,
+     "alt": false,
+     "composing": true
+    },
+    {
+     "t": 6192,
+     "type": "keyup",
+     "key": "Dead",
+     "code": "BracketLeft",
+     "shift": false,
+     "alt": false,
+     "composing": true
+    }
+   ]
+  }
+ ]
+}
