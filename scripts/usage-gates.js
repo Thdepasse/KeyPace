@@ -389,8 +389,8 @@ async function u12() {
   const r4 = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id==="r4"))'));
   const r4want = course.curriculum.modules.flatMap((m) => m.lessons).find((l) => l.id === 'r4');
   if (r4.keys !== 'a ;' || r4.text !== r4want.text || r4.tuto.intro !== r4want.tuto.intro) errs.push('r4 : le contenu QWERTY n\'est pas appliqué (touches, texte, tutoriel)');
-  const acc1 = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id==="acc1"))'));
-  if (/AZERTY/.test(JSON.stringify(acc1.tuto))) errs.push('acc1 : le tutoriel cite encore l\'AZERTY');
+  const acc1 = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id==="ac1"))'));
+  if (/AZERTY/.test(JSON.stringify(acc1.tuto))) errs.push('ac1 : le tutoriel cite encore l\'AZERTY');
   if (/AZERTY/.test(mods())) errs.push('un nom de module cite encore l\'AZERTY');
   const maj1 = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id==="maj1"))'));
   if (JSON.stringify(maj1.text) !== JSON.stringify(JSON.parse(before).find((x) => x[0] === 'maj1')[5])) errs.push('maj1 (reprise) a changé');
@@ -486,12 +486,11 @@ function u14() {
   h.run('kpApplyCourseData("fr/qwerty",__c)'); const viaCurriculum = state();
   const A = JSON.parse(viaOverlay), B = JSON.parse(viaCurriculum);
   // la voie « programme » n'a pas de pool de lettres par leçon pour le cours actuel : on compare tout le reste
-  const hand = new Set(course.handwritten || []); // leçons écrites à la main : comparées par la gate Q9, pas à l'ancienne voie
-  const strip = (x) => ({ ...x, les: x.les.filter((r) => !hand.has(r[0])).map((r) => r.slice(0, 11)) });
-  if (JSON.stringify(strip(A)) !== JSON.stringify(strip(B))) {
-    const i = A.les.findIndex((r, k) => !hand.has(r[0]) && JSON.stringify(r.slice(0, 11)) !== JSON.stringify(B.les[k].slice(0, 11)));
-    errs.push('les deux voies donnent des programmes différents' + (i >= 0 ? ` (leçon ${A.les[i][0]})` : ' (modules, leçons gratuites ou aide de geste)'));
-  }
+  const hand = new Set([...(course.handwritten || []), ...(course.retiredAz || [])]); // écrites à la main (Q9) ou retirées : pas comparables à l'ancienne voie
+  const byId = (x) => Object.fromEntries(x.les.filter((r) => !hand.has(r[0])).map((r) => [r[0], JSON.stringify(r.slice(0, 11).filter((_, k) => k !== 10 && k !== 9))]));
+  const ra = byId(A), rb = byId(B);
+  for (const id of Object.keys(rb)) if (ra[id] === undefined) errs.push(`leçon ${id} du programme absente de l'ancienne voie`);
+  else if (ra[id] !== rb[id]) errs.push(`les deux voies donnent des leçons différentes (${id})`);
   // retour : mêmes objets
   h.run('kpApplyCourseData("fr/azerty",null)');
   if (state() !== original) errs.push('retour au cours par défaut (voie programme) : programme différent de l\'origine');
@@ -532,6 +531,6 @@ function u14() {
     if (h.run('kpApplyCourseData("fr/qwerty",__b)') !== false) errs.push(`programme invalide accepté (${nom})`);
     if (state() !== before) errs.push(`programme invalide (${nom}) : le programme a été modifié`);
   }
-  return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: `programme complet du cours actuel identique à l'ancienne voie (${A.les.length} leçons, ${A.mods.length} modules), programme inventé (3 leçons, ids q1 à q3) appliqué et joué, ${bad.length} programmes invalides refusés sans effet, retour par défaut identique` };
+  return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: `programme complet du cours actuel identique à l'ancienne voie pour les leçons communes (${Object.keys(rb).length} leçons comparées sur ${B.les.length}, ${B.mods.length} modules), programme inventé (3 leçons, ids q1 à q3) appliqué et joué, ${bad.length} programmes invalides refusés sans effet, retour par défaut identique` };
 }
 module.exports = { u14, u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };

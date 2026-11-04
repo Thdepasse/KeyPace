@@ -230,8 +230,8 @@ async function run(opts = {}) {
         const mac = await ev("({opt:document.getElementById('kb-layout-preview').innerText.includes('⌥'),how:KB_HOW['mac-us']['é'],mod:kbModifierName()})");
         if (!mac.opt) problems.push('BR7 : l\'aperçu Mac n\'a pas la touche Option');
         if (!/Option/.test(mac.how) || !/Option/.test(mac.mod)) problems.push(`BR7 : geste ou modificateur Mac sans Option (${mac.how} / ${mac.mod})`);
-        const shown = await ev("(()=>{const l=ALL_LESSONS.find(x=>x.id==='acc1');return kbHowHTML(l)})()");
-        if (!/Sur ton clavier \(Mac/.test(shown) || !/Option/.test(shown)) problems.push('BR7 : le bloc « Sur ton clavier » de acc1 ne donne pas le geste Mac');
+        const shown = await ev("(()=>{const l=ALL_LESSONS.find(x=>x.id==='ac1');return kbHowHTML(l)})()");
+        if (!/Sur ton clavier \(Mac/.test(shown) || !/Option/.test(shown)) problems.push('BR7 : le bloc « Sur ton clavier » de ac1 ne donne pas le geste Mac');
         // une vraie leçon se tape et s'enregistre dans le cours QWERTY, pas dans le plat
         await ev("app.closeSettings();app.view='lessons';app.sess=app.makeSession('lesson','r1');true"); await sleep(200);
         const t7 = await ev('app.sess.text');

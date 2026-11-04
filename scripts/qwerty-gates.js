@@ -232,7 +232,7 @@ function q5() {
   const az = Object.fromEntries(JSON.parse(h.run('JSON.stringify(ALL_LESSONS.map(l=>[l.id,l.text||l.genNum||""]))')));
   const errs = [];
   const hand = new Set(data.handwritten || []); // leçons écrites à la main : vérifiées par Q9, plus lues dans le programme AZERTY
-  if (JSON.stringify(data.reuse) !== JSON.stringify(gen.REUSE.filter((id) => !hand.has(id)))) errs.push('liste reuse du fichier différente du générateur');
+  if (JSON.stringify(data.reuse) !== JSON.stringify(gen.REUSE.filter((id) => !hand.has(id) && !(data.retiredAz || []).includes(id)))) errs.push('liste reuse du fichier différente du générateur');
   let allowed = new Set([...'abcdefghijklmnopqrstuvwxyz', ' ', ',', '.', ';', '/']);
   let caps = false; const counts = [];
   for (const id of gen.INTRO_ORDER) {
@@ -269,25 +269,34 @@ function q6(update) {
   const errs = [];
   const gener = Object.keys(data.lessons).filter((id) => data.lessons[id].kind !== 'adapted').length + (data.handwritten || []).length;
   const adapted = Object.keys(data.lessons).filter((id) => data.lessons[id].kind === 'adapted');
+  const retired = new Set(data.retiredAz || []); // leçons AZERTY remplacées par un module écrit à la main d'un autre rang
   const covered = new Set([...Object.keys(data.lessons), ...data.reuse, ...(data.handwritten || [])]);
   const dup = data.reuse.filter((id) => data.lessons[id]);
   if (dup.length) errs.push('à la fois reprises et réécrites : ' + dup.join(' '));
-  for (const l of az) if (!covered.has(l.id)) errs.push(`${l.id} : leçon du programme absente du cours QWERTY`);
-  for (const id of covered) if (!az.find((l) => l.id === id)) errs.push(`${id} : leçon QWERTY inconnue du programme`);
-  if (covered.size !== az.length) errs.push(`${covered.size} leçons au lieu de ${az.length}`);
-  // accents employés avant leur leçon
-  const finalText = Object.fromEntries(data.curriculum.modules.flatMap((m) => m.lessons).map((l) => [l.id, l.text || '']));
-  const textOf = (id) => (id in finalText ? finalText[id] : (data.lessons[id] ? data.lessons[id].text : az.find((l) => l.id === id).text)) || '';
+  for (const l of az) if (!covered.has(l.id) && !retired.has(l.id)) errs.push(`${l.id} : leçon du programme absente du cours QWERTY`);
+  const hw = new Set(data.handwritten || []);
+  for (const id of covered) if (!az.find((l) => l.id === id) && !hw.has(id)) errs.push(`${id} : leçon QWERTY inconnue du programme`);
+  const inCurriculum = data.curriculum.modules.flatMap((m) => m.lessons).map((l) => l.id);
+  if (new Set(inCurriculum).size !== inCurriculum.length) errs.push('identifiants de leçon en double dans le programme');
+  for (const id of inCurriculum) if (!covered.has(id)) errs.push(`${id} : dans le programme mais ni écrite, ni reprise, ni adaptée`);
+  // accents employés avant leur leçon, dans l'ORDRE DU PROGRAMME FINAL : sont enseignés les caractères listés par `teaches` des leçons écrites à la main
+  // et, pour les leçons AZERTY reprises, ceux de ACCENT_TAUGHT.
+  const finalLessons = data.curriculum.modules.flatMap((m) => m.lessons);
+  const textOf = (l) => (l.text !== undefined ? l.text : (az.find((x) => x.id === l.id) || {}).text) || '';
   const taught = new Set(); const early = {};
-  for (const l of az) {
+  let capsTaught = false; // les majuscules accentuées (É, À…) sont comprises dans le module des majuscules : elles comptent après sa première leçon
+  for (const l of finalLessons) {
+    if (l.id === 'maj1') capsTaught = true;
+    for (const c of (l.teaches || '')) taught.add(c);
+    if (capsTaught) for (const c of [...taught]) taught.add(c.toUpperCase());
     for (const c of (gen.ACCENT_TAUGHT[l.id] || '')) taught.add(c);
-    const bad = [...new Set([...textOf(l.id)].filter((c) => /[éèêëàâîïôûùüçœæÉÈÀÙÇŒÆ]/.test(c) && !taught.has(c)))];
+    const bad = [...new Set([...textOf(l)].filter((c) => /[éèêëàâîïôûùüçœæÉÈÀÙÇŒÆ]/.test(c) && !taught.has(c)))];
     if (bad.length) early[l.id] = bad.join('');
   }
-  const r = { early, total: az.length, generated: gener, reused: data.reuse.length, adapted: adapted.length };
+  const r = { early, total: inCurriculum.length, generated: gener, reused: data.reuse.length, adapted: adapted.length };
   const now = JSON.parse(JSON.stringify(r)); const b = readBaseline();
   if (errs.length) return { ok: false, detail: errs.slice(0, 10).join('\n') };
-  const sum = `${az.length} leçons couvertes (${gener} générées, ${data.reuse.length} reprises, ${adapted.length} adaptées) ; accents employés avant leur leçon : ${Object.entries(early).map(([k, v]) => k + ' ' + v).join(', ') || 'aucun'}`;
+  const sum = `${inCurriculum.length} leçons couvertes (${gener} générées, ${data.reuse.length} reprises, ${adapted.length} adaptées) ; accents employés avant leur leçon : ${Object.entries(early).map(([k, v]) => k + ' ' + v).join(', ') || 'aucun'}`;
   if (update || !b.qwertyCourse) { writeBaselineKey('qwertyCourse', now); return { ok: true, detail: (update ? 'référence mise à jour : ' : 'référence créée : ') + sum }; }
   return JSON.stringify(now) === JSON.stringify(b.qwertyCourse) ? { ok: true, detail: sum } : { ok: false, detail: `le cours QWERTY a changé par rapport à la référence relue (${sum}). Si voulu et relu : npm run gates -- --update-baseline` };
 }
@@ -306,7 +315,7 @@ function q7() {
   const flat = (t) => t ? [t.intro, t.tip, ...(t.rules || []).flatMap((r) => [r.t, r.d])].join(' ') : '';
   const required = new Set();
   for (const l of az) {
-    if ((data.handwritten || []).includes(l.id)) continue; // écrite à la main : tutoriel vérifié par Q9
+    if ((data.handwritten || []).includes(l.id) || (data.retiredAz || []).includes(l.id)) continue; // écrite à la main (Q9) ou retirée du cours QWERTY
     const own = data.lessons[l.id];
     if (own && own.keys && own.keys !== l.keys) required.add(l.id);
     if (AZ_PHRASES.test(flat(l.tuto))) required.add(l.id);
@@ -388,6 +397,7 @@ function q9() {
   const variants = kb.VARIANTS.map((v) => JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', v.id + '.json'), 'utf8')));
   const AZ = /AZERTY|touche (0|2|7|9)\b|droite du P|droite du M|près de Entrée|Q à gauche|\bQ ou M\b/i;
   const flatT = (t) => [t.intro, t.tip, ...(t.rules || []).flatMap((r) => [r.t, r.d])].join(' ');
+  const ACCENTS = 'éèêëàâîïôûùçœæ';
   let learned = ''; const ids = new Set(); let nLessons = 0, prefix = true;
   for (const m of data.curriculum.modules) {
     for (const l of m.lessons) {
@@ -396,12 +406,22 @@ function q9() {
       if (!prefix) errs.push(`${l.id} : module écrit à la main après un module non refondu : le cumul des touches enseignées n'est plus connu`);
       nLessons++;
       if (typeof l.teaches !== 'string') { errs.push(`${l.id} : champ teaches absent`); continue; }
-      if (l.teaches.length && (!m.row || !ROWS[m.row])) errs.push(`${l.id} : rangée du module absente ou inconnue`); // un module sans nouvelle touche n'a pas de rangée
+      if (l.teaches.length && m.kind !== 'accents' && (!m.row || !ROWS[m.row])) errs.push(`${l.id} : rangée du module absente ou inconnue`); // un module sans nouvelle touche n'a pas de rangée
       for (const ch of l.teaches) {
-        const code = codeOf(ch);
-        if (!code) { errs.push(`${l.id} : « ${ch} » introuvable sur le clavier de référence`); continue; }
-        if (ROWS[m.row] && !ROWS[m.row].includes(code)) errs.push(`${l.id} : « ${ch} » n'est pas sur la rangée « ${m.row} » (règle : ligne par ligne)`);
-        for (const def of variants) if (!gestureFor(def, ch)) errs.push(`${l.id} : « ${ch} » sans geste sur ${def.id}`);
+        if (m.kind === 'accents') {
+          // module d'accents : pas de rangée ; le geste dépend de la variante (touche morte, AltGr, Option) et certaines n'en ont pas (US simple, UK) :
+          // la gate U10 rejoue chaque leçon sur les variantes, avec les accents tolérés quand il n'y a pas de geste.
+          if (!ACCENTS.includes(ch)) errs.push(`${l.id} : « ${ch} » n'est pas un caractère accentué du module d'accents`);
+          const sans = variants.filter((def) => !gestureFor(def, ch)).map((d) => d.id);
+          const OK_SANS = ['windows-us', 'windows-uk'];
+          const trop = sans.filter((v) => !OK_SANS.includes(v) && !'œæŒÆ'.includes(ch));
+          if (trop.length) errs.push(`${l.id} : « ${ch} » sans geste sur ${trop.join(', ')} alors que ces claviers savent produire les accents`);
+        } else {
+          const code = codeOf(ch);
+          if (!code) { errs.push(`${l.id} : « ${ch} » introuvable sur le clavier de référence`); continue; }
+          if (ROWS[m.row] && !ROWS[m.row].includes(code)) errs.push(`${l.id} : « ${ch} » n'est pas sur la rangée « ${m.row} » (règle : ligne par ligne)`);
+          for (const def of variants) if (!gestureFor(def, ch)) errs.push(`${l.id} : « ${ch} » sans geste sur ${def.id}`);
+        }
         if (learned.includes(ch)) errs.push(`${l.id} : « ${ch} » enseignée deux fois`);
       }
       learned += l.teaches;

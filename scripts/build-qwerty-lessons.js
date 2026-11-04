@@ -199,21 +199,35 @@ function build() {
   // Modules ÉCRITS À LA MAIN (course-src/fr-qwerty/NN-nom.json) : ils remplacent le module AZERTY de même rang (« replaces »). Leurs leçons ne
   // passent plus par le générateur ni par les tables lessons/tutos ci-dessus (retirées), mais par les gates sur le programme final (Q9).
   const handwritten = [];
+  const retired = []; // leçons du cours AZERTY qui n'existent plus dans le cours QWERTY (remplacées par un module écrit à la main d'un autre rang)
   const srcDir = path.join(root, 'course-src', 'fr-qwerty');
   const srcFiles = fs.existsSync(srcDir) ? fs.readdirSync(srcDir).filter((x) => /^\d\d-.*\.json$/.test(x)).sort() : [];
   const tutos = { ...T.tutos };
-  for (const f of srcFiles) {
-    const m = JSON.parse(fs.readFileSync(path.join(srcDir, f), 'utf8'));
-    curriculum.modules[m.replaces - 1] = { name: m.name, row: m.row, lessons: m.lessons.map((l) => ({ ...l })) };
-    for (const l of m.lessons) { handwritten.push(l.id); delete lessons[l.id]; delete tutos[l.id]; }
+  // `replaces` : rang(s) AZERTY remplacé(s) (nombre ou liste) ; `position` : rang dans le programme QWERTY (par défaut le rang remplacé).
+  const sources = srcFiles.map((f) => JSON.parse(fs.readFileSync(path.join(srcDir, f), 'utf8')));
+  const legacy = curriculum.modules.map((m, i) => ({ rank: i + 1, mod: m }));
+  const replacedRanks = new Set();
+  for (const m of sources) for (const r of [].concat(m.replaces)) replacedRanks.add(r);
+  const rest = legacy.filter((x) => !replacedRanks.has(x.rank)).map((x) => x.mod);
+  const byPos = new Map(sources.map((m) => [m.position || [].concat(m.replaces)[0], m]));
+  const total = rest.length + sources.length; const final = [];
+  for (let pos = 1; pos <= total; pos++) final.push(byPos.has(pos) ? byPos.get(pos) : rest.shift());
+  if (rest.length) throw new Error('module(s) AZERTY non placés : positions de course-src incohérentes');
+  for (const m of sources) {
+    for (const r of [].concat(m.replaces)) for (const l of legacy[r - 1].mod.lessons) retired.push(l.id);
+    for (const l of m.lessons) handwritten.push(l.id);
   }
+  // un id écrit à la main qui reprend un id AZERTY n'est pas « retiré » : il est remplacé
+  const retiredOnly = retired.filter((id) => !handwritten.includes(id));
+  for (const id of retired) { delete lessons[id]; delete tutos[id]; }
+  curriculum.modules = final.map((m) => (m.lessons && m.name && (m.replaces !== undefined) ? { name: m.name, ...(m.row ? { row: m.row } : {}), ...(m.kind ? { kind: m.kind } : {}), lessons: m.lessons.map((l) => ({ ...l })) } : m));
   curriculum.free = curriculum.modules.flatMap((m) => m.lessons).slice(0, 10).map((l) => l.id);
   const allTexts = JSON.parse(h.run("JSON.stringify(ALL_LESSONS.flatMap(l=>[l.text||'',l.keys||'']))")).concat(curriculum.modules.flatMap((m) => m.lessons).flatMap((l) => [l.text || '', l.keys]));
   const keyboards = require('./build-qwerty-keyboards').buildKeyboards(allTexts);
   return {
     schema: 1, id: 'fr/qwerty',
     note: 'Généré par scripts/build-qwerty-lessons.js (mots filtrés, aucun texte écrit à la main sauf titres et conseils des leçons qui changent). À relire avant ouverture du cours.',
-    order: SEQ.map((s) => s.id), courseOrder: azCourseOrder, reuse: REUSE.filter((id) => !handwritten.includes(id)), introOrder: INTRO_ORDER, moduleNames: T.moduleNames, tutos, keyboards, handwritten, curriculum, lessons,
+    order: SEQ.map((s) => s.id), courseOrder: azCourseOrder, reuse: REUSE.filter((id) => !retired.includes(id)), introOrder: INTRO_ORDER, moduleNames: T.moduleNames, tutos, keyboards, handwritten, retiredAz: retiredOnly, curriculum, lessons,
   };
 }
 

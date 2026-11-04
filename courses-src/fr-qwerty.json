@@ -95,14 +95,6 @@
   "maj2",
   "maj4",
   "pon1",
-  "acc4",
-  "cir1",
-  "cir2",
-  "cir3",
-  "cir4",
-  "tre1",
-  "tre2",
-  "tre3",
   "num1",
   "num2",
   "num3",
@@ -165,216 +157,6 @@
     }
    ],
    "tip": "Objectif : taper ? et ! avec l'espace française avant le signe."
-  },
-  "acc1": {
-   "intro": "Sur un clavier QWERTY, les accents n'ont pas de touche à eux : on les obtient avec une touche morte ou une combinaison (AltGr, Option). On commence par le é. Le geste exact de ton clavier est indiqué juste en dessous.",
-   "rules": [
-    {
-     "icon": "⌨️",
-     "t": "Un geste, pas une touche",
-     "d": "Le é s'obtient avec un geste propre à ton clavier (touche morte puis e, AltGr + e, Option + e puis e…). Regarde le geste indiqué sous la leçon."
-    },
-    {
-     "icon": "⏳",
-     "t": "Rien ne s'affiche tout de suite",
-     "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape-le, puis la voyelle. C'est normal, ne t'arrête pas."
-    },
-    {
-     "icon": "🔥",
-     "t": "Très fréquent",
-     "d": "é est l'un des caractères les plus courants du français (été, café, écrire). L'automatiser fait gagner beaucoup."
-    }
-   ],
-   "tip": "Objectif : produire é avec le geste de ton clavier, sans hésiter."
-  },
-  "acc2": {
-   "intro": "Le è (accent grave) s'obtient avec un autre signe que le é. Le geste exact de ton clavier est indiqué juste en dessous.",
-   "rules": [
-    {
-     "icon": "⌨️",
-     "t": "Même principe, autre signe",
-     "d": "Le è passe par l'accent grave (touche morte ` ou combinaison de ton clavier), puis la lettre e."
-    },
-    {
-     "icon": "↔️",
-     "t": "Ne confonds pas é et è",
-     "d": "é et è utilisent deux signes différents : le geste du é, puis le geste du è. Entraîne-toi à les alterner."
-    },
-    {
-     "icon": "💬",
-     "t": "Mots très courants",
-     "d": "père, mère, très, après... Le è revient sans cesse. Profite-en pour réviser le é au passage."
-    }
-   ],
-   "tip": "Objectif : taper è sans le confondre avec é, et réviser les deux."
-  },
-  "acc3": {
-   "intro": "On ajoute le à et le ù. Tu pourras écrire voilà, déjà, où. Le geste exact de ton clavier est indiqué juste en dessous.",
-   "rules": [
-    {
-     "icon": "⌨️",
-     "t": "Accent grave, voyelles a et u",
-     "d": "à et ù utilisent le même signe que è (l'accent grave), suivi de a ou de u. Le geste est celui du è."
-    },
-    {
-     "icon": "⏳",
-     "t": "Rien ne s'affiche tout de suite",
-     "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape-le, puis la voyelle. C'est normal, ne t'arrête pas."
-    },
-    {
-     "icon": "💬",
-     "t": "Petits mots, grand usage",
-     "d": "à, où, là, déjà... Ces petits mots accentués sont partout. Bien les placer évite beaucoup de fautes."
-    }
-   ],
-   "tip": "Objectif : produire à et ù avec le geste de ton clavier, sans hésiter."
-  },
-  "acc4": {
-   "intro": "Dernier accent courant : le ç (c cédille). Avec lui et le ù, tu as les accents usuels du français. Le geste exact de ton clavier est indiqué juste en dessous.",
-   "rules": [
-    {
-     "icon": "⌨️",
-     "t": "Le ç, un geste à part",
-     "d": "Le ç s'obtient avec son propre geste (souvent la touche morte ' puis c, ou Option + c, ou AltGr + , selon ton clavier). Regarde le geste indiqué."
-    },
-    {
-     "icon": "📖",
-     "t": "La cédille",
-     "d": "Le ç se met sous le c devant a, o, u pour faire le son [s] : façon, leçon, garçon, français."
-    },
-    {
-     "icon": "🧩",
-     "t": "Tous les accents réunis",
-     "d": "Avec ç et ù, tu as é è à ù ç. Révise-les ensemble pour que chaque geste devienne un réflexe."
-    }
-   ],
-   "tip": "Objectif : placer ç et ù sans regarder, et réviser l'ensemble des accents."
-  },
-  "acc5": {
-   "intro": "On réunit tous ces accents dans un vrai texte français. C'est ce qui fait la différence à l'écrit.",
-   "rules": [
-    {
-     "icon": "🧭",
-     "t": "Chaque accent a son geste",
-     "d": "é, è, à, ù, ç : cinq caractères, chacun son geste sur ton clavier. Visualise-le avant de taper."
-    },
-    {
-     "icon": "🎯",
-     "t": "Précision d'abord",
-     "d": "Les gestes d'accents sont moins automatiques que les lettres. Ralentis dessus si besoin, la vitesse viendra avec la répétition."
-    },
-    {
-     "icon": "✅",
-     "t": "Le vrai français",
-     "d": "Un texte sans accents fait amateur. Maîtriser ces gestes, c'est écrire un français propre et soigné."
-    }
-   ],
-   "tip": "Objectif : écrire un texte accentué complet sans chercher les gestes."
-  },
-  "cir1": {
-   "intro": "Le circonflexe (le « chapeau ») passe par une touche morte : tu appuies d'abord sur le signe, puis sur la voyelle. Rien ne s'affiche tant que tu n'as pas tapé la voyelle, c'est normal. Le geste exact de ton clavier est indiqué juste en dessous.",
-   "rules": [
-    {
-     "icon": "🎩",
-     "t": "Une touche morte",
-     "d": "Sur QWERTY, le circonflexe s'obtient avec une combinaison propre à ton clavier (par exemple Maj + 6 puis la voyelle, ou Option + i puis la voyelle sur Mac)."
-    },
-    {
-     "icon": "2️⃣",
-     "t": "En deux temps",
-     "d": "Circonflexe = deux frappes : le signe, puis la voyelle. â = signe puis a, ê = signe puis e. Le système combine les deux."
-    },
-    {
-     "icon": "💬",
-     "t": "Mots courants",
-     "d": "château, pâte, être, fête, forêt... Le circonflexe est fréquent. Prends le réflexe du « chapeau d'abord »."
-    }
-   ],
-   "tip": "Objectif : enchaîner le signe puis la voyelle pour écrire â et ê sans hésiter."
-  },
-  "cir2": {
-   "intro": "Même geste pour î et ô : le circonflexe, puis la voyelle. Tu complètes le circonflexe sur i et o. Le geste exact de ton clavier est indiqué juste en dessous.",
-   "rules": [
-    {
-     "icon": "🎩",
-     "t": "Toujours le signe d'abord",
-     "d": "î = signe puis i, ô = signe puis o. Le geste est identique à â et ê : la touche morte vient toujours en premier."
-    },
-    {
-     "icon": "📍",
-     "t": "Même geste que â et ê",
-     "d": "Tu ne changes rien : c'est la même combinaison, seule la voyelle change."
-    },
-    {
-     "icon": "💬",
-     "t": "Mots utiles",
-     "d": "île, maître, boîte, hôtel, côte, rôle... Profite de la révision de â et ê glissés dans les mêmes textes."
-    }
-   ],
-   "tip": "Objectif : taper î et ô avec la touche morte, et réviser â ê."
-  },
-  "cir3": {
-   "intro": "Dernière voyelle du circonflexe : le û. Même principe de touche morte, puis révision de tous les chapeaux.",
-   "rules": [
-    {
-     "icon": "🎩",
-     "t": "û = signe puis u",
-     "d": "Encore une fois : le signe du circonflexe, puis u. Tu connais maintenant les cinq voyelles à chapeau."
-    },
-    {
-     "icon": "🖐️",
-     "t": "Cinq voyelles",
-     "d": "â ê î ô û : toutes se font avec le même geste puis la voyelle. Un seul geste à maîtriser pour les cinq."
-    },
-    {
-     "icon": "🐢",
-     "t": "Va à ton rythme",
-     "d": "La double frappe demande un peu de coordination. Ralentis si besoin, le geste s'automatise vite."
-    }
-   ],
-   "tip": "Objectif : écrire û et enchaîner les cinq voyelles circonflexes sans regarder."
-  },
-  "cir4": {
-   "intro": "On met tous les circonflexes dans un vrai texte. Le geste « chapeau puis voyelle » doit devenir naturel.",
-   "rules": [
-    {
-     "icon": "⚡",
-     "t": "Le réflexe touche morte",
-     "d": "Dès que tu vois un chapeau, pense au signe d'abord, voyelle ensuite. Ce réflexe vaut pour les cinq voyelles."
-    },
-    {
-     "icon": "👀",
-     "t": "Anticipe les accents",
-     "d": "En lisant le mot, repère les voyelles accentuées à l'avance pour préparer la double frappe."
-    },
-    {
-     "icon": "✨",
-     "t": "Soigne le rendu",
-     "d": "Les circonflexes bien placés (être, château, forêt) donnent un texte vraiment correct en français."
-    }
-   ],
-   "tip": "Objectif : intégrer les circonflexes dans un texte fluide, sans casser le rythme."
-  },
-  "tre1": {
-   "intro": "Le tréma (¨) est aussi une touche morte, comme le circonflexe : le signe d'abord, puis la voyelle. Le geste exact de ton clavier est indiqué juste en dessous.",
-   "rules": [
-    {
-     "icon": "¨",
-     "t": "Le signe d'abord",
-     "d": "Fais le geste du tréma (par exemple Maj + ' sur US International, ou Option + u sur Mac), relâche, puis tape e ou i."
-    },
-    {
-     "icon": "⏳",
-     "t": "Rien ne s'affiche tout de suite",
-     "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape-le, puis la voyelle. C'est normal, ne t'arrête pas."
-    },
-    {
-     "icon": "💬",
-     "t": "Mots à tréma",
-     "d": "Noël, naïf, maïs, héroïque... Le tréma sépare deux voyelles qu'on prononce distinctement."
-    }
-   ],
-   "tip": "Objectif : faire le geste du tréma puis la voyelle pour écrire ë et ï."
   },
   "num3": {
    "intro": "Au tour des annulaires : 2 à gauche, 9 à droite. On approche des bords de la rangée.",
@@ -3215,7 +2997,30 @@
   "w2",
   "w3",
   "w4",
-  "w5"
+  "w5",
+  "ac1",
+  "ac2",
+  "ac3",
+  "ac4",
+  "ac5",
+  "ac6",
+  "ac7",
+  "ac8",
+  "ac9"
+ ],
+ "retiredAz": [
+  "acc1",
+  "acc2",
+  "acc3",
+  "acc4",
+  "acc5",
+  "cir1",
+  "cir2",
+  "cir3",
+  "cir4",
+  "tre1",
+  "tre2",
+  "tre3"
  ],
  "curriculum": {
   "modules": [
@@ -3915,6 +3720,274 @@
     ]
    },
    {
+    "name": "5. Les accents",
+    "kind": "accents",
+    "lessons": [
+     {
+      "id": "ac1",
+      "title": "L'accent aigu : é",
+      "keys": "é",
+      "teaches": "é",
+      "tip": "Le é est l'une des lettres les plus fréquentes du français. Sur QWERTY, il n'a pas de touche à lui : on l'obtient avec un geste que ton clavier t'indique en dessous.",
+      "tuto": {
+       "intro": "Les accents n'ont pas de touche à eux sur un clavier QWERTY : on les obtient avec une touche morte ou une combinaison (AltGr, Option). On commence par le plus fréquent, le é. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "⌨️",
+         "t": "Un geste, pas une touche",
+         "d": "Le é s'obtient avec le geste propre à ton clavier : une touche morte puis e, ou AltGr + e, ou Option + e. Regarde le geste indiqué sous la leçon et répète-le plusieurs fois, lentement."
+        },
+        {
+         "icon": "⏳",
+         "t": "Rien ne s'affiche tout de suite",
+         "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape le signe, puis la lettre. C'est normal, ne t'arrête pas."
+        },
+        {
+         "icon": "🛟",
+         "t": "Pas de geste sur ton clavier ?",
+         "d": "Un clavier US simple n'a aucun geste pour les accents. Dans la pastille clavier, en haut, choisis Accents « Tolérés » : la lettre sans accent sera acceptée, et ton score le mentionnera."
+        }
+       ],
+       "tip": "Objectif : produire é avec le geste de ton clavier, sans hésiter."
+      },
+      "text": "é é é, é. été café bébé idée épée école étude étoile thé clé fée réel. elle a été au café avec une amie."
+     },
+     {
+      "id": "ac2",
+      "title": "L'accent grave : è",
+      "keys": "è",
+      "teaches": "è",
+      "tip": "Le è passe par l'accent grave, un autre signe que le é : tu retrouves la même logique, avec une touche morte différente (ou une combinaison différente).",
+      "tuto": {
+       "intro": "Le è s'obtient avec l'accent grave, un autre signe que l'accent aigu du é. Même logique : le signe, puis la lettre. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "⌨️",
+         "t": "Même principe, autre signe",
+         "d": "Le è passe par l'accent grave (touche morte ` ou combinaison de ton clavier), puis la lettre e. Le geste du é et celui du è sont proches mais pas identiques."
+        },
+        {
+         "icon": "↔️",
+         "t": "Ne confonds pas é et è",
+         "d": "é et è utilisent deux signes différents. Entraîne-toi à les alterner dans les mots : père, mère, très, après."
+        },
+        {
+         "icon": "💬",
+         "t": "Des mots très courants",
+         "d": "père, mère, frère, très, près, après, dès, rivière, lumière : le è revient sans cesse, avec le é dans les mêmes phrases."
+        }
+       ],
+       "tip": "Objectif : taper è sans le confondre avec é, et réviser les deux."
+      },
+      "text": "è è è, è. père mère frère très près après dès lèvre règle rivière lumière mètre. mon père et ma mère sont très près de la rivière."
+     },
+     {
+      "id": "ac3",
+      "title": "À et où : l'accent grave sur a et u",
+      "keys": "à ù",
+      "teaches": "àù",
+      "tip": "À et ù utilisent le même accent grave que le è, suivi de a ou de u. Tu as déjà le geste : seule la lettre change.",
+      "tuto": {
+       "intro": "À et ù se font avec le même accent grave que le è : le signe, puis a ou u. Tu pourras écrire voilà, déjà, là et où. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "🔁",
+         "t": "Le même geste que le è",
+         "d": "Le signe est celui du è. Seule la lettre qui suit change : a pour à, u pour ù."
+        },
+        {
+         "icon": "⏳",
+         "t": "Rien ne s'affiche tout de suite",
+         "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape le signe, puis la lettre. C'est normal, ne t'arrête pas."
+        },
+        {
+         "icon": "💬",
+         "t": "Des petits mots qui comptent",
+         "d": "à, là, déjà, voilà, où : ces petits mots accentués sont partout. Bien les placer évite beaucoup de fautes. Le ù n'existe en français que dans où."
+        }
+       ],
+       "tip": "Objectif : produire à et ù avec le geste de ton clavier, sans hésiter."
+      },
+      "text": "à à à, à. ù ù ù, ù. là déjà voilà holà où. où es tu, là où je suis. voilà, je suis déjà à la maison, où je dors."
+     },
+     {
+      "id": "ac4",
+      "title": "La cédille : ç",
+      "keys": "ç",
+      "teaches": "ç",
+      "tip": "Le ç a son propre geste (touche morte puis c, ou Option + c, ou AltGr + virgule, selon ton clavier). Il se met devant a, o, u pour faire le son [s].",
+      "tuto": {
+       "intro": "Le ç (c cédille) a son propre geste, différent de ceux des accents. Il se place devant a, o ou u pour faire le son [s]. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "⌨️",
+         "t": "Un geste à part",
+         "d": "Selon ton clavier : le signe de l'accent aigu puis c, ou Option + c, ou AltGr + virgule. Regarde le geste indiqué et répète-le."
+        },
+        {
+         "icon": "📖",
+         "t": "La cédille",
+         "d": "Le ç sert à garder le son [s] devant a, o, u : façon, leçon, garçon, français."
+        },
+        {
+         "icon": "🧩",
+         "t": "Quatre signes, quatre gestes",
+         "d": "Tu connais maintenant é, è, à, ù et ç : cinq caractères, chacun son geste. Ralentis sur celui qui te résiste."
+        }
+       ],
+       "tip": "Objectif : placer ç sans regarder, et réviser les accents déjà vus."
+      },
+      "text": "ç ç ç, ç. ça ça façon garçon leçon français reçu maçon glaçon soupçon commençons. ça va, le garçon a reçu une leçon."
+     },
+     {
+      "id": "ac5",
+      "title": "Le circonflexe : â et ê",
+      "keys": "â ê",
+      "teaches": "âê",
+      "tip": "Le circonflexe (le chapeau) passe par une touche morte ou une combinaison : tu appuies d'abord sur le signe, puis sur la voyelle.",
+      "tuto": {
+       "intro": "Le circonflexe, le « chapeau », est une touche morte : tu appuies d'abord sur le signe, puis sur la voyelle. Rien ne s'affiche tant que tu n'as pas tapé la voyelle. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "🎩",
+         "t": "Un signe, puis la voyelle",
+         "d": "Le circonflexe s'obtient avec une combinaison propre à ton clavier (par exemple Maj + 6 puis la voyelle, ou Option + i puis la voyelle sur Mac). â = signe puis a, ê = signe puis e."
+        },
+        {
+         "icon": "2️⃣",
+         "t": "En deux temps",
+         "d": "Circonflexe = deux frappes : le signe, puis la voyelle. Le système combine les deux. Prends le réflexe du « chapeau d'abord »."
+        },
+        {
+         "icon": "💬",
+         "t": "Des mots courants",
+         "d": "château, pâte, gâteau, être, fête, forêt, fenêtre : le circonflexe est fréquent, surtout sur le ê."
+        }
+       ],
+       "tip": "Objectif : enchaîner le signe puis la voyelle pour écrire â et ê sans hésiter."
+      },
+      "text": "â â ê ê âê êâ âge âme pâte château bâton gâteau tâche être fête tête forêt fenêtre bête prêt même rêve. la fête est prête."
+     },
+     {
+      "id": "ac6",
+      "title": "Le circonflexe : î, ô et û",
+      "keys": "î ô û",
+      "teaches": "îôû",
+      "tip": "Même geste pour î, ô et û : le signe du circonflexe, puis la voyelle. Tu connais déjà le geste, il ne change pas.",
+      "tuto": {
+       "intro": "Même geste pour î, ô et û : le circonflexe, puis la voyelle. Tu complètes les cinq voyelles à chapeau. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "🎩",
+         "t": "Toujours le signe d'abord",
+         "d": "î = signe puis i, ô = signe puis o, û = signe puis u. Le geste est identique à â et ê : la touche morte vient toujours en premier."
+        },
+        {
+         "icon": "🖐️",
+         "t": "Cinq voyelles, un seul geste",
+         "d": "â ê î ô û : un seul geste à maîtriser pour les cinq. Seule la voyelle change."
+        },
+        {
+         "icon": "💬",
+         "t": "Mots utiles",
+         "d": "île, maître, boîte, dîner, hôtel, rôle, drôle, mûr, sûr, flûte, goût, août : profite des révisions de â et ê glissées dans les textes."
+        }
+       ],
+       "tip": "Objectif : taper î, ô et û avec la touche morte, et réviser â et ê."
+      },
+      "text": "î î ô ô û û îô ôû île maître boîte dîner côté hôtel rôle drôle mûr sûr flûte goût août. le maître est sûr du goût de la fête."
+     },
+     {
+      "id": "ac7",
+      "title": "Le tréma : ë et ï",
+      "keys": "ë ï",
+      "teaches": "ëï",
+      "tip": "Le tréma est aussi une touche morte, avec un autre signe que le circonflexe : le signe, puis la voyelle. Il sépare deux voyelles qu'on prononce distinctement.",
+      "tuto": {
+       "intro": "Le tréma est lui aussi une touche morte : le signe, puis la voyelle. Il sépare deux voyelles qu'on prononce distinctement, comme dans maïs ou noël. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "¨",
+         "t": "Le signe d'abord",
+         "d": "Fais le geste du tréma (par exemple Maj + ' sur US international, ou Option + u sur Mac), relâche, puis tape e ou i."
+        },
+        {
+         "icon": "⏳",
+         "t": "Rien ne s'affiche tout de suite",
+         "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape le signe, puis la lettre. C'est normal, ne t'arrête pas."
+        },
+        {
+         "icon": "💬",
+         "t": "Mots à tréma",
+         "d": "noël, maïs, naïf, haïr, héroïque, égoïste, canoë, aiguë : le tréma est rare, mais indispensable à ces mots."
+        }
+       ],
+       "tip": "Objectif : faire le geste du tréma puis la voyelle pour écrire ë et ï."
+      },
+      "text": "ë ë ï ï ëï ïë maïs naïf haïr héroïque égoïste aïeul noël canoë aiguë ambiguë. noël est une fête pour tous. le héros est naïf."
+     },
+     {
+      "id": "ac8",
+      "title": "Les ligatures : œ et æ",
+      "keys": "œ æ",
+      "teaches": "œæ",
+      "tip": "Œ et æ collent deux lettres en une. Le geste dépend de ton clavier : si tu n'en as pas, tape o puis e (ou a puis e) : c'est accepté.",
+      "tuto": {
+       "intro": "Les ligatures œ et æ collent deux lettres en une. Plus rares, elles demandent un geste propre à ton clavier, ou une solution de repli. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "🔗",
+         "t": "Deux lettres soudées",
+         "d": "œ = o et e soudés (cœur, sœur, œuf) ; æ = a et e soudés (ex æquo). On les écrit comme un seul caractère."
+        },
+        {
+         "icon": "🛟",
+         "t": "Si ton clavier n'a pas de geste",
+         "d": "Tape o puis e (ou a puis e) : c'est accepté. Tu peux continuer sans te bloquer."
+        },
+        {
+         "icon": "🎯",
+         "t": "Surtout l'œ",
+         "d": "L'œ est le plus courant : cœur, sœur, œil, œuvre, bœuf. L'æ est rare. Concentre-toi sur l'œ."
+        }
+       ],
+       "tip": "Objectif : reconnaître et produire œ et æ, surtout l'œ, très fréquent."
+      },
+      "text": "œ œ æ æ æ œæ æœ cœur sœur œuf œil bœuf vœu nœud œuvre ex æquo. ma sœur a un grand cœur et un œil vif."
+     },
+     {
+      "id": "ac9",
+      "title": "Révision : tous les accents",
+      "keys": "é è à ù ç â ê î ô û ë ï œ æ",
+      "teaches": "",
+      "howText": true,
+      "tip": "On réunit tous les accents dans un texte. Chaque accent a son geste : avant de taper, repère ceux que le mot demande et prépare-les.",
+      "tuto": {
+       "intro": "On réunit tous les accents dans un vrai texte français. C'est ce qui fait la différence à l'écrit. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+       "rules": [
+        {
+         "icon": "🧭",
+         "t": "Chaque accent a son geste",
+         "d": "é, è, à, ù, ç, â, ê, î, ô, û, ë, ï, œ : treize caractères, chacun son geste sur ton clavier. Visualise-le avant de taper."
+        },
+        {
+         "icon": "🎯",
+         "t": "Précision d'abord",
+         "d": "Les gestes d'accents sont moins automatiques que les lettres. Ralentis dessus si besoin, la vitesse viendra avec la répétition."
+        },
+        {
+         "icon": "✅",
+         "t": "Le vrai français",
+         "d": "Un texte sans accents fait amateur. Maîtriser ces gestes, c'est écrire un français propre et soigné."
+        }
+       ],
+       "tip": "Objectif : écrire un texte accentué complet sans chercher les gestes."
+      },
+      "text": "é è à ù ç â ê î ô û ë ï œ æ. le garçon a déjà mangé une crème près de la forêt, où la fête commence."
+     }
+    ]
+   },
+   {
     "name": "5. Majuscules",
     "lessons": [
      {
@@ -4190,346 +4263,6 @@
         }
        ],
        "tip": "Objectif : ponctuer un texte réel proprement, en respectant les espaces françaises."
-      },
-      "howText": true
-     }
-    ]
-   },
-   {
-    "name": "7. Les accents",
-    "lessons": [
-     {
-      "id": "acc1",
-      "title": "L'accent aigu : é",
-      "keys": "é",
-      "text": "été café écran étoile étude écrire échec éclat réel série épée érable énergie café été",
-      "tuto": {
-       "intro": "Sur un clavier QWERTY, les accents n'ont pas de touche à eux : on les obtient avec une touche morte ou une combinaison (AltGr, Option). On commence par le é. Le geste exact de ton clavier est indiqué juste en dessous.",
-       "rules": [
-        {
-         "icon": "⌨️",
-         "t": "Un geste, pas une touche",
-         "d": "Le é s'obtient avec un geste propre à ton clavier (touche morte puis e, AltGr + e, Option + e puis e…). Regarde le geste indiqué sous la leçon."
-        },
-        {
-         "icon": "⏳",
-         "t": "Rien ne s'affiche tout de suite",
-         "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape-le, puis la voyelle. C'est normal, ne t'arrête pas."
-        },
-        {
-         "icon": "🔥",
-         "t": "Très fréquent",
-         "d": "é est l'un des caractères les plus courants du français (été, café, écrire). L'automatiser fait gagner beaucoup."
-        }
-       ],
-       "tip": "Objectif : produire é avec le geste de ton clavier, sans hésiter."
-      }
-     },
-     {
-      "id": "acc2",
-      "title": "L'accent grave : è (+ révision é)",
-      "keys": "è",
-      "text": "père mère frère très près après dès fière rivière lumière. été, très près. père préfère le café. très bien.",
-      "tuto": {
-       "intro": "Le è (accent grave) s'obtient avec un autre signe que le é. Le geste exact de ton clavier est indiqué juste en dessous.",
-       "rules": [
-        {
-         "icon": "⌨️",
-         "t": "Même principe, autre signe",
-         "d": "Le è passe par l'accent grave (touche morte ` ou combinaison de ton clavier), puis la lettre e."
-        },
-        {
-         "icon": "↔️",
-         "t": "Ne confonds pas é et è",
-         "d": "é et è utilisent deux signes différents : le geste du é, puis le geste du è. Entraîne-toi à les alterner."
-        },
-        {
-         "icon": "💬",
-         "t": "Mots très courants",
-         "d": "père, mère, très, après... Le è revient sans cesse. Profite-en pour réviser le é au passage."
-        }
-       ],
-       "tip": "Objectif : taper è sans le confondre avec é, et réviser les deux."
-      }
-     },
-     {
-      "id": "acc3",
-      "title": "À et où (+ révision é è)",
-      "keys": "à où",
-      "text": "voilà déjà là-bas à droite. où es-tu ? là-haut, à gauche. père et mère sont déjà là. voilà le café.",
-      "tuto": {
-       "intro": "On ajoute le à et le ù. Tu pourras écrire voilà, déjà, où. Le geste exact de ton clavier est indiqué juste en dessous.",
-       "rules": [
-        {
-         "icon": "⌨️",
-         "t": "Accent grave, voyelles a et u",
-         "d": "à et ù utilisent le même signe que è (l'accent grave), suivi de a ou de u. Le geste est celui du è."
-        },
-        {
-         "icon": "⏳",
-         "t": "Rien ne s'affiche tout de suite",
-         "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape-le, puis la voyelle. C'est normal, ne t'arrête pas."
-        },
-        {
-         "icon": "💬",
-         "t": "Petits mots, grand usage",
-         "d": "à, où, là, déjà... Ces petits mots accentués sont partout. Bien les placer évite beaucoup de fautes."
-        }
-       ],
-       "tip": "Objectif : produire à et ù avec le geste de ton clavier, sans hésiter."
-      }
-     },
-     {
-      "id": "acc4",
-      "title": "Ù et ç (+ révision tous accents)",
-      "keys": "ù ç",
-      "text": "façon leçon garçon français reçu ça voilà. déjà là où tu es, façon très douce. père et mère à la leçon. café.",
-      "tuto": {
-       "intro": "Dernier accent courant : le ç (c cédille). Avec lui et le ù, tu as les accents usuels du français. Le geste exact de ton clavier est indiqué juste en dessous.",
-       "rules": [
-        {
-         "icon": "⌨️",
-         "t": "Le ç, un geste à part",
-         "d": "Le ç s'obtient avec son propre geste (souvent la touche morte ' puis c, ou Option + c, ou AltGr + , selon ton clavier). Regarde le geste indiqué."
-        },
-        {
-         "icon": "📖",
-         "t": "La cédille",
-         "d": "Le ç se met sous le c devant a, o, u pour faire le son [s] : façon, leçon, garçon, français."
-        },
-        {
-         "icon": "🧩",
-         "t": "Tous les accents réunis",
-         "d": "Avec ç et ù, tu as é è à ù ç. Révise-les ensemble pour que chaque geste devienne un réflexe."
-        }
-       ],
-       "tip": "Objectif : placer ç et ù sans regarder, et réviser l'ensemble des accents."
-      }
-     },
-     {
-      "id": "acc5",
-      "title": "Révision : tous les accents directs",
-      "keys": "é è à ù ç",
-      "text": "déjà à l'été, le café et la façon d'écrire. très près de là où père et mère écrivent la leçon de français.",
-      "tuto": {
-       "intro": "On réunit tous ces accents dans un vrai texte français. C'est ce qui fait la différence à l'écrit.",
-       "rules": [
-        {
-         "icon": "🧭",
-         "t": "Chaque accent a son geste",
-         "d": "é, è, à, ù, ç : cinq caractères, chacun son geste sur ton clavier. Visualise-le avant de taper."
-        },
-        {
-         "icon": "🎯",
-         "t": "Précision d'abord",
-         "d": "Les gestes d'accents sont moins automatiques que les lettres. Ralentis dessus si besoin, la vitesse viendra avec la répétition."
-        },
-        {
-         "icon": "✅",
-         "t": "Le vrai français",
-         "d": "Un texte sans accents fait amateur. Maîtriser ces gestes, c'est écrire un français propre et soigné."
-        }
-       ],
-       "tip": "Objectif : écrire un texte accentué complet sans chercher les gestes."
-      }
-     }
-    ]
-   },
-   {
-    "name": "8. Accents circonflexes",
-    "lessons": [
-     {
-      "id": "cir1",
-      "title": "Â et Ê : le chapeau sur a et e",
-      "keys": "^ puis a ou e",
-      "text": "château pâte âge bâton mât. être fête tête bête forêt prêt arrêt. le château est prêt pour la fête.",
-      "tuto": {
-       "intro": "Le circonflexe (le « chapeau ») passe par une touche morte : tu appuies d'abord sur le signe, puis sur la voyelle. Rien ne s'affiche tant que tu n'as pas tapé la voyelle, c'est normal. Le geste exact de ton clavier est indiqué juste en dessous.",
-       "rules": [
-        {
-         "icon": "🎩",
-         "t": "Une touche morte",
-         "d": "Sur QWERTY, le circonflexe s'obtient avec une combinaison propre à ton clavier (par exemple Maj + 6 puis la voyelle, ou Option + i puis la voyelle sur Mac)."
-        },
-        {
-         "icon": "2️⃣",
-         "t": "En deux temps",
-         "d": "Circonflexe = deux frappes : le signe, puis la voyelle. â = signe puis a, ê = signe puis e. Le système combine les deux."
-        },
-        {
-         "icon": "💬",
-         "t": "Mots courants",
-         "d": "château, pâte, être, fête, forêt... Le circonflexe est fréquent. Prends le réflexe du « chapeau d'abord »."
-        }
-       ],
-       "tip": "Objectif : enchaîner le signe puis la voyelle pour écrire â et ê sans hésiter."
-      }
-     },
-     {
-      "id": "cir2",
-      "title": "Î et Ô (+ révision â ê)",
-      "keys": "^ puis i ou o",
-      "text": "île îlot naître maître boîte. hôtel côte rôle tôt dôme. le maître est à l'île, près du château. hôtel.",
-      "tuto": {
-       "intro": "Même geste pour î et ô : le circonflexe, puis la voyelle. Tu complètes le circonflexe sur i et o. Le geste exact de ton clavier est indiqué juste en dessous.",
-       "rules": [
-        {
-         "icon": "🎩",
-         "t": "Toujours le signe d'abord",
-         "d": "î = signe puis i, ô = signe puis o. Le geste est identique à â et ê : la touche morte vient toujours en premier."
-        },
-        {
-         "icon": "📍",
-         "t": "Même geste que â et ê",
-         "d": "Tu ne changes rien : c'est la même combinaison, seule la voyelle change."
-        },
-        {
-         "icon": "💬",
-         "t": "Mots utiles",
-         "d": "île, maître, boîte, hôtel, côte, rôle... Profite de la révision de â et ê glissés dans les mêmes textes."
-        }
-       ],
-       "tip": "Objectif : taper î et ô avec la touche morte, et réviser â ê."
-      }
-     },
-     {
-      "id": "cir3",
-      "title": "Û et révision complète",
-      "keys": "^ puis u (+ tous)",
-      "text": "sûr dû brûler goût août flûte voûte. le château de l'île est sûr. fête au tôt. forêt et dôme. maître.",
-      "tuto": {
-       "intro": "Dernière voyelle du circonflexe : le û. Même principe de touche morte, puis révision de tous les chapeaux.",
-       "rules": [
-        {
-         "icon": "🎩",
-         "t": "û = signe puis u",
-         "d": "Encore une fois : le signe du circonflexe, puis u. Tu connais maintenant les cinq voyelles à chapeau."
-        },
-        {
-         "icon": "🖐️",
-         "t": "Cinq voyelles",
-         "d": "â ê î ô û : toutes se font avec le même geste puis la voyelle. Un seul geste à maîtriser pour les cinq."
-        },
-        {
-         "icon": "🐢",
-         "t": "Va à ton rythme",
-         "d": "La double frappe demande un peu de coordination. Ralentis si besoin, le geste s'automatise vite."
-        }
-       ],
-       "tip": "Objectif : écrire û et enchaîner les cinq voyelles circonflexes sans regarder."
-      }
-     },
-     {
-      "id": "cir4",
-      "title": "Texte avec tous les circonflexes",
-      "keys": "â ê î ô û",
-      "text": "au château sur l'île, la fête était sûre. le maître de l'hôtel brûlait une flûte. forêt, côte, dôme, tôt.",
-      "tuto": {
-       "intro": "On met tous les circonflexes dans un vrai texte. Le geste « chapeau puis voyelle » doit devenir naturel.",
-       "rules": [
-        {
-         "icon": "⚡",
-         "t": "Le réflexe touche morte",
-         "d": "Dès que tu vois un chapeau, pense au signe d'abord, voyelle ensuite. Ce réflexe vaut pour les cinq voyelles."
-        },
-        {
-         "icon": "👀",
-         "t": "Anticipe les accents",
-         "d": "En lisant le mot, repère les voyelles accentuées à l'avance pour préparer la double frappe."
-        },
-        {
-         "icon": "✨",
-         "t": "Soigne le rendu",
-         "d": "Les circonflexes bien placés (être, château, forêt) donnent un texte vraiment correct en français."
-        }
-       ],
-       "tip": "Objectif : intégrer les circonflexes dans un texte fluide, sans casser le rythme."
-      }
-     }
-    ]
-   },
-   {
-    "name": "9. Tréma et ligatures",
-    "lessons": [
-     {
-      "id": "tre1",
-      "title": "Le tréma : ë et ï",
-      "keys": "¨ puis e ou i",
-      "text": "Noël naïf maïs aiguë canoë Joël Gaël héroïque. Noël est naïf. le maïs aiguë. Joël et Gaël au canoë.",
-      "tuto": {
-       "intro": "Le tréma (¨) est aussi une touche morte, comme le circonflexe : le signe d'abord, puis la voyelle. Le geste exact de ton clavier est indiqué juste en dessous.",
-       "rules": [
-        {
-         "icon": "¨",
-         "t": "Le signe d'abord",
-         "d": "Fais le geste du tréma (par exemple Maj + ' sur US International, ou Option + u sur Mac), relâche, puis tape e ou i."
-        },
-        {
-         "icon": "⏳",
-         "t": "Rien ne s'affiche tout de suite",
-         "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape-le, puis la voyelle. C'est normal, ne t'arrête pas."
-        },
-        {
-         "icon": "💬",
-         "t": "Mots à tréma",
-         "d": "Noël, naïf, maïs, héroïque... Le tréma sépare deux voyelles qu'on prononce distinctement."
-        }
-       ],
-       "tip": "Objectif : faire le geste du tréma puis la voyelle pour écrire ë et ï."
-      }
-     },
-     {
-      "id": "tre2",
-      "title": "Les ligatures : œ et æ",
-      "keys": "œ æ",
-      "text": "cœur sœur œil œuvre bœuf manœuvre hors-d'œuvre. ma sœur a du cœur. l'œuvre est belle. bœuf manœuvre.",
-      "tuto": {
-       "intro": "Les ligatures œ et æ collent deux lettres en une. Plus rares, elles demandent une combinaison selon ton système.",
-       "rules": [
-        {
-         "icon": "🔗",
-         "t": "Deux lettres soudées",
-         "d": "œ = o et e soudés (cœur, sœur, œuf) ; æ = a et e soudés (et æquo). On les écrit comme un seul caractère."
-        },
-        {
-         "icon": "⌨️",
-         "t": "Selon le système",
-         "d": "Le geste dépend de ton clavier (indiqué plus haut). Si tu n'arrives pas à taper œ ou æ, tape o puis e (ou a puis e) : c'est accepté."
-        },
-        {
-         "icon": "💬",
-         "t": "Surtout l'œ",
-         "d": "L'œ est le plus courant : cœur, sœur, œil, œuvre, bœuf. L'æ est rare. Concentre-toi sur l'œ."
-        }
-       ],
-       "tip": "Objectif : reconnaître et produire œ et æ, surtout l'œ très fréquent."
-      }
-     },
-     {
-      "id": "tre3",
-      "title": "Texte avec tous les signes",
-      "keys": "ë ï œ æ + tous accents",
-      "text": "à Noël, ma sœur naïve au cœur héroïque fait une manœuvre. le maïs pousse où l'île est sûre, près du château.",
-      "tuto": {
-       "intro": "On réunit trémas, ligatures et tous les accents dans un texte. C'est l'orthographe française complète.",
-       "rules": [
-        {
-         "icon": "🧩",
-         "t": "Tous les signes",
-         "d": "Trémas, circonflexes, accents directs, ligatures : tout est là. Mobilise les gestes appris dans les modules précédents."
-        },
-        {
-         "icon": "👀",
-         "t": "Repère à l'avance",
-         "d": "Chaque signe a son geste (direct, touche morte, combinaison). Anticipe-le en lisant le mot avant de le taper."
-        },
-        {
-         "icon": "🏆",
-         "t": "Le français complet",
-         "d": "Taper ce texte proprement, c'est maîtriser toute la richesse des caractères français. Beau travail !"
-        }
-       ],
-       "tip": "Objectif : écrire un texte avec tous les signes français, chaque accent à sa place."
       },
       "howText": true
      }
@@ -5194,42 +4927,6 @@
    "kind": "adapted",
    "text": "« Viens vite ! » dit-il. Elle dit : « J'arrive ; attends-moi. » Vingt-cinq minutes plus tard (enfin), elle arriva.",
    "why": "répondit (é) remplacé par dit"
-  },
-  "acc1": {
-   "title": "L'accent aigu : é",
-   "keys": "é",
-   "module": "7. Accents directs AZERTY",
-   "moduleIdx": 6,
-   "kind": "adapted",
-   "text": "été café écran étoile étude écrire échec éclat réel série épée érable énergie café été",
-   "why": "élève et ébène (è) retirés : le è s'enseigne en acc2, et sur QWERTY son geste n'est pas encore connu"
-  },
-  "acc2": {
-   "title": "L'accent grave : è (+ révision é)",
-   "keys": "è",
-   "module": "7. Accents directs AZERTY",
-   "moduleIdx": 6,
-   "kind": "adapted",
-   "text": "père mère frère très près après dès fière rivière lumière. été, très près. père préfère le café. très bien.",
-   "why": "fenêtre (ê) retiré : le circonflexe s'enseigne au module 8"
-  },
-  "acc3": {
-   "title": "À et où (+ révision é è)",
-   "keys": "à où",
-   "module": "7. Accents directs AZERTY",
-   "moduleIdx": 6,
-   "kind": "adapted",
-   "text": "voilà déjà là-bas à droite. où es-tu ? là-haut, à gauche. père et mère sont déjà là. voilà le café.",
-   "why": "à côté (ô) remplacé par à droite : le circonflexe s'enseigne au module 8"
-  },
-  "acc5": {
-   "title": "Révision : tous les accents directs",
-   "keys": "é è à ù ç",
-   "module": "7. Accents directs AZERTY",
-   "moduleIdx": 6,
-   "kind": "adapted",
-   "text": "déjà à l'été, le café et la façon d'écrire. très près de là où père et mère écrivent la leçon de français.",
-   "why": "d'être (ê) remplacé par d'écrire : le circonflexe s'enseigne au module 8"
   },
   "flu6": {
    "title": "Sprint de vitesse : texte long",
