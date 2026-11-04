@@ -391,7 +391,7 @@ function q9() {
   const { gestureFor } = require('./gesture');
   const data = JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'));
   const errs = []; const hand = new Set(data.handwritten || []);
-  const ROWS = { repos: ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon'], haut: ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP'], bas: ['KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash'] };
+  const ROWS = { repos: ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon'], haut: ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP'], bas: ['KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash'], chiffres: ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0'] };
   const us = JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', 'windows-us.json'), 'utf8'));
   const codeOf = (ch) => Object.keys(us.keys).find((c) => us.keys[c].l === ch);
   const variants = kb.VARIANTS.map((v) => JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', v.id + '.json'), 'utf8')));

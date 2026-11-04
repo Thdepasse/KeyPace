@@ -1,0 +1,184 @@
+{
+ "replaces": [
+  10
+ ],
+ "position": 8,
+ "name": "8. Chiffres",
+ "row": "chiffres",
+ "lessons": [
+  {
+   "id": "num1",
+   "title": "4 5 6 7 : les index vers le haut",
+   "keys": "4 5 6 7",
+   "teaches": "4567",
+   "tip": "Les index couvrent quatre chiffres : le gauche 4 et 5, le droit 6 et 7. Ils montent de deux rangées, tapent, puis redescendent sur F et J.",
+   "tuto": {
+    "intro": "La rangée des chiffres est tout en haut du clavier, au-dessus de la rangée du haut. On commence par les index, qui couvrent le plus de chiffres : 4 et 5 pour la main gauche, 6 et 7 pour la main droite.",
+    "rules": [
+     {
+      "icon": "⬆️",
+      "t": "L'index monte de deux rangées",
+      "d": "L'index gauche monte sur 4 et 5, l'index droit sur 6 et 7. Le mouvement part de F et de J, traverse la rangée du haut et revient."
+     },
+     {
+      "icon": "🔢",
+      "t": "Les chiffres se tapent sans Maj",
+      "d": "Sur un clavier QWERTY, la rangée des chiffres est directe : un simple appui suffit, sans Maj. Les signes qui partagent ces touches (! ? ( ) …) sont, eux, en Maj."
+     },
+     {
+      "icon": "⚓",
+      "t": "Reviens sur la rangée de repos",
+      "d": "Après chaque chiffre, le doigt redescend sur sa touche de repos. Les autres doigts ne bougent pas : c'est ce qui te permet de ne jamais regarder."
+     }
+    ],
+    "tip": "Objectif : taper 4 5 6 7 avec les index, puis revenir sur F et J sans regarder."
+   },
+   "text": "45 54 4554 5445 67 76 6776 7667 4567 7654 4657 5476 f4 f5 j6 j7 456 765 4567 7654 54 45 67 76"
+  },
+  {
+   "id": "num2",
+   "title": "3 et 8 : les majeurs",
+   "keys": "3 8",
+   "teaches": "38",
+   "tip": "Le majeur gauche monte sur 3, le majeur droit sur 8. Garde les index ancrés sur F et J.",
+   "tuto": {
+    "intro": "Au tour des majeurs : 3 pour la main gauche, 8 pour la main droite. Ils montent tout droit, au-dessus de E et de I.",
+    "rules": [
+     {
+      "icon": "⬆️",
+      "t": "Le majeur monte tout droit",
+      "d": "Le majeur gauche monte sur 3, au-dessus de E. Le majeur droit monte sur 8, au-dessus de I. Un geste droit, sans pivoter la main."
+     },
+     {
+      "icon": "⚓",
+      "t": "Garde tes index ancrés",
+      "d": "Les index restent sur F et J pendant que les majeurs montent : ce sont tes repères pour revenir sans regarder."
+     },
+     {
+      "icon": "🔢",
+      "t": "Les chiffres se tapent sans Maj",
+      "d": "Sur un clavier QWERTY, la rangée des chiffres est directe : un simple appui suffit, sans Maj. Les signes qui partagent ces touches (! ? ( ) …) sont, eux, en Maj."
+     }
+    ],
+    "tip": "Objectif : taper 3 et 8 avec les majeurs, en gardant les autres doigts posés."
+   },
+   "text": "38 83 3883 8338 33 88 3838 8383 e3 i8 d3 k8 345 876 3483 8374 4387 5638 38 83 38 83"
+  },
+  {
+   "id": "num3",
+   "title": "2 et 9 : les annulaires",
+   "keys": "2 9",
+   "teaches": "29",
+   "tip": "L'annulaire gauche monte sur 2, l'annulaire droit sur 9. Ces doigts sont moins agiles : va doucement.",
+   "tuto": {
+    "intro": "Les annulaires couvrent le 2 et le 9. On approche des bords de la rangée : les doigts sont moins agiles, on va doucement.",
+    "rules": [
+     {
+      "icon": "⬆️",
+      "t": "Les annulaires s'étirent",
+      "d": "L'annulaire gauche monte sur 2, au-dessus de W. L'annulaire droit monte sur 9, au-dessus de O. Le mouvement est plus long : reste précis."
+     },
+     {
+      "icon": "🎯",
+      "t": "Précision avant tout",
+      "d": "Plus on s'éloigne du centre, plus les fautes guettent. Mieux vaut lent et juste que rapide et faux."
+     },
+     {
+      "icon": "🔢",
+      "t": "Les chiffres se tapent sans Maj",
+      "d": "Sur un clavier QWERTY, la rangée des chiffres est directe : un simple appui suffit, sans Maj. Les signes qui partagent ces touches (! ? ( ) …) sont, eux, en Maj."
+     }
+    ],
+    "tip": "Objectif : atteindre 2 et 9 avec les annulaires, sans regarder."
+   },
+   "text": "29 92 2992 9229 22 99 2929 9292 w2 o9 s2 l9 234 987 2938 9283 4297 6529 29 92 29 92"
+  },
+  {
+   "id": "num4",
+   "title": "1 et 0 : les auriculaires",
+   "keys": "1 0",
+   "teaches": "10",
+   "tip": "L'auriculaire gauche monte sur 1, l'auriculaire droit sur 0, aux deux bouts de la rangée. Laisse seulement le petit doigt s'étirer.",
+   "tuto": {
+    "intro": "Les auriculaires couvrent le 1 et le 0, aux deux extrémités de la rangée des chiffres. Ce sont les doigts les plus faibles : on leur laisse le temps.",
+    "rules": [
+     {
+      "icon": "🤏",
+      "t": "Les auriculaires montent",
+      "d": "L'auriculaire gauche monte sur 1, au-dessus de Q. L'auriculaire droit monte sur 0, au-dessus de P. Ne tourne pas toute la main."
+     },
+     {
+      "icon": "🧘",
+      "t": "Stabilise le poignet",
+      "d": "Le poignet reste stable, seul le petit doigt s'étire. Ne décolle pas toute la main pour atteindre le 1 ou le 0."
+     },
+     {
+      "icon": "🔢",
+      "t": "Les chiffres se tapent sans Maj",
+      "d": "Sur un clavier QWERTY, la rangée des chiffres est directe : un simple appui suffit, sans Maj. Les signes qui partagent ces touches (! ? ( ) …) sont, eux, en Maj."
+     }
+    ],
+    "tip": "Objectif : taper 1 et 0 avec les auriculaires, sans casser ta position de repos."
+   },
+   "text": "10 01 1001 0110 11 00 1010 0101 q1 p0 a1 ;0 123 098 1029 0192 1357 2468 10 01 10 01"
+  },
+  {
+   "id": "num5",
+   "title": "Révision : tous les chiffres",
+   "keys": "0 1 2 3 4 5 6 7 8 9",
+   "teaches": "",
+   "tip": "Tu connais toute la rangée des chiffres. Enchaîne-les dans tous les sens : l'objectif est de les retrouver sans regarder.",
+   "tuto": {
+    "intro": "Tu connais maintenant les dix chiffres. Cette révision les mélange dans tous les sens pour fixer chaque geste.",
+    "rules": [
+     {
+      "icon": "🔁",
+      "t": "Dans tous les sens",
+      "d": "Des suites croissantes, décroissantes, en alternance : chaque chiffre doit venir sans hésiter, quelle que soit la suite."
+     },
+     {
+      "icon": "🧠",
+      "t": "Pense en groupes",
+      "d": "Un numéro de téléphone ou une date se tape par petits groupes de deux ou trois chiffres. Ressens chaque groupe comme un seul geste."
+     },
+     {
+      "icon": "⚓",
+      "t": "Reviens sur la rangée de repos",
+      "d": "Après chaque chiffre, le doigt redescend sur sa touche de repos. Les autres doigts ne bougent pas : c'est ce qui te permet de ne jamais regarder."
+     }
+    ],
+    "tip": "Objectif : enchaîner les dix chiffres sans regarder le clavier."
+   },
+   "text": "0123456789 9876543210 1357902468 2468013579 1234567890 0987654321 12 34 56 78 90 09 87 65 43 21"
+  },
+  {
+   "id": "num6",
+   "title": "Chiffres dans un texte réel",
+   "keys": "chiffres en contexte",
+   "teaches": "",
+   "tip": "Les chiffres se mêlent aux lettres : heures, adresses, numéros. Garde ton rythme au passage de la rangée des lettres à celle des chiffres.",
+   "tuto": {
+    "intro": "Dans la vraie vie, les chiffres se mêlent aux lettres : des heures, des numéros de téléphone, des codes postaux. C'est ce que tu tapes ici.",
+    "rules": [
+     {
+      "icon": "🔀",
+      "t": "Lettres puis chiffres",
+      "d": "Le passage d'une rangée à l'autre doit rester fluide : monte sur le chiffre, tape, redescends sur la rangée de repos."
+     },
+     {
+      "icon": "📞",
+      "t": "Des groupes familiers",
+      "d": "04 98 76 54 32, 75001, 8h30 : repère le groupe de chiffres avant de l'atteindre et tape-le d'un seul élan."
+     },
+     {
+      "icon": "✅",
+      "t": "La précision d'abord",
+      "d": "Une faute dans un numéro change tout. Ralentis sur les chiffres si besoin : la vitesse viendra avec la répétition."
+     }
+    ],
+    "tip": "Objectif : taper des chiffres au milieu d'un texte sans perdre ton rythme."
+   },
+   "text": "il y a 42 élèves dans 3 classes de 14. le bus 12 part à 8h30. tél : 04 98 76 54 32. code postal : 75001."
+  }
+ ]
+}
