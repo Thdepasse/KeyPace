@@ -118,10 +118,12 @@
   .segs .th{position:absolute;top:32px;transform:translateX(-50%);font-size:12px;font-weight:700;color:#a39c8d}
 
   .cr-prices{margin-top:18px;display:grid;gap:14px}
-  .cr-was{font-size:19px;color:var(--muted);font-weight:700}
-  .cr-was s{text-decoration:none;position:relative;display:inline-block;margin:0 8px 0 4px}
-  .cr-was s::after{content:"";position:absolute;left:-4px;right:-4px;top:54%;height:3px;background:var(--accent);border-radius:3px;transform:rotate(-4deg)}
-  .cr-was small{display:block;font-size:14px;font-weight:500;margin-top:2px}
+  .cr-was{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .cr-was .lbl{font:700 11px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .cr-was .pv{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:clamp(26px,3.4vw,34px);letter-spacing:-.03em;line-height:1;color:var(--muted)}
+  .cr-was .pv s{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:rgba(138,130,117,.75);text-underline-offset:0}
+  .cr-was .pv span{font-size:.55em;letter-spacing:0;font-weight:700;margin-left:6px}
+  .cr-was small{flex-basis:100%;font-size:13.5px;font-weight:500;color:var(--muted);margin-top:-4px}
   .cr-mano{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
   .cr-mano img{height:46px;width:auto;display:block}
   .cr-mano b{display:block;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:clamp(19px,2.4vw,24px);letter-spacing:-.03em;line-height:1.15}
@@ -384,8 +386,8 @@ document.addEventListener('click',e=>{const nl=document.getElementById('nav-link
     $('cr-ptag').innerHTML=eurs(t.p)+'<small>par élève</small>';
     var total=eur(t.p*n)+' pour '+n+' élève'+(n>1?'s':'');
     $('cr-was').innerHTML=be
-      ?'Prix catalogue : <s>'+eurs(t.p)+'</s> par élève<small>('+total+')</small>'
-      :'<span style="color:var(--txt)">'+eurs(t.p)+'</span> par élève<small>('+total+')</small>';
+      ?'<span class="lbl">Prix catalogue</span><span class="pv"><s>'+eurs(t.p)+'</s><span>par élève</span></span><small>'+total+'</small>'
+      :'<span class="lbl">Tarif</span><span class="pv" style="color:var(--txt)">'+eurs(t.p)+'<span>par élève</span></span><small>'+total+'</small>';
     $('cr-mano').hidden=!be; $('cr-fr').hidden=be;
     var b=$('cr-bub');
     if(k<TIERS.length-1){var nx=TIERS[k+1]; b.innerHTML='À partir de <b>'+nx.min+' élèves</b>, le prix passe à <b>'+eurs(nx.p)+'</b> par élève.';}
