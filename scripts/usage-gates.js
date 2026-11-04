@@ -369,4 +369,62 @@ function u11() {
   if (h.fetchCalls.length) errs.push('le choix du pays envoie quelque chose au serveur');
   return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: `${reg.length} pays (${reg.map((r) => r.id + ' : ' + r.langs.map((l) => l.id).join('/')).join(', ')}), défaut Belgique/français, repli sûr, rien envoyé` };
 }
-module.exports = { u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
+
+// U12 : les cours (accesseur course(), contenu, persistance). Le cours par défaut reste identique ; un autre cours (ici QWERTY, proposé
+// seulement pour le test) écrit dans stats.courses[id], jamais dans les champs plats ; le contenu s'applique et se retire à l'identique ;
+// la progression d'un autre cours survit à l'aller-retour serveur (nettoyage) quand le cours est au registre, et est ignorée sinon.
+async function u12() {
+  const errs = []; const h = loadApp();
+  const course = JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'));
+  h.run("currentUser='t';currentToken='t';currentUserId='u';_statsLoaded=true;app.stats=mergeStats();");
+  // 1. cours par défaut : course() EST la progression
+  if (!h.run('course()===app.stats')) errs.push('cours par défaut : course() n\'est pas la progression elle-même');
+  if (h.run("localStorage.setItem('kp_course','fr/qwerty'),kpCourseId()") !== 'fr/azerty') errs.push('un cours non proposé est choisi à cause d\'une valeur gardée');
+  if (h.run("(async()=>0)()") && (await h.run("kpSetCourse('fr/qwerty')")) !== false) errs.push('kpSetCourse accepte un cours non proposé');
+  h.run("localStorage.removeItem('kp_course')");
+  // 2. contenu : appliqué puis retiré à l'identique
+  const snap = () => h.run('JSON.stringify(ALL_LESSONS.map(l=>[l.id,l.title,l.keys,l.tip,l.tuto,l.text,l.module]))');
+  const mods = () => h.run('JSON.stringify(ALL_MODULES.map(m=>m.name))');
+  const before = snap(), beforeMods = mods();
+  h.run('globalThis.__d=' + JSON.stringify(course) + ';');
+  if (!h.run("kpApplyCourseData('fr/qwerty',__d)")) errs.push('le contenu QWERTY n\'est pas appliqué');
+  const r4 = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id==="r4"))'));
+  if (r4.keys !== 'a ;' || r4.text !== course.lessons.r4.text || r4.tuto.intro !== course.tutos.r4.intro) errs.push('r4 : le contenu QWERTY n\'est pas appliqué (touches, texte, tutoriel)');
+  const acc1 = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id==="acc1"))'));
+  if (/AZERTY/.test(JSON.stringify(acc1.tuto))) errs.push('acc1 : le tutoriel cite encore l\'AZERTY');
+  if (/AZERTY/.test(mods())) errs.push('un nom de module cite encore l\'AZERTY');
+  const maj1 = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id==="maj1"))'));
+  if (JSON.stringify(maj1.text) !== JSON.stringify(JSON.parse(before).find((x) => x[0] === 'maj1')[5])) errs.push('maj1 (reprise) a changé');
+  h.run("kpApplyCourseData('fr/azerty',null)");
+  if (snap() !== before || mods() !== beforeMods) errs.push('retour au cours par défaut : le programme n\'est pas identique à l\'origine');
+  if (h.run("kpApplyCourseData('fr/qwerty',{schema:2,id:'fr/qwerty',lessons:{}})")) errs.push('un fichier de cours de mauvais schéma est accepté');
+  if (h.run("kpApplyCourseData('fr/qwerty',{schema:1,id:'xx/zz',lessons:{}})")) errs.push('un fichier de cours d\'un autre identifiant est accepté');
+  if (snap() !== before) errs.push('un fichier invalide a laissé le programme modifié');
+  // 3. un autre cours écrit dans stats.courses[id], pas dans les champs plats (cours proposé pour le test seulement)
+  h.run("KP_COURSES_OFFERED.push('fr/qwerty');localStorage.setItem('kp_course','fr/qwerty');kpApplyCourseData('fr/qwerty',__d);");
+  if (h.run('course()===app.stats')) errs.push('cours QWERTY : course() renvoie la progression plate');
+  h.run("app.view='lessons';app.sess=app.makeSession('lesson','r1');"); const text = h.run('app.sess.text');
+  for (const ch of text) press(h, { key: ch });
+  if (!h.run('app.sess.finished')) errs.push('cours QWERTY : leçon r1 non terminée');
+  const flat = JSON.parse(h.run('JSON.stringify({l:Object.keys(app.stats.lessons),t:app.stats.tests.length,k:Object.keys(app.stats.keyStats||{}).length})'));
+  const q = JSON.parse(h.run('JSON.stringify({l:Object.keys(app.stats.courses["fr/qwerty"].lessons),t:app.stats.courses["fr/qwerty"].tests.length,k:Object.keys(app.stats.courses["fr/qwerty"].keyStats).length})'));
+  if (flat.l.length || flat.t || flat.k) errs.push('cours QWERTY : la progression a été écrite dans les champs plats du cours par défaut ' + JSON.stringify(flat));
+  if (!q.l.includes('r1') || q.t !== 1 || !q.k) errs.push('cours QWERTY : leçon, test ou statistiques de touches absents de stats.courses ' + JSON.stringify(q));
+  // 4. persistance : le blob envoyé contient courses, le serveur le garde si le cours est au registre, l'ignore sinon
+  h.run('_statsDirty=true;'); h.fetchCalls.length = 0; await h.run('flushStats()');
+  const sent = (h.fetchCalls.find((c) => c.url.includes('/api/save-progress')) || {}).body;
+  if (!sent || !sent.data.courses || !sent.data.courses['fr/qwerty'].lessons.r1) errs.push('la progression du cours QWERTY n\'est pas envoyée au serveur');
+  else {
+    const kept = sanitizeProgress(JSON.parse(JSON.stringify(sent.data)), {}, Date.now(), ['fr/qwerty']).data;
+    const dropped = sanitizeProgress(JSON.parse(JSON.stringify(sent.data)), {}, Date.now(), []).data;
+    if (!kept.courses || !kept.courses['fr/qwerty'].lessons.r1) errs.push('le serveur écarte la progression d\'un cours pourtant au registre');
+    if (dropped.courses) errs.push('le serveur garde un cours absent du registre');
+    // aller-retour : rechargée, la progression revient dans course()
+    h.run('app.stats=mergeStats(' + JSON.stringify(kept) + ');');
+    if (!h.run("!!course().lessons.r1")) errs.push('aller-retour : la leçon du cours QWERTY n\'est pas relue');
+    h.run("localStorage.removeItem('kp_course');");
+    if (h.run("!!app.stats.lessons.r1")) errs.push('aller-retour : la leçon QWERTY apparaît dans le cours par défaut');
+  }
+  return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: 'course() identique par défaut, contenu QWERTY appliqué et retiré à l\'identique, progression écrite dans stats.courses, serveur : gardée si au registre, ignorée sinon' };
+}
+module.exports = { u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
