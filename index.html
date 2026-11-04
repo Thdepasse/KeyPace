@@ -4238,14 +4238,66 @@ function kpRegisterKeyboards(data){
     _kpRegKb.push(id);
   }
 }
+/* Programme d'un cours. Deux formes de fichier de cours :
+   - `curriculum` : le cours apporte SES modules et SES leçons (ids, nombre et ordre libres) ; les listes du site (ALL_LESSONS, ALL_MODULES,
+     leçons gratuites, leçons à aide de geste) sont remplacées EN PLACE, donc tout le reste du site les lit sans changement ;
+   - `lessons` / `tutos` / `moduleNames` : ancienne forme, qui ne fait que remplacer des champs des leçons du cours par défaut.
+   Dans les deux cas le cours par défaut est restauré à l'identique (mêmes objets, mêmes champs) au retour. */
 let _kpAzSnap=null;
+function kpSnapshotDefault(){
+  if(_kpAzSnap)return;
+  _kpAzSnap={lessons:ALL_LESSONS.slice(),modules:ALL_MODULES.slice(),free:FREE_LESSON_IDS.slice(),howText:KB_HOW_TEXT_LESSONS.slice(),
+    fields:ALL_LESSONS.map(l=>({title:l.title,keys:l.keys,tip:l.tip,tuto:l.tuto,text:l.text,module:l.module})),names:ALL_MODULES.map(m=>m.name)};
+}
+function kpRestoreDefault(){
+  const z=_kpAzSnap;if(!z)return;
+  z.lessons.forEach((l,i)=>{const o=z.fields[i];l.title=o.title;l.keys=o.keys;l.tip=o.tip;l.tuto=o.tuto;l.text=o.text;l.module=o.module;});
+  z.modules.forEach((m,i)=>{m.name=z.names[i];});
+  ALL_LESSONS.splice(0,ALL_LESSONS.length,...z.lessons);
+  ALL_MODULES.splice(0,ALL_MODULES.length,...z.modules);
+  FREE_LESSON_IDS.splice(0,FREE_LESSON_IDS.length,...z.free);
+  KB_HOW_TEXT_LESSONS.splice(0,KB_HOW_TEXT_LESSONS.length,...z.howText);
+}
+/* Contrôle d'un programme AVANT d'y toucher : retourne un message d'erreur, ou '' s'il est utilisable. */
+function kpCurriculumError(cur){
+  if(!cur||!Array.isArray(cur.modules)||!cur.modules.length||cur.modules.length>40)return'modules absents ou trop nombreux';
+  const ids=new Set();let n=0;
+  for(const m of cur.modules){
+    if(!m||typeof m.name!=='string'||!m.name||!Array.isArray(m.lessons)||!m.lessons.length)return'module sans nom ou sans leçon';
+    for(const l of m.lessons){
+      n++;
+      if(!l||typeof l.id!=='string'||!/^[A-Za-z0-9_-]{1,32}$/.test(l.id))return'identifiant de leçon invalide';
+      if(ids.has(l.id))return'identifiant en double : '+l.id;
+      ids.add(l.id);
+      if(typeof l.title!=='string'||!l.title||typeof l.keys!=='string'||!l.keys)return'leçon sans titre ou sans touches : '+l.id;
+      if(!(typeof l.text==='string'&&l.text.length>=10)&&!l.genNum&&!l.neu&&!l.review)return'leçon sans texte : '+l.id;
+      if(l.tuto&&(typeof l.tuto!=='object'||typeof l.tuto.intro!=='string'||!Array.isArray(l.tuto.rules)))return'tutoriel mal formé : '+l.id;
+    }
+  }
+  if(n>300)return'trop de leçons';
+  if(cur.free!==undefined&&(!Array.isArray(cur.free)||cur.free.some(f=>!ids.has(f))))return'leçons gratuites inconnues';
+  return'';
+}
 function kpApplyCourseData(id,data){
-  if(!_kpAzSnap)_kpAzSnap={les:ALL_LESSONS.map(l=>({title:l.title,keys:l.keys,tip:l.tip,tuto:l.tuto,text:l.text,module:l.module})),mods:ALL_MODULES.map(m=>m.name)};
-  ALL_LESSONS.forEach((l,i)=>{const o=_kpAzSnap.les[i];l.title=o.title;l.keys=o.keys;l.tip=o.tip;l.tuto=o.tuto;l.text=o.text;l.module=o.module;});
-  ALL_MODULES.forEach((m,i)=>{m.name=_kpAzSnap.mods[i];});
-  kpUnregisterKeyboards();
+  kpSnapshotDefault();kpRestoreDefault();kpUnregisterKeyboards();
   if(!data||id==='fr/azerty')return true;
-  if(data.schema!==1||data.id!==id||!data.lessons)return false;
+  if(data.schema!==1||data.id!==id)return false;
+  if(data.curriculum){
+    if(kpCurriculumError(data.curriculum))return false;
+    const les=[],mods=[];let pool='';
+    data.curriculum.modules.forEach((m,mi)=>{
+      const ml=[];
+      m.lessons.forEach(src=>{if(src.neu)pool+=src.neu;const l=Object.assign({},src,{module:m.name,moduleIdx:mi,pool});les.push(l);ml.push(l);});
+      mods.push({name:m.name,lessons:ml});
+    });
+    ALL_LESSONS.splice(0,ALL_LESSONS.length,...les);
+    ALL_MODULES.splice(0,ALL_MODULES.length,...mods);
+    FREE_LESSON_IDS.splice(0,FREE_LESSON_IDS.length,...(data.curriculum.free||les.slice(0,10).map(l=>l.id)));
+    KB_HOW_TEXT_LESSONS.splice(0,KB_HOW_TEXT_LESSONS.length,...les.filter(l=>l.howText).map(l=>l.id));
+    kpRegisterKeyboards(data);
+    return true;
+  }
+  if(!data.lessons)return false;
   const names=data.moduleNames||{};
   ALL_LESSONS.forEach(l=>{
     const o=data.lessons[l.id];

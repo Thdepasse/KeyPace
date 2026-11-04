@@ -468,4 +468,70 @@ async function u13() {
   if (!['fr', 'be', 'mac', 'nf'].includes(h.run('getKbLayoutId()'))) errs.push('disposition invalide après perte d\'accès : ' + h.run('getKbLayoutId()'));
   return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: 'liste demandée au serveur (jeton et access:true seulement), une fois par compte ; visiteur, erreur et inconnus ignorés ; retrait propre à la perte d\'accès' };
 }
-module.exports = { u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
+
+// U14 : un cours peut apporter SON programme (modules et leçons : ids, nombre et ordre libres). Preuves : (1) le programme complet du cours actuel
+// donne EXACTEMENT les mêmes leçons que l'ancienne voie par remplacement de champs ; (2) un petit programme inventé change le nombre et les ids de
+// leçons, les leçons gratuites et le déverrouillage, se joue et s'enregistre dans stats.courses ; (3) un programme invalide est refusé sans rien
+// modifier ; (4) le retour au cours par défaut rend les mêmes objets, identiques.
+function u14() {
+  const errs = []; const h = loadApp();
+  const course = JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'));
+  h.run('globalThis.__c=' + JSON.stringify(course) + ';');
+  const state = () => h.run(`JSON.stringify({les:ALL_LESSONS.map(l=>[l.id,l.title,l.keys,l.tip,l.tuto,l.text,l.genNum,l.neu,l.review,l.module,l.moduleIdx,l.pool]),mods:ALL_MODULES.map(m=>[m.name,m.lessons.map(l=>l.id)]),free:FREE_LESSON_IDS,how:KB_HOW_TEXT_LESSONS})`);
+  const ident = () => h.run('ALL_LESSONS.map(l=>l.id).join()+"|"+ALL_MODULES.length');
+  const original = state(); const origLessons = h.run('globalThis.__o=ALL_LESSONS.slice();globalThis.__om=ALL_MODULES.slice();true');
+  // (1) équivalence des deux voies
+  h.run('kpApplyCourseData("fr/qwerty",Object.assign({},__c,{curriculum:undefined}))'); const viaOverlay = state();
+  h.run('kpApplyCourseData("fr/azerty",null)');
+  if (state() !== original) errs.push('retour au cours par défaut (ancienne voie) : programme différent de l\'origine');
+  h.run('kpApplyCourseData("fr/qwerty",__c)'); const viaCurriculum = state();
+  const A = JSON.parse(viaOverlay), B = JSON.parse(viaCurriculum);
+  // la voie « programme » n'a pas de pool de lettres par leçon pour le cours actuel : on compare tout le reste
+  const strip = (x) => ({ ...x, les: x.les.map((r) => r.slice(0, 11)) });
+  if (JSON.stringify(strip(A)) !== JSON.stringify(strip(B))) {
+    const i = A.les.findIndex((r, k) => JSON.stringify(r.slice(0, 11)) !== JSON.stringify(B.les[k].slice(0, 11)));
+    errs.push('les deux voies donnent des programmes différents' + (i >= 0 ? ` (leçon ${A.les[i][0]})` : ' (modules, leçons gratuites ou aide de geste)'));
+  }
+  // retour : mêmes objets
+  h.run('kpApplyCourseData("fr/azerty",null)');
+  if (state() !== original) errs.push('retour au cours par défaut (voie programme) : programme différent de l\'origine');
+  if (!h.run('ALL_LESSONS.length===__o.length&&ALL_LESSONS.every((l,i)=>l===__o[i])&&ALL_MODULES.every((m,i)=>m===__om[i])')) errs.push('retour au cours par défaut : ce ne sont plus les mêmes objets');
+  // (2) petit programme inventé
+  const mini = { schema: 1, id: 'fr/qwerty', curriculum: { modules: [
+    { name: 'Un', lessons: [{ id: 'q1', title: 'Première', keys: 'f j', text: 'fj jf fjfj jfjf ffjj jjff' }, { id: 'q2', title: 'Deuxième', keys: 'd k', text: 'dk kd dkdk kdkd ddkk kkdd', howText: true }] },
+    { name: 'Deux', lessons: [{ id: 'q3', title: 'Troisième', keys: 's l', text: 'sl ls slsl lsls ssll llss' }] },
+  ], free: ['q1', 'q2'] }, keyboards: course.keyboards };
+  h.run('globalThis.__m=' + JSON.stringify(mini) + ';');
+  if (!h.run('kpApplyCourseData("fr/qwerty",__m)')) errs.push('un petit programme valide est refusé');
+  if (ident() !== 'q1,q2,q3|2') errs.push('le programme inventé n\'est pas appliqué : ' + ident());
+  if (h.run('FREE_LESSON_IDS.join()') !== 'q1,q2') errs.push('leçons gratuites non appliquées : ' + h.run('FREE_LESSON_IDS.join()'));
+  if (h.run('KB_HOW_TEXT_LESSONS.join()') !== 'q2') errs.push('leçons à aide de geste non appliquées');
+  if (h.run('ALL_LESSONS[2].moduleIdx') !== 1 || h.run('ALL_LESSONS[2].module') !== 'Deux') errs.push('module des leçons incorrect');
+  h.run("KP_COURSES_OFFERED.push('fr/qwerty');localStorage.setItem('kp_course','fr/qwerty');currentUser='t';currentToken='t';currentUserId='u';_statsLoaded=true;app.stats=mergeStats();");
+  if (h.run('app.lessonRec("q1").cleared') || h.run('app.lessonRec("q3").cleared')) errs.push('leçons marquées validées sans l\'être');
+  h.run("app.view='lessons';app.sess=app.makeSession('lesson','q1');"); const t = h.run('app.sess.text');
+  for (const ch of t) press(h, { key: ch });
+  if (!h.run('app.sess.finished')) errs.push('la leçon du programme inventé ne se termine pas');
+  if (!h.run('!!app.stats.courses["fr/qwerty"].lessons.q1')) errs.push('la leçon terminée n\'est pas enregistrée dans stats.courses');
+  if (h.run('Object.keys(app.stats.lessons).length')) errs.push('une leçon d\'un autre programme a été écrite dans les champs plats');
+  if (h.run('ALL_LESSONS.findIndex(l=>l.id===app.sess.lessonId)') !== 0) errs.push('rang de la leçon incorrect');
+  // (3) programmes invalides refusés, rien n'est modifié
+  const bad = [
+    ['sans module', { modules: [] }], ['id en double', { modules: [{ name: 'A', lessons: [{ id: 'x', title: 't', keys: 'k', text: 'abcdefghij' }, { id: 'x', title: 't', keys: 'k', text: 'abcdefghij' }] }] }],
+    ['id invalide', { modules: [{ name: 'A', lessons: [{ id: '../x', title: 't', keys: 'k', text: 'abcdefghij' }] }] }],
+    ['sans texte', { modules: [{ name: 'A', lessons: [{ id: 'x', title: 't', keys: 'k' }] }] }],
+    ['gratuite inconnue', { modules: [{ name: 'A', lessons: [{ id: 'x', title: 't', keys: 'k', text: 'abcdefghij' }] }], free: ['zz'] }],
+    ['tutoriel mal formé', { modules: [{ name: 'A', lessons: [{ id: 'x', title: 't', keys: 'k', text: 'abcdefghij', tuto: { intro: 1 } }] }] }],
+  ];
+  h.run('kpApplyCourseData("fr/azerty",null)'); const before = state();
+  // après le petit programme inventé (autres ids, autres leçons gratuites, aide de geste) : retour STRICTEMENT à l'origine
+  if (before !== original) errs.push('retour au cours par défaut après un programme à ids différents : programme, leçons gratuites ou aide de geste non restaurés');
+  if (!h.run('ALL_LESSONS.length===__o.length&&ALL_LESSONS.every((l,i)=>l===__o[i])&&ALL_MODULES.every((m,i)=>m===__om[i])')) errs.push('retour après le petit programme : ce ne sont plus les mêmes objets');
+  for (const [nom, cur] of bad) {
+    h.run('globalThis.__b=' + JSON.stringify({ schema: 1, id: 'fr/qwerty', curriculum: cur }) + ';');
+    if (h.run('kpApplyCourseData("fr/qwerty",__b)') !== false) errs.push(`programme invalide accepté (${nom})`);
+    if (state() !== before) errs.push(`programme invalide (${nom}) : le programme a été modifié`);
+  }
+  return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: `programme complet du cours actuel identique à l'ancienne voie (${A.les.length} leçons, ${A.mods.length} modules), programme inventé (3 leçons, ids q1 à q3) appliqué et joué, ${bad.length} programmes invalides refusés sans effet, retour par défaut identique` };
+}
+module.exports = { u14, u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };

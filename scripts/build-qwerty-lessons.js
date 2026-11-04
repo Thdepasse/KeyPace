@@ -179,12 +179,30 @@ function build() {
     lessons[id] = { title: src.title, keys: src.keys, tip: src.tip, module: src.module, moduleIdx: src.moduleIdx, kind: 'adapted', text: a.text, why: a.why };
   }
   const T = require('./qwerty-tutos');
+  // Forme « programme complet » (le cours apporte ses modules et ses leçons) : le cours actuel y est matérialisé tel qu'il est, leçon par leçon.
+  const azFull = JSON.parse(h.run("JSON.stringify(ALL_MODULES.map(m=>({name:m.name,lessons:m.lessons.map(l=>({id:l.id,title:l.title,keys:l.keys,tip:l.tip,tuto:l.tuto,text:l.text,genNum:l.genNum,neu:l.neu,review:l.review}))})))"));
+  const howText = new Set(JSON.parse(h.run('JSON.stringify(KB_HOW_TEXT_LESSONS)')));
+  const curriculum = {
+    modules: azFull.map((m) => ({
+      name: T.moduleNames[m.name] || m.name,
+      lessons: m.lessons.map((l) => {
+        const o = lessons[l.id]; const out = { id: l.id, title: (o && o.title) || l.title, keys: (o && o.keys) || l.keys };
+        const tip = o && typeof o.tip === 'string' ? o.tip : l.tip; if (tip !== undefined) out.tip = tip;
+        const text = o && typeof o.text === 'string' ? o.text : l.text; if (text !== undefined) out.text = text;
+        const tuto = T.tutos[l.id] || l.tuto; if (tuto !== undefined) out.tuto = tuto;
+        for (const f of ['genNum', 'neu', 'review']) if (l[f] !== undefined) out[f] = l[f];
+        if (howText.has(l.id)) out.howText = true;
+        return out;
+      }),
+    })),
+  };
+  curriculum.free = curriculum.modules.flatMap((m) => m.lessons).slice(0, 10).map((l) => l.id);
   const allTexts = JSON.parse(h.run("JSON.stringify(ALL_LESSONS.flatMap(l=>[l.text||'',l.keys||'']))")).concat(Object.values(lessons).flatMap((l) => [l.text, l.keys]));
   const keyboards = require('./build-qwerty-keyboards').buildKeyboards(allTexts);
   return {
     schema: 1, id: 'fr/qwerty',
     note: 'Généré par scripts/build-qwerty-lessons.js (mots filtrés, aucun texte écrit à la main sauf titres et conseils des leçons qui changent). À relire avant ouverture du cours.',
-    order: SEQ.map((s) => s.id), courseOrder: azCourseOrder, reuse: REUSE, introOrder: INTRO_ORDER, moduleNames: T.moduleNames, tutos: T.tutos, keyboards, lessons,
+    order: SEQ.map((s) => s.id), courseOrder: azCourseOrder, reuse: REUSE, introOrder: INTRO_ORDER, moduleNames: T.moduleNames, tutos: T.tutos, keyboards, curriculum, lessons,
   };
 }
 
