@@ -708,6 +708,14 @@ a.nav-link{text-decoration:none;display:inline-block}
 .nav-guest-settings{width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:none;border:1.5px solid var(--border);border-radius:10px;color:var(--txt);font-size:16px;cursor:pointer;transition:border-color .15s,color .15s}
 .nav-guest-settings:hover{border-color:var(--accent);color:var(--accent)}
 /* Espace pays et langue (en haut à droite) : drapeau du pays choisi, menu pays + langue. Aujourd'hui la Belgique seule. */
+.kb-family-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.kb-family-card{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font:inherit;color:var(--txt);cursor:pointer;transition:border-color .15s}
+.kb-family-card:hover{border-color:var(--accent)}
+.kb-family-card.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(255,77,46,.14)}
+.kb-family-card strong{font-size:15px}.kb-family-card>span:last-child{font-size:12px;color:var(--muted)}
+.kb-family-keys{display:inline-flex;gap:3px}.kb-family-keys i{font-style:normal;font-weight:700;font-size:12px;min-width:20px;text-align:center;padding:3px 0;border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;background:var(--light)}
+.kb-chip{display:inline-flex;align-items:center;gap:6px;background:var(--light);border:1.5px solid var(--border);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;color:var(--txt);cursor:pointer;margin:0 0 10px}
+.kb-chip:hover{border-color:var(--accent);color:var(--accent)}
 .nav-region{position:relative;flex-shrink:0;margin-right:8px}
 .nav-region-btn{height:34px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;background:none;border:1.5px solid var(--border);border-radius:10px;color:var(--txt);font:inherit;font-size:13px;cursor:pointer;transition:border-color .15s,color .15s}
 .nav-region-btn:hover,.nav-region-btn[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
@@ -3873,6 +3881,15 @@ function kpCloseRegion(refocus){
 document.addEventListener('click',e=>{const r=document.getElementById('nav-region');if(r&&!r.contains(e.target))kpCloseRegion(false);});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('nav-region-menu');if(m&&!m.hidden){e.stopPropagation();kpCloseRegion(true);}}},true);
 kpRegionRender();
+/* Au chargement : si l'élève travaille un autre cours que le cours par défaut, on charge son contenu puis on redessine. */
+window.addEventListener('load',()=>{
+  const id=kpCourseId();if(id==='fr/azerty')return;
+  kpLoadCourse(id).then(ok=>{
+    if(!ok){try{localStorage.removeItem('kp_course');}catch{}return;}
+    applyKbLayout(getKbLayoutId());
+    if(window.app&&app.renderView)app.renderView(app.view||'home');
+  });
+});
 function toggleApercu(e){if(e)e.stopPropagation();const m=document.getElementById('apercu-menu');if(m)m.style.display=m.style.display==='block'?'none':'block';}
 function closeApercu(){const m=document.getElementById('apercu-menu');if(m)m.style.display='none';}
 function toggleNavMenu(e){if(e)e.stopPropagation();document.querySelector('.nav-links')?.classList.toggle('open');}
@@ -4121,11 +4138,29 @@ function course(){
 }
 /* Contenu du cours : remplace en place titre, touches, conseil, texte et tutoriel des leçons, et les noms de modules ; le cours par défaut
    est restauré à l'identique depuis une copie prise au premier changement. */
+/* Claviers d'un cours : ses dispositions rejoignent KB_LAYOUTS / KB_EXTRA / KB_HOW (donc surbrillance, aperçu et gestes fonctionnent comme
+   pour l'AZERTY) le temps que le cours est actif, et en sont retirées au retour au cours par défaut. */
+const KB_QWERTY={};
+const _kpRegKb=[];
+function kpUnregisterKeyboards(){
+  for(const id of _kpRegKb){delete KB_LAYOUTS[id];delete KB_EXTRA[id];delete KB_HOW[id];delete KB_LAYOUT_LABELS[id];delete KB_QWERTY[id];}
+  _kpRegKb.length=0;
+}
+function kpRegisterKeyboards(data){
+  kpUnregisterKeyboards();
+  for(const [id,k] of Object.entries(data.keyboards||{})){
+    if(KB_LAYOUTS[id]||!k||!Array.isArray(k.rows)||k.rows.length!==4||!k.extra||!k.how)continue; // jamais écraser une disposition existante, ignorer une entrée mal formée
+    KB_LAYOUTS[id]=k.rows;KB_EXTRA[id]=k.extra;KB_HOW[id]=k.how;KB_LAYOUT_LABELS[id]=k.label;
+    KB_QWERTY[id]={label:k.label,iso:!!k.iso,mac:!!k.mac,status:k.status};
+    _kpRegKb.push(id);
+  }
+}
 let _kpAzSnap=null;
 function kpApplyCourseData(id,data){
   if(!_kpAzSnap)_kpAzSnap={les:ALL_LESSONS.map(l=>({title:l.title,keys:l.keys,tip:l.tip,tuto:l.tuto,text:l.text,module:l.module})),mods:ALL_MODULES.map(m=>m.name)};
   ALL_LESSONS.forEach((l,i)=>{const o=_kpAzSnap.les[i];l.title=o.title;l.keys=o.keys;l.tip=o.tip;l.tuto=o.tuto;l.text=o.text;l.module=o.module;});
   ALL_MODULES.forEach((m,i)=>{m.name=_kpAzSnap.mods[i];});
+  kpUnregisterKeyboards();
   if(!data||id==='fr/azerty')return true;
   if(data.schema!==1||data.id!==id||!data.lessons)return false;
   const names=data.moduleNames||{};
@@ -4136,6 +4171,7 @@ function kpApplyCourseData(id,data){
     if(names[l.module])l.module=names[l.module];
   });
   ALL_MODULES.forEach(m=>{if(names[m.name])m.name=names[m.name];});
+  kpRegisterKeyboards(data);
   return true;
 }
 const _kpCourseCache={};
@@ -4146,6 +4182,21 @@ async function kpLoadCourse(id){
     if(!_kpCourseCache[id]){const r=await fetch(c.src,{cache:'no-cache'});if(!r.ok)return false;_kpCourseCache[id]=await r.json();}
     return kpApplyCourseData(id,_kpCourseCache[id]);
   }catch{return false;}
+}
+/* Famille de clavier choisie par l'élève = cours. Chaque famille retient sa dernière variante (kp_kb_layout_azerty / _qwerty). */
+const KP_FAMILY_COURSE={azerty:'fr/azerty',qwerty:'fr/qwerty'};
+const KP_DEFAULT_VARIANT={azerty:'fr',qwerty:'windows-us-intl'};
+function kpFamilyOf(layoutId){return KB_QWERTY[layoutId]?'qwerty':'azerty';}
+function kpCurrentFamily(){return KP_COURSES[kpCourseId()].family;}
+function kpFamiliesOffered(){return [...new Set(KP_COURSES_OFFERED.map(c=>KP_COURSES[c].family))];}
+async function kpChooseFamily(fam){
+  const cid=KP_FAMILY_COURSE[fam];
+  if(!cid||!KP_COURSES_OFFERED.includes(cid))return false;
+  let remembered=null;try{remembered=localStorage.getItem('kp_kb_layout_'+fam);}catch{}
+  if(!(await kpSetCourse(cid)))return false;
+  const lay=KB_LAYOUTS[remembered]?remembered:KP_DEFAULT_VARIANT[fam];
+  if(KB_LAYOUTS[lay]){setKbLayoutId(lay);applyKbLayout(lay);}
+  return true;
 }
 async function kpSetCourse(id){
   if(!KP_COURSES_OFFERED.includes(id)||!KP_COURSES[id])return false;
@@ -4409,6 +4460,7 @@ function getKbFormFactorId(){
 }
 function setKbFormFactorId(v){try{localStorage.setItem('kp_kb_form',v);}catch{}}
 function kbFormFactorIdsFor(azertyId){
+  if(KB_QWERTY[azertyId])return['full']; // aperçu simplifié : un seul format pour les claviers QWERTY
   const isMac=azertyId==='mac';
   return Object.keys(KB_FORM_FACTORS).filter(id=>{
     const ff=KB_FORM_FACTORS[id];
@@ -4455,7 +4507,31 @@ function _kbpRenderGrid(keys){
   }).join('');
   return`<div class="kbp-grid" style="width:${(maxX*KBP_U+8).toFixed(1)}px;height:${(maxY*KBP_U+8).toFixed(1)}px">${body}</div>`;
 }
+/* Aperçu simplifié d'un clavier QWERTY (bloc alphanumérique), dessiné depuis les données du cours ; un seul format. */
+function kbQwertyPreviewHTML(id){
+  const kb=KB_QWERTY[id],L=KB_LAYOUTS[id],X=KB_EXTRA[id];if(!kb||!L||!X)return'';
+  const keys=[];const K=(x,y,k)=>keys.push(_kbpKey(x,y,1,1,k.l.toLowerCase(),k.s||'',k.f,k.g?'kbp-has-g':'',k.g||''));
+  const M=(x,y,w,h,t,cls)=>keys.push(_kbpKey(x,y,w,h,t,'','n','kbp-mod'+(cls?' '+cls:'')));
+  // rangée des chiffres
+  K(0,0,X.tlde[0]);L[0].forEach((k,i)=>K(i+1,0,k));K(11,0,X.ae[0]);K(12,0,X.ae[1]);M(13,0,2,1,'⌫','kbp-big');
+  // rangée du haut
+  M(0,1,1.5,1,'tab');L[1].forEach((k,i)=>K(1.5+i,1,k));K(11.5,1,X.ad[0]);K(12.5,1,X.ad[1]);
+  if(kb.iso)keys.push({x:13.75,y:1,w:1.25,h:2,main:'entrée',sub:'',finger:'n',cls:'kbp-mod kbp-iso-mac',altgr:''});else K(13.5,1,X.ad[2]);
+  // rangée de repos
+  M(0,2,1.75,1,'caps');L[2].forEach((k,i)=>K(1.75+i,2,k));K(11.75,2,X.ac[0]);
+  if(kb.iso){K(12.75,2,X.ac[1]);}else M(12.75,2,2.25,1,'entrée');
+  // rangée du bas
+  if(kb.iso){M(0,3,1.25,1,'maj');L[3].forEach((k,i)=>K(1.25+i,3,k));M(12.25,3,2.75,1,'maj');}
+  else{M(0,3,2.25,1,'maj');L[3].forEach((k,i)=>K(2.25+i,3,k));M(12.25,3,2.75,1,'maj');}
+  // modificateurs et barre d'espace
+  if(kb.mac){M(0,4,1,1,'fn');M(1,4,1,1,'⌃');M(2,4,1,1,'⌥');M(3,4,1.25,1,'⌘');keys.push(_kbpKey(4.25,4,6.5,1,'espace','','n','kbp-space'));M(10.75,4,1.25,1,'⌘');M(12,4,1,1,'⌥');M(13,4,2,1,'⌃');}
+  else{M(0,4,1.25,1,'ctrl');M(1.25,4,1.25,1,'⊞');M(2.5,4,1.25,1,'alt');keys.push(_kbpKey(3.75,4,6.25,1,'espace','','n','kbp-space'));M(10,4,1.25,1,'alt gr');M(11.25,4,1.25,1,'⊞');M(12.5,4,1.25,1,'☰');M(13.75,4,1.25,1,'ctrl');}
+  const note='<div class="kb-preview-note">Aperçu simplifié (touches alphanumériques). Le geste exact de chaque signe est indiqué dans les leçons, sous « Sur ton clavier ».</div>'
+    +'<div class="kb-preview-note">Disposition modélisée d\'après les sources officielles, <b>pas encore essayée sur un vrai clavier</b> : le cours QWERTY est en bêta.</div>';
+  return`<div class="kb-full-preview">${_kbpRenderGrid(keys)}</div>${note}`;
+}
 function kbFullPreviewHTML(azertyId,formId){
+  if(KB_QWERTY[azertyId])return kbQwertyPreviewHTML(azertyId);
   const layout=KB_LAYOUTS[azertyId]||KB_LAYOUTS.fr;
   const baseline=KB_LAYOUTS.fr;
   const ff=KB_FORM_FACTORS[formId]||KB_FORM_FACTORS.full;
@@ -4670,9 +4746,27 @@ function kbFullPreviewHTML(azertyId,formId){
   const noteHalf=ff.arrows==='half'?`<div class="kb-preview-note"><b>Pg.préc/Pg.suiv</b> n'existent pas sur ce format : elles passent par la couche Fn. Le cluster de flèches demi-hauteur est un motif répandu (Dell XPS et équivalents) mais varie un peu d'un fabricant à l'autre.</div>`:'';
   return`<div class="kb-full-preview">${_kbpRenderGrid(keys)}</div>${note40}${noteMac}${noteCluster}${noteHalf}<div class="kb-preview-note">${KB_LAYOUT_NOTES[azertyId]||''}</div>`;
 }
+/* « Mon clavier » : deux cartes (AZERTY, QWERTY) quand le site propose plus d'une famille ; sinon rien (comportement actuel). */
+function kbLayoutTitle(){return kpCurrentFamily()==='qwerty'?'Disposition QWERTY':'Disposition AZERTY';}
+function kbLayoutBtnsHTML(){
+  const fam=kpCurrentFamily(),cur=getKbLayoutId();
+  return Object.keys(KB_LAYOUT_LABELS).filter(id=>kpFamilyOf(id)===fam).map(id=>`<button class="settings-btn kb-layout-btn${cur===id?' active':''}" data-kb-layout="${id}" onclick="app.setKbLayout('${id}')">${KB_LAYOUT_LABELS[id]}</button>`).join('');
+}
+function kbFamilyBoxHTML(){
+  const fams=kpFamiliesOffered();if(fams.length<2)return'';
+  const cur=kpCurrentFamily();
+  const card=(f,name,rows,sub)=>`<button type="button" role="radio" aria-checked="${cur===f}" class="kb-family-card${cur===f?' active':''}" onclick="app.askKbFamily('${f}')"><span class="kb-family-keys" aria-hidden="true">${rows.split('').map(c=>'<i>'+c+'</i>').join('')}</span><strong>${name}</strong><span>${sub}</span></button>`;
+  return`<div class="settings-row-info"><strong>Mon clavier</strong><span>Choisis la famille de ton clavier : tu travailles le cours qui correspond à tes touches. Chaque famille garde sa propre progression.</span></div>
+  <div class="kb-family-cards" role="radiogroup" aria-label="Famille de clavier">${card('azerty','AZERTY','AZERTY','Français, belge, Mac, NF')}${card('qwerty','QWERTY','QWERTY','US, international, UK, Mac')}</div>`;
+}
+function kpKeyboardChipHTML(){
+  if(kpFamiliesOffered().length<2)return'';
+  const l=getKbLayoutId();
+  return'<div style="max-width:1120px;margin:0 auto;padding:14px 24px 0"><button type="button" class="kb-chip" onclick="app.openSettings()" aria-label="Changer de clavier">⌨ Clavier : '+kpCurrentFamily().toUpperCase()+' '+(KB_LAYOUT_LABELS[l]||'')+' · Changer</button></div>';
+}
 function getKbLayoutId(){try{const v=localStorage.getItem('kp_kb_layout');return KB_LAYOUTS[v]?v:'fr';}catch{return 'fr';}}
-function setKbLayoutId(v){try{localStorage.setItem('kp_kb_layout',v);}catch{}}
-function kbModifierName(){return getKbLayoutId()==='mac'?'Option (⌥)':'AltGr';}
+function setKbLayoutId(v){try{localStorage.setItem('kp_kb_layout',v);localStorage.setItem('kp_kb_layout_'+(KB_QWERTY[v]?'qwerty':'azerty'),v);}catch{}}
+function kbModifierName(){const l=getKbLayoutId();return l==='mac'||(KB_QWERTY[l]&&KB_QWERTY[l].mac)?'Option (⌥)':'AltGr';}
 /* Petit message temporaire en bas d'écran (Verr. Maj, Verr. Num, touches non transmises). */
 function kbNotice(msg){
   try{
@@ -9702,7 +9796,7 @@ const app={
   },
 
   renderModulesHub(){
-    document.getElementById('page-lessons').innerHTML='<div id="kpCoursHost"></div>';
+    document.getElementById('page-lessons').innerHTML=kpKeyboardChipHTML()+'<div id="kpCoursHost"></div>';
     KPCours.mount(document.getElementById('kpCoursHost'));
   },
   enterBasesModule(){
@@ -14572,12 +14666,13 @@ const app={
       <div class="settings-section" id="settings-keyboard-section">
         <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.keyboard}</span> Clavier</div>
         <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+          <div id="kb-family-box">${kbFamilyBoxHTML()}</div>
           <div class="settings-row-info">
-            <strong>Disposition AZERTY</strong>
+            <strong id="kb-layout-title">${kbLayoutTitle()}</strong>
             <span>Le clavier affiché dans les leçons s'adapte à ton clavier physique. Choisis ta disposition.</span>
           </div>
           <div id="kb-layout-btns" style="display:flex;gap:8px;flex-wrap:wrap">
-            ${Object.keys(KB_LAYOUT_LABELS).map(id=>`<button class="settings-btn kb-layout-btn${getKbLayoutId()===id?' active':''}" data-kb-layout="${id}" onclick="app.setKbLayout('${id}')">${KB_LAYOUT_LABELS[id]}</button>`).join('')}
+            ${kbLayoutBtnsHTML()}
           </div>
           <div class="settings-row-info" style="margin-top:4px">
             <strong>Format du clavier</strong>
@@ -14720,6 +14815,27 @@ const app={
   },
   setAccents(v){setAccentMode(v);const b=document.querySelectorAll('#accent-btns .settings-btn');if(b.length===2){b[0].classList.toggle('active',v==='exact');b[1].classList.toggle('active',v==='tolerant');}},
   setQuotes(v){setQuoteStyle(v);const b=document.querySelectorAll('#quote-btns .settings-btn');if(b.length===2){b[0].classList.toggle('active',v==='fr');b[1].classList.toggle('active',v==='droits');}},
+  /* Changer de famille de clavier = changer de cours : on explique avant, la progression de chaque famille est gardée. */
+  askKbFamily(fam){
+    if(fam===kpCurrentFamily())return;
+    const old=document.getElementById('kb-switch-confirm');if(old)old.remove();
+    const to=fam==='qwerty'?'QWERTY':'AZERTY',from=fam==='qwerty'?'AZERTY':'QWERTY';
+    const o=document.createElement('div');o.id='kb-switch-confirm';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Changer de clavier');
+    o.style.cssText='position:fixed;inset:0;background:rgba(22,20,15,.45);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px';
+    o.innerHTML='<div style="background:var(--card);border-radius:16px;padding:22px;max-width:420px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25)"><h3 style="margin:0 0 8px;font-size:18px">Passer au clavier '+to+' ?</h3><p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:var(--muted)">Ta progression '+from+' est gardée. '+(fam==='qwerty'?'Tu reprends le cours QWERTY depuis le début (ou là où tu l\'avais laissé), ':'Tu retrouves ta progression AZERTY, ')+'et tu pourras changer de nouveau quand tu veux.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" id="kb-sw-yes" class="btn-primary" style="padding:10px 16px">Passer au '+to+'</button><button type="button" id="kb-sw-no" class="settings-btn">Rester en '+from+'</button></div></div>';
+    document.body.appendChild(o);
+    const close=()=>o.remove();
+    o.querySelector('#kb-sw-no').onclick=close;
+    o.querySelector('#kb-sw-yes').onclick=async()=>{close();const ok=await kpChooseFamily(fam);if(!ok)kbNotice('Le cours n\'a pas pu être chargé. Réessaie dans un instant.');this._refreshKbSettings();};
+    o.addEventListener('click',e=>{if(e.target===o)close();});
+    o.querySelector('#kb-sw-yes').focus();
+  },
+  _refreshKbSettings(){
+    const set=(id,html)=>{const el=document.getElementById(id);if(el)el.innerHTML=html;};
+    set('kb-family-box',kbFamilyBoxHTML());set('kb-layout-btns',kbLayoutBtnsHTML());set('kb-form-btns',kbFormBtnsHTML(getKbLayoutId()));
+    const t=document.getElementById('kb-layout-title');if(t)t.textContent=kbLayoutTitle();
+    this._refreshKbPreview();
+  },
   setKbLayout(id){
     if(!KB_LAYOUTS[id])return;
     setKbLayoutId(id);

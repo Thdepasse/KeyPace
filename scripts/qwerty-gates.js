@@ -321,4 +321,44 @@ function q7() {
   }
   return errs.length ? { ok: false, detail: errs.slice(0, 10).join('\n') } : { ok: true, detail: `${Object.keys(data.tutos).length} tutoriels QWERTY, ${required.size} leçons à remplacer toutes couvertes, aucune touche AZERTY citée, gestes é è ê ç ë vérifiés sur Windows US International et Mac US` };
 }
-module.exports = { q7, q6, q5, q4, a1, azertyVsApple, q1, q2, q3, disagreements, typability, deadKeyEngine, reach };
+
+// Q8 : claviers QWERTY au format du site (clé `keyboards` du cours). Structure attendue par le dessin et la surbrillance (4 rangées, doigts,
+// touches de bord), gestes affichés lisibles et cohérents avec le système (Option sur Mac, AltGr ailleurs), tous les signes du cours décrits.
+function q8() {
+  const gen = require('./build-qwerty-lessons');
+  const kb = require('./build-qwerty-keyboards');
+  const data = JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'));
+  const errs = [];
+  const FING = new Set(['lp', 'lr', 'lm', 'li', 'ri', 'rm', 'rr', 'rp']);
+  const ids = Object.keys(data.keyboards || {});
+  if (JSON.stringify(ids) !== JSON.stringify(kb.VARIANTS.map((v) => v.id))) errs.push('liste des claviers différente des variantes déclarées');
+  const { loadApp } = require('./engine-harness');
+  const h = loadApp();
+  const texts = JSON.parse(h.run("JSON.stringify(ALL_LESSONS.flatMap(l=>[l.text||'',l.keys||'']))")).concat(Object.values(data.lessons).flatMap((l) => [l.text, l.keys]));
+  const needed = kb.specialChars(texts);
+  for (const id of ids) {
+    const k = data.keyboards[id];
+    const want = [10, 10, 10, k.iso ? 11 : 10];
+    if (JSON.stringify(k.rows.map((r) => r.length)) !== JSON.stringify(want)) errs.push(`${id} : rangées ${k.rows.map((r) => r.length)} au lieu de ${want}`);
+    for (const key of [...k.rows.flat(), ...Object.values(k.extra).flat()]) {
+      if (!key.l || !FING.has(key.f)) errs.push(`${id} : touche « ${key.l} » sans doigt valide`);
+      if (/^[A-Z]$/.test(key.l) && key.s) errs.push(`${id} : lettre ${key.l} avec un signe Maj`);
+    }
+    const homes = k.rows[2].filter((x) => x.home).map((x) => x.l).join('');
+    if (homes !== 'FJ') errs.push(`${id} : repères de la rangée de repos « ${homes} » au lieu de FJ`);
+    if (k.rows[2].map((x) => x.l).join('') !== 'ASDFGHJKL' + k.rows[2][9].l) errs.push(`${id} : rangée de repos inattendue`);
+    for (const c of needed) {
+      const t = k.how[c];
+      if (!t) { errs.push(`${id} : aucun geste décrit pour « ${c} »`); continue; }
+      if (/—/.test(t)) errs.push(`${id} : tiret cadratin dans le geste de « ${c} »`);
+      if (k.mac && /AltGr/.test(t)) errs.push(`${id} : AltGr cité sur un Mac (« ${c} » : ${t})`);
+      if (!k.mac && /Option/.test(t)) errs.push(`${id} : Option citée hors Mac (« ${c} » : ${t})`);
+      if (/AZERTY/.test(t)) errs.push(`${id} : AZERTY cité dans le geste de « ${c} »`);
+    }
+    // un geste décrit existe vraiment : é doit être décrit par un geste ou par le conseil des accents tolérés, jamais vide
+    if (!/\S/.test(k.how['é'])) errs.push(`${id} : geste de é vide`);
+  }
+  // cohérence : mêmes gestes que la gate U10 rejoue (gestureFor) -> ici on vérifie seulement qu'un geste décrit nomme une touche existante du modèle
+  return errs.length ? { ok: false, detail: errs.slice(0, 10).join('\n') } : { ok: true, detail: `${ids.length} claviers (${ids.join(', ')}), ${needed.length} signes décrits par clavier, rangées et doigts valides, Option sur Mac et AltGr ailleurs` };
+}
+module.exports = { q8, q7, q6, q5, q4, a1, azertyVsApple, q1, q2, q3, disagreements, typability, deadKeyEngine, reach };

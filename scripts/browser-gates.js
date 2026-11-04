@@ -183,6 +183,59 @@ async function run(opts = {}) {
         await S('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
         info.region = 'ok';
       } catch (e) { problems.push(`BR6 : ${e.message}`); }
+
+      // BR7 : « Mon clavier » : passer d'AZERTY à QWERTY et revenir, dans le vrai navigateur (le QWERTY est proposé seulement pour ce test)
+      try {
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2500); exceptions.splice(0);
+        await ev("localStorage.clear();KP_COURSES_OFFERED.push('fr/qwerty');app.openSettings();true"); await sleep(500);
+        const cards = await ev("({n:document.querySelectorAll('#kb-family-box .kb-family-card').length,active:[...document.querySelectorAll('#kb-family-box .kb-family-card.active')].map(x=>x.querySelector('strong').innerText)})");
+        if (cards.n !== 2) problems.push(`BR7 : ${cards.n} cartes de famille au lieu de 2`);
+        if (cards.active.join() !== 'AZERTY') problems.push(`BR7 : famille active au départ « ${cards.active} »`);
+        await ev("document.querySelectorAll('#kb-family-box .kb-family-card')[1].click();true"); await sleep(200);
+        const dlg = await ev("(()=>{const d=document.getElementById('kb-switch-confirm');return d?d.innerText:null})()");
+        if (!dlg || !/progression AZERTY est gardée/.test(dlg)) problems.push('BR7 : la confirmation n\'explique pas que la progression AZERTY est gardée');
+        await ev("document.getElementById('kb-sw-no').click();true"); await sleep(150);
+        const stay = await ev("({dlg:!!document.getElementById('kb-switch-confirm'),course:kpCourseId()})");
+        if (stay.dlg || stay.course !== 'fr/azerty') problems.push('BR7 : « Rester en AZERTY » ne laisse pas le cours AZERTY');
+        await ev("document.querySelectorAll('#kb-family-box .kb-family-card')[1].click();true"); await sleep(150);
+        await ev("document.getElementById('kb-sw-yes').click();true"); await sleep(1200);
+        const q = await ev(`(()=>{const l=getKbLayoutId();const r4=ALL_LESSONS.find(x=>x.id==='r4');const keys=document.querySelectorAll('#kb-layout-preview .kbp-key').length;
+          return{course:kpCourseId(),layout:l,r4:r4.keys,btns:[...document.querySelectorAll('#kb-layout-btns .kb-layout-btn')].map(b=>b.innerText),keys,title:document.getElementById('kb-layout-title').innerText,
+          active:[...document.querySelectorAll('#kb-family-box .kb-family-card.active')].map(x=>x.querySelector('strong').innerText).join(),mod7:ALL_MODULES[6].name}})()`);
+        if (q.course !== 'fr/qwerty') problems.push(`BR7 : cours après confirmation « ${q.course} »`);
+        if (q.layout !== 'windows-us-intl') problems.push(`BR7 : variante par défaut « ${q.layout} »`);
+        if (q.r4 !== 'a ;') problems.push(`BR7 : le contenu QWERTY n'est pas appliqué (r4 : ${q.r4})`);
+        if (q.btns.length !== 8) problems.push(`BR7 : ${q.btns.length} variantes proposées au lieu de 8`);
+        if (q.keys < 55) problems.push(`BR7 : aperçu QWERTY avec ${q.keys} touches seulement`);
+        if (q.title !== 'Disposition QWERTY' || q.active !== 'QWERTY') problems.push(`BR7 : libellés (${q.title} / ${q.active})`);
+        if (/AZERTY/.test(q.mod7)) problems.push(`BR7 : module 7 « ${q.mod7} » cite l'AZERTY`);
+        // une variante Mac : l'aperçu a la touche Option et le geste de é parle d'Option
+        await ev("app.setKbLayout('mac-us');true"); await sleep(200);
+        const mac = await ev("({opt:document.getElementById('kb-layout-preview').innerText.includes('⌥'),how:KB_HOW['mac-us']['é'],mod:kbModifierName()})");
+        if (!mac.opt) problems.push('BR7 : l\'aperçu Mac n\'a pas la touche Option');
+        if (!/Option/.test(mac.how) || !/Option/.test(mac.mod)) problems.push(`BR7 : geste ou modificateur Mac sans Option (${mac.how} / ${mac.mod})`);
+        const shown = await ev("(()=>{const l=ALL_LESSONS.find(x=>x.id==='acc1');return kbHowHTML(l)})()");
+        if (!/Sur ton clavier \(Mac/.test(shown) || !/Option/.test(shown)) problems.push('BR7 : le bloc « Sur ton clavier » de acc1 ne donne pas le geste Mac');
+        // une vraie leçon se tape et s'enregistre dans le cours QWERTY, pas dans le plat
+        await ev("currentUser='tester';currentToken='tok';currentUserId='uid';_statsLoaded=true;app.stats=mergeStats();app.view='lessons';app.sess=app.makeSession('lesson','r1');true");
+        const t7 = await ev('app.sess.text');
+        for (const ch of t7) { const code = codeFor(ch); await S('Input.dispatchKeyEvent', { type: 'keyDown', key: ch, code, text: ch, unmodifiedText: ch, windowsVirtualKeyCode: ch.toUpperCase().charCodeAt(0) }); await S('Input.dispatchKeyEvent', { type: 'keyUp', key: ch, code, windowsVirtualKeyCode: ch.toUpperCase().charCodeAt(0) }); }
+        await sleep(200);
+        const rec = await ev("({flat:Object.keys(app.stats.lessons),q:Object.keys((app.stats.courses||{})['fr/qwerty']?(app.stats.courses['fr/qwerty'].lessons):{}),fin:app.sess.finished})");
+        if (!rec.fin || rec.flat.length || !rec.q.includes('r1')) problems.push(`BR7 : la leçon QWERTY n'est pas enregistrée dans stats.courses (${JSON.stringify(rec)})`);
+        // retour à l'AZERTY : tout est restauré, les claviers QWERTY sont retirés
+        await ev("currentUser=null;app.stats=null;app.sess=null;app.openSettings();true"); await sleep(300);
+        await ev("document.querySelectorAll('#kb-family-box .kb-family-card')[0].click();true"); await sleep(150);
+        await ev("document.getElementById('kb-sw-yes').click();true"); await sleep(1000);
+        const back = await ev("({course:kpCourseId(),layout:getKbLayoutId(),r4:ALL_LESSONS.find(x=>x.id==='r4').title,gone:!KB_LAYOUTS['windows-us'],btns:document.querySelectorAll('#kb-layout-btns .kb-layout-btn').length})");
+        if (back.course !== 'fr/azerty' || back.layout !== 'fr') problems.push(`BR7 : retour à l'AZERTY incomplet (${back.course} / ${back.layout})`);
+        if (back.r4 !== 'Q et M, les auriculaires') problems.push(`BR7 : r4 n'est pas restaurée (« ${back.r4} »)`);
+        if (!back.gone) problems.push('BR7 : les claviers QWERTY restent enregistrés après le retour à l\'AZERTY');
+        if (back.btns !== 4) problems.push(`BR7 : ${back.btns} variantes AZERTY au lieu de 4`);
+        exceptions.splice(0).forEach((e) => problems.push(`BR7 : exception : ${e}`));
+        if (opts.screenshotDir) { await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2200); await ev("localStorage.clear();KP_COURSES_OFFERED.length>1||KP_COURSES_OFFERED.push('fr/qwerty');go('home');kpChooseFamily('qwerty').then(()=>{app.openSettings();setTimeout(()=>{const s=document.getElementById('settings-keyboard-section');if(s)s.scrollIntoView({block:'start'});},300);});true"); await sleep(1800); const sh = await S('Page.captureScreenshot', { format: 'png' }); fs.writeFileSync(path.join(opts.screenshotDir, 'mon-clavier-qwerty.png'), Buffer.from(sh.data, 'base64')); }
+        info.keyboardSwitch = 'ok';
+      } catch (e) { problems.push(`BR7 : ${e.message}`); }
     }
   } catch (e) { problems.push(`navigateur : ${e.message}`); }
   finally { if (b) b.close(); server.close(); }

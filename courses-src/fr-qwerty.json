@@ -592,6 +592,2792 @@
    "tip": "Objectif : atteindre 2 et 9 avec les annulaires, sans regarder."
   }
  },
+ "keyboards": {
+  "windows-us": {
+   "label": "États-Unis (US)",
+   "os": "Windows",
+   "iso": false,
+   "mac": false,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "#"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "("
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp"
+     },
+     {
+      "l": "W",
+      "f": "lr"
+     },
+     {
+      "l": "E",
+      "f": "lm"
+     },
+     {
+      "l": "R",
+      "f": "li"
+     },
+     {
+      "l": "T",
+      "f": "li"
+     },
+     {
+      "l": "Y",
+      "f": "ri"
+     },
+     {
+      "l": "U",
+      "f": "ri"
+     },
+     {
+      "l": "I",
+      "f": "rm"
+     },
+     {
+      "l": "O",
+      "f": "rr"
+     },
+     {
+      "l": "P",
+      "f": "rp"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp"
+     },
+     {
+      "l": "S",
+      "f": "lr"
+     },
+     {
+      "l": "D",
+      "f": "lm"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li"
+     },
+     {
+      "l": "H",
+      "f": "ri"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm"
+     },
+     {
+      "l": "L",
+      "f": "rr"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":"
+     }
+    ],
+    [
+     {
+      "l": "Z",
+      "f": "lp"
+     },
+     {
+      "l": "X",
+      "f": "lr"
+     },
+     {
+      "l": "C",
+      "f": "lm"
+     },
+     {
+      "l": "V",
+      "f": "li"
+     },
+     {
+      "l": "B",
+      "f": "li"
+     },
+     {
+      "l": "N",
+      "f": "ri"
+     },
+     {
+      "l": "M",
+      "f": "ri"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "~"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\""
+     }
+    ]
+   },
+   "how": {
+    "!": "Maj + 1",
+    "\"": "Maj + '",
+    "#": "Maj + 3",
+    "%": "Maj + 5",
+    "'": "touche '",
+    "(": "Maj + 9",
+    ")": "Maj + 0",
+    "*": "Maj + 8",
+    "+": "Maj + =",
+    ",": "touche ,",
+    "-": "touche -",
+    ".": "touche .",
+    "/": "touche /",
+    ":": "Maj + ;",
+    ";": "touche ;",
+    "<": "Maj + ,",
+    "=": "touche =",
+    ">": "Maj + .",
+    "?": "Maj + /",
+    "@": "Maj + 2",
+    "[": "touche [",
+    "\\": "touche \\",
+    "]": "touche ]",
+    "^": "Maj + 6",
+    "_": "Maj + -",
+    "`": "touche `",
+    "{": "Maj + [",
+    "|": "Maj + \\",
+    "}": "Maj + ]",
+    "~": "Maj + `",
+    "¨": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "«": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
+    "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "»": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
+    "À": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "Ç": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "È": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "É": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "à": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "â": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "æ": "Pas de touche pour ce signe : tape a puis e, c'est accepté",
+    "ç": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "è": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "é": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "ê": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "ë": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "î": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "ï": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "ô": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "ù": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "û": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "œ": "Pas de touche pour ce signe : tape o puis e, c'est accepté"
+   }
+  },
+  "windows-us-intl": {
+   "label": "États-Unis international",
+   "os": "Windows",
+   "iso": false,
+   "mac": false,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!",
+      "g": "¡",
+      "gs": "¹"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@",
+      "g": "²"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "#",
+      "g": "³"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "¤",
+      "gs": "£"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%",
+      "g": "€"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "¼"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&",
+      "g": "½"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*",
+      "g": "¾"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "(",
+      "g": "‘"
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")",
+      "g": "’"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp",
+      "g": "ä",
+      "gs": "Ä"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "å",
+      "gs": "Å"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "g": "é",
+      "gs": "É"
+     },
+     {
+      "l": "R",
+      "f": "li",
+      "g": "®"
+     },
+     {
+      "l": "T",
+      "f": "li",
+      "g": "þ",
+      "gs": "Þ"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "ü",
+      "gs": "Ü"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "g": "ú",
+      "gs": "Ú"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "g": "í",
+      "gs": "Í"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ó",
+      "gs": "Ó"
+     },
+     {
+      "l": "P",
+      "f": "rp",
+      "g": "ö",
+      "gs": "Ö"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "á",
+      "gs": "Á"
+     },
+     {
+      "l": "S",
+      "f": "lr",
+      "g": "ß",
+      "gs": "§"
+     },
+     {
+      "l": "D",
+      "f": "lm",
+      "g": "ð",
+      "gs": "Ð"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li"
+     },
+     {
+      "l": "H",
+      "f": "ri"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm"
+     },
+     {
+      "l": "L",
+      "f": "rr",
+      "g": "ø",
+      "gs": "Ø"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":",
+      "g": "¶",
+      "gs": "°"
+     }
+    ],
+    [
+     {
+      "l": "Z",
+      "f": "lp",
+      "g": "æ",
+      "gs": "Æ"
+     },
+     {
+      "l": "X",
+      "f": "lr"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "©",
+      "gs": "¢"
+     },
+     {
+      "l": "V",
+      "f": "li"
+     },
+     {
+      "l": "B",
+      "f": "li"
+     },
+     {
+      "l": "N",
+      "f": "ri",
+      "g": "ñ",
+      "gs": "Ñ"
+     },
+     {
+      "l": "M",
+      "f": "ri",
+      "g": "µ"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?",
+      "g": "¿"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "~"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_",
+      "g": "¥"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+",
+      "g": "×",
+      "gs": "÷"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{",
+      "g": "«"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "g": "»"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|",
+      "g": "¬",
+      "gs": "¦"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\"",
+      "g": "´",
+      "gs": "¨"
+     }
+    ]
+   },
+   "how": {
+    "!": "Maj + 1",
+    "\"": "Maj + ' (touche morte), puis Espace",
+    "#": "Maj + 3",
+    "%": "Maj + 5",
+    "'": "touche ' (touche morte), puis Espace",
+    "(": "Maj + 9",
+    ")": "Maj + 0",
+    "*": "Maj + 8",
+    "+": "Maj + =",
+    ",": "touche ,",
+    "-": "touche -",
+    ".": "touche .",
+    "/": "touche /",
+    ":": "Maj + ;",
+    ";": "touche ;",
+    "<": "Maj + ,",
+    "=": "touche =",
+    ">": "Maj + .",
+    "?": "Maj + /",
+    "@": "Maj + 2",
+    "[": "touche [",
+    "\\": "touche \\",
+    "]": "touche ]",
+    "^": "Maj + 6 (touche morte), puis Espace",
+    "_": "Maj + -",
+    "`": "touche ` (touche morte), puis Espace",
+    "{": "Maj + [",
+    "|": "Maj + \\",
+    "}": "Maj + ]",
+    "~": "Maj + ` (touche morte), puis Espace",
+    "¨": "Maj + AltGr + '",
+    "«": "AltGr + [",
+    "²": "AltGr + 2",
+    "»": "AltGr + ]",
+    "À": "touche ` (touche morte), puis Maj + A",
+    "Ç": "Maj + AltGr + ,",
+    "È": "touche ` (touche morte), puis Maj + E",
+    "É": "Maj + AltGr + E",
+    "à": "touche ` (touche morte), puis la lettre A",
+    "â": "Maj + 6 (touche morte), puis la lettre A",
+    "æ": "AltGr + Z",
+    "ç": "AltGr + ,",
+    "è": "touche ` (touche morte), puis la lettre E",
+    "é": "AltGr + E",
+    "ê": "Maj + 6 (touche morte), puis la lettre E",
+    "ë": "Maj + ' (touche morte), puis la lettre E",
+    "î": "Maj + 6 (touche morte), puis la lettre I",
+    "ï": "Maj + ' (touche morte), puis la lettre I",
+    "ô": "Maj + 6 (touche morte), puis la lettre O",
+    "ù": "touche ` (touche morte), puis la lettre U",
+    "û": "Maj + 6 (touche morte), puis la lettre U",
+    "œ": "Pas de touche pour ce signe : tape o puis e, c'est accepté"
+   }
+  },
+  "windows-uk": {
+   "label": "Royaume-Uni (UK)",
+   "os": "Windows",
+   "iso": true,
+   "mac": false,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "\""
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "£"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "€"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "("
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp"
+     },
+     {
+      "l": "W",
+      "f": "lr"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "g": "é",
+      "gs": "É"
+     },
+     {
+      "l": "R",
+      "f": "li"
+     },
+     {
+      "l": "T",
+      "f": "li"
+     },
+     {
+      "l": "Y",
+      "f": "ri"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "g": "ú",
+      "gs": "Ú"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "g": "í",
+      "gs": "Í"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ó",
+      "gs": "Ó"
+     },
+     {
+      "l": "P",
+      "f": "rp"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "á",
+      "gs": "Á"
+     },
+     {
+      "l": "S",
+      "f": "lr"
+     },
+     {
+      "l": "D",
+      "f": "lm"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li"
+     },
+     {
+      "l": "H",
+      "f": "ri"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm"
+     },
+     {
+      "l": "L",
+      "f": "rr"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":"
+     }
+    ],
+    [
+     {
+      "l": "\\",
+      "f": "lp",
+      "s": "|"
+     },
+     {
+      "l": "Z",
+      "f": "lp"
+     },
+     {
+      "l": "X",
+      "f": "lr"
+     },
+     {
+      "l": "C",
+      "f": "lm"
+     },
+     {
+      "l": "V",
+      "f": "li"
+     },
+     {
+      "l": "B",
+      "f": "li"
+     },
+     {
+      "l": "N",
+      "f": "ri"
+     },
+     {
+      "l": "M",
+      "f": "ri"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "¬",
+      "g": "¦"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "@"
+     },
+     {
+      "l": "#",
+      "f": "rp",
+      "s": "~",
+      "g": "\\",
+      "gs": "|"
+     }
+    ]
+   },
+   "how": {
+    "!": "Maj + 1",
+    "\"": "Maj + 2",
+    "#": "touche #",
+    "%": "Maj + 5",
+    "'": "touche '",
+    "(": "Maj + 9",
+    ")": "Maj + 0",
+    "*": "Maj + 8",
+    "+": "Maj + =",
+    ",": "touche ,",
+    "-": "touche -",
+    ".": "touche .",
+    "/": "touche /",
+    ":": "Maj + ;",
+    ";": "touche ;",
+    "<": "Maj + ,",
+    "=": "touche =",
+    ">": "Maj + .",
+    "?": "Maj + /",
+    "@": "Maj + '",
+    "[": "touche [",
+    "\\": "touche \\",
+    "]": "touche ]",
+    "^": "Maj + 6",
+    "_": "Maj + -",
+    "`": "touche `",
+    "{": "Maj + [",
+    "|": "Maj + \\",
+    "}": "Maj + ]",
+    "~": "Maj + #",
+    "¨": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "«": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
+    "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "»": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
+    "À": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "Ç": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "È": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "É": "Maj + AltGr + E",
+    "à": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "â": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "æ": "Pas de touche pour ce signe : tape a puis e, c'est accepté",
+    "ç": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "è": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "é": "AltGr + E",
+    "ê": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "ë": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "î": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "ï": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "ô": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "ù": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "û": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "œ": "Pas de touche pour ce signe : tape o puis e, c'est accepté"
+   }
+  },
+  "windows-uk-extended": {
+   "label": "Royaume-Uni étendu",
+   "os": "Windows",
+   "iso": true,
+   "mac": false,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "\"",
+      "g": "¨"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "£"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "€"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "^"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "("
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "ẃ",
+      "gs": "Ẃ"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "g": "é",
+      "gs": "É"
+     },
+     {
+      "l": "R",
+      "f": "li"
+     },
+     {
+      "l": "T",
+      "f": "li"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "ý",
+      "gs": "Ý"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "g": "ú",
+      "gs": "Ú"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "g": "í",
+      "gs": "Í"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ó",
+      "gs": "Ó"
+     },
+     {
+      "l": "P",
+      "f": "rp"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "á",
+      "gs": "Á"
+     },
+     {
+      "l": "S",
+      "f": "lr"
+     },
+     {
+      "l": "D",
+      "f": "lm"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li"
+     },
+     {
+      "l": "H",
+      "f": "ri"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm"
+     },
+     {
+      "l": "L",
+      "f": "rr"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":"
+     }
+    ],
+    [
+     {
+      "l": "\\",
+      "f": "lp",
+      "s": "|"
+     },
+     {
+      "l": "Z",
+      "f": "lp"
+     },
+     {
+      "l": "X",
+      "f": "lr"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": "V",
+      "f": "li"
+     },
+     {
+      "l": "B",
+      "f": "li"
+     },
+     {
+      "l": "N",
+      "f": "ri"
+     },
+     {
+      "l": "M",
+      "f": "ri"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "¬",
+      "g": "¦"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "gs": "|"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "@",
+      "g": "´",
+      "gs": "`"
+     },
+     {
+      "l": "#",
+      "f": "rp",
+      "s": "~",
+      "g": "~",
+      "gs": "\\"
+     }
+    ]
+   },
+   "how": {
+    "!": "Maj + 1",
+    "\"": "Maj + 2",
+    "#": "touche #",
+    "%": "Maj + 5",
+    "'": "touche '",
+    "(": "Maj + 9",
+    ")": "Maj + 0",
+    "*": "Maj + 8",
+    "+": "Maj + =",
+    ",": "touche ,",
+    "-": "touche -",
+    ".": "touche .",
+    "/": "touche /",
+    ":": "Maj + ;",
+    ";": "touche ;",
+    "<": "Maj + ,",
+    "=": "touche =",
+    ">": "Maj + .",
+    "?": "Maj + /",
+    "@": "Maj + '",
+    "[": "touche [",
+    "\\": "touche \\",
+    "]": "touche ]",
+    "^": "Maj + 6",
+    "_": "Maj + -",
+    "`": "Maj + AltGr + '",
+    "{": "Maj + [",
+    "|": "Maj + \\",
+    "}": "Maj + ]",
+    "~": "Maj + #",
+    "¨": "AltGr + 2 (touche morte), puis Espace",
+    "«": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
+    "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "»": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
+    "À": "touche ` (touche morte), puis Maj + A",
+    "Ç": "Maj + AltGr + C",
+    "È": "touche ` (touche morte), puis Maj + E",
+    "É": "Maj + AltGr + E",
+    "à": "touche ` (touche morte), puis la lettre A",
+    "â": "AltGr + 6 (touche morte), puis la lettre A",
+    "æ": "Pas de touche pour ce signe : tape a puis e, c'est accepté",
+    "ç": "AltGr + C",
+    "è": "touche ` (touche morte), puis la lettre E",
+    "é": "AltGr + E",
+    "ê": "AltGr + 6 (touche morte), puis la lettre E",
+    "ë": "AltGr + 2 (touche morte), puis la lettre E",
+    "î": "AltGr + 6 (touche morte), puis la lettre I",
+    "ï": "AltGr + 2 (touche morte), puis la lettre I",
+    "ô": "AltGr + 6 (touche morte), puis la lettre O",
+    "ù": "touche ` (touche morte), puis la lettre U",
+    "û": "AltGr + 6 (touche morte), puis la lettre U",
+    "œ": "Pas de touche pour ce signe : tape o puis e, c'est accepté"
+   }
+  },
+  "mac-us": {
+   "label": "Mac, États-Unis (ABC)",
+   "os": "macOS",
+   "iso": false,
+   "mac": true,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!",
+      "g": "¡",
+      "gs": "⁄"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@",
+      "g": "™",
+      "gs": "€"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "#",
+      "g": "£",
+      "gs": "‹"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "¢",
+      "gs": "›"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%",
+      "g": "∞",
+      "gs": "ﬁ"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "§",
+      "gs": "ﬂ"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&",
+      "g": "¶",
+      "gs": "‡"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*",
+      "g": "•",
+      "gs": "°"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "(",
+      "g": "ª",
+      "gs": "·"
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")",
+      "g": "º",
+      "gs": "‚"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp",
+      "g": "œ",
+      "gs": "Œ"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "∑",
+      "gs": "„"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "gs": "´"
+     },
+     {
+      "l": "R",
+      "f": "li",
+      "g": "®",
+      "gs": "‰"
+     },
+     {
+      "l": "T",
+      "f": "li",
+      "g": "†",
+      "gs": "ˇ"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "¥",
+      "gs": "Á"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "gs": "¨"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "gs": "ˆ"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ø",
+      "gs": "Ø"
+     },
+     {
+      "l": "P",
+      "f": "rp",
+      "g": "π",
+      "gs": "∏"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "å",
+      "gs": "Å"
+     },
+     {
+      "l": "S",
+      "f": "lr",
+      "g": "ß",
+      "gs": "Í"
+     },
+     {
+      "l": "D",
+      "f": "lm",
+      "g": "∂",
+      "gs": "Î"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "g": "ƒ",
+      "gs": "Ï",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li",
+      "g": "©",
+      "gs": "˝"
+     },
+     {
+      "l": "H",
+      "f": "ri",
+      "g": "˙",
+      "gs": "Ó"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "g": "∆",
+      "gs": "Ô",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm",
+      "g": "˚",
+      "gs": ""
+     },
+     {
+      "l": "L",
+      "f": "rr",
+      "g": "¬",
+      "gs": "Ò"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":",
+      "g": "…",
+      "gs": "Ú"
+     }
+    ],
+    [
+     {
+      "l": "Z",
+      "f": "lp",
+      "g": "Ω",
+      "gs": "¸"
+     },
+     {
+      "l": "X",
+      "f": "lr",
+      "g": "≈",
+      "gs": "˛"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": "V",
+      "f": "li",
+      "g": "√",
+      "gs": "◊"
+     },
+     {
+      "l": "B",
+      "f": "li",
+      "g": "∫",
+      "gs": "ı"
+     },
+     {
+      "l": "N",
+      "f": "ri",
+      "gs": "˜"
+     },
+     {
+      "l": "M",
+      "f": "ri",
+      "g": "µ",
+      "gs": "Â"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<",
+      "g": "≤",
+      "gs": "¯"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">",
+      "g": "≥",
+      "gs": "˘"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?",
+      "g": "÷",
+      "gs": "¿"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "§",
+      "f": "lp",
+      "s": "±"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_",
+      "g": "–",
+      "gs": "—"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+",
+      "g": "≠",
+      "gs": "±"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{",
+      "g": "“",
+      "gs": "”"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "g": "‘",
+      "gs": "’"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|",
+      "g": "«",
+      "gs": "»"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\"",
+      "g": "æ",
+      "gs": "Æ"
+     }
+    ]
+   },
+   "how": {
+    "!": "Maj + 1",
+    "\"": "Maj + '",
+    "#": "Maj + 3",
+    "%": "Maj + 5",
+    "'": "touche '",
+    "(": "Maj + 9",
+    ")": "Maj + 0",
+    "*": "Maj + 8",
+    "+": "Maj + =",
+    ",": "touche ,",
+    "-": "touche -",
+    ".": "touche .",
+    "/": "touche /",
+    ":": "Maj + ;",
+    ";": "touche ;",
+    "<": "Maj + ,",
+    "=": "touche =",
+    ">": "Maj + .",
+    "?": "Maj + /",
+    "@": "Maj + 2",
+    "[": "touche [",
+    "\\": "touche \\",
+    "]": "touche ]",
+    "^": "Maj + 6",
+    "_": "Maj + -",
+    "`": "touche `",
+    "{": "Maj + [",
+    "|": "Maj + \\",
+    "}": "Maj + ]",
+    "~": "Maj + `",
+    "¨": "Maj + Option (⌥) + U",
+    "«": "Option (⌥) + \\",
+    "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "»": "Maj + Option (⌥) + \\",
+    "À": "Option (⌥) + ` (touche morte), puis Maj + A",
+    "Ç": "Maj + Option (⌥) + C",
+    "È": "Option (⌥) + ` (touche morte), puis Maj + E",
+    "É": "Option (⌥) + E (touche morte), puis Maj + E",
+    "à": "Option (⌥) + ` (touche morte), puis la lettre A",
+    "â": "Option (⌥) + I (touche morte), puis la lettre A",
+    "æ": "Option (⌥) + '",
+    "ç": "Option (⌥) + C",
+    "è": "Option (⌥) + ` (touche morte), puis la lettre E",
+    "é": "Option (⌥) + E (touche morte), puis la lettre E",
+    "ê": "Option (⌥) + I (touche morte), puis la lettre E",
+    "ë": "Option (⌥) + U (touche morte), puis la lettre E",
+    "î": "Option (⌥) + I (touche morte), puis la lettre I",
+    "ï": "Option (⌥) + U (touche morte), puis la lettre I",
+    "ô": "Option (⌥) + I (touche morte), puis la lettre O",
+    "ù": "Option (⌥) + ` (touche morte), puis la lettre U",
+    "û": "Option (⌥) + I (touche morte), puis la lettre U",
+    "œ": "Option (⌥) + Q"
+   }
+  },
+  "mac-us-intl-pc": {
+   "label": "Mac, États-Unis international PC",
+   "os": "macOS",
+   "iso": false,
+   "mac": true,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!",
+      "g": "¡",
+      "gs": "⁄"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@",
+      "g": "™",
+      "gs": "€"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "#",
+      "g": "£",
+      "gs": "‹"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "¢",
+      "gs": "›"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%",
+      "g": "∞",
+      "gs": "ﬁ"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "§",
+      "gs": "ﬂ"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&",
+      "g": "¶",
+      "gs": "‡"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*",
+      "g": "•",
+      "gs": "°"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "(",
+      "g": "ª",
+      "gs": "·"
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")",
+      "g": "º",
+      "gs": "‚"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp",
+      "g": "œ",
+      "gs": "Œ"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "∑",
+      "gs": "„"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "gs": "´"
+     },
+     {
+      "l": "R",
+      "f": "li",
+      "g": "®",
+      "gs": "‰"
+     },
+     {
+      "l": "T",
+      "f": "li",
+      "g": "†",
+      "gs": "ˇ"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "¥",
+      "gs": "Á"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "gs": "¨"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "gs": "ˆ"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ø",
+      "gs": "Ø"
+     },
+     {
+      "l": "P",
+      "f": "rp",
+      "g": "π",
+      "gs": "∏"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "å",
+      "gs": "Å"
+     },
+     {
+      "l": "S",
+      "f": "lr",
+      "g": "ß",
+      "gs": "Í"
+     },
+     {
+      "l": "D",
+      "f": "lm",
+      "g": "∂",
+      "gs": "Î"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "g": "ƒ",
+      "gs": "Ï",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li",
+      "g": "©",
+      "gs": "˝"
+     },
+     {
+      "l": "H",
+      "f": "ri",
+      "g": "˙",
+      "gs": "Ó"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "g": "∆",
+      "gs": "Ô",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm",
+      "g": "˚",
+      "gs": ""
+     },
+     {
+      "l": "L",
+      "f": "rr",
+      "g": "¬",
+      "gs": "Ò"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":",
+      "g": "…",
+      "gs": "Ú"
+     }
+    ],
+    [
+     {
+      "l": "Z",
+      "f": "lp",
+      "g": "Ω",
+      "gs": "¸"
+     },
+     {
+      "l": "X",
+      "f": "lr",
+      "g": "≈",
+      "gs": "˛"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": "V",
+      "f": "li",
+      "g": "√",
+      "gs": "◊"
+     },
+     {
+      "l": "B",
+      "f": "li",
+      "g": "∫",
+      "gs": "ı"
+     },
+     {
+      "l": "N",
+      "f": "ri",
+      "gs": "˜"
+     },
+     {
+      "l": "M",
+      "f": "ri",
+      "g": "µ",
+      "gs": "Â"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<",
+      "g": "≤",
+      "gs": "¯"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">",
+      "g": "≥",
+      "gs": "˘"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?",
+      "g": "÷",
+      "gs": "¿"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "§",
+      "f": "lp",
+      "s": "±"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_",
+      "g": "–",
+      "gs": "—"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+",
+      "g": "≠",
+      "gs": "±"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{",
+      "g": "“",
+      "gs": "”"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "g": "‘",
+      "gs": "’"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|",
+      "g": "«",
+      "gs": "»"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\"",
+      "g": "æ",
+      "gs": "Æ"
+     }
+    ]
+   },
+   "how": {
+    "!": "Maj + 1",
+    "\"": "Maj + null (touche morte), puis Espace",
+    "#": "Maj + 3",
+    "%": "Maj + 5",
+    "'": "touche null (touche morte), puis Espace",
+    "(": "Maj + 9",
+    ")": "Maj + 0",
+    "*": "Maj + 8",
+    "+": "Maj + =",
+    ",": "touche ,",
+    "-": "touche -",
+    ".": "touche .",
+    "/": "touche /",
+    ":": "Maj + ;",
+    ";": "touche ;",
+    "<": "Maj + ,",
+    "=": "touche =",
+    ">": "Maj + .",
+    "?": "Maj + /",
+    "@": "Maj + 2",
+    "[": "touche [",
+    "\\": "touche \\",
+    "]": "touche ]",
+    "^": "Maj + 6 (touche morte), puis Espace",
+    "_": "Maj + -",
+    "`": "Maj + Option (⌥) + null",
+    "{": "Maj + [",
+    "|": "Maj + \\",
+    "}": "Maj + ]",
+    "~": "Option (⌥) + N (touche morte), puis Espace",
+    "¨": "Maj + Option (⌥) + U",
+    "«": "Option (⌥) + \\",
+    "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "»": "Maj + Option (⌥) + \\",
+    "À": "Option (⌥) + null (touche morte), puis Maj + A",
+    "Ç": "Maj + Option (⌥) + C",
+    "È": "Option (⌥) + null (touche morte), puis Maj + E",
+    "É": "Option (⌥) + E (touche morte), puis Maj + E",
+    "à": "Option (⌥) + null (touche morte), puis la lettre A",
+    "â": "Maj + 6 (touche morte), puis la lettre A",
+    "æ": "Option (⌥) + null",
+    "ç": "Option (⌥) + C",
+    "è": "Option (⌥) + null (touche morte), puis la lettre E",
+    "é": "Option (⌥) + E (touche morte), puis la lettre E",
+    "ê": "Maj + 6 (touche morte), puis la lettre E",
+    "ë": "Option (⌥) + U (touche morte), puis la lettre E",
+    "î": "Maj + 6 (touche morte), puis la lettre I",
+    "ï": "Option (⌥) + U (touche morte), puis la lettre I",
+    "ô": "Maj + 6 (touche morte), puis la lettre O",
+    "ù": "Option (⌥) + null (touche morte), puis la lettre U",
+    "û": "Maj + 6 (touche morte), puis la lettre U",
+    "œ": "Option (⌥) + Q"
+   }
+  },
+  "mac-british": {
+   "label": "Mac, Royaume-Uni",
+   "os": "macOS",
+   "iso": true,
+   "mac": true,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!",
+      "g": "¡",
+      "gs": "⁄"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@",
+      "g": "€",
+      "gs": "™"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "£",
+      "g": "#",
+      "gs": "‹"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "¢",
+      "gs": "›"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%",
+      "g": "∞",
+      "gs": "ﬁ"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "§",
+      "gs": "ﬂ"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&",
+      "g": "¶",
+      "gs": "‡"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*",
+      "g": "•",
+      "gs": "°"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "(",
+      "g": "ª",
+      "gs": "·"
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")",
+      "g": "º",
+      "gs": "‚"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp",
+      "g": "œ",
+      "gs": "Œ"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "∑",
+      "gs": "„"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "gs": "‰"
+     },
+     {
+      "l": "R",
+      "f": "li",
+      "g": "®",
+      "gs": "Â"
+     },
+     {
+      "l": "T",
+      "f": "li",
+      "g": "†",
+      "gs": "Ê"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "¥",
+      "gs": "Á"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "gs": "Ë"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "gs": "È"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ø",
+      "gs": "Ø"
+     },
+     {
+      "l": "P",
+      "f": "rp",
+      "g": "π",
+      "gs": "∏"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "å",
+      "gs": "Å"
+     },
+     {
+      "l": "S",
+      "f": "lr",
+      "g": "ß",
+      "gs": "Í"
+     },
+     {
+      "l": "D",
+      "f": "lm",
+      "g": "∂",
+      "gs": "Î"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "g": "ƒ",
+      "gs": "Ï",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li",
+      "g": "©",
+      "gs": "Ì"
+     },
+     {
+      "l": "H",
+      "f": "ri",
+      "g": "˙",
+      "gs": "Ó"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "g": "∆",
+      "gs": "Ô",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm",
+      "g": "˚",
+      "gs": ""
+     },
+     {
+      "l": "L",
+      "f": "rr",
+      "g": "¬",
+      "gs": "Ò"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":",
+      "g": "…",
+      "gs": "Ú"
+     }
+    ],
+    [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "~",
+      "gs": "Ÿ"
+     },
+     {
+      "l": "Z",
+      "f": "lp",
+      "g": "Ω",
+      "gs": "Û"
+     },
+     {
+      "l": "X",
+      "f": "lr",
+      "g": "≈",
+      "gs": "Ù"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": "V",
+      "f": "li",
+      "g": "√",
+      "gs": "◊"
+     },
+     {
+      "l": "B",
+      "f": "li",
+      "g": "∫",
+      "gs": "ı"
+     },
+     {
+      "l": "N",
+      "f": "ri",
+      "gs": "ˆ"
+     },
+     {
+      "l": "M",
+      "f": "ri",
+      "g": "µ",
+      "gs": "˜"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<",
+      "g": "≤",
+      "gs": "¯"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">",
+      "g": "≥",
+      "gs": "˘"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?",
+      "g": "÷",
+      "gs": "¿"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "§",
+      "f": "lp",
+      "s": "±"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_",
+      "g": "–",
+      "gs": "—"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+",
+      "g": "≠",
+      "gs": "±"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{",
+      "g": "“",
+      "gs": "”"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "g": "‘",
+      "gs": "’"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\"",
+      "g": "æ",
+      "gs": "Æ"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|",
+      "g": "«",
+      "gs": "»"
+     }
+    ]
+   },
+   "how": {
+    "!": "Maj + 1",
+    "\"": "Maj + '",
+    "#": "Option (⌥) + 3",
+    "%": "Maj + 5",
+    "'": "touche '",
+    "(": "Maj + 9",
+    ")": "Maj + 0",
+    "*": "Maj + 8",
+    "+": "Maj + =",
+    ",": "touche ,",
+    "-": "touche -",
+    ".": "touche .",
+    "/": "touche /",
+    ":": "Maj + ;",
+    ";": "touche ;",
+    "<": "Maj + ,",
+    "=": "touche =",
+    ">": "Maj + .",
+    "?": "Maj + /",
+    "@": "Maj + 2",
+    "[": "touche [",
+    "\\": "touche \\",
+    "]": "touche ]",
+    "^": "Maj + 6",
+    "_": "Maj + -",
+    "`": "touche `",
+    "{": "Maj + [",
+    "|": "Maj + \\",
+    "}": "Maj + ]",
+    "~": "Maj + `",
+    "¨": "Option (⌥) + U (touche morte), puis Espace",
+    "«": "Option (⌥) + \\",
+    "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "»": "Maj + Option (⌥) + \\",
+    "À": "Option (⌥) + ` (touche morte), puis Maj + A",
+    "Ç": "Maj + Option (⌥) + C",
+    "È": "Maj + Option (⌥) + I",
+    "É": "Option (⌥) + E (touche morte), puis Maj + E",
+    "à": "Option (⌥) + ` (touche morte), puis la lettre A",
+    "â": "Option (⌥) + I (touche morte), puis la lettre A",
+    "æ": "Option (⌥) + '",
+    "ç": "Option (⌥) + C",
+    "è": "Option (⌥) + ` (touche morte), puis la lettre E",
+    "é": "Option (⌥) + E (touche morte), puis la lettre E",
+    "ê": "Option (⌥) + I (touche morte), puis la lettre E",
+    "ë": "Option (⌥) + U (touche morte), puis la lettre E",
+    "î": "Option (⌥) + I (touche morte), puis la lettre I",
+    "ï": "Option (⌥) + U (touche morte), puis la lettre I",
+    "ô": "Option (⌥) + I (touche morte), puis la lettre O",
+    "ù": "Option (⌥) + ` (touche morte), puis la lettre U",
+    "û": "Option (⌥) + I (touche morte), puis la lettre U",
+    "œ": "Option (⌥) + Q"
+   }
+  },
+  "linux-us-intl": {
+   "label": "Linux, États-Unis international",
+   "os": "Linux",
+   "iso": false,
+   "mac": false,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!",
+      "g": "¡",
+      "gs": "¹"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@",
+      "g": "²"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "#",
+      "g": "³"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "¤",
+      "gs": "£"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%",
+      "g": "€"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "¼"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&",
+      "g": "½"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*",
+      "g": "¾"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "(",
+      "g": "‘"
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")",
+      "g": "’"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp",
+      "g": "ä",
+      "gs": "Ä"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "å",
+      "gs": "Å"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "g": "é",
+      "gs": "É"
+     },
+     {
+      "l": "R",
+      "f": "li",
+      "g": "®",
+      "gs": "™"
+     },
+     {
+      "l": "T",
+      "f": "li",
+      "g": "þ",
+      "gs": "Þ"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "ü",
+      "gs": "Ü"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "g": "ú",
+      "gs": "Ú"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "g": "í",
+      "gs": "Í"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ó",
+      "gs": "Ó"
+     },
+     {
+      "l": "P",
+      "f": "rp",
+      "g": "ö",
+      "gs": "Ö"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "á",
+      "gs": "Á"
+     },
+     {
+      "l": "S",
+      "f": "lr",
+      "g": "ß",
+      "gs": "§"
+     },
+     {
+      "l": "D",
+      "f": "lm",
+      "g": "ð",
+      "gs": "Ð"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "g": "ë",
+      "gs": "Ë",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li"
+     },
+     {
+      "l": "H",
+      "f": "ri"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "g": "ï",
+      "gs": "Ï",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm",
+      "g": "œ",
+      "gs": "Œ"
+     },
+     {
+      "l": "L",
+      "f": "rr",
+      "g": "ø",
+      "gs": "Ø"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":",
+      "g": "¶",
+      "gs": "°"
+     }
+    ],
+    [
+     {
+      "l": "Z",
+      "f": "lp",
+      "g": "æ",
+      "gs": "Æ"
+     },
+     {
+      "l": "X",
+      "f": "lr",
+      "g": "·"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "©",
+      "gs": "¢"
+     },
+     {
+      "l": "V",
+      "f": "li"
+     },
+     {
+      "l": "B",
+      "f": "li"
+     },
+     {
+      "l": "N",
+      "f": "ri",
+      "g": "ñ",
+      "gs": "Ñ"
+     },
+     {
+      "l": "M",
+      "f": "ri",
+      "g": "µ",
+      "gs": "±"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?",
+      "g": "¿"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "~"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_",
+      "g": "¥"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+",
+      "g": "×",
+      "gs": "÷"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{",
+      "g": "«",
+      "gs": "“"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "g": "»",
+      "gs": "”"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|",
+      "g": "¬",
+      "gs": "¦"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\""
+     }
+    ]
+   },
+   "how": {
+    "!": "Maj + 1",
+    "\"": "Maj + AltGr + null",
+    "#": "Maj + 3",
+    "%": "Maj + 5",
+    "'": "AltGr + null",
+    "(": "Maj + 9",
+    ")": "Maj + 0",
+    "*": "Maj + 8",
+    "+": "Maj + =",
+    ",": "touche ,",
+    "-": "touche -",
+    ".": "touche .",
+    "/": "touche /",
+    ":": "Maj + ;",
+    ";": "touche ;",
+    "<": "Maj + ,",
+    "=": "touche =",
+    ">": "Maj + .",
+    "?": "Maj + /",
+    "@": "Maj + 2",
+    "[": "touche [",
+    "\\": "touche \\",
+    "]": "touche ]",
+    "^": "Maj + AltGr + 6",
+    "_": "Maj + -",
+    "`": "AltGr + null",
+    "{": "Maj + [",
+    "|": "Maj + \\",
+    "}": "Maj + ]",
+    "~": "Maj + AltGr + null",
+    "¨": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
+    "«": "AltGr + [",
+    "²": "AltGr + 2",
+    "»": "AltGr + ]",
+    "À": "touche null (touche morte), puis Maj + A",
+    "Ç": "Maj + AltGr + ,",
+    "È": "touche null (touche morte), puis Maj + E",
+    "É": "Maj + AltGr + E",
+    "à": "touche null (touche morte), puis la lettre A",
+    "â": "Maj + 6 (touche morte), puis la lettre A",
+    "æ": "AltGr + Z",
+    "ç": "AltGr + ,",
+    "è": "touche null (touche morte), puis la lettre E",
+    "é": "AltGr + E",
+    "ê": "Maj + 6 (touche morte), puis la lettre E",
+    "ë": "AltGr + F",
+    "î": "Maj + 6 (touche morte), puis la lettre I",
+    "ï": "AltGr + J",
+    "ô": "Maj + 6 (touche morte), puis la lettre O",
+    "ù": "touche null (touche morte), puis la lettre U",
+    "û": "Maj + 6 (touche morte), puis la lettre U",
+    "œ": "AltGr + K"
+   }
+  }
+ },
  "lessons": {
   "r1": {
    "title": "F et J, les index",

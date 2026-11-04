@@ -179,10 +179,12 @@ function build() {
     lessons[id] = { title: src.title, keys: src.keys, tip: src.tip, module: src.module, moduleIdx: src.moduleIdx, kind: 'adapted', text: a.text, why: a.why };
   }
   const T = require('./qwerty-tutos');
+  const allTexts = JSON.parse(h.run("JSON.stringify(ALL_LESSONS.flatMap(l=>[l.text||'',l.keys||'']))")).concat(Object.values(lessons).flatMap((l) => [l.text, l.keys]));
+  const keyboards = require('./build-qwerty-keyboards').buildKeyboards(allTexts);
   return {
     schema: 1, id: 'fr/qwerty',
     note: 'Généré par scripts/build-qwerty-lessons.js (mots filtrés, aucun texte écrit à la main sauf titres et conseils des leçons qui changent). À relire avant ouverture du cours.',
-    order: SEQ.map((s) => s.id), courseOrder: azCourseOrder, reuse: REUSE, introOrder: INTRO_ORDER, moduleNames: T.moduleNames, tutos: T.tutos, lessons,
+    order: SEQ.map((s) => s.id), courseOrder: azCourseOrder, reuse: REUSE, introOrder: INTRO_ORDER, moduleNames: T.moduleNames, tutos: T.tutos, keyboards, lessons,
   };
 }
 
