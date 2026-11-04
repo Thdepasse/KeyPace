@@ -228,7 +228,7 @@ function q5() {
   const data = JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'));
   const { loadApp } = require('./engine-harness');
   const h = loadApp();
-  const az = Object.fromEntries(JSON.parse(h.run('JSON.stringify(ALL_LESSONS.map(l=>[l.id,l.text]))')));
+  const az = Object.fromEntries(JSON.parse(h.run('JSON.stringify(ALL_LESSONS.map(l=>[l.id,l.text||l.genNum||""]))')));
   const errs = [];
   if (JSON.stringify(data.reuse) !== JSON.stringify(gen.REUSE)) errs.push('liste reuse du fichier différente du générateur');
   let allowed = new Set([...'abcdefghijklmnopqrstuvwxyz', ' ', ',', '.', ';', '/']);
@@ -249,8 +249,76 @@ function q5() {
   }
   // flu6 adaptée : doit exister et ne plus citer l'AZERTY
   if (!data.lessons.flu6 || /AZERTY/i.test(data.lessons.flu6.text)) errs.push('flu6 : texte absent ou cite encore AZERTY');
-  for (const id of gen.REUSE) if (!az[id]) errs.push(`${id} : leçon reprise introuvable dans le programme`);
+  for (const id of gen.REUSE) if (az[id] === undefined) errs.push(`${id} : leçon reprise introuvable dans le programme`);
   if (JSON.stringify(data) !== JSON.stringify(gen.build())) errs.push('le fichier diffère de ce que produit le générateur');
   return errs.length ? { ok: false, detail: errs.slice(0, 10).join('\n') } : { ok: true, detail: `${counts.length} leçons (modules 4 à 6) sans signe avant son apprentissage ; ${gen.REUSE.length} reprises du cours AZERTY, ${Object.values(data.lessons).filter((l) => l.kind === 'adapted').length} adaptées` };
 }
-module.exports = { q5, q4, a1, azertyVsApple, q1, q2, q3, disagreements, typability, deadKeyEngine, reach };
+
+// Q6 : le cours QWERTY couvre TOUT le programme (66 leçons, chacune générée, reprise ou adaptée, une seule fois, même ordre de modules
+// que le cours AZERTY) et on relève, comme référence relue, les caractères accentués employés avant la leçon qui les enseigne.
+// Le programme AZERTY actuel en a déjà (ex. ê dans acc2 avant cir1) : on ne les corrige pas en silence, on les liste.
+function q6(update) {
+  const gen = require('./build-qwerty-lessons');
+  const data = JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'));
+  const { loadApp } = require('./engine-harness');
+  const h = loadApp();
+  const az = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.map(l=>({id:l.id,text:l.text||l.genNum||""})))'));
+  const errs = [];
+  const gener = Object.keys(data.lessons).filter((id) => data.lessons[id].kind !== 'adapted').length;
+  const adapted = Object.keys(data.lessons).filter((id) => data.lessons[id].kind === 'adapted');
+  const covered = new Set([...Object.keys(data.lessons), ...data.reuse]);
+  const dup = data.reuse.filter((id) => data.lessons[id]);
+  if (dup.length) errs.push('à la fois reprises et réécrites : ' + dup.join(' '));
+  for (const l of az) if (!covered.has(l.id)) errs.push(`${l.id} : leçon du programme absente du cours QWERTY`);
+  for (const id of covered) if (!az.find((l) => l.id === id)) errs.push(`${id} : leçon QWERTY inconnue du programme`);
+  if (covered.size !== az.length) errs.push(`${covered.size} leçons au lieu de ${az.length}`);
+  // accents employés avant leur leçon
+  const textOf = (id) => (data.lessons[id] ? data.lessons[id].text : az.find((l) => l.id === id).text);
+  const taught = new Set(); const early = {};
+  for (const l of az) {
+    for (const c of (gen.ACCENT_TAUGHT[l.id] || '')) taught.add(c);
+    const bad = [...new Set([...textOf(l.id)].filter((c) => /[éèêëàâîïôûùüçœæÉÈÀÙÇŒÆ]/.test(c) && !taught.has(c)))];
+    if (bad.length) early[l.id] = bad.join('');
+  }
+  const r = { early, total: az.length, generated: gener, reused: data.reuse.length, adapted: adapted.length };
+  const now = JSON.parse(JSON.stringify(r)); const b = readBaseline();
+  if (errs.length) return { ok: false, detail: errs.slice(0, 10).join('\n') };
+  const sum = `${az.length} leçons couvertes (${gener} générées, ${data.reuse.length} reprises, ${adapted.length} adaptées) ; accents employés avant leur leçon : ${Object.entries(early).map(([k, v]) => k + ' ' + v).join(', ') || 'aucun'}`;
+  if (update || !b.qwertyCourse) { writeBaselineKey('qwertyCourse', now); return { ok: true, detail: (update ? 'référence mise à jour : ' : 'référence créée : ') + sum }; }
+  return JSON.stringify(now) === JSON.stringify(b.qwertyCourse) ? { ok: true, detail: sum } : { ok: false, detail: `le cours QWERTY a changé par rapport à la référence relue (${sum}). Si voulu et relu : npm run gates -- --update-baseline` };
+}
+
+// Q7 : tutoriels du cours QWERTY. Le texte AZERTY de plusieurs leçons parle de touches propres à l'AZERTY (« touche 2 », « à droite du P »,
+// « Sur AZERTY »). Toute leçon dont les touches changent, ou dont le tutoriel AZERTY contient une telle phrase, doit avoir un tutoriel
+// QWERTY ; aucun tutoriel QWERTY ne doit en contenir ; les gestes cités (touche morte, Option, AltGr) doivent exister dans les modèles.
+function q7() {
+  const gen = require('./build-qwerty-lessons');
+  const data = JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'));
+  const { loadApp } = require('./engine-harness');
+  const h = loadApp();
+  const az = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.map(l=>({id:l.id,keys:l.keys,module:l.module,tuto:l.tuto})))'));
+  const errs = [];
+  const AZ_PHRASES = /AZERTY|touche (0|2|7|9)\b|droite du P|droite du M|près de Entrée|sur la touche \d|Q à gauche|\bQ ou M\b/i;
+  const flat = (t) => t ? [t.intro, t.tip, ...(t.rules || []).flatMap((r) => [r.t, r.d])].join(' ') : '';
+  const required = new Set();
+  for (const l of az) {
+    const own = data.lessons[l.id];
+    if (own && own.keys && own.keys !== l.keys) required.add(l.id);
+    if (AZ_PHRASES.test(flat(l.tuto))) required.add(l.id);
+  }
+  for (const id of required) if (!data.tutos[id]) errs.push(`${id} : tutoriel AZERTY propre à l'AZERTY ou touches différentes, mais aucun tutoriel QWERTY`);
+  for (const [id, t] of Object.entries(data.tutos)) {
+    if (!az.find((l) => l.id === id)) errs.push(`${id} : tutoriel pour une leçon inconnue`);
+    if (!t.intro || !t.tip || !Array.isArray(t.rules) || t.rules.length !== 3 || t.rules.some((r) => !r.icon || !r.t || !r.d)) errs.push(`${id} : tutoriel mal formé (intro, 3 règles, tip)`);
+    if (AZ_PHRASES.test(flat(t))) errs.push(`${id} : le tutoriel QWERTY cite encore une touche AZERTY`);
+  }
+  for (const [from, to] of Object.entries(data.moduleNames)) if (/AZERTY/i.test(to)) errs.push(`module « ${to} » cite l'AZERTY`);
+  for (const l of az) if (/AZERTY/i.test(l.module) && !data.moduleNames[l.module]) errs.push(`module « ${l.module} » à renommer pour le cours QWERTY`);
+  // les gestes cités existent dans les modèles : é è ê ç ë faisables sur Windows US International et sur Mac US
+  const defs = Object.fromEntries(loadAll().map((d) => [d.id, d]));
+  for (const id of ['windows-us-intl', 'mac-us']) {
+    for (const c of 'éèêçë') if (!defs[id] || !reach(defs[id], c)) errs.push(`${id} : « ${c} » introuvable alors que le tutoriel suppose un geste`);
+  }
+  return errs.length ? { ok: false, detail: errs.slice(0, 10).join('\n') } : { ok: true, detail: `${Object.keys(data.tutos).length} tutoriels QWERTY, ${required.size} leçons à remplacer toutes couvertes, aucune touche AZERTY citée, gestes é è ê ç ë vérifiés sur Windows US International et Mac US` };
+}
+module.exports = { q7, q6, q5, q4, a1, azertyVsApple, q1, q2, q3, disagreements, typability, deadKeyEngine, reach };

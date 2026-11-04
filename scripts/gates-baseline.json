@@ -1,5 +1,5 @@
 {
- "indexBytes": 1403637,
+ "indexBytes": 1404058,
  "functions": [
   "billing.js",
   "classes.js",
@@ -16,7 +16,7 @@
  ],
  "protected": {
   "typeKey": "956db04e79d3dc06",
-  "handleKey": "2d85189d2c89cf8b",
+  "handleKey": "6261ce56f9c51d30",
   "computeResult": "01f81d7702edf492",
   "recordResult": "37d04eda35a47235",
   "_recordKey": "8a642d02a3a0c0b0",
@@ -1169,5 +1169,54 @@
   "azerty-fr contre cldr-windows-fr": [],
   "azerty-be contre cldr-windows-fr-be": [],
   "azerty-be contre cldr-windows-nl-be": []
+ },
+ "qwertyCourse": {
+  "early": {},
+  "total": 66,
+  "generated": 18,
+  "reused": 37,
+  "adapted": 11
+ },
+ "qwertyCourseTolerance": {
+  "windows-us": [
+   "acc1",
+   "acc2",
+   "acc3",
+   "acc4",
+   "acc5",
+   "cir1",
+   "cir2",
+   "cir3",
+   "cir4",
+   "tre1",
+   "tre3",
+   "num6",
+   "sym2",
+   "sym4",
+   "sym7",
+   "flu1",
+   "flu2",
+   "flu3",
+   "flu4",
+   "flu6"
+  ],
+  "windows-uk": [
+   "acc2",
+   "acc3",
+   "acc4",
+   "acc5",
+   "cir1",
+   "cir2",
+   "cir3",
+   "cir4",
+   "tre1",
+   "tre3",
+   "num6",
+   "flu1",
+   "flu2",
+   "flu3",
+   "flu4",
+   "flu6"
+  ]
  }
 }

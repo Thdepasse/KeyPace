@@ -278,6 +278,8 @@ const GATES = process.env.GATES_FAKE_RED
     { id: 'Q3', name: 'QWERTY : le vrai moteur face aux touches mortes (apostrophe, accents)', run: () => require('./qwerty-gates').q3(UPDATE) },
     { id: 'Q4', name: 'QWERTY : leçons de lettres (mêmes touches physiques, lettres déjà apprises seulement)', run: () => require('./qwerty-gates').q4() },
     { id: 'Q5', name: 'QWERTY : phrases, majuscules, ponctuation (aucun signe avant son apprentissage)', run: () => require('./qwerty-gates').q5() },
+    { id: 'Q6', name: 'QWERTY : le cours couvre les 66 leçons, accents employés avant leur leçon relevés', run: () => require('./qwerty-gates').q6(UPDATE) },
+    { id: 'Q7', name: 'QWERTY : tutoriels sans touche AZERTY, gestes cités présents dans les modèles', run: () => require('./qwerty-gates').q7() },
     { id: 'U1', name: 'Chaque leçon se termine sur chaque disposition (66 x 4)', run: () => usage().u1() },
     { id: 'U2', name: 'Ce que le client envoie est accepté tel quel par le serveur', run: () => usage().u2() },
     { id: 'U3', name: 'Un visiteur sans compte peut taper, rien n\'est envoyé', run: () => usage().u3() },
@@ -287,6 +289,7 @@ const GATES = process.env.GATES_FAKE_RED
     { id: 'U7', name: 'Chaque écran s\'affiche pour chaque type de compte', run: () => usage().u7() },
     { id: 'U8', name: 'Accents : exigés, bandeau d\'aide, toléré, certificat exigeant (D5)', run: () => usage().u8() },
     { id: 'U9', name: 'Détection du clavier (AZERTY/QWERTY/QWERTZ) sur les 29 dispositions', run: () => usage().u9() },
+    { id: 'U10', name: 'Cours QWERTY : chaque leçon rejouée avec les frappes de 8 variantes de clavier', run: () => usage().u10(UPDATE) },
     { id: 'T1', name: 'Traces de matériel réel rejouées dans le moteur (G6)', run: () => require('./traces-gate').run() },
     { id: 'B1', name: 'Vrai navigateur : chargement, écrans, 26 claviers, vraies frappes', run: b1 },
   ];

@@ -289,4 +289,58 @@ function u9() {
   if (a.run('_kpKbSuggested')) errs.push('une suggestion apparaît pour un AZERTY déjà bien réglé');
   return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: `${n} dispositions reconnues dans leur famille, aucune suggestion ni envoi tant que le QWERTY n'est pas proposé` };
 }
-module.exports = { u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
+
+// U10 : le cours QWERTY, leçon par leçon, rejoué dans le VRAI moteur avec les frappes de plusieurs variantes de clavier QWERTY (gestes déduits
+// des modèles : touche directe, Maj, AltGr/Option, touche morte puis lettre ou Espace). Comme U1 pour les 4 AZERTY : chaque leçon doit se terminer
+// sans faute. Les caractères sans geste sur la variante passent par les tolérances connues (« » -> ", œ -> oe) ou par les accents tolérés (D5) ;
+// la liste de ces leçons par variante est une référence relue (changer la liste = relire).
+const QWERTY_VARIANTS = ['windows-us', 'windows-us-intl', 'windows-uk', 'windows-uk-extended', 'mac-us', 'mac-us-intl-pc', 'mac-british', 'linux-us-intl'];
+function u10(update) {
+  const { gestureFor } = require('./gesture');
+  const course = JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'));
+  const base = loadApp();
+  const order = JSON.parse(base.run('JSON.stringify(ALL_LESSONS.map(l=>l.id))'));
+  const texts = {};
+  for (const id of order) {
+    if (course.lessons[id]) texts[id] = course.lessons[id].text;
+    else { base.run("currentUser=null;app.stats=app.stats||mergeStats();"); texts[id] = base.run('app.makeSession("lesson",' + JSON.stringify(id) + ').text'); }
+  }
+  const TOL = { '«': ['"'], '»': ['"'], 'œ': ['o', 'e'], 'Œ': ['O', 'e'], 'æ': ['a', 'e'], 'Æ': ['A', 'e'] };
+  const errs = []; const needsTolerance = {}; let sessions = 0;
+  for (const vid of QWERTY_VARIANTS) {
+    const def = JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', vid + '.json'), 'utf8'));
+    const events = (ch) => {
+      const g = gestureFor(def, ch); if (!g) return null;
+      const press = (p, key) => ({ key, code: p.code, shift: !!p.shift, alt: !!p.alt });
+      const isDead = (p) => { const k = def.keys[p.code]; return !!(k && k.dead && k.dead[p.alt ? (p.shift ? 'gs' : 'g') : (p.shift ? 's' : 'l')]); };
+      if (g.length === 1) return [press(g[0], ch)];
+      if (g.length === 2 && isDead(g[0])) return [press(g[0], 'Dead'), g[1].code === 'Space' ? { key: ch, code: 'Space' } : { key: ch, code: g[1].code, shift: !!g[1].shift }];
+      return g.map((p) => press(p, ch));
+    };
+    for (const id of order) {
+      const text = texts[id]; const h = loadApp(); const evs = []; let tol = false;
+      for (const ch of text) {
+        let e = events(ch);
+        if (!e && TOL[ch]) { e = TOL[ch].flatMap((k) => events(k) || []); }
+        if (!e && kpBase(ch) !== ch && events(kpBase(ch))) { e = events(kpBase(ch)); tol = true; }
+        if (!e) { errs.push(`${vid} ${id} : « ${ch} » sans geste ni tolérance`); evs.length = 0; break; }
+        evs.push(...e);
+      }
+      if (!evs.length) continue;
+      h.run("currentUser='t';currentToken='t';currentUserId='u';_statsLoaded=true;app.stats=mergeStats();app.view='lessons';app.sess={mode:'lesson',lessonId:" + JSON.stringify(id) + ",text:" + JSON.stringify(text) + ",idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false};" + (tol ? "localStorage.setItem('kp_accents','tolerant');" : ''));
+      for (const e of evs) press(h, e);
+      sessions++;
+      const fin = h.run('app.sess.finished'), f = h.run('app.sess.keystrokes-app.sess.correct');
+      if (!fin || f) errs.push(`${vid} ${id} : ${fin ? f + ' faute(s)' : 'non terminée (' + h.run('app.sess.idx') + '/' + [...text].length + ')'}`);
+      if (tol) (needsTolerance[vid] = needsTolerance[vid] || []).push(id);
+    }
+  }
+  const now = JSON.parse(JSON.stringify(needsTolerance));
+  if (errs.length) return { ok: false, detail: errs.slice(0, 8).join('\n') + (errs.length > 8 ? `\n… ${errs.length - 8} autres` : '') };
+  const pth = path.join(root, 'scripts', 'gates-baseline.json'); const b = JSON.parse(fs.readFileSync(pth, 'utf8'));
+  const sum = `${sessions} leçons terminées sans faute (${order.length} leçons x ${QWERTY_VARIANTS.length} variantes) ; accents tolérés nécessaires : ` + (Object.entries(now).map(([k, v]) => `${k} ${v.length} leçons`).join(', ') || 'aucun');
+  if (update || !b.qwertyCourseTolerance) { b.qwertyCourseTolerance = now; fs.writeFileSync(pth, JSON.stringify(b, null, 1) + '\n'); return { ok: true, detail: (update ? 'référence mise à jour : ' : 'référence créée : ') + sum }; }
+  return JSON.stringify(now) === JSON.stringify(b.qwertyCourseTolerance) ? { ok: true, detail: sum } : { ok: false, detail: `les leçons qui exigent les accents tolérés ont changé (${sum}). Si voulu et relu : npm run gates -- --update-baseline` };
+}
+const kpBase = (c) => (c && c.length === 1 ? (c.normalize('NFD').replace(/[\u0300-\u036f]/g, '').length === 1 && /[a-zA-Z]/.test(c.normalize('NFD').replace(/[\u0300-\u036f]/g, '')) ? c.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : c) : c);
+module.exports = { u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };

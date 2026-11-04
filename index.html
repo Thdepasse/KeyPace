@@ -7520,6 +7520,9 @@ const app={
       const _pk=this._pendingDeadAcc;this._pendingDeadKey=null;e.preventDefault&&e.preventDefault();
       this._directKey(e,_pk);this._directKey(e,_pk);this._kbRefresh();return;
     }
+    // ~ et ` déjà comptés à la frappe de la touche morte (cf. plus bas) : l'Espace qui les valide arrive maintenant avec key = le signe
+    // (code Space), pas key = " ". Ce n'est pas une frappe de plus.
+    if(!e._direct&&this.sess&&this.sess._deadSp&&this.sess._deadSp.at===this.sess.idx&&e.code==='Space'&&e.key&&e.key.length===1&&e.key!==' '&&'~`'.includes(e.key)){e.preventDefault&&e.preventDefault();return;}
     // Touche morte puis Espace : Chrome et Safari donnent directement le caractère (key = "^", code = Space).
     if(!e._direct&&this._pendingDeadKey&&e.code==='Space'&&e.key&&e.key.length===1&&e.key!==' '){
       this._pendingDeadKey=null;e._composedKey=e.key;

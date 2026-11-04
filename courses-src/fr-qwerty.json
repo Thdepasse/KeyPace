@@ -22,6 +22,74 @@
   "b5",
   "b6"
  ],
+ "courseOrder": [
+  "r1",
+  "r2",
+  "r3",
+  "r4",
+  "r5",
+  "r6",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "b1",
+  "b2",
+  "b3",
+  "b4",
+  "b5",
+  "b6",
+  "w1",
+  "w2",
+  "w3",
+  "w4",
+  "w5",
+  "maj1",
+  "maj2",
+  "maj3",
+  "maj4",
+  "pon1",
+  "pon2",
+  "pon3",
+  "pon4",
+  "pon5",
+  "pon6",
+  "acc1",
+  "acc2",
+  "acc3",
+  "acc4",
+  "acc5",
+  "cir1",
+  "cir2",
+  "cir3",
+  "cir4",
+  "tre1",
+  "tre2",
+  "tre3",
+  "num1",
+  "num2",
+  "num3",
+  "num4",
+  "num5",
+  "num6",
+  "sym1",
+  "sym2",
+  "sym3",
+  "sym4",
+  "sym5",
+  "sym6",
+  "sym7",
+  "sym8",
+  "sym9",
+  "flu1",
+  "flu2",
+  "flu3",
+  "flu4",
+  "flu5",
+  "flu6"
+ ],
  "reuse": [
   "w1",
   "w2",
@@ -32,6 +100,29 @@
   "maj2",
   "maj4",
   "pon1",
+  "acc4",
+  "cir1",
+  "cir2",
+  "cir3",
+  "cir4",
+  "tre1",
+  "tre2",
+  "tre3",
+  "num1",
+  "num2",
+  "num3",
+  "num4",
+  "num5",
+  "num6",
+  "sym1",
+  "sym2",
+  "sym3",
+  "sym4",
+  "sym5",
+  "sym6",
+  "sym7",
+  "sym8",
+  "sym9",
   "flu1",
   "flu2",
   "flu3",
@@ -55,6 +146,452 @@
   "pon5",
   "pon6"
  ],
+ "moduleNames": {
+  "7. Accents directs AZERTY": "7. Les accents"
+ },
+ "tutos": {
+  "r4": {
+   "intro": "Au tour des auriculaires, les petits doigts : A à gauche, point-virgule à droite. Ce sont les plus délicats à dompter.",
+   "rules": [
+    {
+     "icon": "🤏",
+     "t": "Les doigts les plus faibles",
+     "d": "Les auriculaires manquent de force et de précision au début. C'est universel, même les pros sont passés par là. Patience."
+    },
+    {
+     "icon": "↔️",
+     "t": "N'entraîne pas toute la main",
+     "d": "Étire seulement l'auriculaire vers A ou ;. Si tu fais pivoter le poignet, les autres doigts perdent leur repère."
+    },
+    {
+     "icon": "⚓",
+     "t": "Repose-le aussitôt",
+     "d": "L'auriculaire a tendance à rester en l'air. Ramène-le sur sa touche de repos dès qu'il a frappé."
+    }
+   ],
+   "tip": "Objectif : activer les auriculaires sans casser ta position de repos. Lenteur et régularité avant tout."
+  },
+  "r6": {
+   "intro": "Tu connais maintenant toute la rangée de repos : la rangée où tes doigts reviennent toujours, entre deux frappes.",
+   "rules": [
+    {
+     "icon": "🏠",
+     "t": "Ta base de départ",
+     "d": "Tous tes doigts partent de cette rangée et y reviennent. La maîtriser, c'est savoir où tu es sur le clavier sans regarder."
+    },
+    {
+     "icon": "🔁",
+     "t": "Trouve chaque touche de mémoire",
+     "d": "Cet exercice mélange les dix touches. Si tu hésites, ralentis : le but est de les trouver de mémoire, pas de taper vite."
+    },
+    {
+     "icon": "⚓",
+     "t": "Position de repos constante",
+     "d": "Entre chaque frappe, sens que tes huit doigts sont revenus sur A S D F  J K L ;."
+    }
+   ],
+   "tip": "Objectif : valider toute la rangée de repos, doigts ancrés et yeux sur l'écran."
+  },
+  "h6": {
+   "intro": "Tu connais désormais deux rangées entières. Cette révision mélange toutes les lettres de la rangée du haut.",
+   "rules": [
+    {
+     "icon": "🔁",
+     "t": "Repos et haut sans à-coups",
+     "d": "L'enjeu n'est plus chaque touche, mais la transition entre les rangées. Le passage du repos vers le haut doit être fluide."
+    },
+    {
+     "icon": "🤚",
+     "t": "Les poignets restent posés",
+     "d": "Ne soulève pas les poignets pour changer de rangée : seuls les doigts montent et descendent."
+    },
+    {
+     "icon": "📖",
+     "t": "Lis par groupes",
+     "d": "Essaie de lire deux ou trois mots d'avance. Ton cerveau prépare les doigts pendant que tu tapes."
+    }
+   ],
+   "tip": "Objectif : enchaîner repos et rangée du haut sans regarder, avec un mouvement souple des doigts."
+  },
+  "h3": {
+   "intro": "W et O complètent la rangée du haut côté annulaires. Tu vas former des mots plus variés.",
+   "rules": [
+    {
+     "icon": "⬆️",
+     "t": "Les annulaires montent",
+     "d": "L'annulaire gauche monte sur W, l'annulaire droit sur O. Ces doigts sont moins forts : un petit mouvement précis suffit."
+    },
+    {
+     "icon": "👀",
+     "t": "Entraîne l'anticipation",
+     "d": "Lis le mot suivant pendant que tu tapes le mot en cours. C'est cette anticipation qui rend la frappe fluide et continue."
+    },
+    {
+     "icon": "🔤",
+     "t": "Des mots variés",
+     "d": "four, roue, soleil, kiwi... Tu enchaînes des mots de plus en plus riches. Respecte bien les espaces."
+    }
+   ],
+   "tip": "Objectif : taper W et O proprement et commencer à anticiper le mot suivant."
+  },
+  "h4": {
+   "intro": "Q et P sont les touches des auriculaires sur la rangée du haut. Avec elles, les mots deviennent vraiment riches.",
+   "rules": [
+    {
+     "icon": "⬆️",
+     "t": "Les auriculaires montent",
+     "d": "L'auriculaire gauche atteint Q, le droit atteint P. C'est l'un des mouvements les plus exigeants : va lentement."
+    },
+    {
+     "icon": "🧘",
+     "t": "Stabilise le poignet",
+     "d": "Ne décolle pas toute la main pour aider l'auriculaire. Le poignet reste stable, seul le petit doigt s'étire."
+    },
+    {
+     "icon": "📚",
+     "t": "Des mots plus longs",
+     "d": "pure, papa, appui, loup... Le vocabulaire s'élargit. Vise des mots plus longs sans regarder."
+    }
+   ],
+   "tip": "Objectif : maîtriser Q et P sans casser ta position, même si l'auriculaire manque encore de force."
+  },
+  "b1": {
+   "intro": "Tu attaques la rangée du bas. C et M sont tes premières touches sous la rangée de repos.",
+   "rules": [
+    {
+     "icon": "⬇️",
+     "t": "Les doigts descendent",
+     "d": "Le majeur gauche descend sur C, sous le D. L'index droit descend sur M, sous le J. Le geste va vers le bas, pas sur le côté."
+    },
+    {
+     "icon": "🧘",
+     "t": "Le poignet suit un peu",
+     "d": "Pour la rangée du bas, le poignet peut s'abaisser très légèrement, mais reviens toujours à la position de repos ensuite."
+    },
+    {
+     "icon": "🪝",
+     "t": "Replie le doigt",
+     "d": "Pour descendre, replie le doigt au lieu de tendre toute la main. Une frappe propre rend tes textes réguliers."
+    }
+   ],
+   "tip": "Objectif : descendre sur C et M sans perdre la rangée de repos, poignet détendu."
+  },
+  "b3": {
+   "intro": "X et la virgule sont des touches plus rares, mais utiles pour une frappe vraiment complète.",
+   "rules": [
+    {
+     "icon": "↘️",
+     "t": "Un geste diagonal",
+     "d": "L'annulaire gauche descend en diagonale vers X. C'est un mouvement inhabituel : fais-le lentement pour le mémoriser."
+    },
+    {
+     "icon": "🔎",
+     "t": "La virgule, au majeur droit",
+     "d": "La virgule est en bas, sous le K, tapée par le majeur droit. Cherche-la avec le doigt plutôt qu'avec les yeux."
+    },
+    {
+     "icon": "✍️",
+     "t": "Soigne la ponctuation",
+     "d": "La virgule se colle au mot qui précède, puis une espace suit. Une ponctuation propre rend tes textes lisibles."
+    }
+   ],
+   "tip": "Objectif : mémoriser la position de X et de la virgule, sans regarder le clavier."
+  },
+  "b4": {
+   "intro": "Z et le point complètent la rangée du bas : Z à gauche, le point à droite.",
+   "rules": [
+    {
+     "icon": "🤏",
+     "t": "Z à l'auriculaire",
+     "d": "L'auriculaire gauche descend sur Z, tout en bas à gauche. Garde le poignet stable, seul le petit doigt s'étire."
+    },
+    {
+     "icon": "⌨️",
+     "t": "Le point, à l'annulaire droit",
+     "d": "Le point est en bas, sous le L, juste à droite de la virgule. Il se tape sans Maj."
+    },
+    {
+     "icon": "🏁",
+     "t": "Il termine la phrase",
+     "d": "Le point se colle au mot qui précède, puis une espace suit. Il marque la fin d'une idée."
+    }
+   ],
+   "tip": "Objectif : placer Z et le point, chacun avec le bon doigt, sans crisper la main."
+  },
+  "b5": {
+   "intro": "B complète l'alphabet et la barre oblique ajoute une touche en bas à droite. Un vrai cap : tu auras les 26 lettres.",
+   "rules": [
+    {
+     "icon": "⬇️",
+     "t": "B au centre-bas",
+     "d": "L'index gauche s'étire vers le centre puis descend pour B. C'est un mouvement un peu ample : reviens vite sur F."
+    },
+    {
+     "icon": "⌨️",
+     "t": "La barre oblique /",
+     "d": "Elle est à l'auriculaire droit, tout en bas à droite, après le point. On la rencontre dans oui/non, et/ou, vrai/faux."
+    },
+    {
+     "icon": "🏁",
+     "t": "Les 26 lettres réunies",
+     "d": "Avec B, tu maîtrises tout l'alphabet. À partir d'ici, n'importe quel mot français t'est accessible."
+    }
+   ],
+   "tip": "Objectif : poser B et la barre oblique, et savourer d'avoir bouclé l'alphabet complet."
+  },
+  "pon2": {
+   "intro": "Le point d'interrogation et le point d'exclamation donnent le ton : une question, une émotion.",
+   "rules": [
+    {
+     "icon": "⇧",
+     "t": "Avec Maj",
+     "d": "Sur un clavier QWERTY, ? et ! se font avec Maj. Maintiens Maj de la main opposée, puis frappe le signe. Le geste exact de ton clavier est indiqué juste en dessous."
+    },
+    {
+     "icon": "␣",
+     "t": "Espace avant, en français",
+     "d": "En français, on met une espace avant ? et ! (contrairement à l'anglais) : mot, espace, signe."
+    },
+    {
+     "icon": "🎭",
+     "t": "Le bon ton",
+     "d": "? pour interroger, ! pour exclamer. Un seul suffit : évite les points d'exclamation à répétition."
+    }
+   ],
+   "tip": "Objectif : taper ? et ! avec l'espace française avant le signe."
+  },
+  "acc1": {
+   "intro": "Sur un clavier QWERTY, les accents n'ont pas de touche à eux : on les obtient avec une touche morte ou une combinaison (AltGr, Option). On commence par le é. Le geste exact de ton clavier est indiqué juste en dessous.",
+   "rules": [
+    {
+     "icon": "⌨️",
+     "t": "Un geste, pas une touche",
+     "d": "Le é s'obtient avec un geste propre à ton clavier (touche morte puis e, AltGr + e, Option + e puis e…). Regarde le geste indiqué sous la leçon."
+    },
+    {
+     "icon": "⏳",
+     "t": "Rien ne s'affiche tout de suite",
+     "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape-le, puis la voyelle. C'est normal, ne t'arrête pas."
+    },
+    {
+     "icon": "🔥",
+     "t": "Très fréquent",
+     "d": "é est l'un des caractères les plus courants du français (été, café, écrire). L'automatiser fait gagner beaucoup."
+    }
+   ],
+   "tip": "Objectif : produire é avec le geste de ton clavier, sans hésiter."
+  },
+  "acc2": {
+   "intro": "Le è (accent grave) s'obtient avec un autre signe que le é. Le geste exact de ton clavier est indiqué juste en dessous.",
+   "rules": [
+    {
+     "icon": "⌨️",
+     "t": "Même principe, autre signe",
+     "d": "Le è passe par l'accent grave (touche morte ` ou combinaison de ton clavier), puis la lettre e."
+    },
+    {
+     "icon": "↔️",
+     "t": "Ne confonds pas é et è",
+     "d": "é et è utilisent deux signes différents : le geste du é, puis le geste du è. Entraîne-toi à les alterner."
+    },
+    {
+     "icon": "💬",
+     "t": "Mots très courants",
+     "d": "père, mère, très, après... Le è revient sans cesse. Profite-en pour réviser le é au passage."
+    }
+   ],
+   "tip": "Objectif : taper è sans le confondre avec é, et réviser les deux."
+  },
+  "acc3": {
+   "intro": "On ajoute le à et le ù. Tu pourras écrire voilà, déjà, où. Le geste exact de ton clavier est indiqué juste en dessous.",
+   "rules": [
+    {
+     "icon": "⌨️",
+     "t": "Accent grave, voyelles a et u",
+     "d": "à et ù utilisent le même signe que è (l'accent grave), suivi de a ou de u. Le geste est celui du è."
+    },
+    {
+     "icon": "⏳",
+     "t": "Rien ne s'affiche tout de suite",
+     "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape-le, puis la voyelle. C'est normal, ne t'arrête pas."
+    },
+    {
+     "icon": "💬",
+     "t": "Petits mots, grand usage",
+     "d": "à, où, là, déjà... Ces petits mots accentués sont partout. Bien les placer évite beaucoup de fautes."
+    }
+   ],
+   "tip": "Objectif : produire à et ù avec le geste de ton clavier, sans hésiter."
+  },
+  "acc4": {
+   "intro": "Dernier accent courant : le ç (c cédille). Avec lui et le ù, tu as les accents usuels du français. Le geste exact de ton clavier est indiqué juste en dessous.",
+   "rules": [
+    {
+     "icon": "⌨️",
+     "t": "Le ç, un geste à part",
+     "d": "Le ç s'obtient avec son propre geste (souvent la touche morte ' puis c, ou Option + c, ou AltGr + , selon ton clavier). Regarde le geste indiqué."
+    },
+    {
+     "icon": "📖",
+     "t": "La cédille",
+     "d": "Le ç se met sous le c devant a, o, u pour faire le son [s] : façon, leçon, garçon, français."
+    },
+    {
+     "icon": "🧩",
+     "t": "Tous les accents réunis",
+     "d": "Avec ç et ù, tu as é è à ù ç. Révise-les ensemble pour que chaque geste devienne un réflexe."
+    }
+   ],
+   "tip": "Objectif : placer ç et ù sans regarder, et réviser l'ensemble des accents."
+  },
+  "acc5": {
+   "intro": "On réunit tous ces accents dans un vrai texte français. C'est ce qui fait la différence à l'écrit.",
+   "rules": [
+    {
+     "icon": "🧭",
+     "t": "Chaque accent a son geste",
+     "d": "é, è, à, ù, ç : cinq caractères, chacun son geste sur ton clavier. Visualise-le avant de taper."
+    },
+    {
+     "icon": "🎯",
+     "t": "Précision d'abord",
+     "d": "Les gestes d'accents sont moins automatiques que les lettres. Ralentis dessus si besoin, la vitesse viendra avec la répétition."
+    },
+    {
+     "icon": "✅",
+     "t": "Le vrai français",
+     "d": "Un texte sans accents fait amateur. Maîtriser ces gestes, c'est écrire un français propre et soigné."
+    }
+   ],
+   "tip": "Objectif : écrire un texte accentué complet sans chercher les gestes."
+  },
+  "cir1": {
+   "intro": "Le circonflexe (le « chapeau ») passe par une touche morte : tu appuies d'abord sur le signe, puis sur la voyelle. Rien ne s'affiche tant que tu n'as pas tapé la voyelle, c'est normal. Le geste exact de ton clavier est indiqué juste en dessous.",
+   "rules": [
+    {
+     "icon": "🎩",
+     "t": "Une touche morte",
+     "d": "Sur QWERTY, le circonflexe s'obtient avec une combinaison propre à ton clavier (par exemple Maj + 6 puis la voyelle, ou Option + i puis la voyelle sur Mac)."
+    },
+    {
+     "icon": "2️⃣",
+     "t": "En deux temps",
+     "d": "Circonflexe = deux frappes : le signe, puis la voyelle. â = signe puis a, ê = signe puis e. Le système combine les deux."
+    },
+    {
+     "icon": "💬",
+     "t": "Mots courants",
+     "d": "château, pâte, être, fête, forêt... Le circonflexe est fréquent. Prends le réflexe du « chapeau d'abord »."
+    }
+   ],
+   "tip": "Objectif : enchaîner le signe puis la voyelle pour écrire â et ê sans hésiter."
+  },
+  "cir2": {
+   "intro": "Même geste pour î et ô : le circonflexe, puis la voyelle. Tu complètes le circonflexe sur i et o. Le geste exact de ton clavier est indiqué juste en dessous.",
+   "rules": [
+    {
+     "icon": "🎩",
+     "t": "Toujours le signe d'abord",
+     "d": "î = signe puis i, ô = signe puis o. Le geste est identique à â et ê : la touche morte vient toujours en premier."
+    },
+    {
+     "icon": "📍",
+     "t": "Même geste que â et ê",
+     "d": "Tu ne changes rien : c'est la même combinaison, seule la voyelle change."
+    },
+    {
+     "icon": "💬",
+     "t": "Mots utiles",
+     "d": "île, maître, boîte, hôtel, côte, rôle... Profite de la révision de â et ê glissés dans les mêmes textes."
+    }
+   ],
+   "tip": "Objectif : taper î et ô avec la touche morte, et réviser â ê."
+  },
+  "cir3": {
+   "intro": "Dernière voyelle du circonflexe : le û. Même principe de touche morte, puis révision de tous les chapeaux.",
+   "rules": [
+    {
+     "icon": "🎩",
+     "t": "û = signe puis u",
+     "d": "Encore une fois : le signe du circonflexe, puis u. Tu connais maintenant les cinq voyelles à chapeau."
+    },
+    {
+     "icon": "🖐️",
+     "t": "Cinq voyelles",
+     "d": "â ê î ô û : toutes se font avec le même geste puis la voyelle. Un seul geste à maîtriser pour les cinq."
+    },
+    {
+     "icon": "🐢",
+     "t": "Va à ton rythme",
+     "d": "La double frappe demande un peu de coordination. Ralentis si besoin, le geste s'automatise vite."
+    }
+   ],
+   "tip": "Objectif : écrire û et enchaîner les cinq voyelles circonflexes sans regarder."
+  },
+  "cir4": {
+   "intro": "On met tous les circonflexes dans un vrai texte. Le geste « chapeau puis voyelle » doit devenir naturel.",
+   "rules": [
+    {
+     "icon": "⚡",
+     "t": "Le réflexe touche morte",
+     "d": "Dès que tu vois un chapeau, pense au signe d'abord, voyelle ensuite. Ce réflexe vaut pour les cinq voyelles."
+    },
+    {
+     "icon": "👀",
+     "t": "Anticipe les accents",
+     "d": "En lisant le mot, repère les voyelles accentuées à l'avance pour préparer la double frappe."
+    },
+    {
+     "icon": "✨",
+     "t": "Soigne le rendu",
+     "d": "Les circonflexes bien placés (être, château, forêt) donnent un texte vraiment correct en français."
+    }
+   ],
+   "tip": "Objectif : intégrer les circonflexes dans un texte fluide, sans casser le rythme."
+  },
+  "tre1": {
+   "intro": "Le tréma (¨) est aussi une touche morte, comme le circonflexe : le signe d'abord, puis la voyelle. Le geste exact de ton clavier est indiqué juste en dessous.",
+   "rules": [
+    {
+     "icon": "¨",
+     "t": "Le signe d'abord",
+     "d": "Fais le geste du tréma (par exemple Maj + ' sur US International, ou Option + u sur Mac), relâche, puis tape e ou i."
+    },
+    {
+     "icon": "⏳",
+     "t": "Rien ne s'affiche tout de suite",
+     "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : tape-le, puis la voyelle. C'est normal, ne t'arrête pas."
+    },
+    {
+     "icon": "💬",
+     "t": "Mots à tréma",
+     "d": "Noël, naïf, maïs, héroïque... Le tréma sépare deux voyelles qu'on prononce distinctement."
+    }
+   ],
+   "tip": "Objectif : faire le geste du tréma puis la voyelle pour écrire ë et ï."
+  },
+  "num3": {
+   "intro": "Au tour des annulaires : 2 à gauche, 9 à droite. On approche des bords de la rangée.",
+   "rules": [
+    {
+     "icon": "⬆️",
+     "t": "Les annulaires s'étirent",
+     "d": "Le 2 (annulaire gauche) et le 9 (annulaire droit) demandent un étirement plus long. Doigts moins forts : va doucement."
+    },
+    {
+     "icon": "🔢",
+     "t": "Les chiffres sont directs",
+     "d": "Sur un clavier QWERTY, les chiffres de la rangée du haut se tapent sans Maj. Un simple appui suffit."
+    },
+    {
+     "icon": "🎯",
+     "t": "Précision avant tout",
+     "d": "Plus on s'éloigne du centre, plus les fautes guettent. Mieux vaut lent et juste que rapide et faux."
+    }
+   ],
+   "tip": "Objectif : atteindre 2 et 9 avec les annulaires, sans regarder."
+  }
+ },
  "lessons": {
   "r1": {
    "title": "F et J, les index",
@@ -316,6 +853,42 @@
    "kind": "adapted",
    "text": "« Viens vite ! » dit-il. Elle dit : « J'arrive ; attends-moi. » Vingt-cinq minutes plus tard (enfin), elle arriva.",
    "why": "répondit (é) remplacé par dit"
+  },
+  "acc1": {
+   "title": "L'accent aigu : é",
+   "keys": "é",
+   "module": "7. Accents directs AZERTY",
+   "moduleIdx": 6,
+   "kind": "adapted",
+   "text": "été café écran étoile étude écrire échec éclat réel série épée érable énergie café été",
+   "why": "élève et ébène (è) retirés : le è s'enseigne en acc2, et sur QWERTY son geste n'est pas encore connu"
+  },
+  "acc2": {
+   "title": "L'accent grave : è (+ révision é)",
+   "keys": "è",
+   "module": "7. Accents directs AZERTY",
+   "moduleIdx": 6,
+   "kind": "adapted",
+   "text": "père mère frère très près après dès fière rivière lumière. été, très près. père préfère le café. très bien.",
+   "why": "fenêtre (ê) retiré : le circonflexe s'enseigne au module 8"
+  },
+  "acc3": {
+   "title": "À et où (+ révision é è)",
+   "keys": "à où",
+   "module": "7. Accents directs AZERTY",
+   "moduleIdx": 6,
+   "kind": "adapted",
+   "text": "voilà déjà là-bas à droite. où es-tu ? là-haut, à gauche. père et mère sont déjà là. voilà le café.",
+   "why": "à côté (ô) remplacé par à droite : le circonflexe s'enseigne au module 8"
+  },
+  "acc5": {
+   "title": "Révision : tous les accents directs",
+   "keys": "é è à ù ç",
+   "module": "7. Accents directs AZERTY",
+   "moduleIdx": 6,
+   "kind": "adapted",
+   "text": "déjà à l'été, le café et la façon d'écrire. très près de là où père et mère écrivent la leçon de français.",
+   "why": "d'être (ê) remplacé par d'écrire : le circonflexe s'enseigne au module 8"
   },
   "flu6": {
    "title": "Sprint de vitesse : texte long",
