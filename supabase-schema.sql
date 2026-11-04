@@ -972,3 +972,36 @@ create table if not exists link_mail_requests (
 create index if not exists link_mail_requests_email_idx on link_mail_requests(email, created_at desc);
 create index if not exists link_mail_requests_ip_idx on link_mail_requests(ip, created_at desc);
 alter table link_mail_requests enable row level security;
+
+-- Documents de base du dashboard (mission, vision, lean canvas, matrice de
+-- maturité, documents libres). Une ligne par document, contenu en jsonb :
+--   kind 'text'   => { "text": "..." }
+--   kind 'canvas' => { "blocks": { "<cle_bloc>": "..." } }
+--   kind 'matrix' => { "rows": [{ "name", "level" (0-5), "notes" }] }
+-- Accès via la clé service uniquement ; RLS sans policy => anon refusé.
+create table if not exists strategy_docs (
+  id uuid default gen_random_uuid() primary key,
+  slug text unique not null,
+  title text not null,
+  kind text not null default 'text',
+  content jsonb not null default '{}'::jsonb,
+  link_url text,
+  updated_at timestamptz default now()
+);
+alter table strategy_docs enable row level security;
+
+-- ───────────────────────────────────────────────────────────────
+-- Self onboarding établissement (api/institutions.js, action « self-onboard »).
+-- Un établissement ouvre lui-même son espace d'essai (30 jours, porté par
+-- license_expires_at). Ces colonnes servent à la vérification par l'équipe
+-- (gérant, niveau, pays), à la facturation à l'issue de l'essai et à la limite
+-- de créations par IP. Idempotent : peut être relancé sans effet.
+-- ───────────────────────────────────────────────────────────────
+alter table institutions
+  add column if not exists contact_email text,
+  add column if not exists level text,
+  add column if not exists country text,
+  add column if not exists self_onboarded boolean not null default false,
+  add column if not exists onboarding_ip text;
+create index if not exists institutions_onboarding_ip_idx on institutions(onboarding_ip, created_at);
+create index if not exists institutions_contact_email_idx on institutions(contact_email, created_at);

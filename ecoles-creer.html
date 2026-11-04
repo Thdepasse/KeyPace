@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<!-- Consentement cookies + Google Analytics (chargé seulement après accord, voir /cookies) -->
+<script src="/cookie-consent.js" defer></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ouvrir l'espace de mon école | KeyPace</title>
+<meta name="description" content="Ouvrez en une minute l'espace de votre établissement sur KeyPace : test gratuit de 30 jours, sans engagement.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://keypace.be/ecoles/creer">
+<meta name="theme-color" content="#FF4D2E">
+<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png?v=2" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet"></noscript>
+<style>
+  :root{--accent:#FF4D2E;--bg:#faf9f5;--card:#fff;--border:#E7E1D5;--txt:#16140F;--muted:#8A8275;--light:#F4F1EA;--danger:#E5484D}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,Roboto,'Helvetica Neue',Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.1}
+  header{border-bottom:1px solid var(--border);background:rgba(250,249,245,.92);backdrop-filter:blur(8px);position:sticky;top:0;z-index:100}
+  header a{line-height:normal}
+  .nav-inner{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:20px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:19px;color:var(--txt);text-decoration:none}
+  header .logo{font-family:'Bricolage Grotesque',sans-serif}
+  .logo:hover{text-decoration:none}
+  .logo .k{width:29px;height:29px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;box-shadow:0 4px 10px rgba(255,77,46,.4)}
+  .btn{display:inline-block;background:var(--accent);color:#fff;font-weight:800;font-size:16px;padding:11px 20px;border-radius:12px;box-shadow:0 8px 20px -8px var(--accent);border:none;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .btn:hover{text-decoration:none;transform:translateY(-1px);transition:.15s}
+  .btn.ghost{background:var(--card);color:var(--txt);border:1.5px solid var(--border);box-shadow:none}
+  .nav-links{display:flex;gap:4px;margin-left:4px}
+  .nav-link{position:relative;font-size:15px;font-weight:600;color:var(--txt);padding:7px 12px;border-radius:9px;transition:.15s;text-decoration:none;display:inline-block}
+  .nav-link:hover{background:var(--light);text-decoration:none}
+  .nav-dropdown{position:relative;display:flex;align-items:center}
+  .nav-dropdown-menu{display:none;position:absolute;top:100%;left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:170px;box-shadow:0 12px 32px rgba(0,0,0,.14);z-index:50}
+  .nav-dropdown-menu a{display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:var(--txt);text-decoration:none}
+  .nav-dropdown-menu a:hover{background:var(--light)}
+  .nav-dropdown:hover .nav-dropdown-menu{display:block}
+  .nav-spacer{flex:1}
+  .nav-login-btn{background:none;border:1.5px solid var(--border);border-radius:10px;padding:7px 14px;font-size:14px;font-weight:600;color:var(--txt);text-decoration:none;display:inline-flex;align-items:center}
+  .nav-login-btn:hover{background:var(--light);text-decoration:none}
+  .nav-signup-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 12px rgba(255,77,46,0.26);text-decoration:none;display:inline-flex;align-items:center}
+  .nav-signup-btn:hover{text-decoration:none}
+  .nav-guest-btns{display:flex;gap:8px}
+  .nav-burger{display:none;background:none;border:1.5px solid var(--border);border-radius:10px;width:40px;height:40px;font-size:19px;color:var(--txt);align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
+  @media (max-width:768px){
+    .nav-inner{padding:10px 14px;gap:8px}
+    .nav-burger{display:inline-flex}
+    .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:2px;margin:0;background:var(--card);border-bottom:1px solid var(--border);padding:8px;display:none;box-shadow:0 14px 30px rgba(0,0,0,.12);max-height:78vh;overflow-y:auto}
+    .nav-links.open{display:flex}
+    .nav-link{font-size:15px;font-weight:600;padding:12px 14px;text-align:left;width:100%;border-radius:10px}
+    .nav-dropdown{flex-direction:column;align-items:stretch;width:100%}
+    .nav-dropdown-menu{position:static;display:flex!important;flex-direction:column;box-shadow:none;border:none;padding:0 0 4px 14px;min-width:0}
+    .nav-login-btn{display:none}
+    .nav-signup-btn{font-size:13px;padding:8px 12px}
+  }
+  .crumb{font-size:13px;color:var(--muted);padding:18px 0 0}
+  footer{border-top:1px solid var(--border);margin-top:24px;padding:24px 0 40px;color:var(--muted);font-size:14px}
+  footer .wrap{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+  footer a{color:var(--muted)}
+
+  [hidden]{display:none!important}
+  /* ===== Self onboarding : /ecoles/creer ===== */
+  .cr{background:radial-gradient(ellipse 60% 45% at 85% 0%,rgba(255,77,46,.11),transparent 70%),radial-gradient(ellipse 45% 35% at 0% 100%,rgba(255,138,92,.09),transparent 70%),var(--bg);min-height:calc(100vh - 62px)}
+  .cr-in{max-width:1080px;margin:0 auto;padding:22px 24px 90px}
+  .cr h1,.cr h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;letter-spacing:-.035em;line-height:1.05;margin:0}
+  .cr em{font-style:normal;color:var(--accent)}
+
+  /* fil du parcours */
+  .path{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;row-gap:8px;font-size:13px;font-weight:700;color:#a39c8d;margin:6px 0 34px}
+  .path .s{display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .path .s i{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);background:#fff;display:grid;place-items:center;font-style:normal;font-size:11px;color:#fff}
+  .path .s.done i{background:var(--accent);border-color:var(--accent)}
+  .path .s.cur i{border-color:var(--accent);box-shadow:0 0 0 4px rgba(255,77,46,.18)}
+  .path .s.cur,.path .s.done{color:var(--txt)}
+  .path .ln{width:40px;height:2px;background:var(--border);margin:0 10px;border-radius:2px}
+  .path .ln.on{background:var(--accent)}
+
+  /* formulaire */
+  .cr-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:36px;align-items:start}
+  .cr-left h1{font-size:clamp(30px,4.4vw,46px)}
+  .cr-sub{margin:12px 0 0;font-size:17px;color:var(--muted);line-height:1.5}
+  .cr-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px}
+  .cr-f{display:block;border:0;padding:0;margin:0;min-width:0}
+  .cr-f.full{grid-column:1/-1}
+  .cr-f>span,.cr-f>legend{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px;padding:0}
+  .cr-f input[type=text],.cr-f input[type=email],.cr-f input[type=password]{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:16px;font-family:inherit;color:var(--txt);background:#fff;outline:none}
+  .cr-f input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,.12)}
+  .seg{display:flex;gap:8px;flex-wrap:wrap}
+  .seg button{border:1.5px solid var(--border);background:#fff;border-radius:99px;padding:9px 15px;font:inherit;font-size:14px;font-weight:700;color:#4a4639;cursor:pointer}
+  .seg button[aria-checked=true]{border-color:var(--accent);background:#FFF1EC;color:#C93A1F}
+  .cr-q{margin:34px 0 0;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.035em}
+  .cr-num{display:flex;align-items:baseline;gap:14px;margin-top:2px;flex-wrap:wrap}
+  .cr-num input{width:min(260px,60vw);border:0;border-bottom:4px solid var(--accent);background:transparent;font:800 clamp(56px,10vw,92px)/1.05 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.05em;color:var(--accent);padding:0 4px;outline:0;border-radius:0;-moz-appearance:textfield}
+  .cr-num input::-webkit-outer-spin-button,.cr-num input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .cr-num span{font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.03em}
+
+  /* échelle de prix */
+  .scale{position:relative;margin-top:58px;max-width:560px}
+  .scale input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:99px;margin:0;background:linear-gradient(90deg,var(--accent) var(--p,15%),#EFEBE1 var(--p,15%));outline:0;-webkit-tap-highlight-color:transparent}
+  .scale input[type=range]::-webkit-slider-runnable-track{background:transparent;border:0;height:10px}
+  .scale input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-9px;border-radius:50%;background:#fff;border:4px solid var(--accent);cursor:pointer}
+  .scale input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid var(--accent);cursor:pointer}
+  .scale input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(255,77,46,.25)}
+  .ptag{position:absolute;top:-48px;transform:translateX(-50%);color:var(--accent);font-weight:800;font-size:24px;letter-spacing:-.03em;white-space:nowrap;line-height:1;pointer-events:none}
+  .ptag small{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:0;margin-left:4px}
+  .segs{position:relative;height:54px;margin-top:10px}
+  .segs .tk{position:absolute;top:0;width:2px;height:8px;background:#D9D2C3;transform:translateX(-1px)}
+  .segs .pr{position:absolute;top:10px;transform:translateX(-50%);font-weight:800;font-size:14px;color:#a39c8d;white-space:nowrap}
+  .segs .pr.on{color:var(--accent);font-size:16px}
+  .segs .th{position:absolute;top:32px;transform:translateX(-50%);font-size:12px;font-weight:700;color:#a39c8d}
+
+  .cr-prices{margin-top:18px;display:grid;gap:14px}
+  .cr-was{font-size:19px;color:var(--muted);font-weight:700}
+  .cr-was s{text-decoration:none;position:relative;display:inline-block;margin:0 8px 0 4px}
+  .cr-was s::after{content:"";position:absolute;left:-4px;right:-4px;top:54%;height:3px;background:var(--accent);border-radius:3px;transform:rotate(-4deg)}
+  .cr-was small{display:block;font-size:14px;font-weight:500;margin-top:2px}
+  .cr-mano{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .cr-mano img{height:46px;width:auto;display:block}
+  .cr-mano b{display:block;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:clamp(19px,2.4vw,24px);letter-spacing:-.03em;line-height:1.15}
+  .cr-mano small{display:block;font-size:13px;color:var(--muted);margin-top:3px}
+  .cr-fr{font-size:14px;color:var(--muted);margin:0;line-height:1.5}
+
+  .cr-cgu{display:flex;align-items:flex-start;gap:12px;margin-top:26px;font-size:15px;font-weight:600;line-height:1.4;cursor:pointer}
+  .cr-cgu input{width:22px;height:22px;margin:0;flex:none;accent-color:var(--accent);cursor:pointer}
+  .cr-cgu a{text-decoration:underline}
+  .cr-err{display:none;margin-top:14px;color:#C0272D;background:#FEECEC;border:1px solid #F7C6C8;border-radius:12px;padding:11px 14px;font-size:14px;font-weight:600;line-height:1.4}
+  .cr-err.show{display:block}
+  .cr-auth-label{margin-top:22px;font:700 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .cr-auth{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .cr-btn{font:inherit;font-size:16px;font-weight:800;border-radius:14px;padding:15px 24px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--txt);transition:transform .15s}
+  .cr-btn:hover{transform:translateY(-1px)}
+  .cr-btn.main{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 10px 22px -10px rgba(255,77,46,.75)}
+  .cr-btn:disabled{opacity:.6;cursor:default;transform:none}
+  .cr-pw{margin-top:16px;display:grid;gap:12px;max-width:420px}
+  .cr-fine{margin:18px 0 0;font-size:13px;line-height:1.55;color:var(--muted);max-width:520px}
+  .cr-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+  .cr-right{display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:96px}
+  .cr-bubble{position:relative;background:#fff;border:1.5px solid #FFD3C6;border-radius:20px;padding:14px 18px;font-size:15px;font-weight:700;line-height:1.4;max-width:270px;box-shadow:0 14px 28px -18px rgba(255,77,46,.5)}
+  .cr-bubble::after{content:"";position:absolute;left:50%;bottom:-9px;width:16px;height:16px;background:#fff;border-right:1.5px solid #FFD3C6;border-bottom:1.5px solid #FFD3C6;transform:translateX(-50%) rotate(45deg)}
+  .cr-bubble b{color:var(--accent)}
+  .cr-right img{width:min(250px,60%);height:auto}
+
+  /* création : la frappe qui s'écrit */
+  .cr-make{max-width:660px;margin:0 auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px;padding-top:6px}
+  .cr-make img{width:190px;height:auto;animation:crfloat 3.2s ease-in-out infinite}
+  @keyframes crfloat{50%{transform:translateY(-8px)}}
+  .cr-make h2{font-size:clamp(26px,4vw,36px)}
+  .typed{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:12px;text-align:left;font:700 clamp(16px,2.4vw,22px)/1.3 'JetBrains Mono',monospace}
+  .typed li{display:flex;align-items:center;gap:12px;min-height:30px}
+  .typed .pr{color:var(--accent)}
+  .typed .tx{display:inline-block;overflow:hidden;white-space:nowrap;width:0;border-right:3px solid transparent;transition:width .9s steps(22)}
+  .typed li.on .tx{width:var(--w);border-right-color:var(--accent)}
+  .typed li.done .tx{border-right-color:transparent}
+  .typed .ck{color:var(--accent);font-weight:800;opacity:0;transform:scale(.3);transition:opacity .25s,transform .25s}
+  .typed li.done .ck{opacity:1;transform:none}
+  .track{width:min(560px,100%);height:5px;background:#EFEBE1;border-radius:99px;overflow:hidden}
+  .track i{display:block;height:100%;width:4%;background:linear-gradient(90deg,#FF8A5C,var(--accent));border-radius:99px;transition:width .8s ease}
+  .cr-redir{font-size:14px;font-weight:700;color:var(--muted)}
+  @media (prefers-reduced-motion:reduce){.cr-make img{animation:none}.typed .tx,.typed .ck,.track i{transition:none}}
+
+  /* e-mail à confirmer */
+  .cr-mail{max-width:600px;margin:0 auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px}
+  .cr-mail img{width:210px;height:auto}
+  .cr-mail h2{font-size:clamp(28px,4.4vw,40px)}
+  .cr-mail p{margin:0;font-size:17px;line-height:1.55;color:var(--muted)}
+  .cr-mail p b{color:var(--txt)}
+
+  @media (max-width:860px){
+    .cr-in{padding:14px 16px 70px}
+    .cr-grid{grid-template-columns:1fr;gap:10px}
+    .cr-right{order:-1;padding-top:0;flex-direction:row;align-items:flex-end;justify-content:center;gap:8px}
+    .cr-right img{width:120px}
+    .cr-bubble{max-width:220px;font-size:13.5px;padding:11px 14px}
+    .cr-bubble::after{display:none}
+    .cr-fields{grid-template-columns:1fr}
+    .path .ln{width:18px;margin:0 6px}
+    .path{font-size:12px}
+    .cr-btn{flex:1 1 100%;text-align:center}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="nav-inner">
+    <a class="logo" href="/"><span class="k">K</span> KeyPace</a>
+    <div class="nav-links" id="nav-links">
+      <a class="nav-link" href="/">Accueil</a>
+      <div class="nav-dropdown">
+        <a class="nav-link" href="/ecoles">Établissements</a>
+        <div class="nav-dropdown-menu">
+          <a href="/dactylographie-primaire">Primaire</a>
+          <a href="/dactylographie-secondaire">Secondaire</a>
+          <a href="/dactylographie-superieur">Supérieur</a>
+        </div>
+      </div>
+      <a class="nav-link" href="/?view=test">Test</a>
+      <a class="nav-link" href="/?view=lessons">Cours</a>
+      <a class="nav-link" href="/?view=games">Jeux</a>
+      <a class="nav-link" href="/?view=stats">Progrès</a>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-guest-btns">
+      <a class="nav-login-btn" href="/?auth=login">Se connecter</a>
+      <a class="nav-signup-btn" href="/?auth=register">Créer un compte</a>
+    </div>
+    <button class="nav-burger" onclick="toggleNavMenu(event)" aria-label="Menu">☰</button>
+  </div>
+</header>
+<main class="cr">
+  <div class="cr-in">
+    <nav class="path" id="cr-path" aria-label="Étapes"></nav>
+
+    <!-- 1. Votre école -->
+    <section id="s-form" aria-labelledby="cr-h1">
+      <div class="cr-grid">
+        <div class="cr-left">
+          <h1 id="cr-h1">Votre espace est presque prêt</h1>
+          <p class="cr-sub">Test gratuit de 30 jours, sans engagement. Une minute suffit.</p>
+
+          <div class="cr-fields">
+            <label class="cr-f full"><span>Nom de l'établissement</span><input id="cr-name" type="text" autocomplete="organization" maxlength="120" placeholder="ex : Athénée royal de..."></label>
+            <label class="cr-f full"><span>E-mail professionnel du gérant</span><input id="cr-email" type="email" autocomplete="email" maxlength="254" placeholder="ex : direction@ecole.be"></label>
+            <fieldset class="cr-f"><legend>Niveau</legend>
+              <div class="seg" id="cr-level" role="radiogroup" aria-label="Niveau">
+                <button type="button" role="radio" data-v="primaire" aria-checked="false">Primaire</button>
+                <button type="button" role="radio" data-v="secondaire" aria-checked="true">Secondaire</button>
+                <button type="button" role="radio" data-v="superieur" aria-checked="false">Supérieur</button>
+                <button type="button" role="radio" data-v="formation" aria-checked="false">Formation</button>
+              </div>
+            </fieldset>
+            <fieldset class="cr-f"><legend>Pays</legend>
+              <div class="seg" id="cr-country" role="radiogroup" aria-label="Pays">
+                <button type="button" role="radio" data-v="BE" aria-checked="true">Belgique</button>
+                <button type="button" role="radio" data-v="FR" aria-checked="false">France</button>
+              </div>
+            </fieldset>
+          </div>
+
+          <p class="cr-q">Mon école compte</p>
+          <div class="cr-num"><input id="cr-n" type="number" inputmode="numeric" min="1" max="5000" value="120" aria-label="Nombre d'élèves"><span>élèves</span></div>
+          <div class="scale" id="cr-scale">
+            <span class="ptag" id="cr-ptag"></span>
+            <input id="cr-rg" type="range" min="1" max="800" value="120" aria-label="Nombre d'élèves, curseur">
+            <div class="segs" id="cr-segs"></div>
+          </div>
+
+          <div class="cr-prices">
+            <div class="cr-was" id="cr-was"></div>
+            <div class="cr-mano" id="cr-mano">
+              <img src="/images/keypace-manolo-eligible.png" alt="Éligible à la subvention MANOLO, Fédération Wallonie-Bruxelles" width="223" height="46">
+              <div><b>Pris en charge par <em>la subvention</em></b><small>Sous réserve d'éligibilité, vérifiée avec vous.</small></div>
+            </div>
+            <p class="cr-fr" id="cr-fr" hidden>La subvention MANOLO concerne les établissements de la Fédération Wallonie-Bruxelles. Le tarif ci-dessus s'applique tel quel.</p>
+          </div>
+
+          <label class="cr-cgu"><input type="checkbox" id="cr-cgu"><span>J'accepte les <a href="/conditions" target="_blank" rel="noopener">conditions d'utilisation</a> et la <a href="/confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</span></label>
+          <div class="cr-hp" aria-hidden="true"><label>Site web <input id="cr-hp" type="text" tabindex="-1" autocomplete="off"></label></div>
+          <div class="cr-err" id="cr-err" role="alert"></div>
+
+          <div class="cr-auth-label">Créer mon espace avec</div>
+          <div class="cr-auth">
+            <button type="button" class="cr-btn main" data-m="google">Google</button>
+            <button type="button" class="cr-btn" data-m="microsoft">Microsoft</button>
+            <button type="button" class="cr-btn" data-m="email" id="cr-m-email" aria-expanded="false" aria-controls="cr-pw-wrap">E-mail et mot de passe</button>
+          </div>
+          <div class="cr-pw" id="cr-pw-wrap" hidden>
+            <label class="cr-f"><span>Choisissez un mot de passe (6 caractères minimum)</span><input id="cr-pw" type="password" autocomplete="new-password" minlength="6" maxlength="200"></label>
+            <button type="button" class="cr-btn main" id="cr-pw-go">Créer mon espace →</button>
+          </div>
+
+          <p class="cr-fine">Après les 30 jours, une facture vous est envoyée. L'espace est mis en pause tant qu'elle n'est pas réglée, rien n'est perdu.</p>
+        </div>
+
+        <aside class="cr-right" aria-live="polite">
+          <div class="cr-bubble" id="cr-bub"></div>
+          <img src="/images/keypace-mascot-idea.webp" alt="" width="250" height="300" decoding="async">
+        </aside>
+      </div>
+    </section>
+
+    <!-- 2. Création -->
+    <section id="s-make" hidden aria-live="polite">
+      <div class="cr-make">
+        <img src="/images/keypace-mascot-books.webp" alt="" width="190" height="230" decoding="async">
+        <h2>Nous préparons l'espace de <em id="cr-mk-name"></em></h2>
+        <ul class="typed" id="cr-typed">
+          <li style="--w:22ch"><span class="pr">&gt;</span><span class="tx">Espace de l'école créé</span><span class="ck">✓</span></li>
+          <li style="--w:23ch"><span class="pr">&gt;</span><span class="tx">Essai de 30 jours activé</span><span class="ck">✓</span></li>
+          <li style="--w:20ch"><span class="pr">&gt;</span><span class="tx">Tableau de bord prêt</span><span class="ck">✓</span></li>
+        </ul>
+        <div class="track"><i id="cr-track"></i></div>
+        <div class="cr-redir" id="cr-redir">Quelques secondes…</div>
+      </div>
+    </section>
+
+    <!-- 3. E-mail à confirmer (inscription par e-mail et mot de passe) -->
+    <section id="s-mail" hidden>
+      <div class="cr-mail">
+        <img src="/images/keypace-mascot-cheer.webp" alt="" width="210" height="210" decoding="async">
+        <h2>Dernière étape : <em>confirmez votre e-mail</em></h2>
+        <p>L'espace de <b id="cr-ml-name"></b> est créé. Nous avons envoyé un lien de confirmation à <b id="cr-ml-to"></b>. Cliquez dessus, puis connectez-vous pour ouvrir votre espace.</p>
+        <a class="btn" href="/?auth=login" style="padding:15px 30px;font-size:17px;border-radius:14px">Aller à la connexion →</a>
+        <p style="font-size:14px">Vous ne le trouvez pas ? Regardez dans les courriers indésirables, ou écrivez-nous à <a href="mailto:contact@keypace.be">contact@keypace.be</a>.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="logo" href="/" style="font-size:16px"><span class="k" style="width:24px;height:24px;font-size:13px">K</span> KeyPace</a>
+    <span class="sp" style="flex:1"></span>
+    <a href="/guide">Guides</a>
+    <a href="/comparatif">Comparatif</a>
+    <a href="/ebook-gratuit-dactylographie">E-book gratuit</a>
+    <a href="/conditions">Conditions</a>
+    <a href="/confidentialite">Confidentialité</a>
+    <a href="/cookies">Cookies</a>
+    <a href="/mentions-legales">Mentions légales</a>
+  </div>
+</footer>
+<script>
+function toggleNavMenu(e){if(e)e.stopPropagation();document.getElementById('nav-links')?.classList.toggle('open');}
+document.addEventListener('click',e=>{const nl=document.getElementById('nav-links');const b=document.querySelector('.nav-burger');if(nl&&nl.classList.contains('open')&&!nl.contains(e.target)&&b&&!b.contains(e.target))nl.classList.remove('open');});
+// Self onboarding établissement : /ecoles/creer
+// 1) POST /api/institutions {action:'self-onboard'} ouvre l'espace d'essai et renvoie un token d'invitation admin.
+// 2) Le premier compte se crée avec le MÊME code que l'inscription actuelle :
+//    Google / Microsoft -> /api/oauth?provider=...&invite=TOKEN, e-mail -> /api/register avec profInviteToken.
+(function(){
+  // Grille de prix par élève. Confirmés : 7 € au départ, 5 € pour les grandes écoles.
+  // TODO tarifs : seuils et prix intermédiaires à confirmer, ils ne sont pas définitifs.
+  var TIERS=[{min:1,max:50,p:7.00},{min:51,max:150,p:6.25},{min:151,max:400,p:5.50},{min:401,max:null,p:5.00}];
+  var MAXN=800, MAX_SEATS=5000;
+  var $=function(id){return document.getElementById(id);};
+  var state={level:'secondaire',country:'BE',busy:false};
+
+  function eur(x){return x.toLocaleString('fr-BE',{style:'currency',currency:'EUR'});}
+  function eurs(x){return x.toLocaleString('fr-BE',{minimumFractionDigits:x%1?2:0,maximumFractionDigits:2})+' €';}
+  function tierOf(n){for(var i=0;i<TIERS.length;i++){if(TIERS[i].max===null||n<=TIERS[i].max)return i;}return TIERS.length-1;}
+  function pos(v){return 'calc(14px + '+(Math.min(v,MAXN)/MAXN)+' * (100% - 28px))';}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+  async function hashPw(pw){
+    var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
+    return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+  }
+
+  // ---- fil du parcours
+  function renderPath(stage){ // 0 = école, 1 = création, 2 = espace
+    var steps=['Découvrir','Votre école','Création','Votre espace'], h='';
+    steps.forEach(function(label,i){
+      var cls=i<=stage?'done':(i===stage+1?'cur':''), mark=i<=stage?'✓':'';
+      h+=(i?'<span class="ln'+(i<=stage+1?' on':'')+'"></span>':'')+'<span class="s '+cls+'"><i>'+mark+'</i>'+label+'</span>';
+    });
+    $('cr-path').innerHTML=h;
+  }
+
+  // ---- prix
+  function segs(k){
+    var h='';
+    [50,150,400].forEach(function(v){h+='<span class="tk" style="left:'+pos(v)+'"></span><span class="th" style="left:'+pos(v)+'">'+v+'</span>';});
+    TIERS.forEach(function(t,i){var a=i===0?0:TIERS[i-1].max,b=t.max===null?MAXN:t.max;
+      h+='<span class="pr'+(i===k?' on':'')+'" style="left:'+pos((a+b)/2)+'">'+eurs(t.p)+'</span>';});
+    $('cr-segs').innerHTML=h;
+  }
+  function seatCount(){
+    var n=Math.round(Number($('cr-n').value));
+    return Math.max(1,Math.min(MAX_SEATS,isFinite(n)?n:1));
+  }
+  function update(){
+    var n=seatCount(), k=tierOf(n), t=TIERS[k], v=Math.min(n,MAXN), be=state.country==='BE';
+    $('cr-rg').style.setProperty('--p','calc(14px + '+(v/MAXN)+' * (100% - 28px))');
+    segs(k);
+    $('cr-ptag').style.left=pos(n);
+    $('cr-ptag').innerHTML=eurs(t.p)+'<small>par élève</small>';
+    var total=eur(t.p*n)+' pour '+n+' élève'+(n>1?'s':'');
+    $('cr-was').innerHTML=be
+      ?'Prix catalogue : <s>'+eurs(t.p)+'</s> par élève<small>('+total+')</small>'
+      :'<span style="color:var(--txt)">'+eurs(t.p)+'</span> par élève<small>('+total+')</small>';
+    $('cr-mano').hidden=!be; $('cr-fr').hidden=be;
+    var b=$('cr-bub');
+    if(k<TIERS.length-1){var nx=TIERS[k+1]; b.innerHTML='À partir de <b>'+nx.min+' élèves</b>, le prix passe à <b>'+eurs(nx.p)+'</b> par élève.';}
+    else b.innerHTML='Vous avez <b>le meilleur prix</b> par élève.';
+  }
+  $('cr-n').addEventListener('input',function(){$('cr-rg').value=Math.min(MAXN,seatCount());update();});
+  $('cr-rg').addEventListener('input',function(){$('cr-n').value=$('cr-rg').value;update();});
+
+  // ---- pastilles niveau / pays
+  function radio(groupId,key){
+    var g=$(groupId);
+    g.addEventListener('click',function(e){
+      var btn=e.target.closest('button[data-v]'); if(!btn)return;
+      g.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-checked',x===btn?'true':'false');});
+      state[key]=btn.getAttribute('data-v'); update();
+    });
+  }
+  radio('cr-level','level'); radio('cr-country','country');
+  function setRadio(groupId,key,value){
+    var g=$(groupId),btn=g.querySelector('button[data-v="'+value+'"]'); if(!btn)return;
+    g.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-checked',x===btn?'true':'false');});
+    state[key]=value;
+  }
+
+  // ---- préremplissage par lien (?n=nom&e=email&l=niveau&c=pays&s=élèves), pour les liens personnalisés des mails
+  (function prefill(){
+    var q=new URLSearchParams(location.search);
+    if(q.get('n'))$('cr-name').value=q.get('n').slice(0,120);
+    if(q.get('e'))$('cr-email').value=q.get('e').slice(0,254);
+    if(q.get('l'))setRadio('cr-level','level',q.get('l'));
+    if(q.get('c'))setRadio('cr-country','country',String(q.get('c')).toUpperCase());
+    var s=parseInt(q.get('s'),10);
+    if(s>0){$('cr-n').value=Math.min(MAX_SEATS,s);$('cr-rg').value=Math.min(MAXN,s);}
+  })();
+
+  // ---- erreurs et écrans
+  function showErr(msg){var e=$('cr-err');e.textContent=msg;e.classList.add('show');e.scrollIntoView({block:'nearest',behavior:'smooth'});}
+  function clearErr(){$('cr-err').classList.remove('show');}
+  function show(id){['s-form','s-make','s-mail'].forEach(function(s){$(s).hidden=(s!==id);});window.scrollTo({top:0});}
+  function setBusy(b){state.busy=b;document.querySelectorAll('.cr-btn').forEach(function(x){x.disabled=b;});}
+
+  // ---- frappe animée : une ligne apparaît, puis se coche
+  function line(i){return $('cr-typed').children[i];}
+  async function typeLine(i){line(i).classList.add('on');await sleep(950);}
+  async function doneLine(i,pct){line(i).classList.add('done');$('cr-track').style.width=pct+'%';await sleep(250);}
+  function resetLines(){Array.prototype.forEach.call($('cr-typed').children,function(li){li.classList.remove('on','done');});$('cr-track').style.width='4%';}
+
+  async function post(url,body){
+    var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    var d={}; try{d=await r.json();}catch(e){}
+    return {ok:r.ok,status:r.status,data:d};
+  }
+
+  function baseUsername(name){
+    var u=String(name).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,20);
+    return u.length>=3?u:'ecole-'+u;
+  }
+
+  async function start(method){
+    if(state.busy)return;
+    clearErr();
+    var name=$('cr-name').value.trim().replace(/\s+/g,' '), email=$('cr-email').value.trim().toLowerCase(), pw=$('cr-pw').value, n=seatCount();
+    if(name.length<2)return showErr("Indique le nom de l'établissement."),$('cr-name').focus();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email))return showErr("Indique l'adresse e-mail professionnelle du gérant."),$('cr-email').focus();
+    if(!$('cr-cgu').checked)return showErr("Accepte les conditions d'utilisation pour continuer."),$('cr-cgu').focus();
+    if(method==='email'&&pw.length<6)return showErr('Choisis un mot de passe de 6 caractères minimum.'),$('cr-pw').focus();
+
+    setBusy(true);
+    $('cr-mk-name').textContent=name; resetLines(); renderPath(1); show('s-make');
+    var t0=Date.now();
+    await typeLine(0);
+    var created=await post('/api/institutions',{action:'self-onboard',name:name,email:email,seatCount:n,level:state.level,country:state.country,consent:true,website:$('cr-hp').value});
+    if(!created.ok||!created.data.inviteToken){
+      renderPath(0); show('s-form'); setBusy(false);
+      return showErr((created.data&&created.data.error)||"Impossible d'ouvrir l'espace pour le moment. Réessaie, ou écris-nous à contact@keypace.be.");
+    }
+    var token=created.data.inviteToken;
+    await doneLine(0,34);
+    await typeLine(1);
+    await doneLine(1,67);
+
+    if(method==='email'){
+      var passwordHash=await hashPw(pw), base=baseUsername(name), reg=null;
+      for(var i=0;i<4;i++){
+        var username=i===0?base:base+Math.floor(1000+Math.random()*9000);
+        reg=await post('/api/register',{username:username,email:email,passwordHash:passwordHash,profInviteToken:token});
+        if(reg.ok||reg.status!==409||/email/i.test((reg.data&&reg.data.error)||''))break;
+      }
+      if(!reg.ok){
+        renderPath(0); show('s-form'); setBusy(false);
+        var em=(reg.data&&reg.data.error)||'';
+        return showErr(/email/i.test(em)
+          ?'Cette adresse a déjà un compte KeyPace. Choisis Google ou Microsoft avec cette adresse, ou écris-nous à contact@keypace.be : ton espace est créé, nous le rattachons.'
+          :(em||"La création du compte a échoué. Écris-nous à contact@keypace.be, ton espace est créé."));
+      }
+    }
+    await typeLine(2);
+    await doneLine(2,100);
+    var wait=2600-(Date.now()-t0); if(wait>0)await sleep(wait);
+
+    if(method==='email'){
+      $('cr-ml-name').textContent=name; $('cr-ml-to').textContent=email;
+      renderPath(2); show('s-mail'); setBusy(false);
+      return;
+    }
+    $('cr-redir').textContent='Connexion avec '+(method==='google'?'Google':'Microsoft')+'…';
+    location.href='/api/oauth?provider='+encodeURIComponent(method)+'&invite='+encodeURIComponent(token);
+  }
+
+  document.querySelectorAll('.cr-btn[data-m]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var m=b.getAttribute('data-m');
+      if(m==='email'){
+        var w=$('cr-pw-wrap'); w.hidden=false; b.setAttribute('aria-expanded','true'); $('cr-pw').focus(); return;
+      }
+      start(m);
+    });
+  });
+  $('cr-pw-go').addEventListener('click',function(){start('email');});
+  $('cr-pw').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();start('email');}});
+
+  renderPath(0); update();
+})();
+</script>
+</body>
+</html>

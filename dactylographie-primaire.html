@@ -237,7 +237,7 @@
       <p class="lead">KeyPace apprend aux enfants à taper au clavier avec les dix doigts, en s'amusant : leçons de 10 minutes, jeux, badges à débloquer. Vous suivez toute la classe depuis un tableau de bord simple, sans y passer vos soirées.</p>
       <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M9 12.5L7 21l5-3 5 3-2-8.5"/></svg> Éligible à la subvention MANOLO (Fédération Wallonie-Bruxelles)</div>
       <div class="cta-row" style="margin-top:22px">
-        <a class="btn" href="#licence-form">Demander une démo gratuite →</a>
+        <a class="btn" href="/ecoles/creer">Ouvrir l'espace de mon école →</a>
         <a class="btn ghost" href="/">Découvrir l'application</a>
       </div>
     </div>
@@ -298,8 +298,8 @@
       <div class="manolo-inner">
         <span class="manolo-badge">Financement</span>
         <h2>Éligible à la subvention MANOLO</h2>
-        <p>MANOLO est un dispositif de subvention numérique de la Fédération Wallonie-Bruxelles qui peut réduire le coût d'une licence KeyPace pour votre école. Chaque établissement a une situation différente : écrivez-nous avec le nom du vôtre et nous vérifions ensemble votre éligibilité et le montant applicable.</p>
-        <a class="btn" href="#licence-form">Vérifier mon éligibilité →</a>
+        <p>MANOLO est un dispositif de subvention numérique de la Fédération Wallonie-Bruxelles qui peut réduire le coût d'une licence KeyPace pour votre école. Chaque établissement a une situation différente : ouvrez votre espace et nous vérifions ensemble votre éligibilité et le montant applicable.</p>
+        <a class="btn" href="/ecoles/creer">Ouvrir mon espace et vérifier mon éligibilité →</a>
       </div>
     </div>
   </section>
@@ -310,13 +310,13 @@
     <div class="steps">
       <div class="step">
         <div class="step-n">1</div>
-        <h3>Contactez-nous</h3>
-        <p>Le formulaire ci-dessous suffit : nom de l'école, contact, nombre d'élèves. Nous configurons l'accès et vérifions l'éligibilité MANOLO.</p>
+        <h3>Ouvrez votre espace</h3>
+        <p>En un clic : nom de l'école, nombre d'élèves, connexion. Le test gratuit de 30 jours démarre, nous vérifions l'éligibilité MANOLO avec vous.</p>
       </div>
       <div class="step">
         <div class="step-n">2</div>
-        <h3>Nous créons les comptes</h3>
-        <p>Notre équipe crée directement les comptes de vos élèves et vous transmet les identifiants. Rien à configurer de votre côté.</p>
+        <h3>Créez vos classes</h3>
+        <p>Vous organisez vos classes depuis le tableau de bord et affectez vos enseignants. Chaque classe a son code d'invitation.</p>
       </div>
       <div class="step">
         <div class="step-n">3</div>
@@ -327,8 +327,8 @@
   </section>
 
   <section>
-    <h2>Une licence pour votre école primaire</h2>
-    <p>Dites-nous en un mot où en est votre école : nous revenons vers vous avec un devis adapté et vérifions votre éligibilité à la subvention MANOLO.</p>
+    <h2>Une question avant de commencer ?</h2>
+    <p>Écrivez-nous, nous répondons vite. Pour ouvrir votre espace, <a href="/ecoles/creer">c'est par ici</a>.</p>
     <p>Vous préférez essayer d'abord ? <a href="/cours-dactylographie">Parcourez les cours</a> ou faites <a href="/test-vitesse-frappe">le test de vitesse</a> gratuitement.</p>
 
     <form class="lform" id="licence-form" onsubmit="return submitLicenceForm(event)">
@@ -338,11 +338,11 @@
         <div class="f"><label for="lf-email">Votre email de contact</label><input type="email" id="lf-email" required placeholder="ex: direction@ecole.be"></div>
         <div class="f"><label for="lf-count">Nombre d'élèves concernés</label><input type="number" id="lf-count" required min="1" placeholder="ex: 45"></div>
         <div class="f"><label for="lf-message">Message <span style="font-weight:400">(optionnel)</span></label><textarea id="lf-message" placeholder="Niveau(x) concerné(s), délai souhaité, questions sur MANOLO…"></textarea></div>
-        <button type="submit" id="lf-submit">Envoyer la demande →</button>
+        <button type="submit" id="lf-submit">Envoyer ma question →</button>
       </div>
       <div class="ok" id="lf-ok">
         <div class="em" style="color:var(--accent)">✓</div>
-        <h3>Demande envoyée !</h3>
+        <h3>Question envoyée !</h3>
         <p>Merci pour votre intérêt. Nous revenons vers vous dans les plus brefs délais, MANOLO compris.</p>
       </div>
       <p class="fallback">Vous préférez l'email ? Écrivez-nous directement à <a href="mailto:contact@keypace.be">contact@keypace.be</a>.</p>
@@ -378,11 +378,11 @@
   <div class="wrap final-cta-inner">
     <div>
       <h2>Envie d'essayer avec votre école ?</h2>
-      <p>Réponse rapide, devis adapté, éligibilité MANOLO vérifiée.</p>
+      <p>Test gratuit de 30 jours, sans engagement. Prêt en un clic.</p>
     </div>
     <div class="final-cta-right">
       <img src="/images/keypace-pose-13.webp" width="633" height="960" alt="Mascotte KeyPace garçon, pouce levé" loading="lazy">
-      <a class="btn" href="#licence-form">Demander une démo gratuite →</a>
+      <a class="btn" href="/ecoles/creer">Ouvrir l'espace de mon école →</a>
     </div>
   </div>
 </div>
@@ -419,12 +419,12 @@ async function submitLicenceForm(e){
   try{
     const r=await fetch('/api/institutions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,count,message})});
     const d=await r.json();
-    if(!r.ok){errEl.textContent=d.error||'Erreur, réessaie.';errEl.style.display='block';btn.disabled=false;btn.textContent='Envoyer la demande →';return false;}
+    if(!r.ok){errEl.textContent=d.error||'Erreur, réessaie.';errEl.style.display='block';btn.disabled=false;btn.textContent='Envoyer ma question →';return false;}
     document.getElementById('lf-fields').style.display='none';
     document.getElementById('lf-ok').style.display='block';
   }catch(err){
     errEl.textContent='Erreur réseau, réessaie.';errEl.style.display='block';
-    btn.disabled=false;btn.textContent='Envoyer la demande →';
+    btn.disabled=false;btn.textContent='Envoyer ma question →';
   }
   return false;
 }

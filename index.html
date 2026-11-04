@@ -6809,7 +6809,7 @@ function mount(host){
    {id:'programmation-2',k:'pro',icon:'rocket',img:'images/keypace-mascot-bureau-complet.webp',cat:'Programmation',title:'Programmer : variables et conditions',short:'Variables, logigrammes, opérateurs logiques et langage de programmation.'},
    {id:'recherche-avancee',k:'num',icon:'keyboard',img:'images/keypace-mascot-books.webp',cat:'Outils numériques',title:'Les recherches avancées',short:'Opérateurs, options avancées et combinaisons de mots-clés.'},
    {id:'fiabilite',k:'num',icon:'eye',img:'images/keypace-mascot-idea.webp',cat:'Outils numériques',title:'Vérifier une source',short:'Repérer l’auteur, la date, l’URL et évaluer la fiabilité avec une grille.'},
-   {id:'tableur-formules',k:'num',icon:'table',img:'images/keypace-mascot-idea.webp',cat:'Outils numériques',title:'Tableur : formules et graphiques',short:'Lignes, colonnes, tri, formules, somme, moyenne et graphique.'},
+   {id:'tableur-formules',k:'num',icon:'table',img:'images/keypace-perso-tableur.webp',cat:'Outils numériques',title:'Tableur : formules et graphiques',short:'Lignes, colonnes, tri, formules, somme, moyenne et graphique.'},
    {id:'codage',k:'pro',icon:'rocket',img:'images/keypace-mascot-idea.webp',cat:'Programmation',title:'Coder en binaire',short:'Comprendre le binaire et coder un nombre ou une phrase.'},
    {id:'culture-numerique-2',k:'num',icon:'cap',img:'images/keypace-mascots-duo.webp',cat:'Outils numériques',title:'Culture numérique : histoire, écologie, accessibilité',short:'Histoire d’Internet, obsolescence programmée, impact écologique, accessibilité, fausses informations.'},
    {id:'partager',k:'num',icon:'mail',img:'images/keypace-perso-ecrire-a-plusieurs.webp',cat:'Outils numériques',title:'Partager un contenu en ligne',short:'Choisir l’outil et l’espace de stockage, régler qui peut voir et téléverser.'},
@@ -8892,6 +8892,50 @@ const app={
     },4500);
   },
 
+  // Bandeau d'essai : seulement pour un espace ouvert par l'établissement lui-même
+  // (self onboarding, voir api/institutions.js), à l'approche de la fin des 30 jours.
+  _trialBanner(etab){
+    const inst=etab&&etab.institution;
+    if(!inst||!inst.selfOnboarded||!inst.licenseExpiresAt)return '';
+    const days=Math.max(0,Math.ceil((new Date(inst.licenseExpiresAt)-Date.now())/86400000));
+    if(days>30)return '';
+    const end=new Date(inst.licenseExpiresAt).toLocaleDateString('fr-BE',{day:'numeric',month:'long',year:'numeric'});
+    return `<div style="background:#FFF1EC;border:1px solid #FFD3C6;border-radius:14px;padding:12px 18px;margin-bottom:22px;font-size:13.5px;line-height:1.5;color:var(--txt)"><b>Essai gratuit : ${days} jour${days!==1?'s':''} restant${days!==1?'s':''}</b> (jusqu'au ${end}). Ensuite, une facture vous est envoyée ; l'espace est mis en pause tant qu'elle n'est pas réglée.</div>`;
+  },
+
+  // Premier accès d'un compte établissement : un parcours guidé, une étape à la fois
+  // (fil vertical : étapes faites en orange, étape en cours mise en avant).
+  _etabWelcomeHTML(etab){
+    const inst=etab.institution||null;
+    const name=inst?this._esc(inst.name):'';
+    const trial=this._trialBanner(etab);
+    const node=(state,body)=>{
+      const dot=state==='done'
+        ?'<div style="position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px">✓</div>'
+        :state==='cur'
+          ?'<div style="position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--card);border:3px solid var(--accent);box-shadow:0 0 0 6px rgba(255,77,46,.14)"></div>'
+          :'<div style="position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--card);border:2px solid var(--border)"></div>';
+      return `<div style="position:relative;padding-left:52px">${dot}${body}</div>`;
+    };
+    const title=(txt,state)=>`<div style="font-weight:${state==='cur'?800:700};font-size:${state==='cur'?20:17}px;letter-spacing:-.02em;line-height:1.3;color:${state==='done'?'var(--muted)':(state==='todo'?'var(--muted)':'var(--txt)')}">${txt}</div>`;
+    const sub=txt=>`<div style="font-size:13.5px;color:var(--muted);line-height:1.55;margin-top:3px">${txt}</div>`;
+    return `
+      <div style="max-width:760px;margin:0 auto;padding:56px 24px 90px">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">Votre espace est prêt</div>
+        <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(30px,5vw,44px);letter-spacing:-0.035em;line-height:1.05;margin:0 0 12px">Bienvenue${name?', <span style="color:var(--accent)">'+name+'</span>':''}</h1>
+        <p style="font-size:16px;color:var(--muted);margin:0 0 26px;line-height:1.55">Voici la suite, une étape à la fois.</p>
+        ${trial}
+        <div style="position:relative;display:flex;flex-direction:column;gap:30px">
+          <div style="position:absolute;left:14px;top:14px;bottom:14px;width:2px;background:var(--border)"></div>
+          ${node('done',title("Espace de l'école créé",'done'))}
+          ${node('cur',`${title('Créez votre première classe','cur')}${sub("Donnez-lui un nom (ex. « 6e A »). Un code d'invitation unique est généré pour vos élèves.")}<button class="btn-primary" style="margin-top:14px;padding:11px 22px;font-size:14px" onclick="app.createClass()">+ Créer ma première classe</button>`)}
+          ${node('todo',`${title('Présentez KeyPace à vos élèves','todo')}<ol style="margin:8px 0 0;padding-left:20px;font-size:13.5px;color:var(--muted);line-height:1.6"><li>Donnez à chacun le code de la classe.</li><li>Dites-leur : on apprend à taper sans regarder, 15 à 20 minutes par jour.</li><li>Premier objectif : la position de base, F et J.</li></ol>`)}
+          ${node('todo',`${title('Lancez la première leçon','todo')}${sub("On démarre ensemble, puis chacun avance à son rythme. Vous suivez la progression ici, classe par classe.")}`)}
+          ${node('todo',`${title('Profitez de la subvention MANOLO','todo')}<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:8px"><img src="/images/keypace-manolo-eligible.png" alt="Éligible à la subvention MANOLO, Fédération Wallonie-Bruxelles" width="167" height="34" style="height:34px;width:auto"><span style="font-size:13.5px;color:var(--muted);line-height:1.55;flex:1;min-width:200px">Pour un établissement de la Fédération Wallonie-Bruxelles, la subvention peut prendre le coût en charge. Nous vérifions avec vous l'éligibilité de votre école et le montant applicable : <a href="mailto:contact@keypace.be?subject=Subvention%20MANOLO" style="color:var(--accent);font-weight:700">écrivez-nous</a>.</span></div>`)}
+        </div>
+      </div>`;
+  },
+
   _renderHomeEtab(){
     const etab=this.etab;
     if(!etab||!etab.loaded){
@@ -8916,6 +8960,12 @@ const app={
     const g=etab.global||{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null};
     const series=etab.series||[];
 
+    // Parcours guidé réservé aux espaces ouverts par self onboarding : les écoles
+    // déjà présentes (self_onboarded = false) gardent l'écran d'accueil habituel.
+    if(classes.length===0&&isAdmin()&&etab.institution&&etab.institution.selfOnboarded){
+      document.getElementById('page-home').innerHTML=this._etabWelcomeHTML(etab);
+      return;
+    }
     if(classes.length===0){
       document.getElementById('page-home').innerHTML=`
         <div style="max-width:760px;margin:0 auto;padding:56px 24px 80px">

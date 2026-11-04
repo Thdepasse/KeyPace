@@ -5,6 +5,7 @@ const { Resend } = require('resend');
 const crypto = require('crypto');
 const { setCorsOrigin } = require('./_cors');
 const { safeEqual } = require('./_auth');
+const { normalizeInput, slugify, trialEnd, TRIAL_DAYS } = require('./_self-onboard');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -148,6 +149,134 @@ function linkInviteEmail(url) {
 </body></html>`;
 }
 
+// ── Self onboarding : un établissement ouvre lui-même son espace d'essai ──
+// Crée l'établissement (essai de 30 jours via license_expires_at, ce qui
+// réutilise le blocage déjà en place quand la licence expire), puis une
+// invitation « admin » à usage unique. Le navigateur poursuit l'inscription du
+// premier compte avec ce token : même code que l'inscription actuelle
+// (api/register.js en e-mail + mot de passe, api/oauth.js pour Google et
+// Microsoft). Anti-abus : limite par IP et par adresse, champ piège, e-mail de
+// confirmation au gérant et copie à l'équipe pour vérifier que l'établissement
+// existe, puis facture à l'issue des 30 jours.
+function frDate(iso) {
+  return new Date(iso).toLocaleDateString('fr-BE', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function mailShell(inner) {
+  return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#faf9f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#16140F">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#faf9f5;padding:32px 12px"><tr><td align="center">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #E7E1D5;border-radius:28px;overflow:hidden">
+      <tr><td style="background:#FF4D2E;background-image:linear-gradient(135deg,#FF8A5C 0%,#FF4D2E 55%,#E8391D 100%);padding:24px 36px;font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.03em">KeyPace</td></tr>
+      ${inner}
+    </table>
+  </td></tr></table>
+</body></html>`;
+}
+
+function selfOnboardWelcomeEmail(name, endsAt, url) {
+  const n = escapeHtml(name);
+  return mailShell(`
+      <tr><td style="padding:32px 38px 6px">
+        <p style="margin:0 0 10px;font-size:24px;font-weight:800;letter-spacing:-0.03em;line-height:1.15">L'espace de ${n} est ouvert</p>
+        <p style="margin:0;font-size:15.5px;line-height:1.6;color:#4a4639">Votre test gratuit de ${TRIAL_DAYS} jours court jusqu'au <b>${escapeHtml(frDate(endsAt))}</b>. Il reste une étape : finaliser la création de votre compte.</p>
+      </td></tr>
+      <tr><td align="center" style="padding:22px 38px 8px">
+        <a href="${escapeHtml(url)}" style="display:inline-block;background:#FF4D2E;color:#ffffff;font-weight:800;font-size:16px;text-decoration:none;padding:15px 32px;border-radius:14px">Finaliser mon compte</a>
+      </td></tr>
+      <tr><td style="padding:18px 38px 6px;font-size:14px;line-height:1.6;color:#4a4639">
+        <p style="margin:0 0 10px">À l'issue des ${TRIAL_DAYS} jours, une facture vous est envoyée. L'espace est mis en pause tant qu'elle n'est pas réglée, rien n'est perdu.</p>
+        <p style="margin:0">Pour un établissement de la Fédération Wallonie-Bruxelles, la subvention MANOLO peut prendre ce coût en charge. Nous vérifions l'éligibilité avec vous : répondez simplement à ce mail.</p>
+      </td></tr>
+      <tr><td style="padding:22px 38px 26px;border-top:1px solid #E7E1D5;margin-top:18px;font-size:12px;line-height:1.6;color:#8A8275">Vous n'êtes pas à l'origine de cette demande ? Ignorez ce message, aucun compte ne sera créé sans votre action.</td></tr>`);
+}
+
+function selfOnboardInternalEmail(v, endsAt, inviteUrl) {
+  const row = (k, val) => `<tr><td style="padding:6px 0;border-bottom:1px solid #EDE9E1"><span style="font-size:13px;font-weight:700;color:#8A8275">${k}</span><br><span style="font-size:15px;font-weight:600;color:#16140F">${val}</span></td></tr>`;
+  return mailShell(`
+      <tr><td style="padding:28px 36px 6px">
+        <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#A39C8D;letter-spacing:.06em;text-transform:uppercase">Nouvel espace d'essai à vérifier</p>
+        <p style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.02em">${escapeHtml(v.name)}</p>
+      </td></tr>
+      <tr><td style="padding:16px 36px"><table width="100%" cellpadding="0" cellspacing="0" style="background:#F8F6F1;border-radius:14px;padding:16px 22px">
+        ${row('Gérant', `<a href="mailto:${escapeHtml(v.email)}" style="color:#FF4D2E;text-decoration:none">${escapeHtml(v.email)}</a>`)}
+        ${row("Nombre d'élèves", String(v.seatCount))}
+        ${row('Niveau et pays', `${escapeHtml(v.level)} · ${escapeHtml(v.country)}`)}
+        ${row("Fin de l'essai", escapeHtml(frDate(endsAt)))}
+      </table></td></tr>
+      <tr><td style="padding:0 36px 26px;font-size:13px;line-height:1.6;color:#4a4639">À faire : vérifier que l'établissement existe (répondre à ce mail écrit directement au gérant), puis facturer avant le ${escapeHtml(frDate(endsAt))}. Lien d'invitation, ne le partagez pas : ${escapeHtml(inviteUrl)}</td></tr>`);
+}
+
+async function selfOnboard(req, res) {
+  const body = req.body || {};
+  if (body.website) return res.json({ ok: true }); // champ piège anti-robot
+
+  const parsed = normalizeInput(body);
+  if (!parsed.ok) return res.status(400).json({ error: parsed.error });
+  const v = parsed.value;
+
+  // Limites : 3 créations/heure par IP, 1 création/24 h par adresse. Fermé par
+  // défaut si la base est indisponible (colonnes de migration absentes comprises).
+  const ip = clientIp(req);
+  const since = (ms) => encodeURIComponent(new Date(Date.now() - ms).toISOString());
+  const byIp = await sb(`/institutions?onboarding_ip=eq.${encodeURIComponent(ip)}&created_at=gte.${since(3600e3)}&select=id`);
+  const byEmail = await sb(`/institutions?contact_email=eq.${encodeURIComponent(v.email)}&created_at=gte.${since(24 * 3600e3)}&select=id`);
+  if (!byIp.ok || !byEmail.ok) return res.status(503).json({ error: 'Service momentanément indisponible. Réessaie dans un instant.' });
+  if (byIp.data.length >= 3) return res.status(429).json({ error: 'Trop de demandes depuis ce réseau. Réessaie plus tard.' });
+  if (byEmail.data.length >= 1) return res.status(409).json({ error: 'Un espace a déjà été ouvert avec cette adresse. Vérifie ta boîte mail, ou écris-nous à contact@keypace.be.' });
+
+  const endsAt = trialEnd();
+  let institution = null;
+  for (let i = 0; i < 5 && !institution; i++) {
+    const slug = `${slugify(v.name)}-${crypto.randomBytes(2).toString('hex')}`;
+    const create = await sb('/institutions', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: v.name,
+        slug,
+        // Colonne obligatoire mais sans usage pour l'accès : valeur aléatoire.
+        password_hash: crypto.randomBytes(32).toString('hex'),
+        seat_count: v.seatCount,
+        license_expires_at: endsAt,
+        contact_email: v.email,
+        level: v.level,
+        country: v.country,
+        self_onboarded: true,
+        onboarding_ip: ip,
+      }),
+    });
+    if (create.ok && create.data && create.data[0]) institution = create.data[0];
+    else if (create.status !== 409) break; // 409 = slug déjà pris, on retente avec un autre suffixe
+  }
+  if (!institution) return res.status(500).json({ error: "Impossible d'ouvrir l'espace pour le moment. Réessaie, ou écris-nous à contact@keypace.be." });
+
+  let token = null;
+  for (let i = 0; i < 5 && !token; i++) {
+    const t = genInviteToken();
+    const r = await sb('/prof_invites', {
+      method: 'POST',
+      body: JSON.stringify({ institution_id: institution.id, email: v.email, token: t, role: 'admin' }),
+    });
+    if (r.ok && r.data && r.data[0]) token = t;
+  }
+  if (!token) return res.status(500).json({ error: "Impossible d'ouvrir l'espace pour le moment. Réessaie, ou écris-nous à contact@keypace.be." });
+
+  // E-mails non bloquants : l'espace est créé même si l'envoi échoue.
+  if (RESEND_API_KEY) {
+    const inviteUrl = `${APP_URL}/?prof=${token}`;
+    const resend = new Resend(RESEND_API_KEY);
+    try {
+      await resend.emails.send({ from: FROM_EMAIL, to: v.email, replyTo: 'contact@keypace.be', subject: `L'espace de ${v.name} est ouvert pour ${TRIAL_DAYS} jours`, html: selfOnboardWelcomeEmail(v.name, endsAt, inviteUrl) });
+    } catch (e) { console.error('self-onboard welcome email error:', e.message || e); }
+    try {
+      await resend.emails.send({ from: FROM_EMAIL, to: 'contact@keypace.be', replyTo: v.email, subject: `Nouvel espace d'essai : ${v.name} (${v.seatCount} élèves)`, html: selfOnboardInternalEmail(v, endsAt, inviteUrl) });
+    } catch (e) { console.error('self-onboard internal email error:', e.message || e); }
+  }
+
+  return res.status(201).json({ ok: true, inviteToken: token, name: institution.name, trialEndsAt: endsAt });
+}
+
 module.exports = async function handler(req, res) {
   setCorsOrigin(req, res);
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -254,6 +383,9 @@ module.exports = async function handler(req, res) {
     if (error) { console.error('send-link error:', error.message || error); return res.status(502).json({ error: "Impossible d'envoyer l'email. Réessaie." }); }
     return res.json({ ok: true });
   }
+
+  // POST action=self-onboard → un établissement ouvre lui-même son espace d'essai
+  if (req.body && req.body.action === 'self-onboard') return selfOnboard(req, res);
 
   // POST action=contact → formulaire de contact licence
   const { name, email, count, message } = req.body || {};

@@ -180,7 +180,11 @@ async function teacherOverview(req, res) {
   // places restantes et l'échéance de licence, sans quoi il ne le découvre
   // qu'au moment où une inscription échoue.
   if (user.institution_id) {
-    const instR = await sb(`/institutions?id=eq.${user.institution_id}&select=name,seat_count,license_expires_at`);
+    // self_onboarded : espace d'essai ouvert par l'établissement lui-même (voir
+    // api/institutions.js). Si la migration n'est pas encore passée, la colonne
+    // n'existe pas : on relit sans elle plutôt que de casser le tableau de bord.
+    let instR = await sb(`/institutions?id=eq.${user.institution_id}&select=name,seat_count,license_expires_at,self_onboarded`);
+    if (!instR.ok) instR = await sb(`/institutions?id=eq.${user.institution_id}&select=name,seat_count,license_expires_at`);
     const institution = instR.data && instR.data[0];
     if (institution) {
       const seatsUsedR = await sb(`/users?institution_id=eq.${user.institution_id}&role=eq.eleve&archived=eq.false&select=id`);
@@ -189,6 +193,7 @@ async function teacherOverview(req, res) {
         seatCount: institution.seat_count,
         seatsUsed: Array.isArray(seatsUsedR.data) ? seatsUsedR.data.length : 0,
         licenseExpiresAt: institution.license_expires_at,
+        selfOnboarded: !!institution.self_onboarded,
       };
     }
   }
