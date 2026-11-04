@@ -131,6 +131,58 @@ async function run(opts = {}) {
       info.shotBytes = bytes;
       if (bytes < 15000) problems.push(`BR5 : la capture d'écran est quasi vide (${bytes} octets)`);
       if (opts.screenshotDir) { fs.mkdirSync(opts.screenshotDir, { recursive: true }); fs.writeFileSync(path.join(opts.screenshotDir, 'lessons.png'), Buffer.from(shot.data, 'base64')); }
+
+      // BR6 : l'espace pays et langue (drapeau, en haut à droite), au bureau puis sur téléphone
+      try {
+        // page neuve, visiteur non connecté (BR4 a simulé une connexion et une fenêtre peut être ouverte)
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2500); exceptions.splice(0);
+        for (const [w, h, label] of [[1280, 900, 'bureau'], [375, 800, 'fenêtre étroite']]) {
+          await S('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: w < 700 });
+          await ev("go('home');localStorage.removeItem('kp_region');localStorage.removeItem('kp_lang');true"); await sleep(400);
+          const geo = await ev(`(()=>{const b=document.getElementById('nav-region-btn');if(!b)return null;const r=b.getBoundingClientRect(),g=[...document.querySelectorAll('#nav-guest,#nav-logged')].map(x=>x.getBoundingClientRect()).filter(x=>x.width>0)[0]||{left:1e9},m=document.getElementById('nav-region-menu');
+            return{x:r.x,right:r.right,w:r.width,h:r.height,guestLeft:g.left,menuHidden:m.hidden,flag:!!b.querySelector('svg'),expanded:b.getAttribute('aria-expanded'),label:b.getAttribute('aria-label')}})()`);
+          if (!geo) { problems.push(`BR6 (${label}) : bouton pays et langue absent`); continue; }
+          if (!geo.w || !geo.h) problems.push(`BR6 (${label}) : bouton invisible`);
+          if (geo.right > w) problems.push(`BR6 (${label}) : bouton hors de l'écran (${Math.round(geo.right)} px sur ${w})`);
+          if (label === 'bureau' && geo.x < w / 2) problems.push('BR6 : le drapeau n\'est pas dans la moitié droite de l\'écran');
+          if (label === 'bureau' && geo.right > geo.guestLeft) problems.push('BR6 : le drapeau chevauche les boutons de connexion');
+          if (!geo.flag) problems.push(`BR6 (${label}) : pas de drapeau dessiné`);
+          if (!geo.menuHidden || geo.expanded !== 'false') problems.push(`BR6 (${label}) : menu ouvert au chargement`);
+          if (!/Belgique/.test(geo.label || '')) problems.push(`BR6 (${label}) : libellé sans « Belgique » (${geo.label})`);
+          // l'en-tête ne doit pas casser : pas de défilement horizontal, boutons sur une seule ligne
+          const navOk = await ev(`(()=>{const s=document.querySelector('.nav-signup-btn'),r=s&&s.getBoundingClientRect();return{overflow:document.documentElement.scrollWidth-window.innerWidth,signupH:r?Math.round(r.height):0,signupRight:r?Math.round(r.right):0}})()`);
+          if (navOk.overflow > 0) problems.push(`BR6 (${label}) : l'en-tête fait défiler la page horizontalement (${navOk.overflow} px)`);
+          if (navOk.signupH > 42) problems.push(`BR6 (${label}) : « Créer un compte » passe sur plusieurs lignes (${navOk.signupH} px de haut)`);
+          await ev("document.getElementById('nav-region-btn').click();true"); await sleep(150);
+          const open = await ev(`(()=>{const m=document.getElementById('nav-region-menu'),r=m.getBoundingClientRect();return{hidden:m.hidden,text:m.innerText,left:r.left,right:r.right,expanded:document.getElementById('nav-region-btn').getAttribute('aria-expanded')}})()`);
+          if (open.hidden || open.expanded !== 'true') problems.push(`BR6 (${label}) : le clic n'ouvre pas le menu`);
+          if (!/Belgique/.test(open.text) || !/Français/.test(open.text)) problems.push(`BR6 (${label}) : le menu ne propose pas Belgique et Français (${open.text.replace(/\s+/g, ' ').slice(0, 80)})`);
+          if (open.left < 0 || open.right > w) problems.push(`BR6 (${label}) : le menu déborde de l'écran (${Math.round(open.left)} à ${Math.round(open.right)} sur ${w})`);
+          await S('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+          await S('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
+          await sleep(100);
+          if (!(await ev("document.getElementById('nav-region-menu').hidden"))) problems.push(`BR6 (${label}) : Échap ne ferme pas le menu`);
+          await ev("document.getElementById('nav-region-btn').click();true"); await sleep(100);
+          await ev("document.querySelector('#nav-region-menu .nav-region-item[aria-checked=\"true\"]').click();true"); await sleep(100);
+          const picked = await ev("({hidden:document.getElementById('nav-region-menu').hidden,region:localStorage.getItem('kp_region'),lang:localStorage.getItem('kp_lang'),focus:document.activeElement&&document.activeElement.id})");
+          if (!picked.hidden) problems.push(`BR6 (${label}) : le menu reste ouvert après un choix`);
+          if (picked.region !== 'be' || picked.lang !== 'fr') problems.push(`BR6 (${label}) : le choix n'est pas gardé (${picked.region}/${picked.lang})`);
+          if (picked.focus === 'nav-region-btn') problems.push(`BR6 (${label}) : le bouton garde le focus après un clic (la barre d'espace rouvrirait le menu)`);
+          // une vraie barre d'espace après un choix ne doit pas rouvrir le menu
+          await S('Input.dispatchKeyEvent', { type: 'keyDown', key: ' ', code: 'Space', text: ' ', windowsVirtualKeyCode: 32 });
+          await S('Input.dispatchKeyEvent', { type: 'keyUp', key: ' ', code: 'Space', windowsVirtualKeyCode: 32 });
+          await sleep(100);
+          if (!(await ev("document.getElementById('nav-region-menu').hidden"))) problems.push(`BR6 (${label}) : la barre d'espace rouvre le menu`);
+          exceptions.splice(0).forEach((e) => problems.push(`BR6 (${label}) : exception : ${e}`));
+          if (opts.screenshotDir) { await ev("document.getElementById('nav-region-btn').click();true"); await sleep(150); const sh = await S('Page.captureScreenshot', { format: 'png' }); fs.mkdirSync(opts.screenshotDir, { recursive: true }); fs.writeFileSync(path.join(opts.screenshotDir, `region-${label}.png`), Buffer.from(sh.data, 'base64')); await ev("kpCloseRegion(false);true"); }
+        }
+        // vraie version téléphone (écran tactile étroit sans clavier) : l'espace pays et langue n'y apparaît pas ; il revient au retour au bureau
+        const hid = await ev("(()=>{const real=isMobileLayout;isMobileLayout=()=>true;applyMobileNav();const hidden=getComputedStyle(document.getElementById('nav-region')).display==='none';isMobileLayout=()=>false;applyMobileNav();const back=getComputedStyle(document.getElementById('nav-region')).display!=='none';isMobileLayout=real;return{hidden,back}})()");
+        if (!hid.hidden) problems.push('BR6 : l\'espace pays et langue apparaît sur la version téléphone');
+        if (!hid.back) problems.push('BR6 : l\'espace pays et langue ne revient pas hors version téléphone');
+        await S('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+        info.region = 'ok';
+      } catch (e) { problems.push(`BR6 : ${e.message}`); }
     }
   } catch (e) { problems.push(`navigateur : ${e.message}`); }
   finally { if (b) b.close(); server.close(); }

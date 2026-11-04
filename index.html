@@ -707,6 +707,21 @@ a.nav-link{text-decoration:none;display:inline-block}
    de clavier — c'était le cas jusqu'ici. */
 .nav-guest-settings{width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:none;border:1.5px solid var(--border);border-radius:10px;color:var(--txt);font-size:16px;cursor:pointer;transition:border-color .15s,color .15s}
 .nav-guest-settings:hover{border-color:var(--accent);color:var(--accent)}
+/* Espace pays et langue (en haut à droite) : drapeau du pays choisi, menu pays + langue. Aujourd'hui la Belgique seule. */
+.nav-region{position:relative;flex-shrink:0;margin-right:8px}
+.nav-region-btn{height:34px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;background:none;border:1.5px solid var(--border);border-radius:10px;color:var(--txt);font:inherit;font-size:13px;cursor:pointer;transition:border-color .15s,color .15s}
+.nav-region-btn:hover,.nav-region-btn[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.nav-region-flag{display:inline-flex;width:22px;height:15px;border-radius:3px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.nav-region-flag svg{width:100%;height:100%;display:block}
+.nav-region-menu{position:absolute;right:0;top:calc(100% + 8px);width:min(280px,calc(100vw - 24px));background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;box-shadow:0 12px 32px rgba(0,0,0,.14);z-index:60}
+.nav-region-menu[hidden]{display:none}
+.nav-region-title{font-size:11px;color:var(--muted);padding:6px 10px 4px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.nav-region-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;padding:9px 10px;border-radius:8px;font:inherit;font-size:14px;color:var(--txt);cursor:pointer}
+.nav-region-item:hover,.nav-region-item:focus-visible{background:var(--light);outline:none}
+.nav-region-item[aria-checked="true"]{font-weight:700}
+.nav-region-item .nav-region-tick{margin-left:auto;color:var(--accent);visibility:hidden}
+.nav-region-item[aria-checked="true"] .nav-region-tick{visibility:visible}
+.nav-region-note{font-size:12px;color:var(--muted);padding:8px 10px 4px;line-height:1.4}
 .nav-login-btn:hover{background:var(--light)}
 .nav-signup-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 12px rgba(255,77,46,0.26)}
 /* logged-in nav */
@@ -2582,8 +2597,13 @@ footer{border-top:1px solid var(--border);margin-top:10px}
   #apercu-menu{position:static!important;box-shadow:none;border:none;padding:0 0 0 8px;min-width:0;margin-top:2px}
   .nav-dropdown{position:static!important;flex-direction:column;align-items:stretch;width:100%}
   .nav-dropdown-menu{position:static!important;display:flex!important;flex-direction:column;box-shadow:none;border:none;padding:0 0 4px 14px;min-width:0}
+  /* espace pays et langue : le menu occupe la largeur de l'écran (le bouton n'est plus au bord droit) */
+  .nav-region{position:static;margin-right:0}
+  .nav-region-btn{padding:0 7px;gap:0}.nav-region-btn>span:last-child{display:none}
+  .nav-guest-settings{width:32px;height:32px}
+  .nav-region-menu{position:fixed;left:12px;right:12px;top:62px;width:auto}
   .nav-login-btn{display:none}
-  .nav-signup-btn{font-size:13px;padding:8px 12px}
+  .nav-signup-btn{font-size:13px;padding:8px 10px;white-space:nowrap}
   .nav-upgrade-btn{font-size:12px;padding:5px 8px}
   .nav-username{display:none}
   .nav-logout{display:none}/* déconnexion accessible via l'avatar -> Réglages */
@@ -2862,6 +2882,10 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       </div>
     </div>
     <div class="nav-spacer"></div>
+    <div class="nav-region" id="nav-region">
+      <button type="button" class="nav-region-btn" id="nav-region-btn" aria-haspopup="true" aria-expanded="false" aria-controls="nav-region-menu" onclick="kpToggleRegion(event)"><span class="nav-region-flag" id="nav-region-flag" aria-hidden="true"></span><span aria-hidden="true">▾</span></button>
+      <div class="nav-region-menu" id="nav-region-menu" role="dialog" aria-label="Pays et langue" hidden></div>
+    </div>
     <div id="nav-guest" style="display:flex;gap:8px;align-items:center">
       <button class="nav-guest-settings" onclick="app.openSettings()" aria-label="Réglages" title="Réglages (clavier, sons…)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em" style="vertical-align:-0.15em;flex-shrink:0"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="10"/><line x1="9" y1="10" x2="9" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="15" y1="10" x2="15" y2="10"/><line x1="18" y1="10" x2="18" y2="10"/><line x1="7" y1="14" x2="17" y2="14"/></svg></button>
       <button class="nav-login-btn" onclick="openAuth()">Se connecter</button>
@@ -3774,6 +3798,8 @@ const VIEW_FROM_PATH=Object.fromEntries(Object.entries(VIEW_PATHS).map(([v,p])=>
 function normPath(p){return p.length>1?p.replace(/\/+$/,''):p;}
 const MOBILE_BLOCKED_VIEWS=['test','testtime','testchoix','lessons','games'];
 function applyMobileNav(){
+  // Version téléphone : pas d'espace pays et langue pour l'instant (la page d'accueil réduite reste telle quelle).
+  const rg=document.getElementById('nav-region');if(rg)rg.style.display=isMobileLayout()?'none':'';
   if(!isMobileLayout())return;
   ['nav-test-wrap','nav-lessons','nav-games'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='none';});
   const ap=document.getElementById('nav-apercu');if(ap)ap.style.display='none'; // mène à test/cours/jeux
@@ -3798,6 +3824,55 @@ window.addEventListener('resize',()=>{
   updateNavUser();
   if(typeof app!=='undefined'&&app.renderView)app.renderView(app.view||'home');
 });
+/* ── Pays et langue (espace drapeau, en haut à droite) ──
+   Aujourd'hui : la Belgique, en français. Le registre est fait pour plusieurs pays, chacun avec ses langues : ajouter une entrée
+   à KP_REGIONS suffit à la faire apparaître. Le choix est gardé sur cet appareil (kp_region, kp_lang), rien n'est envoyé au serveur. */
+const KP_REGIONS=[
+  {id:'be',name:'Belgique',langs:[{id:'fr',name:'Français'}],
+   flag:'<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg" focusable="false"><rect width="1" height="2" fill="#000"/><rect x="1" width="1" height="2" fill="#FAE042"/><rect x="2" width="1" height="2" fill="#ED2939"/></svg>'}
+];
+function kpStoreGet(k){try{return localStorage.getItem(k);}catch{return null;}}
+function kpRegionId(){const v=kpStoreGet('kp_region');return KP_REGIONS.some(r=>r.id===v)?v:KP_REGIONS[0].id;}
+function kpRegionObj(){return KP_REGIONS.find(r=>r.id===kpRegionId())||KP_REGIONS[0];}
+function kpLangId(){const r=kpRegionObj(),v=kpStoreGet('kp_lang');return r.langs.some(l=>l.id===v)?v:r.langs[0].id;}
+function kpSetRegion(id,lang){
+  const r=KP_REGIONS.find(x=>x.id===id);if(!r)return false;
+  const l=r.langs.some(x=>x.id===lang)?lang:r.langs[0].id;
+  try{localStorage.setItem('kp_region',r.id);localStorage.setItem('kp_lang',l);}catch{}
+  kpRegionRender();
+  try{window.dispatchEvent(new CustomEvent('kp:region',{detail:{region:r.id,lang:l}}));}catch{}
+  return true;
+}
+function kpRegionRender(){
+  const btn=document.getElementById('nav-region-btn'),fl=document.getElementById('nav-region-flag'),menu=document.getElementById('nav-region-menu');
+  if(!btn||!fl||!menu)return;
+  const r=kpRegionObj(),lang=kpLangId(),ln=(r.langs.find(l=>l.id===lang)||r.langs[0]).name;
+  fl.innerHTML=r.flag;
+  btn.setAttribute('aria-label','Pays et langue : '+r.name+', '+ln);
+  btn.title='Pays et langue : '+r.name+', '+ln;
+  const item=(on,inner,onclick)=>'<button type="button" role="menuitemradio" aria-checked="'+(on?'true':'false')+'" class="nav-region-item" onclick="'+onclick+'">'+inner+'<span class="nav-region-tick" aria-hidden="true">✓</span></button>';
+  menu.innerHTML='<div class="nav-region-title">Pays</div>'
+    +KP_REGIONS.map(x=>item(x.id===r.id,'<span class="nav-region-flag" aria-hidden="true">'+x.flag+'</span><span>'+x.name+'</span>',"kpSetRegion('"+x.id+"');kpCloseRegion(false)")).join('')
+    +'<div class="nav-region-title">Langue</div>'
+    +r.langs.map(l=>item(l.id===lang,'<span>'+l.name+'</span>',"kpSetRegion('"+r.id+"','"+l.id+"');kpCloseRegion(false)")).join('')
+    +'<div class="nav-region-note">D\'autres pays et langues arrivent bientôt.</div>';
+}
+function kpToggleRegion(e){
+  if(e)e.stopPropagation();
+  const btn=document.getElementById('nav-region-btn'),menu=document.getElementById('nav-region-menu');if(!btn||!menu)return;
+  if(!menu.hidden){kpCloseRegion(false);return;}
+  kpRegionRender();menu.hidden=false;btn.setAttribute('aria-expanded','true');
+  const first=menu.querySelector('.nav-region-item[aria-checked="true"]')||menu.querySelector('.nav-region-item');if(first)first.focus();
+}
+function kpCloseRegion(refocus){
+  const btn=document.getElementById('nav-region-btn'),menu=document.getElementById('nav-region-menu');if(!btn||!menu)return;
+  menu.hidden=true;btn.setAttribute('aria-expanded','false');
+  // Après un clic, on ne garde le focus nulle part : sinon la barre d'espace d'un test de frappe rouvrirait le menu. Échap le rend au bouton.
+  if(refocus===true)btn.focus();else if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+}
+document.addEventListener('click',e=>{const r=document.getElementById('nav-region');if(r&&!r.contains(e.target))kpCloseRegion(false);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('nav-region-menu');if(m&&!m.hidden){e.stopPropagation();kpCloseRegion(true);}}},true);
+kpRegionRender();
 function toggleApercu(e){if(e)e.stopPropagation();const m=document.getElementById('apercu-menu');if(m)m.style.display=m.style.display==='block'?'none':'block';}
 function closeApercu(){const m=document.getElementById('apercu-menu');if(m)m.style.display='none';}
 function toggleNavMenu(e){if(e)e.stopPropagation();document.querySelector('.nav-links')?.classList.toggle('open');}

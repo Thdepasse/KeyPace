@@ -343,4 +343,30 @@ function u10(update) {
   return JSON.stringify(now) === JSON.stringify(b.qwertyCourseTolerance) ? { ok: true, detail: sum } : { ok: false, detail: `les leçons qui exigent les accents tolérés ont changé (${sum}). Si voulu et relu : npm run gates -- --update-baseline` };
 }
 const kpBase = (c) => (c && c.length === 1 ? (c.normalize('NFD').replace(/[\u0300-\u036f]/g, '').length === 1 && /[a-zA-Z]/.test(c.normalize('NFD').replace(/[\u0300-\u036f]/g, '')) ? c.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : c) : c);
-module.exports = { u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
+
+// U11 : espace pays et langue (drapeau). Registre valide, valeurs par défaut (Belgique, français), repli si la valeur gardée est inconnue,
+// un choix est conservé sur l'appareil et rien n'est envoyé au serveur. Le rendu réel est vérifié par la gate B1 (BR6).
+function u11() {
+  const errs = []; const h = loadApp();
+  const reg = JSON.parse(h.run('JSON.stringify(KP_REGIONS.map(r=>({id:r.id,name:r.name,flag:r.flag,langs:r.langs})))'));
+  if (!reg.length) errs.push('registre vide');
+  const ids = new Set();
+  for (const r of reg) {
+    if (!/^[a-z]{2}$/.test(r.id)) errs.push(`région « ${r.id} » : identifiant invalide`);
+    if (ids.has(r.id)) errs.push(`région ${r.id} en double`); ids.add(r.id);
+    if (!r.name) errs.push(`région ${r.id} sans nom`);
+    if (!/^<svg[\s\S]*<\/svg>$/.test(r.flag) || /<script|onload|onerror|javascript:/i.test(r.flag)) errs.push(`région ${r.id} : drapeau SVG absent ou suspect`);
+    if (!r.langs.length || r.langs.some((l) => !/^[a-z]{2,3}$/.test(l.id) || !l.name)) errs.push(`région ${r.id} : langues invalides`);
+    if (/—/.test(JSON.stringify(r))) errs.push(`région ${r.id} : tiret cadratin dans un texte du site`);
+  }
+  if (h.run('kpRegionId()') !== 'be' || h.run('kpLangId()') !== 'fr') errs.push('défaut attendu : Belgique, français');
+  h.run("localStorage.setItem('kp_region','zz');localStorage.setItem('kp_lang','xx');");
+  if (h.run('kpRegionId()') !== 'be' || h.run('kpLangId()') !== 'fr') errs.push('une valeur gardée inconnue ne retombe pas sur le défaut');
+  h.fetchCalls.length = 0;
+  if (!h.run("kpSetRegion('be','fr')") || h.run("localStorage.getItem('kp_region')") !== 'be' || h.run("localStorage.getItem('kp_lang')") !== 'fr') errs.push('le choix Belgique/français n\'est pas gardé');
+  if (h.run("kpSetRegion('zz')")) errs.push('une région inconnue est acceptée');
+  h.run("kpSetRegion('be','nl')"); if (h.run("localStorage.getItem('kp_lang')") !== 'fr') errs.push('une langue que la région ne propose pas est acceptée');
+  if (h.fetchCalls.length) errs.push('le choix du pays envoie quelque chose au serveur');
+  return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: `${reg.length} pays (${reg.map((r) => r.id + ' : ' + r.langs.map((l) => l.id).join('/')).join(', ')}), défaut Belgique/français, repli sûr, rien envoyé` };
+}
+module.exports = { u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
