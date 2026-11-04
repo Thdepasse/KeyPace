@@ -729,6 +729,49 @@ a.nav-link{text-decoration:none;display:inline-block}
 .nav-region-item[aria-checked="true"]{font-weight:700}
 .nav-region-item .nav-region-tick{margin-left:auto;color:var(--accent);visibility:hidden}
 .nav-region-item[aria-checked="true"] .nav-region-tick{visibility:visible}
+.nav-kb-btn{max-width:210px}
+.nav-login-btn,.nav-signup-btn,.nav-upgrade-btn,.nav-logout,.nav-plan-badge{white-space:nowrap}
+.kb-logged .nav-kb-btn #nav-kb-text{display:none}
+/* compte connecté : l'en-tête contient déjà le badge de plan, le nom, l'avatar et les boutons ; pour que le drapeau et la pastille tiennent, le nom
+   (déjà dans l'avatar et dans ses réglages) et les petites flèches disparaissent */
+.kb-logged .nav-username{display:none}
+.kb-logged .nav-region-btn>span:last-child{display:none}
+.kb-logged .nav-region-btn{gap:0;padding:0 8px}
+@media(min-width:1181px){.kb-logged .nav-inner{gap:14px}}
+/* petits écrans de bureau, compte connecté : comme sur téléphone, la déconnexion se fait depuis l'avatar (réglages) et le badge de plan se masque */
+@media(min-width:769px) and (max-width:1000px){.kb-logged .nav-logout,.kb-logged .nav-plan-badge{display:none}}
+/* en-tête chargé : la variante disparaît d'abord, puis le texte (il reste l'icône ; le nom complet est dans l'infobulle et pour les lecteurs d'écran) */
+@media(max-width:1480px){.nav-kb-btn .kbc-var{display:none}}
+@media(max-width:1200px){.nav-kb-btn #nav-kb-text{display:none}}
+/* écrans entre téléphone et grand bureau : l'en-tête se resserre pour que le drapeau et la pastille tiennent sans faire défiler la page */
+@media(min-width:769px) and (max-width:1180px){
+  .kb-logged .nav-username{display:none}
+  .nav-inner{gap:10px;padding:12px 14px}
+  .nav-link{padding:7px 8px;font-size:14px}
+  .nav-region{margin-right:0}
+  .nav-region-btn{padding:0 8px}
+  .nav-login-btn{padding:7px 10px}
+  .nav-signup-btn{padding:8px 12px}
+}
+/* tablette en portrait avec clavier (769 à 900 px) : l'en-tête débordait déjà, le nom du logo se masque (l'icône reste) */
+@media(min-width:769px) and (max-width:900px){
+  .nav-logo-name{display:none}
+  .nav-link{padding:7px 6px;font-size:13.5px}
+  .nav-links{gap:2px}
+}
+@media(min-width:769px) and (max-width:860px){
+  .nav-inner{gap:6px;padding:10px}
+  .nav-link{padding:7px 4px;font-size:13px}
+  .nav-region-btn>span:last-child{display:none}
+  .nav-region-btn{padding:0 7px;gap:0}
+  .nav-login-btn{padding:6px 8px;font-size:13px}
+  .nav-signup-btn{padding:8px 10px;font-size:13px}
+}
+.nav-kb-btn #nav-kb-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.nav-kb-menu{width:min(330px,calc(100vw - 24px))}
+.kbc-variants{display:flex;flex-wrap:wrap;gap:6px;padding:4px 8px 6px}
+.kbc-variants .settings-btn{font-size:13px;padding:6px 10px}
+.nav-kb-menu .kb-family-cards{padding:4px 8px}
 .nav-region-note{font-size:12px;color:var(--muted);padding:8px 10px 4px;line-height:1.4}
 .nav-login-btn:hover{background:var(--light)}
 .nav-signup-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 12px rgba(255,77,46,0.26)}
@@ -2894,8 +2937,11 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <button type="button" class="nav-region-btn" id="nav-region-btn" aria-haspopup="true" aria-expanded="false" aria-controls="nav-region-menu" onclick="kpToggleRegion(event)"><span class="nav-region-flag" id="nav-region-flag" aria-hidden="true"></span><span aria-hidden="true">▾</span></button>
       <div class="nav-region-menu" id="nav-region-menu" role="dialog" aria-label="Pays et langue" hidden></div>
     </div>
+    <div class="nav-region nav-kb" id="nav-kb">
+      <button type="button" class="nav-region-btn nav-kb-btn" id="nav-kb-btn" aria-haspopup="true" aria-expanded="false" aria-controls="nav-kb-menu" onclick="kpToggleKbChip(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true" style="flex-shrink:0"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M9 10h.01M12 10h.01M15 10h.01M18 10h.01M7 14h10"/></svg><span id="nav-kb-text"></span><span aria-hidden="true">▾</span></button>
+      <div class="nav-region-menu nav-kb-menu" id="nav-kb-menu" role="dialog" aria-label="Mon clavier" hidden></div>
+    </div>
     <div id="nav-guest" style="display:flex;gap:8px;align-items:center">
-      <button class="nav-guest-settings" onclick="app.openSettings()" aria-label="Réglages" title="Réglages (clavier, sons…)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em" style="vertical-align:-0.15em;flex-shrink:0"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="10"/><line x1="9" y1="10" x2="9" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="15" y1="10" x2="15" y2="10"/><line x1="18" y1="10" x2="18" y2="10"/><line x1="7" y1="14" x2="17" y2="14"/></svg></button>
       <button class="nav-login-btn" onclick="openAuth()">Se connecter</button>
       <button class="nav-signup-btn" onclick="openAuth('register')">Créer un compte</button>
     </div>
@@ -3727,6 +3773,7 @@ function logout(){
 
 function updateNavUser(){
   kpRefreshOffered();kpFetchAccess().catch(()=>{});
+  document.body.classList.toggle('kb-logged',!!currentUser); // en-tête d'un compte connecté : plus chargé, la pastille clavier se réduit à son icône
   const guest=document.getElementById('nav-guest');
   const logged=document.getElementById('nav-logged');
   if(!currentUser){
@@ -3809,6 +3856,7 @@ const MOBILE_BLOCKED_VIEWS=['test','testtime','testchoix','lessons','games'];
 function applyMobileNav(){
   // Version téléphone : pas d'espace pays et langue pour l'instant (la page d'accueil réduite reste telle quelle).
   const rg=document.getElementById('nav-region');if(rg)rg.style.display=isMobileLayout()?'none':'';
+  const kc=document.getElementById('nav-kb');if(kc)kc.style.display=isMobileLayout()?'none':'';
   if(!isMobileLayout())return;
   ['nav-test-wrap','nav-lessons','nav-games'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='none';});
   const ap=document.getElementById('nav-apercu');if(ap)ap.style.display='none'; // mène à test/cours/jeux
@@ -3870,6 +3918,7 @@ function kpToggleRegion(e){
   if(e)e.stopPropagation();
   const btn=document.getElementById('nav-region-btn'),menu=document.getElementById('nav-region-menu');if(!btn||!menu)return;
   if(!menu.hidden){kpCloseRegion(false);return;}
+  if(typeof kpCloseKbChip==='function')kpCloseKbChip(false);
   kpRegionRender();menu.hidden=false;btn.setAttribute('aria-expanded','true');
   const first=menu.querySelector('.nav-region-item[aria-checked="true"]')||menu.querySelector('.nav-region-item');if(first)first.focus();
 }
@@ -3879,8 +3928,8 @@ function kpCloseRegion(refocus){
   // Après un clic, on ne garde le focus nulle part : sinon la barre d'espace d'un test de frappe rouvrirait le menu. Échap le rend au bouton.
   if(refocus===true)btn.focus();else if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
 }
-document.addEventListener('click',e=>{const r=document.getElementById('nav-region');if(r&&!r.contains(e.target))kpCloseRegion(false);});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('nav-region-menu');if(m&&!m.hidden){e.stopPropagation();kpCloseRegion(true);}}},true);
+document.addEventListener('click',e=>{const r=document.getElementById('nav-region');if(r&&!r.contains(e.target))kpCloseRegion(false);const k=document.getElementById('nav-kb');if(k&&!k.contains(e.target))kpCloseKbChip(false);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('nav-region-menu');if(m&&!m.hidden){e.stopPropagation();kpCloseRegion(true);return;}const k=document.getElementById('nav-kb-menu');if(k&&!k.hidden){e.stopPropagation();kpCloseKbChip(true);}}},true);
 kpRegionRender();
 /* Au chargement : si l'élève travaille un autre cours que le cours par défaut, on charge son contenu puis on redessine. */
 window.addEventListener('load',()=>{
@@ -3888,7 +3937,7 @@ window.addEventListener('load',()=>{
   kpLoadCourse(id).then(ok=>{
     if(!ok){try{localStorage.removeItem('kp_course');}catch{}return;}
     applyKbLayout(getKbLayoutId());
-    if(window.app&&app.renderView)app.renderView(app.view||'home');
+    if(typeof app!=='undefined'&&app.renderView)app.renderView(app.view||'home');
   });
 });
 function toggleApercu(e){if(e)e.stopPropagation();const m=document.getElementById('apercu-menu');if(m)m.style.display=m.style.display==='block'?'none':'block';}
@@ -4149,6 +4198,7 @@ function kpRefreshOffered(){
   const want=['fr/azerty'].concat(currentUser?_kpAllowed:[]);
   if(want.join()===KP_COURSES_OFFERED.join())return;
   KP_COURSES_OFFERED.splice(0,KP_COURSES_OFFERED.length,...want);
+  kpKbChipRender();
   const id=kpCourseId();
   if(id==='fr/azerty'){
     if(_kpAzSnap){kpApplyCourseData('fr/azerty',null);applyKbLayout(getKbLayoutId());if(app.renderView)app.renderView(app.view||'home');}
@@ -4184,7 +4234,7 @@ function kpRegisterKeyboards(data){
   for(const [id,k] of Object.entries(data.keyboards||{})){
     if(KB_LAYOUTS[id]||!k||!Array.isArray(k.rows)||k.rows.length!==4||!k.extra||!k.how)continue; // jamais écraser une disposition existante, ignorer une entrée mal formée
     KB_LAYOUTS[id]=k.rows;KB_EXTRA[id]=k.extra;KB_HOW[id]=k.how;KB_LAYOUT_LABELS[id]=k.label;
-    KB_QWERTY[id]={label:k.label,iso:!!k.iso,mac:!!k.mac,status:k.status};
+    KB_QWERTY[id]={label:k.label,short:k.short||k.label,iso:!!k.iso,mac:!!k.mac,status:k.status};
     _kpRegKb.push(id);
   }
 }
@@ -4216,6 +4266,14 @@ async function kpLoadCourse(id){
     return kpApplyCourseData(id,_kpCourseCache[id]);
   }catch{return false;}
 }
+/* Après un changement de clavier, la page de frappe (test ou leçon) se redessine pour montrer la nouvelle disposition, sauf en pleine frappe. */
+function kpRedrawKeyboard(){
+  try{
+    if(typeof app==='undefined'||!app.renderView)return;
+    const s=app.sess;if(s&&s.started&&!s.finished)return;
+    if(app.view==='test'||app.view==='lessons')app.renderView(app.view);
+  }catch{}
+}
 /* Famille de clavier choisie par l'élève = cours. Chaque famille retient sa dernière variante (kp_kb_layout_azerty / _qwerty). */
 const KP_FAMILY_COURSE={azerty:'fr/azerty',qwerty:'fr/qwerty'};
 const KP_DEFAULT_VARIANT={azerty:'fr',qwerty:'windows-us-intl'};
@@ -4229,13 +4287,14 @@ async function kpChooseFamily(fam){
   if(!(await kpSetCourse(cid)))return false;
   const lay=KB_LAYOUTS[remembered]?remembered:KP_DEFAULT_VARIANT[fam];
   if(KB_LAYOUTS[lay]){setKbLayoutId(lay);applyKbLayout(lay);}
+  kpKbChipRender();kpRedrawKeyboard();
   return true;
 }
 async function kpSetCourse(id){
   if(!KP_COURSES_OFFERED.includes(id)||!KP_COURSES[id])return false;
   if(!(await kpLoadCourse(id)))return false;
   try{localStorage.setItem('kp_course',id);}catch{}
-  if(window.app&&app.renderView)app.renderView(app.view||'home');
+  if(typeof app!=='undefined'&&app.renderView)app.renderView(app.view||'home');
   return true;
 }
 
@@ -4785,12 +4844,44 @@ function kbLayoutBtnsHTML(){
   const fam=kpCurrentFamily(),cur=getKbLayoutId();
   return Object.keys(KB_LAYOUT_LABELS).filter(id=>kpFamilyOf(id)===fam).map(id=>`<button class="settings-btn kb-layout-btn${cur===id?' active':''}" data-kb-layout="${id}" onclick="app.setKbLayout('${id}')">${KB_LAYOUT_LABELS[id]}</button>`).join('');
 }
-function kbFamilyBoxHTML(){
+function kbFamilyCardsHTML(){
   const fams=kpFamiliesOffered();if(fams.length<2)return'';
   const cur=kpCurrentFamily();
   const card=(f,name,rows,sub)=>`<button type="button" role="radio" aria-checked="${cur===f}" class="kb-family-card${cur===f?' active':''}" onclick="app.askKbFamily('${f}')"><span class="kb-family-keys" aria-hidden="true">${rows.split('').map(c=>'<i>'+c+'</i>').join('')}</span><strong>${name}</strong><span>${sub}</span></button>`;
-  return`<div class="settings-row-info"><strong>Mon clavier</strong><span>Choisis la famille de ton clavier : tu travailles le cours qui correspond à tes touches. Chaque famille garde sa propre progression.</span></div>
-  <div class="kb-family-cards" role="radiogroup" aria-label="Famille de clavier">${card('azerty','AZERTY','AZERTY','Français, belge, Mac, NF')}${card('qwerty','QWERTY','QWERTY','US, international, UK, Mac')}</div>`;
+  return`<div class="kb-family-cards" role="radiogroup" aria-label="Famille de clavier">${card('azerty','AZERTY','AZERTY','Français, belge, Mac, NF')}${card('qwerty','QWERTY','QWERTY','US, international, UK, Mac')}</div>`;
+}
+function kbFamilyBoxHTML(){
+  const cards=kbFamilyCardsHTML();if(!cards)return'';
+  return`<div class="settings-row-info"><strong>Mon clavier</strong><span>Choisis la famille de ton clavier : tu travailles le cours qui correspond à tes touches. Chaque famille garde sa propre progression.</span></div>${cards}`;
+}
+/* Pastille « clavier » de l'en-tête : le clavier actuel, cliquable pour en changer sans passer par les réglages (visiteur ou connecté). */
+const KB_AZ_SHORT={fr:'Français',be:'Belge',mac:'Mac',nf:'NF'};
+function kbChipText(){const l=getKbLayoutId(),q=KB_QWERTY[l];return q?('QWERTY · '+(q.short||q.label)):('AZERTY · '+(KB_AZ_SHORT[l]||KB_LAYOUT_LABELS[l]||''));}
+function kpKbChipRender(){
+  const t=document.getElementById('nav-kb-text'),b=document.getElementById('nav-kb-btn'),m=document.getElementById('nav-kb-menu');
+  if(!t||!b||!m)return;
+  const ct=kbChipText().split(' · ');t.innerHTML='<b>'+ct[0]+'</b>'+(ct[1]?'<span class="kbc-var"> · '+ct[1]+'</span>':'');
+  const full=(kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY')+', '+(KB_LAYOUT_LABELS[getKbLayoutId()]||'');
+  b.setAttribute('aria-label','Mon clavier : '+full);b.title='Mon clavier : '+full+' (cliquer pour changer)';
+  const acc=getAccentMode();
+  m.innerHTML=kbFamilyCardsHTML()
+    +'<div class="nav-region-title">Disposition '+(kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY')+'</div><div class="kbc-variants">'+kbLayoutBtnsHTML()+'</div>'
+    +'<div class="nav-region-title">Accents</div><div class="kbc-variants"><button type="button" class="settings-btn'+(acc==='exact'?' active':'')+'" onclick="app.setAccents(\'exact\')">Exigés</button><button type="button" class="settings-btn'+(acc==='tolerant'?' active':'')+'" onclick="app.setAccents(\'tolerant\')">Tolérés</button></div>'
+    +'<div class="nav-region-note">Exigés : tu apprends à taper é, è, ê… Tolérés : la lettre sans accent est acceptée.</div>'
+    +(currentUser?'<button type="button" class="nav-region-item" onclick="kpCloseKbChip(false);app.openSettings()">Tous les réglages…</button>':'');
+}
+function kpToggleKbChip(e){
+  if(e)e.stopPropagation();
+  const btn=document.getElementById('nav-kb-btn'),menu=document.getElementById('nav-kb-menu');if(!btn||!menu)return;
+  if(!menu.hidden){kpCloseKbChip(false);return;}
+  if(typeof kpCloseRegion==='function')kpCloseRegion(false);
+  kpKbChipRender();menu.hidden=false;btn.setAttribute('aria-expanded','true');
+  const first=menu.querySelector('.kb-layout-btn.active')||menu.querySelector('button');if(first)first.focus();
+}
+function kpCloseKbChip(refocus){
+  const btn=document.getElementById('nav-kb-btn'),menu=document.getElementById('nav-kb-menu');if(!btn||!menu)return;
+  menu.hidden=true;btn.setAttribute('aria-expanded','false');
+  if(refocus===true)btn.focus();else if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
 }
 function kpKeyboardChipHTML(){
   if(kpFamiliesOffered().length<2)return'';
@@ -4860,7 +4951,7 @@ function kpKbSuggest(family){
     n.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:min(560px,calc(100vw - 24px));background:#3A352B;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.4;z-index:9999;box-shadow:0 6px 24px rgba(0,0,0,.25)';
     n.innerHTML='<div>Ton clavier semble être un '+family.toUpperCase()+'. Veux-tu choisir cette disposition dans les réglages ?</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" id="kp-kbs-yes" style="padding:6px 12px;border-radius:8px;border:0;cursor:pointer;font:inherit">Choisir mon clavier</button><button type="button" id="kp-kbs-no" style="padding:6px 12px;border-radius:8px;border:0;cursor:pointer;font:inherit">Garder le réglage actuel</button></div>';
     document.body.appendChild(n);
-    n.querySelector('#kp-kbs-yes').onclick=()=>{n.remove();if(window.app&&app.openSettings)app.openSettings();};
+    n.querySelector('#kp-kbs-yes').onclick=()=>{n.remove();if(typeof app!=='undefined'&&app.openSettings)app.openSettings();};
     n.querySelector('#kp-kbs-no').onclick=()=>{try{localStorage.setItem('kp_kb_suggest_no',family);}catch{}n.remove();};
     setTimeout(()=>{try{n.remove();}catch{}},30000);
   }catch{}
@@ -4966,6 +5057,7 @@ function applyKbLayout(id){
   const ex=KB_EXTRA[id]||KB_EXTRA.fr,cp=a=>(a||[]).map(k=>({...k}));
   KB_FULL=[cp(ex.tlde).concat(KB[0],cp(ex.ae)),KB[1].concat(cp(ex.ad)),KB[2].concat(cp(ex.ac)),KB[3]];
   T4A_KPOS=t4aComputeKpos();
+  try{kpKbChipRender();}catch{}
 }
 applyKbLayout(getKbLayoutId());
 // Magic Tiles (Visée) : 8 couloirs FIXES, un par doigt hors pouces — Q S D F
@@ -9242,7 +9334,7 @@ const app={
         <div class="intro-screen">
           <h3>Comment bien apprendre à taper ?</h3>
           <div class="intro-rules">
-            <div class="intro-rule"><div class="intro-rule-icon">🤲</div><div class="intro-rule-text"><strong>La position de repos</strong>Les doigts gauches reposent sur Q·S·D·F, les droits sur J·K·L·M. Tu sentiras deux petits reliefs sous les index (F et J) : c'est ton point d'ancrage. Reviens toujours ici après chaque frappe.</div></div>
+            <div class="intro-rule"><div class="intro-rule-icon">🤲</div><div class="intro-rule-text"><strong>La position de repos</strong>Les doigts gauches reposent sur ${kpCurrentFamily()==='qwerty'?'A·S·D·F':'Q·S·D·F'}, les droits sur ${kpCurrentFamily()==='qwerty'?'J·K·L·;':'J·K·L·M'}. Tu sentiras deux petits reliefs sous les index (F et J) : c'est ton point d'ancrage. Reviens toujours ici après chaque frappe.</div></div>
             <div class="intro-rule"><div class="intro-rule-icon">👁️</div><div class="intro-rule-text"><strong>Regarde l'écran, pas tes doigts</strong>C'est la règle la plus importante. Regarder le clavier te force à mémoriser visuellement : regarder l'écran force ta mémoire musculaire. C'est elle qui te rendra rapide.</div></div>
             <div class="intro-rule"><div class="intro-rule-icon">🐢</div><div class="intro-rule-text"><strong>La lenteur avant la vitesse</strong>Taper lentement et juste vaut mieux que taper vite et faux. Chaque erreur crée une mauvaise habitude. La vitesse vient naturellement une fois les gestes mémorisés.</div></div>
             <div class="intro-rule"><div class="intro-rule-icon">📍</div><div class="intro-rule-text"><strong>Un doigt, une touche</strong>Chaque touche est assignée à un doigt précis. Respecter ces assignations, même au début quand c'est lent, est ce qui construira une technique solide sur le long terme.</div></div>
@@ -14844,7 +14936,7 @@ const app={
       if(!isMusicMuted())this._sourisAudio.volume=0.35;
     }
   },
-  setAccents(v){setAccentMode(v);const b=document.querySelectorAll('#accent-btns .settings-btn');if(b.length===2){b[0].classList.toggle('active',v==='exact');b[1].classList.toggle('active',v==='tolerant');}},
+  setAccents(v){setAccentMode(v);kpKbChipRender();const b=document.querySelectorAll('#accent-btns .settings-btn');if(b.length===2){b[0].classList.toggle('active',v==='exact');b[1].classList.toggle('active',v==='tolerant');}},
   setQuotes(v){setQuoteStyle(v);const b=document.querySelectorAll('#quote-btns .settings-btn');if(b.length===2){b[0].classList.toggle('active',v==='fr');b[1].classList.toggle('active',v==='droits');}},
   /* Changer de famille de clavier = changer de cours : on explique avant, la progression de chaque famille est gardée. */
   askKbFamily(fam){
@@ -14865,7 +14957,7 @@ const app={
     const set=(id,html)=>{const el=document.getElementById(id);if(el)el.innerHTML=html;};
     set('kb-family-box',kbFamilyBoxHTML());set('kb-layout-btns',kbLayoutBtnsHTML());set('kb-form-btns',kbFormBtnsHTML(getKbLayoutId()));
     const t=document.getElementById('kb-layout-title');if(t)t.textContent=kbLayoutTitle();
-    this._refreshKbPreview();
+    this._refreshKbPreview();kpKbChipRender();
   },
   setKbLayout(id){
     if(!KB_LAYOUTS[id])return;
@@ -14879,7 +14971,7 @@ const app={
     if(!kbFormFactorIdsFor(id).includes(getKbFormFactorId()))setKbFormFactorId('full');
     const formBtns=document.getElementById('kb-form-btns');
     if(formBtns)formBtns.innerHTML=kbFormBtnsHTML(id);
-    this._refreshKbPreview();
+    this._refreshKbPreview();kpKbChipRender();kpRedrawKeyboard();
   },
   setKbFormFactor(id){
     if(!KB_FORM_FACTORS[id])return;

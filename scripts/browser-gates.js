@@ -252,6 +252,111 @@ async function run(opts = {}) {
         if (opts.screenshotDir) { await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2200); await ev("localStorage.clear();KP_COURSES_OFFERED.length>1||KP_COURSES_OFFERED.push('fr/qwerty');go('home');kpChooseFamily('qwerty').then(()=>{app.openSettings();setTimeout(()=>{const s=document.getElementById('settings-keyboard-section');if(s)s.scrollIntoView({block:'start'});},300);});true"); await sleep(1800); const sh = await S('Page.captureScreenshot', { format: 'png' }); fs.writeFileSync(path.join(opts.screenshotDir, 'mon-clavier-qwerty.png'), Buffer.from(sh.data, 'base64')); }
         info.keyboardSwitch = 'ok';
       } catch (e) { problems.push(`BR7 : ${e.message}`); }
+
+      // BR8 : la pastille « clavier » de l'en-tête (visiteur puis compte testeur)
+      try {
+        const shot = async (name) => { if (!opts.screenshotDir) return; const sh = await S('Page.captureScreenshot', { format: 'png' }); fs.mkdirSync(opts.screenshotDir, { recursive: true }); fs.writeFileSync(path.join(opts.screenshotDir, name), Buffer.from(sh.data, 'base64')); };
+        const menuHidden = () => ev("document.getElementById('nav-kb-menu').hidden");
+        for (const w of [1280, 1100, 1000, 900, 800, 770]) {
+          await S('Emulation.setDeviceMetricsOverride', { width: w, height: 900, deviceScaleFactor: 1, mobile: false });
+          await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(1500);
+          await ev("localStorage.clear();true"); // on efface la session AVANT de recharger : sinon la page redémarre avec le compte du test précédent
+          await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2200); exceptions.splice(0);
+          const g1 = await ev(`(()=>{const b=document.getElementById('nav-kb-btn');if(!b)return null;const r=b.getBoundingClientRect(),f=document.getElementById('nav-region-btn').getBoundingClientRect(),
+            gu=document.getElementById('nav-guest').getBoundingClientRect(),nav=document.querySelector('.nav-links').getBoundingClientRect();
+            return{text:document.getElementById('nav-kb-text').textContent,w:r.width,h:r.height,left:r.left,right:r.right,flagRight:f.right,guestLeft:gu.left,linksRight:nav.right,gear:!!document.querySelector('.nav-guest-settings'),overflow:document.documentElement.scrollWidth-window.innerWidth,signupH:Math.round(document.querySelector('.nav-signup-btn').getBoundingClientRect().height)}})()`);
+          if (!g1) { problems.push(`BR8 (${w}) : pastille clavier absente`); continue; }
+          if (g1.text !== 'AZERTY · Français') problems.push(`BR8 (${w}) : texte « ${g1.text} » au lieu de « AZERTY · Français »`);
+          if (!g1.w || !g1.h) problems.push(`BR8 (${w}) : pastille invisible`);
+          if (g1.gear) problems.push(`BR8 (${w}) : l'engrenage des visiteurs est encore là`);
+          if (g1.left < g1.flagRight - 1) problems.push(`BR8 (${w}) : la pastille chevauche le drapeau`);
+          if (g1.right > g1.guestLeft + 1) problems.push(`BR8 (${w}) : la pastille chevauche les boutons de connexion`);
+          if (g1.left < g1.linksRight - 1) problems.push(`BR8 (${w}) : la pastille chevauche le menu`);
+          if (g1.overflow > 0) problems.push(`BR8 (${w}) : l'en-tête fait défiler la page horizontalement (${g1.overflow} px)`);
+          if (g1.signupH > 42) problems.push(`BR8 (${w}) : « Créer un compte » passe sur plusieurs lignes`);
+          if (w === 1280) {
+            if (!(await menuHidden())) problems.push('BR8 : menu ouvert au chargement');
+            await ev("document.getElementById('nav-kb-btn').click();true"); await sleep(150);
+            const m = await ev(`(()=>{const m=document.getElementById('nav-kb-menu'),r=m.getBoundingClientRect();return{hidden:m.hidden,variants:[...m.querySelectorAll('.kb-layout-btn')].map(b=>b.innerText),cards:m.querySelectorAll('.kb-family-card').length,acc:m.querySelectorAll('.kbc-variants')[1]&&m.querySelectorAll('.kbc-variants')[1].querySelectorAll('button').length,all:/Tous les réglages/.test(m.innerText),left:r.left,right:r.right,expanded:document.getElementById('nav-kb-btn').getAttribute('aria-expanded')}})()`);
+            if (m.hidden || m.expanded !== 'true') problems.push('BR8 : le clic n\'ouvre pas le menu du clavier');
+            if (m.variants.length !== 4) problems.push(`BR8 : ${m.variants.length} variantes AZERTY au lieu de 4 (${m.variants})`);
+            if (m.cards !== 0) problems.push('BR8 : cartes de famille visibles alors que seul l\'AZERTY est proposé');
+            if (m.acc !== 2) problems.push('BR8 : réglage des accents absent du menu');
+            if (m.all) problems.push('BR8 : « Tous les réglages » proposé à un visiteur');
+            if (m.left < 0 || m.right > w) problems.push('BR8 : le menu déborde de l\'écran');
+            await shot('pastille-clavier-visiteur.png');
+            await ev("[...document.querySelectorAll('#nav-kb-menu .kb-layout-btn')].find(b=>b.dataset.kbLayout==='be').click();true"); await sleep(150);
+            const be = await ev("({text:document.getElementById('nav-kb-text').textContent,stored:localStorage.getItem('kp_kb_layout'),hidden:document.getElementById('nav-kb-menu').hidden,focusOnMenu:!!(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#nav-kb-menu'))})");
+            if (be.text !== 'AZERTY · Belge' || be.stored !== 'be') problems.push(`BR8 : choisir Belge ne met pas à jour la pastille (${be.text} / ${be.stored})`);
+            await ev("[...document.querySelectorAll('#nav-kb-menu .kbc-variants')[1].querySelectorAll('button')][1].click();true"); await sleep(100);
+            if ((await ev("localStorage.getItem('kp_accents')")) !== 'tolerant') problems.push('BR8 : « Tolérés » du menu ne change pas le réglage des accents');
+            await ev("document.querySelectorAll('#nav-kb-menu .kbc-variants')[1].querySelectorAll('button')[0].click();true"); await sleep(100);
+            if ((await ev("localStorage.getItem('kp_accents')")) !== 'exact') problems.push('BR8 : « Exigés » du menu ne rétablit pas le réglage des accents');
+            // Échap ferme ; ouvrir le drapeau ferme la pastille et réciproquement ; la barre d'espace ne rouvre rien
+            await S('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }); await S('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }); await sleep(100);
+            if (!(await menuHidden())) problems.push('BR8 : Échap ne ferme pas le menu du clavier');
+            await ev("document.getElementById('nav-kb-btn').click();true"); await sleep(80);
+            await ev("document.getElementById('nav-region-btn').click();true"); await sleep(80);
+            if (!(await menuHidden())) problems.push('BR8 : ouvrir le drapeau ne ferme pas le menu du clavier');
+            await ev("document.getElementById('nav-kb-btn').click();true"); await sleep(80);
+            if (!(await ev("document.getElementById('nav-region-menu').hidden"))) problems.push('BR8 : ouvrir le clavier ne ferme pas le menu du drapeau');
+            await ev("document.querySelector('.nav-links').click();true"); await sleep(80);
+            if (!(await menuHidden())) problems.push('BR8 : un clic à côté ne ferme pas le menu du clavier');
+            await S('Input.dispatchKeyEvent', { type: 'keyDown', key: ' ', code: 'Space', text: ' ', windowsVirtualKeyCode: 32 }); await S('Input.dispatchKeyEvent', { type: 'keyUp', key: ' ', code: 'Space', windowsVirtualKeyCode: 32 }); await sleep(100);
+            if (!(await menuHidden())) problems.push('BR8 : la barre d\'espace rouvre le menu du clavier');
+          }
+          exceptions.splice(0).forEach((e) => problems.push(`BR8 (${w}) : exception : ${e}`));
+        }
+        await S('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+        // compte testeur : les cartes sont dans la pastille, on passe au QWERTY par elle, « Tous les réglages » apparaît
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2200); exceptions.splice(0);
+        await ev("localStorage.clear();currentUser='testeur';currentToken='tok-testeur';currentUserId='uid';_statsLoaded=true;app.stats=mergeStats();_kpAccessFor=null;updateNavUser();true"); await sleep(700);
+        await ev("document.getElementById('nav-kb-btn').click();true"); await sleep(150);
+        const t = await ev("({cards:document.querySelectorAll('#nav-kb-menu .kb-family-card').length,all:/Tous les réglages/.test(document.getElementById('nav-kb-menu').innerText)})");
+        if (t.cards !== 2) problems.push(`BR8 : ${t.cards} cartes dans la pastille d'un compte testeur au lieu de 2`);
+        if (!t.all) problems.push('BR8 : « Tous les réglages » absent pour un compte connecté');
+        await ev("document.querySelectorAll('#nav-kb-menu .kb-family-card')[1].click();true"); await sleep(150);
+        await ev("document.getElementById('kb-sw-yes').click();true"); await sleep(1200);
+        const qq = await ev("({text:document.getElementById('nav-kb-text').textContent,variants:document.querySelectorAll('#nav-kb-menu .kb-layout-btn').length,course:kpCourseId()})");
+        if (qq.text !== 'QWERTY · US intl' || qq.course !== 'fr/qwerty') problems.push(`BR8 : après le passage au QWERTY, pastille « ${qq.text} », cours ${qq.course}`);
+        await ev("document.getElementById('nav-kb-btn').click();true"); await sleep(150);
+        const q2 = await ev("({variants:[...document.querySelectorAll('#nav-kb-menu .kb-layout-btn')].map(b=>b.innerText).length})");
+        if (q2.variants !== 8) problems.push(`BR8 : ${q2.variants} variantes QWERTY dans la pastille au lieu de 8`);
+        const onPage = await ev("(()=>{const k=document.querySelector(\".t4a-key[data-l='1'],.kb-key-t[data-l='1']\");return k?(k.getAttribute('data-s')||'(sans signe Maj)'):null})()");
+        if (onPage === null) problems.push('BR8 : la touche 1 du clavier de la page de frappe est introuvable');
+        else if (onPage !== '!') problems.push(`BR8 : le clavier de la page garde les symboles AZERTY après le passage au QWERTY (signe Maj de la touche 1 : « ${onPage} » au lieu de « ! »)`);
+        const intro = await ev("(()=>{app._showIntro=true;app.renderView('lessons');const t=document.getElementById('page-lessons').innerText;app._showIntro=false;return t})()");
+        if (!/A·S·D·F/.test(intro) || /Q·S·D·F/.test(intro)) problems.push('BR8 : l\'écran d\'introduction cite encore la position de repos AZERTY (Q·S·D·F) en cours QWERTY');
+        await ev("app.renderView('test');true");
+        await shot('pastille-clavier-qwerty.png');
+        await ev("[...document.querySelectorAll('#nav-kb-menu .kb-layout-btn')].find(b=>b.dataset.kbLayout==='mac-us').click();true"); await sleep(150);
+        if ((await ev("document.getElementById('nav-kb-text').textContent")) !== 'QWERTY · Mac US') problems.push('BR8 : choisir Mac US ne met pas à jour la pastille');
+        await ev("[...document.querySelectorAll('#nav-kb-menu .nav-region-item')].find(b=>/Tous les réglages/.test(b.innerText)).click();true"); await sleep(900);
+        if (!(await ev("!!document.getElementById('settings-overlay')"))) problems.push('BR8 : « Tous les réglages » n\'ouvre pas les réglages');
+        // bandeau de détection : un QWERTY tapé sur le site AZERTY, pour un compte qui a accès au QWERTY, propose de choisir son clavier
+        await ev("localStorage.setItem('kp_course','fr/azerty');kpChooseFamily('azerty');true"); await sleep(800);
+        await ev("[['KeyQ','q'],['KeyW','w'],['KeyA','a']].forEach(([c,k])=>kpKbSample({code:c,key:k,altKey:false,ctrlKey:false,metaKey:false}));true"); await sleep(150);
+        const ban = await ev("(()=>{const b=document.getElementById('kp-kb-suggest');return b?b.innerText:null})()");
+        if (!ban || !/QWERTY/.test(ban)) problems.push(`BR8 : le bandeau de détection n'apparaît pas pour un QWERTY tapé (${ban})`);
+        else {
+          await ev("document.getElementById('kp-kbs-yes').click();true"); await sleep(900);
+          if (!(await ev("!!document.getElementById('settings-overlay')"))) problems.push('BR8 : « Choisir mon clavier » du bandeau n\'ouvre pas les réglages');
+          await ev("app.closeSettings();true");
+        }
+        // en-tête d'un compte connecté (plus chargé : badge, nom, avatar, « Passer Expert », « Déconnexion »)
+        await ev("document.getElementById('settings-overlay')&&app.closeSettings();true");
+        for (const w of [1280, 1100, 1000, 900, 800, 770]) {
+          await S('Emulation.setDeviceMetricsOverride', { width: w, height: 900, deviceScaleFactor: 1, mobile: false }); await sleep(300);
+          const lg = await ev(`(()=>{const q=s=>document.querySelector(s);const r=x=>x?Math.round(x.getBoundingClientRect().height):0;const lo=q('.nav-logout'),up=q('#nav-upgrade-btn');
+            return{overflow:document.documentElement.scrollWidth-window.innerWidth,logoutH:r(lo),upH:up&&getComputedStyle(up).display!=='none'?r(up):0,logoutRight:lo?Math.round(lo.getBoundingClientRect().right):0,kb:document.getElementById('nav-kb-btn').getBoundingClientRect().width>0}})()`);
+          if (lg.overflow > 0) problems.push(`BR8 connecté (${w}) : l'en-tête fait défiler la page horizontalement (${lg.overflow} px)`);
+          if (lg.upH > 42) problems.push(`BR8 connecté (${w}) : « Passer Expert » passe sur plusieurs lignes`);
+          if (!lg.kb) problems.push(`BR8 connecté (${w}) : pastille clavier invisible`);
+        }
+        await S('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+        exceptions.splice(0).forEach((e) => problems.push(`BR8 : exception : ${e}`));
+        info.chip = 'ok';
+      } catch (e) { problems.push(`BR8 : ${e.message}`); }
     }
   } catch (e) { problems.push(`navigateur : ${e.message}`); }
   finally { if (b) b.close(); server.close(); }

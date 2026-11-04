@@ -10,14 +10,14 @@ const root = path.join(__dirname, '..');
 // Variantes proposées (choix fait par l'utilisateur : « tous les claviers dans les paramètres », sans les doublons de sources).
 // iso : touche supplémentaire à gauche de W (UK, britannique). mac : Option au lieu d'AltGr.
 const VARIANTS = [
-  { id: 'windows-us', label: 'États-Unis (US)', iso: false, mac: false },
-  { id: 'windows-us-intl', label: 'États-Unis international', iso: false, mac: false },
-  { id: 'windows-uk', label: 'Royaume-Uni (UK)', iso: true, mac: false },
-  { id: 'windows-uk-extended', label: 'Royaume-Uni étendu', iso: true, mac: false },
-  { id: 'mac-us', label: 'Mac, États-Unis (ABC)', iso: false, mac: true },
-  { id: 'mac-us-intl-pc', label: 'Mac, États-Unis international PC', iso: false, mac: true },
-  { id: 'mac-british', label: 'Mac, Royaume-Uni', iso: true, mac: true },
-  { id: 'linux-us-intl', label: 'Linux, États-Unis international', iso: false, mac: false },
+  { id: 'windows-us', short: 'US', label: 'États-Unis (US)', iso: false, mac: false },
+  { id: 'windows-us-intl', short: 'US intl', label: 'États-Unis international', iso: false, mac: false },
+  { id: 'windows-uk', short: 'UK', label: 'Royaume-Uni (UK)', iso: true, mac: false },
+  { id: 'windows-uk-extended', short: 'UK étendu', label: 'Royaume-Uni étendu', iso: true, mac: false },
+  { id: 'mac-us', short: 'Mac US', label: 'Mac, États-Unis (ABC)', iso: false, mac: true },
+  { id: 'mac-us-intl-pc', short: 'Mac US intl', label: 'Mac, États-Unis international PC', iso: false, mac: true },
+  { id: 'mac-british', short: 'Mac UK', label: 'Mac, Royaume-Uni', iso: true, mac: true },
+  { id: 'linux-us-intl', short: 'Linux US intl', label: 'Linux, États-Unis international', iso: false, mac: false },
 ];
 const DIGITS = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0'];
 const TOP = ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP'];
@@ -97,7 +97,7 @@ function buildKeyboards(texts) {
       ad: [key(def, 'BracketLeft'), key(def, 'BracketRight')].concat(v.iso ? [] : [key(def, 'Backslash')]),
       ac: [key(def, 'Quote')].concat(v.iso ? [key(def, 'Backslash')] : []),
     };
-    out[v.id] = { label: v.label, os: def.os, iso: v.iso, mac: v.mac, status: def.status, rows, extra, how: howFor(def, v.mac, chars) };
+    out[v.id] = { label: v.label, short: v.short, os: def.os, iso: v.iso, mac: v.mac, status: def.status, rows, extra, how: howFor(def, v.mac, chars) };
   }
   return out;
 }

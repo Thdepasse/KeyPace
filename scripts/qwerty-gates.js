@@ -344,6 +344,7 @@ function q8() {
       if (!key.l || !FING.has(key.f)) errs.push(`${id} : touche « ${key.l} » sans doigt valide`);
       if (/^[A-Z]$/.test(key.l) && key.s) errs.push(`${id} : lettre ${key.l} avec un signe Maj`);
     }
+    if (!k.short || k.short.length > 14 || /—/.test(k.short)) errs.push(`${id} : nom court absent, trop long ou avec tiret cadratin (« ${k.short} »)`);
     const homes = k.rows[2].filter((x) => x.home).map((x) => x.l).join('');
     if (homes !== 'FJ') errs.push(`${id} : repères de la rangée de repos « ${homes} » au lieu de FJ`);
     if (k.rows[2].map((x) => x.l).join('') !== 'ASDFGHJKL' + k.rows[2][9].l) errs.push(`${id} : rangée de repos inattendue`);
