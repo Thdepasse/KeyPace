@@ -406,9 +406,25 @@ function q9() {
       if (!prefix) errs.push(`${l.id} : module écrit à la main après un module non refondu : le cumul des touches enseignées n'est plus connu`);
       nLessons++;
       if (typeof l.teaches !== 'string') { errs.push(`${l.id} : champ teaches absent`); continue; }
-      if (l.teaches.length && m.kind !== 'accents' && (!m.row || !ROWS[m.row])) errs.push(`${l.id} : rangée du module absente ou inconnue`); // un module sans nouvelle touche n'a pas de rangée
+      if (l.teaches.length && m.kind !== 'accents' && m.kind !== 'majuscules' && (!m.row || !ROWS[m.row])) errs.push(`${l.id} : rangée du module absente ou inconnue`); // un module sans nouvelle touche n'a pas de rangée
       for (const ch of l.teaches) {
-        if (m.kind === 'accents') {
+        if (m.kind === 'majuscules') {
+          // module de majuscules : chaque majuscule enseignée a sa minuscule déjà enseignée ; la main déclarée (gauche = Maj droite, droite = Maj gauche)
+          // est la vraie main de la lettre ; une majuscule accentuée suppose le geste de son accent (comme au module des accents).
+          const low = ch.toLowerCase();
+          if (ch === low || low === ch.toUpperCase()) errs.push(`${l.id} : « ${ch} » n'est pas une majuscule`);
+          if (!learned.includes(low)) errs.push(`${l.id} : « ${ch} » enseignée avant sa minuscule « ${low} »`);
+          if (/[a-z]/.test(low) && l.hand) {
+            const code = codeOf(low); const fing = code ? us.keys[code].f : '';
+            const main = fing.startsWith('l') ? 'gauche' : 'droite';
+            if (main !== l.hand) errs.push(`${l.id} : « ${ch} » est tapée par la main ${main}, la leçon annonce la main ${l.hand}`);
+          }
+          if (!/[a-z]/.test(low)) {
+            const sans = variants.filter((def) => !gestureFor(def, ch)).map((d) => d.id);
+            const trop = sans.filter((v) => !['windows-us', 'windows-uk'].includes(v));
+            if (trop.length) errs.push(`${l.id} : « ${ch} » sans geste sur ${trop.join(', ')} alors que ces claviers savent produire les accents`);
+          }
+        } else if (m.kind === 'accents') {
           // module d'accents : pas de rangée ; le geste dépend de la variante (touche morte, AltGr, Option) et certaines n'en ont pas (US simple, UK) :
           // la gate U10 rejoue chaque leçon sur les variantes, avec les accents tolérés quand il n'y a pas de geste.
           if (!ACCENTS.includes(ch)) errs.push(`${l.id} : « ${ch} » n'est pas un caractère accentué du module d'accents`);
@@ -427,7 +443,7 @@ function q9() {
       learned += l.teaches;
       const text = l.text || '';
       for (const c of text) if (c !== ' ' && !learned.includes(c)) { errs.push(`${l.id} : « ${c} » pas encore enseignée (…${text.slice(Math.max(0, text.indexOf(c) - 8), text.indexOf(c) + 8)}…)`); break; }
-      for (const ch of l.teaches) { const n = [...text].filter((x) => x === ch).length; const need = /[a-z]/.test(ch) ? 8 : 6; if (n < need) errs.push(`${l.id} : « ${ch} » travaillée ${n} fois seulement (minimum ${need})`); }
+      for (const ch of l.teaches) { const n = [...text].filter((x) => x === ch).length; const need = /[a-z]/.test(ch) ? 8 : (ch !== ch.toLowerCase() ? 2 : 6) /* une majuscule revient dans la suite du cours : 2 suffit */; if (n < need) errs.push(`${l.id} : « ${ch} » travaillée ${n} fois seulement (minimum ${need})`); }
       if (/^ | $|  /.test(text)) errs.push(`${l.id} : espaces en trop`);
       if (text.length < 60 || text.length > 130) errs.push(`${l.id} : longueur ${text.length} hors de 60 à 130`);
       if (!l.title || !l.tip) errs.push(`${l.id} : titre ou conseil absent`);

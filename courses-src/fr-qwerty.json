@@ -91,9 +91,6 @@
   "flu6"
  ],
  "reuse": [
-  "maj1",
-  "maj2",
-  "maj4",
   "pon1",
   "num1",
   "num2",
@@ -3006,7 +3003,13 @@
   "ac6",
   "ac7",
   "ac8",
-  "ac9"
+  "ac9",
+  "maj1",
+  "maj2",
+  "maj3",
+  "maj4",
+  "maj5",
+  "maj6"
  ],
  "retiredAz": [
   "acc1",
@@ -3988,115 +3991,184 @@
     ]
    },
    {
-    "name": "5. Majuscules",
+    "name": "6. Majuscules",
+    "kind": "majuscules",
     "lessons": [
      {
       "id": "maj1",
-      "title": "Majuscule : main gauche (Shift droit)",
-      "keys": "Maj + lettres gauches",
-      "text": "La Le Lo Li Lu Na Ne Nu No Ni Ma Me Mu Mo Mi Ta Te Tu To Ti Fa Fe Fu Fo Fi Ra Re Ru",
+      "title": "Majuscules de la main gauche (Maj droite)",
+      "keys": "Q W E R T A S D F G",
+      "teaches": "QWERTASDFG",
+      "hand": "gauche",
+      "tip": "Pour une lettre de la main gauche, tu tiens la touche Maj de droite avec l'auriculaire droit. Maintiens Maj, tape la lettre, relâche.",
       "tuto": {
-       "intro": "Une majuscule, c'est Maj (Shift) maintenu pendant que tu frappes la lettre. Pour les lettres de la main gauche, on utilise le Shift de droite.",
+       "intro": "Pour écrire une majuscule, tu maintiens la touche Maj enfoncée, puis tu tapes la lettre. Règle d'or : on utilise la touche Maj de la main opposée à la lettre. On commence par les lettres de la main gauche.",
        "rules": [
         {
          "icon": "⇧",
-         "t": "Shift de la main opposée",
-         "d": "Pour une lettre tapée de la main gauche, maintiens le Shift DROIT avec l'auriculaire droit. Les deux mains se partagent le travail."
+         "t": "La touche Maj de la main opposée",
+         "d": "On tient Maj avec l'auriculaire de la main qui ne tape PAS la lettre : Maj droite pour une lettre de la main gauche, Maj gauche pour une lettre de la main droite. Les deux mains travaillent ensemble."
         },
         {
-         "icon": "🤙",
-         "t": "Maintiens, frappe, relâche",
-         "d": "Appuie sur Shift, garde-le enfoncé, frappe la lettre, puis relâche. Pas besoin de tout faire d'un coup sec."
+         "icon": "🔒",
+         "t": "Maintiens, tape, relâche",
+         "d": "Appuie sur Maj et garde-la enfoncée, tape la lettre, puis relâche les deux. Ne relâche pas Maj trop tôt : tu obtiendrais une minuscule."
         },
         {
-         "icon": "🚫",
-         "t": "Évite le Shift du même côté",
-         "d": "Utiliser le Shift du même côté que la lettre tord la main. Le réflexe à prendre : toujours la main opposée."
+         "icon": "🧑",
+         "t": "Les prénoms commencent par une majuscule",
+         "d": "Quentin, William, Elsa, Rose, Thomas, Alice, Sarah, David, Fanny, Gabriel : chaque prénom est un bon entraînement."
         }
        ],
-       "tip": "Objectif : taper les majuscules de gauche avec le Shift droit, sans tordre la main."
-      }
+       "tip": "Objectif : taper les majuscules de la main gauche avec la touche Maj de droite, sans hésiter."
+      },
+      "text": "Qq Ww Ee Rr Tt Aa Ss Dd Ff Gg Quentin William Elsa Rose Thomas Alice Sarah David Fanny Gabriel"
      },
      {
       "id": "maj2",
-      "title": "Majuscule : main droite (Shift gauche)",
-      "keys": "Maj + lettres droites",
-      "text": "Pa Pe Pu Po Pi Sa Se Su So Si Da De Du Do Di Ya Ye Yu Zo Ze Wa We Wu Xa Xe Xi Xo",
+      "title": "Majuscules de la main droite (Maj gauche)",
+      "keys": "Y U I O P H J K L",
+      "teaches": "YUIOPHJKL",
+      "hand": "droite",
+      "tip": "Pour une lettre de la main droite, tu tiens la touche Maj de gauche avec l'auriculaire gauche. Même geste qu'avant, de l'autre côté.",
       "tuto": {
-       "intro": "Cette fois, les lettres de la main droite. On maintient le Shift GAUCHE avec l'auriculaire gauche.",
+       "intro": "Même principe, de l'autre côté : pour une lettre de la main droite, tu tiens la touche Maj de gauche avec l'auriculaire gauche.",
        "rules": [
         {
          "icon": "⇧",
-         "t": "Shift gauche pour la droite",
-         "d": "Pour une lettre de la main droite, l'auriculaire gauche tient le Shift gauche. C'est le miroir de la leçon précédente."
+         "t": "La touche Maj de la main opposée",
+         "d": "On tient Maj avec l'auriculaire de la main qui ne tape PAS la lettre : Maj droite pour une lettre de la main gauche, Maj gauche pour une lettre de la main droite. Les deux mains travaillent ensemble."
         },
         {
-         "icon": "🤝",
-         "t": "Coordination des deux mains",
-         "d": "Une main tient Shift, l'autre frappe. Cette répartition garde tes deux mains en place sans contorsion."
+         "icon": "🔒",
+         "t": "Maintiens, tape, relâche",
+         "d": "Appuie sur Maj et garde-la enfoncée, tape la lettre, puis relâche les deux. Ne relâche pas Maj trop tôt : tu obtiendrais une minuscule."
         },
         {
-         "icon": "🎵",
-         "t": "Garde le rythme",
-         "d": "La majuscule ne doit pas casser ta cadence. Avec l'habitude, Shift devient un geste naturel et fluide."
+         "icon": "🧑",
+         "t": "Encore des prénoms",
+         "d": "Yves, Ulysse, Isabelle, Olivier, Pierre, Hugo, Julie, Karim, Louis : tu mélanges maintenant les deux côtés dans les mêmes mots."
         }
        ],
-       "tip": "Objectif : taper les majuscules de droite avec le Shift gauche, en gardant les mains posées."
-      }
+       "tip": "Objectif : taper les majuscules de la main droite avec la touche Maj de gauche, et alterner avec la main gauche."
+      },
+      "text": "Yy Uu Ii Oo Pp Hh Jj Kk Ll Yves Ulysse Isabelle Olivier Pierre Hugo Julie Karim Louis. Sarah et Hugo, Elsa et Louis."
      },
      {
       "id": "maj3",
-      "title": "Noms propres et villes",
-      "keys": "majuscules",
-      "text": "Paris Lyon Bruxelles Berlin Tokyo Rome Marie Jean Sophie Pierre Hugo Luc Anna Emma Paul Clara",
+      "title": "Majuscules de la rangée du bas",
+      "keys": "Z X C V B N M",
+      "teaches": "ZXCVBNM",
+      "tip": "Pour Z X C V B, tiens la Maj de droite ; pour N M, tiens la Maj de gauche. Même règle : la main opposée à la lettre.",
       "tuto": {
-       "intro": "On applique les majuscules à de vrais noms propres : prénoms et villes. Une seule majuscule, au début du mot.",
+       "intro": "Il reste les majuscules de la rangée du bas. La règle ne change pas : Maj de la main opposée. Z, X, C, V, B pour la main gauche ; N et M pour la main droite.",
        "rules": [
         {
-         "icon": "🔠",
-         "t": "Majuscule, puis minuscules",
-         "d": "Seule la première lettre prend Shift. Relâche Shift aussitôt pour taper le reste du mot en minuscules."
+         "icon": "⇧",
+         "t": "La touche Maj de la main opposée",
+         "d": "On tient Maj avec l'auriculaire de la main qui ne tape PAS la lettre : Maj droite pour une lettre de la main gauche, Maj gauche pour une lettre de la main droite. Les deux mains travaillent ensemble."
         },
         {
-         "icon": "🌍",
-         "t": "Les noms propres",
-         "d": "Villes et prénoms commencent par une majuscule : Paris, Marie, Bruxelles. C'est une règle, pas une option."
+         "icon": "🔒",
+         "t": "Maintiens, tape, relâche",
+         "d": "Appuie sur Maj et garde-la enfoncée, tape la lettre, puis relâche les deux. Ne relâche pas Maj trop tôt : tu obtiendrais une minuscule."
         },
         {
-         "icon": "🎯",
-         "t": "Anticipe le Shift",
-         "d": "Prépare ton auriculaire sur Shift juste avant la lettre. Le geste devient propre quand il est anticipé."
+         "icon": "🔤",
+         "t": "Toutes les majuscules",
+         "d": "Avec ces sept lettres, tu connais les 26 majuscules. À partir d'ici, tu peux écrire des noms propres et des débuts de phrase."
         }
        ],
-       "tip": "Objectif : capitaliser proprement prénoms et villes, Shift sur la première lettre seulement."
-      }
+       "tip": "Objectif : taper les majuscules du bas des deux côtés, en choisissant la bonne touche Maj."
+      },
+      "text": "Zz Xx Cc Vv Bb Nn Mm Zoé Xavier Camille Victor Bruno Nathalie Marie. Camille et Victor, Bruno et Marie."
      },
      {
       "id": "maj4",
-      "title": "Phrases correctement capitalisées",
-      "keys": "majuscules en contexte",
-      "text": "Le train joue dans la rue. La classe lit pour lire. Anna sort sans un bruit. Paul dort avec un ami. Le chat monte tout le jour.",
+      "title": "Majuscules accentuées : É È À Ç",
+      "keys": "É È À Ç",
+      "teaches": "ÉÈÀÇ",
+      "tip": "En français, les majuscules gardent leurs accents : École, À demain, Ça va. Tu fais le geste de l'accent, puis tu tapes la lettre avec Maj.",
       "tuto": {
-       "intro": "Dernière étape : les majuscules en contexte, au début de chaque phrase. C'est l'usage réel de tous les jours.",
+       "intro": "En français, les majuscules s'écrivent avec leurs accents : École, États, À demain, Ça va. Le geste est celui de l'accent, suivi de la lettre avec Maj. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
        "rules": [
         {
-         "icon": "🔠",
-         "t": "Début de phrase",
-         "d": "Chaque phrase commence par une majuscule, juste après un point. Pense-y au moment de la frappe, pas après."
+         "icon": "🎩",
+         "t": "Le geste de l'accent, puis Maj + lettre",
+         "d": "Fais le geste de l'accent que tu connais (touche morte, Option ou AltGr), puis tape la lettre en gardant Maj : É = accent aigu puis Maj + e."
         },
         {
-         "icon": "🔗",
-         "t": "Intègre Shift au flux",
-         "d": "La majuscule s'enchaîne dans le mouvement : point, espace, Shift et lettre, puis le mot continue."
+         "icon": "⏳",
+         "t": "Rien ne s'affiche tout de suite",
+         "d": "Avec une touche morte, le signe n'apparaît qu'à la frappe suivante : c'est normal."
+        },
+        {
+         "icon": "🛟",
+         "t": "Pas de geste sur ton clavier ?",
+         "d": "Un clavier US simple n'a pas ces gestes. Avec les accents « Tolérés » (pastille clavier), la lettre sans accent est acceptée."
+        }
+       ],
+       "tip": "Objectif : produire É, È, À et Ç avec le geste de ton clavier et la touche Maj."
+      },
+      "text": "É É È È À À Ç Ç École États Éric Émilie Ève À demain, Éric. Ça va, Ève. Ça va, Émilie."
+     },
+     {
+      "id": "maj5",
+      "title": "Noms propres et villes",
+      "keys": "majuscules",
+      "teaches": "",
+      "tip": "Les noms de personnes, de villes et de pays commencent par une majuscule. Garde le rythme : Maj, lettre, puis les minuscules sans à-coup.",
+      "tuto": {
+       "intro": "Les noms propres, ceux des personnes, des villes et des pays, commencent par une majuscule. C'est l'occasion de mélanger tout ce que tu viens d'apprendre.",
+       "rules": [
+        {
+         "icon": "🏙️",
+         "t": "Villes et personnes",
+         "d": "Bruxelles, Liège, Namur, Paris, Genève, Marie, Pierre, Éric : à chaque nom propre, un geste Maj, puis les minuscules en continu."
+        },
+        {
+         "icon": "🎵",
+         "t": "Garde ton rythme",
+         "d": "Ne ralentis pas après la majuscule : Maj et la lettre forment un seul mouvement, les minuscules suivent."
         },
         {
          "icon": "👀",
-         "t": "Relis ce que tu tapes",
-         "d": "Vérifie d'un coup d'œil que tes débuts de phrase ont bien leur majuscule. C'est un marqueur de soin."
+         "t": "Anticipe la majuscule",
+         "d": "Repère le prochain nom propre avant d'y arriver : ta main sait déjà quelle touche Maj va servir."
         }
        ],
-       "tip": "Objectif : capitaliser automatiquement chaque début de phrase, sans casser le rythme."
-      }
+       "tip": "Objectif : enchaîner des noms propres sans casser le rythme."
+      },
+      "text": "Bruxelles Liège Namur Mons Anvers Gand Paris Lyon Genève Rome Berlin Marie Jean Sophie Pierre Hugo Anna Paul Clara Éric Ève"
+     },
+     {
+      "id": "maj6",
+      "title": "Phrases correctement capitalisées",
+      "keys": "majuscules en contexte",
+      "teaches": "",
+      "tip": "Une phrase commence par une majuscule et se termine par un point. Après le point, une espace, puis la majuscule de la phrase suivante.",
+      "tuto": {
+       "intro": "Une phrase commence toujours par une majuscule et se termine par un point. Tu mets tout en pratique dans de vraies phrases.",
+       "rules": [
+        {
+         "icon": "🏁",
+         "t": "Point, espace, majuscule",
+         "d": "Après le point, tape une espace, puis la majuscule qui ouvre la phrase suivante. C'est un geste à automatiser."
+        },
+        {
+         "icon": "🧑",
+         "t": "Les noms propres aussi",
+         "d": "Marie, Paul, Paris, Éric, Bruxelles : au milieu d'une phrase, un nom propre garde sa majuscule."
+        },
+        {
+         "icon": "✅",
+         "t": "Le bon réflexe",
+         "d": "Avant de taper un mot, demande-toi : début de phrase ? nom propre ? Si oui, Maj de la main opposée."
+        }
+       ],
+       "tip": "Objectif : taper des phrases entières avec leurs majuscules, sans hésiter sur la touche Maj."
+      },
+      "text": "Marie et Paul vont à Paris. Ils prennent le train avec Éric. Ça va être une belle journée à Bruxelles."
      }
     ]
    },
@@ -4874,15 +4946,6 @@
   ]
  },
  "lessons": {
-  "maj3": {
-   "title": "Noms propres et villes",
-   "keys": "majuscules",
-   "module": "5. Majuscules",
-   "moduleIdx": 4,
-   "kind": "adapted",
-   "text": "Paris Lyon Bruxelles Berlin Tokyo Rome Marie Jean Sophie Pierre Hugo Luc Anna Emma Paul Clara",
-   "why": "Genève (accent grave) retiré : accents appris au module 7"
-  },
   "pon2": {
    "title": "Question et exclamation",
    "keys": "? !",
