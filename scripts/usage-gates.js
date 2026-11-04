@@ -485,21 +485,14 @@ function u14() {
   const state = () => h.run(`JSON.stringify({les:ALL_LESSONS.map(l=>[l.id,l.title,l.keys,l.tip,l.tuto,l.text,l.genNum,l.neu,l.review,l.module,l.moduleIdx,l.pool]),mods:ALL_MODULES.map(m=>[m.name,m.lessons.map(l=>l.id)]),free:FREE_LESSON_IDS,how:KB_HOW_TEXT_LESSONS})`);
   const ident = () => h.run('ALL_LESSONS.map(l=>l.id).join()+"|"+ALL_MODULES.length');
   const original = state(); const origLessons = h.run('globalThis.__o=ALL_LESSONS.slice();globalThis.__om=ALL_MODULES.slice();true');
-  // (1) équivalence des deux voies
-  h.run('kpApplyCourseData("fr/qwerty",Object.assign({},__c,{curriculum:undefined}))'); const viaOverlay = state();
+  // (1) le vrai cours s'applique avec ses leçons dans l'ordre du fichier, puis se retire strictement
+  h.run('kpApplyCourseData("fr/qwerty",__c)');
+  const want = course.curriculum.modules.flatMap((m) => m.lessons).map((l) => l.id);
+  if (JSON.stringify(JSON.parse(h.run('JSON.stringify(ALL_LESSONS.map(l=>l.id))'))) !== JSON.stringify(want)) errs.push('le cours appliqué n\'a pas les leçons du fichier, dans l\'ordre');
+  if (h.run('ALL_MODULES.length') !== course.curriculum.modules.length) errs.push('nombre de modules appliqué différent du fichier');
+  if (JSON.stringify(JSON.parse(h.run('JSON.stringify(FREE_LESSON_IDS)'))) !== JSON.stringify(course.curriculum.free)) errs.push('leçons gratuites appliquées différentes du fichier');
   h.run('kpApplyCourseData("fr/azerty",null)');
-  if (state() !== original) errs.push('retour au cours par défaut (ancienne voie) : programme différent de l\'origine');
-  h.run('kpApplyCourseData("fr/qwerty",__c)'); const viaCurriculum = state();
-  const A = JSON.parse(viaOverlay), B = JSON.parse(viaCurriculum);
-  // la voie « programme » n'a pas de pool de lettres par leçon pour le cours actuel : on compare tout le reste
-  const hand = new Set([...(course.handwritten || []), ...(course.retiredAz || [])]); // écrites à la main (Q9) ou retirées : pas comparables à l'ancienne voie
-  const byId = (x) => Object.fromEntries(x.les.filter((r) => !hand.has(r[0])).map((r) => [r[0], JSON.stringify(r.slice(0, 11).filter((_, k) => k !== 10 && k !== 9))]));
-  const ra = byId(A), rb = byId(B);
-  for (const id of Object.keys(rb)) if (ra[id] === undefined) errs.push(`leçon ${id} du programme absente de l'ancienne voie`);
-  else if (ra[id] !== rb[id]) errs.push(`les deux voies donnent des leçons différentes (${id})`);
-  // retour : mêmes objets
-  h.run('kpApplyCourseData("fr/azerty",null)');
-  if (state() !== original) errs.push('retour au cours par défaut (voie programme) : programme différent de l\'origine');
+  if (state() !== original) errs.push('retour au cours par défaut : programme différent de l\'origine');
   if (!h.run('ALL_LESSONS.length===__o.length&&ALL_LESSONS.every((l,i)=>l===__o[i])&&ALL_MODULES.every((m,i)=>m===__om[i])')) errs.push('retour au cours par défaut : ce ne sont plus les mêmes objets');
   // (2) petit programme inventé
   const mini = { schema: 1, id: 'fr/qwerty', curriculum: { modules: [
@@ -537,6 +530,6 @@ function u14() {
     if (h.run('kpApplyCourseData("fr/qwerty",__b)') !== false) errs.push(`programme invalide accepté (${nom})`);
     if (state() !== before) errs.push(`programme invalide (${nom}) : le programme a été modifié`);
   }
-  return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: `programme complet du cours actuel identique à l'ancienne voie pour les leçons communes (${Object.keys(rb).length} leçons comparées sur ${B.les.length}, ${B.mods.length} modules), programme inventé (3 leçons, ids q1 à q3) appliqué et joué, ${bad.length} programmes invalides refusés sans effet, retour par défaut identique` };
+  return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: `le vrai cours (${want.length} leçons, ${course.curriculum.modules.length} modules) s'applique dans l'ordre du fichier et se retire à l'identique ; programme inventé (3 leçons, ids q1 à q3) appliqué et joué ; ${bad.length} programmes invalides refusés sans effet` };
 }
 module.exports = { u14, u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };

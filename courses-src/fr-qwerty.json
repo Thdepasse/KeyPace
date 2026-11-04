@@ -1,28 +1,8 @@
 {
  "schema": 1,
  "id": "fr/qwerty",
- "note": "Généré par scripts/build-qwerty-lessons.js (mots filtrés, aucun texte écrit à la main sauf titres et conseils des leçons qui changent). À relire avant ouverture du cours.",
- "order": [
-  "r1",
-  "r2",
-  "r3",
-  "r4",
-  "r5",
-  "r6",
-  "h1",
-  "h2",
-  "h3",
-  "h4",
-  "h5",
-  "h6",
-  "b1",
-  "b2",
-  "b3",
-  "b4",
-  "b5",
-  "b6"
- ],
- "courseOrder": [
+ "note": "Généré par scripts/build-qwerty-course.js à partir de course-src/fr-qwerty/ (textes écrits à la main, relus par l'utilisateur). Ne pas modifier à la main.",
+ "handwritten": [
   "r1",
   "r2",
   "r3",
@@ -46,28 +26,28 @@
   "w3",
   "w4",
   "w5",
+  "ac1",
+  "ac2",
+  "ac3",
+  "ac4",
+  "ac5",
+  "ac6",
+  "ac7",
+  "ac8",
+  "ac9",
   "maj1",
   "maj2",
   "maj3",
   "maj4",
+  "maj5",
+  "maj6",
   "pon1",
   "pon2",
   "pon3",
   "pon4",
   "pon5",
   "pon6",
-  "acc1",
-  "acc2",
-  "acc3",
-  "acc4",
-  "acc5",
-  "cir1",
-  "cir2",
-  "cir3",
-  "cir4",
-  "tre1",
-  "tre2",
-  "tre3",
+  "pon7",
   "num1",
   "num2",
   "num3",
@@ -83,6 +63,8 @@
   "sym7",
   "sym8",
   "sym9",
+  "sym10",
+  "sym11",
   "flu1",
   "flu2",
   "flu3",
@@ -90,34 +72,6 @@
   "flu5",
   "flu6"
  ],
- "reuse": [
-  "flu1",
-  "flu2",
-  "flu3",
-  "flu4",
-  "flu5"
- ],
- "introOrder": [
-  "w1",
-  "w2",
-  "w3",
-  "w4",
-  "w5",
-  "maj1",
-  "maj2",
-  "maj3",
-  "maj4",
-  "pon1",
-  "pon2",
-  "pon3",
-  "pon4",
-  "pon5",
-  "pon6"
- ],
- "moduleNames": {
-  "7. Accents directs AZERTY": "7. Les accents"
- },
- "tutos": {},
  "keyboards": {
   "windows-us": {
    "label": "États-Unis (US)",
@@ -390,10 +344,7 @@
     "|": "Maj + \\",
     "}": "Maj + ]",
     "~": "Maj + `",
-    "¨": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
-    "«": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
     "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
-    "»": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
     "À": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
     "Ç": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
     "È": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
@@ -745,10 +696,7 @@
     "|": "Maj + \\",
     "}": "Maj + ]",
     "~": "Maj + ` (touche morte), puis Espace",
-    "¨": "Maj + AltGr + '",
-    "«": "AltGr + [",
     "²": "AltGr + 2",
-    "»": "AltGr + ]",
     "À": "touche ` (touche morte), puis Maj + A",
     "Ç": "Maj + AltGr + ,",
     "È": "touche ` (touche morte), puis Maj + E",
@@ -1059,10 +1007,7 @@
     "|": "Maj + \\",
     "}": "Maj + ]",
     "~": "Maj + #",
-    "¨": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
-    "«": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
     "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
-    "»": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
     "À": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
     "Ç": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
     "È": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
@@ -1384,10 +1329,7 @@
     "|": "Maj + \\",
     "}": "Maj + ]",
     "~": "Maj + #",
-    "¨": "AltGr + 2 (touche morte), puis Espace",
-    "«": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
     "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
-    "»": "Pas de touche pour ce signe : tape \" à la place, c'est accepté",
     "À": "touche ` (touche morte), puis Maj + A",
     "Ç": "Maj + AltGr + C",
     "È": "touche ` (touche morte), puis Maj + E",
@@ -1767,10 +1709,7 @@
     "|": "Maj + \\",
     "}": "Maj + ]",
     "~": "Maj + `",
-    "¨": "Maj + Option (⌥) + U",
-    "«": "Option (⌥) + \\",
     "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
-    "»": "Maj + Option (⌥) + \\",
     "À": "Option (⌥) + ` (touche morte), puis Maj + A",
     "Ç": "Maj + Option (⌥) + C",
     "È": "Option (⌥) + ` (touche morte), puis Maj + E",
@@ -2150,10 +2089,7 @@
     "|": "Maj + \\",
     "}": "Maj + ]",
     "~": "Option (⌥) + N (touche morte), puis Espace",
-    "¨": "Maj + Option (⌥) + U",
-    "«": "Option (⌥) + \\",
     "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
-    "»": "Maj + Option (⌥) + \\",
     "À": "Option (⌥) + null (touche morte), puis Maj + A",
     "Ç": "Maj + Option (⌥) + C",
     "È": "Option (⌥) + null (touche morte), puis Maj + E",
@@ -2539,10 +2475,7 @@
     "|": "Maj + \\",
     "}": "Maj + ]",
     "~": "Maj + `",
-    "¨": "Option (⌥) + U (touche morte), puis Espace",
-    "«": "Option (⌥) + \\",
     "²": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
-    "»": "Maj + Option (⌥) + \\",
     "À": "Option (⌥) + ` (touche morte), puis Maj + A",
     "Ç": "Maj + Option (⌥) + C",
     "È": "Maj + Option (⌥) + I",
@@ -2903,10 +2836,7 @@
     "|": "Maj + \\",
     "}": "Maj + ]",
     "~": "Maj + AltGr + null",
-    "¨": "Aucun geste sur ce clavier. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée",
-    "«": "AltGr + [",
     "²": "AltGr + 2",
-    "»": "AltGr + ]",
     "À": "touche null (touche morte), puis Maj + A",
     "Ç": "Maj + AltGr + ,",
     "È": "touche null (touche morte), puis Maj + E",
@@ -2928,84 +2858,6 @@
    }
   }
  },
- "handwritten": [
-  "r1",
-  "r2",
-  "r3",
-  "r4",
-  "r5",
-  "r6",
-  "h1",
-  "h2",
-  "h3",
-  "h4",
-  "h5",
-  "h6",
-  "b1",
-  "b2",
-  "b3",
-  "b4",
-  "b5",
-  "b6",
-  "w1",
-  "w2",
-  "w3",
-  "w4",
-  "w5",
-  "ac1",
-  "ac2",
-  "ac3",
-  "ac4",
-  "ac5",
-  "ac6",
-  "ac7",
-  "ac8",
-  "ac9",
-  "maj1",
-  "maj2",
-  "maj3",
-  "maj4",
-  "maj5",
-  "maj6",
-  "pon1",
-  "pon2",
-  "pon3",
-  "pon4",
-  "pon5",
-  "pon6",
-  "pon7",
-  "num1",
-  "num2",
-  "num3",
-  "num4",
-  "num5",
-  "num6",
-  "sym1",
-  "sym2",
-  "sym3",
-  "sym4",
-  "sym5",
-  "sym6",
-  "sym7",
-  "sym8",
-  "sym9",
-  "sym10",
-  "sym11"
- ],
- "retiredAz": [
-  "acc1",
-  "acc2",
-  "acc3",
-  "acc4",
-  "acc5",
-  "cir1",
-  "cir2",
-  "cir3",
-  "cir4",
-  "tre1",
-  "tre2",
-  "tre3"
- ],
  "curriculum": {
   "modules": [
    {
@@ -4915,13 +4767,14 @@
     ]
    },
    {
-    "name": "13. Vitesse et fluidité",
+    "name": "11. Vitesse et fluidité",
     "lessons": [
      {
       "id": "flu1",
       "title": "Enchaînement de phrases courtes",
       "keys": "fluidité",
-      "text": "le jour se lève. les oiseaux chantent. le café est prêt. on y va ensemble. allons-y, vite ! bonne journée.",
+      "teaches": "",
+      "tip": "Ne t'arrête pas entre les phrases : le point, l'espace et la majuscule s'enchaînent dans le même mouvement.",
       "tuto": {
        "intro": "Place à la vitesse. On enchaîne des phrases courtes pour travailler la fluidité d'un bout à l'autre.",
        "rules": [
@@ -4942,20 +4795,22 @@
         }
        ],
        "tip": "Objectif : enchaîner des phrases courtes sans temps mort entre elles."
-      }
+      },
+      "text": "Le jour se lève. Les oiseaux chantent. Le café est prêt. On y va ensemble. Allons-y, vite ! Bonne journée."
      },
      {
       "id": "flu2",
       "title": "Phrases moyennes naturelles",
       "keys": "fluidité",
-      "text": "chaque matin, elle ouvre la fenêtre et respire l'air frais avant de commencer sa journée de travail chargée.",
+      "teaches": "",
+      "tip": "Sur une phrase longue, ne bloque pas si tu fais une faute : continue. Tape par groupes de mots qui vont ensemble.",
       "tuto": {
        "intro": "Des phrases plus longues, comme dans la vraie vie. L'objectif : tenir le rythme sur la durée.",
        "rules": [
         {
          "icon": "🌬️",
          "t": "Respire et continue",
-         "d": "Sur une phrase longue, ne bloque pas si tu fais une faute : corrige et repars. La continuité prime."
+         "d": "Sur une phrase longue, ne bloque pas si tu fais une faute : continue. La continuité prime."
         },
         {
          "icon": "➡️",
@@ -4969,13 +4824,16 @@
         }
        ],
        "tip": "Objectif : taper une phrase moyenne d'un seul flux, sans perdre le rythme."
-      }
+      },
+      "text": "Chaque matin, elle ouvre la fenêtre et respire l'air frais avant de commencer sa journée de travail chargée."
      },
      {
       "id": "flu3",
       "title": "Paragraphe narratif complet",
       "keys": "paragraphe",
-      "text": "taper sans regarder ses doigts demande de la patience, mais chaque jour de pratique rend les mains plus rapides et plus sûres. C'est une question d'habitude.",
+      "teaches": "",
+      "maxLen": 200,
+      "tip": "Un paragraphe demande de l'endurance : installe un rythme confortable que tu peux tenir jusqu'au bout, sans quitter l'écran des yeux.",
       "tuto": {
        "intro": "Un paragraphe entier à taper. C'est l'endurance : garder concentration et régularité jusqu'au bout.",
        "rules": [
@@ -4996,13 +4854,16 @@
         }
        ],
        "tip": "Objectif : taper un paragraphe complet à rythme régulier, du début à la fin."
-      }
+      },
+      "text": "Taper sans regarder ses doigts demande de la patience, mais chaque jour de pratique rend les mains plus rapides et plus sûres. C'est une question d'habitude."
      },
      {
       "id": "flu4",
       "title": "Texte professionnel",
       "keys": "style pro",
-      "text": "Veuillez trouver ci-joint notre offre. N'hésitez pas à nous contacter au 04 98 76 54 32 ou par email : contact@keypace.be. Bien cordialement.",
+      "teaches": "",
+      "maxLen": 200,
+      "tip": "Un texte professionnel ne tolère pas l'à-peu-près : formules de politesse, majuscules, ponctuation soignée, chiffres et adresse.",
       "tuto": {
        "intro": "Un texte de type professionnel : email, courrier, avec adresse et numéro. Le genre de texte que tu écriras vraiment.",
        "rules": [
@@ -5024,25 +4885,26 @@
        ],
        "tip": "Objectif : taper un texte professionnel propre, lettres, chiffres et symboles mêlés."
       },
-      "howText": true
+      "text": "Veuillez trouver ci-joint notre offre. N'hésitez pas à nous contacter au 04 98 76 54 32 ou par email : contact@keypace.be. Bien cordialement."
      },
      {
       "id": "flu5",
       "title": "Texte technique avec symboles",
       "keys": "mixte complet",
-      "text": "le fichier config.json : {\"version\": \"1.0\", \"debug\": false, \"port\": 3000}. Lancer : `npm start` dans ~/projet.",
+      "teaches": "",
+      "tip": "Du code et de la configuration : accolades, guillemets, chemins et chiffres. Repère à l'avance le geste de chaque signe.",
       "tuto": {
        "intro": "Le défi complet : du code et de la configuration, avec accolades, guillemets, chemins et chiffres.",
        "rules": [
         {
          "icon": "💻",
          "t": "Tout à la fois",
-         "d": "Accolades, guillemets, deux-points, chiffres... Ce texte mobilise Shift et AltGr en continu. L'épreuve la plus dense en symboles."
+         "d": "Accolades, guillemets, deux-points, chiffres... Ce texte mobilise Maj et les touches mortes en continu. C'est l'épreuve la plus dense en symboles."
         },
         {
          "icon": "🧭",
          "t": "Anticipe chaque combo",
-         "d": "Repère à l'avance si le prochain signe est direct, Shift ou AltGr. La préparation évite les blocages."
+         "d": "Repère à l'avance si le prochain signe est direct, avec Maj ou avec une touche morte. La préparation évite les blocages."
         },
         {
          "icon": "🎯",
@@ -5052,13 +4914,15 @@
        ],
        "tip": "Objectif : taper un texte technique mêlant code, symboles et chiffres, proprement."
       },
-      "howText": true
+      "text": "Le fichier config.json : {\"version\": \"1.0\", \"debug\": false, \"port\": 3000}. Lancer : `npm start` dans ~/projet."
      },
      {
       "id": "flu6",
       "title": "Sprint de vitesse : texte long",
       "keys": "vitesse maximale",
-      "text": "Écrire vite s'apprend avec de la régularité ; entraîne-toi chaque jour, garde les yeux sur l'écran, et laisse tes doigts trouver leur place tout seuls sur le clavier QWERTY. Bonne chance !",
+      "teaches": "",
+      "maxLen": 250,
+      "tip": "L'épreuve finale : un texte long à taper le plus vite et le plus juste possible, sans regarder le clavier.",
       "tuto": {
        "intro": "L'épreuve finale : un texte long à taper le plus vite et le plus juste possible. Donne tout !",
        "rules": [
@@ -5080,7 +4944,7 @@
        ],
        "tip": "Objectif : taper un texte long à ta vitesse maximale, sans regarder le clavier."
       },
-      "howText": true
+      "text": "Écrire vite s'apprend avec de la régularité ; entraîne-toi chaque jour, garde les yeux sur l'écran, et laisse tes doigts trouver leur place tout seuls sur le clavier QWERTY. Bonne chance !"
      }
     ]
    }
@@ -5097,16 +4961,5 @@
    "h3",
    "h4"
   ]
- },
- "lessons": {
-  "flu6": {
-   "title": "Sprint de vitesse : texte long",
-   "keys": "vitesse maximale",
-   "module": "13. Vitesse et fluidité",
-   "moduleIdx": 12,
-   "kind": "adapted",
-   "text": "Écrire vite s'apprend avec de la régularité ; entraîne-toi chaque jour, garde les yeux sur l'écran, et laisse tes doigts trouver leur place tout seuls sur le clavier QWERTY. Bonne chance !",
-   "why": "le texte citait le clavier AZERTY"
-  }
  }
 }
