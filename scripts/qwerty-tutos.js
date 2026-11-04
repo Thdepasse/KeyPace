@@ -10,14 +10,6 @@ const MORTE = R('⏳', 'Rien ne s\'affiche tout de suite', "Avec une touche mort
 module.exports = {
   moduleNames: { '7. Accents directs AZERTY': '7. Les accents' },
   tutos: {
-    r4: { intro: "Au tour des auriculaires, les petits doigts : A à gauche, point-virgule à droite. Ce sont les plus délicats à dompter.", rules: [
-      R('🤏', 'Les doigts les plus faibles', "Les auriculaires manquent de force et de précision au début. C'est universel, même les pros sont passés par là. Patience."),
-      R('↔️', "N'entraîne pas toute la main", "Étire seulement l'auriculaire vers A ou ;. Si tu fais pivoter le poignet, les autres doigts perdent leur repère."),
-      R('⚓', 'Repose-le aussitôt', "L'auriculaire a tendance à rester en l'air. Ramène-le sur sa touche de repos dès qu'il a frappé.")], tip: "Objectif : activer les auriculaires sans casser ta position de repos. Lenteur et régularité avant tout." },
-    r6: { intro: "Tu connais maintenant toute la rangée de repos : la rangée où tes doigts reviennent toujours, entre deux frappes.", rules: [
-      R('🏠', 'Ta base de départ', "Tous tes doigts partent de cette rangée et y reviennent. La maîtriser, c'est savoir où tu es sur le clavier sans regarder."),
-      R('🔁', 'Trouve chaque touche de mémoire', "Cet exercice mélange les dix touches. Si tu hésites, ralentis : le but est de les trouver de mémoire, pas de taper vite."),
-      R('⚓', 'Position de repos constante', "Entre chaque frappe, sens que tes huit doigts sont revenus sur A S D F  J K L ;.")], tip: "Objectif : valider toute la rangée de repos, doigts ancrés et yeux sur l'écran." },
     h6: { intro: "Tu connais désormais deux rangées entières. Cette révision mélange toutes les lettres de la rangée du haut.", rules: [
       R('🔁', 'Repos et haut sans à-coups', "L'enjeu n'est plus chaque touche, mais la transition entre les rangées. Le passage du repos vers le haut doit être fluide."),
       R('🤚', 'Les poignets restent posés', "Ne soulève pas les poignets pour changer de rangée : seuls les doigts montent et descendent."),

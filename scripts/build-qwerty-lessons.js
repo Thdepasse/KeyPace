@@ -196,13 +196,24 @@ function build() {
       }),
     })),
   };
+  // Modules ÉCRITS À LA MAIN (course-src/fr-qwerty/NN-nom.json) : ils remplacent le module AZERTY de même rang (« replaces »). Leurs leçons ne
+  // passent plus par le générateur ni par les tables lessons/tutos ci-dessus (retirées), mais par les gates sur le programme final (Q9).
+  const handwritten = [];
+  const srcDir = path.join(root, 'course-src', 'fr-qwerty');
+  const srcFiles = fs.existsSync(srcDir) ? fs.readdirSync(srcDir).filter((x) => /^\d\d-.*\.json$/.test(x)).sort() : [];
+  const tutos = { ...T.tutos };
+  for (const f of srcFiles) {
+    const m = JSON.parse(fs.readFileSync(path.join(srcDir, f), 'utf8'));
+    curriculum.modules[m.replaces - 1] = { name: m.name, row: m.row, lessons: m.lessons.map((l) => ({ ...l })) };
+    for (const l of m.lessons) { handwritten.push(l.id); delete lessons[l.id]; delete tutos[l.id]; }
+  }
   curriculum.free = curriculum.modules.flatMap((m) => m.lessons).slice(0, 10).map((l) => l.id);
-  const allTexts = JSON.parse(h.run("JSON.stringify(ALL_LESSONS.flatMap(l=>[l.text||'',l.keys||'']))")).concat(Object.values(lessons).flatMap((l) => [l.text, l.keys]));
+  const allTexts = JSON.parse(h.run("JSON.stringify(ALL_LESSONS.flatMap(l=>[l.text||'',l.keys||'']))")).concat(curriculum.modules.flatMap((m) => m.lessons).flatMap((l) => [l.text || '', l.keys]));
   const keyboards = require('./build-qwerty-keyboards').buildKeyboards(allTexts);
   return {
     schema: 1, id: 'fr/qwerty',
     note: 'Généré par scripts/build-qwerty-lessons.js (mots filtrés, aucun texte écrit à la main sauf titres et conseils des leçons qui changent). À relire avant ouverture du cours.',
-    order: SEQ.map((s) => s.id), courseOrder: azCourseOrder, reuse: REUSE, introOrder: INTRO_ORDER, moduleNames: T.moduleNames, tutos: T.tutos, keyboards, curriculum, lessons,
+    order: SEQ.map((s) => s.id), courseOrder: azCourseOrder, reuse: REUSE, introOrder: INTRO_ORDER, moduleNames: T.moduleNames, tutos, keyboards, handwritten, curriculum, lessons,
   };
 }
 
@@ -210,6 +221,6 @@ if (require.main === module) {
   const out = build();
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');
-  for (const id of out.order) console.log(id.padEnd(3), String(out.lessons[id].keys).padEnd(22), out.lessons[id].text.slice(0, 90));
+  for (const l of out.curriculum.modules.flatMap((m) => m.lessons)) console.log(l.id.padEnd(5), String(l.keys).padEnd(24), (l.text || '(chiffres générés)').slice(0, 80));
 }
 module.exports = { ACCENT_TAUGHT, build, SEQ, SLASH_PAIRS, OUT, wordPool, REUSE, ADAPTED, INTRO_ORDER, INTRO };

@@ -150,48 +150,6 @@
   "7. Accents directs AZERTY": "7. Les accents"
  },
  "tutos": {
-  "r4": {
-   "intro": "Au tour des auriculaires, les petits doigts : A à gauche, point-virgule à droite. Ce sont les plus délicats à dompter.",
-   "rules": [
-    {
-     "icon": "🤏",
-     "t": "Les doigts les plus faibles",
-     "d": "Les auriculaires manquent de force et de précision au début. C'est universel, même les pros sont passés par là. Patience."
-    },
-    {
-     "icon": "↔️",
-     "t": "N'entraîne pas toute la main",
-     "d": "Étire seulement l'auriculaire vers A ou ;. Si tu fais pivoter le poignet, les autres doigts perdent leur repère."
-    },
-    {
-     "icon": "⚓",
-     "t": "Repose-le aussitôt",
-     "d": "L'auriculaire a tendance à rester en l'air. Ramène-le sur sa touche de repos dès qu'il a frappé."
-    }
-   ],
-   "tip": "Objectif : activer les auriculaires sans casser ta position de repos. Lenteur et régularité avant tout."
-  },
-  "r6": {
-   "intro": "Tu connais maintenant toute la rangée de repos : la rangée où tes doigts reviennent toujours, entre deux frappes.",
-   "rules": [
-    {
-     "icon": "🏠",
-     "t": "Ta base de départ",
-     "d": "Tous tes doigts partent de cette rangée et y reviennent. La maîtriser, c'est savoir où tu es sur le clavier sans regarder."
-    },
-    {
-     "icon": "🔁",
-     "t": "Trouve chaque touche de mémoire",
-     "d": "Cet exercice mélange les dix touches. Si tu hésites, ralentis : le but est de les trouver de mémoire, pas de taper vite."
-    },
-    {
-     "icon": "⚓",
-     "t": "Position de repos constante",
-     "d": "Entre chaque frappe, sens que tes huit doigts sont revenus sur A S D F  J K L ;."
-    }
-   ],
-   "tip": "Objectif : valider toute la rangée de repos, doigts ancrés et yeux sur l'écran."
-  },
   "h6": {
    "intro": "Tu connais désormais deux rangées entières. Cette révision mélange toutes les lettres de la rangée du haut.",
    "rules": [
@@ -3386,24 +3344,33 @@
    }
   }
  },
+ "handwritten": [
+  "r1",
+  "r2",
+  "r3",
+  "r4",
+  "r5",
+  "r6"
+ ],
  "curriculum": {
   "modules": [
    {
     "name": "1. Position de base",
+    "row": "repos",
     "lessons": [
      {
       "id": "r1",
       "title": "F et J, les index",
       "keys": "f j",
-      "tip": "Bienvenue ! Pose tes index sur F (main gauche) et J (main droite) : ce sont les touches de référence, les deux petits reliefs que tu sens sous les doigts. Ne regarde pas ton clavier : fais confiance à ta mémoire musculaire.",
-      "text": "jjfj fjf jff fjj fjfj ffjf fjff jf ffjj jjff jjf jfjf fjjf fjjj jjjf fj ffj jfj",
+      "teaches": "fj",
+      "tip": "Bienvenue ! Pose tes index sur F (main gauche) et J (main droite) : ce sont les deux touches de référence, avec un petit relief sous chaque doigt. Ne regarde pas ton clavier : fais confiance à ta mémoire musculaire.",
       "tuto": {
-       "intro": "Bienvenue dans ta toute première leçon ! Prends 30 secondes pour comprendre la base de la frappe à dix doigts, c'est ce qui va tout changer pour la suite.",
+       "intro": "Bienvenue dans ta toute première leçon ! Prends 30 secondes pour comprendre la base de la frappe à dix doigts : c'est ce qui va tout changer pour la suite.",
        "rules": [
         {
          "icon": "🤲",
          "t": "La position de repos",
-         "d": "Pose tes huit doigts sur la rangée du milieu. Les deux index vont sur F et J : tu sens deux petits reliefs sous les doigts, c'est ton point de repère pour ne jamais regarder le clavier."
+         "d": "Pose tes huit doigts sur la rangée du milieu : A S D F pour la main gauche, J K L ; pour la main droite. Les deux index vont sur F et J, où tu sens un petit relief : c'est ton repère pour ne jamais regarder le clavier."
         },
         {
          "icon": "👁️",
@@ -3411,9 +3378,9 @@
          "d": "Ne regarde pas tes doigts. C'est en arrêtant de regarder le clavier que tu construis ta mémoire musculaire, celle qui te rendra vraiment rapide."
         },
         {
-         "icon": "📍",
-         "t": "Un doigt, une touche",
-         "d": "Le F se tape avec l'index gauche, le J avec l'index droit. Après chaque frappe, l'index revient se poser sur sa touche de repos."
+         "icon": "👍",
+         "t": "Les pouces sur la barre d'espace",
+         "d": "La grande barre du bas se tape avec le pouce, droit ou gauche, comme tu préfères. Entre deux groupes de lettres, un petit coup de pouce suffit."
         },
         {
          "icon": "🐢",
@@ -3421,15 +3388,16 @@
          "d": "Tape lentement et juste : chaque faute crée une mauvaise habitude. La vitesse viendra toute seule une fois le geste mémorisé."
         }
        ],
-       "tip": "Objectif de cette leçon : ancrer la position de tes deux index en ne tapant que F et J. Ne force pas, vise la régularité plutôt que la vitesse."
-      }
+       "tip": "Objectif : ancrer la position de tes deux index en ne tapant que F et J. Ne force pas, vise la régularité plutôt que la vitesse."
+      },
+      "text": "fj jf fj jf fjfj jfjf ffjj jjff fjf jfj ffj jjf fjfj jfjf fj jf fj jf ffjj jjff"
      },
      {
       "id": "r2",
       "title": "D et K, les majeurs",
       "keys": "d k",
+      "teaches": "dk",
       "tip": "Les majeurs se posent naturellement sur D et K, juste à côté des index. Garde les index sur F et J comme ancres : les autres doigts reviennent toujours à leur place de repos après chaque frappe.",
-      "text": "fjdf fk jd kjdd kjfk dk kd fdk djj ddkk kdkd ddkf dkdk fkj djf jkk kkdd kjk",
       "tuto": {
        "intro": "Tu ajoutes tes majeurs. D et K se posent juste à côté de tes index, sur la même rangée de repos.",
        "rules": [
@@ -3450,21 +3418,22 @@
         }
        ],
        "tip": "Objectif : enchaîner F D K J de mémoire, en gardant les quatre doigts proches de leur position de repos."
-      }
+      },
+      "text": "dk kd dk kd dkdk kdkd ddkk kkdd fd jk dj kf fdk jkd dfk kjd fdkj jkdf dkfj kjfd dk kd"
      },
      {
       "id": "r3",
       "title": "S et L, les annulaires",
       "keys": "s l",
-      "tip": "Les annulaires couvrent S et L. Tu as maintenant 6 doigts placés. Pense à la position en arc : les doigts reposent légèrement courbés, prêts à frapper sans lever le poignet.",
-      "text": "flj ssll ssff sl ssls kjls skdl lsls fjs jsfs ssl llls slsl llss ls sf llks jlls",
+      "teaches": "sl",
+      "tip": "Les annulaires couvrent S et L. Tu as maintenant six doigts placés. Pense à la position en arc : les doigts reposent légèrement courbés, prêts à frapper sans lever le poignet.",
       "tuto": {
        "intro": "Place tes annulaires sur S (à gauche) et L (à droite). Tu as maintenant six doigts posés sur la rangée de repos.",
        "rules": [
         {
          "icon": "🖐️",
          "t": "Des doigts moins habiles",
-         "d": "Les annulaires sont moins agiles que les index et les majeurs, c'est normal. Va doucement, la précision se construit avant la vitesse."
+         "d": "Les annulaires sont moins agiles que les index et les majeurs, c'est normal. Va doucement : la précision se construit avant la vitesse."
         },
         {
          "icon": "🌙",
@@ -3478,16 +3447,17 @@
         }
        ],
        "tip": "Objectif : taper S et L sans tordre la main, en revenant à chaque fois sur la rangée de repos."
-      }
+      },
+      "text": "sl ls sl ls slsl lsls ssll llss sd lk sf lj sdf lkj fsl jls sdfl lkjf slfd lsjk fdsl kjls sl ls"
      },
      {
       "id": "r4",
       "title": "A et point-virgule, les auriculaires",
       "keys": "a ;",
+      "teaches": "a;",
       "tip": "Les auriculaires (petits doigts) sont les moins forts, c'est normal. A à gauche, point-virgule à droite. Évite de tourner tout le poignet : laisse juste l'auriculaire s'étirer légèrement.",
-      "text": "aa;; asf k; ;a adad ak; d; fa ak;j ;a;a kkd; ;afs a;a; ;;aa ak k;f a; aafk",
       "tuto": {
-       "intro": "Au tour des auriculaires, les petits doigts : A à gauche, point-virgule à droite. Ce sont les plus délicats à dompter.",
+       "intro": "Au tour des auriculaires, les petits doigts : A à gauche, point-virgule à droite. Ce sont les plus délicats à dompter. Avec eux, ta rangée de repos est complète : A S D F, puis J K L ;.",
        "rules": [
         {
          "icon": "🤏",
@@ -3506,14 +3476,15 @@
         }
        ],
        "tip": "Objectif : activer les auriculaires sans casser ta position de repos. Lenteur et régularité avant tout."
-      }
+      },
+      "text": "a; ;a a; ;a a;a; ;a;a aa;; ;;aa as ;l ad ;k af ;j asd ;lk afs ;jl sa la sas las dada salsa"
      },
      {
       "id": "r5",
       "title": "G et H, index intérieurs",
       "keys": "g h",
+      "teaches": "gh",
       "tip": "G et H sont tapés par les index qui s'avancent légèrement vers le centre. Ce mouvement doit rester petit : l'index glisse, ne saute pas. Reviens sur F ou J après chaque frappe.",
-      "text": "hg lg hljj gghh gg; hf; dh gl gkhh ghgh hhgg gh gsjf afhg hll hghg alg lgs",
       "tuto": {
        "intro": "G et H sont au centre du clavier. Ce sont tes index qui s'avancent un peu pour les atteindre.",
        "rules": [
@@ -3525,7 +3496,7 @@
         {
          "icon": "⚓",
          "t": "Reviens sur F et J",
-         "d": "Juste après G ou H, ramène l'index sur sa touche de repos. Ce sont les touches les plus éloignées de ta position de base."
+         "d": "Juste après G ou H, ramène l'index sur sa touche de repos. Ce sont les touches de la rangée les plus éloignées de ta position de base."
         },
         {
          "icon": "🎯",
@@ -3534,14 +3505,15 @@
         }
        ],
        "tip": "Objectif : couvrir tout le centre de la rangée de repos sans déplacer les autres doigts."
-      }
+      },
+      "text": "gh hg gh hg ghgh hghg gghh hhgg gf hj gd hk gs hl fgh jhg dgh khg sgh lhg gala hall flash"
      },
      {
       "id": "r6",
       "title": "Révision : toute la rangée de repos",
       "keys": "a s d f g h j k l ;",
+      "teaches": "",
       "tip": "Révision complète de la rangée de repos. C'est ta base : tous tes doigts y reviennent après chaque frappe. Prends ton temps, la régularité compte plus que la vitesse.",
-      "text": "dj;g ;gf; fas ak ahd ;k sl sf fdhj fg lhl gklh dhlj dd; fks ;a lj shd",
       "tuto": {
        "intro": "Tu connais maintenant toute la rangée de repos : la rangée où tes doigts reviennent toujours, entre deux frappes.",
        "rules": [
@@ -3558,11 +3530,12 @@
         {
          "icon": "⚓",
          "t": "Position de repos constante",
-         "d": "Entre chaque frappe, sens que tes huit doigts sont revenus sur A S D F  J K L ;."
+         "d": "Entre chaque frappe, sens que tes huit doigts sont revenus sur A S D F et J K L ;."
         }
        ],
        "tip": "Objectif : valider toute la rangée de repos, doigts ancrés et yeux sur l'écran."
-      }
+      },
+      "text": "asdf jkl; fdsa ;lkj asdfg hjkl; gfdsa ;lkjh gala hall flash salsa dada sas las alfa"
      }
     ]
    },
@@ -5279,72 +5252,6 @@
   ]
  },
  "lessons": {
-  "r1": {
-   "title": "F et J, les index",
-   "keys": "f j",
-   "tip": "Bienvenue ! Pose tes index sur F (main gauche) et J (main droite) : ce sont les touches de référence, les deux petits reliefs que tu sens sous les doigts. Ne regarde pas ton clavier : fais confiance à ta mémoire musculaire.",
-   "module": "1. Position de base",
-   "moduleIdx": 0,
-   "kind": "drill",
-   "learned": "fj",
-   "newKeys": "fj",
-   "text": "jjfj fjf jff fjj fjfj ffjf fjff jf ffjj jjff jjf jfjf fjjf fjjj jjjf fj ffj jfj"
-  },
-  "r2": {
-   "title": "D et K, les majeurs",
-   "keys": "d k",
-   "tip": "Les majeurs se posent naturellement sur D et K, juste à côté des index. Garde les index sur F et J comme ancres : les autres doigts reviennent toujours à leur place de repos après chaque frappe.",
-   "module": "1. Position de base",
-   "moduleIdx": 0,
-   "kind": "drill",
-   "learned": "fjdk",
-   "newKeys": "dk",
-   "text": "fjdf fk jd kjdd kjfk dk kd fdk djj ddkk kdkd ddkf dkdk fkj djf jkk kkdd kjk"
-  },
-  "r3": {
-   "title": "S et L, les annulaires",
-   "keys": "s l",
-   "tip": "Les annulaires couvrent S et L. Tu as maintenant 6 doigts placés. Pense à la position en arc : les doigts reposent légèrement courbés, prêts à frapper sans lever le poignet.",
-   "module": "1. Position de base",
-   "moduleIdx": 0,
-   "kind": "drill",
-   "learned": "fjdksl",
-   "newKeys": "sl",
-   "text": "flj ssll ssff sl ssls kjls skdl lsls fjs jsfs ssl llls slsl llss ls sf llks jlls"
-  },
-  "r4": {
-   "title": "A et point-virgule, les auriculaires",
-   "keys": "a ;",
-   "tip": "Les auriculaires (petits doigts) sont les moins forts, c'est normal. A à gauche, point-virgule à droite. Évite de tourner tout le poignet : laisse juste l'auriculaire s'étirer légèrement.",
-   "module": "1. Position de base",
-   "moduleIdx": 0,
-   "kind": "drill",
-   "learned": "fjdksla;",
-   "newKeys": "a;",
-   "text": "aa;; asf k; ;a adad ak; d; fa ak;j ;a;a kkd; ;afs a;a; ;;aa ak k;f a; aafk"
-  },
-  "r5": {
-   "title": "G et H, index intérieurs",
-   "keys": "g h",
-   "tip": "G et H sont tapés par les index qui s'avancent légèrement vers le centre. Ce mouvement doit rester petit : l'index glisse, ne saute pas. Reviens sur F ou J après chaque frappe.",
-   "module": "1. Position de base",
-   "moduleIdx": 0,
-   "kind": "drill",
-   "learned": "fjdksla;gh",
-   "newKeys": "gh",
-   "text": "hg lg hljj gghh gg; hf; dh gl gkhh ghgh hhgg gh gsjf afhg hll hghg alg lgs"
-  },
-  "r6": {
-   "title": "Révision : toute la rangée de repos",
-   "keys": "a s d f g h j k l ;",
-   "tip": "Révision complète de la rangée de repos. C'est ta base : tous tes doigts y reviennent après chaque frappe. Prends ton temps, la régularité compte plus que la vitesse.",
-   "module": "1. Position de base",
-   "moduleIdx": 0,
-   "kind": "drill",
-   "learned": "fjdksla;gh",
-   "newKeys": "",
-   "text": "dj;g ;gf; fas ak ahd ;k sl sf fdhj fg lhl gklh dhlj dd; fks ;a lj shd"
-  },
   "h1": {
    "title": "R et U, premiers vrais mots",
    "keys": "r u",

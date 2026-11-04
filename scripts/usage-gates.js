@@ -299,12 +299,10 @@ function u10(update) {
   const { gestureFor } = require('./gesture');
   const course = JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'));
   const base = loadApp();
+  base.run('globalThis.__c=' + JSON.stringify(course) + ';kpApplyCourseData("fr/qwerty",__c);');
   const order = JSON.parse(base.run('JSON.stringify(ALL_LESSONS.map(l=>l.id))'));
   const texts = {};
-  for (const id of order) {
-    if (course.lessons[id]) texts[id] = course.lessons[id].text;
-    else { base.run("currentUser=null;app.stats=app.stats||mergeStats();"); texts[id] = base.run('app.makeSession("lesson",' + JSON.stringify(id) + ').text'); }
-  }
+  for (const id of order) { base.run("currentUser=null;app.stats=app.stats||mergeStats();"); texts[id] = base.run('app.makeSession("lesson",' + JSON.stringify(id) + ').text'); }
   const TOL = { '«': ['"'], '»': ['"'], 'œ': ['o', 'e'], 'Œ': ['O', 'e'], 'æ': ['a', 'e'], 'Æ': ['A', 'e'] };
   const errs = []; const needsTolerance = {}; let sessions = 0;
   for (const vid of QWERTY_VARIANTS) {
@@ -389,7 +387,8 @@ async function u12() {
   h.run('globalThis.__d=' + JSON.stringify(course) + ';');
   if (!h.run("kpApplyCourseData('fr/qwerty',__d)")) errs.push('le contenu QWERTY n\'est pas appliqué');
   const r4 = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id==="r4"))'));
-  if (r4.keys !== 'a ;' || r4.text !== course.lessons.r4.text || r4.tuto.intro !== course.tutos.r4.intro) errs.push('r4 : le contenu QWERTY n\'est pas appliqué (touches, texte, tutoriel)');
+  const r4want = course.curriculum.modules.flatMap((m) => m.lessons).find((l) => l.id === 'r4');
+  if (r4.keys !== 'a ;' || r4.text !== r4want.text || r4.tuto.intro !== r4want.tuto.intro) errs.push('r4 : le contenu QWERTY n\'est pas appliqué (touches, texte, tutoriel)');
   const acc1 = JSON.parse(h.run('JSON.stringify(ALL_LESSONS.find(l=>l.id==="acc1"))'));
   if (/AZERTY/.test(JSON.stringify(acc1.tuto))) errs.push('acc1 : le tutoriel cite encore l\'AZERTY');
   if (/AZERTY/.test(mods())) errs.push('un nom de module cite encore l\'AZERTY');
@@ -487,9 +486,10 @@ function u14() {
   h.run('kpApplyCourseData("fr/qwerty",__c)'); const viaCurriculum = state();
   const A = JSON.parse(viaOverlay), B = JSON.parse(viaCurriculum);
   // la voie « programme » n'a pas de pool de lettres par leçon pour le cours actuel : on compare tout le reste
-  const strip = (x) => ({ ...x, les: x.les.map((r) => r.slice(0, 11)) });
+  const hand = new Set(course.handwritten || []); // leçons écrites à la main : comparées par la gate Q9, pas à l'ancienne voie
+  const strip = (x) => ({ ...x, les: x.les.filter((r) => !hand.has(r[0])).map((r) => r.slice(0, 11)) });
   if (JSON.stringify(strip(A)) !== JSON.stringify(strip(B))) {
-    const i = A.les.findIndex((r, k) => JSON.stringify(r.slice(0, 11)) !== JSON.stringify(B.les[k].slice(0, 11)));
+    const i = A.les.findIndex((r, k) => !hand.has(r[0]) && JSON.stringify(r.slice(0, 11)) !== JSON.stringify(B.les[k].slice(0, 11)));
     errs.push('les deux voies donnent des programmes différents' + (i >= 0 ? ` (leçon ${A.les[i][0]})` : ' (modules, leçons gratuites ou aide de geste)'));
   }
   // retour : mêmes objets
