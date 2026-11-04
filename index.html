@@ -4564,6 +4564,48 @@ function kpAccentBase(c){
   const b=c.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   return b.length===1&&b!==c&&/[a-zA-Z]/.test(b)?b:c;
 }
+/* Détection de la famille de clavier (AZERTY / QWERTY / QWERTZ) à partir des lettres réellement tapées : une touche physique
+   (e.code) qui produit telle lettre (e.key) la trahit (KeyQ→a = AZERTY, KeyQ→q = QWERTY, KeyY→z = QWERTZ). Rien n'est stocké ni
+   envoyé : tout reste en mémoire dans la page. Chromium ajoute navigator.keyboard.getLayoutMap() comme source supplémentaire. */
+const KP_KB_EVIDENCE={KeyQ:{a:'azerty',q:'qwerty'},KeyA:{q:'azerty',a:'qwerty'},KeyW:{z:'azerty',w:'qwerty'},KeyZ:{w:'azerty',z:'qwerty',y:'qwertz'},KeyY:{z:'qwertz'}};
+function kpKbFamilyFromSamples(samples){
+  const seen={};
+  for(const sm of samples||[]){
+    const f=(KP_KB_EVIDENCE[sm.code]||{})[String(sm.key||'').toLowerCase()];
+    if(f)(seen[f]=seen[f]||new Set()).add(sm.code);
+  }
+  const fams=Object.keys(seen);
+  // Décidé seulement si UNE famille a au moins 2 touches distinctes qui la trahissent et qu'aucune autre n'apparaît.
+  return fams.length===1&&seen[fams[0]].size>=2?fams[0]:null;
+}
+/* Familles que le site sait proposer aujourd'hui : le QWERTY s'ajoutera ici quand son cours existera (rien n'est suggéré avant). */
+const KP_KB_FAMILIES_OFFERED=['azerty'];
+const _kpKbSamples=[];let _kpKbSuggested=false;
+function kpKbSample(e){
+  try{
+    if(_kpKbSuggested||!e||!e.code||!e.key||e.key.length!==1||e.altKey||e.ctrlKey||e.metaKey)return;
+    if(!KP_KB_EVIDENCE[e.code])return;
+    if(_kpKbSamples.length<40)_kpKbSamples.push({code:e.code,key:e.key});
+    const f=kpKbFamilyFromSamples(_kpKbSamples);
+    if(f)kpKbSuggest(f);
+  }catch{}
+}
+function kpKbSuggest(family){
+  const current='azerty'; // toutes les dispositions réglables aujourd'hui (KB_LAYOUTS) sont des AZERTY
+  if(_kpKbSuggested||family===current||!KP_KB_FAMILIES_OFFERED.includes(family))return;
+  let dismissed=false;try{dismissed=localStorage.getItem('kp_kb_suggest_no')===family;}catch{}
+  if(dismissed)return;
+  _kpKbSuggested=true;
+  try{
+    const n=document.createElement('div');n.id='kp-kb-suggest';n.setAttribute('role','status');
+    n.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:min(560px,calc(100vw - 24px));background:#3A352B;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.4;z-index:9999;box-shadow:0 6px 24px rgba(0,0,0,.25)';
+    n.innerHTML='<div>Ton clavier semble être un '+family.toUpperCase()+'. Veux-tu choisir cette disposition dans les réglages ?</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" id="kp-kbs-yes" style="padding:6px 12px;border-radius:8px;border:0;cursor:pointer;font:inherit">Choisir mon clavier</button><button type="button" id="kp-kbs-no" style="padding:6px 12px;border-radius:8px;border:0;cursor:pointer;font:inherit">Garder le réglage actuel</button></div>';
+    document.body.appendChild(n);
+    n.querySelector('#kp-kbs-yes').onclick=()=>{n.remove();if(window.app&&app.openSettings)app.openSettings();};
+    n.querySelector('#kp-kbs-no').onclick=()=>{try{localStorage.setItem('kp_kb_suggest_no',family);}catch{}n.remove();};
+    setTimeout(()=>{try{n.remove();}catch{}},30000);
+  }catch{}
+}
 /* Bandeau discret (sans fenêtre bloquante) quand l'élève rate plusieurs fois la même lettre accentuée en tapant la lettre nue. */
 let _kpAccBannerShown=false;
 function kpAccentBannerShow(ch){
@@ -7455,6 +7497,7 @@ const app={
     // sinon typeKey() fait preventDefault() et rien ne s'inscrit dans le champ.
     const t=e.target;
     if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable))return;
+    if(!e._direct)kpKbSample(e);
     if(e.key&&e.key.length===1){this._lastKdKey=e.key;this._lastKdAt=Date.now();}
     // Alt + pavé numérique (Alt + 0156…) : les chiffres tapés ne sont pas des frappes (le caractère final
     // arrive par un événement « keypress », cf. _onKeyPress_).

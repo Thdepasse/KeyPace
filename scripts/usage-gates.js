@@ -247,4 +247,46 @@ function u8() {
   h = mk(); h.run("localStorage.setItem('kp_accents','tolerant')"); start(h, 'été', ',cert:true'); press(h, { key: 'e' }); if (faults(h) !== 1) errs.push('certificat : la tolérance ne doit pas s\'appliquer');
   return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: 'exigés par défaut, bandeau au 3e échec, toléré marqué tolerant:true, certificat toujours exigeant' };
 }
-module.exports = { u1, u2, u3, u4, u5, u6, u7, u8, typableSet, plan };
+
+// U9 : détection de la famille de clavier à partir des frappes (suggestion dans les réglages). Les 29 dispositions du dépôt
+// doivent être reconnues dans leur famille, sans jamais se tromper, et rien ne doit être suggéré ni envoyé tant que le site
+// ne propose pas cette famille.
+function u9() {
+  const errs = [];
+  const dir = path.join(root, 'layouts-src');
+  const h = loadApp();
+  const CODES = ['KeyQ', 'KeyA', 'KeyW', 'KeyZ', 'KeyY'];
+  const detect = (samples) => h.run('kpKbFamilyFromSamples(' + JSON.stringify(samples) + ')');
+  let n = 0;
+  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json'))) {
+    const def = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
+    const map = {};
+    if (def.keys) for (const [c, k] of Object.entries(def.keys)) map[c] = k.l;
+    else for (const k of [...def.rows.flat(), ...Object.values(def.extra || {}).flat()]) map[k.c] = k.l;
+    const want = f.startsWith('azerty-') ? 'azerty' : 'qwerty';
+    const samples = CODES.filter((c) => map[c]).map((c) => ({ code: c, key: map[c] }));
+    const got = detect(samples);
+    if (got !== want) errs.push(`${f} : famille ${got} au lieu de ${want} (${samples.map((x) => x.code + '→' + x.key).join(' ')})`);
+    n++;
+  }
+  // QWERTZ (pas de modèle dans le dépôt : cas synthétique)
+  if (detect([{ code: 'KeyY', key: 'z' }, { code: 'KeyZ', key: 'y' }]) !== 'qwertz') errs.push('QWERTZ non reconnu');
+  // une seule touche ne suffit pas ; des signaux contradictoires ne décident rien ; majuscules et inconnues ignorées
+  if (detect([{ code: 'KeyQ', key: 'a' }]) !== null) errs.push('une seule touche ne doit pas décider');
+  if (detect([{ code: 'KeyQ', key: 'a' }, { code: 'KeyA', key: 'a' }]) !== null) errs.push('signaux contradictoires : aucune décision attendue');
+  if (detect([{ code: 'KeyQ', key: 'A' }, { code: 'KeyW', key: 'Z' }]) !== 'azerty') errs.push('les majuscules doivent compter');
+  if (detect([{ code: 'KeyQ', key: 'q' }, { code: 'KeyQ', key: 'q' }, { code: 'KeyQ', key: 'q' }]) !== null) errs.push('la même touche répétée ne doit pas compter plusieurs fois');
+  if (detect([{ code: 'KeyP', key: 'p' }, { code: 'KeyK', key: 'k' }]) !== null) errs.push('des touches non discriminantes ne décident rien');
+  // dans le vrai moteur : un QWERTY tapé ne suggère rien aujourd'hui (le site ne propose que l'AZERTY), rien n'est envoyé
+  const g = loadApp(); g.run("currentUser=null;currentToken=null;_statsLoaded=true;app.stats=mergeStats();app.view='test';app.sess=app.makeSession('test');");
+  g.fetchCalls.length = 0;
+  for (const [c, k] of [['KeyQ', 'q'], ['KeyW', 'w'], ['KeyA', 'a'], ['KeyZ', 'z']]) press(g, { key: k, code: c });
+  if (g.run('_kpKbSuggested')) errs.push('une suggestion QWERTY est affichée alors que le site ne la propose pas encore');
+  if (g.fetchCalls.length) errs.push('la détection du clavier a envoyé quelque chose au serveur');
+  // un AZERTY tapé sur le site AZERTY ne suggère rien non plus
+  const a = loadApp(); a.run("currentUser=null;currentToken=null;_statsLoaded=true;app.stats=mergeStats();app.view='test';app.sess=app.makeSession('test');");
+  for (const [c, k] of [['KeyQ', 'a'], ['KeyW', 'z'], ['KeyA', 'q']]) press(a, { key: k, code: c });
+  if (a.run('_kpKbSuggested')) errs.push('une suggestion apparaît pour un AZERTY déjà bien réglé');
+  return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: `${n} dispositions reconnues dans leur famille, aucune suggestion ni envoi tant que le QWERTY n'est pas proposé` };
+}
+module.exports = { u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
