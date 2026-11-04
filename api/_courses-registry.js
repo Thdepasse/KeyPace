@@ -1,12 +1,31 @@
-// Registre des cours que le serveur accepte d'écrire dans `progress.data.courses`
-// (étape 2 du plan clavier/langues). Un cours = langue de contenu + famille de clavier,
-// par exemple 'nl/azerty'. Le cours par défaut 'fr/azerty' n'est PAS ici : il reste dans les
-// champs plats du bloc, comme avant (migration additive, voir docs/PLAN-clavier-qwerty.md, 4.4).
-// Vide tant qu'aucun second cours n'est ouvert : le serveur ignore alors tout `courses` envoyé
-// par le client. Plus tard ce fichier sera produit par le script de build, depuis le registre
-// unique lu aussi par le client (plan 4.6).
+// Registre des cours que le serveur accepte d'écrire dans `progress.data.courses` (étape 2 du plan clavier/langues) et QUI y a accès.
+// Un cours = langue de contenu + famille de clavier, par exemple 'fr/qwerty'. Le cours par défaut 'fr/azerty' n'est PAS ici : il reste
+// dans les champs plats du bloc, comme avant (migration additive, voir docs/PLAN-clavier-qwerty.md, 4.4).
+//
+// Statut de chaque cours : 'bêta' (réservé aux COMPTES TESTEURS) ou 'en ligne' (tous les comptes). Le contrôle est fait ICI, côté serveur,
+// d'après le compte enregistré en base : le client est public et ne protège rien. Le site demande au serveur la liste des cours auxquels le
+// compte a droit (save-progress, requête `access`) et ne propose que ceux-là.
+// Les comptes testeurs sont dans la variable d'environnement KEYPACE_BETA_TESTERS (noms d'utilisateur séparés par des virgules, sans
+// distinction de casse). Vide ou absente : personne. On la change dans les réglages Vercel du projet, puis on redéploie.
 const DEFAULT_COURSE = 'fr/azerty';
-const COURSE_IDS = [];
+const COURSE_ACCESS = {
+  'fr/qwerty': { status: 'bêta' },
+};
+const COURSE_IDS = Object.keys(COURSE_ACCESS);
 const COURSE_ID_RE = /^[a-z]{2,3}(-[A-Z]{2})?\/[a-z0-9-]{2,24}$/;
 
-module.exports = { DEFAULT_COURSE, COURSE_IDS, COURSE_ID_RE };
+function betaTesters() {
+  return String(process.env.KEYPACE_BETA_TESTERS || '').split(',').map((x) => x.trim().toLowerCase()).filter(Boolean);
+}
+
+// Identifiants de cours que CE compte peut écrire et voir (nom d'utilisateur lu en base, jamais ce que le client envoie).
+function courseIdsFor(user) {
+  const name = String((user && user.username) || '').trim().toLowerCase();
+  const tester = !!name && betaTesters().includes(name);
+  return COURSE_IDS.filter((id) => {
+    const a = COURSE_ACCESS[id];
+    return a.status === 'en ligne' || (a.status === 'bêta' && tester);
+  });
+}
+
+module.exports = { DEFAULT_COURSE, COURSE_ACCESS, COURSE_IDS, COURSE_ID_RE, courseIdsFor, betaTesters };

@@ -293,6 +293,7 @@ const GATES = process.env.GATES_FAKE_RED
     { id: 'U10', name: 'Cours QWERTY : chaque leçon rejouée avec les frappes de 8 variantes de clavier', run: () => usage().u10(UPDATE) },
     { id: 'U11', name: 'Espace pays et langue (drapeau) : registre, défaut, repli, rien envoyé', run: () => usage().u11() },
     { id: 'U12', name: 'Cours : course() identique par défaut, contenu, progression par cours, serveur', run: () => usage().u12() },
+    { id: 'U13', name: 'Accès bêta aux cours : liste demandée au serveur, retrait propre', run: () => usage().u13() },
     { id: 'T1', name: 'Traces de matériel réel rejouées dans le moteur (G6)', run: () => require('./traces-gate').run() },
     { id: 'B1', name: 'Vrai navigateur : chargement, écrans, 26 claviers, vraies frappes', run: b1 },
   ];

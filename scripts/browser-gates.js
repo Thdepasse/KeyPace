@@ -15,6 +15,16 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.
 function serve() {
   const server = http.createServer((req, res) => {
     const u = decodeURIComponent((req.url || '/').split('?')[0]);
+    // Sauvegarde de la progression d'un compte simulé : le faux serveur répond « enregistré » (sinon un 401 déconnecterait le compte du test).
+    if (u === '/api/save-progress' && req.method === 'POST') {
+      let raw = ''; req.on('data', (c) => { raw += c; });
+      return req.on('end', () => { let body = {}; try { body = JSON.parse(raw); } catch (e) { /* corps vide */ } res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(body.access === true ? { ok: true, coursAcces: /testeur/.test(String(body.token)) ? ['fr/qwerty'] : [] } : { ok: true })); });
+    }
+    // Réouverture de session (ouverture des réglages) : le faux serveur reconnaît le jeton du compte simulé (sinon `{}` effacerait son nom).
+    if (u === '/api/login' && req.method === 'POST') {
+      let raw = ''; req.on('data', (c) => { raw += c; });
+      return req.on('end', () => { let body = {}; try { body = JSON.parse(raw); } catch (e) { /* corps vide */ } res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(body.action === 'session-login' && body.token ? { username: String(body.token).replace(/^tok-?/, '') || 'tester', token: body.token, plan: 'free', role: 'eleve' } : {})); });
+    }
     if (u.startsWith('/api/')) {
       // Sans compte, le serveur répond 401 aux actions réservées aux comptes ; le reste reçoit un objet vide.
       const guestOnly = /^\/api\/(classes|save-progress|institutions|billing)/.test(u);
@@ -187,7 +197,13 @@ async function run(opts = {}) {
       // BR7 : « Mon clavier » : passer d'AZERTY à QWERTY et revenir, dans le vrai navigateur (le QWERTY est proposé seulement pour ce test)
       try {
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2500); exceptions.splice(0);
-        await ev("localStorage.clear();KP_COURSES_OFFERED.push('fr/qwerty');app.openSettings();true"); await sleep(500);
+        // un élève ne voit pas les cartes : le cours QWERTY est en bêta pour les comptes testeurs
+        await ev("localStorage.clear();currentUser='eleve1';currentToken='tok-eleve';currentUserId='uid';_statsLoaded=true;app.stats=mergeStats({role:'eleve'});_kpAccessFor=null;updateNavUser();true"); await sleep(500); await ev("app.openSettings();true"); await sleep(400);
+        const noCards = await ev("document.querySelectorAll('#kb-family-box .kb-family-card').length");
+        if (noCards !== 0) problems.push(`BR7 : ${noCards} cartes de famille visibles pour un élève`);
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2200); exceptions.splice(0); // page neuve pour l'admin
+        await ev("localStorage.clear();currentUser='testeur';currentToken='tok-testeur';currentUserId='uid';_statsLoaded=true;app.stats=mergeStats();_kpAccessFor=null;updateNavUser();true"); await sleep(600); await ev("app.openSettings();true"); await sleep(500);
+        if (!(await ev("KP_COURSES_OFFERED.includes('fr/qwerty')"))) problems.push('BR7 : le cours QWERTY n\'est pas proposé à un compte testeur');
         const cards = await ev("({n:document.querySelectorAll('#kb-family-box .kb-family-card').length,active:[...document.querySelectorAll('#kb-family-box .kb-family-card.active')].map(x=>x.querySelector('strong').innerText)})");
         if (cards.n !== 2) problems.push(`BR7 : ${cards.n} cartes de famille au lieu de 2`);
         if (cards.active.join() !== 'AZERTY') problems.push(`BR7 : famille active au départ « ${cards.active} »`);
@@ -217,14 +233,14 @@ async function run(opts = {}) {
         const shown = await ev("(()=>{const l=ALL_LESSONS.find(x=>x.id==='acc1');return kbHowHTML(l)})()");
         if (!/Sur ton clavier \(Mac/.test(shown) || !/Option/.test(shown)) problems.push('BR7 : le bloc « Sur ton clavier » de acc1 ne donne pas le geste Mac');
         // une vraie leçon se tape et s'enregistre dans le cours QWERTY, pas dans le plat
-        await ev("currentUser='tester';currentToken='tok';currentUserId='uid';_statsLoaded=true;app.stats=mergeStats();app.view='lessons';app.sess=app.makeSession('lesson','r1');true");
+        await ev("app.closeSettings();app.view='lessons';app.sess=app.makeSession('lesson','r1');true"); await sleep(200);
         const t7 = await ev('app.sess.text');
         for (const ch of t7) { const code = codeFor(ch); await S('Input.dispatchKeyEvent', { type: 'keyDown', key: ch, code, text: ch, unmodifiedText: ch, windowsVirtualKeyCode: ch.toUpperCase().charCodeAt(0) }); await S('Input.dispatchKeyEvent', { type: 'keyUp', key: ch, code, windowsVirtualKeyCode: ch.toUpperCase().charCodeAt(0) }); }
         await sleep(200);
-        const rec = await ev("({flat:Object.keys(app.stats.lessons),q:Object.keys((app.stats.courses||{})['fr/qwerty']?(app.stats.courses['fr/qwerty'].lessons):{}),fin:app.sess.finished})");
+        const rec = await ev("({flat:Object.keys(app.stats.lessons),q:Object.keys((app.stats.courses||{})['fr/qwerty']?(app.stats.courses['fr/qwerty'].lessons):{}),fin:app.sess.finished,course:kpCourseId(),offered:KP_COURSES_OFFERED.join(),user:currentUser,statsKeys:Object.keys(app.stats).join()})");
         if (!rec.fin || rec.flat.length || !rec.q.includes('r1')) problems.push(`BR7 : la leçon QWERTY n'est pas enregistrée dans stats.courses (${JSON.stringify(rec)})`);
         // retour à l'AZERTY : tout est restauré, les claviers QWERTY sont retirés
-        await ev("currentUser=null;app.stats=null;app.sess=null;app.openSettings();true"); await sleep(300);
+        await ev("app.sess=null;app.openSettings();true"); await sleep(300);
         await ev("document.querySelectorAll('#kb-family-box .kb-family-card')[0].click();true"); await sleep(150);
         await ev("document.getElementById('kb-sw-yes').click();true"); await sleep(1000);
         const back = await ev("({course:kpCourseId(),layout:getKbLayoutId(),r4:ALL_LESSONS.find(x=>x.id==='r4').title,gone:!KB_LAYOUTS['windows-us'],btns:document.querySelectorAll('#kb-layout-btns .kb-layout-btn').length})");

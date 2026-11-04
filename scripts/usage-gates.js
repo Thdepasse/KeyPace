@@ -168,13 +168,13 @@ function u6() {
         press(h, { key: 'x' }); // le caractère suivant doit être accepté ensuite, sans faute (sinon la séquence n'est pas complète)
         return h.run('app.sess.finished') === true && h.run('app.sess.keystrokes') === h.run('app.sess.correct');
       };
-      const t0 = Date.now(); const BUDGET_MS = 1500; let cut = false;
+      let tries = 0; const MAX_TRIES = 6000; let cut = false; // borne en nombre d'essais, pas en secondes : le résultat ne dépend plus de la charge de la machine
       for (const k of keys) if (tryseq([k])) { seq = [k]; break; }
       const second = keys.filter((c) => /^[a-z ]$/.test(c));
-      if (!seq) outer: for (const a of keys) for (const b of second) { if (Date.now() - t0 > BUDGET_MS) { cut = true; break outer; } if (tryseq([a, b])) { seq = [a, b]; break outer; } }
+      if (!seq) outer: for (const a of keys) for (const b of second) { if (++tries > MAX_TRIES) { cut = true; break outer; } if (tryseq([a, b])) { seq = [a, b]; break outer; } }
       (found[lay] = found[lay] || {})[ch] = seq;
       const documented = TOLERANCE[ch];
-      if (!seq) errs.push(`${lay} : « ${ch} » n'a aucun geste de 1 ou 2 touches accepté par le moteur${cut ? ' (recherche arrêtée à 1,5 s)' : ''}`);
+      if (!seq) errs.push(`${lay} : « ${ch} » n'a aucun geste de 1 ou 2 touches accepté par le moteur${cut ? ' (recherche limitée à 6000 essais)' : ''}`);
       else if (documented && !tryseq(documented)) errs.push(`${lay} : la tolérance documentée pour « ${ch} » n'est pas acceptée par le moteur`);
     }
   }
@@ -427,4 +427,45 @@ async function u12() {
   }
   return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: 'course() identique par défaut, contenu QWERTY appliqué et retiré à l\'identique, progression écrite dans stats.courses, serveur : gardée si au registre, ignorée sinon' };
 }
-module.exports = { u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
+
+// U13 : accès bêta aux cours. Le SERVEUR décide (comptes testeurs, api/_courses-access.test.js) ; le site demande la liste, ne propose que ces
+// cours, ignore ce qu'il ne connaît pas, n'en propose aucun à un visiteur ni en cas d'erreur, et un compte qui perd l'accès retrouve le
+// cours AZERTY, contenu et clavier restaurés.
+async function u13() {
+  const errs = []; const h = loadApp();
+  const offered = () => JSON.parse(h.run('JSON.stringify(KP_COURSES_OFFERED)')).join();
+  const login = (name) => h.run(`currentUser='${name}';currentToken='tok-${name}';currentUserId='u';_statsLoaded=true;app.stats=mergeStats();_kpAccessFor=null;`);
+  const stub = (body, ok = true) => { h.run(`globalThis.__n=0;globalThis.__bodies=[];fetch=async(u,o)=>{__n++;__bodies.push(o&&o.body);return{ok:${ok},status:${ok ? 200 : 500},json:async()=>(${JSON.stringify(body)}),text:async()=>'{}'}};`); };
+  // visiteur : rien, même si une liste lui était donnée
+  h.run("currentUser=null;currentToken=null;"); h.run("kpSetAllowed(['fr/qwerty'])");
+  if (offered() !== 'fr/azerty') errs.push('un visiteur se voit proposer le cours QWERTY');
+  // compte sans accès
+  login('eleve'); stub({ ok: true, coursAcces: [] }); await h.run('kpFetchAccess()');
+  if (offered() !== 'fr/azerty') errs.push('un compte sans accès se voit proposer le cours QWERTY');
+  // compte testeur : la requête n'envoie que le jeton et access:true
+  login('testeur'); stub({ ok: true, coursAcces: ['fr/qwerty'] }); await h.run('kpFetchAccess()');
+  if (offered() !== 'fr/azerty,fr/qwerty') errs.push('un compte testeur ne se voit pas proposer le cours QWERTY');
+  const sent = JSON.parse(h.run('__bodies[0]'));
+  if (JSON.stringify(Object.keys(sent).sort()) !== '["access","token"]' || sent.access !== true) errs.push('la demande d\'accès envoie autre chose que le jeton et access:true : ' + JSON.stringify(sent));
+  await h.run('kpFetchAccess()'); if (h.run('__n') !== 1) errs.push('la liste est redemandée à chaque appel pour le même compte (' + h.run('__n') + ' requêtes)');
+  // identifiants inconnus ou fr/azerty dans la réponse : ignorés
+  login('autre'); stub({ ok: true, coursAcces: ['xx/yy', 'fr/azerty', 'fr/qwerty', '../x'] }); await h.run('kpFetchAccess()');
+  if (offered() !== 'fr/azerty,fr/qwerty') errs.push('identifiants inconnus non ignorés : ' + offered());
+  // erreur serveur ou réseau : rien de proposé, on réessaiera
+  login('panne'); h.run('kpSetAllowed([])'); stub({}, false); await h.run('kpFetchAccess()');
+  if (offered() !== 'fr/azerty') errs.push('une erreur serveur laisse le cours QWERTY proposé');
+  h.run("fetch=async()=>{throw new Error('réseau')};"); h.run('_kpAccessFor=null;'); await h.run('kpFetchAccess()');
+  if (offered() !== 'fr/azerty') errs.push('une panne réseau laisse le cours QWERTY proposé');
+  if (h.run('_kpAccessFor') !== null) errs.push('après une panne, la demande n\'est pas marquée à refaire');
+  // le testeur choisit le QWERTY, puis perd l'accès : AZERTY, contenu et clavier restaurés
+  login('testeur2'); h.run('kpSetAllowed([\'fr/qwerty\'])');
+  h.run("kpApplyCourseData('fr/qwerty'," + JSON.stringify(JSON.parse(fs.readFileSync(path.join(root, 'courses-src', 'fr-qwerty.json'), 'utf8'))) + ");localStorage.setItem('kp_course','fr/qwerty');setKbLayoutId('windows-us-intl');applyKbLayout('windows-us-intl');");
+  if (h.run('kpCourseId()') !== 'fr/qwerty') errs.push('cours QWERTY non choisi pour le testeur');
+  h.run('kpSetAllowed([])');
+  if (h.run('kpCourseId()') !== 'fr/azerty') errs.push('un compte sans accès garde le cours QWERTY');
+  if (h.run("ALL_LESSONS.find(l=>l.id==='r4').keys") !== 'q m') errs.push('contenu QWERTY non retiré après perte d\'accès');
+  if (h.run("!!KB_LAYOUTS['windows-us-intl']")) errs.push('clavier QWERTY non retiré après perte d\'accès');
+  if (!['fr', 'be', 'mac', 'nf'].includes(h.run('getKbLayoutId()'))) errs.push('disposition invalide après perte d\'accès : ' + h.run('getKbLayoutId()'));
+  return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: 'liste demandée au serveur (jeton et access:true seulement), une fois par compte ; visiteur, erreur et inconnus ignorés ; retrait propre à la perte d\'accès' };
+}
+module.exports = { u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };

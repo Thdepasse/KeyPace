@@ -1,5 +1,6 @@
 const { setCorsOrigin } = require('./_cors');
 const { sanitizeProgress, MAX_BYTES } = require('./_progress-sanitize');
+const { courseIdsFor } = require('./_courses-registry');
 const { mergeProgress } = require('./_progress-merge');
 const { archiveReasons, toEvict, alreadyKept, counts } = require('./_progress-history');
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -48,9 +49,12 @@ module.exports = async function handler(req, res) {
   let { data } = req.body || {};
   if (!token) return res.status(400).json({ error: 'Token manquant.' });
 
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id`);
+  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,role,username`);
   const user = r.data && r.data[0];
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
+
+  // Cours auxquels ce compte a droit (cours en bêta : comptes testeurs). Ne touche ni à la progression ni à la sauvegarde.
+  if (req.body && req.body.access === true) return res.json({ ok: true, coursAcces: courseIdsFor(user) });
 
   // Pas de `data` => lecture : on renvoie la progression enregistrée (utilisé au chargement)
   if (data === undefined || data === null) {
@@ -89,7 +93,7 @@ module.exports = async function handler(req, res) {
 
     // Nettoyage : champs du serveur (role, classes, courses) conservés, valeurs impossibles
     // écartées champ par champ (la valeur enregistrée est gardée), clés inconnues signalées.
-    const clean = sanitizeProgress(next, prevData);
+    const clean = sanitizeProgress(next, prevData, Date.now(), courseIdsFor(user));
     next = clean.data;
     if (attempt === 0 && (clean.dropped.length || clean.unknownKeys.length)) {
       console.warn('save-progress nettoyage', JSON.stringify({ user: user.id, ecartes: clean.dropped.length, champs: [...new Set(clean.dropped)], clesInconnues: clean.unknownKeys }));

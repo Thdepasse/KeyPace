@@ -3726,6 +3726,7 @@ function logout(){
 }
 
 function updateNavUser(){
+  kpRefreshOffered();kpFetchAccess().catch(()=>{});
   const guest=document.getElementById('nav-guest');
   const logged=document.getElementById('nav-logged');
   if(!currentUser){
@@ -4124,6 +4125,38 @@ const KP_COURSES={
 };
 /* Cours que le site propose aujourd'hui. Le QWERTY s'ajoute ici quand il est ouvert (bêta côté serveur, puis public). */
 const KP_COURSES_OFFERED=['fr/azerty'];
+/* Qui voit quoi : le SERVEUR dit à quels cours ce compte a droit (cours en bêta : comptes testeurs, liste dans les réglages Vercel,
+   cf. api/_courses-registry.js). Le site ne propose que ceux-là ; rien n'est décidé ici. Visiteur ou erreur réseau : cours par défaut seul. */
+let _kpAllowed=[],_kpAccessFor=null;
+function kpSetAllowed(ids){
+  _kpAllowed=Array.isArray(ids)?ids.filter(id=>KP_COURSES[id]&&id!=='fr/azerty'):[];
+  kpRefreshOffered();
+}
+async function kpFetchAccess(){
+  if(!currentUser||!currentToken){if(_kpAllowed.length){_kpAccessFor=null;kpSetAllowed([]);}return;}
+  if(_kpAccessFor===currentToken)return;
+  _kpAccessFor=currentToken;
+  try{
+    const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,access:true})});
+    if(!r.ok){_kpAccessFor=null;return;}
+    const d=await r.json();
+    kpSetAllowed(d&&d.coursAcces);
+  }catch{_kpAccessFor=null;}
+}
+function kpRefreshOffered(){
+  try{ // peut être appelée avant que le reste du script soit chargé : sans effet dans ce cas
+  if(typeof app==='undefined'||typeof ALL_LESSONS==='undefined')return;
+  const want=['fr/azerty'].concat(currentUser?_kpAllowed:[]);
+  if(want.join()===KP_COURSES_OFFERED.join())return;
+  KP_COURSES_OFFERED.splice(0,KP_COURSES_OFFERED.length,...want);
+  const id=kpCourseId();
+  if(id==='fr/azerty'){
+    if(_kpAzSnap){kpApplyCourseData('fr/azerty',null);applyKbLayout(getKbLayoutId());if(app.renderView)app.renderView(app.view||'home');}
+  }else{
+    kpLoadCourse(id).then(ok=>{if(ok){applyKbLayout(getKbLayoutId());if(app.renderView)app.renderView(app.view||'home');}});
+  }
+  }catch{}
+}
 function kpCourseId(){try{const v=localStorage.getItem('kp_course');return KP_COURSES_OFFERED.includes(v)&&KP_COURSES[v]?v:'fr/azerty';}catch{return'fr/azerty';}}
 /* Les données du cours actif : leçons, tests, statistiques de touches. Cours par défaut : la progression elle-même (identique à avant). */
 function course(){
@@ -4806,8 +4839,6 @@ function kpKbFamilyFromSamples(samples){
   // Décidé seulement si UNE famille a au moins 2 touches distinctes qui la trahissent et qu'aucune autre n'apparaît.
   return fams.length===1&&seen[fams[0]].size>=2?fams[0]:null;
 }
-/* Familles que le site sait proposer aujourd'hui : le QWERTY s'ajoutera ici quand son cours existera (rien n'est suggéré avant). */
-const KP_KB_FAMILIES_OFFERED=['azerty'];
 const _kpKbSamples=[];let _kpKbSuggested=false;
 function kpKbSample(e){
   try{
@@ -4820,7 +4851,7 @@ function kpKbSample(e){
 }
 function kpKbSuggest(family){
   const current='azerty'; // toutes les dispositions réglables aujourd'hui (KB_LAYOUTS) sont des AZERTY
-  if(_kpKbSuggested||family===current||!KP_KB_FAMILIES_OFFERED.includes(family))return;
+  if(_kpKbSuggested||family===current||!kpFamiliesOffered().includes(family))return;
   let dismissed=false;try{dismissed=localStorage.getItem('kp_kb_suggest_no')===family;}catch{}
   if(dismissed)return;
   _kpKbSuggested=true;

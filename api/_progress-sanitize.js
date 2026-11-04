@@ -35,7 +35,7 @@ function sanitizeCourses(input, prev, now, courseIds, note) {
   return out;
 }
 
-function sanitizeProgress(input, prev, now = Date.now(), courseIds = COURSE_IDS) {
+function sanitizeProgress(input, prev, now = Date.now(), courseIds = []) {
   const data = { ...input };
   const prevData = isObj(prev) ? prev : {};
   const dropped = [];
