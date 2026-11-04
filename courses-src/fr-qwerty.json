@@ -1,0 +1,234 @@
+{
+ "schema": 1,
+ "id": "fr/qwerty",
+ "note": "Généré par scripts/build-qwerty-lessons.js (mots filtrés, aucun texte écrit à la main sauf titres et conseils des leçons qui changent). À relire avant ouverture du cours.",
+ "order": [
+  "r1",
+  "r2",
+  "r3",
+  "r4",
+  "r5",
+  "r6",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "b1",
+  "b2",
+  "b3",
+  "b4",
+  "b5",
+  "b6"
+ ],
+ "lessons": {
+  "r1": {
+   "title": "F et J, les index",
+   "keys": "f j",
+   "tip": "Bienvenue ! Pose tes index sur F (main gauche) et J (main droite) : ce sont les touches de référence, les deux petits reliefs que tu sens sous les doigts. Ne regarde pas ton clavier : fais confiance à ta mémoire musculaire.",
+   "module": "1. Position de base",
+   "moduleIdx": 0,
+   "kind": "drill",
+   "learned": "fj",
+   "newKeys": "fj",
+   "text": "jjfj fjf jff fjj fjfj ffjf fjff jf ffjj jjff jjf jfjf fjjf fjjj jjjf fj ffj jfj"
+  },
+  "r2": {
+   "title": "D et K, les majeurs",
+   "keys": "d k",
+   "tip": "Les majeurs se posent naturellement sur D et K, juste à côté des index. Garde les index sur F et J comme ancres : les autres doigts reviennent toujours à leur place de repos après chaque frappe.",
+   "module": "1. Position de base",
+   "moduleIdx": 0,
+   "kind": "drill",
+   "learned": "fjdk",
+   "newKeys": "dk",
+   "text": "fjdf fk jd kjdd kjfk dk kd fdk djj ddkk kdkd ddkf dkdk fkj djf jkk kkdd kjk"
+  },
+  "r3": {
+   "title": "S et L, les annulaires",
+   "keys": "s l",
+   "tip": "Les annulaires couvrent S et L. Tu as maintenant 6 doigts placés. Pense à la position en arc : les doigts reposent légèrement courbés, prêts à frapper sans lever le poignet.",
+   "module": "1. Position de base",
+   "moduleIdx": 0,
+   "kind": "drill",
+   "learned": "fjdksl",
+   "newKeys": "sl",
+   "text": "flj ssll ssff sl ssls kjls skdl lsls fjs jsfs ssl llls slsl llss ls sf llks jlls"
+  },
+  "r4": {
+   "title": "A et point-virgule, les auriculaires",
+   "keys": "a ;",
+   "tip": "Les auriculaires (petits doigts) sont les moins forts, c'est normal. A à gauche, point-virgule à droite. Évite de tourner tout le poignet : laisse juste l'auriculaire s'étirer légèrement.",
+   "module": "1. Position de base",
+   "moduleIdx": 0,
+   "kind": "drill",
+   "learned": "fjdksla;",
+   "newKeys": "a;",
+   "text": "aa;; asf k; ;a adad ak; d; fa ak;j ;a;a kkd; ;afs a;a; ;;aa ak k;f a; aafk"
+  },
+  "r5": {
+   "title": "G et H, index intérieurs",
+   "keys": "g h",
+   "tip": "G et H sont tapés par les index qui s'avancent légèrement vers le centre. Ce mouvement doit rester petit : l'index glisse, ne saute pas. Reviens sur F ou J après chaque frappe.",
+   "module": "1. Position de base",
+   "moduleIdx": 0,
+   "kind": "drill",
+   "learned": "fjdksla;gh",
+   "newKeys": "gh",
+   "text": "hg lg hljj gghh gg; hf; dh gl gkhh ghgh hhgg gh gsjf afhg hll hghg alg lgs"
+  },
+  "r6": {
+   "title": "Révision : toute la rangée de repos",
+   "keys": "a s d f g h j k l ;",
+   "tip": "Révision complète de la rangée de repos. C'est ta base : tous tes doigts y reviennent après chaque frappe. Prends ton temps, la régularité compte plus que la vitesse.",
+   "module": "1. Position de base",
+   "moduleIdx": 0,
+   "kind": "drill",
+   "learned": "fjdksla;gh",
+   "newKeys": "",
+   "text": "dj;g ;gf; fas ak ahd ;k sl sf fdhj fg lhl gklh dhlj dd; fks ;a lj shd"
+  },
+  "h1": {
+   "title": "R et U, premiers vrais mots",
+   "keys": "r u",
+   "tip": "R est tapé par l'index gauche (il s'étire vers le haut), U par l'index droit. Félicitations : avec ces deux touches tu peux déjà former de vrais mots français ! Garde les yeux sur l'écran.",
+   "module": "2. Rangée du haut",
+   "moduleIdx": 1,
+   "kind": "words",
+   "learned": "fjdksla;ghru",
+   "newKeys": "ru",
+   "text": "la jus sa jus dur surf dur surf durs dur jus durs dur durs fur jus la jus sur surf"
+  },
+  "h2": {
+   "title": "E et I, le français prend forme",
+   "keys": "e i",
+   "tip": "E est la lettre la plus fréquente du français : ton majeur gauche sera très sollicité. I est au majeur droit. Dès cette leçon, tu peux écrire des centaines de mots réels : profites-en pour fluidifier le mouvement.",
+   "module": "2. Rangée du haut",
+   "moduleIdx": 1,
+   "kind": "words",
+   "learned": "fjdksla;ghruei",
+   "newKeys": "ei",
+   "text": "duel le aide lis ski rire lire ail ride fier fleur sel air il dire si hier leur laisser des"
+  },
+  "h3": {
+   "title": "W et O, des mots plus variés",
+   "keys": "w o",
+   "tip": "W est à l'annulaire gauche (rangée du haut), O à l'annulaire droit. Tu commences à former des mots plus variés. Essaie de lire le mot suivant pendant que tu tapes le mot en cours : c'est ce qu'on appelle l'anticipation.",
+   "module": "2. Rangée du haut",
+   "moduleIdx": 1,
+   "kind": "words",
+   "learned": "fjdksla;ghrueiwo",
+   "newKeys": "wo",
+   "fill": [
+    "ow",
+    "iwi",
+    "iw"
+   ],
+   "text": "lourd soleil ou four iwi roue sourd foi ours roi sol iw duo sole jour ow kiwi loi dose jouer sous alors dos"
+  },
+  "h4": {
+   "title": "Q et P, les auriculaires du haut",
+   "keys": "q p",
+   "tip": "Q est à l'auriculaire gauche (haut), P à l'auriculaire droit. Les auriculaires sur la rangée du haut demandent un léger étirement : garde le poignet stable et laisse le doigt faire le travail.",
+   "module": "2. Rangée du haut",
+   "moduleIdx": 1,
+   "kind": "words",
+   "learned": "fjdksla;ghrueiwoqp",
+   "newKeys": "qp",
+   "text": "jupe produire perdre risque pure papa loup passer appui frappe parler appel plage pleurer que qui propre quoi page parole"
+  },
+  "h5": {
+   "title": "T et Y, phrases naturelles",
+   "keys": "t y",
+   "tip": "T et Y sont tous les deux tapés par les index (T par le gauche qui s'étire, Y par le droit). C'est un mouvement symétrique. À ce stade, essaie de maintenir un rythme régulier plutôt que de te précipiter.",
+   "module": "2. Rangée du haut",
+   "moduleIdx": 1,
+   "kind": "words",
+   "learned": "fjdksla;ghrueiwoqpty",
+   "newKeys": "ty",
+   "text": "titre lettre sortie tuyau repartir tout tour rat tu saut style yoga rester royal toit tas type art stylo utile"
+  },
+  "h6": {
+   "title": "Révision : toute la rangée du haut",
+   "keys": "q w e r t y u i o p",
+   "tip": "Tu maîtrises maintenant deux rangées complètes. Pendant cette révision, concentre-toi sur la fluidité entre les rangées : le passage repos → haut doit se faire sans lever les poignets du bureau.",
+   "module": "2. Rangée du haut",
+   "moduleIdx": 1,
+   "kind": "words",
+   "learned": "fjdksla;ghrueiwoqpty",
+   "newKeys": "",
+   "text": "sort art toit route doigt air plus tous et ris pierre produire quoi tour pied kiwi apporter tuyau retirer hier pratique risque type fur"
+  },
+  "b1": {
+   "title": "C et M, la rangée du bas",
+   "keys": "c m",
+   "tip": "Tu attaques la rangée du bas. C est au majeur gauche (un peu plus bas que D), M à l'index droit (en bas, sous J). Pour la rangée du bas, laisse les doigts descendre naturellement : le poignet peut légèrement s'abaisser.",
+   "module": "3. Rangée du bas",
+   "moduleIdx": 2,
+   "kind": "words",
+   "learned": "fjdksla;ghrueiwoqptycm",
+   "newKeys": "cm",
+   "text": "fermer acheter rythme courir char mur chat court merci marcher coup dome sucre cap acteur source ma camp mois compter"
+  },
+  "b2": {
+   "title": "V et N, texte naturel",
+   "keys": "v n",
+   "tip": "V est à l'index gauche (bas), N à l'index droit (bas). Les index gèrent beaucoup de touches : entraîne-toi à alterner rapidement entre les rangées sans perdre la position de référence sur F et J.",
+   "module": "3. Rangée du bas",
+   "moduleIdx": 2,
+   "kind": "words",
+   "learned": "fjdksla;ghrueiwoqptycmvn",
+   "newKeys": "vn",
+   "text": "vis entrer lapin plonger nom van cuisiner entendre nuance fond vol vent centre apprendre son envoyer venir vin pont vivace"
+  },
+  "b3": {
+   "title": "X et virgule",
+   "keys": "x ,",
+   "tip": "X est à l'annulaire gauche bas : c'est un mouvement diagonal peu courant. La virgule se tape au majeur droit, en bas. Prends le temps de localiser chaque touche avant d'accélérer.",
+   "module": "3. Rangée du bas",
+   "moduleIdx": 2,
+   "kind": "words",
+   "learned": "fjdksla;ghrueiwoqptycmvnx,",
+   "newKeys": "x,",
+   "text": "avoir axe taxi, explorer voix texte, utiliser index porte, pomme valeur lien, six yeux four, air aux noix, luxe dix"
+  },
+  "b4": {
+   "title": "Z et point",
+   "keys": "z .",
+   "tip": "Z est à l'auriculaire gauche bas, le point à l'annulaire droit, en bas à droite de la virgule. Tape le point sans regarder : c'est la touche qui termine chaque phrase.",
+   "module": "3. Rangée du bas",
+   "moduleIdx": 2,
+   "kind": "words",
+   "learned": "fjdksla;ghrueiwoqptycmvnx,z.",
+   "newKeys": "z.",
+   "text": "lire raz main te. gel aimer rue ami. nez zeste gris terminer. royal char douze vendre. seize foi gaz riz"
+  },
+  "b5": {
+   "title": "B et barre oblique",
+   "keys": "b /",
+   "tip": "B est à l'index gauche bas (côté centre) ; la barre oblique / est à l'auriculaire droit, en bas à droite du point. Tu couvres maintenant les 26 lettres de l'alphabet : c'est un cap important ! Chaque texte réel sera désormais accessible.",
+   "module": "3. Rangée du bas",
+   "moduleIdx": 2,
+   "kind": "words",
+   "learned": "fjdksla;ghrueiwoqptycmvnx,z.b/",
+   "newKeys": "b/",
+   "text": "robotique but vrai/faux bras bord bol brun oui/non bourse bon robe banc blanc/noir bien timbre bas bronze"
+  },
+  "b6": {
+   "title": "Révision : les 26 lettres réunies",
+   "keys": "tout l'alphabet",
+   "tip": "Toutes les lettres sont là. L'objectif de cette révision : zéro regard sur le clavier. Si tu hésites sur une touche, fais une pause, localise-la mentalement, puis frappe. Ne regarde pas, cherche avec le doigt.",
+   "module": "3. Rangée du bas",
+   "moduleIdx": 2,
+   "kind": "words",
+   "learned": "fjdksla;ghrueiwoqptycmvnx,z.b/",
+   "newKeys": "",
+   "fill": [
+    "wo",
+    "ya"
+   ],
+   "text": "ajouter conserver pratique effacer texte bronze ski utiliser calculer wo ya explorer enseigner permettre descendre renforcer marcher robotique jouer chercher douze"
+  }
+ }
+}

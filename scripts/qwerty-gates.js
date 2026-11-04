@@ -162,4 +162,60 @@ const a1 = (update) => runGate('azertyVsApple', azertyVsApple, (n) => Object.ent
 const q1 = (update) => runGate('qwertyDisagreements', disagreements, (n) => Object.entries(n).map(([k, v]) => `${k} : ${v.length}`).join(' ; '), update);
 const q2 = (update) => runGate('qwertyTypability', () => typability().out, (n) => Object.entries(n).map(([k, v]) => `${k}: ${v.impossible.length} impossibles`).join(' | '), update);
 const q3 = (update) => runGate('qwertyDeadKeyEngine', deadKeyEngine, (n) => `${Object.values(n).filter((x) => x.finished && x.faults === 0).length}/${Object.keys(n).length} séquences acceptées sans faute`, update);
-module.exports = { a1, azertyVsApple, q1, q2, q3, disagreements, typability, deadKeyEngine, reach };
+
+// Q4 : leçons de lettres du cours français sur QWERTY (courses-src/fr-qwerty.json, générées par scripts/build-qwerty-lessons.js).
+// Ce qu'on prouve : (1) les touches enseignées sont bien AUX MÊMES TOUCHES PHYSIQUES que la leçon AZERTY correspondante,
+// lues dans nos deux modèles (azerty-fr, windows-us), pas dans le générateur ; (2) chaque texte ne contient que des lettres et signes déjà appris ;
+// (3) chaque nouvelle touche est bien travaillée ; (4) les mots viennent des listes du site ; (5) le fichier est exactement ce que
+// le générateur produit (rien de modifié à la main sans le dire).
+function q4() {
+  const gen = require('./build-qwerty-lessons');
+  const errs = [];
+  const file = path.join(root, 'courses-src', 'fr-qwerty.json');
+  if (!fs.existsSync(file)) return { ok: false, detail: 'courses-src/fr-qwerty.json absent : node scripts/build-qwerty-lessons.js' };
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  if (JSON.stringify(data) !== JSON.stringify(gen.build())) errs.push('le fichier diffère de ce que produit le générateur (relancer node scripts/build-qwerty-lessons.js, ou le dire)');
+  const az = JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', 'azerty-fr.json'), 'utf8'));
+  const us = JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', 'windows-us.json'), 'utf8'));
+  const azCode = {}; for (const k of [...az.rows.flat(), ...Object.values(az.extra || {}).flat()]) azCode[k.l.toLowerCase()] = k.c;
+  const usChar = (code) => ((us.keys[code] || {}).l || '').toLowerCase();
+  const { loadApp } = require('./engine-harness');
+  const h = loadApp();
+  const azLessons = Object.fromEntries(JSON.parse(h.run('JSON.stringify(ALL_LESSONS.map(l=>[l.id,l.keys]))')));
+  const pool = new Set(gen.wordPool(h));
+  const PUNCT_AFTER = { ',': 'b3', '.': 'b4', '/': 'b5', ';': 'r4' };
+  let learnedAll = '';
+  const summary = [];
+  for (const id of data.order) {
+    const L = data.lessons[id]; if (!L) { errs.push(`${id} : leçon absente`); continue; }
+    const step = gen.SEQ.find((s) => s.id === id);
+    learnedAll += (step.add || step.review || '');
+    // (1) mêmes touches physiques que la leçon AZERTY
+    if (!step.review) {
+      const want = String(azLessons[id]).split(/\s+/).filter((x) => x.length === 1).map((c) => azCode[c]).filter(Boolean).map(usChar).sort().join('');
+      const got = step.add.split('').sort().join('');
+      if (want !== got) errs.push(`${id} : enseigne « ${got} » mais les mêmes touches physiques que la leçon AZERTY donnent « ${want} » sur QWERTY`);
+    }
+    // (2) seulement des signes déjà appris
+    const allowed = new Set([...learnedAll.split(''), ' ']);
+    for (const c of L.text) if (!allowed.has(c)) { errs.push(`${id} : « ${c} » pas encore appris (${L.text.slice(0, 40)}…)`); break; }
+    if (L.learned.split('').sort().join('') !== [...new Set(learnedAll)].sort().join('')) errs.push(`${id} : champ learned incohérent`);
+    // (3) nouvelles touches travaillées
+    const min = L.kind === 'drill' ? 6 : 3;
+    for (const c of (L.newKeys || '')) { const n = [...L.text].filter((x) => x === c).length; if (n < (/[a-z]/.test(c) ? min : 2)) errs.push(`${id} : « ${c} » n'apparaît que ${n} fois`); }
+    if (/^ | $|  /.test(L.text)) errs.push(`${id} : espaces en trop`);
+    if (L.text.length < 60 || L.text.length > 170) errs.push(`${id} : longueur ${L.text.length} hors de 60 à 170`);
+    // (4) mots tirés des listes du site (hors suites de lettres et paires à barre oblique)
+    if (L.kind === 'words') {
+      const toks = L.text.split(' ').map((t) => t.replace(/[,.]$/, ''));
+      const pairs = new Set(gen.SLASH_PAIRS);
+      const fill = new Set(L.fill || []);
+      if (fill.size > 8) errs.push(`${id} : trop de suites de lettres de complément (${fill.size})`);
+      for (const t of toks) { if (pairs.has(t) || fill.has(t)) continue; if (!pool.has(t)) errs.push(`${id} : « ${t} » n'est pas dans les listes de mots du site`); }
+      const distinct = new Set(toks.filter((t) => !fill.has(t))).size; if (distinct < 6) errs.push(`${id} : seulement ${distinct} mots différents`);
+      summary.push(`${id}:${distinct}`);
+    }
+  }
+  return errs.length ? { ok: false, detail: errs.slice(0, 10).join('\n') } : { ok: true, detail: `${data.order.length} leçons (6 suites de lettres, 12 de mots), touches vérifiées contre azerty-fr et windows-us ; mots différents par leçon : ${summary.join(' ')} ; compléments : ${data.order.filter((i) => data.lessons[i].fill).map((i) => i + ' (' + data.lessons[i].fill.length + ')').join(' ') || 'aucun'}` };
+}
+module.exports = { q4, a1, azertyVsApple, q1, q2, q3, disagreements, typability, deadKeyEngine, reach };

@@ -276,6 +276,7 @@ const GATES = process.env.GATES_FAKE_RED
     { id: 'Q1', name: 'QWERTY : désaccords entre Microsoft et xkeyboard-config connus et relus', run: () => require('./qwerty-gates').q1(UPDATE) },
     { id: 'Q2', name: 'QWERTY : caractères de nos textes tapables ou impossibles, par variante', run: () => require('./qwerty-gates').q2(UPDATE) },
     { id: 'Q3', name: 'QWERTY : le vrai moteur face aux touches mortes (apostrophe, accents)', run: () => require('./qwerty-gates').q3(UPDATE) },
+    { id: 'Q4', name: 'QWERTY : leçons de lettres (mêmes touches physiques, lettres déjà apprises seulement)', run: () => require('./qwerty-gates').q4() },
     { id: 'U1', name: 'Chaque leçon se termine sur chaque disposition (66 x 4)', run: () => usage().u1() },
     { id: 'U2', name: 'Ce que le client envoie est accepté tel quel par le serveur', run: () => usage().u2() },
     { id: 'U3', name: 'Un visiteur sans compte peut taper, rien n\'est envoyé', run: () => usage().u3() },
