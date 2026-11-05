@@ -13993,6 +13993,9 @@ const app={
   startBossLoop(){this.stopBoss();this._bossLoop=setInterval(()=>{
     const b=this.boss;if(!b)return;
     if(b.phase==='lobby'&&typeof b.secondsLeft==='number'&&b.secondsLeft>0)b.secondsLeft--;
+    // Pas de re-rendu de la page pendant que les réglages (ou une modale) sont ouverts par-dessus :
+    // sinon la page du Boss est reconstruite chaque seconde sous le champ en cours de saisie.
+    if(document.getElementById('settings-overlay')||document.querySelector('.modal-overlay.open'))return;
     if(b.phase==='lobby'||b.phase==='playing')this.renderCurrent();
   },1000);},
   stopBoss(){if(this._bossLoop){clearInterval(this._bossLoop);this._bossLoop=null;}},
