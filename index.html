@@ -3967,7 +3967,7 @@ function canAccessGame(){return !!currentUser;}
 // gardait l'ancien en mémoire. On reprend le plus récent avant de facturer.
 function _syncTokenFromStorage(){
   try{
-    const s=JSON.parse(localStorage.getItem('klak_session')||'{}');
+    const s=kpReadSession();
     if(s.token&&s.username===currentUser&&s.token!==currentToken)currentToken=s.token;
   }catch{}
 }
@@ -4086,7 +4086,7 @@ async function handlePaymentReturn(){
     }
     if(d.plan){
       currentPlan=d.plan;
-      const s=JSON.parse(localStorage.getItem('klak_session')||'{}');
+      const s=kpReadSession();
       s.plan=d.plan;localStorage.setItem('klak_session',JSON.stringify(s));
       updateNavUser();
       const msg=document.getElementById('upgrade-msg');
@@ -6969,6 +6969,7 @@ function mount(host){
 return {mount};
 })();
 
+function kpReadSession(){try{const v=JSON.parse(localStorage.getItem('klak_session')||'{}');return v&&typeof v==='object'?v:{};}catch{return {};}}
 const app={
   view:'home',sess:null,stats:null,game:null,sprint:null,course:null,simon:null,boss:null,duel:null,royale:null,clavier:null,activeGame:null,now:Date.now(),_gcineCat:'vitesse',_gcineVisible:null,_clavierFlashT:null,_royaleHistory:null,_royaleHistLoading:false,
   _timer:null,_gameLoop:null,_sprintLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_royalePollTimer:null,_royaleSeq:0,_onKey:null,_wid:0,_gameRec:false,_courseRec:false,
@@ -14085,7 +14086,7 @@ const app={
       // réessaie une fois avant d'abandonner le score.
       if(sub&&sub.error==='Session invalide.'){
         try{
-          const stored=JSON.parse(localStorage.getItem('klak_session')||'{}').token;
+          const stored=kpReadSession().token;
           if(stored&&stored!==currentToken){currentToken=stored;sub=await postSubmit();}
         }catch{}
       }
@@ -14346,6 +14347,7 @@ const app={
   stopDuelLoop(){if(this._duelLoop){clearInterval(this._duelLoop);this._duelLoop=null;}},
   duelLoopTick(){
     const d=this.duel;if(!d)return;
+    if(document.getElementById('settings-overlay')||document.querySelector('.modal-overlay.open'))return;
     if(d.phase==='countdown'){if(Date.now()>=d.startAt)d.phase='racing';this.renderCurrent();}
     else if(d.phase==='racing'){this.renderCurrent();}
   },
@@ -14683,6 +14685,7 @@ const app={
   _royaleStopPoll(){if(this._royalePollTimer){clearInterval(this._royalePollTimer);this._royalePollTimer=null;}},
   async _royalePollTick(){
     const r=this.royale;if(!r||!r.sessionId||(r.phase!=='lobby'&&r.phase!=='round-wait'))return;
+    if(document.getElementById('settings-overlay')||document.querySelector('.modal-overlay.open'))return;
     const seq=this._royaleSeq;
     try{
       const s=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'royale-state',token:currentToken,sessionId:r.sessionId})}).then(x=>x.json());
@@ -14834,7 +14837,7 @@ const app={
           // l'ancien jeton, désormais invalidé — toute requête authentifiée
           // suivante aurait échoué en "Session invalide" jusqu'au prochain login.
           if(d.token){currentToken=d.token;}
-          const s=JSON.parse(localStorage.getItem('klak_session')||'{}');
+          const s=kpReadSession();
           s.username=d.username;s.email=currentEmail;s.displayName=currentDisplayName;
           if(d.token)s.token=d.token;
           localStorage.setItem('klak_session',JSON.stringify(s));
@@ -14849,7 +14852,8 @@ const app={
     const planLabel=isEtab?'Compte Établissement':role==='prof'?'Compte Enseignant':plan==='expert'?'Compte Expert':'Compte Gratuit';
     const planColor=(isEtab||role==='prof'||plan==='expert')?'var(--accent)':'var(--muted)';
     const calibRaw=localStorage.getItem('keypace-gaze-calib');
-    const calibData=calibRaw?JSON.parse(calibRaw):null;
+    let calibData=null;try{calibData=calibRaw?JSON.parse(calibRaw):null;}catch{}
+    if(calibData&&typeof calibData.threshold!=='number')calibData=null;
     const calibrated=!!calibData;
     const overlay=document.createElement('div');
     overlay.className='settings-overlay';overlay.id='settings-overlay';
@@ -15194,7 +15198,7 @@ const app={
       const d=await r.json();
       if(!r.ok)throw new Error(d.error||'Erreur.');
       currentUser=d.username;input.value=d.username;
-      const s=JSON.parse(localStorage.getItem('klak_session')||'{}');s.username=d.username;localStorage.setItem('klak_session',JSON.stringify(s));
+      const s=kpReadSession();s.username=d.username;localStorage.setItem('klak_session',JSON.stringify(s));
       updateNavUser();
       showMsg("Nom d'utilisateur mis à jour !",true);
     }catch(e){showMsg(e.message,false);}
@@ -15212,7 +15216,7 @@ const app={
       const d=await r.json();
       if(!r.ok)throw new Error(d.error||'Erreur.');
       currentDisplayName=d.displayName||null;
-      const s=JSON.parse(localStorage.getItem('klak_session')||'{}');s.displayName=currentDisplayName;localStorage.setItem('klak_session',JSON.stringify(s));
+      const s=kpReadSession();s.displayName=currentDisplayName;localStorage.setItem('klak_session',JSON.stringify(s));
       showMsg(currentDisplayName?'Nom affiché mis à jour !':"Nom affiché réinitialisé : ton nom d'utilisateur sera utilisé.",true);
     }catch(e){showMsg(e.message,false);}
     finally{btn.disabled=false;btn.textContent=old;}
@@ -15258,7 +15262,7 @@ const app={
       // reprend pour ne pas se retrouver déconnecté à la prochaine action.
       if(d.token){
         currentToken=d.token;
-        const s=JSON.parse(localStorage.getItem('klak_session')||'{}');s.token=d.token;localStorage.setItem('klak_session',JSON.stringify(s));
+        const s=kpReadSession();s.token=d.token;localStorage.setItem('klak_session',JSON.stringify(s));
       }
       showMsg('Mot de passe mis à jour !',true);
       oldInput.value='';newInput.value='';
@@ -17451,7 +17455,7 @@ const app={
     try{
       const mr=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'migrate-self',token:currentToken})});
       if(currentToken!==_token){this._etabLoading=false;return null;}
-      if(mr.ok){const md=await mr.json();if(md&&md.role&&this.stats&&this.stats.role!==md.role){this.stats.role=md.role;const ss=JSON.parse(localStorage.getItem('klak_session')||'{}');ss.role=md.role;localStorage.setItem('klak_session',JSON.stringify(ss));updateNavUser();}}
+      if(mr.ok){const md=await mr.json();if(md&&md.role&&this.stats&&this.stats.role!==md.role){this.stats.role=md.role;const ss=kpReadSession();ss.role=md.role;localStorage.setItem('klak_session',JSON.stringify(ss));updateNavUser();}}
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'teacher-overview',token:currentToken})});
       if(currentToken!==_token){this._etabLoading=false;return null;}
       if(r.ok){const data=await r.json();data.loaded=true;this.etab=data;}
@@ -17911,7 +17915,7 @@ async function loadProgressFromServer(attempt){
       if(d.data)app.stats=mergeStats(d.data);
       if(_preRole&&app.stats&&!app.stats.role)app.stats.role=_preRole;
       _statsLoaded=true;
-      const _s=JSON.parse(localStorage.getItem('klak_session')||'{}');let _changed=false;if(d.id&&!currentUserId){currentUserId=d.id;_s.userId=d.id;_changed=true;}if(app.stats&&app.stats.role&&_s.role!==app.stats.role){_s.role=app.stats.role||null;_changed=true;}if(_changed)localStorage.setItem('klak_session',JSON.stringify(_s));
+      const _s=kpReadSession();let _changed=false;if(d.id&&!currentUserId){currentUserId=d.id;_s.userId=d.id;_changed=true;}if(app.stats&&app.stats.role&&_s.role!==app.stats.role){_s.role=app.stats.role||null;_changed=true;}if(_changed)localStorage.setItem('klak_session',JSON.stringify(_s));
       updateNavUser();app.renderCurrent();if(isAdmin())app.loadAdmin();else if(isTeacher())app.loadEtab();
       if(_statsDirty)flushStats(); // persiste une éventuelle modif locale, maintenant en toute sécurité sur la base réelle
     }
