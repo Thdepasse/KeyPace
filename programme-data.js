@@ -465,7 +465,7 @@
   // Ce que disent les textes officiels français sur une autre année que celle du module : encadré « Ce que dit le programme français cette année ». Rien ne se déplace.
   const FR_ANCHORS = {
     'CE2': [
-      { src: 'Sciences et technologie, cycle 2, BO n° 24 du 11 juin 2026', q: '« Utiliser un ordinateur ou une tablette numérique pour saisir un texte. » « L’élève saisit un texte à l’aide d’un logiciel de traitement de texte. » « L’élève utilise le correcteur orthographique et adapte la mise en forme et la mise en page. »' },
+      { src: 'Sciences et technologie, cycle 2, BO n° 24 du 11 juin 2026', q: '« Utiliser un ordinateur ou tablette numérique, pour saisir un texte. » « L’élève saisit un texte à l’aide d’un logiciel de traitement de texte. » « L’élève utilise le correcteur orthographique et adapte la mise en forme et la mise en page. »' },
       { src: 'Sciences et technologie, cycle 2, BO n° 24 du 11 juin 2026', q: '« Identifier les dispositifs permettant la saisie, le traitement et la restitution d’informations (clavier, processeur, écran, etc.). »' },
     ],
     'CM1': [{ src: 'Français, cycle 3, BO n° 16 du 17 avril 2025', q: '« produire des écrits sur différents supports (notamment numériques, ou propices aux écritures créatives) »' }],
