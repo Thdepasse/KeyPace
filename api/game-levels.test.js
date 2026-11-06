@@ -103,3 +103,17 @@ test('suites : un tirage constant ne bloque jamais (garde contre les boucles inf
   assert.ok(Date.now() - t0 < 500);
   assert.ok(s.length >= 1 && s.length <= 40);
 });
+
+test('textFor : texte du niveau, déterministe avec une graine, aucun mot hors des lettres', () => {
+  const letters = G.myLevel(AZ, (l) => AZ.indexOf(l) < 8).letters;
+  const mk = () => G.textFor(VOCAB, letters, 16, { rnd: G.seededRnd(G.hash('auto:14')) });
+  const a = mk(), b = mk();
+  assert.strictEqual(a, b, 'même graine, même texte');
+  assert.notStrictEqual(a, G.textFor(VOCAB, letters, 16, { rnd: G.seededRnd(G.hash('autre:14')) }), 'graine différente, texte différent');
+  const ws = a.split(' ');
+  assert.strictEqual(ws.length, 16);
+  for (const w of ws) assert.ok([...w].every((c) => letters.has(c)), w);
+  for (let i = 1; i < ws.length; i++) assert.notStrictEqual(ws[i], ws[i - 1]);
+  assert.ok(G.textFor(VOCAB, G.levels(AZ)[0].letters, 14).split(' ').length === 14, 'rangée de repos : suites de lettres');
+  assert.strictEqual(G.textFor([], new Set(), 5), '');
+});

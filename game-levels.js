@@ -81,6 +81,23 @@
     return { words, suites: s, pool: words.concat(s), mixed: true };
   }
 
-  const api = { lettersOf, cumulative, levels, myLevel, suites, contentFor };
+  // Tirage déterministe (même graine, même suite) : sert à fixer le texte du Fantôme à un niveau donné.
+  function seededRnd(seed) {
+    let a = seed >>> 0;
+    return function () { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  function hash(str) { let h = 2166136261; for (const c of String(str)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+
+  // Texte de `count` mots (ou suites) tirés du contenu d'un niveau, séparés par des espaces, jamais deux fois le même d'affilée.
+  function textFor(vocab, letters, count, opts) {
+    const o = Object.assign({ rnd: null, minWords: 15 }, opts || {}); const r = o.rnd || Math.random;
+    const pool = contentFor(vocab, letters, { minWords: o.minWords, rnd: r }).pool;
+    if (!pool.length) return '';
+    const out = []; let prev = null; let guard = 0;
+    while (out.length < count && guard++ < count * 30) { const w = pool[Math.floor(r() * pool.length)]; if (w !== prev || pool.length === 1) { out.push(w); prev = w; } }
+    return out.join(' ');
+  }
+
+  const api = { lettersOf, cumulative, levels, myLevel, suites, contentFor, seededRnd, hash, textFor };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.KPGameLevels = api;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -319,6 +319,60 @@ async function run(opts = {}) {
         info.jeuxNiveaux = 'ok';
       } catch (e) { problems.push(`BR10 : ${e.message}`); }
 
+      // BR11 : tous les jeux par niveau (Sprint, Simon, Course, Fantôme, Duo), conseils « Pour toi », jeux de lettres qui suivent le clavier (Grille réflexe, Magic Tiles, ZQSD/WASD)
+      try {
+        await ev("localStorage.clear();true");
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2500); exceptions.splice(0);
+        const gm = await ev(`(async()=>{
+          currentUser='eleve';currentToken='tok';currentUserId='uid';_statsLoaded=true;app.stats=mergeStats();
+          ALL_LESSONS.slice(0,8).forEach(l=>{(app.stats.lessons=app.stats.lessons||{})[l.id]={bestWpm:30,bestErr:1,cleared:true}});
+          const sev=[];window.track=(e,p)=>{sev.push(e+':'+(p&&p.game)+':'+(p&&p.level))};
+          go('games');app.activeGame=null;app.renderGames();
+          const out={};const K=new Set('fjdkslqmghruei');const bad=t=>t.split(' ').filter(w=>![...w].every(c=>K.has(c))).length;
+          out.advice=(document.querySelector('.gcine-advice')||{innerText:''}).innerText;out.recTags=[...document.querySelectorAll('.gcine-card-tag-idle')].filter(t=>/CONSEILL/.test(t.innerText)).length;
+          app.pickGameLevel('sprint','auto');app.startSprint();clearInterval(app._sprintLoop);out.sprint={train:!app.sprint.glv.full,bad:bad(app.sprint.text)};
+          const sp=app.sprint;sp.on=true;sp.started=true;sp.timeLeft=1;app.sprintTick();out.sprintBest=app.stats.sprintBest||null;app.stopSprint();
+          app.pickGameLevel('simon','auto');app.startSimon();clearInterval(app._simonLoop);const si=app.simon;let sb=0;for(let i=0;i<40;i++){app.simonNewSequence();sb+=si.words.filter(w=>![...w].every(c=>K.has(c))).length}out.simon={train:!si.glv.full,bad:sb};app.stopSimon();
+          app.pickGameLevel('course','auto');app.startCourse();clearInterval(app._courseLoop);const co=app.course;out.course={train:!co.glv.full,bad:bad(co.text),bots:co.bots.map(b=>b.wpm).join('/')};
+          const cb=JSON.stringify(app.stats.courseBest);co.startTime=Date.now();co.endTime=co.startTime+8000;co.rank=1;co.correct=co.text.length;co.keystrokes=co.text.length;app.afterCourse();out.courseKept=JSON.stringify(app.stats.courseBest)===cb;app.stopCourse();
+          app.pickGameLevel('ghost','auto');app.startGhost();clearInterval(app._ghostLoop);const t1=app.ghost.text;app.stopGhost();app.startGhost();clearInterval(app._ghostLoop);
+          out.ghost={train:!app.ghost.glv.full,same:t1===app.ghost.text,bad:bad(t1)};
+          const gg=app.ghost;gg.recording=[[100,3],[900,t1.length]];gg.typed=t1.split('');gg.startTime=Date.now();gg.endTime=gg.startTime+5000;gg.correct=t1.length;gg.keystrokes=t1.length;
+          const gb=JSON.stringify(app.stats.ghostBest);app.afterGhost();out.ghostLocal=!!localStorage.getItem(app._ghostKey(gg.glv));out.ghostKept=JSON.stringify(app.stats.ghostBest)===gb;app.stopGhost();
+          // Duo : seulement les lettres apprises de sa main
+          app.stats.sourisHybridHand='mouse-right';app.pickGameLevel('hybrid','auto');app.souris={phase:'play',track:'hybrid',glv:app._glResolve('hybrid'),score:0};
+          const seen=new Set();for(let i=0;i<80;i++){app._sourisHybridSpawn();seen.add(app.souris.letter)}out.duo={letters:[...seen].sort().join(''),bad:[...seen].filter(c=>!K.has(c)).length};
+          // tout le clavier : rien ne change
+          app.pickGameLevel('sprint','tout');app.startSprint();clearInterval(app._sprintLoop);out.sprintFull={full:app.sprint.glv.full};app.stopSprint();
+          // Grille réflexe et Magic Tiles en AZERTY : identiques à l'origine
+          out.azSgr=app._sgrLevels.map(l=>l.pool).join('|');kpSyncTilesLanes();out.azLanes=TILES_LANES.map(l=>l.letter).join('');
+          // QWERTY
+          const d=await (await fetch('/courses-src/fr-qwerty.json')).json();kpApplyCourseData('fr/qwerty',d);localStorage.setItem('kp_kb_layout','windows-us');
+          out.qwSgr=app._sgrLevels.map(l=>l.pool).join('|');kpSyncTilesLanes();out.qwLanes=TILES_LANES.map(l=>l.letter).join('');
+          out.qwDesc=app._gcineDesc(GCINE_GAMES.find(g=>g.key==='sourisTiles'));out.qwSouris=app._gcineDesc(GCINE_GAMES.find(g=>g.key==='souris'));
+          go('games');const el=document.getElementById('page-games');el.insertAdjacentHTML('beforeend','<p id="zq">Z Q S D et ZQSD</p>');await new Promise(r=>setTimeout(r,60));out.relabel=document.getElementById('zq').innerText;
+          kpApplyCourseData('fr/azerty',null);localStorage.setItem('kp_kb_layout','fr');kpSyncTilesLanes();out.azBack=TILES_LANES.map(l=>l.letter).join('');
+          window.track=undefined;out.events=sev;return out})()`);
+        const A = 'QSDFGHJKLM|AZERTYUIOP|WXCVBN|AZERTYUIOPQSDFGHJKLMWXCVBN';
+        if (!/Tu apprends la rangée du haut/.test(gm.advice) || gm.recTags < 1) problems.push(`BR11 : conseils « Pour toi » absents ou faux (${gm.advice.slice(0, 80)} / ${gm.recTags})`);
+        for (const g of ['sprint', 'simon', 'course', 'ghost']) { if (!gm[g].train) problems.push(`BR11 : ${g} n'est pas au niveau « Mon niveau »`); if (gm[g].bad) problems.push(`BR11 : ${g} propose des mots hors des lettres apprises (${gm[g].bad})`); }
+        if (gm.sprintBest) problems.push('BR11 : le Sprint d\'entraînement a enregistré un record');
+        if (!gm.courseKept || !gm.ghostKept) problems.push('BR11 : un niveau d\'entraînement a touché le record de la Course ou du Fantôme');
+        if (!gm.ghost.same) problems.push('BR11 : le texte du Fantôme change d\'une partie à l\'autre (le fantôme ne rejouerait pas la même course)');
+        if (!gm.ghostLocal) problems.push('BR11 : le fantôme du niveau n\'est pas gardé sur l\'appareil');
+        if (gm.course.bots !== '10/16/24') problems.push(`BR11 : bots de la Course au niveau d'entraînement (${gm.course.bots})`);
+        if (gm.duo.bad || gm.duo.letters.length < 2) problems.push(`BR11 : le Duo propose des lettres inconnues (${gm.duo.letters})`);
+        if (!gm.sprintFull.full) problems.push('BR11 : « Tout le clavier » n\'est plus l\'expérience complète');
+        if (gm.azSgr !== A) problems.push(`BR11 : lettres de la Grille réflexe changées en AZERTY (${gm.azSgr})`);
+        if (gm.azLanes !== 'qsdfjklm' || gm.azBack !== 'qsdfjklm') problems.push(`BR11 : couloirs de Magic Tiles changés en AZERTY (${gm.azLanes} / ${gm.azBack})`);
+        if (gm.qwSgr !== 'ASDFGHJKL|QWERTYUIOP|ZXCVBNM|QWERTYUIOPASDFGHJKLZXCVBNM') problems.push(`BR11 : lettres de la Grille réflexe en QWERTY (${gm.qwSgr})`);
+        if (gm.qwLanes !== 'asdfjkl;') problems.push(`BR11 : couloirs de Magic Tiles en QWERTY (${gm.qwLanes})`);
+        if (!/ASDF JKL;/.test(gm.qwDesc) || !/WASD/.test(gm.qwSouris)) problems.push(`BR11 : descriptions des jeux en QWERTY (${gm.qwDesc} / ${gm.qwSouris})`);
+        if (gm.relabel !== 'W A S D et WASD') problems.push(`BR11 : ZQSD non remplacé par WASD en QWERTY (${gm.relabel})`);
+        exceptions.splice(0).forEach((e) => problems.push(`BR11 : exception : ${e}`));
+        info.jeuxTous = 'ok';
+      } catch (e) { problems.push(`BR11 : ${e.message}`); }
+
       // BR8 : la pastille « clavier » de l'en-tête (visiteur puis compte testeur)
       try {
         const shot = async (name) => { if (!opts.screenshotDir) return; const sh = await S('Page.captureScreenshot', { format: 'png' }); fs.mkdirSync(opts.screenshotDir, { recursive: true }); fs.writeFileSync(path.join(opts.screenshotDir, name), Buffer.from(sh.data, 'base64')); };

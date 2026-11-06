@@ -1427,6 +1427,14 @@ a.nav-link{text-decoration:none;display:inline-block}
    utilisé par les écrans de fin/portail invité, où le glow serait excessif). */
 .gidle{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:40px 20px}
 .gidle p{color:rgba(255,255,255,.55);font-size:15px;line-height:1.6;max-width:420px;margin:0}
+.gcine-advice{max-width:1120px;margin:0 auto 22px;padding:18px 22px;border-radius:20px;background:var(--card);border:1.5px solid var(--border)}
+.gcine-advice h3{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;margin:0 0 4px}
+.gcine-advice p{margin:0 0 12px;color:var(--muted);font-size:14px}
+.gcine-advice-list{display:flex;flex-wrap:wrap;gap:10px}
+.gcine-advice-item{flex:1 1 220px;text-align:left;font:inherit;border:1.5px solid var(--border);background:var(--bg);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--txt)}
+.gcine-advice-item:hover{border-color:var(--accent)}
+.gcine-advice-item b{display:block;font-size:15px;margin-bottom:2px}
+.gcine-advice-item span{font-size:13px;color:var(--muted)}
 .gl-picker{margin:8px auto 4px;max-width:560px}
 .gl-picker .gl-lab{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:6px}
 .gl-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
@@ -3999,6 +4007,7 @@ function kpCloseRegion(refocus){
 document.addEventListener('click',e=>{const r=document.getElementById('nav-region');if(r&&!r.contains(e.target))kpCloseRegion(false);const k=document.getElementById('nav-kb');if(k&&!k.contains(e.target))kpCloseKbChip(false);});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('nav-region-menu');if(m&&!m.hidden){e.stopPropagation();kpCloseRegion(true);return;}const k=document.getElementById('nav-kb-menu');if(k&&!k.hidden){e.stopPropagation();kpCloseKbChip(true);}}},true);
 kpRegionRender();
+try{const _pg=document.getElementById('page-games');if(_pg)new MutationObserver(kpRelabelMoveKeys).observe(_pg,{childList:true,subtree:true});}catch{}
 /* Au chargement : si l'élève travaille un autre cours que le cours par défaut, on charge son contenu puis on redessine. */
 window.addEventListener('load',()=>{
   const id=kpCourseId();if(id==='fr/azerty')return;
@@ -5014,6 +5023,20 @@ function kpKeyboardChipHTML(){
   const l=getKbLayoutId();
   return'<div style="max-width:1120px;margin:0 auto;padding:14px 24px 0"><button type="button" class="kb-chip" onclick="app.openSettings()" aria-label="Changer de clavier">⌨ Clavier : '+kpCurrentFamily().toUpperCase()+' '+(KB_LAYOUT_LABELS[l]||'')+' · Changer</button></div>';
 }
+/* Lettres des trois rangées de la disposition courante, en majuscules : [haut, repos, bas]. AZERTY : AZERTYUIOP / QSDFGHJKLM / WXCVBN ; QWERTY : QWERTYUIOP / ASDFGHJKL / ZXCVBNM.
+   Les jeux de lettres s'en servent au lieu de lettres écrites en dur. */
+function kpLetterRows(){
+  const rows=KB_LAYOUTS[getKbLayoutId()]||KB_LAYOUTS.fr;
+  return[1,2,3].map(i=>(rows[i]||[]).map(k=>String(k&&k.l||'').toUpperCase()).filter(c=>/^[A-Z]$/.test(c)));
+}
+/* Déplacement au clavier de Précision souris : les touches physiques sont les mêmes (W A S D de la rangée), seul le nom change. En QWERTY on affiche WASD au lieu de ZQSD. */
+function kpRelabelMoveKeys(){
+  try{
+    const el=document.getElementById('page-games');if(!el||!KB_QWERTY[getKbLayoutId()])return;
+    const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n;
+    while((n=w.nextNode())){const t=n.nodeValue;if(/ZQSD|Z Q S D/.test(t))n.nodeValue=t.replace(/Z Q S D/g,'W A S D').replace(/ZQSD/g,'WASD');}
+  }catch{}
+}
 function getKbLayoutId(){try{const v=localStorage.getItem('kp_kb_layout');return KB_LAYOUTS[v]?v:'fr';}catch{return 'fr';}}
 function setKbLayoutId(v){try{localStorage.setItem('kp_kb_layout',v);localStorage.setItem('kp_kb_layout_'+(KB_QWERTY[v]?'qwerty':'azerty'),v);}catch{}}
 function kbModifierName(){const l=getKbLayoutId();return l==='mac'||(KB_QWERTY[l]&&KB_QWERTY[l].mac)?'Option (⌥)':'AltGr';}
@@ -5209,6 +5232,15 @@ const TILES_LANES=[
   {letter:'l',hand:'r'},
   {letter:'m',hand:'r'},
 ];
+/* Les couloirs suivent la disposition du clavier : les 4 premiers et les 3 suivants après G H de la rangée de repos, puis la dernière touche (AZERTY : Q S D F J K L M ;
+   QWERTY : A S D F J K L ;). Les lettres sont lues dans la disposition courante, jamais écrites en dur ; la liste est modifiée en place (les morceaux visent des indices). */
+function kpSyncTilesLanes(){
+  try{
+    const row=(KB_LAYOUTS[getKbLayoutId()]||KB_LAYOUTS.fr)[2].map(k=>String(k.l||'').toLowerCase());
+    if(row.length<10)return;
+    [0,1,2,3,6,7,8,9].forEach((src,i)=>{TILES_LANES[i].letter=row[src];});
+  }catch{}
+}
 // Couleur unique des tuiles "normales" (appui simple), tuiles longues
 // (maintien) et accords : c'est le TYPE qui donne la couleur, plus la
 // lettre. Bonus (♥) et piège (✕) gardent leur propre couleur via les classes
@@ -5363,7 +5395,7 @@ const CURRICULUM=[
        rules:[
          {icon:'📊',t:'La rangée la plus utilisée',d:"Plus de la moitié des frappes d'un texte français se font ici. La maîtriser, c'est déjà taper la majorité des mots sans regarder."},
          {icon:'🔁',t:'Trouve chaque touche de mémoire',d:"Cet exercice mélange les dix touches. Si tu hésites, ralentis : le but est de les trouver de mémoire, pas de taper vite."},
-         {icon:'⚓',t:'Position de repos constante',d:"Entre chaque frappe, sens que tes huit doigts sont revenus sur Q S D F  J K L M."}
+         {icon:'⚓',t:'Position de repos constante',d:"Entre chaque frappe, sens que tes huit doigts sont revenus sur la rangée de repos."}
        ],
        tip:"Objectif : valider toute la rangée de repos, doigts ancrés et yeux sur l'écran."
      },
@@ -7891,7 +7923,9 @@ const app={
     const cur=this._glChoice(game),list=this._glList(),lv=this._glResolve(game);
     const mine=KPGameLevels.myLevel(ALL_LESSONS,l=>!!this.lessonRec(l.id).cleared);
     const chip=(id,label)=>`<button type="button" class="gl-chip" aria-pressed="${cur===id}" onclick="app.pickGameLevel('${game}','${id}')">${label}</button>`;
-    const info=lv.full?'Tous les mots du clavier, avec les paliers de score et ton record.'
+    const lettersOnly=game==='hybrid'; // jeu de lettres : pas de mots à compter
+    const info=lv.full?(lettersOnly?'Toutes les lettres de ta main, avec les paliers et ton record.':'Tous les mots du clavier, avec les paliers de score et ton record.')
+      :lettersOnly?`Lettres : <b>${[...lv.letters].map(c=>c.toUpperCase()).join(' ')}</b>. Niveau d’entraînement : pas de palier ni de record.`
       :`Lettres : <b>${[...lv.letters].map(c=>c.toUpperCase()).join(' ')}</b>. ${lv.content.mixed?(lv.content.words.length?`${lv.content.words.length} mots et des suites de lettres.`:'Pas encore de mot possible : des suites de lettres.'):`${lv.content.words.length} mots possibles.`} Niveau d’entraînement : pas de record.`;
     return`<div class="gl-picker"><div class="gl-lab">Niveau</div><div class="gl-chips">${chip('auto',`Mon niveau (${mine.letters.size} lettres)`)}${list.map(x=>chip(x.id,x.label)).join('')}${chip('tout','Tout le clavier')}</div><div class="gl-info">${info}</div></div>`;
   },
@@ -8262,12 +8296,18 @@ const app={
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startSprint());return;}
     this.stopSprint();this.stopGame();
     this.activeGame='sprint';
-    const text=genSprintText();
-    this.sprint={on:true,over:false,text,idx:0,typed:[],correct:0,errors:0,timeLeft:30,started:false};
+    const glv=this._glResolve('sprint');
+    const text=glv.full?genSprintText():KPGameLevels.textFor(GAME_VOCAB,glv.letters,200);
+    this.sprint={on:true,over:false,text,idx:0,typed:[],correct:0,errors:0,timeLeft:30,started:false,glv};
+    try{track('game_start',{game:'sprint',level:glv.id,letters:glv.full?0:glv.letters.size,mixed:!!(glv.content&&glv.content.mixed)});}catch{}
     this.renderCurrent();
     setTimeout(()=>{const b=document.querySelector('.sprint-text-box');if(b)b.focus();},50);
   },
-  stopSprint(){if(this._sprintLoop){clearInterval(this._sprintLoop);this._sprintLoop=null;}},
+  stopSprint(){
+    const as=this.sprint;
+    if(as&&as.on&&!as.over&&as.started&&!as._abandonSent&&as.glv){as._abandonSent=true;try{track('game_abandon',{game:'sprint',level:as.glv.id,secs:30-as.timeLeft});}catch{}}
+    if(this._sprintLoop){clearInterval(this._sprintLoop);this._sprintLoop=null;}
+  },
   sprintTick(){
     const s=this.sprint;if(!s||!s.on)return;
     s.timeLeft=Math.max(0,s.timeLeft-1);
@@ -8279,7 +8319,8 @@ const app={
     if(this.royale&&this.royale.phase==='playing'){this._royaleRoundFinished(Math.round((s.correct/5)/0.5));return;}
     if(!currentUser||!this.stats)return;
     const wpm=Math.round((s.correct/5)/0.5);
-    try{track('game_completed',{game:'sprint',wpm});}catch{}
+    try{track('game_completed',{game:'sprint',wpm,level:s.glv?s.glv.id:'tout'});}catch{}
+    if(s.glv&&!s.glv.full)return; // entraînement : pas de record
     // Le flag record doit être posé AVANT d'écraser sprintBest : calculé après
     // (comme c'était le cas avant), wpm et best étaient déjà égaux au moment du
     // rendu et le bandeau "Nouveau record" ne s'affichait quasiment jamais.
@@ -8344,6 +8385,7 @@ const app={
       <div class="sprint-arena">
         ${isIdle?`
           <div class="gidle"><h2 class="gidle-title">Le Sprint<span class="dot"> .</span></h2><p>30 secondes, texte infini. Pas de retour arrière : chaque seconde compte.${best>0?`<br>Record : <b style="color:var(--accent)">${best} mpm</b>`:''}</p>
+            ${this._gameLevelPicker('sprint')}
             <button class="btn-primary" autofocus onclick="app.startSprint()">Lancer le Sprint ▸</button>
             <div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>
         `:isOver?`
@@ -8355,7 +8397,7 @@ const app={
               {label:'Caractères corrects',value:correct},
               {label:'Erreurs',value:errors,color:errors>0?'var(--danger)':'var(--success)'},
             ],
-            bestLine:best>0?`Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best} mpm</b>`:null,
+            bestLine:s.glv&&!s.glv.full?`Niveau d’entraînement : ton record se bat au niveau « Tout le clavier ».`:best>0?`Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best} mpm</b>`:null,
             primaryLabel:'Rejouer',primaryOnClick:'app.startSprint()',
           })}
         `:`
@@ -11251,17 +11293,23 @@ const app={
   _sgrBase:{left:45000,spawnMs:260,dur0:2400,durMin:1400,durStep:25,twoFrom:5,trapFrom:12,lives:3,slots:9},
   // pool : lettres tirées au dernier moment dans l'un des 9 emplacements vides.
   // tiers : seuils de médaille du niveau.
-  _sgrLevels:[
-    {n:1,id:'r1',name:'Rangée du milieu',short:'Milieu',intro:'Les lettres de la rangée de repos (Q S D F G H J K L M) apparaissent au dernier moment, dans l’une des neuf cases.',
+  _sgrLevelsBase:[
+    {n:1,id:'r1',name:'Rangée du milieu',short:'Milieu',intro:'Les lettres de la rangée de repos ({L}) apparaissent au dernier moment, dans l’une des neuf cases.',
      pool:'QSDFGHJKLM',tiers:{bronze:150,silver:245,gold:345},tune:{dur0:3000,durMin:1800,durStep:20}},
-    {n:2,id:'r2',name:'Rangée du haut',short:'Haut',intro:'Les lettres de la rangée du haut (A Z E R T Y U I O P) apparaissent au dernier moment. Tes doigts montent puis reviennent à leur place.',
+    {n:2,id:'r2',name:'Rangée du haut',short:'Haut',intro:'Les lettres de la rangée du haut ({L}) apparaissent au dernier moment. Tes doigts montent puis reviennent à leur place.',
      pool:'AZERTYUIOP',tiers:{bronze:120,silver:205,gold:310},tune:{dur0:3000,durMin:1800,durStep:20}},
-    {n:3,id:'r3',name:'Rangée du bas',short:'Bas',intro:'Les lettres de la rangée du bas (W X C V B N) apparaissent au dernier moment. Tes doigts descendent, la rangée la plus difficile à atteindre.',
+    {n:3,id:'r3',name:'Rangée du bas',short:'Bas',intro:'Les lettres de la rangée du bas ({L}) apparaissent au dernier moment. Tes doigts descendent, la rangée la plus difficile à atteindre.',
      pool:'WXCVBN',tiers:{bronze:105,silver:175,gold:265},tune:{dur0:3200,durMin:2000,durStep:20}},
     {n:4,id:'r4',name:'Tout le clavier',short:'Expert',intro:'Les lettres de tout le clavier apparaissent au dernier moment, n’importe lesquelles. À toi de retrouver la touche.',
      pool:'AZERTYUIOPQSDFGHJKLMWXCVBN',tiers:{bronze:100,silver:230,gold:335},tune:{}},
   ],
-  _sgrLevel(n){return this._sgrLevels[(n||1)-1]||this._sgrLevels[0];},
+  // Les lettres de chaque niveau viennent de la disposition courante (AZERTY ou QWERTY) : rangée du milieu, du haut, du bas, puis tout le clavier.
+  // Les identifiants (r1 à r4) ne changent pas : les records existants restent valables.
+  get _sgrLevels(){
+    const R=kpLetterRows(),pools=[R[1],R[0],R[2],[...R[0],...R[1],...R[2]]];
+    return this._sgrLevelsBase.map((l,i)=>Object.assign({},l,{pool:pools[i].join(''),intro:l.intro.replace('{L}',pools[i].join(' '))}));
+  },
+  _sgrLevel(n){const L=this._sgrLevels;return L[(n||1)-1]||L[0];},
   _sgrTuneOf(n){return Object.assign({},this._sgrBase,this._sgrLevel(n).tune);},
   // Lettres jouables du niveau
   _sgrPoolOf(n){return this._sgrLevel(n).pool.split('');},
@@ -11833,6 +11881,7 @@ const app={
           <div style="display:flex;gap:26px;margin-top:4px">
             <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${this._sourisTiers.hybrid.bronze} · 🥈${this._sourisTiers.hybrid.silver} · 🥇${this._sourisTiers.hybrid.gold}</div></div>
           </div>
+          ${this._gameLevelPicker('hybrid')}
           <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisHybridStart()">Commencer</button>
         </div>
       </div>
@@ -11840,14 +11889,17 @@ const app={
   },
   _sourisHybridStart(){
     this.stopSouris();
-    this.souris={phase:'play',track:'hybrid',score:0,rounds:0,hits:0,misses:0,aimTimes:[],
+    const glv=this._glResolve('hybrid');
+    try{track('game_start',{game:'souris-duo',level:glv.id,letters:glv.full?0:glv.letters.size});}catch{}
+    this.souris={phase:'play',track:'hybrid',score:0,rounds:0,hits:0,misses:0,aimTimes:[],glv,
       letter:'',tx:50,ty:50,tr:9,spawnAt:0,firstHoverAt:null,_hovering:false};
     this._sourisHybridSpawn();
     this.renderSouris();
   },
   _sourisHybridSpawn(){
     const s=this.souris;
-    const pool=this._sourisHandLetters(this.stats.sourisHybridHand);
+    let pool=this._sourisHandLetters(this.stats.sourisHybridHand);
+    if(s.glv&&!s.glv.full){const known=pool.filter(c=>s.glv.letters.has(c));if(known.length>=2)pool=known;} // niveau d'entraînement : seulement les lettres apprises
     s.letter=pool[Math.floor(Math.random()*pool.length)];
     s.tx=16+Math.random()*68;s.ty=18+Math.random()*64;s.tr=9;
     s.spawnAt=Date.now();s.firstHoverAt=null;s._hovering=false;
@@ -11896,7 +11948,9 @@ const app={
     const s=this.souris;
     const acc=(s.hits+s.misses)?Math.round(100*s.hits/(s.hits+s.misses)):0;
     const avgAim=s.aimTimes.length?Math.round(s.aimTimes.reduce((a,b)=>a+b,0)/s.aimTimes.length):0;
-    const res=this._sourisFinishTrack('hybrid',{score:s.score,thresholds:this._sourisTiers.hybrid,extra:{aimMs:avgAim,acc},sessionResult:{hits:s.hits}});
+    const training=!!(s.glv&&!s.glv.full);
+    const res=training?{tier:null,isNewBest:false,training:true}:this._sourisFinishTrack('hybrid',{score:s.score,thresholds:this._sourisTiers.hybrid,extra:{aimMs:avgAim,acc},sessionResult:{hits:s.hits}});
+    if(training){try{track('game_completed',{game:'souris-duo',level:s.glv.id,score:s.score});}catch{}} // entraînement : ni palier ni record
     s.phase='end';s._result=res;s._acc=acc;s._avgAim=avgAim;
     this.renderSouris();
   },
@@ -11937,6 +11991,7 @@ const app={
             icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
             record:r.isNewBest?'Nouveau record sur cette piste !':null,
             boxes:[{label:'Score',value:s.score,accent:true},{label:'Visée',value:s._avgAim,unit:'ms'},{label:'Frappe',value:s._acc,unit:'%'}],
+            bestLine:r.training?'Niveau d’entraînement : ton score ne compte pas pour les paliers.':null,
             primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisHybridStart()',
           })}
         </div>
@@ -12003,6 +12058,7 @@ const app={
       </span>`;
   },
   _sourisTilesSelect(){
+    kpSyncTilesLanes();
     const bestRaw=(this.stats&&this.stats.sourisTilesBest)||{};
     const best=typeof bestRaw.score==='number'?{}:bestRaw; // ignore l'ancien format plat (un seul best global)
     const estDurMs={facile:185391,difficile:165303,extreme:162926}; // durées réelles des 3 fichiers, mesurées une fois
@@ -12281,6 +12337,7 @@ const app={
   // serait plus frustrant qu'utile. La sélection normale d'un morceau, elle,
   // passe toujours par le brief.
   _sourisTilesStart(songId,skipBrief){
+    kpSyncTilesLanes();
     if(!this.stats.sourisTilesTutorialSeen){this._sourisTilesTutorial(()=>this._sourisTilesStart(songId,skipBrief));return;}
     if(songId==='libre'){this._sourisTilesStartFree(skipBrief);return;}
     const idx=TILES_SONGS.findIndex(x=>x.id===songId);
@@ -12837,6 +12894,7 @@ const app={
       </div>
       <div class="gcine-boss-cta">Relever le défi →</div>
     </div>`;
+    this._advice=this._gamesAdvice();
     const cardsHTML=visible.map((g,i)=>this._gcineCard(g,i)).join('');
     const dotsHTML=visible.map((g,i)=>`<div class="gcine-dot" data-idx="${i}"></div>`).join('');
     const keysHTML=GCINE_LAYOUT.layout.map((k,i)=>`<div class="gcine-key" id="gk-${i}" style="width:${k.w}px;margin-left:${-k.w/2}px"><div class="gcine-key-base"></div><div class="gcine-key-top"><span class="gcine-key-label">${k.ch}</span></div></div>`).join('');
@@ -12872,6 +12930,7 @@ const app={
         ${gamesGate}
         <div class="${currentUser?'':'gate-teased'}">
           ${bossHTML}
+          ${this._gamesAdviceHTML()}
           <div class="gcine-cat-tabs">${tabsHTML}</div>
           <div class="gcine-carousel" id="gcine-carousel">
             <div class="gcine-cards" id="gcine-cards">${cardsHTML}</div>
@@ -12891,10 +12950,40 @@ const app={
     this._gcineCat=cat;
     this.renderGames();
   },
+  /* « Pour toi » : le niveau repéré (lettres des leçons validées) conseille quelques jeux. Tableau fixe, sans règle dynamique ni IA ; rien n'est verrouillé.
+     Étapes : repos, haut, bas (jusqu'à l'alphabet complet), puis tout. Les clés sont celles de GCINE_GAMES ; Boss et Clavier vide ne sont jamais conseillés ici. */
+  _GAMES_ADVICE:{
+    repos:[{key:'sourisGrid',why:'Une touche s’allume, tu tapes sa lettre : idéal pour la rangée de repos.'},{key:'sourisTiles',why:'Les couloirs des doigts de repos, en commençant par deux touches.'},{key:'frappe',why:'Des suites de lettres qui tombent, avec seulement les lettres que tu connais.'}],
+    haut:[{key:'sourisGrid',why:'Entraîne la rangée du haut, une rangée à la fois.'},{key:'frappe',why:'Tes premiers vrais mots, avec les lettres que tu connais.'},{key:'simon',why:'Retiens de petits mots, sans la pression du temps.'}],
+    bas:[{key:'frappe',why:'Des mots avec toutes les lettres que tu as apprises.'},{key:'sprint',why:'30 secondes pour prendre de la vitesse.'},{key:'simon',why:'Retiens et retape des séquences de mots.'}],
+    tout:[{key:'course',why:'Une course contre des bots, sur de vrais textes.'},{key:'ghost',why:'Bats ta meilleure course passée.'},{key:'sprint',why:'30 secondes de vitesse pure.'}],
+  },
+  _gamesAdvice(){
+    if(!currentUser||!this.stats)return null;
+    const lv=this._glList(),repos=lv.find(x=>x.id==='repos'),haut=lv.find(x=>x.id==='haut');
+    if(!repos||!haut)return null;
+    const mine=KPGameLevels.myLevel(ALL_LESSONS,l=>!!this.lessonRec(l.id).cleared),n=mine.letters.size;
+    const alpha=lv.find(x=>x.id==='alphabet'),top=lv[lv.length-1];
+    const stage=n<=repos.letters.size?'repos':n<=haut.letters.size?'haut':(alpha&&n<alpha.letters.size)||(top&&top.id==='accents'&&n<top.letters.size&&!alpha)?'bas':'tout';
+    const title={repos:'Tu découvres la rangée de repos',haut:'Tu apprends la rangée du haut',bas:'Tu finis l’alphabet',tout:'Tu connais toutes les lettres'}[stage];
+    return{stage,letters:n,title,items:this._GAMES_ADVICE[stage]};
+  },
+  _gamesAdviceHTML(){
+    const a=this._advice;if(!a)return'';
+    const byKey=Object.fromEntries(GCINE_GAMES.map(g=>[g.key,g]));
+    return`<div class="gcine-advice"><h3>Pour toi : ${a.title}</h3><p>${a.letters} lettres apprises. Voici des jeux qui vont bien avec ton niveau, tu peux jouer à tous les autres quand tu veux.</p><div class="gcine-advice-list">${a.items.map(x=>`<button type="button" class="gcine-advice-item" onclick="app.selectGame('${x.key}')"><b>${byKey[x.key]?byKey[x.key].name:x.key}</b><span>${x.why}</span></button>`).join('')}</div></div>`;
+  },
+  // Les descriptions qui citent des touches suivent la disposition du clavier (AZERTY ou QWERTY).
+  _gcineDesc(g){
+    const q=typeof KB_QWERTY!=='undefined'&&KB_QWERTY[getKbLayoutId()];
+    if(g.key==='sourisTiles'){const r=(KB_LAYOUTS[getKbLayoutId()]||KB_LAYOUTS.fr)[2].map(k=>String(k.l||'').toUpperCase());return`8 couloirs, ta rangée de repos ${[0,1,2,3].map(i=>r[i]).join('')} ${[6,7,8,9].map(i=>r[i]).join('')} : tape ou tiens la touche avant la ligne.`;}
+    return q?g.desc.replace(/ZQSD/g,'WASD'):g.desc;
+  },
   _gcineCard(g,i){
     const locked=typeof g.locked==='function'&&g.locked(this);
     const disabled=g.comingSoon||locked;
-    const tag=g.comingSoon?'Bientôt disponible':locked?'🔒 Verrouillé':(g.expert?'EXPERT':(currentUser?'GRATUIT':'Compte requis'));
+    const rec=!!(this._advice&&this._advice.items.some(x=>x.key===g.key));
+    const tag=g.comingSoon?'Bientôt disponible':locked?'🔒 Verrouillé':rec?'CONSEILLÉ POUR TOI':(g.expert?'EXPERT':(currentUser?'GRATUIT':'Compte requis'));
     const cta=g.comingSoon?'Bientôt disponible ⏳':locked?(g.lockedTag||'Verrouillé'):'Jouer maintenant →';
     return `<div class="gcine-card${disabled?' is-disabled':''}" data-idx="${i}">
       <div class="gcine-card-inner"${disabled?' style="--gcine-fill:linear-gradient(140deg,#c9c2b6,#a9a196 64%)"':''}>
@@ -12909,7 +12998,7 @@ const app={
         </div>
         <div class="gcine-card-body">
           <div class="gcine-card-name">${g.name}</div>
-          <div class="gcine-card-desc">${g.desc}</div>
+          <div class="gcine-card-desc">${this._gcineDesc(g)}</div>
         </div>
         <div class="gcine-card-foot">
           <div class="gcine-card-cta">${cta}</div>
@@ -13217,14 +13306,20 @@ const app={
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startCourse());return;}
     this.stopGame();this.stopSprint();this.stopCourse();
     this.activeGame='course';this._courseRec=false;
-    const text=kpTypable(RACE_TEXTS[Math.floor(Math.random()*RACE_TEXTS.length)]);
-    this.course={on:true,over:false,text,typed:[],correct:0,keystrokes:0,
+    const glv=this._glResolve('course');
+    const text=glv.full?kpTypable(RACE_TEXTS[Math.floor(Math.random()*RACE_TEXTS.length)]):KPGameLevels.textFor(GAME_VOCAB,glv.letters,14);
+    try{track('game_start',{game:'course',level:glv.id,letters:glv.full?0:glv.letters.size,mixed:!!(glv.content&&glv.content.mixed)});}catch{}
+    this.course={on:true,over:false,text,typed:[],correct:0,keystrokes:0,glv,
       raceStarted:false,startAt:Date.now()+3000,startTime:0,endTime:0,finished:false,
-      bots:this._courseAdaptiveBots().map(b=>({...b,prog:0,finished:false,finishTime:0,_jit:0.85+Math.random()*0.3,_ahead:null})),rank:0};
+      bots:(glv.full?this._courseAdaptiveBots():COURSE_BOTS.map((b,i)=>({...b,wpm:[10,16,24][i]}))).map(b=>({...b,prog:0,finished:false,finishTime:0,_jit:0.85+Math.random()*0.3,_ahead:null})),rank:0};
     this.renderCurrent();
     this._courseLoop=setInterval(()=>this.courseTick(),100);
   },
-  stopCourse(){if(this._courseLoop){clearInterval(this._courseLoop);this._courseLoop=null;}},
+  stopCourse(){
+    const ac=this.course;
+    if(ac&&ac.on&&!ac.over&&!ac._abandonSent&&ac.glv){ac._abandonSent=true;try{track('game_abandon',{game:'course',level:ac.glv.id});}catch{}}
+    if(this._courseLoop){clearInterval(this._courseLoop);this._courseLoop=null;}
+  },
   courseTick(){
     const c=this.course;if(!c||!c.on)return;
     const now=Date.now();
@@ -13280,7 +13375,8 @@ const app={
     if(this.royale&&this.royale.phase==='playing'){this._royaleRoundFinished(wpm);return;}
     const acc=c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     c._wpm=wpm;c._acc=acc;c._isRecord=false;
-    try{track('game_completed',{game:'course',wpm,acc,rank:c.rank});}catch{}
+    try{track('game_completed',{game:'course',wpm,acc,rank:c.rank,level:c.glv?c.glv.id:'tout'});}catch{}
+    if(c.glv&&!c.glv.full){this.renderCurrent();return;} // entraînement : pas de record
     if(currentUser&&this.stats){
       const b=this.stats.courseBest;
       if(!b||wpm>b.wpm){c._isRecord=true;this.stats.courseBest={wpm,acc,rank:c.rank,date:Date.now()};saveStats(this.stats);this._celebrateGame();}
@@ -13333,13 +13429,13 @@ const app={
         {label:'Précision',value:c._acc,unit:'%'},
         {label:'Classement',value:c.rank+' / '+(c.bots.length+1)},
       ],
-      bestLine:best?`Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best.wpm} mpm</b>`:null,
+      bestLine:c&&c.glv&&!c.glv.full?`Niveau d’entraînement : ton record se bat au niveau « Tout le clavier ».`:best?`Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best.wpm} mpm</b>`:null,
       primaryLabel:'Rejouer',primaryOnClick:'app.startCourse()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       ${this._gameHeader('Course de dactylo',ICONS.raceCar)}
       <div class="course-arena">
-        ${idle&&!IS_TOUCH_ONLY()?`<div class="course-idle"><h2>Course de dactylo<span class="dot"> .</span></h2><p>Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary course-cta" autofocus onclick="app.startCourse()">Lancer la course ▸</button><div class="course-espace">OU APPUIE SUR ESPACE</div></div>`:''}
+        ${idle&&!IS_TOUCH_ONLY()?`<div class="course-idle"><h2>Course de dactylo<span class="dot"> .</span></h2><p>Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p>${this._gameLevelPicker('course')}<button class="btn-primary course-cta" autofocus onclick="app.startCourse()">Lancer la course ▸</button><div class="course-espace">OU APPUIE SUR ESPACE</div></div>`:''}
         ${c?`
           <div class="course-hud">
             <div><div class="course-stat-label">VITESSE</div><div class="course-stat-val">${liveWpm}<span class="course-stat-unit"> mpm</span></div></div>
@@ -13364,20 +13460,33 @@ const app={
      passée sur GHOST_TEXT — un texte fixe, contrairement à Course qui en
      tire un au hasard à chaque partie : le fantôme n'a de sens que rejoué
      sur exactement le même texte. */
+  /* Fantôme d'un niveau d'entraînement : gardé sur cet appareil seulement (pas de changement du schéma de progression). Clé : niveau + nombre de lettres,
+     car le texte change quand « Mon niveau » gagne une lettre. */
+  _ghostKey(glv){return'kp_ghost_'+glv.id+'_'+glv.letters.size;},
+  _ghostBestOf(c){
+    const glv=c&&c.glv;
+    if(glv&&!glv.full){try{const v=JSON.parse(localStorage.getItem(this._ghostKey(glv))||'null');return v&&Array.isArray(v.timeline)&&v.timeline.length?v:null;}catch{return null;}}
+    return currentUser&&this.stats&&this.stats.ghostBest?this.stats.ghostBest:null;
+  },
   startGhost(){
     if(!canAccessGame()){openAuth('register','Crée un compte pour jouer.',()=>this.startGhost());return;}
     this.stopGame();this.stopSprint();this.stopCourse();this.stopGhost();
     this.activeGame='ghost';
-    this.ghost={on:true,over:false,text:GHOST_TEXT,typed:[],correct:0,keystrokes:0,
+    // Niveau d'entraînement : un texte FIXE par niveau (même graine = même texte, sinon le fantôme ne rejoue pas la même course), fantôme gardé sur cet appareil.
+    const glv=this._glResolve('ghost');
+    const text=glv.full?GHOST_TEXT:KPGameLevels.textFor(GAME_VOCAB,glv.letters,16,{rnd:KPGameLevels.seededRnd(KPGameLevels.hash(glv.id+':'+glv.letters.size))});
+    try{track('game_start',{game:'ghost',level:glv.id,letters:glv.full?0:glv.letters.size,mixed:!!(glv.content&&glv.content.mixed)});}catch{}
+    this.ghost={on:true,over:false,text,typed:[],correct:0,keystrokes:0,glv,
       raceStarted:false,startAt:Date.now()+3000,startTime:0,endTime:0,finished:false,
       recording:[],ghostFinished:false,won:false};
     this.renderCurrent();
     this._ghostLoop=setInterval(()=>this.ghostTick(),100);
   },
   stopGhost(){if(this._ghostLoop){clearInterval(this._ghostLoop);this._ghostLoop=null;}},
-  _ghostProgAt(timeline,elapsedMs){
+  _ghostProgAt(timeline,elapsedMs,len){
+    len=len||GHOST_TEXT.length;
     if(!timeline||!timeline.length)return 0;
-    if(elapsedMs<=timeline[0][0])return timeline[0][1]/GHOST_TEXT.length;
+    if(elapsedMs<=timeline[0][0])return timeline[0][1]/len;
     const last=timeline[timeline.length-1];
     if(elapsedMs>=last[0])return 1;
     for(let i=1;i<timeline.length;i++){
@@ -13385,7 +13494,7 @@ const app={
       if(elapsedMs<=t1){
         const t0=timeline[i-1][0],c0=timeline[i-1][1];
         const frac=t1===t0?1:(elapsedMs-t0)/(t1-t0);
-        return (c0+(c1-c0)*frac)/GHOST_TEXT.length;
+        return (c0+(c1-c0)*frac)/len;
       }
     }
     return 1;
@@ -13397,7 +13506,7 @@ const app={
       if(now>=c.startAt){c.raceStarted=true;c.startTime=now;}
       this.renderCurrent();return;
     }
-    const best=currentUser&&this.stats&&this.stats.ghostBest?this.stats.ghostBest:null;
+    const best=this._ghostBestOf(c);
     if(best&&!c.ghostFinished&&(now-c.startTime)>=best.timeline[best.timeline.length-1][0])c.ghostFinished=true;
     this.renderCurrent();
   },
@@ -13416,7 +13525,7 @@ const app={
     c.recording.push([Date.now()-c.startTime,this._ghostCorrectPrefix()]);
     if(c.typed.length===c.text.length&&this._ghostCorrectPrefix()===c.text.length){
       c.finished=true;c.endTime=Date.now();c.on=false;c.over=true;
-      const best=currentUser&&this.stats&&this.stats.ghostBest?this.stats.ghostBest:null;
+      const best=this._ghostBestOf(c);
       const finishMs=c.endTime-c.startTime;
       c.won=!best||finishMs<best.timeline[best.timeline.length-1][0];
       this.stopGhost();this.afterGhost();
@@ -13430,7 +13539,13 @@ const app={
     if(this.royale&&this.royale.phase==='playing'){this._royaleRoundFinished(wpm);return;}
     const acc=c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     c._wpm=wpm;c._acc=acc;c._isRecord=false;c._isFirst=false;
-    try{track('game_completed',{game:'ghost',wpm,acc,won:c.won});}catch{}
+    try{track('game_completed',{game:'ghost',wpm,acc,won:c.won,level:c.glv?c.glv.id:'tout'});}catch{}
+    if(c.glv&&!c.glv.full){
+      // entraînement : le fantôme du niveau se garde sur cet appareil, jamais dans la progression
+      const b=this._ghostBestOf(c);c._isFirst=!b;
+      if(!b||wpm>b.wpm){c._isRecord=!!b;try{localStorage.setItem(this._ghostKey(c.glv),JSON.stringify({timeline:c.recording,wpm,acc,date:Date.now()}));}catch{}}
+      this.renderCurrent();return;
+    }
     if(currentUser&&this.stats){
       const b=this.stats.ghostBest;
       c._isFirst=!b;
@@ -13441,7 +13556,7 @@ const app={
   renderGhost(){
     const c=this.ghost;
     const over=!!(c&&c.over),idle=!c||(!c.on&&!c.over);
-    const best=currentUser&&this.stats&&this.stats.ghostBest?this.stats.ghostBest:null;
+    const best=this._ghostBestOf(c||{glv:this._glResolve('ghost')});
     const len=c?c.text.length:1;
     const prefix=c?this._ghostCorrectPrefix():0;
     const playerProg=c?prefix/len:0;
@@ -13449,7 +13564,7 @@ const app={
     const liveWpm=c&&c.raceStarted?Math.round((prefix/5)/elapsedMin):0;
     const liveAcc=c&&c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     const ghostElapsed=c&&c.raceStarted?Date.now()-c.startTime:0;
-    const ghostProg=c&&best?(c.ghostFinished?1:this._ghostProgAt(best.timeline,ghostElapsed)):0;
+    const ghostProg=c&&best?(c.ghostFinished?1:this._ghostProgAt(best.timeline,ghostElapsed,c.text.length)):0;
     // Mêmes capsules à traînée que Course de dactylo (_courseLanesHTML),
     // toujours 2 pistes ici : toi et ton fantôme.
     const lanes=c?[
@@ -13482,13 +13597,13 @@ const app={
         {label:'Vitesse',value:c._wpm,unit:'mpm',accent:true},
         {label:'Précision',value:c._acc,unit:'%'},
       ],
-      bestLine:best&&!c._isFirst?`Fantôme : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best.wpm} mpm</b>`:null,
+      bestLine:c&&c.glv&&!c.glv.full?`Niveau d’entraînement : ton record se bat au niveau « Tout le clavier ».`:best&&!c._isFirst?`Fantôme : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best.wpm} mpm</b>`:null,
       primaryLabel:'Rejouer',primaryOnClick:'app.startGhost()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       ${this._gameHeader('Contre ton fantôme',ICONS.ghost)}
       <div class="sprint-arena" style="position:relative">
-        ${idle&&!IS_TOUCH_ONLY()?`<div class="gidle"><h2 class="gidle-title">Contre ton fantôme<span class="dot"> .</span></h2><p>${best?'Bats ton meilleur temps sur ce texte : ton fantôme court à ton propre rythme précédent.':'Ta toute première course sur ce texte : elle enregistrera ton fantôme pour la prochaine fois.'}${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p><button class="btn-primary" autofocus onclick="app.startGhost()">Lancer la course ▸</button><div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`:''}
+        ${idle&&!IS_TOUCH_ONLY()?`<div class="gidle"><h2 class="gidle-title">Contre ton fantôme<span class="dot"> .</span></h2><p>${best?'Bats ton meilleur temps sur ce texte : ton fantôme court à ton propre rythme précédent.':'Ta toute première course sur ce texte : elle enregistrera ton fantôme pour la prochaine fois.'}${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p>${this._gameLevelPicker('ghost')}<button class="btn-primary" autofocus onclick="app.startGhost()">Lancer la course ▸</button><div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`:''}
         ${c?`
           <div class="sprint-hud">
             <div><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> mpm</span></div></div>
@@ -13512,14 +13627,20 @@ const app={
     this.activeGame='simon';
     this.simon={on:true,over:false,phase:'show',level:1,lives:3,score:0,maxSeq:0,
       words:[],currentWord:'',wordIdx:0,showUntil:0,failUntil:0,inputStart:0,_showTotal:0,_lastBonus:0};
+    const glv=this._glResolve('simon');this.simon.glv=glv;
+    try{track('game_start',{game:'simon',level:glv.id,letters:glv.full?0:glv.letters.size,mixed:!!(glv.content&&glv.content.mixed)});}catch{}
     this.simonNewSequence();
     this.renderCurrent();
     this._simonLoop=setInterval(()=>this.simonLoop(),100);
   },
-  stopSimon(){if(this._simonLoop){clearInterval(this._simonLoop);this._simonLoop=null;}},
+  stopSimon(){
+    const as=this.simon;
+    if(as&&as.on&&!as.over&&!as._abandonSent&&as.glv){as._abandonSent=true;try{track('game_abandon',{game:'simon',level:as.glv.id,score:as.score,maxSeq:as.maxSeq});}catch{}}
+    if(this._simonLoop){clearInterval(this._simonLoop);this._simonLoop=null;}
+  },
   simonNewSequence(){
     const s=this.simon;const lvl=s.level;
-    const pool=lvl<4?TIREUR_EASY:lvl<8?TIREUR_MID:[...TIREUR_MID,...TIREUR_ACCENTS];
+    const pool=s.glv&&!s.glv.full?s.glv.pool:lvl<4?TIREUR_EASY:lvl<8?TIREUR_MID:[...TIREUR_MID,...TIREUR_ACCENTS];
     const words=[];for(let i=0;i<lvl;i++)words.push(pool[Math.floor(Math.random()*pool.length)]);
     s.words=words;s.currentWord='';s.wordIdx=0;s.phase='show';
     const perWord=Math.max(500,850-lvl*45);
@@ -13580,7 +13701,8 @@ const app={
     const s=this.simon;
     if(this.royale&&this.royale.phase==='playing'){this._royaleRoundFinished(s.score);return;}
     s._isRecord=false;
-    try{track('game_completed',{game:'simon',score:s.score,maxSeq:s.maxSeq});}catch{}
+    try{track('game_completed',{game:'simon',score:s.score,maxSeq:s.maxSeq,level:s.glv?s.glv.id:'tout'});}catch{}
+    if(s.glv&&!s.glv.full){this.renderCurrent();return;} // entraînement : pas de record
     if(currentUser&&this.stats){
       const b=this.stats.simonBest;
       if((!b||s.score>b.score)&&s.score>0){s._isRecord=true;this.stats.simonBest={score:s.score,maxSeq:s.maxSeq,date:Date.now()};saveStats(this.stats);this._celebrateGame();}
@@ -13619,7 +13741,7 @@ const app={
     } else if(!currentUser){
       overlay=`<div class="race-overlay"><h2>Simon des mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="btn-primary" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
     } else if(idle){
-      overlay=`<div class="race-overlay"><h2 class="gidle-title">Simon des mots<span class="dot"> .</span></h2><p>Mémorise une séquence de mots puis retape-la. Elle s'allonge à chaque réussite.${best?'<br>Record : <b style="color:var(--accent)">'+best.score+' pts</b> (séquence de '+best.maxSeq+')':''}</p><button class="btn-primary" autofocus onclick="app.startSimon()">Jouer ▸</button><div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`;
+      overlay=`<div class="race-overlay"><h2 class="gidle-title">Simon des mots<span class="dot"> .</span></h2><p>Mémorise une séquence de mots puis retape-la. Elle s'allonge à chaque réussite.${best?'<br>Record : <b style="color:var(--accent)">'+best.score+' pts</b> (séquence de '+best.maxSeq+')':''}</p>${this._gameLevelPicker('simon')}<button class="btn-primary" autofocus onclick="app.startSimon()">Jouer ▸</button><div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`;
     } else if(over){
       const badge=s.maxSeq>=8?'Mémoire d\'éléphant !':s.maxSeq>=5?'Excellente mémoire !':s.maxSeq>=3?'Bien joué !':'Continue !';
       overlay=`<div class="race-overlay">${this._gameResult({
@@ -13630,6 +13752,7 @@ const app={
           {label:'Score',value:s.score,unit:'pts',accent:true},
           {label:'Séquence max',value:s.maxSeq,unit:'mots'},
         ],
+        bestLine:s.glv&&!s.glv.full?`Niveau d’entraînement : ton record se bat au niveau « Tout le clavier ».`:null,
         primaryLabel:'Rejouer ▸',primaryOnClick:'app.startSimon()',
       })}</div>`;
     }
