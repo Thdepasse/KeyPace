@@ -9,7 +9,7 @@
 // distinction de casse). Vide ou absente : personne. On la change dans les réglages Vercel du projet, puis on redéploie.
 const DEFAULT_COURSE = 'fr/azerty';
 const COURSE_ACCESS = {
-  'fr/qwerty': { status: 'bêta' },
+  'fr/qwerty': { status: 'en ligne' }, // ouvert à tous les comptes connectés le 2026-11-06 (avant : 'bêta', comptes testeurs)
 };
 const COURSE_IDS = Object.keys(COURSE_ACCESS);
 const COURSE_ID_RE = /^[a-z]{2,3}(-[A-Z]{2})?\/[a-z0-9-]{2,24}$/;
@@ -20,6 +20,7 @@ function betaTesters() {
 
 // Identifiants de cours que CE compte peut écrire et voir (nom d'utilisateur lu en base, jamais ce que le client envoie).
 function courseIdsFor(user) {
+  if (!user) return []; // jamais de cours pour une requête sans compte, même 'en ligne'
   const name = String((user && user.username) || '').trim().toLowerCase();
   const tester = !!name && betaTesters().includes(name);
   return COURSE_IDS.filter((id) => {

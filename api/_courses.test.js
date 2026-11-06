@@ -11,7 +11,7 @@ const NOW = Date.UTC(2026, 10, 3, 12, 0, 0);
 const IDS = ['nl/azerty'];
 const L = { bestWpm: 30, bestErr: 1, cleared: true };
 
-test('le registre ne contient que le cours QWERTY en bêta ; sans liste explicite rien n\'est accepté', () => {
+test('le registre ne contient que le cours QWERTY ; sans liste explicite rien n\'est accepté', () => {
   assert.deepEqual(COURSE_IDS, ['fr/qwerty']);
   assert.equal(DEFAULT_COURSE, 'fr/azerty');
   const r = sanitizeProgress({ lessons: {}, courses: { 'nl/azerty': { lessons: { a: L } } } }, {}, NOW);

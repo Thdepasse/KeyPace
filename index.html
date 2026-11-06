@@ -768,7 +768,11 @@ a.nav-link{text-decoration:none;display:inline-block}
   .nav-signup-btn{padding:8px 10px;font-size:13px}
 }
 .nav-kb-btn #nav-kb-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
-.nav-kb-menu{width:min(330px,calc(100vw - 24px))}
+.nav-kb-menu{width:min(360px,calc(100vw - 24px))}
+/* les deux cartes AZERTY / QWERTY tiennent dans le cadre (elles en sortaient : leur largeur minimale dépassait celle du menu) */
+.nav-kb-menu .kb-family-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+.nav-kb-menu .kb-family-card{min-width:0;overflow:hidden;padding:12px 10px}
+@media(max-width:420px){.nav-kb-menu .kb-family-card>span:first-child{transform:scale(.82);transform-origin:left center;margin-right:-30px}}
 .kbc-variants{display:flex;flex-wrap:wrap;gap:6px;padding:4px 8px 6px}
 .kbc-variants .settings-btn{font-size:13px;padding:6px 10px}
 .nav-kb-menu .kb-family-cards{padding:4px 8px}

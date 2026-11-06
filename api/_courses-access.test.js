@@ -1,4 +1,4 @@
-// Accès aux cours : le cours QWERTY est en bêta, réservé aux comptes testeurs (KEYPACE_BETA_TESTERS), contrôle fait côté serveur
+// Mécanisme d'accès BÊTA aux cours (le cours QWERTY l'a utilisé avant son ouverture à tous, voir _courses-open.test.js) : réservé aux comptes testeurs (KEYPACE_BETA_TESTERS), contrôle fait côté serveur
 // d'après le nom d'utilisateur enregistré en base. Lancer : node --test api/_courses-access.test.js
 process.env.SUPABASE_URL = 'http://supabase.test';
 process.env.SUPABASE_SECRET_KEY = 'k';
@@ -7,6 +7,8 @@ const test = require('node:test');
 const assert = require('node:assert');
 const saveProgress = require('./save-progress');
 const { COURSE_ACCESS, courseIdsFor, betaTesters } = require('./_courses-registry');
+// Ce fichier teste le mécanisme « bêta » : on remet le statut du cours à 'bêta' pour la durée du test (le vrai statut est vérifié ailleurs).
+COURSE_ACCESS['fr/qwerty'].status = 'bêta';
 
 let USER, PROGRESS, CALLS;
 global.fetch = async (url, opts = {}) => {
@@ -27,7 +29,7 @@ const call = async (body) => {
 const R1 = { bestWpm: 30, bestErr: 1, cleared: true };
 const blob = () => ({ lessons: { r1: R1 }, courses: { 'fr/qwerty': { lessons: { r1: R1 }, tests: [], keyStats: {} } } });
 
-test('le registre déclare le cours QWERTY en bêta ; la liste des testeurs vient de l\'environnement', () => {
+test('en statut bêta, la liste des testeurs vient de l\'environnement', () => {
   assert.deepEqual(COURSE_ACCESS['fr/qwerty'], { status: 'bêta' });
   assert.deepEqual(betaTesters(), ['testeur1', 'testeur2']);
   assert.deepEqual(courseIdsFor({ username: 'testeur1' }), ['fr/qwerty']);

@@ -347,6 +347,10 @@ async function run(opts = {}) {
         const t = await ev("({cards:document.querySelectorAll('#nav-kb-menu .kb-family-card').length,all:/Tous les réglages/.test(document.getElementById('nav-kb-menu').innerText)})");
         if (t.cards !== 2) problems.push(`BR8 : ${t.cards} cartes dans la pastille d'un compte testeur au lieu de 2`);
         if (!t.all) problems.push('BR8 : « Tous les réglages » absent pour un compte connecté');
+        // les deux cartes AZERTY / QWERTY restent DANS le cadre du menu (elles en sortaient de quelques pixels)
+        const fit = await ev("(()=>{const m=document.getElementById('nav-kb-menu').getBoundingClientRect();return [...document.querySelectorAll('#nav-kb-menu .kb-family-card')].map(c=>{const r=c.getBoundingClientRect();return{out:Math.round(Math.max(m.left-r.left,r.right-m.right,0)),clip:c.scrollWidth-c.clientWidth}})})()");
+        if (fit.some((c) => c.out > 0)) problems.push(`BR8 : une carte de famille sort du cadre du menu du clavier (${fit.map((c) => c.out).join(' / ')} px)`);
+        if (fit.some((c) => c.clip > 0)) problems.push(`BR8 : les touches d'une carte de famille débordent de la carte (${fit.map((c) => c.clip).join(' / ')} px)`);
         await ev("document.querySelectorAll('#nav-kb-menu .kb-family-card')[1].click();true"); await sleep(150);
         await ev("document.getElementById('kb-sw-yes').click();true"); await sleep(1200);
         const qq = await ev("({text:document.getElementById('nav-kb-text').textContent,variants:document.querySelectorAll('#nav-kb-menu .kb-layout-btn').length,course:kpCourseId()})");
