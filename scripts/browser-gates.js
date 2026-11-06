@@ -352,6 +352,10 @@ async function run(opts = {}) {
           out.gridMine={training:!!(gs._result&&gs._result.training),kept:JSON.stringify([app.stats.sourisGridBest,app.stats.sourisGridTop])===gk,noGold:!/Or décroché/.test(document.querySelector('.sgr-card').innerText)};
           app.souris.lvl=1;app._sgrBegin();app._sgrStopLoop();app.souris.score=200;app.souris.hits=10;app._sgrEnd();out.gridNormal={tier:app.souris._result&&app.souris._result.tier,top:(app.stats.sourisGridTop||{}).r1};
           app.activeGame=null;
+          // Duel : le créateur choisit le niveau ; son texte (lettres apprises) part au serveur, « Tout le clavier » laisse le serveur choisir
+          app.activeGame='duel';app.duel=null;app.renderGames();out.duelPicker=!!document.querySelector('.duel-card .gl-picker');
+          app.pickGameLevel('duel','auto');const db=app._duelCreateBody();out.duelTrain={action:db.action,has:typeof db.text==='string',bad:typeof db.text==='string'?bad(db.text):-1,n:typeof db.text==='string'?db.text.split(' ').length:0};
+          app.pickGameLevel('duel','tout');out.duelFull=!('text' in app._duelCreateBody());app.activeGame=null;app.duel=null;
           // tout le clavier : rien ne change
           app.pickGameLevel('sprint','tout');app.startSprint();clearInterval(app._sprintLoop);out.sprintFull={full:app.sprint.glv.full};app.stopSprint();
           // Grille réflexe et Magic Tiles en AZERTY : identiques à l'origine
@@ -376,6 +380,9 @@ async function run(opts = {}) {
         if (gm.grid8.suggest === 5 || gm.grid8.cards !== 5 || gm.grid8.mine !== 'ERUIQSDFGHJKLM') problems.push(`BR11 : Grille réflexe, élève en leçon 8 (${JSON.stringify(gm.grid8)})`);
         if (!gm.gridMine.training || !gm.gridMine.kept || !gm.gridMine.noGold) problems.push(`BR11 : « Mon niveau » de la Grille réflexe a touché les records ou affiche une médaille (${JSON.stringify(gm.gridMine)})`);
         if (gm.gridNormal.tier !== 'bronze' || gm.gridNormal.top !== 200) problems.push(`BR11 : les niveaux d'origine de la Grille réflexe ont changé (${JSON.stringify(gm.gridNormal)})`);
+        if (!gm.duelPicker) problems.push('BR11 : le sélecteur de niveau est absent du menu du Duel');
+        if (gm.duelTrain.action !== 'duel-create' || !gm.duelTrain.has || gm.duelTrain.bad !== 0 || gm.duelTrain.n !== 12) problems.push(`BR11 : texte du Duel au niveau « Mon niveau » (${JSON.stringify(gm.duelTrain)})`);
+        if (!gm.duelFull) problems.push('BR11 : au niveau « Tout le clavier », le Duel doit laisser le serveur choisir le texte');
         if (!gm.sprintFull.full) problems.push('BR11 : « Tout le clavier » n\'est plus l\'expérience complète');
         if (gm.azSgr !== A) problems.push(`BR11 : lettres de la Grille réflexe changées en AZERTY (${gm.azSgr})`);
         if (gm.azLanes !== 'qsdfjklm' || gm.azBack !== 'qsdfjklm') problems.push(`BR11 : couloirs de Magic Tiles changés en AZERTY (${gm.azLanes} / ${gm.azBack})`);

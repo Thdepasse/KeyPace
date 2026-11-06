@@ -1435,6 +1435,10 @@ a.nav-link{text-decoration:none;display:inline-block}
 .gcine-advice-item:hover{border-color:var(--accent)}
 .gcine-advice-item b{display:block;font-size:15px;margin-bottom:2px}
 .gcine-advice-item span{font-size:13px;color:var(--muted)}
+.boss-card .gl-picker .gl-lab,.boss-card .gl-picker .gl-info,.duel-card .gl-picker .gl-lab,.duel-card .gl-picker .gl-info{color:var(--muted)}
+.boss-card .gl-chip,.duel-card .gl-chip{color:var(--txt);border-color:var(--border);font-size:12px;padding:5px 10px}
+.boss-card .gl-chip:hover,.duel-card .gl-chip:hover{border-color:var(--accent)}
+.boss-card .gl-chip[aria-pressed=true],.duel-card .gl-chip[aria-pressed=true]{color:#fff;border-color:var(--accent)}
 .gl-picker{margin:8px auto 4px;max-width:560px}
 .gl-picker .gl-lab{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:6px}
 .gl-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
@@ -7924,7 +7928,9 @@ const app={
     const mine=KPGameLevels.myLevel(ALL_LESSONS,l=>!!this.lessonRec(l.id).cleared);
     const chip=(id,label)=>`<button type="button" class="gl-chip" aria-pressed="${cur===id}" onclick="app.pickGameLevel('${game}','${id}')">${label}</button>`;
     const lettersOnly=game==='hybrid'; // jeu de lettres : pas de mots à compter
-    const info=lv.full?(lettersOnly?'Toutes les lettres de ta main, avec les paliers et ton record.':'Tous les mots du clavier, avec les paliers de score et ton record.')
+    const duel=game==='duel'; // le texte est le même pour les deux joueurs, le record de victoires continue de compter
+    const info=lv.full?(duel?'Un texte de phrases, comme d’habitude.':lettersOnly?'Toutes les lettres de ta main, avec les paliers et ton record.':'Tous les mots du clavier, avec les paliers de score et ton record.')
+      :duel?`Lettres : <b>${[...lv.letters].map(c=>c.toUpperCase()).join(' ')}</b>. Vous tapez tous les deux le même texte, fait de ces lettres.`
       :lettersOnly?`Lettres : <b>${[...lv.letters].map(c=>c.toUpperCase()).join(' ')}</b>. Niveau d’entraînement : pas de palier ni de record.`
       :`Lettres : <b>${[...lv.letters].map(c=>c.toUpperCase()).join(' ')}</b>. ${lv.content.mixed?(lv.content.words.length?`${lv.content.words.length} mots et des suites de lettres.`:'Pas encore de mot possible : des suites de lettres.'):`${lv.content.words.length} mots possibles.`} Niveau d’entraînement : pas de record.`;
     return`<div class="gl-picker"><div class="gl-lab">Niveau</div><div class="gl-chips">${chip('auto',`Mon niveau (${mine.letters.size} lettres)`)}${list.map(x=>chip(x.id,x.label)).join('')}${chip('tout','Tout le clavier')}</div><div class="gl-info">${info}</div></div>`;
@@ -14140,6 +14146,14 @@ const app={
     }
     return this._duelSbClient;
   },
+  // Corps de la requête de création : au niveau « Tout le clavier », le serveur choisit un texte comme avant ; à un niveau d'entraînement, le créateur envoie un texte
+  // fait des mots (ou suites de lettres) de ses leçons. Les deux joueurs tapent ensuite le MÊME texte, renvoyé par le serveur.
+  _duelCreateBody(){
+    const glv=this._glResolve('duel'),body={action:'duel-create',token:currentToken};
+    if(!glv.full)body.text=KPGameLevels.textFor(GAME_VOCAB,glv.letters,12);
+    try{track('game_start',{game:'duel',level:glv.id,letters:glv.full?0:glv.letters.size});}catch{}
+    return body;
+  },
   async duelCreate(){
     // Si l'utilisateur quitte le duel (duelLeave, ou selectGame vers un autre
     // jeu) pendant que ce create/join est encore en vol, this._duelSeq change
@@ -14148,7 +14162,7 @@ const app={
     const seq=(this._duelSeq=(this._duelSeq||0)+1);
     this.duel={phase:'creating'};this.renderCurrent();
     try{
-      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-create',token:currentToken})}).then(r=>r.json());
+      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(this._duelCreateBody())}).then(r=>r.json());
       if(seq!==this._duelSeq)return;
       if(r.error){this.duel={phase:'error',msg:r.error};this.renderCurrent();return;}
       this.duel=this._duelBlank('host',r.roomId,r.roomCode,r.text,r.hostLabel);
@@ -14334,7 +14348,7 @@ const app={
     const seq=(this._duelSeq=(this._duelSeq||0)+1);
     d._rematchLoading=true;this.renderCurrent();
     try{
-      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'duel-create',token:currentToken})}).then(r=>r.json());
+      const r=await fetch('/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(this._duelCreateBody())}).then(r=>r.json());
       if(seq!==this._duelSeq)return;
       if(r.error||!r.roomId){d._rematchLoading=false;d._rematchError=r.error||'Erreur.';this.renderCurrent();return;}
       if(d._channel)d._channel.send({type:'broadcast',event:'rematch-go',payload:{roomId:r.roomId,roomCode:r.roomCode,text:r.text,hostLabel:r.hostLabel}}).catch(()=>{});
@@ -14379,6 +14393,7 @@ const app={
             <div class="duel-card-icon">🚀</div>
             <h3>Créer un duel</h3>
             <p>Génère un code à partager à ton adversaire</p>
+            ${this._gameLevelPicker('duel')}
             <button class="btn-primary" style="width:100%;margin-top:4px" onclick="app.duelCreate()">Créer ▸</button>
           </div>
           <div class="duel-card">

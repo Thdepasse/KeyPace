@@ -73,4 +73,14 @@ function generateRoomCode() {
   return code;
 }
 
-module.exports = { sb, DUEL_TEXTS, userFromToken, generateRoomCode };
+// Texte proposé par celui qui crée le duel (niveau d'entraînement : mots ou suites de lettres de ses leçons). Le serveur ne fait confiance à rien :
+// uniquement des lettres (accents compris), des espaces, des apostrophes et des traits d'union, 4 à 400 signes. Sinon : null, le texte aléatoire habituel est utilisé.
+function sanitizeDuelText(raw) {
+  if (typeof raw !== 'string') return null;
+  const t = raw.replace(/\s+/g, ' ').trim();
+  if (t.length < 4 || t.length > 400) return null;
+  if (!/^[\p{L}' -]+$/u.test(t)) return null;
+  return t;
+}
+
+module.exports = { sb, DUEL_TEXTS, userFromToken, generateRoomCode, sanitizeDuelText };

@@ -2,7 +2,7 @@
 // sous la limite de 12 fonctions du plan Vercel Hobby.
 // Route par `action` dans le body JSON. Helpers dans _boss-shared / _duel-shared.
 const { sb, getCurrentChallenge, computeScore } = require('./_boss-shared');
-const { DUEL_TEXTS, userFromToken, generateRoomCode } = require('./_duel-shared');
+const { DUEL_TEXTS, userFromToken, generateRoomCode, sanitizeDuelText } = require('./_duel-shared');
 const { canActAsTeacher } = require('./_class-logic');
 const { setCorsOrigin } = require('./_cors');
 
@@ -117,7 +117,8 @@ module.exports = async function handler(req, res) {
         const { token } = body;
         const user = await userFromToken(token);
         if (!user) return res.status(401).json({ error: 'Session invalide.' });
-        const text = DUEL_TEXTS[Math.floor(Math.random() * DUEL_TEXTS.length)];
+        // niveau d'entraînement : le créateur propose un texte limité aux lettres de ses leçons (validé ici) ; sinon texte aléatoire
+        const text = sanitizeDuelText(body.text) || DUEL_TEXTS[Math.floor(Math.random() * DUEL_TEXTS.length)];
         let room = null;
         for (let attempt = 0; attempt < 5; attempt++) {
           const code = generateRoomCode();
