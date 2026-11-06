@@ -11307,8 +11307,15 @@ const app={
   // Les identifiants (r1 à r4) ne changent pas : les records existants restent valables.
   get _sgrLevels(){
     const R=kpLetterRows(),pools=[R[1],R[0],R[2],[...R[0],...R[1],...R[2]]];
-    return this._sgrLevelsBase.map((l,i)=>Object.assign({},l,{pool:pools[i].join(''),intro:l.intro.replace('{L}',pools[i].join(' '))}));
+    const out=this._sgrLevelsBase.map((l,i)=>Object.assign({},l,{pool:pools[i].join(''),intro:l.intro.replace('{L}',pools[i].join(' '))}));
+    // 5e niveau, d'entraînement : les lettres déjà apprises (toutes rangées confondues), sans médaille ni record. Jamais « verrouillé ».
+    const mine=this._sgrMineInfo(),known=pools[3].filter(c=>mine.letters.has(c.toLowerCase()));
+    const mp=known.length>=2?known:pools[1].slice(0,4);
+    out.push({n:5,id:'mine',name:'Mon niveau',short:'Mon niveau',training:true,pool:mp.join(''),tiers:{bronze:0,silver:0,gold:0},tune:{dur0:3200,durMin:2000,durStep:20},
+      intro:`Les lettres que tu as déjà apprises (${mp.join(' ')}) apparaissent au dernier moment, dans l’une des neuf cases. Entraînement : pas de médaille.`});
+    return out;
   },
+  _sgrMineInfo(){return KPGameLevels.myLevel(ALL_LESSONS,l=>!!this.lessonRec(l.id).cleared);},
   _sgrLevel(n){const L=this._sgrLevels;return L[(n||1)-1]||L[0];},
   _sgrTuneOf(n){return Object.assign({},this._sgrBase,this._sgrLevel(n).tune);},
   // Lettres jouables du niveau
@@ -11336,6 +11343,8 @@ const app={
   },
   // Niveau conseillé : le premier niveau débloqué sans médaille, sinon le dernier débloqué
   _sgrSuggest(){
+    const m=this._sgrMineInfo(),reposN=kpLetterRows()[1].length;
+    if(currentUser&&m.done>0&&m.letters.size<reposN)return 5; // il apprend encore la rangée de repos : on commence par ses lettres
     const b=this._sgrBests(),u=this._sgrUnlocked();
     for(let n=1;n<=u;n++){if(!b[this._sgrLevel(n).id])return n;}
     return u;
@@ -11489,7 +11498,7 @@ const app={
     const ph=s.phase,L=this._sgrLevel(s.lvl);
     const stg=document.getElementById('sgr-stage');if(stg)stg.classList.toggle('ov',ph==='brief'||ph==='paused'||ph==='end');
     const set=(id,t)=>{const el=document.getElementById(id);if(el&&el.textContent!==t)el.textContent=t;};
-    set('sgr-lvl','Niveau '+L.n+' sur 4');set('sgr-name',L.name);
+    set('sgr-lvl',L.training?'Entraînement':'Niveau '+L.n+' sur 4');set('sgr-name',L.name);
     const pb=document.getElementById('sgr-pause');if(pb)pb.hidden=!(ph==='play'||(ph==='countdown'&&!s.fresh));
     this._sgrCellsUpdate();this._sgrHud();
     const ov=document.getElementById('sgr-ov');
@@ -11618,19 +11627,19 @@ const app={
     const needKb=matchMedia('(hover:none)').matches;
     const tierName={gold:'Or',silver:'Argent',bronze:'Bronze'};
     const picker=this._sgrLevels.map(l=>{
-      const open=l.n<=unlocked,b=bests[l.id],sel=l.n===s.lvl;
-      const st=!open?`<span class="sgr-lst lock">Valide le niveau ${l.n-1}</span>`:b?`<span class="sgr-lst done">${this._sfsMedalSvg(b.tier,16)}${tierName[b.tier]||'Validé'}</span>`:`<span class="sgr-lst todo">${sel?'Choisi':'À faire'}</span>`;
+      const open=l.n<=unlocked||l.training,b=bests[l.id],sel=l.n===s.lvl;
+      const st=!open?`<span class="sgr-lst lock">Valide le niveau ${l.n-1}</span>`:b?`<span class="sgr-lst done">${this._sfsMedalSvg(b.tier,16)}${tierName[b.tier]||'Validé'}</span>`:`<span class="sgr-lst todo">${l.training?'Entraînement':sel?'Choisi':'À faire'}</span>`;
       return `<button type="button" class="sgr-lv-card${sel?' sel':''}${open?'':' locked'}" ${open?`onclick="app._sgrPick(${l.n})"`:'disabled'} aria-label="Niveau ${l.n}, ${this._esc(l.name)}">
         ${this._sgrMini()}<b>${this._esc(l.short)}</b><em class="sgr-lt">${l.pool.length>10?'26 lettres':l.pool}</em>${st}</button>`;
     }).join('');
     this._sgrOv(`<div class="sgr-card">
       <img class="sgr-cm" src="${this._sgrPoseUrl(3)}" alt="">
-      <div class="sgr-kick">Niveau ${L.n} sur 4</div><h2>${this._esc(L.name)}</h2>
+      <div class="sgr-kick">${L.training?'Entraînement':'Niveau '+L.n+' sur 4'}</div><h2>${this._esc(L.name)}</h2>
       <p class="sgr-intro">${this._esc(L.intro)}</p>
       <div class="sgr-pick">${picker}</div>
       <ol class="sgr-rules"><li>Une case <b>s’allume en vert</b> et révèle une lettre : tape-la au clavier.</li><li>Elle s’éteint vite. Une touche verte ratée te coûte <b>1 vie</b>.</li><li>Après ${T.trapFrom} réussites, des <b>touches rouges</b> apparaissent : ne les tape pas.</li></ol>
       <div class="sgr-legend"><span><i style="background:#1FA971"></i>Verte : à taper</span><span><i style="background:#E5484D"></i>Rouge : piège, ne tape pas</span></div>
-      <div class="sgr-meds"><span class="b">Bronze ${L.tiers.bronze}</span><span class="s">Argent ${L.tiers.silver}</span><span class="g">Or ${L.tiers.gold}</span><span>${T.lives} vies</span><span>${T.left/1000} secondes</span>${best?`<span class="r">Ton record ${best}</span>`:''}</div>
+      <div class="sgr-meds">${L.training?'<span>Pas de médaille</span>':`<span class="b">Bronze ${L.tiers.bronze}</span><span class="s">Argent ${L.tiers.silver}</span><span class="g">Or ${L.tiers.gold}</span>`}<span>${T.lives} vies</span><span>${T.left/1000} secondes</span>${best?`<span class="r">Ton record ${best}</span>`:''}</div>
       <p class="sgr-sub"><b>4 réussites de suite</b> doublent tes points, <b>8 de suite</b> les triplent. Une erreur ou une touche à côté remet le combo à zéro.</p>
       ${needKb?'<p class="sgr-warn">Ce jeu se joue au clavier. Reviens sur un ordinateur pour y jouer.</p>':''}
       <div class="sgr-row2"><button class="sgr-go" type="button" data-focus ${needKb?'disabled':''} onclick="app._sgrBegin()">${I.play}<span>Commencer</span></button></div>
@@ -11649,8 +11658,8 @@ const app={
     const medal=t?`<svg viewBox="0 0 64 64" width="92" height="92" aria-hidden="true"><path d="M19 3h10l5 15H24z" fill="#FF4D2E"/><path d="M45 3H35l-5 15h10z" fill="#C93A20"/><circle cx="32" cy="40" r="20" fill="${tv[0]}" stroke="${tv[1]}" stroke-width="2"/><path d="M32 28l3.4 6.9 7.6 1.1-5.5 5.3 1.3 7.6L32 45.4l-6.8 3.5 1.3-7.6-5.5-5.3 7.6-1.1z" fill="${tv[1]}" opacity=".55"/></svg>`
       :'';
     const girl=`<img class="sgr-cm" src="${this._sgrPoseUrl(t||s._newTop?8:12)}" alt="">`; // fille : idée à la victoire, haussement d'épaules sinon
-    const next=t==='gold'?null:t==='silver'?['or',tiers.gold]:t==='bronze'?['argent',tiers.silver]:['bronze',tiers.bronze];
-    const prog=next?`<div class="sgr-nx">${t?'Prochain palier':'Pour valider le niveau'} : <b>${next[0]} à ${next[1]} points</b>${s.score<next[1]?', il t’en manquait '+(next[1]-s.score):''}<div class="bar2"><i style="width:${Math.min(100,s.score/next[1]*100)}%"></i></div></div>`:'<div class="sgr-nx"><b>Or décroché.</b> Tu ne peux pas faire mieux sur ce niveau.</div>';
+    const next=L.training?null:t==='gold'?null:t==='silver'?['or',tiers.gold]:t==='bronze'?['argent',tiers.silver]:['bronze',tiers.bronze];
+    const prog=next?`<div class="sgr-nx">${t?'Prochain palier':'Pour valider le niveau'} : <b>${next[0]} à ${next[1]} points</b>${s.score<next[1]?', il t’en manquait '+(next[1]-s.score):''}<div class="bar2"><i style="width:${Math.min(100,s.score/next[1]*100)}%"></i></div></div>`:L.training?'<div class="sgr-nx">Niveau d’entraînement : pas de médaille. Tes médailles se gagnent sur les niveaux Milieu, Haut, Bas et Expert.</div>':'<div class="sgr-nx"><b>Or décroché.</b> Tu ne peux pas faire mieux sur ce niveau.</div>';
     let tip='Bien joué. Enchaîne plus de réussites d’affilée pour faire monter le combo.';
     if(s.traps>=2)tip='Tu as tapé des touches rouges. Regarde la couleur avant de taper : vert oui, rouge non.';
     else if(s.expired>=3)tip='Des touches se sont éteintes avant ta frappe. Garde les yeux sur tout le clavier, pas seulement sur une touche.';
@@ -11658,7 +11667,7 @@ const app={
     const mc=s.bestCombo>=8?3:s.bestCombo>=4?2:1;
     const nextLvl=t&&L.n<4;
     this._sgrOv(`<div class="sgr-card"><div class="sgr-top">${girl}${medal}</div>
-      <h2>${t?tv[2]:'Pas cette fois'}</h2>
+      <h2>${t?tv[2]:L.training?'Bien joué !':'Pas cette fois'}</h2>
       ${(s._newTop||r.isNewBest)?'<div class="sgr-rec">Nouveau record sur ce niveau !</div>':''}
       <div class="sgr-final"><b>${s.score}</b><span>points</span></div>
       ${(!s._newTop&&s._prevTop>0)?`<div class="sgr-prevtop">Ton record : <b>${s._prevTop}</b></div>`:''}
@@ -11686,6 +11695,7 @@ const app={
   _sgrBegin(){
     const s=this.souris;if(!s||s.track!=='grid')return;
     if(!s.lvl)s.lvl=this._sgrSuggest();
+    try{track('game_start',{game:'souris-grille',level:this._sgrLevel(s.lvl).id});}catch{}
     this._sgrStopLoop();this._sgrReset();s.fresh=true;
     this._sgrCountdown(3,700);
   },
@@ -11804,6 +11814,11 @@ const app={
     s._acc=tot?Math.round(100*s.hits/tot):0;
     this._sgrMigrate();
     // Meilleur score du niveau, indépendamment des médailles
+    if(L.training){
+      s._prevTop=0;s._newTop=false;s._result={tier:null,isNewBest:false,training:true};
+      try{track('game_completed',{game:'souris-grille',level:'mine',score:s.score});}catch{}
+      playSound('victory');s.phase='end';this._sgrRender();return;
+    }
     const prevTop=this._sgrTop(s.lvl);
     s._prevTop=prevTop;
     if(this.stats&&currentUser&&s.score>prevTop){

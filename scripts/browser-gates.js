@@ -342,13 +342,23 @@ async function run(opts = {}) {
           // Duo : seulement les lettres apprises de sa main
           app.stats.sourisHybridHand='mouse-right';app.pickGameLevel('hybrid','auto');app.souris={phase:'play',track:'hybrid',glv:app._glResolve('hybrid'),score:0};
           const seen=new Set();for(let i=0;i<80;i++){app._sourisHybridSpawn();seen.add(app.souris.letter)}out.duo={letters:[...seen].sort().join(''),bad:[...seen].filter(c=>!K.has(c)).length};
+          // Grille réflexe : « Mon niveau » (lettres apprises, sans médaille ni record) ; les 4 niveaux d'origine gardent leurs médailles
+          app.activeGame='sourisGrid';app.souris={phase:'brief',track:'grid'};app.renderGames();
+          out.grid8={suggest:app._sgrSuggest(),mine:app._sgrLevels[4].pool,cards:document.querySelectorAll('.sgr-lv-card').length};
+          const les=app.stats.lessons;app.stats.lessons={};ALL_LESSONS.slice(0,3).forEach(l=>{app.stats.lessons[l.id]=les[l.id]});
+          out.grid3={suggest:app._sgrSuggest(),mine:app._sgrLevels[4].pool};app.stats.lessons=les;
+          const gs=app.souris;gs.lvl=5;app._sgrBegin();app._sgrStopLoop();gs.score=120;gs.hits=8;gs.misses=2;gs.bestCombo=4;
+          const gk=JSON.stringify([app.stats.sourisGridBest,app.stats.sourisGridTop]);app._sgrEnd();
+          out.gridMine={training:!!(gs._result&&gs._result.training),kept:JSON.stringify([app.stats.sourisGridBest,app.stats.sourisGridTop])===gk,noGold:!/Or décroché/.test(document.querySelector('.sgr-card').innerText)};
+          app.souris.lvl=1;app._sgrBegin();app._sgrStopLoop();app.souris.score=200;app.souris.hits=10;app._sgrEnd();out.gridNormal={tier:app.souris._result&&app.souris._result.tier,top:(app.stats.sourisGridTop||{}).r1};
+          app.activeGame=null;
           // tout le clavier : rien ne change
           app.pickGameLevel('sprint','tout');app.startSprint();clearInterval(app._sprintLoop);out.sprintFull={full:app.sprint.glv.full};app.stopSprint();
           // Grille réflexe et Magic Tiles en AZERTY : identiques à l'origine
-          out.azSgr=app._sgrLevels.map(l=>l.pool).join('|');kpSyncTilesLanes();out.azLanes=TILES_LANES.map(l=>l.letter).join('');
+          out.azSgr=app._sgrLevels.slice(0,4).map(l=>l.pool).join('|');kpSyncTilesLanes();out.azLanes=TILES_LANES.map(l=>l.letter).join('');
           // QWERTY
           const d=await (await fetch('/courses-src/fr-qwerty.json')).json();kpApplyCourseData('fr/qwerty',d);localStorage.setItem('kp_kb_layout','windows-us');
-          out.qwSgr=app._sgrLevels.map(l=>l.pool).join('|');kpSyncTilesLanes();out.qwLanes=TILES_LANES.map(l=>l.letter).join('');
+          out.qwSgr=app._sgrLevels.slice(0,4).map(l=>l.pool).join('|');kpSyncTilesLanes();out.qwLanes=TILES_LANES.map(l=>l.letter).join('');
           out.qwDesc=app._gcineDesc(GCINE_GAMES.find(g=>g.key==='sourisTiles'));out.qwSouris=app._gcineDesc(GCINE_GAMES.find(g=>g.key==='souris'));
           go('games');const el=document.getElementById('page-games');el.insertAdjacentHTML('beforeend','<p id="zq">Z Q S D et ZQSD</p>');await new Promise(r=>setTimeout(r,60));out.relabel=document.getElementById('zq').innerText;
           kpApplyCourseData('fr/azerty',null);localStorage.setItem('kp_kb_layout','fr');kpSyncTilesLanes();out.azBack=TILES_LANES.map(l=>l.letter).join('');
@@ -362,6 +372,10 @@ async function run(opts = {}) {
         if (!gm.ghostLocal) problems.push('BR11 : le fantôme du niveau n\'est pas gardé sur l\'appareil');
         if (gm.course.bots !== '10/16/24') problems.push(`BR11 : bots de la Course au niveau d'entraînement (${gm.course.bots})`);
         if (gm.duo.bad || gm.duo.letters.length < 2) problems.push(`BR11 : le Duo propose des lettres inconnues (${gm.duo.letters})`);
+        if (gm.grid3.suggest !== 5 || gm.grid3.mine !== 'SDFJKL') problems.push(`BR11 : Grille réflexe, élève en leçon 3 : « Mon niveau » devrait être conseillé avec F J D K S L (${JSON.stringify(gm.grid3)})`);
+        if (gm.grid8.suggest === 5 || gm.grid8.cards !== 5 || gm.grid8.mine !== 'ERUIQSDFGHJKLM') problems.push(`BR11 : Grille réflexe, élève en leçon 8 (${JSON.stringify(gm.grid8)})`);
+        if (!gm.gridMine.training || !gm.gridMine.kept || !gm.gridMine.noGold) problems.push(`BR11 : « Mon niveau » de la Grille réflexe a touché les records ou affiche une médaille (${JSON.stringify(gm.gridMine)})`);
+        if (gm.gridNormal.tier !== 'bronze' || gm.gridNormal.top !== 200) problems.push(`BR11 : les niveaux d'origine de la Grille réflexe ont changé (${JSON.stringify(gm.gridNormal)})`);
         if (!gm.sprintFull.full) problems.push('BR11 : « Tout le clavier » n\'est plus l\'expérience complète');
         if (gm.azSgr !== A) problems.push(`BR11 : lettres de la Grille réflexe changées en AZERTY (${gm.azSgr})`);
         if (gm.azLanes !== 'qsdfjklm' || gm.azBack !== 'qsdfjklm') problems.push(`BR11 : couloirs de Magic Tiles changés en AZERTY (${gm.azLanes} / ${gm.azBack})`);
