@@ -36,7 +36,7 @@ function loadLexicon(srcDir, errs, only) {
     const checked = fs.existsSync(checkFile) ? Object.fromEntries(readJson(checkFile).results.map((r) => [r.w, r])) : {};
     for (const w of list) {
       const c = checked[w];
-      if (!/^[a-z]+$/.test(w)) { errs.push(`${f} : « ${w} » n'est pas un mot en minuscules sans signe`); continue; }
+      if (!/^[a-z]+('[a-z]+)?$/.test(w)) { errs.push(`${f} : « ${w} » n'est pas un mot en minuscules (une apostrophe est admise : don't)`); continue; }
       if (US_SPELLINGS.test(w) && !BRITISH_OK.has(w)) { errs.push(`${f} : « ${w} » est une orthographe américaine (anglais britannique attendu)`); continue; }
       if (!c) { errs.push(`${f} : « ${w} » n'a pas été vérifié (lancer scripts/check-en-words.js --in ${f})`); continue; }
       const ok = c.dict === 'oui' || c.wik === 'oui' || (c.freq !== null && c.freq >= 1 && w.length <= 3);
@@ -74,7 +74,7 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
     if (!/^\d+\. /.test(m.name || '')) errs.push(`${dirName}/${m.file} : le nom du module doit commencer par « ${i + 1}. »`);
   });
   const lessons = mods.flatMap((m) => m.lessons.map((l) => ({ ...l, _m: m })));
-  const ids = new Set(); const cum = new Set(); let majOn = false; const signs = new Set(); let n = 0;
+  const ids = new Set(); const cum = new Set(); let majOn = false; const signs = new Set(); const digits = new Set(); let n = 0;
   const wrong = family === 'azerty' ? /QWERTY|qwerty/ : /AZERTY|azerty/;
   for (const l of lessons) {
     const where = `${dirName} ${l.id}`; n++;
@@ -92,6 +92,7 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
     // touches apprises (cumul) : lettres de `keys`, signes de `keys`
     G.lettersOf(l).forEach((c) => cum.add(c));
     String(l.keys).split(/\s+/).filter((k) => k.length === 1 && !/[\p{L}\p{N}]/u.test(k)).forEach((k) => signs.add(k));
+    String(l.keys).split(/\s+/).filter((k) => k.length === 1 && /\p{N}/u.test(k)).forEach((k) => digits.add(k));
     if (l._m.kind === 'majuscules') majOn = true;
     const text = l.text || '';
     if (text.length < 30) errs.push(`${where} : texte trop court (${text.length})`);
@@ -103,6 +104,7 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
       const lower = ch.toLowerCase();
       const isUpper = ch !== lower;
       if (/\p{L}/u.test(ch)) { if (!cum.has(lower)) errs.push(`${where} : « ${ch} » tapée avant d'être apprise`); else if (isUpper && !majOn) errs.push(`${where} : majuscule « ${ch} » avant le module des majuscules`); }
+      else if (/\p{N}/u.test(ch)) { if (!digits.has(ch)) errs.push(`${where} : chiffre « ${ch} » tapé avant d'être enseigné`); }
       else if (!signs.has(ch)) errs.push(`${where} : signe « ${ch} » tapé avant d'être enseigné`);
     }
     for (const ch of String(l.teaches || '')) {
@@ -111,15 +113,20 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
     }
     // vocabulaire
     const playable = [...lexicon].filter((w) => w.length >= 2 && [...w].every((c) => cum.has(c))).length;
-    const toks = text.toLowerCase().match(/[a-z]+/g) || []; let suites = 0;
+    const toks = text.toLowerCase().match(/[a-z]+(?:'[a-z]+)*/g) || []; let suites = 0;
     for (const w of toks) {
+      if (w.includes("'")) { // contraction (don't, it's) : toujours un mot du lexique, jamais un exercice de doigts
+        if (!lexicon.has(w)) errs.push(`${where} : « ${w} » n'est pas dans le lexique vérifié (ajouter la contraction à course-src/en-lexicon-extra-*.json)`);
+        continue;
+      }
       if (US_SPELLINGS.test(w) && !BRITISH_OK.has(w)) { errs.push(`${where} : « ${w} » est une orthographe américaine`); continue; }
       if (lexicon.has(w)) continue;
       if (w.length <= 4 && playable < 15) { suites++; continue; }
       if (w.length <= 4) { suites++; continue; }
       errs.push(`${where} : « ${w} » n'est pas dans le lexique vérifié (ajouter au fichier course-src/en-lexicon-extra-*.json puis lancer scripts/check-en-words.js)`);
     }
-    if (playable >= 15 && toks.length && suites / toks.length > 0.25) errs.push(`${where} : ${suites} suites de lettres sur ${toks.length} éléments alors que ${playable} mots sont possibles : écrire de vrais mots`);
+    // les modules de symboles (adresses, prix, code) mêlent des éléments qui ne sont pas des mots : pas de limite de proportion pour eux
+    if (l._m.kind !== 'symboles' && playable >= 15 && toks.length && suites / toks.length > 0.25) errs.push(`${where} : ${suites} suites de lettres sur ${toks.length} éléments alors que ${playable} mots sont possibles : écrire de vrais mots`);
   }
   return { lessons: n, letters: cum.size, signs: signs.size };
 }

@@ -127,3 +127,42 @@ test('LANG_COURSE / only : ne vérifie que le cours demandé (un agent n\'est pa
   fs.writeFileSync(path.join(dir, 'en-lexicon-extra-azerty.json'), JSON.stringify({ words: ['nonverifie'] }));
   assert.ok(q10({ srcDir: dir, only: 'en-qwerty' }).ok, 'le lexique complémentaire de l\'autre clavier est ignoré');
 });
+
+// ── Modules suivants : chiffres, apostrophes, symboles ──
+function withModule2(kind, lesson, enLesson, lexiconExtra, extraCheck) {
+  const dir = mk({ extra: lexiconExtra, extraCheck });
+  const mod = (ls) => JSON.stringify({ position: 2, name: '2. Suite', kind, lessons: ls });
+  fs.writeFileSync(path.join(dir, 'fr-qwerty', '02-s.json'), mod([lesson]));
+  fs.writeFileSync(path.join(dir, 'en-qwerty', '02-s.json'), mod([enLesson || lesson]));
+  return dir;
+}
+const NUM = L('num1', '4 5', '45', 'sad 4 dad 5 lads 4 all 5 ask 4 add 5 salad 4 lass 5 as 4 ad 5 fall 4 dads 5');
+
+test('chiffres : admis une fois enseignés, refusés avant', () => {
+  assert.ok(q10({ srcDir: withModule2('chiffres', NUM) }).ok);
+  const bad = L('num1', '4 5', '45', 'sad 4 dad 5 lads 6 all 5 ask 4 add 5 salad 4 lass 5 as 4 ad 5 fall 4 dads 5');
+  const r = q10({ srcDir: withModule2('chiffres', bad) });
+  assert.ok(has(r, /chiffre « 6 » tapé avant d'être enseigné/), r.detail);
+});
+
+test('signe tapé avant d\'être enseigné : refusé, y compris le $ ou l\'apostrophe', () => {
+  const bad = L('pon1', ':', ':', 'sad: dad: ask: lad: all: add: salad: lass: as: ad: fall: dads: it\'s');
+  const r = q10({ srcDir: withModule2('ponctuation', bad, bad, ['it\'s'], [{ w: 'it\'s', dict: 'oui', wik: 'oui', freq: 100 }]) });
+  assert.ok(has(r, /signe « ' » tapé avant d'être enseigné/), r.detail);
+});
+
+test('contractions : acceptées si le mot est au lexique vérifié, refusées sinon, jamais un exercice de doigts', () => {
+  const ok = L('pon2', "'", "'", "dad's lad's sad dad ask lad all add salad lass as ad fall dads lad's dad's sad's dad's");
+  const extra = ["dad's", "lad's", "sad's"].map((w) => ({ w, dict: 'oui', wik: 'oui', freq: 1 }));
+  assert.ok(q10({ srcDir: withModule2('ponctuation', ok, ok, ["dad's", "lad's", "sad's"], extra) }).ok);
+  const r = q10({ srcDir: withModule2('ponctuation', ok, ok) });
+  assert.ok(has(r, /« dad's » n'est pas dans le lexique vérifié/), r.detail);
+});
+
+test('modules de symboles : pas de limite de proportion de suites de lettres, mais le lexique reste exigé', () => {
+  const sym = L('sym1', '$ %', '$%', 'sad $ dad % ask $ lad % all $ add % salad $ lass % kl $ lk % kl $ lk % kls $ lks %');
+  assert.ok(q10({ srcDir: withModule2('symboles', sym) }).ok);
+  assert.ok(has(q10({ srcDir: withModule2('ponctuation', sym) }), /suites de lettres sur/));
+  const longWord = L('sym1', '$ %', '$%', 'sad $ dad % ask $ lad % all $ add % salad $ lass % kl $ lk % kl $ lk % flasker $ falls %');
+  assert.ok(has(q10({ srcDir: withModule2('symboles', longWord) }), /« flasker » n'est pas dans le lexique/));
+});
