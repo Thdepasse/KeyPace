@@ -285,6 +285,40 @@ async function run(opts = {}) {
         info.programmeBE = 'identique';
       } catch (e) { problems.push(`BR9 : ${e.message}`); }
 
+      // BR10 : Frappe-mots par niveau : « Mon niveau » d'un élève en leçon 8 = 14 lettres et de vrais mots ; un niveau d'entraînement ne touche ni le record ni les paliers ;
+      // « Tout le clavier » garde l'ancien comportement (record, paliers de score)
+      try {
+        await ev("localStorage.clear();true");
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2500); exceptions.splice(0);
+        const gl = await ev(`(()=>{
+          currentUser='eleve';currentToken='tok';currentUserId='uid';_statsLoaded=true;app.stats=mergeStats();
+          ALL_LESSONS.slice(0,8).forEach(l=>{(app.stats.lessons=app.stats.lessons||{})[l.id]={bestWpm:30,bestErr:1,cleared:true}});
+          const sent=[];const oldTrack=window.track;window.track=(e,p)=>{sent.push(e)};
+          go('games');app.activeGame='frappe';app.game=null;app.renderGames();
+          const chips=[...document.querySelectorAll('.gl-chip')].map(b=>b.innerText),info=(document.querySelector('.gl-info')||{}).innerText||'';
+          const run=(score)=>{app.game=null;app.startGame();clearTimeout(app._cdTimer);const g=app.game;g.on=true;g.startTime=Date.now();g.score=score;app.stats.gameBest=40;const seen=new Set();
+            for(let i=0;i<5000&&!g.over;i++){app.gameTick();g.words.forEach(w=>seen.add(w.text));}clearInterval(app._gameLoop);return{g,seen:[...seen]};};
+          const K=new Set('fjdkslqmghruei');
+          app.pickGameLevel('frappe','auto');const a=run(500);
+          const train={level:a.g.level.id,pool:!!a.g.pool,bad:a.seen.filter(w=>![...w].every(c=>K.has(c))),words:a.seen.length,best:app.stats.gameBest,record:!!a.g._isRecord,tier:a.g.tierIdx};
+          app.pickGameLevel('frappe','repos');const r=run(10);const reposBad=r.seen.filter(w=>![...w].every(c=>'dfghjklmqs'.includes(c)));
+          const reposInfo=(()=>{app.pickGameLevel('frappe','repos');return app._gameLevelPicker('frappe')})();
+          app.pickGameLevel('frappe','tout');const t=run(80);
+          const full={level:t.g.level.id,pool:t.g.pool,best:app.stats.gameBest,record:!!t.g._isRecord,tier:t.g.tierIdx};
+          window.track=oldTrack;
+          return{chips,info,train,reposBad,reposMixed:/suites de lettres/.test(reposInfo),full,starts:sent.filter(e=>e==='game_start').length,done:sent.filter(e=>e==='game_completed').length}})()`);
+        if (!gl.chips.some((c) => /^Mon niveau \(14 lettres\)$/.test(c))) problems.push(`BR10 : « Mon niveau » d'un élève en leçon 8 devrait afficher 14 lettres (${gl.chips.join(' / ')})`);
+        if (!/25 mots possibles/.test(gl.info)) problems.push(`BR10 : information de niveau inattendue (${gl.info})`);
+        if (!gl.train.pool || gl.train.bad.length) problems.push(`BR10 : mots hors des lettres apprises au niveau « Mon niveau » (${gl.train.bad.join(', ')})`);
+        if (gl.train.best !== 40 || gl.train.record || gl.train.tier !== 0) problems.push(`BR10 : un niveau d'entraînement a touché le record ou les paliers (${JSON.stringify(gl.train)})`);
+        if (gl.reposBad.length) problems.push(`BR10 : mots hors de la rangée de repos (${gl.reposBad.join(', ')})`);
+        if (!gl.reposMixed) problems.push('BR10 : la rangée de repos devrait annoncer des suites de lettres (aucun mot possible)');
+        if (gl.full.pool !== null || gl.full.best !== 80 || !gl.full.record || gl.full.tier < 1) problems.push(`BR10 : « Tout le clavier » a changé de comportement (${JSON.stringify(gl.full)})`);
+        if (gl.starts !== 3 || gl.done !== 3) problems.push(`BR10 : événements de partie manquants (${gl.starts} départs, ${gl.done} fins)`);
+        exceptions.splice(0).forEach((e) => problems.push(`BR10 : exception : ${e}`));
+        info.jeuxNiveaux = 'ok';
+      } catch (e) { problems.push(`BR10 : ${e.message}`); }
+
       // BR8 : la pastille « clavier » de l'en-tête (visiteur puis compte testeur)
       try {
         const shot = async (name) => { if (!opts.screenshotDir) return; const sh = await S('Page.captureScreenshot', { format: 'png' }); fs.mkdirSync(opts.screenshotDir, { recursive: true }); fs.writeFileSync(path.join(opts.screenshotDir, name), Buffer.from(sh.data, 'base64')); };

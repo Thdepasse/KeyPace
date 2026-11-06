@@ -82,7 +82,7 @@ function loadApp(htmlPath, opts) {
   const env = createEnv(opts);
   const errors = [];
   // Scripts externes du site qui définissent des données dont la page a besoin (liste fermée : cookie-consent.js n'est pas exécuté).
-  ['programme-data.js'].forEach((f) => {
+  ['programme-data.js', 'game-levels.js'].forEach((f) => {
     if (!html.includes(`<script src="/${f}"></script>`)) { errors.push(`${f} n'est pas chargé par la page`); return; }
     try { env.run(fs.readFileSync(path.join(__dirname, '..', f), 'utf8'), f); } catch (e) { errors.push(`${f} : ${e && e.message}`); }
   });

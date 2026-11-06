@@ -1427,6 +1427,13 @@ a.nav-link{text-decoration:none;display:inline-block}
    utilisé par les écrans de fin/portail invité, où le glow serait excessif). */
 .gidle{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:40px 20px}
 .gidle p{color:rgba(255,255,255,.55);font-size:15px;line-height:1.6;max-width:420px;margin:0}
+.gl-picker{margin:8px auto 4px;max-width:560px}
+.gl-picker .gl-lab{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:6px}
+.gl-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.gl-chip{font:inherit;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;border:1.5px solid rgba(255,255,255,.28);background:transparent;color:#fff;cursor:pointer}
+.gl-chip:hover{border-color:#fff}
+.gl-chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent)}
+.gl-info{font-size:12px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.45}
 .gidle-title{font-size:44px!important;color:#fff;text-shadow:0 0 30px rgba(255,140,90,.7),0 0 70px rgba(255,77,46,.4)}
 .gidle-title .dot{color:var(--accent);text-shadow:0 0 24px rgba(255,77,46,.9)}
 .gidle-espace{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;color:rgba(255,255,255,.35);margin-top:-4px}
@@ -2964,6 +2971,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <!-- Consentement cookies + Google Analytics (juste après la nav : le bandeau s'affiche sans attendre la fin du script de l'appli) -->
 <script src="/cookie-consent.js"></script>
 <script src="/programme-data.js"></script>
+<script src="/game-levels.js"></script>
 
 <div id="page-home"><noscript>
   <main>
@@ -6156,6 +6164,8 @@ const SPRINT_WORDS=["le","la","les","un","une","de","des","et","ou","dans","sur"
 const TIREUR_ACCENTS=["école","élève","fenêtre","château","préféré","règle","forêt","crème","théâtre","numéro","côté","énergie","français","intérêt","élément","problème","éléphant","lumière","révéler","différent"];
 const TIREUR_EASY=SPRINT_WORDS.filter(w=>w.length<=4);
 const TIREUR_MID=[...WORDS,...SPRINT_WORDS].filter(w=>w.length>=5&&w.length<=7);
+/* Tout le vocabulaire des jeux de mots (Sprint, paliers de Frappe-mots, mots accentués), source du filtre par niveau (game-levels.js). */
+const GAME_VOCAB=[...new Set([...WORDS,...SPRINT_WORDS,...GAME_TIERS.flatMap(t=>t.words),...TIREUR_ACCENTS])];
 
 /* Course de dactylo : textes FR cohérents (réutilise PASSAGES) + bots locaux */
 const RACE_TEXTS=[...PASSAGES,
@@ -7857,6 +7867,34 @@ const app={
       </div>`:`<div style="text-align:center;color:var(--muted);font-size:13px;margin-top:12px">Pas encore de données de frappe. Quelques tests suffisent à révéler les touches difficiles.</div>`}`;
   },
 
+  /* ── Niveau des jeux de mots : lettres apprises (game-levels.js) ──
+     « Mon niveau » = les lettres des leçons déjà validées ; sinon un niveau fixe du cours ; « Tout le clavier » = l'expérience d'origine (paliers de score, record).
+     Un niveau d'entraînement n'enregistre ni record ni palier. Le choix est gardé par jeu sur cet appareil (kp_game_level_<jeu>). */
+  _glChoice(game){try{return localStorage.getItem('kp_game_level_'+game)||'auto';}catch{return 'auto';}},
+  pickGameLevel(game,id){try{localStorage.setItem('kp_game_level_'+game,id);}catch{}this.renderCurrent();},
+  _glList(){return KPGameLevels.levels(ALL_LESSONS);},
+  _glResolve(game){
+    const full={id:'tout',label:'Tout le clavier',full:true};
+    if(this.royale&&this.royale.phase==='playing')return full;
+    const choice=this._glChoice(game),list=this._glList();
+    let lv=null;
+    if(choice==='auto'){
+      lv=KPGameLevels.myLevel(ALL_LESSONS,l=>!!this.lessonRec(l.id).cleared);
+      const top=list[list.length-1];
+      if(top&&top.id==='accents'&&lv.letters.size>=top.letters.size)return full; // toutes les lettres apprises : expérience complète
+    }else if(choice!=='tout')lv=list.find(x=>x.id===choice)||null;
+    if(!lv)return full;
+    const content=KPGameLevels.contentFor(GAME_VOCAB,lv.letters);
+    return{id:lv.id,label:lv.label,full:false,letters:lv.letters,content,pool:content.pool};
+  },
+  _gameLevelPicker(game){
+    const cur=this._glChoice(game),list=this._glList(),lv=this._glResolve(game);
+    const mine=KPGameLevels.myLevel(ALL_LESSONS,l=>!!this.lessonRec(l.id).cleared);
+    const chip=(id,label)=>`<button type="button" class="gl-chip" aria-pressed="${cur===id}" onclick="app.pickGameLevel('${game}','${id}')">${label}</button>`;
+    const info=lv.full?'Tous les mots du clavier, avec les paliers de score et ton record.'
+      :`Lettres : <b>${[...lv.letters].map(c=>c.toUpperCase()).join(' ')}</b>. ${lv.content.mixed?(lv.content.words.length?`${lv.content.words.length} mots et des suites de lettres.`:'Pas encore de mot possible : des suites de lettres.'):`${lv.content.words.length} mots possibles.`} Niveau d’entraînement : pas de record.`;
+    return`<div class="gl-picker"><div class="gl-lab">Niveau</div><div class="gl-chips">${chip('auto',`Mon niveau (${mine.letters.size} lettres)`)}${list.map(x=>chip(x.id,x.label)).join('')}${chip('tout','Tout le clavier')}</div><div class="gl-info">${info}</div></div>`;
+  },
   startGame(){
     if(!canAccessGame()){openAuth('register','Crée un compte gratuit pour jouer.',()=>this.startGame());return;}
     this.stopGame();this._gameRec=false;this._pendingDeadKey=null;
@@ -7864,6 +7902,8 @@ const app={
       tierIdx:0,tierFlash:0,
       wordsTyped:0,errorCount:0,totalKeys:0,
       startTime:null,combo:0,maxCombo:0,tierHistory:[]};
+    const glv=this._glResolve('frappe');this.game.level=glv;this.game.pool=glv.full?null:glv.pool;
+    try{track('game_start',{game:'frappe',level:glv.id,letters:glv.full?0:glv.letters.size,mixed:!!(glv.content&&glv.content.mixed)});}catch{}
     this.renderCurrent();
     this._startCountdown(3);
   },
@@ -7920,6 +7960,8 @@ const app={
     },2800);
   },
   stopGame(){
+    const ag=this.game;
+    if(ag&&ag.on&&!ag.over&&!ag._abandonSent&&ag.level){ag._abandonSent=true;try{track('game_abandon',{game:'frappe',level:ag.level.id,score:ag.score,secs:ag.startTime?Math.round((Date.now()-ag.startTime)/1000):0});}catch{}}
     if(this._gameLoop){clearInterval(this._gameLoop);this._gameLoop=null;}
     if(this._cdTimer){clearTimeout(this._cdTimer);this._cdTimer=null;}
     document.getElementById('game-cd')?.remove();
@@ -7927,6 +7969,7 @@ const app={
   },
   spawnWord(){
     const g=this.game;
+    if(g.pool&&g.pool.length)return{id:++this._wid,text:g.pool[Math.floor(Math.random()*g.pool.length)],x:4+Math.random()*72,y:-4,typedLen:0};
     const tier=getGameTier(g.score);const tierIdx=GAME_TIERS.indexOf(tier);
     let pool=tier.words;
     if(tierIdx>0&&Math.random()<0.25){pool=GAME_TIERS[Math.floor(Math.random()*tierIdx)].words;}
@@ -7939,12 +7982,13 @@ const app={
     const tierNextSpeeds=[0.48,0.58,0.80,1.15,1.50];
     const tier=getGameTier(g.score);const nextTier=GAME_TIERS[tierIdx+1];
     const withinTierPct=nextTier?Math.min(1,(g.score-tier.score)/(nextTier.score-tier.score)):1;
-    const speed=tierSpeeds[Math.min(tierIdx,4)]+(tierNextSpeeds[Math.min(tierIdx,4)]-tierSpeeds[Math.min(tierIdx,4)])*withinTierPct;
+    const soft=!!g.pool; // niveau d'entraînement : vitesse douce, pas de palier de score
+    const speed=soft?0.30+Math.min(0.22,g.score/900):tierSpeeds[Math.min(tierIdx,4)]+(tierNextSpeeds[Math.min(tierIdx,4)]-tierSpeeds[Math.min(tierIdx,4)])*withinTierPct;
     g.words=g.words.map(w=>({...w,y:w.y+speed}));
     g.spawnAcc=(g.spawnAcc||0)+1;
-    const interval=Math.max(12,38-Math.floor(g.score/40));
+    const interval=soft?Math.max(22,46-Math.floor(g.score/35)):Math.max(12,38-Math.floor(g.score/40));
     if(g.spawnAcc>=interval){g.spawnAcc=0;g.words.push(this.spawnWord());}
-    const newTierIdx=GAME_TIERS.indexOf(getGameTier(g.score));
+    const newTierIdx=soft?tierIdx:GAME_TIERS.indexOf(getGameTier(g.score));
     if(newTierIdx>tierIdx){
       const newT=GAME_TIERS[newTierIdx];
       g.tierIdx=newTierIdx;g.tierFlash=60;
@@ -7963,7 +8007,9 @@ const app={
   },
   afterGameOver(score){
     if(this.royale&&this.royale.phase==='playing'){this._royaleRoundFinished(score);return;}
-    try{track('game_completed',{game:'frappe',score});}catch{}
+    const glv=this.game&&this.game.level;
+    try{track('game_completed',{game:'frappe',score,level:glv?glv.id:'tout',secs:this.game&&this.game.startTime?Math.round((Date.now()-this.game.startTime)/1000):0});}catch{}
+    if(this.game&&this.game.pool){this.game._isRecord=false;this.renderCurrent();return;} // entraînement : ni record ni palier
     // Flag posé AVANT d'écraser gameBest (même bug que Sprint à l'origine :
     // comparé après mutation, "Nouveau record" ne s'affichait jamais).
     if(this.game)this.game._isRecord=currentUser&&this.stats&&score>(this.stats.gameBest||0);
@@ -13106,7 +13152,8 @@ const app={
     const nextTier=GAME_TIERS[tierIdx+1];
     const tierBarPct=nextTier?Math.min(100,((score-(tier.score||0))/(nextTier.score-(tier.score||0)))*100):100;
     // HUD tier widget (only while actively playing)
-    const tierHTML=gameOn?`<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+    const soft=!!(g&&g.pool);
+    const tierHTML=gameOn&&soft?`<div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase">${g.level.label}</div><div style="font-size:10px;color:rgba(255,255,255,0.4)">Entraînement</div></div>`:gameOn?`<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
       <div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase">
         ${tier.label}
       </div>
@@ -13129,8 +13176,8 @@ const app={
         {label:'Mots tapés',value:g?g.wordsTyped:0},
         {label:'Précision',value:accuracy,unit:'%'},
       ],
-      extra:tierExtra,
-      bestLine:!isRecord?`Meilleur : <b style="color:var(--accent)">${best} pts</b>`:null,
+      extra:soft?'':tierExtra,
+      bestLine:soft?`Niveau d’entraînement : ton record se bat au niveau « Tout le clavier ».`:!isRecord?`Meilleur : <b style="color:var(--accent)">${best} pts</b>`:null,
       primaryLabel:'Rejouer ▸',primaryOnClick:'app.startGame()',
     })}</div>`;
     const bestTierIdx=GAME_TIERS.indexOf(getGameTier(best));
@@ -13140,7 +13187,8 @@ const app={
       state:i<bestTierIdx?'done':i===bestTierIdx?'current':'locked',
     }));
     const idleOverlay=`<div class="game-overlay"><h2 class="gidle-title">Frappe-mots<span class="dot"> .</span></h2><p style="margin-bottom:6px">Mots qui tombent, doigts qui dansent.<br>Meilleur : <b style="color:#fff">${best} pts</b></p>
-      ${this._tierRoadmap(roadmapItems)}
+      ${this._gameLevelPicker('frappe')}
+      ${this._glResolve('frappe').full?this._tierRoadmap(roadmapItems):''}
       <button class="game-play-btn" autofocus onclick="app.startGame()" style="margin-top:4px">Jouer ▸</button>
       <div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`;
     const guestOverlay=`<div class="game-overlay"><h2>Frappe-mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
