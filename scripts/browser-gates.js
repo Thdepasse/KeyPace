@@ -186,6 +186,17 @@ async function run(opts = {}) {
           exceptions.splice(0).forEach((e) => problems.push(`BR6 (${label}) : exception : ${e}`));
           if (opts.screenshotDir) { await ev("document.getElementById('nav-region-btn').click();true"); await sleep(150); const sh = await S('Page.captureScreenshot', { format: 'png' }); fs.mkdirSync(opts.screenshotDir, { recursive: true }); fs.writeFileSync(path.join(opts.screenshotDir, `region-${label}.png`), Buffer.from(sh.data, 'base64')); await ev("kpCloseRegion(false);true"); }
         }
+        // France : le menu propose les deux pays ; choisir la France mémorise le choix et vise l'adresse française (la navigation elle-même n'est pas suivie ici)
+        await S('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+        await ev("go('home');localStorage.removeItem('kp_region');localStorage.removeItem('kp_lang');localStorage.removeItem('kp_country');document.getElementById('nav-region-btn').click();true"); await sleep(150);
+        const fr = await ev(`(()=>{const m=document.getElementById('nav-region-menu');const items=[...m.querySelectorAll('.nav-region-item')].map(x=>x.innerText.replace(/\\s+/g,' ').trim());
+          const t={beHome:kpRegionTarget('be','home'),frHome:kpRegionTarget('fr','home'),frLessons:kpRegionTarget('fr','lessons'),beLessons:kpRegionTarget('be','lessons'),frTest:kpRegionTarget('fr','test')};
+          kpSetRegion('fr');const lab=document.getElementById('nav-region-btn').getAttribute('aria-label');const c=KPProg.getCountry();kpSetRegion('be');
+          return{items,t,lab,c,back:KPProg.getCountry()}})()`);
+        if (!fr.items.some((x) => /^France/.test(x)) || !fr.items.some((x) => /^Belgique/.test(x))) problems.push(`BR6 : le menu ne propose pas les deux pays (${fr.items.join(' / ')})`);
+        if (fr.t.beHome !== '/' || fr.t.frHome !== '/fr' || fr.t.frLessons !== '/fr/cours-dactylo-en-ligne' || fr.t.beLessons !== '/cours-dactylo-en-ligne' || fr.t.frTest !== '/fr') problems.push(`BR6 : mauvaise adresse visée en changeant de pays (${JSON.stringify(fr.t)})`);
+        if (!/France/.test(fr.lab) || fr.c !== 'fr' || fr.back !== 'be') problems.push(`BR6 : le choix de la France n'est pas pris en compte (${fr.lab} / ${fr.c} / ${fr.back})`);
+        await ev("localStorage.removeItem('kp_region');localStorage.removeItem('kp_lang');localStorage.removeItem('kp_country');kpCloseRegion(false);true");
         // vraie version téléphone (écran tactile étroit sans clavier) : l'espace pays et langue n'y apparaît pas ; il revient au retour au bureau
         const hid = await ev("(()=>{const real=isMobileLayout;isMobileLayout=()=>true;applyMobileNav();const hidden=getComputedStyle(document.getElementById('nav-region')).display==='none';isMobileLayout=()=>false;applyMobileNav();const back=getComputedStyle(document.getElementById('nav-region')).display!=='none';isMobileLayout=real;return{hidden,back}})()");
         if (!hid.hidden) problems.push('BR6 : l\'espace pays et langue apparaît sur la version téléphone');
@@ -252,6 +263,27 @@ async function run(opts = {}) {
         if (opts.screenshotDir) { await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2200); await ev("localStorage.clear();KP_COURSES_OFFERED.length>1||KP_COURSES_OFFERED.push('fr/qwerty');go('home');kpChooseFamily('qwerty').then(()=>{app.openSettings();setTimeout(()=>{const s=document.getElementById('settings-keyboard-section');if(s)s.scrollIntoView({block:'start'});},300);});true"); await sleep(1800); const sh = await S('Page.captureScreenshot', { format: 'png' }); fs.writeFileSync(path.join(opts.screenshotDir, 'mon-clavier-qwerty.png'), Buffer.from(sh.data, 'base64')); }
         info.keyboardSwitch = 'ok';
       } catch (e) { problems.push(`BR7 : ${e.message}`); }
+
+      // BR9 : la page programme de la Belgique est strictement inchangée (4 réseaux × 10 années), la France n'y change rien
+      try {
+        const ref = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'programme-be-render.json'), 'utf8')).hash;
+        // visiteur non connecté : les étapes précédentes ont simulé une connexion, et le rendu change avec la progression
+        await ev("localStorage.removeItem('klak_session');true");
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2500); exceptions.splice(0);
+        const got = await ev(`(()=>{try{localStorage.removeItem('kp_prog');localStorage.removeItem('kp_country');}catch(e){}go('lessons');const r=document.getElementById('kpCoursHost').shadowRoot;
+          const h=s=>{let x=5381;for(let i=0;i<s.length;i++)x=((x<<5)+x+s.charCodeAt(i))|0;return (x>>>0).toString(36)};
+          const o={};const nets=[...r.querySelectorAll('#menu1 button')].map(b=>b.dataset.id);const yrs=[...r.querySelectorAll('#menu2 button')].map(b=>b.dataset.l);
+          for(const n of nets){for(const y of yrs){r.querySelector('#menu1 button[data-id="'+n+'"]').click();r.querySelector('#menu2 button[data-l="'+y+'"]').click();if(!r.getElementById('pfold').classList.contains('open'))r.getElementById('pgo').click();o[n+'|'+y]=h(r.getElementById('pc').innerHTML);}}
+          return{nets,o,pressed:r.querySelector('#ctry button[aria-pressed=true]').dataset.c,guest:!(typeof currentUser!=='undefined'&&currentUser)}})()`);
+        if (got.nets.length !== 4) problems.push(`BR9 : ${got.nets.length} réseaux au lieu de 4`);
+        if (!got.guest) problems.push('BR9 : le test devait se faire en visiteur non connecté');
+        if (got.pressed !== 'be') problems.push(`BR9 : le pays par défaut n'est pas la Belgique (${got.pressed})`);
+        const bad = [];
+        for (const n of got.nets) for (const y of Object.keys(ref)) if (got.o[n + '|' + y] !== ref[y]) bad.push(n + ' / ' + y);
+        if (bad.length) problems.push(`BR9 : la page programme belge a changé (${bad.length} sur 40, ex. ${bad.slice(0, 3).join(', ')})`);
+        exceptions.splice(0).forEach((e) => problems.push(`BR9 : exception : ${e}`));
+        info.programmeBE = 'identique';
+      } catch (e) { problems.push(`BR9 : ${e.message}`); }
 
       // BR8 : la pastille « clavier » de l'en-tête (visiteur puis compte testeur)
       try {

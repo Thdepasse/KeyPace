@@ -16,6 +16,7 @@ module.exports = {
   },
   "lessons": {
     "path": "/cours-dactylo-en-ligne",
+    "alternates": {"fr-BE": "/cours-dactylo-en-ligne", "fr-FR": "/fr/cours-dactylo-en-ligne", "x-default": "/cours-dactylo-en-ligne"},
     "title": "Les 65 leçons de dactylographie KeyPace : commence ton parcours",
     "description": "Accède aux 65 leçons progressives KeyPace sur clavier AZERTY : touches de repos, accents, chiffres et symboles. 10 leçons gratuites.",
     "ogTitle": "Les 65 leçons de dactylographie KeyPace",
@@ -89,5 +90,39 @@ module.exports = {
     "description": "Classes et devoirs KeyPace.",
     "index": false,
     "jsonld": []
+  },
+  "fr-home": {
+    "path": "/fr",
+    "title": "KeyPace France : apprendre à taper au clavier, du CE2 à la terminale",
+    "description": "Parcours de dactylographie AZERTY classe par classe, du CE2 à la terminale, en lien avec le CRCN et Pix. Test de vitesse, jeux de frappe, gratuit pour commencer.",
+    "ogTitle": "KeyPace France : apprendre à taper, du CE2 à la terminale",
+    "ogDescription": "Un parcours de dactylographie par classe, en lien avec le CRCN et Pix.",
+    "ogType": "website",
+    "index": true,
+    "alternates": {
+      "fr-FR": "/fr",
+      "fr-BE": "/",
+      "x-default": "/"
+    },
+    "jsonld": [
+      "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"BreadcrumbList\",\n  \"itemListElement\": [\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 1,\n      \"name\": \"KeyPace France\",\n      \"item\": \"https://keypace.be/fr\"\n    }\n  ]\n}"
+    ]
+  },
+  "fr-lessons": {
+    "path": "/fr/cours-dactylo-en-ligne",
+    "title": "Programme de dactylographie par classe, du CE2 à la terminale | KeyPace",
+    "description": "Choisis ton établissement et ta classe (public, privé sous contrat, CAP) et découvre les leçons et modules KeyPace conseillés, avec les jalons officiels du CRCN et de Pix.",
+    "ogTitle": "Le programme de dactylographie par classe | KeyPace France",
+    "ogDescription": "Leçons et jalons officiels, du CE2 à la terminale.",
+    "ogType": "website",
+    "index": true,
+    "alternates": {
+      "fr-FR": "/fr/cours-dactylo-en-ligne",
+      "fr-BE": "/cours-dactylo-en-ligne",
+      "x-default": "/cours-dactylo-en-ligne"
+    },
+    "jsonld": [
+      "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"BreadcrumbList\",\n  \"itemListElement\": [\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 1,\n      \"name\": \"Accueil\",\n      \"item\": \"https://keypace.be/fr\"\n    },\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 2,\n      \"name\": \"Programme par classe\",\n      \"item\": \"https://keypace.be/fr/cours-dactylo-en-ligne\"\n    }\n  ]\n}"
+    ]
   }
 };

@@ -15,6 +15,8 @@
           { "source": "/test-vitesse-frappe", "destination": "/test-vitesse-frappe.html" },
           { "source": "/test-dactylographie-chronometre", "destination": "/api/track?r=testtime" },
           { "source": "/cours-dactylo-en-ligne", "destination": "/api/track?r=lessons" },
+          { "source": "/fr", "destination": "/api/track?r=fr-home" },
+          { "source": "/fr/cours-dactylo-en-ligne", "destination": "/api/track?r=fr-lessons" },
           { "source": "/cours-dactylographie", "destination": "/cours-dactylographie.html" },
           { "source": "/jeux-dactylo-en-ligne", "destination": "/api/track?r=games" },
           { "source": "/jeux-dactylo", "destination": "/jeux-dactylo.html" },

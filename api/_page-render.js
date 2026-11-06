@@ -22,7 +22,13 @@ function render(html, key) {
     ? '<meta name="robots" content="index, follow, max-image-preview:large">'
     : '<meta name="robots" content="noindex, follow">');
   out = setMeta(out, /<link rel="canonical"[^>]*>/, `<link rel="canonical" href="${url}">`);
-  out = out.replace(/(<link rel="alternate" hreflang="[^"]+" href=")[^"]*(">)/g, (_, a, b) => a + url + b);
+  if (r.alternates) {
+    // page qui a un équivalent dans un autre pays : chaque version déclare l'autre (réciprocité exigée par Google)
+    const links = Object.entries(r.alternates).map(([lang, pth]) => `<link rel="alternate" hreflang="${lang}" href="${BASE + pth}">`).join('\n');
+    out = out.replace(/(<link rel="alternate" hreflang="[^"]+" href="[^"]*">\n?)+/, () => links + '\n');
+  } else {
+    out = out.replace(/(<link rel="alternate" hreflang="[^"]+" href=")[^"]*(">)/g, (_, a, b) => a + url + b);
+  }
   out = setMeta(out, /<meta property="og:url"[^>]*>/, `<meta property="og:url" content="${url}">`);
   out = setMeta(out, /<meta property="og:title"[^>]*>/, `<meta property="og:title" content="${esc(r.ogTitle || r.title)}">`);
   out = setMeta(out, /<meta property="og:description"[^>]*>/, `<meta property="og:description" content="${esc(r.ogDescription || r.description)}">`);
