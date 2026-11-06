@@ -4,13 +4,19 @@
 //   C. Wiktionary (API REST) : le mot existe-t-il en anglais, et ses sens portent-ils une étiquette qui interdit de l'utiliser tel quel
 //      (argot, injurieux, vieilli, rare, régional, orthographe américaine ou fautive) ?
 // Les réponses des services sont des DONNÉES : seules des valeurs simples (statut, fréquence, étiquettes) en sont tirées.
-// Usage : node scripts/check-en-words.js [fichier-sortie.json]   (réseau requis ; environ 5 minutes)
+// Usage : node scripts/check-en-words.js [--in liste.json] [--retry] [sortie.json]   (réseau requis ; compter 1 seconde par mot)
+//   --in : liste de mots à vérifier ({"words":[...]}), par défaut course-src/en-words.json ; la sortie est <liste>-check.json à côté.
+//   --retry : refait seulement les mots dont un service a répondu par une erreur (limite de débit), plus lentement.
 const fs = require('fs');
 const path = require('path');
 
 const root = path.join(__dirname, '..');
-const words = JSON.parse(fs.readFileSync(path.join(root, 'course-src', 'en-words.json'), 'utf8')).words;
-const OUT = process.argv.slice(2).find((x) => !x.startsWith('--')) || path.join(root, 'course-src', 'en-words-check.json');
+const argIn = process.argv.indexOf('--in') > -1 ? process.argv[process.argv.indexOf('--in') + 1] : null;
+const IN = argIn ? path.resolve(argIn) : path.join(root, 'course-src', 'en-words.json');
+const words = JSON.parse(fs.readFileSync(IN, 'utf8')).words;
+// sortie : fichier voisin de l'entrée, nom terminé par -check.json (la gate Q10 le cherche là), sauf si un chemin est donné
+const posArgs = process.argv.slice(2).filter((x, i, a) => !x.startsWith('--') && a[i - 1] !== '--in');
+const OUT = posArgs[0] || IN.replace(/\.json$/, '-check.json');
 const RETRY = process.argv.includes('--retry'); // ne refait que les mots dont un service a répondu par une erreur (limite de débit), plus lentement
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

@@ -279,6 +279,7 @@ const GATES = process.env.GATES_FAKE_RED
     { id: 'Q6', name: 'QWERTY : programme cohérent (ids, modules, gratuites), accents employés avant leur leçon relevés', run: () => require('./qwerty-gates').q6(UPDATE) },
     { id: 'Q8', name: 'QWERTY : claviers au format du site (rangées, doigts, gestes par variante)', run: () => require('./qwerty-gates').q8() },
     { id: 'Q9', name: 'QWERTY : modules écrits à la main (ligne par ligne, rien avant son enseignement)', run: () => require('./qwerty-gates').q9() },
+    { id: 'Q10', name: 'Cours de langue (anglais) : forme, mêmes touches que le cours français, lettres apprises, lexique vérifié', run: () => require('./language-gates').q10() },
     { id: 'U1', name: 'Chaque leçon se termine sur chaque disposition (66 x 4)', run: () => usage().u1() },
     { id: 'U2', name: 'Ce que le client envoie est accepté tel quel par le serveur', run: () => usage().u2() },
     { id: 'U3', name: 'Un visiteur sans compte peut taper, rien n\'est envoyé', run: () => usage().u3() },

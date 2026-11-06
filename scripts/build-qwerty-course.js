@@ -6,15 +6,18 @@
 // Format d'un module source : { position (rang dans le programme, à partir de 1), name, kind?, row?, lessons: [ ... ] }
 //   kind : accents | majuscules | ponctuation | symboles (règles propres de la gate Q9) ; row : rangée enseignée (repos, haut, bas, chiffres).
 //   leçon : { id, title, keys, teaches, tip, tuto: { intro, rules[3 ou 4], tip }, text, maxLen?, hand?, fingers?, row?, howText? }
-// Usage : node scripts/build-qwerty-course.js [langue]   (écrit le fichier et affiche le programme ; langue : fr par défaut, en pour l'anglais)
-// La langue choisit le dossier des sources (course-src/<langue>-qwerty), le fichier produit (courses-src/<langue>-qwerty.json) et l'identifiant du cours (<langue>/qwerty).
+// Usage : node scripts/build-qwerty-course.js [langue] [clavier]   (langue : fr par défaut, en pour l'anglais ; clavier : qwerty par défaut, ou azerty)
+// La langue et le clavier choisissent le dossier des sources (course-src/<langue>-<clavier>), le fichier produit (courses-src/<langue>-<clavier>.json) et l'identifiant
+// du cours (<langue>/<clavier>). Un cours azerty n'apporte pas de claviers (les 4 dispositions AZERTY existent déjà dans le site).
 const fs = require('fs');
 const path = require('path');
 
 const root = path.join(__dirname, '..');
-const LANG = (process.argv[2] && /^[a-z]{2}$/.test(process.argv[2]) && require.main === module) ? process.argv[2] : 'fr';
-const SRC = path.join(root, 'course-src', LANG + '-qwerty');
-const OUT = path.join(root, 'courses-src', LANG + '-qwerty.json');
+const CLI = require.main === module;
+const LANG = (CLI && /^[a-z]{2}$/.test(process.argv[2] || '')) ? process.argv[2] : 'fr';
+const FAMILY = (CLI && /^(qwerty|azerty)$/.test(process.argv[3] || '')) ? process.argv[3] : 'qwerty';
+const SRC = path.join(root, 'course-src', `${LANG}-${FAMILY}`);
+const OUT = path.join(root, 'courses-src', `${LANG}-${FAMILY}.json`);
 
 function loadSources() {
   const files = fs.existsSync(SRC) ? fs.readdirSync(SRC).filter((f) => /^\d\d-.*\.json$/.test(f)).sort() : [];
@@ -31,10 +34,10 @@ function build() {
   const modules = sources.map((m) => ({ name: m.name, ...(m.row ? { row: m.row } : {}), ...(m.kind ? { kind: m.kind } : {}), lessons: m.lessons.map((l) => ({ ...l })) }));
   const lessons = modules.flatMap((m) => m.lessons);
   const curriculum = { modules, free: lessons.slice(0, 10).map((l) => l.id) };
-  const keyboards = require('./build-qwerty-keyboards').buildKeyboards(lessons.flatMap((l) => [l.text || '', l.keys]));
+  const keyboards = FAMILY === 'qwerty' ? require('./build-qwerty-keyboards').buildKeyboards(lessons.flatMap((l) => [l.text || '', l.keys])) : {};
   return {
-    schema: 1, id: LANG + '/qwerty',
-    note: `Généré par scripts/build-qwerty-course.js à partir de course-src/${LANG}-qwerty/ (textes écrits à la main, relus par l'utilisateur). Ne pas modifier à la main.`,
+    schema: 1, id: `${LANG}/${FAMILY}`,
+    note: `Généré par scripts/build-qwerty-course.js à partir de course-src/${LANG}-${FAMILY}/ (textes écrits à la main, relus par l'utilisateur). Ne pas modifier à la main.`,
     handwritten: lessons.map((l) => l.id), keyboards, curriculum,
   };
 }
