@@ -25,11 +25,12 @@ const FR_ACCENTS = /[éèêëàâîïôûùçœæ]/i;
 function readJson(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
 const flatTuto = (t) => [t.intro, t.tip, ...(t.rules || []).flatMap((r) => [r.t, r.d])].join(' ');
 
-function loadLexicon(srcDir, errs) {
+function loadLexicon(srcDir, errs, only) {
   const words = new Set();
   const base = path.join(srcDir, 'en-words.json');
   if (fs.existsSync(base)) readJson(base).words.forEach((w) => words.add(w));
-  for (const f of fs.readdirSync(srcDir).filter((x) => /^en-lexicon-extra.*\.json$/.test(x) && !/-check\.json$/.test(x))) {
+  // `only` (ex. « en-azerty ») : ne charge que le lexique complémentaire de ce cours (en-lexicon-extra-azerty.json), pour qu'un agent ne soit pas gêné par le travail en cours d'un autre
+  for (const f of fs.readdirSync(srcDir).filter((x) => /^en-lexicon-extra.*\.json$/.test(x) && !/-check\.json$/.test(x) && (!only || x === `en-lexicon-extra-${only.split('-')[1]}.json`))) {
     const list = readJson(path.join(srcDir, f)).words || [];
     const checkFile = path.join(srcDir, f.replace(/\.json$/, '-check.json'));
     const checked = fs.existsSync(checkFile) ? Object.fromEntries(readJson(checkFile).results.map((r) => [r.w, r])) : {};
@@ -125,9 +126,10 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
 
 function q10(opts) {
   const srcDir = (opts && opts.srcDir) || path.join(root, 'course-src');
-  const dirs = fs.existsSync(srcDir) ? fs.readdirSync(srcDir).filter((d) => /^[a-z]{2}-(qwerty|azerty)$/.test(d) && !d.startsWith('fr-') && fs.statSync(path.join(srcDir, d)).isDirectory()) : [];
+  const only = (opts && opts.only) || process.env.LANG_COURSE || ''; // ex. LANG_COURSE=en-qwerty : ne vérifier que ce cours
+  const dirs = fs.existsSync(srcDir) ? fs.readdirSync(srcDir).filter((d) => /^[a-z]{2}-(qwerty|azerty)$/.test(d) && !d.startsWith('fr-') && (!only || d === only) && fs.statSync(path.join(srcDir, d)).isDirectory()) : [];
   if (!dirs.length) return { ok: true, detail: 'aucun cours de langue à vérifier' };
-  const errs = []; const lexicon = loadLexicon(srcDir, errs); const done = [];
+  const errs = []; const lexicon = loadLexicon(srcDir, errs, only); const done = [];
   for (const d of dirs) { const r = checkCourse(d, srcDir, lexicon, errs); if (r.lessons) done.push(`${d} : ${r.lessons} leçons`); }
   return errs.length ? { ok: false, detail: `${errs.length} problème(s) :\n` + errs.slice(0, 15).join('\n') } : { ok: true, detail: `${done.join(' ; ') || 'dossiers vides'} (lexique de ${lexicon.size} mots)` };
 }

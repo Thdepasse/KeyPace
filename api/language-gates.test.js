@@ -117,3 +117,13 @@ test('majuscules : refusées avant le module des majuscules, admises après', ()
   fs.writeFileSync(path.join(dir, 'en-qwerty', '02-m.json'), JSON.stringify({ position: 2, name: '2. Majuscules', kind: 'majuscules', lessons: [L4] }));
   const r = q10({ srcDir: dir }); assert.ok(r.ok, r.detail);
 });
+
+test('LANG_COURSE / only : ne vérifie que le cours demandé (un agent n\'est pas gêné par le travail d\'un autre)', () => {
+  const dir = mk({});
+  fs.mkdirSync(path.join(dir, 'en-azerty'));
+  fs.writeFileSync(path.join(dir, 'en-azerty', '01-x.json'), JSON.stringify({ position: 1, name: 'Mauvais', lessons: [{ id: 'zz' }] }));
+  assert.ok(!q10({ srcDir: dir }).ok, 'sans filtre, le cours AZERTY cassé est vu');
+  const r = q10({ srcDir: dir, only: 'en-qwerty' }); assert.ok(r.ok, r.detail);
+  fs.writeFileSync(path.join(dir, 'en-lexicon-extra-azerty.json'), JSON.stringify({ words: ['nonverifie'] }));
+  assert.ok(q10({ srcDir: dir, only: 'en-qwerty' }).ok, 'le lexique complémentaire de l\'autre clavier est ignoré');
+});
