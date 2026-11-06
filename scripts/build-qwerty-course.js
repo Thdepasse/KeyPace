@@ -6,13 +6,15 @@
 // Format d'un module source : { position (rang dans le programme, à partir de 1), name, kind?, row?, lessons: [ ... ] }
 //   kind : accents | majuscules | ponctuation | symboles (règles propres de la gate Q9) ; row : rangée enseignée (repos, haut, bas, chiffres).
 //   leçon : { id, title, keys, teaches, tip, tuto: { intro, rules[3 ou 4], tip }, text, maxLen?, hand?, fingers?, row?, howText? }
-// Usage : node scripts/build-qwerty-course.js   (écrit le fichier et affiche le programme)
+// Usage : node scripts/build-qwerty-course.js [langue]   (écrit le fichier et affiche le programme ; langue : fr par défaut, en pour l'anglais)
+// La langue choisit le dossier des sources (course-src/<langue>-qwerty), le fichier produit (courses-src/<langue>-qwerty.json) et l'identifiant du cours (<langue>/qwerty).
 const fs = require('fs');
 const path = require('path');
 
 const root = path.join(__dirname, '..');
-const SRC = path.join(root, 'course-src', 'fr-qwerty');
-const OUT = path.join(root, 'courses-src', 'fr-qwerty.json');
+const LANG = (process.argv[2] && /^[a-z]{2}$/.test(process.argv[2]) && require.main === module) ? process.argv[2] : 'fr';
+const SRC = path.join(root, 'course-src', LANG + '-qwerty');
+const OUT = path.join(root, 'courses-src', LANG + '-qwerty.json');
 
 function loadSources() {
   const files = fs.existsSync(SRC) ? fs.readdirSync(SRC).filter((f) => /^\d\d-.*\.json$/.test(f)).sort() : [];
@@ -31,8 +33,8 @@ function build() {
   const curriculum = { modules, free: lessons.slice(0, 10).map((l) => l.id) };
   const keyboards = require('./build-qwerty-keyboards').buildKeyboards(lessons.flatMap((l) => [l.text || '', l.keys]));
   return {
-    schema: 1, id: 'fr/qwerty',
-    note: "Généré par scripts/build-qwerty-course.js à partir de course-src/fr-qwerty/ (textes écrits à la main, relus par l'utilisateur). Ne pas modifier à la main.",
+    schema: 1, id: LANG + '/qwerty',
+    note: `Généré par scripts/build-qwerty-course.js à partir de course-src/${LANG}-qwerty/ (textes écrits à la main, relus par l'utilisateur). Ne pas modifier à la main.`,
     handwritten: lessons.map((l) => l.id), keyboards, curriculum,
   };
 }
