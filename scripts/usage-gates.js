@@ -532,4 +532,103 @@ function u14() {
   }
   return errs.length ? { ok: false, detail: errs.join('\n') } : { ok: true, detail: `le vrai cours (${want.length} leçons, ${course.curriculum.modules.length} modules) s'applique dans l'ordre du fichier et se retire à l'identique ; programme inventé (3 leçons, ids q1 à q3) appliqué et joué ; ${bad.length} programmes invalides refusés sans effet` };
 }
-module.exports = { u14, u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
+
+// U15 : cours de LANGUE (hors français), construits depuis leurs sources (scripts/build-qwerty-course.js) : appliqués à la vraie page, le vocabulaire des jeux
+// devient celui du cours (et le français revient au retour), les jeux ne tirent AUCUN mot français, et chaque leçon se termine sans faute sur chaque disposition
+// de la famille du cours (QWERTY : les 8 variantes avec leurs gestes ; AZERTY : fr, be, mac, nf).
+function u15() {
+  const { build } = require('./build-qwerty-course');
+  const { gestureFor } = require('./gesture');
+  const srcDir = path.join(root, 'course-src');
+  const dirs = fs.existsSync(srcDir) ? fs.readdirSync(srcDir).filter((d) => /^[a-z]{2}-(qwerty|azerty)$/.test(d) && !d.startsWith('fr-') && fs.readdirSync(path.join(srcDir, d)).some((f) => /^\d\d-.*\.json$/.test(f))) : [];
+  if (!dirs.length) return { ok: true, detail: 'aucun cours de langue à vérifier' };
+  const errs = []; const done = [];
+  for (const d of dirs) {
+    const [lang, family] = d.split('-'); const id = `${lang}/${family}`;
+    let data; try { data = build(lang, family); } catch (e) { errs.push(`${id} : assemblage impossible (${e.message})`); continue; }
+    const base = loadApp(); if (base.errors.length) { errs.push(`${id} : chargement de la page : ${base.errors[0]}`); continue; }
+    base.run('globalThis.__c=' + JSON.stringify(data) + ';');
+    if (!base.run(`kpApplyCourseData(${JSON.stringify(id)},__c)`)) { errs.push(`${id} : le cours est refusé par la page`); continue; }
+    const order = JSON.parse(base.run('JSON.stringify(ALL_LESSONS.map(l=>l.id))'));
+    if (order.length !== data.curriculum.modules.flatMap((m) => m.lessons).length) errs.push(`${id} : ${order.length} leçons appliquées sur ${data.curriculum.modules.flatMap((m) => m.lessons).length}`);
+    // vocabulaire des jeux et jeux sans français
+    const frWords = ['doigt', 'clavier', 'fleur', 'soleil']; // mots du vocabulaire français des jeux : aucun ne doit rester dans un cours en anglais
+    if (!data.vocab || data.vocab.length < 300) errs.push(`${id} : vocabulaire des jeux absent ou trop court (${data.vocab ? data.vocab.length : 0})`);
+    else {
+      if (base.run('GAME_VOCAB.length') !== data.vocab.length) errs.push(`${id} : le vocabulaire des jeux n'est pas celui du cours`);
+      if (frWords.some((w) => base.run(`GAME_VOCAB.includes(${JSON.stringify(w)})`))) errs.push(`${id} : des mots français restent dans le vocabulaire des jeux`);
+      const vocab = new Set(data.vocab); const bad = (words) => words.filter((w) => !vocab.has(w));
+      base.run(`KP_COURSES_OFFERED.push(${JSON.stringify(id)});localStorage.setItem('kp_course',${JSON.stringify(id)});currentUser='t';currentToken='t';currentUserId='u';_statsLoaded=true;app.stats=mergeStats();`);
+      if (base.run('kpCourseId()') !== id) errs.push(`${id} : le cours n'est pas devenu le cours actif`);
+      if (base.run('kpContentLang()') !== lang) errs.push(`${id} : langue du cours « ${base.run('kpContentLang()')} »`);
+      for (const choice of ['tout', 'auto', 'repos']) {
+        base.run(`localStorage.setItem('kp_game_level_frappe',${JSON.stringify(choice)})`);
+        const r = JSON.parse(base.run('JSON.stringify((()=>{const g=app._glResolve("frappe");return{full:g.full,letters:g.letters?g.letters.size:0,pool:g.pool||[]}})())'));
+        if (r.full) errs.push(`${id} : au niveau « ${choice} », les jeux retombent sur le contenu français (full)`);
+        const b = bad(r.pool.filter((w) => /^[a-z]{4,}$/.test(w) && !/^[a-z]{1,4}$/.test(w) || w.length > 4)); // les suites de lettres (4 lettres ou moins) ne sont pas des mots
+        if (choice === 'tout' && b.length) errs.push(`${id} : mots hors du vocabulaire du cours au niveau « tout » : ${b.slice(0, 4).join(', ')}`);
+        if (choice === 'tout' && r.pool.length < 300) errs.push(`${id} : ${r.pool.length} mots seulement au niveau « tout »`);
+      }
+      base.run("localStorage.setItem('kp_game_level_sprint','tout');app.startSprint();clearInterval(app._sprintLoop);");
+      const words = base.run('app.sprint.text').split(' '); const sb = bad(words);
+      if (sb.length || base.run('app.sprint.glv.full')) errs.push(`${id} : le Sprint propose ${sb.length ? 'des mots hors du vocabulaire (' + sb.slice(0, 3).join(', ') + ')' : 'du contenu français'}`);
+      const tt = base.run("app.makeSession('test').text"); if (!/^[a-z ]+$/.test(tt) || bad(tt.split(' ')).length) errs.push(`${id} : le texte du test de frappe n'est pas fait de mots du cours (${tt.slice(0, 50)})`);
+      base.run("localStorage.setItem('kp_game_level_ghost','tout');app.startGhost();clearInterval(app._ghostLoop);");
+      const gt = base.run('app.ghost.text').split(' '); if (bad(gt).length) errs.push(`${id} : le Fantôme propose des mots hors du vocabulaire`);
+      base.run("localStorage.setItem('kp_game_level_simon','tout');app.startSimon();clearInterval(app._simonLoop);app.simonNewSequence();");
+      if (bad(base.run('app.simon.words')).length) errs.push(`${id} : Simon propose des mots hors du vocabulaire`);
+      // aucun record pour un cours dans une autre langue : fin d'une partie de Sprint
+      const before = JSON.stringify(base.run('app.stats.sprintBest||null'));
+      base.run("app.sprint.on=true;app.sprint.started=true;app.sprint.correct=300;app.sprint.timeLeft=1;app.sprintTick();");
+      if (JSON.stringify(base.run('app.stats.sprintBest||null')) !== before) errs.push(`${id} : un record du Sprint a été enregistré dans un cours en ${lang}`);
+    }
+    // retour au français
+    base.run('localStorage.removeItem("kp_course");kpApplyCourseData("fr/azerty",null);');
+    if (!frWords.every((w) => base.run(`GAME_VOCAB.includes(${JSON.stringify(w)})`)) || base.run('GAME_VOCAB.includes("salad")')) errs.push(`${id} : le vocabulaire français n'est pas remis en place au retour`);
+    if (base.run('ALL_LESSONS.length') !== 66) errs.push(`${id} : ${base.run('ALL_LESSONS.length')} leçons au retour au français au lieu de 66`);
+    // leçons rejouées sur chaque disposition
+    let sessions = 0;
+    const texts = {}; const b2 = loadApp(); b2.run('globalThis.__c=' + JSON.stringify(data) + ';kpApplyCourseData(' + JSON.stringify(id) + ',__c);');
+    for (const lid of order) { b2.run('currentUser=null;app.stats=app.stats||mergeStats();'); texts[lid] = b2.run('app.makeSession("lesson",' + JSON.stringify(lid) + ').text'); }
+    if (family === 'qwerty') {
+      for (const vid of QWERTY_VARIANTS) {
+        const def = JSON.parse(fs.readFileSync(path.join(root, 'layouts-src', vid + '.json'), 'utf8'));
+        const events = (ch) => {
+          const g = gestureFor(def, ch); if (!g) return null;
+          const pr = (p, key) => ({ key, code: p.code, shift: !!p.shift, alt: !!p.alt });
+          const isDead = (p) => { const k = def.keys[p.code]; return !!(k && k.dead && k.dead[p.alt ? (p.shift ? 'gs' : 'g') : (p.shift ? 's' : 'l')]); };
+          if (g.length === 1) return [pr(g[0], ch)];
+          if (g.length === 2 && isDead(g[0])) return [pr(g[0], 'Dead'), g[1].code === 'Space' ? { key: ch, code: 'Space' } : { key: ch, code: g[1].code, shift: !!g[1].shift }];
+          return g.map((pp) => pr(pp, ch));
+        };
+        for (const lid of order) {
+          const text = texts[lid]; const evs = []; let stop = false;
+          for (const ch of text) { const e = events(ch); if (!e) { errs.push(`${id} ${vid} ${lid} : « ${ch} » sans geste`); stop = true; break; } evs.push(...e); }
+          if (stop) continue;
+          const h = loadApp();
+          h.run("currentUser='t';currentToken='t';currentUserId='u';_statsLoaded=true;app.stats=mergeStats();app.view='lessons';app.sess={mode:'lesson',lessonId:" + JSON.stringify(lid) + ",text:" + JSON.stringify(text) + ",idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false};");
+          for (const e of evs) press(h, e);
+          sessions++;
+          if (!h.run('app.sess.finished') || h.run('app.sess.keystrokes-app.sess.correct')) errs.push(`${id} ${vid} ${lid} : leçon non terminée sans faute`);
+        }
+      }
+    } else {
+      const dead = b2.run('KB_DEAD_DECOMP');
+      for (const lay of LAYOUTS) {
+        const direct = typableSet(loadLayout(lay));
+        b2.store.kp_kb_layout = lay; b2.run(`applyKbLayout('${lay}')`); login(b2);
+        for (const lid of order) {
+          const text = startLesson(b2, lid); sessions++;
+          let imp = null;
+          for (const ch of text) { const steps = plan(ch, lay, direct, dead); if (!steps) { imp = ch; break; } steps.forEach((st) => press(b2, st)); }
+          if (imp) { errs.push(`${id} ${lay} ${lid} : « ${imp} » impossible à taper`); continue; }
+          if (!b2.run('app.sess.finished') || b2.run('app.sess.keystrokes') !== b2.run('app.sess.correct')) errs.push(`${id} ${lay} ${lid} : leçon non terminée sans faute`);
+        }
+      }
+    }
+    done.push(`${id} : ${order.length} leçons, vocabulaire de ${data.vocab ? data.vocab.length : 0} mots, ${sessions} leçons rejouées sans faute`);
+  }
+  return errs.length ? { ok: false, detail: `${errs.length} problème(s) :\n` + errs.slice(0, 12).join('\n') } : { ok: true, detail: done.join(' ; ') };
+}
+
+module.exports = { u15, u14, u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };

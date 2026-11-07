@@ -139,6 +139,16 @@ function q10(opts) {
   if (!dirs.length) return { ok: true, detail: 'aucun cours de langue à vérifier' };
   const errs = []; const lexicon = loadLexicon(srcDir, errs, only); const done = [];
   for (const d of dirs) { const r = checkCourse(d, srcDir, lexicon, errs); if (r.lessons) done.push(`${d} : ${r.lessons} leçons`); }
+  // Le fichier que le site charge (courses-src/<langue>-<clavier>.json), s'il existe, est EXACTEMENT ce que produit l'assembleur : jamais périmé, jamais écrit à la main.
+  if (!(opts && opts.srcDir)) {
+    const { build } = require('./build-qwerty-course');
+    for (const d of dirs) {
+      const [lang, family] = d.split('-'); const file = path.join(root, 'courses-src', `${d}.json`);
+      if (!fs.existsSync(file)) continue;
+      let built; try { built = build(lang, family); } catch (e) { continue; }
+      if (JSON.stringify(readJson(file)) !== JSON.stringify(JSON.parse(JSON.stringify(built)))) errs.push(`courses-src/${d}.json n'est pas à jour avec ses sources (relancer node scripts/build-qwerty-course.js ${lang} ${family})`);
+    }
+  }
   return errs.length ? { ok: false, detail: `${errs.length} problème(s) :\n` + errs.slice(0, 15).join('\n') } : { ok: true, detail: `${done.join(' ; ') || 'dossiers vides'} (lexique de ${lexicon.size} mots)` };
 }
 module.exports = { q10 };

@@ -18,7 +18,7 @@ function serve() {
     // Sauvegarde de la progression d'un compte simulé : le faux serveur répond « enregistré » (sinon un 401 déconnecterait le compte du test).
     if (u === '/api/save-progress' && req.method === 'POST') {
       let raw = ''; req.on('data', (c) => { raw += c; });
-      return req.on('end', () => { let body = {}; try { body = JSON.parse(raw); } catch (e) { /* corps vide */ } res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(body.access === true ? { ok: true, coursAcces: /testeur/.test(String(body.token)) ? ['fr/qwerty'] : [] } : { ok: true })); });
+      return req.on('end', () => { let body = {}; try { body = JSON.parse(raw); } catch (e) { /* corps vide */ } res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(body.access === true ? { ok: true, coursAcces: /testeur-en/.test(String(body.token)) ? ['fr/qwerty', 'en/azerty', 'en/qwerty'] : /testeur/.test(String(body.token)) ? ['fr/qwerty'] : [] } : { ok: true })); });
     }
     // Réouverture de session (ouverture des réglages) : le faux serveur reconnaît le jeton du compte simulé (sinon `{}` effacerait son nom).
     if (u === '/api/login' && req.method === 'POST') {
@@ -30,6 +30,9 @@ function serve() {
       const guestOnly = /^\/api\/(classes|save-progress|institutions|billing)/.test(u);
       res.writeHead(guestOnly ? 401 : 200, { 'Content-Type': 'application/json' }); return res.end(guestOnly ? '{"error":"Session invalide."}' : '{}');
     }
+    // Cours de langue (hors français) : construits à la demande depuis leurs sources (la gate teste la source de vérité, pas un fichier assemblé oublié sur le disque).
+    const lc = /^\/courses-src\/([a-z]{2})-(qwerty|azerty)\.json$/.exec(u);
+    if (lc && lc[1] !== 'fr') { try { const body = JSON.stringify(require('./build-qwerty-course').build(lc[1], lc[2])); res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end(body); } catch (e) { res.writeHead(404); return res.end('{}'); } }
     const f = path.join(root, u);
     if (u !== '/' && f.startsWith(root) && fs.existsSync(f) && fs.statSync(f).isFile()) {
       res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); return fs.createReadStream(f).pipe(res);
@@ -393,6 +396,38 @@ async function run(opts = {}) {
         exceptions.splice(0).forEach((e) => problems.push(`BR11 : exception : ${e}`));
         info.jeuxTous = 'ok';
       } catch (e) { problems.push(`BR11 : ${e.message}`); }
+
+      // BR12 : langue du cours (anglais, bêta) : un compte testeur voit « Langue du cours », passe à l'anglais et revient ; un visiteur ne voit rien
+      try {
+        await ev("localStorage.clear();true");
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2500); exceptions.splice(0);
+        const lg = await ev(`(async()=>{
+          const out={};
+          out.guestRow=!!document.querySelector('.kbc-langs');
+          currentUser='testeur-en';currentToken='tok-testeur-en';currentUserId='uid';_statsLoaded=true;app.stats=mergeStats();_kpAccessFor=null;
+          kpSetAllowed(['fr/qwerty','en/azerty','en/qwerty']);updateNavUser();
+          document.getElementById('nav-kb-btn').click();await new Promise(r=>setTimeout(r,150));
+          const m=document.getElementById('nav-kb-menu').getBoundingClientRect();
+          out.row=[...document.querySelectorAll('#nav-kb-menu .kbc-lang-btn')].map(b=>b.innerText+(b.classList.contains('active')?'*':''));
+          out.inFrame=m.left>=0&&m.right<=innerWidth;
+          out.okEn=await kpChooseLanguage('en');
+          out.en={course:kpCourseId(),lang:kpContentLang(),lessons:ALL_LESSONS.length,first:ALL_LESSONS[0].id+':'+ALL_LESSONS[0].keys,vocab:GAME_VOCAB.length,test:app.makeSession('test').text,badge:kpCourseBadgeHTML().includes('anglais')};
+          out.rowEn=[...document.querySelectorAll('#nav-kb-menu .kbc-lang-btn')].map(b=>b.innerText+(b.classList.contains('active')?'*':''));
+          out.okQ=await kpChooseFamily('qwerty');out.q={course:kpCourseId(),lessons:ALL_LESSONS.length};
+          out.okFr=await kpChooseLanguage('fr');
+          out.fr={course:kpCourseId(),lessons:ALL_LESSONS.length,vocab:GAME_VOCAB.length,testFr:!/^[a-z' ,.]*$/.test('x')&&app.makeSession('test').text.length>20};
+          return out})()`);
+        if (lg.guestRow) problems.push('BR12 : la langue du cours est proposée à un visiteur');
+        if (lg.row.join('|') !== 'Français*|English') problems.push(`BR12 : choix de langue pour un testeur (${lg.row.join('|')})`);
+        if (!lg.inFrame) problems.push('BR12 : le menu du clavier sort de l\'écran avec la ligne de langue');
+        if (!lg.okEn || lg.en.course !== 'en/azerty' || lg.en.lang !== 'en' || lg.en.lessons !== 54 || lg.en.first !== 'r1:f j' || lg.en.vocab < 300 || !lg.en.badge) problems.push(`BR12 : passage à l'anglais (${JSON.stringify(lg.en)})`);
+        if (/[éèêàùç]/.test(lg.en.test || '') || !/^[a-z ]+$/.test(lg.en.test || '')) problems.push(`BR12 : le texte de test d'un cours en anglais n'est pas de l'anglais (${(lg.en.test || '').slice(0, 60)})`);
+        if (lg.rowEn.join('|') !== 'Français|English*') problems.push(`BR12 : langue active après le passage (${lg.rowEn.join('|')})`);
+        if (!lg.okQ || lg.q.course !== 'en/qwerty' || lg.q.lessons !== 58) problems.push(`BR12 : en anglais, passer à QWERTY garde la langue (${JSON.stringify(lg.q)})`);
+        if (!lg.okFr || lg.fr.course !== 'fr/qwerty' || lg.fr.lessons !== 68 || lg.fr.vocab < 400) problems.push(`BR12 : retour au français (${JSON.stringify(lg.fr)})`);
+        exceptions.splice(0).forEach((e) => problems.push(`BR12 : exception : ${e}`));
+        info.langues = 'ok';
+      } catch (e) { problems.push(`BR12 : ${e.message}`); }
 
       // BR8 : la pastille « clavier » de l'en-tête (visiteur puis compte testeur)
       try {

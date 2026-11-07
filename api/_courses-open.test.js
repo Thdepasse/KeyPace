@@ -51,3 +51,10 @@ test('un cours qui n\'est pas au registre reste refusé', async () => {
   await call({ token: 't', data: { lessons: { r1: R1 }, courses: { 'nl/azerty': { lessons: { r1: R1 } } } } });
   assert.equal(PROGRESS.courses && PROGRESS.courses['nl/azerty'], undefined);
 });
+
+test('les cours d\'anglais restent en bêta : un testeur les reçoit, un compte ordinaire non', () => {
+  assert.deepEqual(COURSE_ACCESS['en/qwerty'], { status: 'bêta' });
+  assert.deepEqual(COURSE_ACCESS['en/azerty'], { status: 'bêta' });
+  assert.deepEqual(courseIdsFor({ username: 'testeur1', role: 'eleve' }), ['fr/qwerty', 'en/azerty', 'en/qwerty']);
+  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.deepEqual(courseIdsFor({ username: 'autre', role }), ['fr/qwerty'], role);
+});

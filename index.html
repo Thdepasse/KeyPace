@@ -769,6 +769,8 @@ a.nav-link{text-decoration:none;display:inline-block}
 }
 .nav-kb-btn #nav-kb-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
 .nav-kb-menu{width:min(360px,calc(100vw - 24px))}
+.kbc-langs{display:flex;flex-wrap:wrap;gap:6px;padding:4px 8px 6px}
+.kbc-langs .settings-btn{font-size:13px;padding:6px 10px}
 /* les deux cartes AZERTY / QWERTY tiennent dans le cadre (elles en sortaient : leur largeur minimale dépassait celle du menu) */
 .nav-kb-menu .kb-family-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
 .nav-kb-menu .kb-family-card{min-width:0;overflow:hidden;padding:12px 10px}
@@ -4251,7 +4253,10 @@ function saveStats(s){
    (titres, touches, textes, tutoriels) est un fichier de données chargé à la demande : jamais mélangé au cours par défaut. */
 const KP_COURSES={
   'fr/azerty':{id:'fr/azerty',family:'azerty',content:'fr'},
-  'fr/qwerty':{id:'fr/qwerty',family:'qwerty',content:'fr',src:'/courses-src/fr-qwerty.json'}
+  'fr/qwerty':{id:'fr/qwerty',family:'qwerty',content:'fr',src:'/courses-src/fr-qwerty.json'},
+  /* Anglais britannique (bêta : comptes testeurs, côté serveur). L'interface reste en français ; seuls les textes à taper et le vocabulaire des jeux sont en anglais. */
+  'en/azerty':{id:'en/azerty',family:'azerty',content:'en',src:'/courses-src/en-azerty.json'},
+  'en/qwerty':{id:'en/qwerty',family:'qwerty',content:'en',src:'/courses-src/en-qwerty.json'}
 };
 /* Cours que le site propose aujourd'hui. Le QWERTY s'ajoute ici quand il est ouvert (bêta côté serveur, puis public). */
 const KP_COURSES_OFFERED=['fr/azerty'];
@@ -4328,7 +4333,8 @@ let _kpAzSnap=null;
 function kpSnapshotDefault(){
   if(_kpAzSnap)return;
   _kpAzSnap={lessons:ALL_LESSONS.slice(),modules:ALL_MODULES.slice(),free:FREE_LESSON_IDS.slice(),howText:KB_HOW_TEXT_LESSONS.slice(),
-    fields:ALL_LESSONS.map(l=>({title:l.title,keys:l.keys,tip:l.tip,tuto:l.tuto,text:l.text,module:l.module})),names:ALL_MODULES.map(m=>m.name)};
+    fields:ALL_LESSONS.map(l=>({title:l.title,keys:l.keys,tip:l.tip,tuto:l.tuto,text:l.text,module:l.module})),names:ALL_MODULES.map(m=>m.name),
+    vocab:(()=>{try{return GAME_VOCAB.slice();}catch{return null;}})()};
 }
 function kpRestoreDefault(){
   const z=_kpAzSnap;if(!z)return;
@@ -4338,7 +4344,10 @@ function kpRestoreDefault(){
   ALL_MODULES.splice(0,ALL_MODULES.length,...z.modules);
   FREE_LESSON_IDS.splice(0,FREE_LESSON_IDS.length,...z.free);
   KB_HOW_TEXT_LESSONS.splice(0,KB_HOW_TEXT_LESSONS.length,...z.howText);
+  if(z.vocab){try{GAME_VOCAB.splice(0,GAME_VOCAB.length,...z.vocab);}catch{}} // vocabulaire des jeux : le français est remis en place
 }
+/* Vocabulaire des jeux d'un cours (cours dans une autre langue) : liste de mots en minuscules, 2 à 12 lettres, sans signe. Refusé en entier s'il est mal formé. */
+function kpVocabOk(v){return Array.isArray(v)&&v.length>=50&&v.length<=5000&&v.every(w=>typeof w==='string'&&/^[a-z]{2,12}$/.test(w));}
 /* Contrôle d'un programme AVANT d'y toucher : retourne un message d'erreur, ou '' s'il est utilisable. */
 function kpCurriculumError(cur){
   if(!cur||!Array.isArray(cur.modules)||!cur.modules.length||cur.modules.length>40)return'modules absents ou trop nombreux';
@@ -4365,6 +4374,7 @@ function kpApplyCourseData(id,data){
   if(data.schema!==1||data.id!==id)return false;
   if(data.curriculum){
     if(kpCurriculumError(data.curriculum))return false;
+    if(data.vocab!==undefined&&!kpVocabOk(data.vocab))return false;
     const les=[],mods=[];let pool='';
     data.curriculum.modules.forEach((m,mi)=>{
       const ml=[];
@@ -4375,6 +4385,7 @@ function kpApplyCourseData(id,data){
     ALL_MODULES.splice(0,ALL_MODULES.length,...mods);
     FREE_LESSON_IDS.splice(0,FREE_LESSON_IDS.length,...(data.curriculum.free||les.slice(0,10).map(l=>l.id)));
     KB_HOW_TEXT_LESSONS.splice(0,KB_HOW_TEXT_LESSONS.length,...les.filter(l=>l.howText).map(l=>l.id));
+    if(data.vocab){try{GAME_VOCAB.splice(0,GAME_VOCAB.length,...data.vocab);}catch{}} // les jeux de mots piochent dans le vocabulaire du cours
     kpRegisterKeyboards(data);
     return true;
   }
@@ -4408,19 +4419,34 @@ function kpRedrawKeyboard(){
   }catch{}
 }
 /* Famille de clavier choisie par l'élève = cours. Chaque famille retient sa dernière variante (kp_kb_layout_azerty / _qwerty). */
-const KP_FAMILY_COURSE={azerty:'fr/azerty',qwerty:'fr/qwerty'};
+/* Langue du cours : s'ajoute à la famille de clavier. Un cours = langue + famille (fr/azerty, fr/qwerty, en/azerty, en/qwerty). */
+const KP_LANG_NAMES={fr:'Français',en:'English'};
+function kpContentLang(){return KP_COURSES[kpCourseId()].content;}
+function kpLanguagesOffered(){return [...new Set(KP_COURSES_OFFERED.map(c=>KP_COURSES[c].content))];}
+function kpFamilyCourse(fam){const id=kpContentLang()+'/'+fam;return KP_COURSES[id]?id:'fr/'+fam;}
 const KP_DEFAULT_VARIANT={azerty:'fr',qwerty:'windows-us-intl'};
 function kpFamilyOf(layoutId){return KB_QWERTY[layoutId]?'qwerty':'azerty';}
 function kpCurrentFamily(){return KP_COURSES[kpCourseId()].family;}
 function kpFamiliesOffered(){return [...new Set(KP_COURSES_OFFERED.map(c=>KP_COURSES[c].family))];}
 async function kpChooseFamily(fam){
-  const cid=KP_FAMILY_COURSE[fam];
+  const cid=kpFamilyCourse(fam);
   if(!cid||!KP_COURSES_OFFERED.includes(cid))return false;
   let remembered=null;try{remembered=localStorage.getItem('kp_kb_layout_'+fam);}catch{}
   if(!(await kpSetCourse(cid)))return false;
   const lay=KB_LAYOUTS[remembered]?remembered:KP_DEFAULT_VARIANT[fam];
   if(KB_LAYOUTS[lay]){setKbLayoutId(lay);applyKbLayout(lay);}
   kpKbChipRender();kpRedrawKeyboard();
+  return true;
+}
+/* Changer de langue garde la famille de clavier : en/qwerty devient fr/qwerty et inversement (si ce cours est proposé au compte). */
+async function kpChooseLanguage(lang){
+  const fam=kpCurrentFamily();
+  let cid=lang+'/'+fam;
+  if(!KP_COURSES_OFFERED.includes(cid))cid=KP_COURSES_OFFERED.find(c=>KP_COURSES[c].content===lang)||null;
+  if(!cid||cid===kpCourseId())return false;
+  if(!(await kpSetCourse(cid)))return false;
+  kpKbChipRender();kpRedrawKeyboard();
+  try{if(typeof app!=='undefined'&&app.view==='games')app.renderGames();}catch{}
   return true;
 }
 async function kpSetCourse(id){
@@ -4983,9 +5009,24 @@ function kbFamilyCardsHTML(){
   const card=(f,name,rows,sub)=>`<button type="button" role="radio" aria-checked="${cur===f}" class="kb-family-card${cur===f?' active':''}" onclick="app.askKbFamily('${f}')"><span class="kb-family-keys" aria-hidden="true">${rows.split('').map(c=>'<i>'+c+'</i>').join('')}</span><strong>${name}</strong><span>${sub}</span></button>`;
   return`<div class="kb-family-cards" role="radiogroup" aria-label="Famille de clavier">${card('azerty','AZERTY','AZERTY','Français, belge, Mac, NF')}${card('qwerty','QWERTY','QWERTY','US, international, UK, Mac')}</div>`;
 }
+/* Langue du cours : deux boutons quand le compte a droit à plus d'une langue ; sinon rien (comportement actuel). */
+/* Texte d'un test de frappe : un passage français au hasard ; dans un cours en anglais, des mots du vocabulaire du cours (le test mesure la vitesse sur l'anglais,
+   pas sur du français). */
+function kpTestPassage(){
+  if(typeof KP_COURSES!=='undefined'&&KP_COURSES[kpCourseId()].content!=='fr'){
+    const t=KPGameLevels.textFor(GAME_VOCAB,new Set('abcdefghijklmnopqrstuvwxyz'),18);
+    if(t)return t;
+  }
+  return PASSAGES[Math.floor(Math.random()*PASSAGES.length)];
+}
+function kpLangRowHTML(){
+  const langs=kpLanguagesOffered();if(langs.length<2)return'';
+  const cur=kpContentLang();
+  return'<div class="nav-region-title">Langue du cours</div><div class="kbc-langs kbc-variants-like" role="radiogroup" aria-label="Langue du cours">'+langs.map(l=>'<button type="button" role="radio" aria-checked="'+(cur===l)+'" class="settings-btn kbc-lang-btn'+(cur===l?' active':'')+'" data-lang="'+l+'" onclick="kpChooseLanguage(\''+l+'\')">'+(KP_LANG_NAMES[l]||l)+'</button>').join('')+'</div>';
+}
 function kbFamilyBoxHTML(){
   const cards=kbFamilyCardsHTML();if(!cards)return'';
-  return`<div class="settings-row-info"><strong>Mon clavier</strong><span>Choisis la famille de ton clavier : tu travailles le cours qui correspond à tes touches. Chaque famille garde sa propre progression.</span></div>${cards}`;
+  return`<div class="settings-row-info"><strong>Mon clavier</strong><span>Choisis la famille de ton clavier : tu travailles le cours qui correspond à tes touches. Chaque famille garde sa propre progression.</span></div>${cards}${kpLangRowHTML()}`;
 }
 /* Pastille « clavier » de l'en-tête : le clavier actuel, cliquable pour en changer sans passer par les réglages (visiteur ou connecté). */
 const KB_AZ_SHORT={fr:'Français',be:'Belge',mac:'Mac',nf:'NF'};
@@ -4997,7 +5038,7 @@ function kpKbChipRender(){
   const full=(kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY')+', '+(KB_LAYOUT_LABELS[getKbLayoutId()]||'');
   b.setAttribute('aria-label','Mon clavier : '+full);b.title='Mon clavier : '+full+' (cliquer pour changer)';
   const acc=getAccentMode();
-  m.innerHTML=kbFamilyCardsHTML()
+  m.innerHTML=kbFamilyCardsHTML()+kpLangRowHTML()
     +'<div class="nav-region-title">Disposition '+(kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY')+'</div><div class="kbc-variants">'+kbLayoutBtnsHTML()+'</div>'
     +'<div class="nav-region-title">Accents</div><div class="kbc-variants"><button type="button" class="settings-btn'+(acc==='exact'?' active':'')+'" onclick="app.setAccents(\'exact\')">Exigés</button><button type="button" class="settings-btn'+(acc==='tolerant'?' active':'')+'" onclick="app.setAccents(\'tolerant\')">Tolérés</button></div>'
     +'<div class="nav-region-note">Exigés : tu apprends à taper é, è, ê… Tolérés : la lettre sans accent est acceptée.</div>'
@@ -5018,9 +5059,11 @@ function kpCloseKbChip(refocus){
 }
 /* Quand l'élève travaille un autre cours que le cours par défaut, la page des leçons le dit clairement (cours et clavier). */
 function kpCourseBadgeHTML(){
-  if(kpCurrentFamily()!=='qwerty')return'';
+  const en=kpContentLang()==='en';
+  if(kpCurrentFamily()!=='qwerty'&&!en)return'';
   const q=KB_QWERTY[getKbLayoutId()];
-  return' <span style="display:inline-block;vertical-align:middle;margin-left:8px;padding:3px 10px;border-radius:999px;background:rgba(255,77,46,.1);color:var(--accent);font:700 12px/1.4 inherit;letter-spacing:.03em">Cours QWERTY (bêta)'+(q?' · '+q.short:'')+'</span>';
+  const name=en?'Cours d’anglais, '+(kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY'):'Cours QWERTY';
+  return' <span style="display:inline-block;vertical-align:middle;margin-left:8px;padding:3px 10px;border-radius:999px;background:rgba(255,77,46,.1);color:var(--accent);font:700 12px/1.4 inherit;letter-spacing:.03em">'+name+' (bêta)'+(q?' · '+q.short:'')+'</span>';
 }
 function kpKeyboardChipHTML(){
   if(kpFamiliesOffered().length<2)return'';
@@ -6768,7 +6811,7 @@ const app={
   },
 
   makeSession(mode,lessonId){
-    let text=adaptQuotes(mode==='lesson'?this.genDrill(lessonId):PASSAGES[Math.floor(Math.random()*PASSAGES.length)]);
+    let text=adaptQuotes(mode==='lesson'?this.genDrill(lessonId):kpTestPassage());
     return{mode,lessonId:lessonId||null,text,idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false};
   },
   lessonById(id){return ALL_LESSONS.find(l=>l.id===id);},
@@ -7910,7 +7953,13 @@ const app={
   pickGameLevel(game,id){try{localStorage.setItem('kp_game_level_'+game,id);}catch{}this.renderCurrent();},
   _glList(){return KPGameLevels.levels(ALL_LESSONS);},
   _glResolve(game){
-    const full={id:'tout',label:'Tout le clavier',full:true};
+    let full={id:'tout',label:'Tout le clavier',full:true};
+    // Cours dans une autre langue : les mots, textes et paliers de score des jeux sont français ; « Tout le clavier » devient toutes les lettres avec le vocabulaire du cours,
+    // en entraînement (aucun record : les records des jeux sont ceux du français).
+    if(KP_COURSES[kpCourseId()].content!=='fr'){
+      const letters=new Set('abcdefghijklmnopqrstuvwxyz'),content=KPGameLevels.contentFor(GAME_VOCAB,letters);
+      full={id:'tout',label:'Tout le clavier',full:false,letters,content,pool:content.pool};
+    }
     if(this.royale&&this.royale.phase==='playing')return full;
     const choice=this._glChoice(game),list=this._glList();
     let lv=null;
@@ -8917,7 +8966,7 @@ const app={
   // Ajoute des phrases tant qu'il n'y a pas ~800 caractères d'avance. Retourne l'ancienne longueur.
   _ttExtend(){
     const t=this.tt,from=t.text.length;
-    while(t.text.length<t.idx+800){t.text+=(t.text.length?' ':'')+PASSAGES[Math.floor(Math.random()*PASSAGES.length)];}
+    while(t.text.length<t.idx+800){t.text+=(t.text.length?' ':'')+kpTestPassage();}
     return from;
   },
   _ttCharsHTML(from,to){
