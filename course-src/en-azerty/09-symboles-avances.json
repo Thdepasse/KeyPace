@@ -1,0 +1,123 @@
+{
+ "position": 9,
+ "name": "9. Symboles avancés",
+ "kind": "symboles",
+ "lessons": [
+  {
+   "id": "sym6",
+   "title": "{} et <> : code et HTML",
+   "keys": "{ } < >",
+   "teaches": "{}<>",
+   "tip": "Accolades et chevrons vont par paire : ouvre, écris, puis ferme.",
+   "tuto": {
+    "intro": "Les accolades {} et chevrons <> sont les symboles du code et du HTML. Eux aussi vont par paire.",
+    "rules": [
+     {
+      "icon": "⌨️",
+      "t": "Les accolades",
+      "d": "Les accolades { } encadrent des blocs de code : {code}. Leur geste dépend de ton clavier (indiqué plus haut)."
+     },
+     {
+      "icon": "🔠",
+      "t": "Les chevrons",
+      "d": "Les chevrons < > ouvrent et ferment les balises HTML. Selon ton clavier, > se tape avec Maj : le geste est indiqué plus haut."
+     },
+     {
+      "icon": "🧩",
+      "t": "Toujours fermer",
+      "d": "Comme les parenthèses, accolades et balises s'ouvrent ET se ferment : &lt;p&gt;text&lt;/p&gt;, {return x}."
+     }
+    ],
+    "tip": "Objectif : ouvrir et fermer accolades et chevrons."
+   },
+   "text": "<p>hello</p> <b>go</b> {code} {start} {a} {b} {c} <html> </html> {end} <div> </div>"
+  },
+  {
+   "id": "sym7",
+   "title": "\"\" et ~ : chaînes et chemins",
+   "keys": "\" ~",
+   "teaches": "\"~",
+   "tip": "Le guillemet droit entoure du texte en code ; le tilde ~ désigne le dossier personnel : ~/work.",
+   "tuto": {
+    "intro": "Les guillemets droits et le tilde ~ servent aux chaînes de caractères et aux chemins système.",
+    "rules": [
+     {
+      "icon": "⌨️",
+      "t": "Guillemets droits",
+      "d": "Le guillemet droit (\") entoure les chaînes en code. Son geste dépend de ton clavier (indiqué plus haut)."
+     },
+     {
+      "icon": "〜",
+      "t": "Le tilde ~",
+      "d": "Le tilde désigne le dossier personnel sous Linux et Mac : ~/music."
+     },
+     {
+      "icon": "💻",
+      "t": "Surtout en code",
+      "d": "Ces deux signes sont rares à l'écrit courant mais essentiels en programmation et au terminal."
+     }
+    ],
+    "tip": "Objectif : taper le guillemet droit et ~ sans hésiter."
+   },
+   "text": "\"hello\" \"world\" ~/music ~/school \"name\": \"Anna\" ~tom ~/book \"city\": \"York\" ~/work ~/home"
+  },
+  {
+   "id": "sym8",
+   "title": "\\ et ` : code et terminal",
+   "keys": "\\ `",
+   "teaches": "\\`",
+   "tip": "L'antislash et le backtick sont purement techniques : ils se trouvent en code, dans les chemins Windows et au terminal.",
+   "tuto": {
+    "intro": "L'antislash et l'accent grave (le backtick) sont des symboles purement techniques, fréquents en code.",
+    "rules": [
+     {
+      "icon": "⌨️",
+      "t": "L'antislash",
+      "d": "Il sépare les dossiers sous Windows et marque les caractères spéciaux en code."
+     },
+     {
+      "icon": "⌨️",
+      "t": "Le backtick",
+      "d": "Le backtick entoure le code en ligne et les variables en programmation. Sur certains claviers, il faut taper la touche puis la barre d'espace."
+     },
+     {
+      "icon": "💻",
+      "t": "Réservés au technique",
+      "d": "Tu ne t'en serviras qu'en code ou au terminal. Mémorise-les si tu programmes, sinon retiens juste leur existence."
+     }
+    ],
+    "tip": "Objectif : situer l'antislash et le backtick et les taper sans regarder."
+   },
+   "text": "C:\\Work\\Anna `copy` \\n \\t `name` C:\\School\\Tom `open file` \\r\\n `ls -a`"
+  },
+  {
+   "id": "sym9",
+   "title": "Révision : tous les symboles en texte",
+   "keys": "tous symboles",
+   "teaches": "",
+   "tip": "Avant chaque symbole, demande-toi : direct, Maj ou AltGr ? Ce réflexe te fait gagner du temps.",
+   "tuto": {
+    "intro": "On réunit tous les symboles dans un texte mêlant email, web, code et pourcentages. Le grand mélange !",
+    "rules": [
+     {
+      "icon": "🧩",
+      "t": "Tous les combos",
+      "d": "Maj, AltGr, touches spéciales... Chaque symbole a son geste. Mobilise tout ce que tu as appris dans les deux modules."
+     },
+     {
+      "icon": "🧭",
+      "t": "Repère le geste",
+      "d": "Avant chaque symbole, identifie : direct, Maj ou AltGr ? Ce réflexe te fait gagner du temps."
+     },
+     {
+      "icon": "💻",
+      "t": "Le clavier complet",
+      "d": "Maîtriser les symboles, c'est taper une adresse, un bout de code ou une formule sans jamais bloquer."
+     }
+    ],
+    "tip": "Objectif : enchaîner tous les symboles dans un texte réel, chaque combo au bon moment."
+   },
+   "text": "anna@school.com (2026) www.bank.com/help #leeds {open: true} <html> 50% a+b=c [end] ~/home \"name\" my_file | ls"
+  }
+ ]
+}

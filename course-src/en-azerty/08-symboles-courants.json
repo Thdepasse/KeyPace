@@ -1,0 +1,152 @@
+{
+ "position": 8,
+ "name": "8. Symboles courants",
+ "kind": "symboles",
+ "lessons": [
+  {
+   "id": "sym1",
+   "title": "@ et # : email et hashtag",
+   "keys": "@ #",
+   "teaches": "@#",
+   "tip": "Le geste de @ et de # dépend de ton clavier : il est indiqué juste en dessous. Garde tes doigts de repos entre deux symboles.",
+   "tuto": {
+    "intro": "Les symboles comme @ et # demandent une combinaison de touches qui change selon les claviers : le geste du tien est indiqué juste en dessous.",
+    "rules": [
+     {
+      "icon": "⌨️",
+      "t": "Les touches spéciales",
+      "d": "Selon ton clavier, un symbole se tape en direct, avec Maj, ou avec AltGr (la touche à droite de la barre d'espace, à maintenir avec le pouce droit)."
+     },
+     {
+      "icon": "📧",
+      "t": "@ pour les emails",
+      "d": "L'arobase relie le nom et le domaine d'une adresse : anna@school.com. Indispensable au quotidien."
+     },
+     {
+      "icon": "#️⃣",
+      "t": "# le hashtag",
+      "d": "Le croisillon (hash) sert aux mots-clés des réseaux sociaux et au code."
+     }
+    ],
+    "tip": "Objectif : produire @ et # avec le bon geste, sans casser ta position de repos."
+   },
+   "text": "anna@school.com #bath @tom #team info@bank.com #rain @kate #happy hello@club.org @sam #sunny #cake"
+  },
+  {
+   "id": "sym2",
+   "title": "Parenthèses () et crochets []",
+   "keys": "( ) [ ]",
+   "teaches": "[]",
+   "tip": "Parenthèses et crochets vont par paire : tape la paire, puis reviens écrire au milieu.",
+   "tuto": {
+    "intro": "Parenthèses et crochets vont par paire : on apprend à toujours ouvrir ET fermer.",
+    "rules": [
+     {
+      "icon": "🧩",
+      "t": "Toujours par paire",
+      "d": "Une parenthèse ou un crochet ouvert se ferme toujours. Tape la paire, puis reviens écrire au milieu."
+     },
+     {
+      "icon": "⌨️",
+      "t": "Parenthèses déjà vues",
+      "d": "Tu connais déjà ( et ) depuis la leçon sur les parenthèses : ici, on les mélange avec les crochets."
+     },
+     {
+      "icon": "⌨️",
+      "t": "Les crochets",
+      "d": "Les crochets [ ] demandent une combinaison de touches (le geste de ton clavier est indiqué plus haut). Utiles pour le code et les listes."
+     }
+    ],
+    "tip": "Objectif : ouvrir et fermer parenthèses et crochets, sans en oublier."
+   },
+   "text": "list[0] list[1] total(2) score[3] items[4] (ok) [end] count(5) index[i] page[6] (yes) [no]"
+  },
+  {
+   "id": "sym3",
+   "title": "/ et | : chemins et pipes",
+   "keys": "/ |",
+   "teaches": "/|",
+   "tip": "La barre oblique / sépare les parties d'une adresse ou d'un chemin ; la barre verticale | relie deux commandes.",
+   "tuto": {
+    "intro": "La barre oblique / et la barre verticale | servent aux adresses web, chemins de fichiers et commandes.",
+    "rules": [
+     {
+      "icon": "🌐",
+      "t": "Le slash /",
+      "d": "La barre oblique sépare les parties d'une URL ou d'un chemin : www.school.com/news, home/anna."
+     },
+     {
+      "icon": "⌨️",
+      "t": "Le pipe |",
+      "d": "La barre verticale demande une combinaison de touches. En informatique, elle relie deux commandes : ls | grep file."
+     },
+     {
+      "icon": "💻",
+      "t": "Symboles de l'informatique",
+      "d": "Ces deux signes sont partout dès qu'on touche au web ou au terminal. Repère bien leur combinaison."
+     }
+    ],
+    "tip": "Objectif : taper / et | pour les chemins et les commandes."
+   },
+   "text": "www.school.com/news ls | grep file | sort | head | more yes/no and/or home/anna a/b | c/d left | right"
+  },
+  {
+   "id": "sym4",
+   "title": "* = + : calculs et code",
+   "keys": "* = +",
+   "teaches": "*=+",
+   "tip": "Dans une formule simple, on colle souvent les opérateurs : x*y+z. Repère le rythme touche par touche.",
+   "tuto": {
+    "intro": "Les opérateurs * = + servent aux calculs et au code. On les enchaîne dans des expressions.",
+    "rules": [
+     {
+      "icon": "🧮",
+      "t": "Les opérateurs",
+      "d": "* pour multiplier, + pour additionner, = pour le résultat ou l'affectation : 2*3=6, a+b=c."
+     },
+     {
+      "icon": "⇧",
+      "t": "Où sont + et = ?",
+      "d": "Leur position change selon les claviers : regarde le geste de ton clavier, indiqué plus haut."
+     },
+     {
+      "icon": "🔗",
+      "t": "Sans espace dans les formules",
+      "d": "Dans une expression simple, on colle souvent les opérateurs : x*y+z. Repère le rythme touche par touche."
+     }
+    ],
+    "tip": "Objectif : enchaîner * = + dans des expressions, sans hésiter sur le bon geste."
+   },
+   "text": "2*3=6 a+b=c x*y+z=0 total=price*8 score=time*9+1 count=a+b+c speed=5*2 4+5=9 area=4*7=28"
+  },
+  {
+   "id": "sym5",
+   "title": "% et _ : taux et variables",
+   "keys": "% _",
+   "teaches": "%_",
+   "tip": "Le % se colle au nombre (50%) ; le tiret bas _ relie des mots sans espace dans les noms techniques.",
+   "tuto": {
+    "intro": "Le pourcentage % et le tiret bas _ (underscore) reviennent souvent dans les chiffres et les noms techniques.",
+    "rules": [
+     {
+      "icon": "📊",
+      "t": "Le pourcentage %",
+      "d": "Il se colle au nombre : 50%, 100%."
+     },
+     {
+      "icon": "➿",
+      "t": "Le tiret bas _",
+      "d": "L'underscore relie des mots sans espace dans les noms techniques : my_name, file_name."
+     },
+     {
+      "icon": "💻",
+      "t": "Usage technique",
+      "d": "% et _ sont surtout utiles en informatique et dans les données. Mémorise leur position pour ne pas ralentir."
+     }
+    ],
+    "tip": "Objectif : placer % et _ sans regarder."
+   },
+   "text": "50% 75% my_name file_name 100% top_speed 20% word_count 5% pass_mark 90% tea_time"
+  }
+ ]
+}
