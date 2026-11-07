@@ -21,6 +21,7 @@ const root = path.join(__dirname, '..');
 const US_SPELLINGS = /^(colou?rs?|colored|colorful|favou?rites?|neighbou?rs?|gray|centers?|theaters?|labor|honor|humor|flavor|moms?|sidewalks?|elevators?|trucks?|cookies?|soccer|apartments?|traveling|organized?|realized?)$/;
 const BRITISH_OK = new Set(['colour', 'colours', 'favourite', 'favourites', 'neighbour', 'neighbours']); // les formes britanniques ne sont pas refusées
 const FR_ACCENTS = /[éèêëàâîïôûùçœæ]/i;
+const TECH_TOKENS = new Set(['https']); // termes techniques admis tels quels dans les modules de symboles (adresses, code) ; un mot de plus de 4 lettres qui n'est pas anglais doit sinon être au lexique
 
 function readJson(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
 const flatTuto = (t) => [t.intro, t.tip, ...(t.rules || []).flatMap((r) => [r.t, r.d])].join(' ');
@@ -120,7 +121,7 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
         continue;
       }
       if (US_SPELLINGS.test(w) && !BRITISH_OK.has(w)) { errs.push(`${where} : « ${w} » est une orthographe américaine`); continue; }
-      if (lexicon.has(w)) continue;
+      if (lexicon.has(w) || (l._m.kind === 'symboles' && TECH_TOKENS.has(w))) continue;
       if (w.length <= 4 && playable < 15) { suites++; continue; }
       if (w.length <= 4) { suites++; continue; }
       errs.push(`${where} : « ${w} » n'est pas dans le lexique vérifié (ajouter au fichier course-src/en-lexicon-extra-*.json puis lancer scripts/check-en-words.js)`);

@@ -83,7 +83,7 @@
    ],
    "tip": "L'arobase est sur la touche 2, avec Maj : l'annulaire gauche monte, avec Maj droite.",
    "tuto": {
-    "intro": "L'arobase relie le nom d'une personne et le domaine d'une adresse mail : anna@mail.com. Sur QWERTY, elle est sur la touche 2, avec Maj. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+    "intro": "L'arobase relie le nom d'une personne et le domaine d'une adresse mail : anna@mail.example. Sur QWERTY, elle est sur la touche 2, avec Maj. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
     "rules": [
      {
       "icon": "⇧",
@@ -93,7 +93,7 @@
      {
       "icon": "📧",
       "t": "Le cœur d'une adresse mail",
-      "d": "info@shop.co.uk : le nom, @, puis le domaine. Aucune espace n'est permise dans une adresse."
+      "d": "info@shop.example : le nom, @, puis le domaine. Aucune espace n'est permise dans une adresse."
      },
      {
       "icon": "🐢",
@@ -103,7 +103,7 @@
     ],
     "tip": "Objectif : taper @ avec Maj + 2, dans des adresses complètes."
    },
-   "text": "hello@school.co.uk anna@mail.com jack@work.org info@shop.co.uk @emma @tom @lucy mark@home.net"
+   "text": "hello@school.example anna@mail.example jack@work.example info@shop.example @emma @tom @lucy mark@home.example"
   },
   {
    "id": "sym4",
@@ -199,7 +199,7 @@
     ],
     "tip": "Objectif : enchaîner tous les symboles de la rangée des chiffres dans un texte réel."
    },
-   "text": "hello@school.co.uk $name 50% a&b #tag 3*4 x_y 2+3=5 `code` ~/home 3^2 info@shop.co.uk 10% a+b=c"
+   "text": "hello@school.example $name 50% a&b #tag 3*4 x_y 2+3=5 `code` ~/home 3^2 info@shop.example 10% a+b=c"
   }
  ]
 }

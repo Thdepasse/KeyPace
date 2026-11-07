@@ -12,7 +12,7 @@ const WORDS = ['ad', 'as', 'sad', 'dad', 'fad', 'fads', 'dads', 'add', 'adds', '
 const L1 = L('r1', 'f j', 'fj', 'fj jf fj jf fjfj jfjf ffjj jjff fjf jfj ffj jjf fjfj jfjf');
 const L2 = L('r2', 'a s d', 'asd', 'as ad sad dad fad add sas das fas ads adds dads fads ass daa sda fas asd');
 const GOOD3 = 'sad dad ask lad fall add salad lass lads all as ad dads falls asks adds flask'; // 15+ mots
-const L3 = L('r3', 'k l', 'l', GOOD3);
+const L3 = L('r3', 'k l h t p', 'l', GOOD3);
 
 function mk({ en, fr, lexicon, extra, extraCheck, family }) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kp-lang-'));
@@ -56,7 +56,7 @@ test('lettre tapée avant d\'être apprise : refusé', () => {
 });
 
 test('mot inconnu du lexique (plus de 4 lettres) : refusé', () => {
-  const r = run({ en: [L1, L2, L('r3', 'k l', 'l', GOOD3 + ' salads')] });
+  const r = run({ en: [L1, L2, L('r3', 'k l h t p', 'l', GOOD3 + ' salads')] });
   assert.ok(has(r, /« salads » n'est pas dans le lexique/), r.detail);
 });
 
@@ -64,24 +64,24 @@ test('suites de lettres : admises quand peu de mots existent, refusées quand de
   // leçon 2 : 5 lettres apprises (f j a s d), moins de 15 mots possibles : des suites sont admises
   assert.ok(run({ en: [L1, L('r2', 'a s d', 'asd', 'sas das fas dfa afs sda fda asd sfd dsa fas das afd sad dad ad as'), L3], fr: [L1, L('r2', 'a s d', 'asd', 'x'), L3] }).ok);
   // leçon 3 : 15 mots ou plus possibles : plus d'un quart de suites refusé
-  const r = run({ en: [L1, L2, L('r3', 'k l', 'l', 'kl lk kls lkd lak all ask lad dak lak ksl kla sad dad lads asks fall')] });
+  const r = run({ en: [L1, L2, L('r3', 'k l h t p', 'l', 'kl lk kls lkd lak all ask lad dak lak ksl kla sad dad lads asks fall')] });
   assert.ok(has(r, /suites de lettres sur .* alors que \d+ mots sont possibles/), r.detail);
 });
 
 test('touche enseignée trop peu travaillée : refusé', () => {
-  const r = run({ en: [L1, L2, L('r3', 'k l', 'l', 'sad dad ask add as ad dads asks adds dad sad ask add')] });
+  const r = run({ en: [L1, L2, L('r3', 'k l h t p', 'l', 'sad dad ask add as ad dads asks adds dad sad ask add')] });
   assert.ok(has(r, /« l » enseignée mais tapée \d fois/), r.detail);
 });
 
 test('longueur : trop court, trop long, espaces', () => {
   assert.ok(has(run({ en: [L('r1', 'f j', 'fj', 'fj jf'), L2, L3] }), /texte trop court/));
-  assert.ok(has(run({ en: [L1, L2, L('r3', 'k l', 'l', GOOD3 + ' ' + GOOD3)] }), /texte trop long/));
-  assert.ok(has(run({ en: [L1, L2, L('r3', 'k l', 'l', GOOD3 + '  ask')] }), /espaces en double/));
+  assert.ok(has(run({ en: [L1, L2, L('r3', 'k l h t p', 'l', GOOD3 + ' ' + GOOD3)] }), /texte trop long/));
+  assert.ok(has(run({ en: [L1, L2, L('r3', 'k l h t p', 'l', GOOD3 + '  ask')] }), /espaces en double/));
 });
 
 test('lettre accentuée, orthographe américaine, tiret cadratin, mauvais clavier : refusés', () => {
-  assert.ok(has(run({ en: [L1, L2, L('r3', 'k l', 'l', GOOD3 + ' élan')] }), /accentuée/));
-  assert.ok(has(run({ en: [L1, L2, L('r3', 'k l', 'l', GOOD3 + ' color')] }), /orthographe américaine/));
+  assert.ok(has(run({ en: [L1, L2, L('r3', 'k l h t p', 'l', GOOD3 + ' élan')] }), /accentuée/));
+  assert.ok(has(run({ en: [L1, L2, L('r3', 'k l h t p', 'l', GOOD3 + ' color')] }), /orthographe américaine/));
   assert.ok(has(run({ en: [L1, L2, { ...L3, tip: 'Un conseil — avec un tiret.' }] }), /tiret cadratin/));
   assert.ok(has(run({ en: [L1, L2, { ...L3, tip: 'Sur ton clavier AZERTY.' }] }), /mauvais clavier/));
 });
@@ -94,7 +94,7 @@ test('forme : tutoriel incomplet, module mal numéroté, id en double', () => {
 });
 
 test('lexique complémentaire : un mot non vérifié ou non confirmé est refusé, un mot vérifié est accepté', () => {
-  const en = [L1, L2, L('r3', 'k l', 'l', GOOD3 + ' salads')];
+  const en = [L1, L2, L('r3', 'k l h t p', 'l', GOOD3 + ' salads')];
   assert.ok(has(run({ en, extra: ['salads'] }), /n'a pas été vérifié/));
   assert.ok(has(run({ en, extra: ['salads'], extraCheck: [{ w: 'salads', dict: 'non', wik: 'non', freq: 0.1 }] }), /n'est confirmé par aucun dictionnaire/));
   assert.ok(run({ en, extra: ['salads'], extraCheck: [{ w: 'salads', dict: 'oui', wik: 'erreur 429', freq: 0.1 }] }).ok);
@@ -110,7 +110,7 @@ test('cours AZERTY : refuse une mention de QWERTY', () => {
 });
 
 test('majuscules : refusées avant le module des majuscules, admises après', () => {
-  assert.ok(has(run({ en: [L1, L2, L('r3', 'k l', 'l', 'Sad dad ask lad fall add salad lass lads all as ad dads falls asks adds flask')] }), /majuscule « S » avant le module des majuscules/));
+  assert.ok(has(run({ en: [L1, L2, L('r3', 'k l h t p', 'l', 'Sad dad ask lad fall add salad lass lads all as ad dads falls asks adds flask')] }), /majuscule « S » avant le module des majuscules/));
   const dir = mk({});
   const L4 = L('maj1', 'Maj', '', 'Sad Dad ask Lad fall Add salad Lass lads All as ad dads falls asks adds flask');
   fs.writeFileSync(path.join(dir, 'fr-qwerty', '02-m.json'), JSON.stringify({ position: 2, name: '2. Majuscules', kind: 'majuscules', lessons: [L4] }));
@@ -165,4 +165,10 @@ test('modules de symboles : pas de limite de proportion de suites de lettres, ma
   assert.ok(has(q10({ srcDir: withModule2('ponctuation', sym) }), /suites de lettres sur/));
   const longWord = L('sym1', '$ %', '$%', 'sad $ dad % ask $ lad % all $ add % salad $ lass % kl $ lk % kl $ lk % flasker $ falls %');
   assert.ok(has(q10({ srcDir: withModule2('symboles', longWord) }), /« flasker » n'est pas dans le lexique/));
+});
+
+test('https : terme technique admis dans un module de symboles seulement', () => {
+  const sym = L('sym1', '$ %', '$%', 'sad $ dad % ask $ lad % all $ add % salad $ lass % https $ falls % ask $ add %');
+  assert.ok(q10({ srcDir: withModule2('symboles', sym) }).ok);
+  assert.ok(has(q10({ srcDir: withModule2('ponctuation', sym) }), /« https » n'est pas dans le lexique/));
 });
