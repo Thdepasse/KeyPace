@@ -1,0 +1,2489 @@
+{
+ "schema": 1,
+ "id": "en/azerty",
+ "note": "Généré par scripts/build-qwerty-course.js à partir de course-src/en-azerty/ (textes écrits à la main, relus par l'utilisateur). Ne pas modifier à la main.",
+ "handwritten": [
+  "r1",
+  "r2",
+  "r3",
+  "r4",
+  "r5",
+  "r6",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "b1",
+  "b2",
+  "b3",
+  "b4",
+  "b5",
+  "b6",
+  "w1",
+  "w2",
+  "w3",
+  "w4",
+  "w5",
+  "maj1",
+  "maj2",
+  "maj3",
+  "maj4",
+  "pon1",
+  "pon2",
+  "pon3",
+  "pon4",
+  "en-pon5",
+  "pon6",
+  "num1",
+  "num2",
+  "num3",
+  "num4",
+  "num5",
+  "num6",
+  "sym1",
+  "sym2",
+  "sym3",
+  "sym4",
+  "sym5",
+  "sym6",
+  "sym7",
+  "sym8",
+  "sym9",
+  "flu1",
+  "flu2",
+  "flu3",
+  "flu4",
+  "flu5",
+  "flu6"
+ ],
+ "keyboards": {},
+ "curriculum": {
+  "modules": [
+   {
+    "name": "1. Position de base",
+    "row": "repos",
+    "lessons": [
+     {
+      "id": "r1",
+      "title": "F et J, les index",
+      "keys": "f j",
+      "teaches": "fj",
+      "tip": "Bienvenue ! Pose tes index sur F (main gauche) et J (main droite) : ce sont les touches de référence, les deux petits reliefs que tu sens sous les doigts. Ne regarde pas ton clavier : fais confiance à ta mémoire musculaire.",
+      "tuto": {
+       "intro": "Bienvenue dans ta toute première leçon ! Prends 30 secondes pour comprendre la base de la frappe à dix doigts, c'est ce qui va tout changer pour la suite.",
+       "rules": [
+        {
+         "icon": "🤲",
+         "t": "La position de repos",
+         "d": "Pose tes huit doigts sur la rangée du milieu. Les deux index vont sur F et J : tu sens deux petits reliefs sous les doigts, c'est ton point de repère pour ne jamais regarder le clavier."
+        },
+        {
+         "icon": "👁️",
+         "t": "Garde les yeux sur l'écran",
+         "d": "Ne regarde pas tes doigts. C'est en arrêtant de regarder le clavier que tu construis ta mémoire musculaire, celle qui te rendra vraiment rapide."
+        },
+        {
+         "icon": "📍",
+         "t": "Un doigt, une touche",
+         "d": "Le F se tape avec l'index gauche, le J avec l'index droit. Après chaque frappe, l'index revient se poser sur sa touche de repos."
+        },
+        {
+         "icon": "🐢",
+         "t": "La lenteur d'abord",
+         "d": "Tape lentement et juste : chaque faute crée une mauvaise habitude. La vitesse viendra toute seule une fois le geste mémorisé."
+        }
+       ],
+       "tip": "Objectif de cette leçon : ancrer la position de tes deux index en ne tapant que F et J. Ne force pas, vise la régularité plutôt que la vitesse."
+      },
+      "text": "fj jf fj jf fjf jfj ffjj jjff fj jf fjfj jfjf ffj jjf fj jf ffjj jjff"
+     },
+     {
+      "id": "r2",
+      "title": "D et K, les majeurs",
+      "keys": "d k",
+      "teaches": "dk",
+      "tip": "Les majeurs se posent naturellement sur D et K, juste à côté des index. Garde les index sur F et J comme ancres : les autres doigts reviennent toujours à leur place de repos après chaque frappe.",
+      "tuto": {
+       "intro": "Tu ajoutes tes majeurs. D et K se posent juste à côté de tes index, sur la même rangée de repos.",
+       "rules": [
+        {
+         "icon": "🖐️",
+         "t": "Les majeurs au repos",
+         "d": "Le majeur gauche couvre D, le majeur droit couvre K. Ils reposent naturellement sur ces touches, tout contre F et J."
+        },
+        {
+         "icon": "⚓",
+         "t": "Garde tes index ancrés",
+         "d": "Ne bouge pas tes index : ils restent sur F et J pendant que les majeurs frappent. C'est ce qui te permet de revenir sans regarder."
+        },
+        {
+         "icon": "🎯",
+         "t": "Mouvement minimal",
+         "d": "Un petit appui suffit. Ne soulève pas toute la main, laisse juste le doigt descendre puis remonter à sa place."
+        }
+       ],
+       "tip": "Objectif : enchaîner F D K J de mémoire, en gardant les quatre doigts proches de leur position de repos."
+      },
+      "text": "dk kd fd jk dkf jkd fdk kjd dkdk kdkd ddkk kkdd fdjk jkfd dk kd fjdk"
+     },
+     {
+      "id": "r3",
+      "title": "S et L, les annulaires",
+      "keys": "s l",
+      "teaches": "sl",
+      "tip": "Les annulaires couvrent S et L. Tu as maintenant 6 doigts placés. Pense à la position en arc : les doigts reposent légèrement courbés, prêts à frapper sans lever le poignet.",
+      "tuto": {
+       "intro": "Place tes annulaires sur S (à gauche) et L (à droite). Tu as maintenant six doigts posés sur la rangée de repos.",
+       "rules": [
+        {
+         "icon": "🖐️",
+         "t": "Des doigts moins habiles",
+         "d": "Les annulaires sont moins agiles que les index et les majeurs, c'est normal. Va doucement, la précision se construit avant la vitesse."
+        },
+        {
+         "icon": "🌙",
+         "t": "La position en arc",
+         "d": "Garde les doigts légèrement courbés, comme posés sur une petite balle. Le poignet reste détendu et ne s'écrase pas sur le bureau."
+        },
+        {
+         "icon": "⚓",
+         "t": "Retour au repos",
+         "d": "Après chaque S ou L, l'annulaire revient à sa place. Tes index sur F et J restent tes repères."
+        }
+       ],
+       "tip": "Objectif : taper S et L sans tordre la main, en revenant à chaque fois sur la rangée de repos."
+      },
+      "text": "sl ls sd lk sls lsl slsl lsls ssll llss sdfl lkjs sl ls fsjl dlsk"
+     },
+     {
+      "id": "r4",
+      "title": "Q et M, les auriculaires",
+      "keys": "q m",
+      "teaches": "qm",
+      "tip": "Les auriculaires (petits doigts) sont les moins forts, c'est normal. Q à gauche, M à droite. Évite de tourner tout le poignet : laisse juste l'auriculaire s'étirer légèrement.",
+      "tuto": {
+       "intro": "Au tour des auriculaires, les petits doigts : Q à gauche, M à droite. Ce sont les plus délicats à dompter.",
+       "rules": [
+        {
+         "icon": "🤏",
+         "t": "Les doigts les plus faibles",
+         "d": "Les auriculaires manquent de force et de précision au début. C'est universel, même les pros sont passés par là. Patience."
+        },
+        {
+         "icon": "↔️",
+         "t": "N'entraîne pas toute la main",
+         "d": "Étire seulement l'auriculaire vers Q ou M. Si tu fais pivoter le poignet, les autres doigts perdent leur repère."
+        },
+        {
+         "icon": "⚓",
+         "t": "Repose-le aussitôt",
+         "d": "L'auriculaire a tendance à rester en l'air. Ramène-le sur sa touche de repos dès qu'il a frappé."
+        }
+       ],
+       "tip": "Objectif : activer les auriculaires sans casser ta position de repos. Lenteur et régularité avant tout."
+      },
+      "text": "qm mq qs ml qmq mqm qmqm mqmq qqmm mmqq qdfm mjks qm mq sqlm qdml"
+     },
+     {
+      "id": "r5",
+      "title": "G et H, index intérieurs",
+      "keys": "g h",
+      "teaches": "gh",
+      "tip": "G et H sont tapés par les index qui s'avancent légèrement vers le centre. Ce mouvement doit rester petit : l'index glisse, ne saute pas. Reviens sur F ou J après chaque frappe.",
+      "tuto": {
+       "intro": "G et H sont au centre du clavier. Ce sont tes index qui s'avancent un peu pour les atteindre.",
+       "rules": [
+        {
+         "icon": "👉",
+         "t": "Les index s'étirent",
+         "d": "L'index gauche glisse vers la droite pour G, l'index droit vers la gauche pour H. C'est un petit mouvement latéral, pas un saut."
+        },
+        {
+         "icon": "⚓",
+         "t": "Reviens sur F et J",
+         "d": "Juste après G ou H, ramène l'index sur sa touche de repos. Ce sont les touches les plus éloignées de ta position de base."
+        },
+        {
+         "icon": "🎯",
+         "t": "Ne confonds pas la main",
+         "d": "G se tape toujours avec l'index gauche, H toujours avec l'index droit. Garde bien cette règle en tête."
+        }
+       ],
+       "tip": "Objectif : couvrir tout le centre de la rangée de repos sans déplacer les autres doigts."
+      },
+      "text": "gh hg gf hj ghg hgh ghgh hghg gghh hhgg gdsh hlkg gh hg fghj hgfd"
+     },
+     {
+      "id": "r6",
+      "title": "Révision : toute la rangée de repos",
+      "keys": "q s d f g h j k l m",
+      "teaches": "",
+      "tip": "Révision complète de la rangée de repos. C'est la rangée la plus importante : c'est la base de tous tes mouvements, celle où tes doigts reviennent sans cesse. Prends ton temps, la régularité compte plus que la vitesse.",
+      "tuto": {
+       "intro": "Tu connais maintenant toute la rangée de repos, la rangée la plus importante du clavier.",
+       "rules": [
+        {
+         "icon": "📊",
+         "t": "La rangée de départ",
+         "d": "Tes doigts partent d'ici et y reviennent après chaque frappe. La maîtriser, c'est la base pour taper tous les mots sans regarder."
+        },
+        {
+         "icon": "🔁",
+         "t": "Trouve chaque touche de mémoire",
+         "d": "Cet exercice mélange les dix touches. Si tu hésites, ralentis : le but est de les trouver de mémoire, pas de taper vite."
+        },
+        {
+         "icon": "⚓",
+         "t": "Position de repos constante",
+         "d": "Entre chaque frappe, sens que tes huit doigts sont revenus sur la rangée de repos."
+        }
+       ],
+       "tip": "Objectif : valider toute la rangée de repos, doigts ancrés et yeux sur l'écran."
+      },
+      "text": "sdf jkl qsd mlk fgh jhg dsq klm gfd hjk sqm fdg lkj qsdf hjkl ghfd mlqs"
+     }
+    ]
+   },
+   {
+    "name": "2. Rangée du haut",
+    "row": "haut",
+    "lessons": [
+     {
+      "id": "h1",
+      "title": "R et U, premiers vrais mots",
+      "keys": "r u",
+      "teaches": "ru",
+      "tip": "R est tapé par l'index gauche (il s'étire vers le haut), U par l'index droit. Félicitations : avec ces deux touches tu peux déjà former de vrais mots anglais ! Garde les yeux sur l'écran.",
+      "tuto": {
+       "intro": "Tu montes sur la rangée du haut. Avec R et U, tu vas taper tes tout premiers vrais mots anglais.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Les index montent",
+         "d": "L'index gauche s'étire vers le haut pour R, l'index droit pour U. Le doigt monte d'une rangée puis redescend aussitôt sur F ou J."
+        },
+        {
+         "icon": "⚓",
+         "t": "Garde la base",
+         "d": "Seul l'index bouge : les sept autres doigts restent posés sur la rangée de repos. C'est ton filet de sécurité pour ne pas regarder."
+        },
+        {
+         "icon": "💬",
+         "t": "De vrais mots",
+         "d": "rug, fur, mum, full... Tu peux déjà écrire des mots entiers. Lis le mot en entier avant de le taper, plutôt que lettre par lettre."
+        }
+       ],
+       "tip": "Objectif : monter sur R et U sans quitter des yeux ta position de repos ni y décoller les autres doigts."
+      },
+      "text": "full mum us rug fur rush drum surf rugs furs mug jug hug gum sum dull rug fur rush drum surf"
+     },
+     {
+      "id": "h2",
+      "title": "E et I, les mots se multiplient",
+      "keys": "e i",
+      "teaches": "ei",
+      "tip": "E est la lettre la plus fréquente de l'anglais : ton majeur gauche sera très sollicité. I est au majeur droit. Dès cette leçon, tu peux écrire des dizaines de mots réels : profites-en pour fluidifier le mouvement.",
+      "tuto": {
+       "intro": "E et I rejoignent la partie. E est la lettre la plus fréquente de l'anglais : ce sera ta touche la plus utilisée.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Les majeurs montent",
+         "d": "Le majeur gauche monte sur E, le majeur droit sur I. Comme pour R et U, c'est un aller-retour rapide vers la rangée du haut."
+        },
+        {
+         "icon": "🔥",
+         "t": "E, la reine des lettres",
+         "d": "Le E revient sans arrêt dans les mots anglais. Soigne particulièrement ce geste : bien le maîtriser change toute ta vitesse."
+        },
+        {
+         "icon": "💬",
+         "t": "Le vocabulaire grandit",
+         "d": "he, is, here, girl, fish, field... Des dizaines de mots deviennent possibles. Cherche la fluidité plutôt que la performance."
+        }
+       ],
+       "tip": "Objectif : automatiser E et I avec un mouvement souple et un retour systématique au repos."
+      },
+      "text": "he is here if she is here girl did file red desk fire fish milk seed field ruler"
+     },
+     {
+      "id": "h3",
+      "title": "Z et O, de nouveaux mots",
+      "keys": "z o",
+      "teaches": "zo",
+      "tip": "Z est à l'annulaire gauche (rangée du haut), O à l'annulaire droit. Essaie de lire le mot suivant pendant que tu tapes le mot en cours : c'est ce qu'on appelle l'anticipation.",
+      "tuto": {
+       "intro": "Z et O complètent la rangée du haut côté annulaires. Ton vocabulaire s'élargit encore.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Les annulaires montent",
+         "d": "L'annulaire gauche monte sur Z, l'annulaire droit sur O. Ces doigts sont moins forts : un petit mouvement précis suffit."
+        },
+        {
+         "icon": "👀",
+         "t": "Entraîne l'anticipation",
+         "d": "Lis le mot suivant pendant que tu tapes le mot en cours. C'est cette anticipation qui rend la frappe fluide et continue."
+        },
+        {
+         "icon": "🔤",
+         "t": "Des mots plus variés",
+         "d": "zero, zoo, size, horse, good... Enchaîne les mots en gardant un rythme régulier et respecte bien les espaces."
+        }
+       ],
+       "tip": "Objectif : taper Z et O proprement et commencer à anticiper le mot suivant."
+      },
+      "text": "zero zoo size fizz freeze seize zoo size zero fizz horse should do good"
+     },
+     {
+      "id": "h4",
+      "title": "A et P, des mots bien plus riches",
+      "keys": "a p",
+      "teaches": "ap",
+      "tip": "A est à l'auriculaire gauche (haut), P à l'auriculaire droit. Les auriculaires sur la rangée du haut demandent un léger étirement : garde le poignet stable et laisse le doigt faire le travail.",
+      "tuto": {
+       "intro": "A et P sont les touches des auriculaires sur la rangée du haut. Avec elles, presque tout l'alphabet est à toi.",
+       "rules": [
+        {
+         "icon": "🤏",
+         "t": "Les auriculaires montent",
+         "d": "L'auriculaire gauche atteint A, le droit atteint P. C'est l'un des mouvements les plus exigeants : va lentement."
+        },
+        {
+         "icon": "🤚",
+         "t": "Stabilise le poignet",
+         "d": "Ne décolle pas toute la main pour aider l'auriculaire. Le poignet reste stable, seul le petit doigt s'étire."
+        },
+        {
+         "icon": "💬",
+         "t": "Un vocabulaire riche",
+         "d": "apple, paper, please, salad... Le vocabulaire devient vraiment varié. Vise des mots plus longs sans regarder."
+        }
+       ],
+       "tip": "Objectif : maîtriser A et P sans casser ta position, même si l'auriculaire manque encore de force."
+      },
+      "text": "apple paper pear page pupil push pull please plum poem soup keep sleep speak help jump ship shop salad glad dad"
+     },
+     {
+      "id": "h5",
+      "title": "T et Y, mots et mini-phrases",
+      "keys": "t y",
+      "teaches": "ty",
+      "tip": "T et Y sont tous les deux tapés par les index (T par le gauche qui s'étire, Y par le droit). C'est un mouvement symétrique. À ce stade, essaie de maintenir un rythme régulier plutôt que de te précipiter.",
+      "tuto": {
+       "intro": "T et Y terminent la rangée du haut. Ce sont encore les index qui travaillent, vers le centre-haut du clavier.",
+       "rules": [
+        {
+         "icon": "👐",
+         "t": "Un geste symétrique",
+         "d": "L'index gauche s'étire vers T, l'index droit vers Y. Les deux mains font le même mouvement en miroir."
+        },
+        {
+         "icon": "🎵",
+         "t": "Cherche le rythme",
+         "d": "À ce stade, vise une cadence régulière plutôt que des pics de vitesse. Un rythme stable réduit les fautes."
+        },
+        {
+         "icon": "⚓",
+         "t": "Toujours le retour",
+         "d": "Après T ou Y, l'index revient sur F ou J. Ce réflexe de retour est la clé pour ne jamais perdre tes repères."
+        }
+       ],
+       "tip": "Objectif : intégrer T et Y dans un mouvement fluide et régulier des deux index."
+      },
+      "text": "yes they type story tall lady happy sky grey story too hot the"
+     },
+     {
+      "id": "h6",
+      "title": "Révision : toute la rangée du haut",
+      "keys": "a z e r t y u i o p",
+      "teaches": "",
+      "tip": "Tu maîtrises maintenant deux rangées complètes. Pendant cette révision, concentre-toi sur la fluidité entre les rangées : le passage repos → haut doit se faire sans lever les poignets du bureau.",
+      "tuto": {
+       "intro": "Tu connais désormais deux rangées entières. Cette révision mélange toutes les lettres de la rangée du haut.",
+       "rules": [
+        {
+         "icon": "🔁",
+         "t": "Repos et haut sans à-coups",
+         "d": "L'enjeu n'est plus chaque touche, mais la transition entre les rangées. Le passage du repos vers le haut doit être fluide."
+        },
+        {
+         "icon": "🤚",
+         "t": "Les poignets restent posés",
+         "d": "Ne soulève pas les poignets pour changer de rangée : seuls les doigts montent et descendent."
+        },
+        {
+         "icon": "📖",
+         "t": "Lis par groupes",
+         "d": "Essaie de lire deux ou trois mots d'avance. Ton cerveau prépare les doigts pendant que tu tapes."
+        }
+       ],
+       "tip": "Objectif : enchaîner repos et rangée du haut sans regarder, avec un mouvement souple des doigts."
+      },
+      "text": "girl quiet pupil happy horse tired soup hot lady late story tall type they yes the"
+     }
+    ]
+   },
+   {
+    "name": "3. Rangée du bas",
+    "row": "bas",
+    "lessons": [
+     {
+      "id": "b1",
+      "title": "C et la virgule",
+      "keys": "c ,",
+      "teaches": "c,",
+      "tip": "Tu attaques la rangée du bas. C est au majeur gauche (un peu plus bas que D), la virgule au milieu droit. Pour la rangée du bas, laisse les doigts descendre naturellement : le poignet peut légèrement s'abaisser.",
+      "tuto": {
+       "intro": "Tu attaques la rangée du bas. C et la virgule sont tes premières touches sous la rangée de repos.",
+       "rules": [
+        {
+         "icon": "⬇️",
+         "t": "Les doigts descendent",
+         "d": "Le majeur gauche descend sur C, sous le D. La virgule se tape côté droit. Le geste va vers le bas, pas sur le côté."
+        },
+        {
+         "icon": "🤚",
+         "t": "Le poignet suit un peu",
+         "d": "Pour la rangée du bas, le poignet peut s'abaisser très légèrement, mais reviens toujours à la position de repos ensuite."
+        },
+        {
+         "icon": "✍️",
+         "t": "Soigne la ponctuation",
+         "d": "La virgule se colle au mot qui précède, puis une espace suit. Une ponctuation propre rend tes textes lisibles."
+        }
+       ],
+       "tip": "Objectif : descendre sur C et la virgule sans perdre la rangée de repos, poignet détendu."
+      },
+      "text": "cake, cheese, rice, coffee, tea, milk, soup, salad, coat, cold, cool, duck, car, cat"
+     },
+     {
+      "id": "b2",
+      "title": "V et N, les mots du quotidien",
+      "keys": "v n",
+      "teaches": "vn",
+      "tip": "V est à l'index gauche (bas), N à l'index droit (bas). Les index gèrent beaucoup de touches : entraîne-toi à alterner rapidement entre les rangées sans perdre la position de référence sur F et J.",
+      "tuto": {
+       "intro": "V et N descendent sous les index. Avec elles, presque tout le vocabulaire courant devient accessible.",
+       "rules": [
+        {
+         "icon": "⬇️",
+         "t": "Les index descendent",
+         "d": "L'index gauche descend sur V, l'index droit sur N. Tes index couvrent maintenant trois rangées : haut, repos et bas."
+        },
+        {
+         "icon": "🔀",
+         "t": "Apprends à alterner",
+         "d": "Les index sont très sollicités. Entraîne-toi à passer d'une rangée à l'autre sans perdre F et J de référence."
+        },
+        {
+         "icon": "💬",
+         "t": "Des mots du quotidien",
+         "d": "seven, river, village, never, heavy... Tu écris maintenant des mots très courants. Cherche la continuité du mouvement."
+        }
+       ],
+       "tip": "Objectif : descendre sur V et N et fluidifier l'alternance entre les rangées."
+      },
+      "text": "five, seven, nine, ten, even, never, over, river, village, valley, visit, heavy, glove, evening, give"
+     },
+     {
+      "id": "b3",
+      "title": "X et point-virgule",
+      "keys": "x ;",
+      "teaches": "x;",
+      "tip": "X est à l'annulaire gauche bas : c'est un mouvement diagonal peu courant. Le point-virgule se tape côté droit. Prends le temps de localiser chaque touche avant d'accélérer.",
+      "tuto": {
+       "intro": "X et le point-virgule sont des touches plus rares, mais utiles pour une frappe vraiment complète.",
+       "rules": [
+        {
+         "icon": "↘️",
+         "t": "Un geste diagonal",
+         "d": "L'annulaire gauche descend en diagonale vers X. C'est un mouvement inhabituel : fais-le lentement pour le mémoriser."
+        },
+        {
+         "icon": "🔎",
+         "t": "Localise avant de frapper",
+         "d": "Ces touches reviennent peu souvent. Si tu hésites, cherche la touche avec le doigt plutôt qu'avec les yeux."
+        },
+        {
+         "icon": "✍️",
+         "t": "Le point-virgule",
+         "d": "Il relie deux idées proches dans une phrase. Comme la virgule, il se colle au mot puis une espace suit."
+        }
+       ],
+       "tip": "Objectif : mémoriser la position de X et du point-virgule, sans regarder le clavier."
+      },
+      "text": "six; fox; mix; next; text; exit; taxi; extra; relax; exam"
+     },
+     {
+      "id": "b4",
+      "title": "W et deux-points",
+      "keys": "w :",
+      "teaches": "w:",
+      "tip": "W est à l'auriculaire gauche bas, les deux-points à l'annulaire droit, en haut à droite : une touche à part, sans Shift, juste à côté du point-virgule.",
+      "tuto": {
+       "intro": "W arrive en bas à gauche, et les deux-points ajoutent une touche de ponctuation à droite, sans Shift.",
+       "rules": [
+        {
+         "icon": "🤏",
+         "t": "W à l'auriculaire",
+         "d": "L'auriculaire gauche descend sur W, tout en bas à gauche. Garde le poignet stable, seul le petit doigt s'étire."
+        },
+        {
+         "icon": "⌨️",
+         "t": "Les deux-points, en direct",
+         "d": "Les deux-points se tapent directement, sans Shift : une touche à part, juste à côté du point-virgule."
+        },
+        {
+         "icon": "🤝",
+         "t": "Une touche par doigt",
+         "d": "Comme toujours, chaque touche a son doigt dédié : ne bouge pas toute la main pour une seule frappe."
+        }
+       ],
+       "tip": "Objectif : placer W et les deux-points, chacun avec le bon doigt, sans crisper la main."
+      },
+      "text": "drinks: tea, water, milk; food: rice, soup, cheese; colours: red, white, grey; weather: wet, warm, wind; animals: owl, hen, fox; fruit: apple, plum, pear; time: day, week",
+      "maxLen": 170
+     },
+     {
+      "id": "b5",
+      "title": "B et point d'exclamation",
+      "keys": "b !",
+      "teaches": "b!",
+      "tip": "B est à l'index gauche bas (côté centre) ; la position du ! varie selon ton clavier, regarde le clavier affiché à l'écran. Tu couvres maintenant les 26 lettres de l'alphabet : c'est un cap important ! Chaque texte réel sera désormais accessible.",
+      "tuto": {
+       "intro": "B complète l'alphabet et le point d'exclamation ajoute de l'émotion. Un vrai cap : tu auras les 26 lettres.",
+       "rules": [
+        {
+         "icon": "⬇️",
+         "t": "B au centre-bas",
+         "d": "L'index gauche s'étire vers le centre puis descend pour B. C'est un mouvement un peu ample : reviens vite sur F."
+        },
+        {
+         "icon": "⌨️",
+         "t": "Le !, selon ton clavier",
+         "d": "Sa position (et si Shift est nécessaire) dépend de ta disposition AZERTY : suis le clavier affiché à l'écran plutôt qu'un repère fixe."
+        },
+        {
+         "icon": "🏁",
+         "t": "Les 26 lettres réunies",
+         "d": "Avec B, tu maîtrises tout l'alphabet. À partir d'ici, n'importe quel mot anglais t'est accessible."
+        }
+       ],
+       "tip": "Objectif : poser B et le point d'exclamation, et savourer d'avoir bouclé l'alphabet complet."
+      },
+      "text": "big boat! blue bike! bad bear! brown bird! black book! baby boy! bus! bag!"
+     },
+     {
+      "id": "b6",
+      "title": "Révision : les 26 lettres réunies",
+      "keys": "tout l'alphabet",
+      "teaches": "",
+      "tip": "Toutes les lettres sont là. L'objectif de cette révision : zéro regard sur le clavier. Si tu hésites sur une touche, fais une pause, localise-la mentalement, puis frappe. Ne regarde pas, cherche avec le doigt.",
+      "tuto": {
+       "intro": "Toutes les lettres de l'alphabet sont désormais entre tes doigts. Cette révision les mélange toutes.",
+       "rules": [
+        {
+         "icon": "🚫",
+         "t": "Zéro regard",
+         "d": "Le seul objectif ici : ne jamais regarder le clavier. C'est le moment de vérifier que ta mémoire musculaire tient bien."
+        },
+        {
+         "icon": "🧭",
+         "t": "Cherche avec le doigt",
+         "d": "Si tu hésites sur une touche, ne baisse pas les yeux. Localise-la mentalement à partir de F et J, puis frappe."
+        },
+        {
+         "icon": "🐢",
+         "t": "Précision avant vitesse",
+         "d": "Mieux vaut taper lentement sans regarder que vite en trichant. La vitesse arrivera, la bonne habitude reste."
+        }
+       ],
+       "tip": "Objectif : écrire avec les 26 lettres sans un seul regard vers le clavier."
+      },
+      "text": "the quick brown fox can jump over the big dog; one boy can watch from the bus, but we wait: next stop, the zoo!"
+     }
+    ]
+   },
+   {
+    "name": "4. Construire des phrases",
+    "lessons": [
+     {
+      "id": "w1",
+      "title": "Rythme et petits mots",
+      "keys": "toutes lettres",
+      "teaches": "",
+      "tip": "Tape ces petits mots comme on compte : un geste, un temps. Garde le même tempo d'un bout à l'autre, sans accélérer ni ralentir.",
+      "tuto": {
+       "intro": "Tu as toutes les lettres en main. Place maintenant au rythme : enchaîner des petits mots réguliers pour fluidifier ta frappe.",
+       "rules": [
+        {
+         "icon": "🎵",
+         "t": "Un tempo régulier",
+         "d": "Tape les mots à intervalle constant, comme un métronome. La régularité vaut mieux que des à-coups rapides."
+        },
+        {
+         "icon": "🔗",
+         "t": "Pense en petits groupes",
+         "d": "Ton cerveau ne tape pas lettre par lettre mais par petits groupes. « in and out » se ressent comme un seul mouvement."
+        },
+        {
+         "icon": "😌",
+         "t": "Reste détendu",
+         "d": "Épaules et poignets relâchés : la tension casse le rythme et fatigue les mains."
+        }
+       ],
+       "tip": "Objectif : trouver un rythme régulier et fluide sur de petits mots anglais."
+      },
+      "text": "up and down, in and out, on and off, here and there, now and then, one two three, six seven eight"
+     },
+     {
+      "id": "w2",
+      "title": "Mots outils essentiels",
+      "keys": "vocabulaire",
+      "teaches": "",
+      "tip": "Les petits mots outils reviennent dans toutes les phrases. Vise un seul élan par mot, sans réfléchir lettre par lettre.",
+      "tuto": {
+       "intro": "Les petits mots outils (the, and, of, to, in...) reviennent dans toutes les phrases en anglais. Les automatiser, c'est gagner partout.",
+       "rules": [
+        {
+         "icon": "⚡",
+         "t": "Des mots ultra-fréquents",
+         "d": "Ces mots représentent une énorme part de tout texte anglais. Plus ils sont automatiques, plus tu écris vite globalement."
+        },
+        {
+         "icon": "🔗",
+         "t": "Un mot, un geste",
+         "d": "Vise à taper chaque petit mot d'un seul élan, sans réfléchir lettre par lettre."
+        },
+        {
+         "icon": "👀",
+         "t": "Garde les yeux devant",
+         "d": "Lis le mot suivant pendant que tes doigts finissent le précédent."
+        }
+       ],
+       "tip": "Objectif : taper les mots outils sans hésitation, comme des réflexes."
+      },
+      "text": "the, and, of, to, in, is, it, you, that, he, was, for, on, are, with, his, at, be, this, have, from, but, not"
+     },
+     {
+      "id": "w3",
+      "title": "Mots fréquents du quotidien",
+      "keys": "vocabulaire",
+      "teaches": "",
+      "tip": "Des mots du quotidien (repas, boissons). Ne ralentis pas brutalement sur un mot plus long : lisse ta cadence sur l'ensemble de la ligne.",
+      "tuto": {
+       "intro": "On élargit aux mots courants du quotidien. Plus ton stock de mots automatiques grandit, plus ta frappe devient fluide.",
+       "rules": [
+        {
+         "icon": "🧠",
+         "t": "Construis des automatismes",
+         "d": "Un mot répété assez souvent finit par se taper tout seul. C'est le but : libérer ta tête pour penser au sens."
+        },
+        {
+         "icon": "🎵",
+         "t": "Garde le rythme",
+         "d": "Ne ralentis pas brutalement sur un mot plus long. Lisse ta cadence sur l'ensemble de la ligne."
+        },
+        {
+         "icon": "✅",
+         "t": "Vise juste d'abord",
+         "d": "Si un mot te fait fauter souvent, ralentis dessus quelques répétitions, puis reprends le tempo."
+        }
+       ],
+       "tip": "Objectif : enchaîner des mots courants avec aisance et régularité."
+      },
+      "text": "bread, butter, cheese, rice, soup, salad, milk, coffee, tea, sugar, honey, apple, orange, cake, water"
+     },
+     {
+      "id": "w4",
+      "title": "Vocabulaire de la vie courante",
+      "keys": "vocabulaire",
+      "teaches": "",
+      "tip": "Des mots plus longs et concrets. Découpe-les en petits gestes (kit-chen, gar-den) et garde un rythme égal du début à la fin.",
+      "tuto": {
+       "intro": "Des mots plus longs et concrets. C'est l'occasion de tenir ton rythme sur des mots de plusieurs syllabes.",
+       "rules": [
+        {
+         "icon": "🔗",
+         "t": "Découpe en syllabes",
+         "d": "Un mot long se tape comme une suite de petits gestes. gar-den, kit-chen, com-pu-ter : pense par morceaux."
+        },
+        {
+         "icon": "🎯",
+         "t": "Précision sur la longueur",
+         "d": "Plus le mot est long, plus une faute coûte cher. Garde une frappe propre plutôt que pressée."
+        },
+        {
+         "icon": "👀",
+         "t": "Anticipe la fin du mot",
+         "d": "Pendant que tu tapes le début, ton regard a déjà capté la fin. Laisse les doigts suivre."
+        }
+       ],
+       "tip": "Objectif : taper des mots plus longs sans casser ton rythme ni ta précision."
+      },
+      "text": "kitchen, garden, window, teacher, computer, mountain, airport, holiday, evening, morning, village, children, neighbour"
+     },
+     {
+      "id": "w5",
+      "title": "Premières phrases naturelles",
+      "keys": "fluidité",
+      "teaches": "",
+      "tip": "Tu tapes de vraies phrases. Lis par petits groupes de mots et garde un mouvement continu, virgules et points-virgules compris.",
+      "tuto": {
+       "intro": "Tu passes aux vraies phrases. L'enjeu n'est plus la touche, mais la fluidité d'un bout à l'autre de la phrase.",
+       "rules": [
+        {
+         "icon": "➡️",
+         "t": "Pense par groupes de mots",
+         "d": "Lis et tape par petits groupes (the cat / is / on the mat) plutôt que mot par mot isolé."
+        },
+        {
+         "icon": "👍",
+         "t": "N'oublie pas l'espace",
+         "d": "L'espace se frappe avec le pouce, sans casser le rythme. C'est la touche la plus utilisée du clavier."
+        },
+        {
+         "icon": "✍️",
+         "t": "Ponctue proprement",
+         "d": "La virgule, le point-virgule et le point d'exclamation se collent au dernier mot, puis une espace suit."
+        }
+       ],
+       "tip": "Objectif : taper des phrases entières d'un mouvement continu et fluide."
+      },
+      "text": "it is cold today, so we stay at home; my sister makes tea, and we eat bread and cheese; the cat is on the mat!"
+     }
+    ]
+   },
+   {
+    "name": "5. Majuscules",
+    "kind": "majuscules",
+    "lessons": [
+     {
+      "id": "maj1",
+      "title": "Majuscule : main gauche (Maj droit)",
+      "keys": "Maj + lettres gauches",
+      "teaches": "",
+      "tip": "Pour une lettre de la main gauche, maintiens le Maj de droite avec l'auriculaire droit, frappe la lettre, puis relâche.",
+      "tuto": {
+       "intro": "Une majuscule, c'est Maj (Shift) maintenu pendant que tu frappes la lettre. Pour les lettres de la main gauche, on utilise le Maj de droite.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Maj de la main opposée",
+         "d": "Pour une lettre tapée de la main gauche (A Z E R T Q S D F G W C V B), maintiens le Maj DROIT avec l'auriculaire droit. Les deux mains se partagent le travail."
+        },
+        {
+         "icon": "🤙",
+         "t": "Maintiens, frappe, relâche",
+         "d": "Appuie sur Maj, garde-le enfoncé, frappe la lettre, puis relâche. Pas besoin de tout faire d'un coup sec."
+        },
+        {
+         "icon": "🚫",
+         "t": "Évite le Maj du même côté",
+         "d": "Utiliser le Maj du même côté que la lettre tord la main. Le réflexe à prendre : toujours la main opposée."
+        }
+       ],
+       "tip": "Objectif : taper les majuscules de gauche avec le Maj droit, sans tordre la main."
+      },
+      "text": "Bread, Cake, Dad, Eat, Fish, Garden, Queen, Read, Sit, Table, Water, Zoo, Visit, Apple, Bag"
+     },
+     {
+      "id": "maj2",
+      "title": "Majuscule : main droite (Maj gauche)",
+      "keys": "Maj + lettres droites",
+      "teaches": "",
+      "tip": "Pour une lettre de la main droite, maintiens le Maj de gauche avec l'auriculaire gauche : c'est le miroir de la leçon précédente.",
+      "tuto": {
+       "intro": "Cette fois, les lettres de la main droite. On maintient le Maj GAUCHE avec l'auriculaire gauche.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Maj gauche pour la droite",
+         "d": "Pour une lettre de la main droite (Y U I O P H J K L M N), l'auriculaire gauche tient le Maj gauche. C'est le miroir de la leçon précédente."
+        },
+        {
+         "icon": "🤝",
+         "t": "Coordination des deux mains",
+         "d": "Une main tient Maj, l'autre frappe. Cette répartition garde tes deux mains en place sans contorsion."
+        },
+        {
+         "icon": "🎵",
+         "t": "Garde le rythme",
+         "d": "La majuscule ne doit pas casser ta cadence. Avec l'habitude, Maj devient un geste naturel et fluide."
+        }
+       ],
+       "tip": "Objectif : taper les majuscules de droite avec le Maj gauche, en gardant les mains posées."
+      },
+      "text": "Hat, Ice, Jump, Keep, Lamp, Moon, Night, Open, Pear, Under, Yes, Orange, Hello, King, Nose"
+     },
+     {
+      "id": "maj3",
+      "title": "Noms propres et villes",
+      "keys": "majuscules",
+      "teaches": "",
+      "tip": "En anglais, les prénoms, les villes et les pays prennent toujours une majuscule. Une seule, au début du mot.",
+      "tuto": {
+       "intro": "On applique les majuscules à de vrais noms propres : villes et prénoms. Une seule majuscule, au début du mot.",
+       "rules": [
+        {
+         "icon": "🔠",
+         "t": "Majuscule, puis minuscules",
+         "d": "Seule la première lettre prend Maj. Relâche Maj aussitôt pour taper le reste du mot en minuscules."
+        },
+        {
+         "icon": "🌍",
+         "t": "Les noms propres",
+         "d": "Villes et prénoms commencent par une majuscule : London, Anna, Oxford. C'est une règle, pas une option."
+        },
+        {
+         "icon": "🎯",
+         "t": "Anticipe le Maj",
+         "d": "Prépare ton auriculaire sur Maj juste avant la lettre. Le geste devient propre quand il est anticipé."
+        }
+       ],
+       "tip": "Objectif : mettre une majuscule aux prénoms et aux villes, Maj sur la première lettre seulement."
+      },
+      "text": "Bath, Leeds, Bristol, Oxford, York, Wales, Anna, Emma, Paul, Tom, Kate, Lucy, Harry, Sam, Ben"
+     },
+     {
+      "id": "maj4",
+      "title": "Phrases avec majuscules",
+      "keys": "majuscules en contexte",
+      "teaches": "",
+      "tip": "Une phrase commence par une majuscule, et le pronom « I » en prend toujours une, où qu'il soit dans la phrase.",
+      "tuto": {
+       "intro": "Dernière étape : les majuscules en contexte, au début de chaque phrase. Le point n'est pas encore appris : ici, ce sont les points d'exclamation et les virgules qui séparent les phrases.",
+       "rules": [
+        {
+         "icon": "🔠",
+         "t": "Début de phrase",
+         "d": "Chaque phrase commence par une majuscule. Pense-y au moment de la frappe, pas après."
+        },
+        {
+         "icon": "🙋",
+         "t": "Le pronom « I »",
+         "d": "En anglais, « I » (je) s'écrit toujours en majuscule, même au milieu d'une phrase : « I am Anna », « and I live here »."
+        },
+        {
+         "icon": "👀",
+         "t": "Relis ce que tu tapes",
+         "d": "Vérifie d'un coup d'œil que tes débuts de phrase et tes noms propres ont bien leur majuscule. C'est un marqueur de soin."
+        }
+       ],
+       "tip": "Objectif : mettre une majuscule en début de phrase et aux noms propres sans casser le rythme."
+      },
+      "text": "I am Anna; I live in Leeds, and Paul is here; Tom is late, but Kate can swim, and Harry can run!"
+     }
+    ]
+   },
+   {
+    "name": "6. Ponctuation complète",
+    "kind": "ponctuation",
+    "lessons": [
+     {
+      "id": "pon1",
+      "title": "Le point et la virgule",
+      "keys": ". ,",
+      "teaches": ".",
+      "tip": "Le point et la virgule se collent au mot qui précède, sans espace avant, puis une espace suit.",
+      "tuto": {
+       "intro": "Le point et la virgule sont les deux signes les plus utilisés. Bien les placer rend n'importe quel texte lisible.",
+       "rules": [
+        {
+         "icon": "✍️",
+         "t": "Collés au mot",
+         "d": "Le point et la virgule se collent au mot qui précède (pas d'espace avant), puis une espace suit."
+        },
+        {
+         "icon": "🛑",
+         "t": "Le point ferme la phrase",
+         "d": "Après un point, la phrase suivante prend une majuscule. La virgule, elle, marque une courte pause."
+        },
+        {
+         "icon": "🎵",
+         "t": "Garde le rythme",
+         "d": "La ponctuation fait partie de la frappe : ne t'arrête pas net, enchaîne le signe puis l'espace."
+        }
+       ],
+       "tip": "Objectif : placer point et virgule sans espace avant, une espace après."
+      },
+      "text": "Dad is here. Mum is here. Anna is glad. The cat is on the mat. Tom has a red bag. We eat bread, cheese and honey."
+     },
+     {
+      "id": "pon2",
+      "title": "Question et exclamation",
+      "keys": "? !",
+      "teaches": "?",
+      "tip": "En anglais, ? et ! se collent au mot qui précède : pas d'espace avant, contrairement au français.",
+      "tuto": {
+       "intro": "Le point d'interrogation et le point d'exclamation donnent le ton : une question, une émotion.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Souvent avec Maj",
+         "d": "Sur ce clavier, le ? se fait avec Maj. Maintiens Maj de la main opposée, puis frappe le signe."
+        },
+        {
+         "icon": "␣",
+         "t": "Pas d'espace avant",
+         "d": "En anglais, ? et ! se collent au dernier mot : « Where is Tom? ». Une espace seulement après le signe."
+        },
+        {
+         "icon": "🎭",
+         "t": "Le bon ton",
+         "d": "? pour interroger, ! pour exclamer. Un seul suffit : évite les points d'exclamation à répétition."
+        }
+       ],
+       "tip": "Objectif : taper ? et ! collés au mot, avec une espace seulement après."
+      },
+      "text": "Where is Tom? Who is that? What is this? Is Dad here? Can we go? Why not? Yes, we can! Hello!"
+     },
+     {
+      "id": "pon3",
+      "title": "Deux-points et point-virgule",
+      "keys": ": ;",
+      "teaches": "",
+      "tip": "En anglais, les deux-points et le point-virgule se collent au mot qui précède : une espace seulement après.",
+      "tuto": {
+       "intro": "Les deux-points annoncent, le point-virgule relie. Deux outils pour structurer des phrases plus riches.",
+       "rules": [
+        {
+         "icon": "📋",
+         "t": "Les deux-points annoncent",
+         "d": "Ils introduisent une liste ou une explication : « Here is the list: ». Pas d'espace avant, une espace après."
+        },
+        {
+         "icon": "🔗",
+         "t": "Le point-virgule relie",
+         "d": "Il sépare deux idées proches ou deux groupes d'une liste, sans couper la phrase. Même règle d'espaces que les deux-points."
+        },
+        {
+         "icon": "⌨️",
+         "t": "Deux touches voisines",
+         "d": "Sur ce clavier, ; et : sont côte à côte à droite. Repère-les bien pour ne pas les confondre."
+        }
+       ],
+       "tip": "Objectif : utiliser deux-points et point-virgule collés au mot, une espace après."
+      },
+      "text": "Here is the list: bread, milk, eggs; tea, sugar, honey; apples, plums, pears. Three rules: be kind, be quiet, be early."
+     },
+     {
+      "id": "pon4",
+      "title": "L'apostrophe et le trait d'union",
+      "keys": "' -",
+      "teaches": "'-",
+      "tip": "L'apostrophe et le trait d'union se collent aux mots, sans espace autour : don't, one-way.",
+      "tuto": {
+       "intro": "En anglais, l'apostrophe sert surtout aux contractions (it's, don't, I'm) et le trait d'union aux mots composés (one-way, mother-in-law).",
+       "rules": [
+        {
+         "icon": "✂️",
+         "t": "L'apostrophe colle",
+         "d": "Elle remplace des lettres omises dans une contraction : it's (it is), don't (do not), I'm (I am). Aucune espace autour."
+        },
+        {
+         "icon": "➖",
+         "t": "Le trait d'union relie",
+         "d": "Il joint les éléments d'un mot composé : one-way, check-in, mother-in-law. Sans espace autour."
+        },
+        {
+         "icon": "🔎",
+         "t": "Deux signes discrets",
+         "d": "Petits mais très fréquents. Repère bien leur position pour les taper sans ralentir."
+        }
+       ],
+       "tip": "Objectif : placer apostrophe et trait d'union collés, sans espace autour."
+      },
+      "text": "one-way, check-in, part-time, mother-in-law, so-so, well-known; it's, don't, can't, isn't, we're, that's"
+     },
+     {
+      "id": "en-pon5",
+      "title": "Les parenthèses",
+      "keys": "( )",
+      "teaches": "()",
+      "tip": "Une parenthèse ouverte se ferme toujours, et on ne met pas d'espace juste à l'intérieur : (comme ceci).",
+      "tuto": {
+       "intro": "Les parenthèses ajoutent une précision au milieu d'une phrase. On apprend à les ouvrir et à les fermer.",
+       "rules": [
+        {
+         "icon": "🧩",
+         "t": "Parenthèses par paire",
+         "d": "Une parenthèse ouverte se ferme toujours. Pas d'espace juste à l'intérieur : (comme ceci)."
+        },
+        {
+         "icon": "⇧",
+         "t": "Souvent avec Maj",
+         "d": "Selon ton clavier, ( et ) demandent parfois Maj : pense à maintenir Maj de la main opposée. Le geste de ton clavier est indiqué plus haut."
+        },
+        {
+         "icon": "🔗",
+         "t": "Une espace avant, une espace après",
+         "d": "On met une espace avant la parenthèse ouvrante et une après la fermante, sauf devant une virgule ou un point."
+        }
+       ],
+       "tip": "Objectif : ouvrir et fermer les parenthèses par paire, sans en oublier."
+      },
+      "text": "Dad (tired) and Mum (happy) are here (at last). We have a cat (grey), a dog (brown) and a hen (white)."
+     },
+     {
+      "id": "pon6",
+      "title": "Ponctuation en texte réel",
+      "keys": "toute la ponctuation",
+      "teaches": "",
+      "tip": "Dans un vrai texte, chaque signe a sa règle : colle les signes au mot qui précède, puis une espace après.",
+      "tuto": {
+       "intro": "On réunit toute la ponctuation dans un vrai texte. C'est l'épreuve qui ressemble le plus à l'écriture réelle.",
+       "rules": [
+        {
+         "icon": "🧩",
+         "t": "Tout en même temps",
+         "d": "Virgules, points, deux-points, parenthèses... Tout arrive ensemble. Reste calme et applique les règles d'espace."
+        },
+        {
+         "icon": "🇬🇧",
+         "t": "Les espaces à l'anglaise",
+         "d": "Rappel : jamais d'espace avant , . ; : ? ! mais une espace après. Apostrophes et traits d'union restent collés."
+        },
+        {
+         "icon": "📖",
+         "t": "Lis pour anticiper",
+         "d": "Repère la ponctuation à venir en lisant le texte d'avance : tu prépares le bon doigt et le bon Maj."
+        }
+       ],
+       "tip": "Objectif : ponctuer un texte réel proprement, en respectant les espaces à l'anglaise."
+      },
+      "text": "Hello, Tom! Where are you? We're at the station (platform two); it's cold, so don't wait. It's a well-known stop: come in!"
+     }
+    ]
+   },
+   {
+    "name": "7. Chiffres",
+    "row": "chiffres",
+    "lessons": [
+     {
+      "id": "num1",
+      "title": "4 5 6 7 : proches des index",
+      "keys": "4 5 6 7",
+      "teaches": "4567",
+      "tip": "Les chiffres se tapent avec Maj enfoncé. 4 et 5 : index gauche, avec le Maj droit. 6 et 7 : index droit, avec le Maj gauche.",
+      "tuto": {
+       "intro": "On monte sur la rangée des chiffres. On commence par le centre : 4 5 6 7, les plus proches des index. Sur ce clavier, les chiffres se tapent avec Maj enfoncé : sans Maj, la touche donne un autre signe, inutile ici.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Chiffres avec Maj",
+         "d": "Maintiens Maj de la main opposée au doigt qui frappe : Maj droit pour 4 et 5 (index gauche), Maj gauche pour 6 et 7 (index droit)."
+        },
+        {
+         "icon": "⬆️",
+         "t": "Les index montent",
+         "d": "4 et 5 se tapent avec l'index gauche, 6 et 7 avec l'index droit. Les index s'étirent jusqu'aux chiffres puis redescendent."
+        },
+        {
+         "icon": "⚓",
+         "t": "Retour au repos",
+         "d": "Après chaque chiffre, ramène l'index sur F ou J. C'est le repère qui t'évite de te perdre en haut."
+        }
+       ],
+       "tip": "Objectif : atteindre 4 5 6 7 avec les index, avec Maj, sans baisser les yeux."
+      },
+      "text": "Bus 45 leaves at 6.57; bus 67 leaves at 7.46. Room 54, room 65, room 74, room 46, seat 47, seat 56, seat 57."
+     },
+     {
+      "id": "num2",
+      "title": "3 et 8 : un pas de plus",
+      "keys": "3 8",
+      "teaches": "38",
+      "tip": "Le 3 se tape avec le majeur gauche, le 8 avec le majeur droit, toujours avec Maj de la main opposée.",
+      "tuto": {
+       "intro": "On élargit aux majeurs : 3 à gauche, 8 à droite, juste à côté des chiffres déjà connus.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Les majeurs montent",
+         "d": "Le 3 se tape avec le majeur gauche (Maj droit), le 8 avec le majeur droit (Maj gauche). Ils prolongent vers l'extérieur le travail des index."
+        },
+        {
+         "icon": "🧭",
+         "t": "Compte depuis le centre",
+         "d": "Repère-toi par rapport au centre : 4-5-6-7 au milieu, puis 3 et 8 juste à côté. La rangée se construit pas à pas."
+        },
+        {
+         "icon": "⚓",
+         "t": "Toujours revenir",
+         "d": "Plus tu montes loin, plus le retour au repos compte. Reviens sur la rangée du milieu après chaque chiffre."
+        }
+       ],
+       "tip": "Objectif : ajouter 3 et 8 avec les majeurs, sans perdre le centre."
+      },
+      "text": "Flat 38 is on floor 3; flat 83 is on floor 8. The bus leaves at 8.38 and 3.38, from stop 3 or stop 8."
+     },
+     {
+      "id": "num3",
+      "title": "2 et 9 : les annulaires",
+      "keys": "2 9",
+      "teaches": "29",
+      "tip": "Le 2 se tape avec l'annulaire gauche, le 9 avec l'annulaire droit : étire doucement le doigt et reviens au repos.",
+      "tuto": {
+       "intro": "Au tour des annulaires : 2 à gauche, 9 à droite. On approche des bords de la rangée.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Les annulaires s'étirent",
+         "d": "Le 2 (annulaire gauche, Maj droit) et le 9 (annulaire droit, Maj gauche) demandent un étirement plus long. Doigts moins forts : va doucement."
+        },
+        {
+         "icon": "🤝",
+         "t": "Maj de l'autre main",
+         "d": "Garde la même règle : la main qui ne frappe pas tient Maj. Le geste devient vite automatique."
+        },
+        {
+         "icon": "🎯",
+         "t": "Précision avant tout",
+         "d": "Plus on s'éloigne du centre, plus les fautes guettent. Mieux vaut lent et juste que rapide et faux."
+        }
+       ],
+       "tip": "Objectif : atteindre 2 et 9 avec les annulaires, sans regarder."
+      },
+      "text": "There are 29 pupils in class 2. Read page 92, page 29 and page 9. Bus 22 leaves at 9.29, bus 99 at 2.29."
+     },
+     {
+      "id": "num4",
+      "title": "1 et 0 : les auriculaires",
+      "keys": "1 0",
+      "teaches": "10",
+      "tip": "Le 1 se tape avec l'auriculaire gauche, le 0 avec l'auriculaire droit : laisse le doigt s'allonger, sans bouger toute la main.",
+      "tuto": {
+       "intro": "Les extrémités de la rangée : 1 tout à gauche, 0 tout à droite, pour les auriculaires.",
+       "rules": [
+        {
+         "icon": "🤏",
+         "t": "Les auriculaires aux bords",
+         "d": "Le 1 (auriculaire gauche) et le 0 (auriculaire droit) sont les chiffres les plus éloignés. Les petits doigts s'étirent loin."
+        },
+        {
+         "icon": "🤚",
+         "t": "Stabilise la main",
+         "d": "Pour atteindre les bords, ne déplace pas toute la main : laisse l'auriculaire s'allonger, le reste reste ancré."
+        },
+        {
+         "icon": "✅",
+         "t": "La rangée complète",
+         "d": "Avec 1 et 0, tu couvres toute la rangée des chiffres. Il ne reste plus qu'à les enchaîner."
+        }
+       ],
+       "tip": "Objectif : atteindre 1 et 0 avec les auriculaires, main stable."
+      },
+      "text": "I have 10 pencils, 100 pens and 1 ruler. The date is 10 March. Room 101 is open until 10.10; flat 1 is free."
+     },
+     {
+      "id": "num5",
+      "title": "Tous les chiffres enchaînés",
+      "keys": "tous les chiffres",
+      "teaches": "",
+      "tip": "Chaque chiffre a son doigt, et Maj reste tenu par l'autre main : 1 2 3 puis 4 5 de la main gauche, 6 7 puis 8 9 0 de la main droite.",
+      "tuto": {
+       "intro": "On enchaîne maintenant les dix chiffres. Chacun a son doigt : c'est le moment de tout relier.",
+       "rules": [
+        {
+         "icon": "🔢",
+         "t": "Chaque chiffre, son doigt",
+         "d": "1-2-3 : auriculaire, annulaire, majeur gauche. 4-5 : index gauche. 6-7 : index droit. 8-9-0 : majeur, annulaire, auriculaire droit."
+        },
+        {
+         "icon": "⬆️",
+         "t": "Le grand écart",
+         "d": "La rangée des chiffres est la plus haute : l'aller-retour est long. Garde un mouvement net, sans regarder."
+        },
+        {
+         "icon": "🐢",
+         "t": "Lentement d'abord",
+         "d": "Les chiffres sont souvent le point faible. Travaille-les au calme : très utile pour les codes, les dates et les montants."
+        }
+       ],
+       "tip": "Objectif : enchaîner 0 à 9 de mémoire, chaque chiffre avec le bon doigt."
+      },
+      "text": "Count up: 0 1 2 3 4 5 6 7 8 9. Count down: 9 8 7 6 5 4 3 2 1 0. Then: 12 34 56 78 90."
+     },
+     {
+      "id": "num6",
+      "title": "Chiffres dans un texte réel",
+      "keys": "chiffres en contexte",
+      "teaches": "",
+      "tip": "En anglais britannique, une date s'écrit « 12 March 2026 » et une heure « 8:30 » : le jour d'abord, puis le mois.",
+      "tuto": {
+       "intro": "On mélange chiffres et lettres dans un vrai texte : numéros, heures, dates. C'est l'usage quotidien.",
+       "rules": [
+        {
+         "icon": "🔀",
+         "t": "Alterner lettres et chiffres",
+         "d": "Le défi : passer de la rangée des lettres à celle des chiffres sans perdre tes repères. Reviens toujours sur F et J."
+        },
+        {
+         "icon": "📞",
+         "t": "Numéros, heures, dates",
+         "d": "Heures, dates, effectifs, numéros de salle... Les chiffres en contexte sont partout dans la vie réelle."
+        },
+        {
+         "icon": "🎯",
+         "t": "Précision indispensable",
+         "d": "Une faute dans un numéro change tout. Sur les chiffres, la précision compte encore plus que la vitesse."
+        }
+       ],
+       "tip": "Objectif : taper chiffres et lettres mélangés sans hésiter ni regarder."
+      },
+      "text": "There are 42 pupils in 3 classes of 14. Bus 12 leaves at 8.30. Room 105. The date is 12 March 2026."
+     }
+    ]
+   },
+   {
+    "name": "8. Symboles courants",
+    "kind": "symboles",
+    "lessons": [
+     {
+      "id": "sym1",
+      "title": "@ et # : email et hashtag",
+      "keys": "@ #",
+      "teaches": "@#",
+      "tip": "Le geste de @ et de # dépend de ton clavier : il est indiqué juste en dessous. Garde tes doigts de repos entre deux symboles.",
+      "tuto": {
+       "intro": "Les symboles comme @ et # demandent une combinaison de touches qui change selon les claviers : le geste du tien est indiqué juste en dessous.",
+       "rules": [
+        {
+         "icon": "⌨️",
+         "t": "Les touches spéciales",
+         "d": "Selon ton clavier, un symbole se tape en direct, avec Maj, ou avec AltGr (la touche à droite de la barre d'espace, à maintenir avec le pouce droit)."
+        },
+        {
+         "icon": "📧",
+         "t": "@ pour les emails",
+         "d": "L'arobase relie le nom et le domaine d'une adresse : anna@school.example. Indispensable au quotidien."
+        },
+        {
+         "icon": "#️⃣",
+         "t": "# le hashtag",
+         "d": "Le croisillon (hash) sert aux mots-clés des réseaux sociaux et au code."
+        }
+       ],
+       "tip": "Objectif : produire @ et # avec le bon geste, sans casser ta position de repos."
+      },
+      "text": "anna@school.example #bath @tom #team info@bank.example #rain @kate #happy hello@club.example @sam #sunny #cake"
+     },
+     {
+      "id": "sym2",
+      "title": "Parenthèses () et crochets []",
+      "keys": "( ) [ ]",
+      "teaches": "[]",
+      "tip": "Parenthèses et crochets vont par paire : tape la paire, puis reviens écrire au milieu.",
+      "tuto": {
+       "intro": "Parenthèses et crochets vont par paire : on apprend à toujours ouvrir ET fermer.",
+       "rules": [
+        {
+         "icon": "🧩",
+         "t": "Toujours par paire",
+         "d": "Une parenthèse ou un crochet ouvert se ferme toujours. Tape la paire, puis reviens écrire au milieu."
+        },
+        {
+         "icon": "⌨️",
+         "t": "Parenthèses déjà vues",
+         "d": "Tu connais déjà ( et ) depuis la leçon sur les parenthèses : ici, on les mélange avec les crochets."
+        },
+        {
+         "icon": "⌨️",
+         "t": "Les crochets",
+         "d": "Les crochets [ ] demandent une combinaison de touches (le geste de ton clavier est indiqué plus haut). Utiles pour le code et les listes."
+        }
+       ],
+       "tip": "Objectif : ouvrir et fermer parenthèses et crochets, sans en oublier."
+      },
+      "text": "list[0] list[1] total(2) score[3] items[4] (ok) [end] count(5) index[i] page[6] (yes) [no]"
+     },
+     {
+      "id": "sym3",
+      "title": "/ et | : chemins et pipes",
+      "keys": "/ |",
+      "teaches": "/|",
+      "tip": "La barre oblique / sépare les parties d'une adresse ou d'un chemin ; la barre verticale | relie deux commandes.",
+      "tuto": {
+       "intro": "La barre oblique / et la barre verticale | servent aux adresses web, chemins de fichiers et commandes.",
+       "rules": [
+        {
+         "icon": "🌐",
+         "t": "Le slash /",
+         "d": "La barre oblique sépare les parties d'une URL ou d'un chemin : www.school.example/news, home/anna."
+        },
+        {
+         "icon": "⌨️",
+         "t": "Le pipe |",
+         "d": "La barre verticale demande une combinaison de touches. En informatique, elle relie deux commandes : ls | grep file."
+        },
+        {
+         "icon": "💻",
+         "t": "Symboles de l'informatique",
+         "d": "Ces deux signes sont partout dès qu'on touche au web ou au terminal. Repère bien leur combinaison."
+        }
+       ],
+       "tip": "Objectif : taper / et | pour les chemins et les commandes."
+      },
+      "text": "www.school.example/news ls | grep file | sort | head | more yes/no and/or home/anna a/b | c/d left | right"
+     },
+     {
+      "id": "sym4",
+      "title": "* = + : calculs et code",
+      "keys": "* = +",
+      "teaches": "*=+",
+      "tip": "Dans une formule simple, on colle souvent les opérateurs : x*y+z. Repère le rythme touche par touche.",
+      "tuto": {
+       "intro": "Les opérateurs * = + servent aux calculs et au code. On les enchaîne dans des expressions.",
+       "rules": [
+        {
+         "icon": "🧮",
+         "t": "Les opérateurs",
+         "d": "* pour multiplier, + pour additionner, = pour le résultat ou l'affectation : 2*3=6, a+b=c."
+        },
+        {
+         "icon": "⇧",
+         "t": "Où sont + et = ?",
+         "d": "Leur position change selon les claviers : regarde le geste de ton clavier, indiqué plus haut."
+        },
+        {
+         "icon": "🔗",
+         "t": "Sans espace dans les formules",
+         "d": "Dans une expression simple, on colle souvent les opérateurs : x*y+z. Repère le rythme touche par touche."
+        }
+       ],
+       "tip": "Objectif : enchaîner * = + dans des expressions, sans hésiter sur le bon geste."
+      },
+      "text": "2*3=6 a+b=c x*y+z=0 total=price*8 score=time*9+1 count=a+b+c speed=5*2 4+5=9 area=4*7=28"
+     },
+     {
+      "id": "sym5",
+      "title": "% et _ : taux et variables",
+      "keys": "% _",
+      "teaches": "%_",
+      "tip": "Le % se colle au nombre (50%) ; le tiret bas _ relie des mots sans espace dans les noms techniques.",
+      "tuto": {
+       "intro": "Le pourcentage % et le tiret bas _ (underscore) reviennent souvent dans les chiffres et les noms techniques.",
+       "rules": [
+        {
+         "icon": "📊",
+         "t": "Le pourcentage %",
+         "d": "Il se colle au nombre : 50%, 100%."
+        },
+        {
+         "icon": "➿",
+         "t": "Le tiret bas _",
+         "d": "L'underscore relie des mots sans espace dans les noms techniques : my_name, file_name."
+        },
+        {
+         "icon": "💻",
+         "t": "Usage technique",
+         "d": "% et _ sont surtout utiles en informatique et dans les données. Mémorise leur position pour ne pas ralentir."
+        }
+       ],
+       "tip": "Objectif : placer % et _ sans regarder."
+      },
+      "text": "50% 75% my_name file_name 100% top_speed 20% word_count 5% pass_mark 90% tea_time"
+     }
+    ]
+   },
+   {
+    "name": "9. Symboles avancés",
+    "kind": "symboles",
+    "lessons": [
+     {
+      "id": "sym6",
+      "title": "{} et <> : code et HTML",
+      "keys": "{ } < >",
+      "teaches": "{}<>",
+      "tip": "Accolades et chevrons vont par paire : ouvre, écris, puis ferme.",
+      "tuto": {
+       "intro": "Les accolades {} et chevrons <> sont les symboles du code et du HTML. Eux aussi vont par paire.",
+       "rules": [
+        {
+         "icon": "⌨️",
+         "t": "Les accolades",
+         "d": "Les accolades { } encadrent des blocs de code : {code}. Leur geste dépend de ton clavier (indiqué plus haut)."
+        },
+        {
+         "icon": "🔠",
+         "t": "Les chevrons",
+         "d": "Les chevrons < > ouvrent et ferment les balises HTML. Selon ton clavier, > se tape avec Maj : le geste est indiqué plus haut."
+        },
+        {
+         "icon": "🧩",
+         "t": "Toujours fermer",
+         "d": "Comme les parenthèses, accolades et balises s'ouvrent ET se ferment : &lt;p&gt;text&lt;/p&gt;, {return x}."
+        }
+       ],
+       "tip": "Objectif : ouvrir et fermer accolades et chevrons."
+      },
+      "text": "<p>hello</p> <b>go</b> {code} {start} {a} {b} {c} <html> </html> {end} <div> </div>"
+     },
+     {
+      "id": "sym7",
+      "title": "\"\" et ~ : chaînes et chemins",
+      "keys": "\" ~",
+      "teaches": "\"~",
+      "tip": "Le guillemet droit entoure du texte en code ; le tilde ~ désigne le dossier personnel : ~/work.",
+      "tuto": {
+       "intro": "Les guillemets droits et le tilde ~ servent aux chaînes de caractères et aux chemins système.",
+       "rules": [
+        {
+         "icon": "⌨️",
+         "t": "Guillemets droits",
+         "d": "Le guillemet droit (\") entoure les chaînes en code. Son geste dépend de ton clavier (indiqué plus haut)."
+        },
+        {
+         "icon": "〜",
+         "t": "Le tilde ~",
+         "d": "Le tilde désigne le dossier personnel sous Linux et Mac : ~/music."
+        },
+        {
+         "icon": "💻",
+         "t": "Surtout en code",
+         "d": "Ces deux signes sont rares à l'écrit courant mais essentiels en programmation et au terminal."
+        }
+       ],
+       "tip": "Objectif : taper le guillemet droit et ~ sans hésiter."
+      },
+      "text": "\"hello\" \"world\" ~/music ~/school \"name\": \"Anna\" ~tom ~/book \"city\": \"York\" ~/work ~/home"
+     },
+     {
+      "id": "sym8",
+      "title": "\\ et ` : code et terminal",
+      "keys": "\\ `",
+      "teaches": "\\`",
+      "tip": "L'antislash et le backtick sont purement techniques : ils se trouvent en code, dans les chemins Windows et au terminal.",
+      "tuto": {
+       "intro": "L'antislash et l'accent grave (le backtick) sont des symboles purement techniques, fréquents en code.",
+       "rules": [
+        {
+         "icon": "⌨️",
+         "t": "L'antislash",
+         "d": "Il sépare les dossiers sous Windows et marque les caractères spéciaux en code."
+        },
+        {
+         "icon": "⌨️",
+         "t": "Le backtick",
+         "d": "Le backtick entoure le code en ligne et les variables en programmation. Sur certains claviers, il faut taper la touche puis la barre d'espace."
+        },
+        {
+         "icon": "💻",
+         "t": "Réservés au technique",
+         "d": "Tu ne t'en serviras qu'en code ou au terminal. Mémorise-les si tu programmes, sinon retiens juste leur existence."
+        }
+       ],
+       "tip": "Objectif : situer l'antislash et le backtick et les taper sans regarder."
+      },
+      "text": "C:\\Work\\Anna `copy` \\n \\t `name` C:\\School\\Tom `open file` \\r\\n `ls -a`"
+     },
+     {
+      "id": "sym9",
+      "title": "Révision : tous les symboles en texte",
+      "keys": "tous symboles",
+      "teaches": "",
+      "tip": "Avant chaque symbole, demande-toi : direct, Maj ou AltGr ? Ce réflexe te fait gagner du temps.",
+      "tuto": {
+       "intro": "On réunit tous les symboles dans un texte mêlant email, web, code et pourcentages. Le grand mélange !",
+       "rules": [
+        {
+         "icon": "🧩",
+         "t": "Tous les combos",
+         "d": "Maj, AltGr, touches spéciales... Chaque symbole a son geste. Mobilise tout ce que tu as appris dans les deux modules."
+        },
+        {
+         "icon": "🧭",
+         "t": "Repère le geste",
+         "d": "Avant chaque symbole, identifie : direct, Maj ou AltGr ? Ce réflexe te fait gagner du temps."
+        },
+        {
+         "icon": "💻",
+         "t": "Le clavier complet",
+         "d": "Maîtriser les symboles, c'est taper une adresse, un bout de code ou une formule sans jamais bloquer."
+        }
+       ],
+       "tip": "Objectif : enchaîner tous les symboles dans un texte réel, chaque combo au bon moment."
+      },
+      "text": "anna@school.example (2026) www.bank.example/help #leeds {open: true} <html> 50% a+b=c [end] ~/home \"name\" my_file | ls"
+     }
+    ]
+   },
+   {
+    "name": "10. Vitesse et fluidité",
+    "lessons": [
+     {
+      "id": "flu1",
+      "title": "Enchaînement de phrases courtes",
+      "keys": "fluidité",
+      "teaches": "",
+      "tip": "Enchaîne les phrases sans pause : le point, l'espace et la majuscule suivante font partie du même mouvement.",
+      "tuto": {
+       "intro": "Place à la vitesse. On enchaîne des phrases courtes pour travailler la fluidité d'un bout à l'autre.",
+       "rules": [
+        {
+         "icon": "🎵",
+         "t": "Un flux continu",
+         "d": "Ne t'arrête pas entre les phrases. Le point, l'espace et la majuscule s'enchaînent dans le même mouvement."
+        },
+        {
+         "icon": "👀",
+         "t": "Lis en avance",
+         "d": "Garde une longueur d'avance des yeux sur les doigts : c'est le secret d'une frappe rapide et fluide."
+        },
+        {
+         "icon": "😌",
+         "t": "Reste détendu",
+         "d": "La vitesse vient de la souplesse, pas de la force. Relâche les épaules et les poignets."
+        }
+       ],
+       "tip": "Objectif : enchaîner des phrases courtes sans temps mort entre elles."
+      },
+      "text": "The sun is up. The birds sing. The tea is hot. We leave at eight, so let's go. Have a lovely day!"
+     },
+     {
+      "id": "flu2",
+      "title": "Phrases moyennes naturelles",
+      "keys": "fluidité",
+      "teaches": "",
+      "tip": "Tape par groupes de mots qui vont ensemble : la phrase devient une suite de petits élans.",
+      "tuto": {
+       "intro": "Des phrases plus longues, comme dans la vraie vie. L'objectif : tenir le rythme sur la durée.",
+       "rules": [
+        {
+         "icon": "🌬️",
+         "t": "Respire et continue",
+         "d": "Sur une phrase longue, ne bloque pas si tu fais une faute : corrige et repars. La continuité prime."
+        },
+        {
+         "icon": "➡️",
+         "t": "Par groupes de sens",
+         "d": "Tape par groupes de mots qui vont ensemble, pas mot à mot. La phrase devient une suite de petits élans."
+        },
+        {
+         "icon": "🎯",
+         "t": "Garde la précision",
+         "d": "Plus la phrase est longue, plus une faute coûte. Vise une vitesse que tu tiens proprement."
+        }
+       ],
+       "tip": "Objectif : taper une phrase moyenne d'un seul flux, sans perdre le rythme."
+      },
+      "text": "Every morning, she opens the window and sits down with a cup of tea before she starts work."
+     },
+     {
+      "id": "flu3",
+      "title": "Paragraphe narratif complet",
+      "keys": "paragraphe",
+      "teaches": "",
+      "tip": "Un paragraphe demande de l'endurance : installe un rythme confortable et garde-le jusqu'au bout.",
+      "tuto": {
+       "intro": "Un paragraphe entier à taper. C'est l'endurance : garder concentration et régularité jusqu'au bout.",
+       "rules": [
+        {
+         "icon": "🏃",
+         "t": "Tiens la distance",
+         "d": "Un paragraphe demande de l'endurance. Installe un rythme confortable que tu peux maintenir sans fatigue."
+        },
+        {
+         "icon": "👀",
+         "t": "Ne quitte pas l'écran",
+         "d": "Plus le texte est long, plus la tentation de regarder le clavier revient. Garde les yeux devant."
+        },
+        {
+         "icon": "✍️",
+         "t": "Ponctuation comprise",
+         "d": "Virgules, points, apostrophes font partie du flux. Intègre-les sans casser ta cadence."
+        }
+       ],
+       "tip": "Objectif : taper un paragraphe complet à rythme régulier, du début à la fin."
+      },
+      "text": "Typing without looking at your hands takes patience, but every day of practice makes your fingers faster. It is simply a matter of habit.",
+      "maxLen": 200
+     },
+     {
+      "id": "flu4",
+      "title": "Texte professionnel",
+      "keys": "style pro",
+      "teaches": "",
+      "tip": "Dans un courrier professionnel, soigne les majuscules, la ponctuation et les chiffres : zéro faute visée.",
+      "tuto": {
+       "intro": "Un texte de type professionnel : email, courrier, avec adresse. Le genre de texte que tu écriras vraiment.",
+       "rules": [
+        {
+         "icon": "💼",
+         "t": "Le registre pro",
+         "d": "Formules de politesse, majuscules, ponctuation soignée : un texte pro ne tolère pas l'à-peu-près."
+        },
+        {
+         "icon": "🔀",
+         "t": "Lettres, chiffres, symboles",
+         "d": "Numéros, emails, @ : tu mélanges tout ce que tu as appris. C'est la synthèse de ton apprentissage."
+        },
+        {
+         "icon": "🎯",
+         "t": "Zéro faute visée",
+         "d": "Dans un cadre pro, la précision compte autant que la vitesse. Relis-toi mentalement en tapant."
+        }
+       ],
+       "tip": "Objectif : taper un texte professionnel propre, lettres, chiffres et symboles mêlés."
+      },
+      "text": "Dear Ms Clark, please find our offer attached. Do not hesitate to contact us by email: info@school.example. Kind regards, Anna Brown",
+      "maxLen": 200
+     },
+     {
+      "id": "flu5",
+      "title": "Texte technique avec symboles",
+      "keys": "mixte complet",
+      "teaches": "",
+      "tip": "Ici, mieux vaut lent et exact que rapide et approximatif : en code, une seule faute casse tout.",
+      "tuto": {
+       "intro": "Le défi complet : du code et de la configuration, avec accolades, guillemets, chemins et chiffres.",
+       "rules": [
+        {
+         "icon": "💻",
+         "t": "Tout à la fois",
+         "d": "Accolades, guillemets, deux-points, chiffres... Ce texte mobilise Maj et AltGr en continu. L'épreuve la plus dense en symboles."
+        },
+        {
+         "icon": "🧭",
+         "t": "Anticipe chaque combo",
+         "d": "Repère à l'avance si le prochain signe est direct, avec Maj ou avec AltGr. La préparation évite les blocages."
+        },
+        {
+         "icon": "🎯",
+         "t": "Précision maximale",
+         "d": "En code, une faute casse tout. Ici, mieux vaut lent et exact que rapide et approximatif."
+        }
+       ],
+       "tip": "Objectif : taper un texte technique mêlant code, symboles et chiffres, proprement."
+      },
+      "text": "The file settings.json: {\"debug\": false, \"port\": 3000}. Type: `npm start` in ~/project."
+     },
+     {
+      "id": "flu6",
+      "title": "Sprint de vitesse : texte long",
+      "keys": "vitesse maximale",
+      "teaches": "",
+      "tip": "C'est l'épreuve finale : un sprint propre vaut mieux qu'un sprint truffé de fautes.",
+      "tuto": {
+       "intro": "L'épreuve finale : un texte long à taper le plus vite et le plus juste possible. Donne tout !",
+       "rules": [
+        {
+         "icon": "🚀",
+         "t": "Pousse ta vitesse",
+         "d": "C'est le moment de tester tes limites. Cherche ta vitesse maximale tout en restant lisible."
+        },
+        {
+         "icon": "⚖️",
+         "t": "Vitesse ET précision",
+         "d": "Un sprint propre vaut mieux qu'un sprint truffé de fautes. Trouve le point où tu vas vite sans déraper."
+        },
+        {
+         "icon": "🏆",
+         "t": "Le bout du parcours",
+         "d": "Si tu tapes ce texte sans regarder le clavier, tu as atteint l'objectif de KeyPace. Félicitations !"
+        }
+       ],
+       "tip": "Objectif : taper un texte long à ta vitesse maximale, sans regarder le clavier."
+      },
+      "text": "Typing fast comes with regular practice: train every day, keep your eyes on the screen, and let your fingers find their own way across the keys. Good luck!",
+      "maxLen": 250
+     }
+    ]
+   }
+  ],
+  "free": [
+   "r1",
+   "r2",
+   "r3",
+   "r4",
+   "r5",
+   "r6",
+   "h1",
+   "h2",
+   "h3",
+   "h4"
+  ]
+ },
+ "vocab": [
+  "about",
+  "above",
+  "across",
+  "ad",
+  "add",
+  "adds",
+  "after",
+  "again",
+  "ah",
+  "air",
+  "airport",
+  "alas",
+  "all",
+  "also",
+  "although",
+  "always",
+  "am",
+  "an",
+  "and",
+  "angry",
+  "animals",
+  "anna",
+  "answer",
+  "apple",
+  "apples",
+  "are",
+  "area",
+  "arm",
+  "around",
+  "as",
+  "ask",
+  "asked",
+  "asks",
+  "at",
+  "attached",
+  "aunt",
+  "baby",
+  "bad",
+  "bag",
+  "bags",
+  "ban",
+  "bank",
+  "bath",
+  "be",
+  "beach",
+  "bear",
+  "because",
+  "bed",
+  "been",
+  "before",
+  "begin",
+  "being",
+  "below",
+  "ben",
+  "between",
+  "big",
+  "bike",
+  "bird",
+  "birds",
+  "birthday",
+  "biscuit",
+  "black",
+  "blue",
+  "boat",
+  "bold",
+  "book",
+  "boot",
+  "box",
+  "boy",
+  "bread",
+  "breathes",
+  "bright",
+  "bring",
+  "bristol",
+  "brother",
+  "brown",
+  "bus",
+  "busy",
+  "but",
+  "butter",
+  "by",
+  "cab",
+  "cake",
+  "calm",
+  "calmer",
+  "can",
+  "car",
+  "carry",
+  "cat",
+  "cave",
+  "centre",
+  "chair",
+  "cheap",
+  "check",
+  "cheese",
+  "child",
+  "children",
+  "chips",
+  "city",
+  "civic",
+  "clark",
+  "class",
+  "classes",
+  "clean",
+  "clever",
+  "climb",
+  "close",
+  "cloud",
+  "club",
+  "coat",
+  "code",
+  "coffee",
+  "cold",
+  "colour",
+  "colours",
+  "come",
+  "comes",
+  "computer",
+  "contact",
+  "cool",
+  "copy",
+  "cost",
+  "cosy",
+  "could",
+  "count",
+  "cousin",
+  "cove",
+  "cow",
+  "cream",
+  "cricket",
+  "cub",
+  "cup",
+  "dad",
+  "dads",
+  "dark",
+  "dash",
+  "data",
+  "date",
+  "day",
+  "days",
+  "dead",
+  "deaf",
+  "dear",
+  "debug",
+  "degree",
+  "derby",
+  "desert",
+  "desk",
+  "desktop",
+  "did",
+  "dirty",
+  "do",
+  "documents",
+  "does",
+  "dog",
+  "doing",
+  "done",
+  "door",
+  "down",
+  "draw",
+  "dress",
+  "drink",
+  "drinks",
+  "drum",
+  "dry",
+  "duck",
+  "dull",
+  "during",
+  "ear",
+  "early",
+  "east",
+  "eat",
+  "egg",
+  "eggs",
+  "eight",
+  "email",
+  "emma",
+  "empty",
+  "end",
+  "equal",
+  "even",
+  "evening",
+  "every",
+  "exam",
+  "example",
+  "exit",
+  "extra",
+  "eye",
+  "eyes",
+  "face",
+  "fall",
+  "falls",
+  "false",
+  "family",
+  "far",
+  "fast",
+  "faster",
+  "fat",
+  "father",
+  "favourite",
+  "fear",
+  "fed",
+  "few",
+  "field",
+  "file",
+  "find",
+  "fine",
+  "finger",
+  "fingers",
+  "fire",
+  "fish",
+  "five",
+  "fix",
+  "fizz",
+  "flag",
+  "flags",
+  "flash",
+  "flask",
+  "flat",
+  "floor",
+  "flower",
+  "fly",
+  "folder",
+  "food",
+  "foot",
+  "football",
+  "for",
+  "forest",
+  "four",
+  "fox",
+  "foxes",
+  "free",
+  "freeze",
+  "fresh",
+  "friend",
+  "frog",
+  "from",
+  "frost",
+  "fruit",
+  "full",
+  "funny",
+  "fur",
+  "furs",
+  "fuzz",
+  "garden",
+  "gas",
+  "gate",
+  "get",
+  "girl",
+  "give",
+  "glad",
+  "glass",
+  "glove",
+  "go",
+  "goal",
+  "goat",
+  "gold",
+  "golf",
+  "good",
+  "goodbye",
+  "grade",
+  "grape",
+  "grass",
+  "great",
+  "green",
+  "grey",
+  "gum",
+  "habit",
+  "had",
+  "hair",
+  "half",
+  "hall",
+  "halls",
+  "hand",
+  "hands",
+  "happy",
+  "hard",
+  "harry",
+  "has",
+  "hash",
+  "hat",
+  "have",
+  "having",
+  "he",
+  "head",
+  "heavy",
+  "hello",
+  "help",
+  "hen",
+  "henry",
+  "her",
+  "here",
+  "hesitate",
+  "high",
+  "hill",
+  "him",
+  "hip",
+  "his",
+  "hold",
+  "holds",
+  "holiday",
+  "holly",
+  "holy",
+  "home",
+  "honey",
+  "hop",
+  "hope",
+  "horse",
+  "hot",
+  "hour",
+  "house",
+  "how",
+  "hug",
+  "huh",
+  "hungry",
+  "ice",
+  "if",
+  "in",
+  "index",
+  "info",
+  "install",
+  "is",
+  "island",
+  "it",
+  "item",
+  "items",
+  "jack",
+  "jane",
+  "jill",
+  "job",
+  "john",
+  "jolly",
+  "joy",
+  "judy",
+  "jug",
+  "jump",
+  "jumper",
+  "jumps",
+  "just",
+  "kate",
+  "keep",
+  "kerb",
+  "keyboard",
+  "keys",
+  "kill",
+  "kilo",
+  "kind",
+  "king",
+  "kitchen",
+  "know",
+  "known",
+  "koi",
+  "kyle",
+  "kylie",
+  "lad",
+  "lads",
+  "lady",
+  "lag",
+  "lake",
+  "lamb",
+  "lamp",
+  "laptop",
+  "lash",
+  "last",
+  "late",
+  "law",
+  "lazy",
+  "leaf",
+  "learn",
+  "leave",
+  "leaves",
+  "leeds",
+  "left",
+  "leg",
+  "lemon",
+  "lesson",
+  "let",
+  "letter",
+  "light",
+  "like",
+  "lily",
+  "list",
+  "listen",
+  "little",
+  "live",
+  "liverpool",
+  "long",
+  "look",
+  "looking",
+  "lorry",
+  "lose",
+  "loud",
+  "lovely",
+  "low",
+  "luck",
+  "lucy",
+  "made",
+  "mail",
+  "make",
+  "makes",
+  "making",
+  "man",
+  "manchester",
+  "march",
+  "mark",
+  "market",
+  "mat",
+  "match",
+  "matter",
+  "max",
+  "me",
+  "message",
+  "milk",
+  "minute",
+  "mix",
+  "mode",
+  "molly",
+  "money",
+  "month",
+  "moon",
+  "more",
+  "morning",
+  "mother",
+  "mountain",
+  "mouse",
+  "mouth",
+  "move",
+  "mug",
+  "mum",
+  "music",
+  "my",
+  "name",
+  "names",
+  "narrow",
+  "near",
+  "neighbour",
+  "never",
+  "new",
+  "news",
+  "next",
+  "nice",
+  "nick",
+  "night",
+  "nine",
+  "no",
+  "none",
+  "noon",
+  "north",
+  "nose",
+  "not",
+  "note",
+  "novel",
+  "now",
+  "of",
+  "off",
+  "offer",
+  "often",
+  "oil",
+  "old",
+  "on",
+  "one",
+  "only",
+  "open",
+  "opens",
+  "or",
+  "orange",
+  "organise",
+  "oscar",
+  "our",
+  "out",
+  "over",
+  "owl",
+  "own",
+  "oxford",
+  "page",
+  "paper",
+  "paris",
+  "part",
+  "pass",
+  "patience",
+  "paul",
+  "pavement",
+  "pear",
+  "pears",
+  "pen",
+  "pencil",
+  "pencils",
+  "penny",
+  "pens",
+  "pepper",
+  "peter",
+  "phil",
+  "phone",
+  "photos",
+  "pig",
+  "pink",
+  "pizza",
+  "place",
+  "plane",
+  "platform",
+  "play",
+  "please",
+  "plum",
+  "plums",
+  "poem",
+  "pool",
+  "port",
+  "pound",
+  "practice",
+  "price",
+  "prince",
+  "prize",
+  "programme",
+  "project",
+  "pull",
+  "pupil",
+  "pupils",
+  "push",
+  "puzzle",
+  "quake",
+  "quarter",
+  "queen",
+  "question",
+  "queue",
+  "quick",
+  "quickly",
+  "quiet",
+  "quite",
+  "rain",
+  "read",
+  "ready",
+  "really",
+  "red",
+  "regards",
+  "regular",
+  "relax",
+  "remember",
+  "replies",
+  "rest",
+  "rice",
+  "right",
+  "river",
+  "road",
+  "roof",
+  "room",
+  "root",
+  "rose",
+  "rug",
+  "rugby",
+  "rugs",
+  "ruler",
+  "rules",
+  "run",
+  "rush",
+  "sad",
+  "sag",
+  "salad",
+  "salt",
+  "sam",
+  "sash",
+  "says",
+  "scarf",
+  "school",
+  "score",
+  "screen",
+  "sea",
+  "seat",
+  "second",
+  "seed",
+  "seize",
+  "settings",
+  "seven",
+  "shall",
+  "she",
+  "sheep",
+  "shelf",
+  "ship",
+  "shirt",
+  "shoe",
+  "shop",
+  "short",
+  "should",
+  "silly",
+  "silver",
+  "simply",
+  "since",
+  "sing",
+  "sister",
+  "sit",
+  "sits",
+  "six",
+  "size",
+  "skirt",
+  "sky",
+  "sleep",
+  "slow",
+  "small",
+  "smoke",
+  "snow",
+  "so",
+  "sock",
+  "soft",
+  "sometimes",
+  "song",
+  "sorry",
+  "sort",
+  "soup",
+  "sour",
+  "south",
+  "speak",
+  "speed",
+  "sport",
+  "squad",
+  "square",
+  "stage",
+  "stand",
+  "star",
+  "stars",
+  "start",
+  "starts",
+  "station",
+  "stay",
+  "still",
+  "stop",
+  "storm",
+  "story",
+  "strange",
+  "street",
+  "style",
+  "sugar",
+  "sum",
+  "sun",
+  "sunny",
+  "sure",
+  "surf",
+  "sweet",
+  "swim",
+  "table",
+  "take",
+  "takes",
+  "talk",
+  "tall",
+  "taxi",
+  "taxis",
+  "tea",
+  "teach",
+  "teacher",
+  "team",
+  "ten",
+  "tennis",
+  "test",
+  "text",
+  "than",
+  "thank",
+  "thanks",
+  "that",
+  "the",
+  "theatre",
+  "their",
+  "them",
+  "then",
+  "there",
+  "these",
+  "they",
+  "thick",
+  "thin",
+  "things",
+  "think",
+  "thirsty",
+  "this",
+  "those",
+  "three",
+  "thumb",
+  "ticket",
+  "time",
+  "tip",
+  "tired",
+  "title",
+  "to",
+  "today",
+  "together",
+  "tom",
+  "tomorrow",
+  "top",
+  "total",
+  "town",
+  "train",
+  "travel",
+  "travelling",
+  "tree",
+  "trousers",
+  "true",
+  "turn",
+  "twelve",
+  "two",
+  "type",
+  "typing",
+  "tyre",
+  "umbrella",
+  "uncle",
+  "under",
+  "until",
+  "up",
+  "us",
+  "user",
+  "users",
+  "usually",
+  "valley",
+  "value",
+  "van",
+  "version",
+  "very",
+  "victor",
+  "village",
+  "visit",
+  "vivid",
+  "wait",
+  "wake",
+  "wales",
+  "walk",
+  "wall",
+  "warm",
+  "was",
+  "waste",
+  "watch",
+  "water",
+  "way",
+  "we",
+  "wear",
+  "weather",
+  "web",
+  "week",
+  "welcome",
+  "well",
+  "were",
+  "west",
+  "wet",
+  "what",
+  "when",
+  "where",
+  "which",
+  "while",
+  "white",
+  "who",
+  "why",
+  "wide",
+  "will",
+  "wind",
+  "window",
+  "windows",
+  "winner",
+  "with",
+  "without",
+  "woman",
+  "wood",
+  "word",
+  "words",
+  "work",
+  "world",
+  "would",
+  "write",
+  "writing",
+  "wrote",
+  "year",
+  "yes",
+  "yesterday",
+  "yolk",
+  "york",
+  "you",
+  "young",
+  "your",
+  "zebra",
+  "zero",
+  "zip",
+  "zoo",
+  "zoom"
+ ]
+}
