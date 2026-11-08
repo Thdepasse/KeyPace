@@ -2986,6 +2986,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <script src="/cookie-consent.js"></script>
 <script src="/programme-data.js"></script>
 <script src="/game-levels.js"></script>
+<script src="/i18n.js"></script>
 
 <div id="page-home"><noscript>
   <main>
@@ -4421,6 +4422,8 @@ function kpRedrawKeyboard(){
 /* Famille de clavier choisie par l'élève = cours. Chaque famille retient sa dernière variante (kp_kb_layout_azerty / _qwerty). */
 /* Langue du cours : s'ajoute à la famille de clavier. Un cours = langue + famille (fr/azerty, fr/qwerty, en/azerty, en/qwerty). */
 const KP_LANG_NAMES={fr:'Français',en:'English'};
+const kpT=(k,p)=>KPI18n.t(k,p),kpTn=(k,n,p)=>KPI18n.tn(k,n,p); /* textes de l'interface (i18n.js) : français par défaut, anglais en bêta avec ?ui=en */
+try{document.documentElement.lang=KPI18n.lang();}catch{}
 function kpContentLang(){return KP_COURSES[kpCourseId()].content;}
 function kpLanguagesOffered(){return [...new Set(KP_COURSES_OFFERED.map(c=>KP_COURSES[c].content))];}
 function kpFamilyCourse(fam){const id=kpContentLang()+'/'+fam;return KP_COURSES[id]?id:'fr/'+fam;}
@@ -9892,7 +9895,7 @@ const app={
     const pb=currentUser&&this.stats?Math.max(0,...(course().tests||[]).filter(t=>!t.dur).map(t=>t.wpm)):0;
     const beating=!!(pb&&s.started&&!s.finished&&wpm>pb);
 
-    const hintText=s.finished?`Terminé : ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé, garde le rythme':'Commence à taper : le chrono démarre tout seul.';
+    const hintText=s.finished?kpT('test.hint_done',{wpm,acc:s.idx?Math.round(100*s.correct/s.idx):0}):s.started?kpT('test.hint_running'):kpT('test.hint_idle');
     const hintCls='t4a-hint'+(s.finished?' done':!s.started?' idle':'');
 
     const chal=this._t4aChallenge(s,!!s.finished);
@@ -9904,41 +9907,41 @@ const app={
         <div class="t4a-halo" id="t4a-halo"></div>
         <div class="t4a-head">
           <div class="t4a-hero-copy">
-            <p class="t4a-eyebrow">Défi n° 1 — le test de vitesse</p>
-            <h1 class="t4a-title">Tape la phrase, découvre <span class="t4a-title-accent">ta vitesse.</span></h1>
-            <p class="t4a-subtitle">Le chrono démarre tout seul dès que tu commences à taper. À la fin, tu découvres ta vitesse, ta précision et ton badge.</p>
+            <p class="t4a-eyebrow">${kpT('test.eyebrow')}</p>
+            <h1 class="t4a-title">${kpT('test.title_pre')}<span class="t4a-title-accent">${kpT('test.title_accent')}</span></h1>
+            <p class="t4a-subtitle">${kpT('test.subtitle')}</p>
           </div>
           <img class="t4a-hero-img" src="/images/keypace-mascot-idea.webp" width="234" height="282" alt="Mascotte KeyPace avec l'index levé, assise avec un ordinateur portable" loading="eager" decoding="async">
         </div>
         <div class="t4a-actionsrow">
           <div class="t4a-actions">
-            <button class="t4a-btn-ghost" onclick="app.newPassage()">↻ Autre texte</button>
-            <button class="t4a-btn-dark" onclick="app.restart()">Recommencer</button>
-            <button class="t4a-btn-eye${eyeOn?' on':''}" onclick="app.gazeToggle()">◉ ${eyeOn?'Traqueur des yeux actif':'Activer traqueur des yeux'}</button>
+            <button class="t4a-btn-ghost" onclick="app.newPassage()">${kpT('test.another')}</button>
+            <button class="t4a-btn-dark" onclick="app.restart()">${kpT('test.restart')}</button>
+            <button class="t4a-btn-eye${eyeOn?' on':''}" onclick="app.gazeToggle()">◉ ${eyeOn?kpT('test.eye_on'):kpT('test.eye_off')}</button>
           </div>
         </div>
         <div class="t4a-eyebanner${eyeOn?' on':''}" id="t4a-eyebanner">
-          <div>Traqueur des yeux actif : <span id="t4a-glances">${this._t4a.glances}</span> coup d'œil vers le clavier détecté${this._t4a.glances===1?'':'s'}.</div>
-          <div class="t4a-eyebanner-cam">CAMÉRA · ${this._gaze.permError?'ERREUR':'OK'}</div>
+          <div>${kpT('test.eye_banner_head')}<span id="t4a-glances">${this._t4a.glances}</span>${kpT(this._t4a.glances===1?'test.eye_banner_tail_one':'test.eye_banner_tail_other')}</div>
+          <div class="t4a-eyebanner-cam">${this._gaze.permError?kpT('test.camera_error'):kpT('test.camera_ok')}</div>
         </div>
         <div class="t4a-stats">
           <div class="t4a-stat t4a-stat-speed">
             <div style="display:flex;flex-direction:column;gap:7px">
-              <div class="t4a-stat-label">VITESSE</div>
+              <div class="t4a-stat-label">${kpT('test.speed')}</div>
               <div class="t4a-odo${(s.started&&!s.finished)?' calm':''}" id="t4a-odo">${this._t4aOdoHTML(wpm)}</div>
-              <div class="t4a-stat-sub">mots / min${beating?` <span class="t4a-record">🏆 record !</span>`:''}</div>
+              <div class="t4a-stat-sub">${kpT('test.wpm_unit')}${beating?` <span class="t4a-record">${kpT('test.record')}</span>`:''}</div>
             </div>
             <div class="t4a-spark" id="t4a-spark">${this._t4aSparkHTML()}</div>
           </div>
-          <div class="t4a-stat"><div class="t4a-stat-label">PRÉCISION</div><div class="t4a-stat-val" id="t4a-acc">${s.idx?acc+'%':'-'}</div><div class="t4a-stat-sub" id="t4a-accmeta">${err} faute${err===1?'':'s'}</div></div>
-          <div class="t4a-stat"><div class="t4a-stat-label">TEMPS</div><div class="t4a-stat-val" id="t4a-time">${elapsed.toFixed(1)}s</div><div class="t4a-stat-sub" id="t4a-timemeta">${s.finished?'test terminé':'en cours'}</div></div>
-          <div class="t4a-stat"><div class="t4a-stat-label">PROGRESSION</div><div class="t4a-stat-val" id="t4a-prog">${prog}%</div><div class="t4a-stat-sub" id="t4a-progmeta">${s.idx} / ${T.length} car.</div></div>
+          <div class="t4a-stat"><div class="t4a-stat-label">${kpT('test.accuracy')}</div><div class="t4a-stat-val" id="t4a-acc">${s.idx?acc+'%':'-'}</div><div class="t4a-stat-sub" id="t4a-accmeta">${kpTn('test.faults',err)}</div></div>
+          <div class="t4a-stat"><div class="t4a-stat-label">${kpT('test.time')}</div><div class="t4a-stat-val" id="t4a-time">${elapsed.toFixed(1)}s</div><div class="t4a-stat-sub" id="t4a-timemeta">${s.finished?kpT('test.finished'):kpT('test.running')}</div></div>
+          <div class="t4a-stat"><div class="t4a-stat-label">${kpT('test.progress')}</div><div class="t4a-stat-val" id="t4a-prog">${prog}%</div><div class="t4a-stat-sub" id="t4a-progmeta">${kpT('test.chars_short',{n:s.idx,total:T.length})}</div></div>
         </div>
         <div class="t4a-textwrap">
           <div class="t4a-card">
             <div class="t4a-card-head">
               <div class="${hintCls}" id="t4a-hint">${hintText}</div>
-              <div class="t4a-counter" id="t4a-counter">${s.idx} / ${T.length} caractères</div>
+              <div class="t4a-counter" id="t4a-counter">${kpT('test.counter',{n:s.idx,total:T.length})}</div>
             </div>
             <div class="${textboxCls}" id="t4a-textbox">${wordsHTML}</div>
           </div>
@@ -9951,18 +9954,18 @@ const app={
             ${keysHTML}
             <div class="t4a-spacewrap${spaceOn?' next':''}" id="t4a-spacewrap">
               <div class="t4a-space-base"></div>
-              <div class="t4a-space">espace</div>
+              <div class="t4a-space">${kpT('test.space_key')}</div>
             </div>
             ${fxHTML}
           </div>
         </div>`:''}
         <div class="t4a-prefs-card">
-          <p class="t4a-prefs-title">Règle l'affichage comme tu veux</p>
+          <p class="t4a-prefs-title">${kpT('test.prefs_title')}</p>
           <div class="t4a-prefs">
-            <button type="button" class="t4a-pref-btn${prefs.spaces?' on':''}" onclick="app._t4aToggle('spaces')">Espaces visibles&nbsp;: ${prefs.spaces?'oui':'non'}</button>
-            <button type="button" class="t4a-pref-btn${prefs.big?' on':''}" onclick="app._t4aToggle('big')">Très grand texte&nbsp;: ${prefs.big?'oui':'non'}</button>
-            <button type="button" class="t4a-pref-btn${prefs.font==='atkinson'?' on':''}" onclick="app._t4aToggleFont()">Police&nbsp;: ${prefs.font==='atkinson'?'Lecture facile':'Standard'}</button>
-            <button type="button" class="t4a-pref-btn${prefs.kb?' on':''}" onclick="app._t4aToggle('kb')">Clavier à l'écran&nbsp;: ${prefs.kb?'oui':'non'}</button>
+            <button type="button" class="t4a-pref-btn${prefs.spaces?' on':''}" onclick="app._t4aToggle('spaces')">${kpT('test.pref_spaces')} ${prefs.spaces?kpT('test.yes'):kpT('test.no')}</button>
+            <button type="button" class="t4a-pref-btn${prefs.big?' on':''}" onclick="app._t4aToggle('big')">${kpT('test.pref_big')} ${prefs.big?kpT('test.yes'):kpT('test.no')}</button>
+            <button type="button" class="t4a-pref-btn${prefs.font==='atkinson'?' on':''}" onclick="app._t4aToggleFont()">${kpT('test.pref_font')} ${prefs.font==='atkinson'?kpT('test.font_easy'):kpT('test.font_std')}</button>
+            <button type="button" class="t4a-pref-btn${prefs.kb?' on':''}" onclick="app._t4aToggle('kb')">${kpT('test.pref_kb')} ${prefs.kb?kpT('test.yes'):kpT('test.no')}</button>
           </div>
         </div>
       </div>
@@ -10032,14 +10035,14 @@ const app={
 
     const $=id=>document.getElementById(id);
     const speedSub=$('t4a-odo')&&$('t4a-odo').parentElement.querySelector('.t4a-stat-sub');
-    if(speedSub)speedSub.innerHTML='mots / min'+(beating?` <span class="t4a-record">🏆 record !</span>`:'');
+    if(speedSub)speedSub.innerHTML=kpT('test.wpm_unit')+(beating?` <span class="t4a-record">${kpT('test.record')}</span>`:'');
     const accEl=$('t4a-acc');if(accEl)accEl.textContent=s.idx?acc+'%':'-';
-    const accMetaEl=$('t4a-accmeta');if(accMetaEl)accMetaEl.textContent=err+' faute'+(err===1?'':'s');
+    const accMetaEl=$('t4a-accmeta');if(accMetaEl)accMetaEl.textContent=kpTn('test.faults',err);
     const timeEl=$('t4a-time');if(timeEl)timeEl.textContent=elapsed.toFixed(1)+'s';
-    const timeMetaEl=$('t4a-timemeta');if(timeMetaEl)timeMetaEl.textContent=s.finished?'test terminé':'en cours';
+    const timeMetaEl=$('t4a-timemeta');if(timeMetaEl)timeMetaEl.textContent=s.finished?kpT('test.finished'):kpT('test.running');
     const progEl=$('t4a-prog');if(progEl)progEl.textContent=prog+'%';
-    const progMetaEl=$('t4a-progmeta');if(progMetaEl)progMetaEl.textContent=s.idx+' / '+s.text.length+' car.';
-    const counterEl=$('t4a-counter');if(counterEl)counterEl.textContent=s.idx+' / '+s.text.length+' caractères';
+    const progMetaEl=$('t4a-progmeta');if(progMetaEl)progMetaEl.textContent=kpT('test.chars_short',{n:s.idx,total:s.text.length});
+    const counterEl=$('t4a-counter');if(counterEl)counterEl.textContent=kpT('test.counter',{n:s.idx,total:s.text.length});
     const trackBarEl=$('t4a-track-bar');if(trackBarEl)trackBarEl.style.width=prog+'%';
     const glancesEl=$('t4a-glances');if(glancesEl)glancesEl.textContent=t.glances;
 
@@ -10068,7 +10071,7 @@ const app={
 
     const hintEl=$('t4a-hint');
     if(hintEl){
-      const txt=s.finished?`Terminé : ${wpm} mots/min à ${s.idx?Math.round(100*s.correct/s.idx):0}%`:s.started?'Chrono lancé, garde le rythme':'Commence à taper : le chrono démarre tout seul.';
+      const txt=s.finished?kpT('test.hint_done',{wpm,acc:s.idx?Math.round(100*s.correct/s.idx):0}):s.started?kpT('test.hint_running'):kpT('test.hint_idle');
       if(hintEl.textContent!==txt)hintEl.textContent=txt;
       hintEl.classList.toggle('done',!!s.finished);
       hintEl.classList.toggle('idle',!s.started&&!s.finished);

@@ -294,6 +294,7 @@ const GATES = process.env.GATES_FAKE_RED
     { id: 'U12', name: 'Cours : course() identique par défaut, contenu, progression par cours, serveur', run: () => usage().u12() },
     { id: 'U13', name: 'Accès bêta aux cours : liste demandée au serveur, retrait propre', run: () => usage().u13() },
     { id: 'U14', name: 'Un cours peut apporter son propre programme (modules et leçons)', run: () => usage().u14() },
+    { id: 'I1', name: 'Interface : textes français et anglais complets, clés de la page valides', run: () => require('./i18n-gates').i1() },
     { id: 'U15', name: 'Cours de langue : appliqués à la page, vocabulaire des jeux, rien de français, leçons rejouées sur chaque disposition', run: () => usage().u15() },
     { id: 'T1', name: 'Traces de matériel réel rejouées dans le moteur (G6)', run: () => require('./traces-gate').run() },
     { id: 'B1', name: 'Vrai navigateur : chargement, écrans, 26 claviers, vraies frappes', run: b1 },
