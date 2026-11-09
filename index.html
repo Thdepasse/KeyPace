@@ -9483,24 +9483,24 @@ const app={
   _challengeForm(wpm,acc){
     const saved=(()=>{try{return currentUser||localStorage.getItem('keypace-guest-name')||'';}catch{return currentUser||'';}})();
     return`<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <input id="chal-name" maxlength="18" placeholder="Ton prénom" value="${saved.replace(/"/g,'&quot;')}" style="flex:1;min-width:150px;max-width:200px;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
-        <button onclick="app.shareChallenge(${wpm},${acc})" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 20px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(255,77,46,.3)">Partager mon défi</button>
+        <input id="chal-name" maxlength="18" placeholder="${kpT('chal.first_name')}" value="${saved.replace(/"/g,'&quot;')}" style="flex:1;min-width:150px;max-width:200px;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+        <button onclick="app.shareChallenge(${wpm},${acc})" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 20px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(255,77,46,.3)">${kpT('chal.share_btn')}</button>
       </div>
       <div id="chal-msg" style="font-size:13px;margin-top:10px;font-weight:600;display:none"></div>`;
   },
 
   async shareChallenge(wpm,acc){
     const el=document.getElementById('chal-name');
-    const name=((el&&el.value)||'').trim().replace(/[~|]/g,'')||'Un ami';
+    const name=((el&&el.value)||'').trim().replace(/[~|]/g,'')||kpT('chal.a_friend');
     try{localStorage.setItem('keypace-guest-name',name);}catch{}
     const url=`${location.origin}/?defi=${encodeURIComponent(name+'~'+wpm+'~'+acc)}`;
     const msg=document.getElementById('chal-msg');
-    const txt=`Je viens de taper à ${wpm} mpm sur KeyPace. Tu peux faire mieux ?`;
+    const txt=kpT('chal.share_text',{wpm});
     try{track('challenge_shared',{wpm});}catch{}
     try{
-      if(navigator.share){await navigator.share({title:'Défi KeyPace',text:txt,url});return;}
+      if(navigator.share){await navigator.share({title:kpT('chal.share_title'),text:txt,url});return;}
       await navigator.clipboard.writeText(txt+' '+url);
-      if(msg){msg.style.display='block';msg.style.color='var(--success)';msg.textContent='✓ Lien copié ! Envoie-le à tes amis. Quand ils te renvoient le leur, tu peux rejouer.';}
+      if(msg){msg.style.display='block';msg.style.color='var(--success)';msg.textContent=kpT('chal.copied');}
     }catch{
       if(msg){msg.style.display='block';msg.style.color='var(--muted)';msg.textContent=url;}
     }
@@ -9545,7 +9545,7 @@ const app={
     const plainTest=!isLesson&&!custom&&!cert;
     const chalBanner=(ch&&plainTest&&!finished)?`<div style="background:linear-gradient(135deg,rgba(255,77,46,.12),rgba(255,77,46,.03));border:1.5px solid rgba(255,77,46,.3);border-radius:16px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div style="font-size:24px">🏁</div>
-        <div style="flex:1;min-width:180px"><div style="font-weight:800;font-size:15px">${ch.name} te défie !</div><div style="font-size:13px;color:var(--muted)">Son score : <b style="color:var(--accent)">${ch.wpm} mpm</b>${ch.acc?' · '+ch.acc+'% de précision':''}. À toi de faire mieux.</div></div>
+        <div style="flex:1;min-width:180px"><div style="font-weight:800;font-size:15px">${kpT('chal.challenges_you',{name:ch.name})}</div><div style="font-size:13px;color:var(--muted)">${kpT('chal.their_score')} <b style="color:var(--accent)">${ch.wpm} ${kpT('chal.wpm')}</b>${ch.acc?' · '+kpT('chal.accuracy_pct',{acc:ch.acc}):''}. ${kpT('chal.do_better')}</div></div>
       </div>`:'';
     let chalResult='';
     if(finished&&plainTest){
@@ -9553,14 +9553,14 @@ const app={
       if(ch){
         const won=resWpm>ch.wpm, tie=resWpm===ch.wpm;
         vs=`<div style="background:${won?'rgba(31,169,113,.1)':tie?'var(--light)':'rgba(255,77,46,.08)'};border-radius:14px;padding:14px 16px;margin-bottom:16px">
-            <div style="font-size:16px;font-weight:800;margin-bottom:4px">${won?'🏆 Tu bats '+ch.name+' !':tie?'🤝 Égalité avec '+ch.name:'😤 '+ch.name+' te devance'}</div>
-            <div style="font-size:13.5px;color:var(--muted)">Toi <b style="color:var(--txt)">${resWpm} mpm</b> · ${ch.name} <b style="color:var(--txt)">${ch.wpm} mpm</b></div>
+            <div style="font-size:16px;font-weight:800;margin-bottom:4px">${won?kpT('chal.you_win',{name:ch.name}):tie?kpT('chal.tie',{name:ch.name}):kpT('chal.you_lose',{name:ch.name})}</div>
+            <div style="font-size:13.5px;color:var(--muted)">${kpT('chal.you')} <b style="color:var(--txt)">${resWpm} ${kpT('chal.wpm')}</b> · ${ch.name} <b style="color:var(--txt)">${ch.wpm} ${kpT('chal.wpm')}</b></div>
           </div>`;
       }
       chalResult=`<div style="margin-top:18px;border-top:1px solid var(--border);padding-top:18px">
         ${vs}
-        <div style="font-size:15px;font-weight:800;margin-bottom:4px">🏁 Défie tes amis</div>
-        <div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">Envoie-leur ton score : le lien leur débloque un test pour te battre. Pour continuer le duel, <b>demande-leur de te renvoyer leur score</b> : chaque lien reçu te redonne un test.</div>
+        <div style="font-size:15px;font-weight:800;margin-bottom:4px">${kpT('chal.challenge_friends')}</div>
+        <div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">${kpT('chal.explain')}</div>
         ${this._challengeForm(resWpm,resAcc)}
       </div>`;
     }
@@ -9804,7 +9804,7 @@ const app={
     const ch=this._challenge;
     const banner=(ch&&!finished)?`<div style="background:linear-gradient(135deg,rgba(255,77,46,.12),rgba(255,77,46,.03));border:1.5px solid rgba(255,77,46,.3);border-radius:16px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div style="font-size:24px">🏁</div>
-        <div style="flex:1;min-width:180px"><div style="font-weight:800;font-size:15px">${ch.name} te défie !</div><div style="font-size:13px;color:var(--muted)">Son score : <b style="color:var(--accent)">${ch.wpm} mpm</b>${ch.acc?' · '+ch.acc+'% de précision':''}. À toi de faire mieux.</div></div>
+        <div style="flex:1;min-width:180px"><div style="font-weight:800;font-size:15px">${kpT('chal.challenges_you',{name:ch.name})}</div><div style="font-size:13px;color:var(--muted)">${kpT('chal.their_score')} <b style="color:var(--accent)">${ch.wpm} ${kpT('chal.wpm')}</b>${ch.acc?' · '+kpT('chal.accuracy_pct',{acc:ch.acc}):''}. ${kpT('chal.do_better')}</div></div>
       </div>`:'';
     let result='';
     if(finished){
@@ -9813,14 +9813,14 @@ const app={
       if(ch){
         const won=res.wpm>ch.wpm,tie=res.wpm===ch.wpm;
         vs=`<div style="background:${won?'rgba(31,169,113,.1)':tie?'var(--light)':'rgba(255,77,46,.08)'};border-radius:14px;padding:14px 16px;margin-bottom:16px">
-            <div style="font-size:16px;font-weight:800;margin-bottom:4px">${won?'🏆 Tu bats '+ch.name+' !':tie?'🤝 Égalité avec '+ch.name:'😤 '+ch.name+' te devance'}</div>
-            <div style="font-size:13.5px;color:var(--muted)">Toi <b style="color:var(--txt)">${res.wpm} mpm</b> · ${ch.name} <b style="color:var(--txt)">${ch.wpm} mpm</b></div>
+            <div style="font-size:16px;font-weight:800;margin-bottom:4px">${won?kpT('chal.you_win',{name:ch.name}):tie?kpT('chal.tie',{name:ch.name}):kpT('chal.you_lose',{name:ch.name})}</div>
+            <div style="font-size:13.5px;color:var(--muted)">${kpT('chal.you')} <b style="color:var(--txt)">${res.wpm} ${kpT('chal.wpm')}</b> · ${ch.name} <b style="color:var(--txt)">${ch.wpm} ${kpT('chal.wpm')}</b></div>
           </div>`;
       }
       result=`<div style="max-width:1120px;margin:20px auto 0;background:#fff;border:1px solid #ece8e0;border-radius:16px;padding:20px 24px">
         ${vs}
-        <div style="font-size:15px;font-weight:800;margin-bottom:4px">🏁 Défie tes amis</div>
-        <div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">Envoie-leur ton score : le lien leur débloque un test pour te battre. Pour continuer le duel, <b>demande-leur de te renvoyer leur score</b> : chaque lien reçu te redonne un test.</div>
+        <div style="font-size:15px;font-weight:800;margin-bottom:4px">${kpT('chal.challenge_friends')}</div>
+        <div style="font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:14px">${kpT('chal.explain')}</div>
         ${this._challengeForm(res.wpm,res.acc)}
       </div>`;
     }
@@ -9971,35 +9971,35 @@ const app={
       </div>
       ${chal.result}
       ${!currentUser?`<div class="t4a-aftertest">
-        <p class="t4a-aftertest-eyebrow">Après le test</p>
-        <h2 class="t4a-aftertest-title">Ce que tu débloques avec ton compte</h2>
+        <p class="t4a-aftertest-eyebrow">${kpT('after.eyebrow')}</p>
+        <h2 class="t4a-aftertest-title">${kpT('after.title')}</h2>
         <div class="features-grid" style="grid-template-columns:repeat(3,1fr);max-width:none;padding:0;margin:0">
-          <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.bookOpen}</div><h3>65 leçons, 5 minutes chacune</h3><p>Tu commences par 8 touches, puis les accents, les chiffres et les symboles.</p></div>
-          <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.gamepad}</div><h3>8+ jeux pour s'entraîner</h3><p>Frappe-mots, Le Sprint et d'autres défis : précision, mémoire et vitesse.</p></div>
-          <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.trendUp}</div><h3>Tes progrès enregistrés</h3><p>Chaque défi réussi fait monter ta courbe de vitesse et de précision.</p></div>
+          <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.bookOpen}</div><h3>${kpT('after.f1_title')}</h3><p>${kpT('after.f1_text')}</p></div>
+          <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.gamepad}</div><h3>${kpT('after.f2_title')}</h3><p>${kpT('after.f2_text')}</p></div>
+          <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.trendUp}</div><h3>${kpT('after.f3_title')}</h3><p>${kpT('after.f3_text')}</p></div>
         </div>
       </div>
       <div class="t4a-cta-banner">
         <div class="t4a-cta-inner">
           <div>
-            <h2>Prêt pour le défi n° 2&nbsp;?</h2>
-            <p>10 leçons offertes, test illimité, rien à installer.</p>
+            <h2>${kpT('after.cta2_title')}</h2>
+            <p>${kpT('after.cta2_text')}</p>
           </div>
           <div class="t4a-cta-right">
             <img src="/images/keypace-mascot-cheer.webp" width="282" height="303" alt="Mascotte KeyPace levant le poing pour célébrer, avec un ordinateur portable" loading="lazy" decoding="async">
-            <button class="btn-primary" onclick="openAuth('register')">Créer mon compte gratuit →</button>
+            <button class="btn-primary" onclick="openAuth('register')">${kpT('after.create_account')}</button>
           </div>
         </div>
       </div>`:`
       <div class="t4a-cta-banner">
         <div class="t4a-cta-inner">
           <div>
-            <h2>Prêt pour la suite&nbsp;?</h2>
-            <p>Retourne à tes leçons et continue ta progression.</p>
+            <h2>${kpT('after.next_title')}</h2>
+            <p>${kpT('after.next_text')}</p>
           </div>
           <div class="t4a-cta-right">
             <img src="/images/keypace-mascot-cheer.webp" width="282" height="303" alt="Mascotte KeyPace levant le poing pour célébrer, avec un ordinateur portable" loading="lazy" decoding="async">
-            <button class="btn-primary" onclick="app._skipModulesHub=true;go('lessons')">Reprendre les cours →</button>
+            <button class="btn-primary" onclick="app._skipModulesHub=true;go('lessons')">${kpT('after.resume')}</button>
           </div>
         </div>
       </div>`}

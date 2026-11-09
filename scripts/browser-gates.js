@@ -431,13 +431,13 @@ async function run(opts = {}) {
 
       // BR13 : interface en anglais (bêta, ?ui=en) : l'écran Test passe en anglais sans reste de français, se retient, et ?ui=fr ramène le français
       try {
-        const readTest = `(async()=>{go('test');await new Promise(r=>setTimeout(r,400));const el=document.getElementById('page-test');return{lang:document.documentElement.lang,ui:localStorage.getItem('kp_ui'),text:el?el.innerText:'',btns:[...document.querySelectorAll('#page-test button')].map(b=>b.innerText.trim())}})()`;
+        const readTest = `(async()=>{app._challenge={name:'Ana',wpm:40,acc:95};go('test');await new Promise(r=>setTimeout(r,400));const el=document.getElementById('page-test');return{lang:document.documentElement.lang,ui:localStorage.getItem('kp_ui'),text:el?el.innerText:'',btns:[...document.querySelectorAll('#page-test button')].map(b=>b.innerText.trim())}})()`;
         await ev("localStorage.clear();true");
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/?ui=en` }); await sleep(2500); exceptions.splice(0);
         const en = await ev(readTest);
-        const frLeft = ['Tape la phrase', 'ta vitesse', 'Recommencer', 'Autre texte', 'PRÉCISION', 'VITESSE', 'PROGRESSION', 'Commence à taper', 'Règle l', 'Espaces visibles', 'Lecture facile', 'caractères', 'mots / min'].filter((w) => en.text.includes(w));
+        const frLeft = ['Tape la phrase', 'ta vitesse', 'Recommencer', 'Autre texte', 'PRÉCISION', 'VITESSE', 'PROGRESSION', 'Commence à taper', 'Règle l', 'Espaces visibles', 'Lecture facile', 'caractères', 'mots / min', 'te défie', 'Son score', 'Après le test', 'Créer mon compte'].filter((w) => en.text.toLowerCase().includes(w.toLowerCase()));
         if (en.lang !== 'en' || en.ui !== 'en') problems.push(`BR13 : langue de l'interface non prise en compte (${en.lang}/${en.ui})`);
-        for (const w of ['Type the sentence', 'your speed.', 'ACCURACY', 'SPEED', 'PROGRESS', 'words / min', 'Show spaces:', 'Restart', 'Another text']) if (!en.text.includes(w) && !en.btns.some((b) => b.includes(w))) problems.push(`BR13 : « ${w} » absent de l'écran Test en anglais`);
+        for (const w of ['Type the sentence', 'your speed.', 'ACCURACY', 'SPEED', 'PROGRESS', 'words / min', 'Show spaces:', 'Restart', 'Another text', 'Ana is challenging you!', 'Their score:', 'After the test', 'Create my free account']) if (!en.text.toLowerCase().includes(w.toLowerCase()) && !en.btns.some((b) => b.toLowerCase().includes(w.toLowerCase()))) problems.push(`BR13 : « ${w} » absent de l'écran Test en anglais`);
         if (frLeft.length) problems.push(`BR13 : du français reste sur l'écran Test en anglais : ${frLeft.join(', ')}`);
         if (/\{\w+\}|test\.[a-z_]+/.test(en.text)) problems.push('BR13 : une clé ou un paramètre non remplacé est visible');
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2500); exceptions.splice(0);
@@ -445,7 +445,7 @@ async function run(opts = {}) {
         if (keep.lang !== 'en' || !keep.text.includes('Type the sentence')) problems.push('BR13 : la langue de l\'interface n\'est pas retenue au rechargement');
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/?ui=fr` }); await sleep(2500); exceptions.splice(0);
         const fr = await ev(readTest);
-        if (fr.lang !== 'fr' || !fr.text.includes('Tape la phrase') || !fr.btns.includes('Recommencer') || /Type the sentence|ACCURACY/.test(fr.text)) problems.push('BR13 : ?ui=fr ne ramène pas le français');
+        if (fr.lang !== 'fr' || !fr.text.includes('Tape la phrase') || !fr.text.includes('Ana te défie') || !fr.text.toLowerCase().includes('après le test') || !fr.btns.includes('Recommencer') || /Type the sentence|ACCURACY/.test(fr.text)) problems.push('BR13 : ?ui=fr ne ramène pas le français');
         exceptions.splice(0).forEach((e) => problems.push(`BR13 : exception : ${e}`));
         info.interfaceEn = 'ok';
       } catch (e) { problems.push(`BR13 : ${e.message}`); }
