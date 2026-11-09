@@ -6342,7 +6342,7 @@ const KP_GAME_TXT={
   boss:()=>[kpT('game.boss.name'),kpT('game.boss.desc')],
 };
 const KP_CAT_TXT={vitesse:()=>kpT('cat.speed'),precision:()=>kpT('cat.precision'),memoire:()=>kpT('cat.memory'),multi:()=>kpT('cat.multi')};
-const KP_LEVEL_TXT={repos:()=>kpT('lvl.repos'),haut:()=>kpT('lvl.top'),alphabet:()=>kpT('lvl.alphabet'),accents:()=>kpT('lvl.accents')};
+const KP_LEVEL_TXT={tout:()=>kpT('gl.all'),repos:()=>kpT('lvl.repos'),haut:()=>kpT('lvl.top'),alphabet:()=>kpT('lvl.alphabet'),accents:()=>kpT('lvl.accents')};
 const kpGameName=g=>(KP_GAME_TXT[g.key]?KP_GAME_TXT[g.key]()[0]:g.name);
 const kpGameDesc=g=>(KP_GAME_TXT[g.key]?KP_GAME_TXT[g.key]()[1]:g.desc);
 const kpLevelLabel=x=>(KP_LEVEL_TXT[x.id]?KP_LEVEL_TXT[x.id]():x.label);
@@ -8242,8 +8242,8 @@ const app={
       (arena||document.body).appendChild(el);
     }
     el.innerHTML=n>0
-      ?`<span class="cd-n" style="animation:cdPop .85s ease forwards">${n}</span><div style="font-size:13px;color:rgba(255,255,255,.4);margin-top:10px">Prépare tes doigts…</div>`
-      :`<span class="cd-go" style="animation:cdPop .5s ease forwards">GO !</span>`;
+      ?`<span class="cd-n" style="animation:cdPop .85s ease forwards">${n}</span><div style="font-size:13px;color:rgba(255,255,255,.4);margin-top:10px">${kpT('game.get_ready')}</div>`
+      :`<span class="cd-go" style="animation:cdPop .5s ease forwards">${kpT('game.go')}</span>`;
     playSound('countdown');
     if(n>0){
       this._cdTimer=setTimeout(()=>this._startCountdown(n-1),1000);
@@ -8474,7 +8474,7 @@ const app={
      étendre sa forme pour ces deux besoins. */
   _gameHeader(title,emoji){
     return `<div style="max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;align-items:center;gap:12px">
-      <button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button>
+      <button class="btn-quit" onclick="app.exitActiveGame()" title="${kpT('game.quit_title')}">${kpT('game.quit')}</button>
       <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px">${title} <span style="color:var(--accent)">${emoji}</span></h2>
     </div>`;
   },
@@ -8491,8 +8491,8 @@ const app={
       ${extra?`<div style="margin-bottom:20px">${extra}</div>`:''}
       ${bestLine?`<p style="font-size:14px;color:rgba(255,255,255,.55);margin-bottom:20px">${bestLine}</p>`:''}
       <div style="display:flex;gap:12px;justify-content:center">
-        <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="${primaryOnClick}">${primaryLabel||'Rejouer'}</button>
-        <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="${secondaryOnClick||'app.exitActiveGame()'}">${secondaryLabel||'← Jeux'}</button>
+        <button class="res-btn pri" style="flex:none;padding:14px 32px" onclick="${primaryOnClick}">${primaryLabel||kpT('game.replay')}</button>
+        <button class="res-btn sec" style="flex:none;padding:14px 32px" onclick="${secondaryOnClick||'app.exitActiveGame()'}">${secondaryLabel||kpT('game.back_games')}</button>
       </div>
     </div>`;
   },
@@ -8553,7 +8553,7 @@ const app={
   // Duel, qui le réécrivaient chacun séparément.
   _raceCountdownHTML(startAt){
     const cd=Math.max(0,Math.ceil((startAt-Date.now())/1000));
-    return `<div class="race-count">${cd>0?cd:'GO !'}</div><p>Prépare tes doigts…</p>`;
+    return `<div class="race-count">${cd>0?cd:kpT('game.go')}</div><p>${kpT('game.get_ready')}</p>`;
   },
 
   _tierRoadmap(items){
@@ -8673,43 +8673,43 @@ const app={
     const progressPct=s?Math.round(100*(30-timeLeft)/30):0;
 
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Le Sprint',ICONS.flag)}
+      ${this._gameHeader(kpT('game.sprint.name'),ICONS.flag)}
       <div class="sprint-arena">
         ${isIdle?`
-          <div class="gidle"><h2 class="gidle-title">Le Sprint<span class="dot"> .</span></h2><p>30 secondes, texte infini. Pas de retour arrière : chaque seconde compte.${best>0?`<br>Record : <b style="color:var(--accent)">${best} mpm</b>`:''}</p>
+          <div class="gidle"><h2 class="gidle-title">${kpT('game.sprint.name')}<span class="dot"> .</span></h2><p>${kpT('sprint.idle')}${best>0?`<br>${kpT('sprint.record',{n:best})}`:''}</p>
             ${this._gameLevelPicker('sprint')}
-            <button class="btn-primary" autofocus onclick="app.startSprint()">Lancer le Sprint ▸</button>
-            <div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>
+            <button class="btn-primary" autofocus onclick="app.startSprint()">${kpT('sprint.launch')}</button>
+            <div class="gidle-espace">${kpT('game.or_space')}</div></div>
         `:isOver?`
           ${this._gameResult({
-            title:wpm>=50?'Impressionnant !':wpm>=35?'Excellent !':wpm>=20?'Bien joué !':'Continue !',
-            record:(isRecord||isFirstRecord)?'Nouveau record personnel !':null,
+            title:wpm>=50?kpT('sprint.r_wow'):wpm>=35?kpT('typ.b_excellent'):wpm>=20?kpT('sprint.r_good'):kpT('sprint.r_keep'),
+            record:(isRecord||isFirstRecord)?kpT('typ.new_title'):null,
             boxes:[
-              {label:'Vitesse',value:wpm,unit:'mpm',accent:true},
-              {label:'Caractères corrects',value:correct},
-              {label:'Erreurs',value:errors,color:errors>0?'var(--danger)':'var(--success)'},
+              {label:kpT('typ.speed'),value:wpm,unit:kpT('unit.wpm'),accent:true},
+              {label:kpT('sprint.correct_chars'),value:correct},
+              {label:kpT('typ.errors'),value:errors,color:errors>0?'var(--danger)':'var(--success)'},
             ],
-            bestLine:s.glv&&!s.glv.full?`Niveau d’entraînement : ton record se bat au niveau « Tout le clavier ».`:best>0?`Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best} mpm</b>`:null,
-            primaryLabel:'Rejouer',primaryOnClick:'app.startSprint()',
+            bestLine:s.glv&&!s.glv.full?kpT('game.train_note'):best>0?`<span style="font-family:'JetBrains Mono',monospace">${kpT('sprint.record_b',{n:best})}</span>`:null,
+            primaryLabel:kpT('game.replay'),primaryOnClick:'app.startSprint()',
           })}
         `:`
           <div class="sprint-hud">
             <div>
-              <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px">TEMPS</div>
+              <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px">${kpT('sprint.time')}</div>
               <div class="sprint-timer${timeLeft<=10?' low':''}">${String(timeLeft).padStart(2,'0')}</div>
             </div>
             <div class="sprint-score-wrap">
-              <div class="sprint-score-label">VITESSE</div>
-              <div class="sprint-score-val">${wpm}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> mpm</span></div>
+              <div class="sprint-score-label">${kpT('sprint.speed')}</div>
+              <div class="sprint-score-val">${wpm}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> ${kpT('unit.wpm')}</span></div>
             </div>
           </div>
           <div class="sprint-progress"><div class="sprint-progress-fill" style="width:${progressPct}%"></div></div>
           <div class="sprint-text-box" tabindex="0">${textHTML}</div>
-          <div class="sprint-hint">${!s.started?'Commence à taper : le chrono démarre automatiquement.':errors>0?`<span style="color:var(--danger)">${errors} erreur${errors>1?'s':''}</span> · ${correct} corrects`:`${correct} caractères corrects`}</div>
+          <div class="sprint-hint">${!s.started?kpT('sprint.hint_idle'):errors>0?`<span style="color:var(--danger)">${kpTn('sprint.errors',errors)}</span> · ${kpT('sprint.n_correct',{n:correct})}`:kpT('sprint.n_chars_correct',{n:correct})}</div>
           <div style="display:flex;gap:12px;justify-content:center;position:relative;z-index:1">
-            <button class="btn-sm btn-dark" onclick="app.startSprint()">↻ Recommencer</button>
+            <button class="btn-sm btn-dark" onclick="app.startSprint()">↻ ${kpT('test.restart')}</button>
           </div>
-          ${best>0?`<p style="position:relative;z-index:1;text-align:center;font-size:13px;color:rgba(255,255,255,.5);margin-top:12px">Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best} mpm</b></p>`:''}
+          ${best>0?`<p style="position:relative;z-index:1;text-align:center;font-size:13px;color:rgba(255,255,255,.5);margin-top:12px"><span style="font-family:'JetBrains Mono',monospace">${kpT('sprint.record_b',{n:best})}</span></p>`:''}
         `}
       </div>
     </div>`;
@@ -12283,7 +12283,7 @@ const app={
             <div id="hybrid-target" style="position:absolute;left:${s.tx}%;top:${s.ty}%;width:${s.tr*2}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid var(--accent);background:radial-gradient(circle at 35% 30%,rgba(255,77,46,.5),rgba(255,77,46,.12) 70%);box-shadow:0 8px 24px rgba(255,77,46,.3);display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3);animation:calib-pulse 1s infinite">${s.letter}</div>
           </div>
         </div>
-        <div style="text-align:center;margin-top:10px"><button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button></div>
+        <div style="text-align:center;margin-top:10px"><button class="btn-quit" onclick="app.exitActiveGame()" title="${kpT('game.quit_title')}">${kpT('game.quit')}</button></div>
       </div>
     </div>`;
     this._sourisHybridBindArena();
@@ -13020,8 +13020,8 @@ const app={
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
-          <div class="race-count">${cd>0?cd:'GO !'}</div>
-          <p style="color:rgba(255,255,255,.5);font-size:14px">Prépare tes doigts…</p>
+          <div class="race-count">${cd>0?cd:kpT('game.go')}</div>
+          <p style="color:rgba(255,255,255,.5);font-size:14px">${kpT('game.get_ready')}</p>
         </div>
       </div>
     </div>`;
@@ -13132,7 +13132,7 @@ const app={
           <div class="tiles-keys">${keysHtml}</div>
           <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin-top:10px">${hasLong?'TUILE LONGUE · MAINTIENS LA TOUCHE':hasChord?'ACCORD · LES DEUX TOUCHES ENSEMBLE':hasTrap?'TUILE PIÈGE (✕) · NE LA TAPE PAS':'Frappe la lettre avant la ligne'}</div>
         </div>
-        <div style="text-align:center;margin-top:10px"><button class="btn-quit" onclick="app.exitActiveGame()" title="Quitter la partie (Échap)">✕ Quitter</button></div>
+        <div style="text-align:center;margin-top:10px"><button class="btn-quit" onclick="app.exitActiveGame()" title="${kpT('game.quit_title')}">${kpT('game.quit')}</button></div>
       </div>
     </div>`;
   },
@@ -13549,7 +13549,7 @@ const app={
     const tierBarPct=nextTier?Math.min(100,((score-(tier.score||0))/(nextTier.score-(tier.score||0)))*100):100;
     // HUD tier widget (only while actively playing)
     const soft=!!(g&&g.pool);
-    const tierHTML=gameOn&&soft?`<div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase">${g.level.label}</div><div style="font-size:10px;color:rgba(255,255,255,0.4)">Entraînement</div></div>`:gameOn?`<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+    const tierHTML=gameOn&&soft?`<div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase">${kpLevelLabel(g.level)}</div><div style="font-size:10px;color:rgba(255,255,255,0.4)">${kpT('frappe.training')}</div></div>`:gameOn?`<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
       <div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase">
         ${tier.label}
       </div>
@@ -13565,16 +13565,16 @@ const app={
       +(tierHistHTML?`<div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Paliers franchis</div>${tierHistHTML}</div>`:'');
     const isRecord=!!(g&&g._isRecord);
     const gameOverOverlay=`<div class="game-overlay">${this._gameResult({
-      title:isRecord?'Nouveau record !':'Fin de partie',
-      record:isRecord?'Tu bats ton record !':null,
+      title:isRecord?kpT('frappe.new_record'):kpT('frappe.game_over'),
+      record:isRecord?kpT('frappe.beat_record'):null,
       boxes:[
-        {label:'Score',value:score,unit:'pts',accent:true},
-        {label:'Mots tapés',value:g?g.wordsTyped:0},
-        {label:'Précision',value:accuracy,unit:'%'},
+        {label:kpT('frappe.score'),value:score,unit:kpT('unit.pts'),accent:true},
+        {label:kpT('frappe.words_typed'),value:g?g.wordsTyped:0},
+        {label:kpT('typ.accuracy'),value:accuracy,unit:'%'},
       ],
       extra:soft?'':tierExtra,
-      bestLine:soft?`Niveau d’entraînement : ton record se bat au niveau « Tout le clavier ».`:!isRecord?`Meilleur : <b style="color:var(--accent)">${best} pts</b>`:null,
-      primaryLabel:'Rejouer ▸',primaryOnClick:'app.startGame()',
+      bestLine:soft?kpT('game.train_note'):!isRecord?kpT('frappe.best',{n:best}):null,
+      primaryLabel:kpT('frappe.replay'),primaryOnClick:'app.startGame()',
     })}</div>`;
     const bestTierIdx=GAME_TIERS.indexOf(getGameTier(best));
     const roadmapItems=GAME_TIERS.map((t,i)=>({
@@ -13582,18 +13582,18 @@ const app={
       sub:i===0?'départ':t.score+' pts',
       state:i<bestTierIdx?'done':i===bestTierIdx?'current':'locked',
     }));
-    const idleOverlay=`<div class="game-overlay"><h2 class="gidle-title">Frappe-mots<span class="dot"> .</span></h2><p style="margin-bottom:6px">Mots qui tombent, doigts qui dansent.<br>Meilleur : <b style="color:#fff">${best} pts</b></p>
+    const idleOverlay=`<div class="game-overlay"><h2 class="gidle-title">${kpT('game.frappe.name')}<span class="dot"> .</span></h2><p style="margin-bottom:6px">${kpT('frappe.tagline')}<br>${kpT('frappe.best_idle',{n:best})}</p>
       ${this._gameLevelPicker('frappe')}
       ${this._glResolve('frappe').full?this._tierRoadmap(roadmapItems):''}
-      <button class="game-play-btn" autofocus onclick="app.startGame()" style="margin-top:4px">Jouer ▸</button>
-      <div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`;
-    const guestOverlay=`<div class="game-overlay"><h2>Frappe-mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="game-play-btn" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
+      <button class="game-play-btn" autofocus onclick="app.startGame()" style="margin-top:4px">${kpT('frappe.play')}</button>
+      <div class="gidle-espace">${kpT('game.or_space')}</div></div>`;
+    const guestOverlay=`<div class="game-overlay"><h2>${kpT('game.frappe.name')}</h2><p>${kpT('game.guest_text')}</p><button class="game-play-btn" onclick="openAuth('register',${JSON.stringify(kpT('game.guest_auth')).replace(/"/g,'&quot;')})">${kpT('game.guest_btn')}</button></div>`;
     // Countdown/tierBanner are body-injected : no overlay needed here
     const overlay=!currentUser?guestOverlay:gameIdle?idleOverlay:gameOver?gameOverOverlay:'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Frappe-mots',ICONS.target)}
+      ${this._gameHeader(kpT('game.frappe.name'),ICONS.target)}
       <div class="game-arena" style="max-width:1120px;margin:0 auto;margin-left:24px;margin-right:24px">
-        <div class="game-hud"><div class="game-score-val">${score}<span> pts</span></div>${tierHTML}<div style="display:flex;gap:5px">${hearts}</div></div>
+        <div class="game-hud"><div class="game-score-val">${score}<span> ${kpT('unit.pts')}</span></div>${tierHTML}<div style="display:flex;gap:5px">${hearts}</div></div>
         ${wordsHTML}${overlay}
       </div>
     </div>`;
@@ -13725,7 +13725,7 @@ const app={
       overlay=`<div class="course-overlay"><h2>⌨️ Clavier requis</h2><p>La Course de dactylo se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
     } else if(c&&!c.raceStarted){
       const cd=Math.max(0,Math.ceil((c.startAt-Date.now())/1000));
-      overlay=`<div class="course-overlay"><div class="course-count">${cd>0?cd:'GO !'}</div><p>Prépare tes doigts…</p></div>`;
+      overlay=`<div class="course-overlay"><div class="course-count">${cd>0?cd:kpT('game.go')}</div><p>${kpT('game.get_ready')}</p></div>`;
     }
     const result=over?this._gameResult({
       icon:c.rank===1?'🥇':c.rank===2?'🥈':c.rank===3?'🥉':'🏁',
@@ -13742,7 +13742,7 @@ const app={
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       ${this._gameHeader('Course de dactylo',ICONS.raceCar)}
       <div class="course-arena">
-        ${idle&&!IS_TOUCH_ONLY()?`<div class="course-idle"><h2>Course de dactylo<span class="dot"> .</span></h2><p>Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p>${this._gameLevelPicker('course')}<button class="btn-primary course-cta" autofocus onclick="app.startCourse()">Lancer la course ▸</button><div class="course-espace">OU APPUIE SUR ESPACE</div></div>`:''}
+        ${idle&&!IS_TOUCH_ONLY()?`<div class="course-idle"><h2>Course de dactylo<span class="dot"> .</span></h2><p>Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p>${this._gameLevelPicker('course')}<button class="btn-primary course-cta" autofocus onclick="app.startCourse()">Lancer la course ▸</button><div class="course-espace">${kpT('game.or_space')}</div></div>`:''}
         ${c?`
           <div class="course-hud">
             <div><div class="course-stat-label">VITESSE</div><div class="course-stat-val">${liveWpm}<span class="course-stat-unit"> mpm</span></div></div>
@@ -13910,7 +13910,7 @@ const app={
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       ${this._gameHeader('Contre ton fantôme',ICONS.ghost)}
       <div class="sprint-arena" style="position:relative">
-        ${idle&&!IS_TOUCH_ONLY()?`<div class="gidle"><h2 class="gidle-title">Contre ton fantôme<span class="dot"> .</span></h2><p>${best?'Bats ton meilleur temps sur ce texte : ton fantôme court à ton propre rythme précédent.':'Ta toute première course sur ce texte : elle enregistrera ton fantôme pour la prochaine fois.'}${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p>${this._gameLevelPicker('ghost')}<button class="btn-primary" autofocus onclick="app.startGhost()">Lancer la course ▸</button><div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`:''}
+        ${idle&&!IS_TOUCH_ONLY()?`<div class="gidle"><h2 class="gidle-title">Contre ton fantôme<span class="dot"> .</span></h2><p>${best?'Bats ton meilleur temps sur ce texte : ton fantôme court à ton propre rythme précédent.':'Ta toute première course sur ce texte : elle enregistrera ton fantôme pour la prochaine fois.'}${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p>${this._gameLevelPicker('ghost')}<button class="btn-primary" autofocus onclick="app.startGhost()">Lancer la course ▸</button><div class="gidle-espace">${kpT('game.or_space')}</div></div>`:''}
         ${c?`
           <div class="sprint-hud">
             <div><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> mpm</span></div></div>
@@ -14048,7 +14048,7 @@ const app={
     } else if(!currentUser){
       overlay=`<div class="race-overlay"><h2>Simon des mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="btn-primary" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
     } else if(idle){
-      overlay=`<div class="race-overlay"><h2 class="gidle-title">Simon des mots<span class="dot"> .</span></h2><p>Mémorise une séquence de mots puis retape-la. Elle s'allonge à chaque réussite.${best?'<br>Record : <b style="color:var(--accent)">'+best.score+' pts</b> (séquence de '+best.maxSeq+')':''}</p>${this._gameLevelPicker('simon')}<button class="btn-primary" autofocus onclick="app.startSimon()">Jouer ▸</button><div class="gidle-espace">OU APPUIE SUR ESPACE</div></div>`;
+      overlay=`<div class="race-overlay"><h2 class="gidle-title">Simon des mots<span class="dot"> .</span></h2><p>Mémorise une séquence de mots puis retape-la. Elle s'allonge à chaque réussite.${best?'<br>Record : <b style="color:var(--accent)">'+best.score+' pts</b> (séquence de '+best.maxSeq+')':''}</p>${this._gameLevelPicker('simon')}<button class="btn-primary" autofocus onclick="app.startSimon()">Jouer ▸</button><div class="gidle-espace">${kpT('game.or_space')}</div></div>`;
     } else if(over){
       const badge=s.maxSeq>=8?'Mémoire d\'éléphant !':s.maxSeq>=5?'Excellente mémoire !':s.maxSeq>=3?'Bien joué !':'Continue !';
       overlay=`<div class="race-overlay">${this._gameResult({
