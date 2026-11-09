@@ -4009,7 +4009,14 @@ function kpCloseRegion(refocus){
   const btn=document.getElementById('nav-region-btn'),menu=document.getElementById('nav-region-menu');if(!btn||!menu)return;
   menu.hidden=true;btn.setAttribute('aria-expanded','false');
   // Après un clic, on ne garde le focus nulle part : sinon la barre d'espace d'un test de frappe rouvrirait le menu. Échap le rend au bouton.
-  if(refocus===true)btn.focus();else if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+  // Seulement si le focus est encore sur ce menu ou son bouton : ce code tourne à CHAQUE clic de la page
+  // (menu déjà fermé compris), et retirait le focus du champ qu'on venait de cliquer au relâché de la
+  // souris — il fallait garder le clic enfoncé pour écrire son identifiant ou son mot de passe.
+  kpBlurIfInside(btn,menu,refocus);
+}
+function kpBlurIfInside(btn,menu,refocus){
+  const a=document.activeElement;
+  if(refocus===true)btn.focus();else if(a&&a.blur&&(a===btn||menu.contains(a)))a.blur();
 }
 document.addEventListener('click',e=>{const r=document.getElementById('nav-region');if(r&&!r.contains(e.target))kpCloseRegion(false);const k=document.getElementById('nav-kb');if(k&&!k.contains(e.target))kpCloseKbChip(false);});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('nav-region-menu');if(m&&!m.hidden){e.stopPropagation();kpCloseRegion(true);return;}const k=document.getElementById('nav-kb-menu');if(k&&!k.hidden){e.stopPropagation();kpCloseKbChip(true);}}},true);
@@ -5072,7 +5079,7 @@ function kpToggleKbChip(e){
 function kpCloseKbChip(refocus){
   const btn=document.getElementById('nav-kb-btn'),menu=document.getElementById('nav-kb-menu');if(!btn||!menu)return;
   menu.hidden=true;btn.setAttribute('aria-expanded','false');
-  if(refocus===true)btn.focus();else if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+  kpBlurIfInside(btn,menu,refocus); // voir kpCloseRegion : ne jamais retirer le focus d'un champ cliqué ailleurs
 }
 /* Quand l'élève travaille un autre cours que le cours par défaut, la page des leçons le dit clairement (cours et clavier). */
 function kpCourseBadgeHTML(){
