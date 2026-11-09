@@ -4423,8 +4423,10 @@ function kpRedrawKeyboard(){
 /* Langue du cours : s'ajoute à la famille de clavier. Un cours = langue + famille (fr/azerty, fr/qwerty, en/azerty, en/qwerty). */
 const KP_LANG_NAMES={fr:'Français',en:'English'};
 const kpT=(k,p)=>KPI18n.t(k,p),kpTn=(k,n,p)=>KPI18n.tn(k,n,p); /* textes de l'interface (i18n.js) : français par défaut, anglais en bêta avec ?ui=en */
-try{document.documentElement.lang=KPI18n.lang();}catch{}
 function kpContentLang(){return KP_COURSES[kpCourseId()].content;}
+KPI18n.setCourseLangGetter(()=>kpContentLang()); /* l'interface suit la langue du cours actif (sauf ?ui= explicite) */
+function kpSyncUiLang(){try{document.documentElement.lang=KPI18n.lang();}catch{}}
+kpSyncUiLang();
 function kpLanguagesOffered(){return [...new Set(KP_COURSES_OFFERED.map(c=>KP_COURSES[c].content))];}
 function kpFamilyCourse(fam){const id=kpContentLang()+'/'+fam;return KP_COURSES[id]?id:'fr/'+fam;}
 const KP_DEFAULT_VARIANT={azerty:'fr',qwerty:'windows-us-intl'};
@@ -5035,6 +5037,7 @@ function kbFamilyBoxHTML(){
 const KB_AZ_SHORT={fr:'Français',be:'Belge',mac:'Mac',nf:'NF'};
 function kbChipText(){const l=getKbLayoutId(),q=KB_QWERTY[l];return q?('QWERTY · '+(q.short||q.label)):('AZERTY · '+(KB_AZ_SHORT[l]||KB_LAYOUT_LABELS[l]||''));}
 function kpKbChipRender(){
+  kpSyncUiLang();
   const t=document.getElementById('nav-kb-text'),b=document.getElementById('nav-kb-btn'),m=document.getElementById('nav-kb-menu');
   if(!t||!b||!m)return;
   const ct=kbChipText().split(' · ');t.innerHTML='<b>'+ct[0]+'</b>'+(ct[1]?'<span class="kbc-var"> · '+ct[1]+'</span>':'');
@@ -9530,13 +9533,13 @@ const app={
     }
     const finished=!!(s&&s.finished);
     let resWpm=0,resAcc=0,resTime=0,resErrors=0,badge='';
-    if(finished){const r=this.computeResult(s);resWpm=r.wpm;resAcc=r.acc;resTime=r.time;resErrors=r.errors;badge=r.wpm>=45?'Excellent !':r.wpm>=30?'Beau travail !':'Continue, ça vient !';}
+    if(finished){const r=this.computeResult(s);resWpm=r.wpm;resAcc=r.acc;resTime=r.time;resErrors=r.errors;badge=r.wpm>=45?kpT('typ.b_excellent'):r.wpm>=30?kpT('typ.b_good'):kpT('typ.b_keep_going');}
     let lessonPassed=false,hasNext=false,missingTxt='';
     if(finished&&isLesson){
       lessonPassed=resWpm>=goals.minWpm&&resErrors<=goals.maxErrors;
       const li=ALL_LESSONS.findIndex(l=>l.id===s.lessonId);hasNext=li>=0&&li<ALL_LESSONS.length-1;
-      const parts=[];if(resWpm<goals.minWpm)parts.push('+'+(goals.minWpm-resWpm)+' mpm');if(resErrors>goals.maxErrors)parts.push((resErrors-goals.maxErrors)+' faute(s) en trop');missingTxt=parts.join(' · ');
-      badge=lessonPassed?'Leçon réussie !':'Pas encore validée';
+      const parts=[];if(resWpm<goals.minWpm)parts.push('+'+(goals.minWpm-resWpm)+' '+kpT('unit.wpm'));if(resErrors>goals.maxErrors)parts.push(kpTn('typ.extra_faults',resErrors-goals.maxErrors));missingTxt=parts.join(' · ');
+      badge=lessonPassed?kpT('typ.lesson_done'):kpT('typ.not_yet');
     }
     const les=isLesson?this.lessonById(s.lessonId):null;
     const ch=this._challenge;
@@ -9565,7 +9568,7 @@ const app={
       </div>`;
     }
     const typingTitle=titled?(s.title||'Devoir'):les?les.title:'Test de vitesse';
-    const typingSub=cert?(vocal?`<span style="color:var(--accent)">${ICONS.gradCap}</span> Dictée de certification : garde les yeux sur l'écran (≥ 90% requis), écoute et tape.`:`<span style="color:var(--accent)">${ICONS.gradCap}</span> Examen de certification : regard sur l'écran ≥ 90% et précision ≥ 90% requis.`):custom?(vocal?`<span style="color:var(--accent)">${ICONS.bookOpen}</span> Dictée : écoute le texte et tape ce que tu entends.`:'Recopie le texte ci-dessous le plus vite et juste possible.'):les?`Touches : ${les.keys||''}  ·  Objectif ${goals.minWpm} mpm, max ${goals.maxErrors} fautes`:'Tape le texte ci-dessous le plus vite et juste possible.';
+    const typingSub=cert?(vocal?`<span style="color:var(--accent)">${ICONS.gradCap}</span> Dictée de certification : garde les yeux sur l'écran (≥ 90% requis), écoute et tape.`:`<span style="color:var(--accent)">${ICONS.gradCap}</span> Examen de certification : regard sur l'écran ≥ 90% et précision ≥ 90% requis.`):custom?(vocal?`<span style="color:var(--accent)">${ICONS.bookOpen}</span> Dictée : écoute le texte et tape ce que tu entends.`:'Recopie le texte ci-dessous le plus vite et juste possible.'):les?kpT('typ.lesson_sub',{keys:les.keys||'',wpm:goals.minWpm,errors:goals.maxErrors}):'Tape le texte ci-dessous le plus vite et juste possible.';
     const next=s&&!s.finished&&!vocal?s.text[s.idx]:null;
     let tbHTML='';
     if(s){let wbuf=[];const flush=()=>{if(wbuf.length){tbHTML+='<span style="white-space:nowrap">'+wbuf.join('')+'</span>';wbuf=[];}};s.text.split('').forEach((ch,i)=>{let cls='todo';if(i<s.idx)cls=s.typed[i]==='w'?'wrong':'ok';else if(i===s.idx)cls='cur';if(ch===' '){flush();tbHTML+=`<span class="ch ${cls}">&nbsp;</span>`;}else wbuf.push(`<span class="ch ${cls}">${ch}</span>`);});flush();}
@@ -9573,20 +9576,20 @@ const app={
     const kbHTML=KB_FULL.map(row=>`<div class="kb-row-t">${row.map(k=>{const on=knext!=null&&this.keyMatches(k,knext);const viaG=on&&!kdir&&!!k.g&&k.g.toLowerCase()===klow&&k.l.toLowerCase()!==klow;const viaGS=on&&!kdir&&!viaG&&!!k.gs&&k.gs.toLowerCase()===klow&&k.l.toLowerCase()!==klow;return`<div class="kb-key-t${on?' on':''}" data-l="${kbAttr(k.l.toLowerCase())}" data-s="${kbAttr(k.s)}" data-g="${kbAttr(k.g)}" data-gs="${kbAttr(k.gs)}" data-finger="${FINGERS[k.f]||''}" style="border-bottom-color:${on?'rgba(0,0,0,0.2)':FINGERS[k.f]}">${k.l.toLowerCase()}${k.s?'<br><span style="font-size:9px;opacity:.6">'+k.s+'</span>':''}${(k.g||k.gs)?`<span class="kb-ag" style="display:${viaG||viaGS?'block':'none'};font-size:8px;opacity:.7">${viaGS?kbModifierName()+' + Maj':kbModifierName()}</span>`:''}</div>`;}).join('')}</div>`).join('');
     document.getElementById(pageId).innerHTML=`<div class="typing-section">
       <div class="typing-header">
-        <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Tous les cours</button><br>':custom?'<button onclick="go(\'classes\')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Mes devoirs</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
-        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')"><span style="color:var(--accent)">${ICONS.bulb}</span> Explication</button>`:''}${vocal&&!finished?`<button class="btn-sm btn-outline" onclick="app.speakAssignment()"><span style="color:var(--accent)">${ICONS.volume}</span> Réécouter</button>`:''}${!isLesson&&!custom&&!cert?'<button class="btn-sm btn-outline" onclick="app.newPassage()">↻ Autre texte</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">Recommencer</button><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()">${this._gaze.enabled?`<span style="color:#fff">${ICONS.eye}</span> Traqueur actif`:`<span style="color:var(--accent)">${ICONS.eye}</span> Activer traqueur des yeux`}</button>${this._gaze.permError?`<span style="font-size:11px;color:var(--danger);max-width:220px;text-align:right">${this._gaze.permError}</span>`:''}</div></div>
+        <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">'+kpT('typ.back_courses')+'</button><br>':custom?'<button onclick="go(\'classes\')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">← Mes devoirs</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
+        <div class="typing-actions">${isLesson&&les&&les.tuto?`<button class="btn-sm btn-outline" onclick="app.openLessonTuto('${les.id}')"><span style="color:var(--accent)">${ICONS.bulb}</span> ${kpT('typ.explain')}</button>`:''}${vocal&&!finished?`<button class="btn-sm btn-outline" onclick="app.speakAssignment()"><span style="color:var(--accent)">${ICONS.volume}</span> Réécouter</button>`:''}${!isLesson&&!custom&&!cert?'<button class="btn-sm btn-outline" onclick="app.newPassage()">'+kpT('test.another')+'</button>':''}<button class="btn-sm btn-dark" onclick="app.restart()">${kpT('test.restart')}</button><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><button class="gaze-toggle${this._gaze.enabled?' on':''}${this._gaze.permError?' error':''}" onclick="app.gazeToggle()">${this._gaze.enabled?`<span style="color:#fff">${ICONS.eye}</span> ${kpT('typ.tracker_on')}`:`<span style="color:var(--accent)">${ICONS.eye}</span> ${kpT('test.eye_off')}`}</button>${this._gaze.permError?`<span style="font-size:11px;color:var(--danger);max-width:220px;text-align:right">${this._gaze.permError}</span>`:''}</div></div>
       </div>
       <div class="live-stats" style="${finished?'display:none':''}">
-        <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val">${s&&s.started?liveWpm+'<span class="stat-unit"> mpm</span>':'·'}</div></div>
-        <div class="stat-box"><div class="stat-label">Précision</div><div class="stat-val">${s&&s.started?liveAcc:'·'}</div></div>
-        <div class="stat-box"><div class="stat-label">Temps</div><div class="stat-val">${s&&s.started?liveTime+'<span class="stat-unit"> s</span>':'·'}</div></div>
-        <div class="stat-box"><div class="stat-label">Progression</div><div class="stat-val">${s&&s.idx>0?progress+'<span class="stat-unit"> %</span>':'·'}</div></div>
+        <div class="stat-box"><div class="stat-label">${kpT('typ.speed')}</div><div class="stat-val">${s&&s.started?liveWpm+'<span class="stat-unit"> '+kpT('unit.wpm')+'</span>':'·'}</div></div>
+        <div class="stat-box"><div class="stat-label">${kpT('typ.accuracy')}</div><div class="stat-val">${s&&s.started?liveAcc:'·'}</div></div>
+        <div class="stat-box"><div class="stat-label">${kpT('typ.time')}</div><div class="stat-val">${s&&s.started?liveTime+'<span class="stat-unit"> s</span>':'·'}</div></div>
+        <div class="stat-box"><div class="stat-label">${kpT('typ.progress')}</div><div class="stat-val">${s&&s.idx>0?progress+'<span class="stat-unit"> %</span>':'·'}</div></div>
         ${(()=>{
           if(!currentUser||!this.stats)return'';
           const pb=s?this._prevBestFor(s):0;
           if(!pb)return'';
           const beating=s&&s.started&&liveWpm>pb;
-          return`<div class="stat-box" style="border-left:1px solid var(--border)"><div class="stat-label" style="color:${beating?'var(--success)':'var(--muted)'}">Record</div><div class="stat-val" style="font-size:22px;color:${beating?'var(--success)':'var(--muted)'}">${pb}<span class="stat-unit"> mpm</span></div></div>`;
+          return`<div class="stat-box" style="border-left:1px solid var(--border)"><div class="stat-label" style="color:${beating?'var(--success)':'var(--muted)'}">${kpT('typ.record')}</div><div class="stat-val" style="font-size:22px;color:${beating?'var(--success)':'var(--muted)'}">${pb}<span class="stat-unit"> ${kpT('unit.wpm')}</span></div></div>`;
         })()}
       </div>
       <div class="prog-wrap"><div class="prog-fill" style="width:${progress}%"></div></div>
@@ -9598,12 +9601,12 @@ const app={
         <div style="margin-top:18px;font-size:13px;color:var(--muted)">Avancement : <span id="voc-count" style="font-weight:700;color:var(--txt)">${s.idx} / ${s.text.length}</span> caractères</div>
       </div>`:`<div class="typing-box"><div class="typing-box-inner" id="tb-scroll">${tbHTML}</div></div>`):''}
       ${finished?`<div class="result-box"><div class="result-badge">${badge}</div>
-        ${isLesson?`<div class="banner ${lessonPassed?'pass':'fail'}"><div class="banner-title">${lessonPassed?'Leçon validée ✓':'Presque !'}</div><div class="banner-sub">${lessonPassed?(hasNext?'La leçon suivante est débloquée.':'Bravo, tu as terminé tout le parcours !'):'Objectif : '+goals.minWpm+' mpm · max '+goals.maxErrors+' fautes : il te manque '+missingTxt+'.'}</div></div>`:''}
+        ${isLesson?`<div class="banner ${lessonPassed?'pass':'fail'}"><div class="banner-title">${lessonPassed?kpT('typ.passed'):kpT('typ.almost')}</div><div class="banner-sub">${lessonPassed?(hasNext?kpT('typ.next_unlocked'):kpT('typ.course_done')):kpT('typ.goal_missing',{wpm:goals.minWpm,errors:goals.maxErrors,missing:missingTxt})}</div></div>`:''}
         <div class="result-grid">
-          <div class="stat-box"><div class="stat-label">Vitesse</div><div class="stat-val">${resWpm}<span class="stat-unit"> mpm</span></div></div>
-          <div class="stat-box"><div class="stat-label">Précision</div><div class="stat-val">${resAcc}<span class="stat-unit"> %</span></div></div>
-          <div class="stat-box"><div class="stat-label">Temps</div><div class="stat-val">${resTime}<span class="stat-unit"> s</span></div></div>
-          <div class="stat-box"><div class="stat-label">Erreurs</div><div class="stat-val">${resErrors}</div></div>
+          <div class="stat-box"><div class="stat-label">${kpT('typ.speed')}</div><div class="stat-val">${resWpm}<span class="stat-unit"> ${kpT('unit.wpm')}</span></div></div>
+          <div class="stat-box"><div class="stat-label">${kpT('typ.accuracy')}</div><div class="stat-val">${resAcc}<span class="stat-unit"> %</span></div></div>
+          <div class="stat-box"><div class="stat-label">${kpT('typ.time')}</div><div class="stat-val">${resTime}<span class="stat-unit"> s</span></div></div>
+          <div class="stat-box"><div class="stat-label">${kpT('typ.errors')}</div><div class="stat-val">${resErrors}</div></div>
         </div>
         ${(()=>{
           if(!currentUser||s._prevBestWpm==null)return'';
@@ -9616,16 +9619,16 @@ const app={
                 <div style="width:38px;height:38px;border-radius:10px;background:${iconBg};color:${iconColor};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${icon}</div>
                 <div><div style="font-size:14px;font-weight:700;color:${titleColor}">${title}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${sub}</div></div>
               </div>
-              <div style="text-align:right;flex-shrink:0;margin-left:12px"><span style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:${titleColor}">${rightVal}</span><span style="font-size:13px;color:var(--muted);font-weight:500"> mpm</span></div>
+              <div style="text-align:right;flex-shrink:0;margin-left:12px"><span style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:${titleColor}">${rightVal}</span><span style="font-size:13px;color:var(--muted);font-weight:500"> ${kpT('unit.wpm')}</span></div>
             </div>
             <div style="height:6px;border-radius:3px;background:var(--border);overflow:hidden"><div style="height:100%;width:${barPct}%;background:${barColor};border-radius:3px"></div></div>
             <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:11px;color:var(--muted)">${leftLbl}</span><span style="font-size:11px;color:var(--muted)">${rightLbl}</span></div>
           </div>`;
-          if(isFirst)return _card(ICONS.award,'rgba(31,169,113,.15)','#1FA971','Premier record établi !','#1FA971',`Ton score de <b style="color:#1FA971">${resWpm} mpm</b> est maintenant ta référence.`,resWpm,100,'#1FA971',`${resWpm} mpm (ce test)`,'1er record');
-          if(isRecord){const diff=resWpm-prev;return _card(ICONS.trophy,'rgba(31,169,113,.15)','#1FA971','Nouveau record personnel !','#1FA971',`Tu bats ton ancien record de <b style="color:#1FA971">+${diff} mpm</b>.`,resWpm,100,'#1FA971',`Ancien : ${prev} mpm`,`Nouveau : ${resWpm} mpm ✓`);}
+          if(isFirst)return _card(ICONS.award,'rgba(31,169,113,.15)','#1FA971',kpT('typ.first_title'),'#1FA971',kpT('typ.first_sub',{wpm:resWpm}),resWpm,100,'#1FA971',kpT('typ.this_test',{wpm:resWpm}),kpT('typ.first_label'));
+          if(isRecord){const diff=resWpm-prev;return _card(ICONS.trophy,'rgba(31,169,113,.15)','#1FA971',kpT('typ.new_title'),'#1FA971',kpT('typ.new_sub',{diff}),resWpm,100,'#1FA971',kpT('typ.old',{prev}),kpT('typ.new',{wpm:resWpm}));}
           const gap=prev-resWpm;const pct=Math.min(99,Math.round(100*resWpm/prev));
           const equalRecord=resWpm===prev;
-          return _card(equalRecord?ICONS.target:ICONS.trendUp,equalRecord?'rgba(31,169,113,.15)':'rgba(255,77,46,.1)',equalRecord?'#1FA971':'var(--accent)',equalRecord?'Record égalé !':'Meilleur score à battre','var(--txt)',equalRecord?'Tu es au niveau de ton record.':gap===1?'Il te manque <b style="color:var(--accent)">1 mpm</b> pour le record.':`Il te manque <b style="color:var(--accent)">${gap} mpm</b> pour le record.`,prev,pct,equalRecord?'#1FA971':'var(--accent)',`${resWpm} mpm (ce test)`,`Record : ${prev} mpm`);
+          return _card(equalRecord?ICONS.target:ICONS.trendUp,equalRecord?'rgba(31,169,113,.15)':'rgba(255,77,46,.1)',equalRecord?'#1FA971':'var(--accent)',equalRecord?kpT('typ.equal_title'):kpT('typ.beat_title'),'var(--txt)',equalRecord?kpT('typ.equal_sub'):kpTn('typ.gap',gap),prev,pct,equalRecord?'#1FA971':'var(--accent)',kpT('typ.this_test',{wpm:resWpm}),kpT('typ.record_of',{prev}));
         })()}
         ${(custom||cert)?`<div style="margin-top:16px;text-align:left;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px">
           <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px">${vocal?'Texte de la dictée':cert?"Texte de l'examen":'Texte du devoir'}</div>
@@ -9633,11 +9636,11 @@ const app={
         </div>`:''}
         ${chalResult}
         <div class="result-actions">
-          ${isLesson&&lessonPassed&&hasNext?`<button class="res-btn pri" onclick="app.goNextLesson()">Leçon suivante →</button>`:`<button class="res-btn pri" onclick="app.restart()">${isLesson?'Réessayer':'Recommencer'}</button>`}
-          <button class="res-btn sec" onclick="${isLesson?'app.backLessons()':custom?'go(\'classes\')':'go(\'stats\')'}">${isLesson?'Tous les cours':custom?'Mes devoirs':'Voir mes progrès'}</button>
+          ${isLesson&&lessonPassed&&hasNext?`<button class="res-btn pri" onclick="app.goNextLesson()">${kpT('typ.next_lesson')}</button>`:`<button class="res-btn pri" onclick="app.restart()">${isLesson?kpT('typ.retry'):kpT('test.restart')}</button>`}
+          <button class="res-btn sec" onclick="${isLesson?'app.backLessons()':custom?'go(\'classes\')':'go(\'stats\')'}">${isLesson?kpT('typ.all_courses'):custom?'Mes devoirs':'Voir mes progrès'}</button>
         </div>
       </div>`:''}
-      ${!finished?`<div class="hint-txt">${s&&!s.started?'Commence à taper pour démarrer le chrono…':s&&s.started?'<span style="opacity:.5;font-size:12px">Tab pour recommencer</span>':''}</div>`:''}
+      ${!finished?`<div class="hint-txt">${s&&!s.started?kpT('typ.start_hint'):s&&s.started?'<span style="opacity:.5;font-size:12px">'+kpT('typ.tab_restart')+'</span>':''}</div>`:''}
       ${(()=>{
         if(!(s&&s._gazeStats))return'';
         const stats=s._gazeStats;
@@ -9653,7 +9656,7 @@ const app={
           </div>
         </div>`;
       })()}
-      <div class="kb-wrap">${kbHTML}<div class="kb-space${next===' '?' on':''}">espace</div></div>
+      <div class="kb-wrap">${kbHTML}<div class="kb-space${next===' '?' on':''}">${kpT('test.space_key')}</div></div>
     </div>`;
     requestAnimationFrame(()=>app.scrollToCursor());
   },
@@ -9673,7 +9676,7 @@ const app={
       prog=Math.round(100*s.idx/s.text.length);
       if(s.started){const e=this.now||Date.now();const m=Math.max((e-s.startTime)/6e4,1/600);wpm=Math.round(s.correct/5/m);acc=s.keystrokes?Math.round(100*s.correct/s.keystrokes):100;time=Math.round((e-s.startTime)/1e3);}
     }
-    if(sv[0])sv[0].innerHTML=s.started?wpm+'<span class="stat-unit"> mpm</span>':'·';
+    if(sv[0])sv[0].innerHTML=s.started?wpm+'<span class="stat-unit"> '+kpT('unit.wpm')+'</span>':'·';
     if(sv[1])sv[1].innerHTML=s.started?acc+'<span class="stat-unit"> %</span>':'·';
     if(sv[2])sv[2].innerHTML=s.started?time+'<span class="stat-unit"> s</span>':'·';
     if(sv[3])sv[3].innerHTML=prog>0?prog+'<span class="stat-unit"> %</span>':'·';
@@ -9714,7 +9717,7 @@ const app={
     const sp=document.querySelector('.kb-space');
     if(sp)sp.classList.toggle('on',realNext===' '||(next===' '));
     const hint=document.querySelector('.hint-txt');
-    if(hint)hint.innerHTML=s.started?'<span style="opacity:.45;font-size:12px">Tab pour recommencer</span>':'Commence à taper pour démarrer le chrono…';
+    if(hint)hint.innerHTML=s.started?'<span style="opacity:.45;font-size:12px">'+kpT('typ.tab_restart')+'</span>':kpT('typ.start_hint');
     requestAnimationFrame(()=>this.scrollToCursor());
   },
 
@@ -10090,8 +10093,8 @@ const app={
       <p class="gg-sub">${o.text}</p>
       <div class="guest-gate-feats">${(o.feats||[]).map(f=>`<span>${f}</span>`).join('')}</div>
       <div class="guest-gate-btns">
-        <button class="gg-btn-pri" onclick="openAuth('register')">${o.cta||'Créer mon compte gratuit'}</button>
-        <button class="gg-btn-sec" onclick="openAuth('login')">J'ai déjà un compte</button>
+        <button class="gg-btn-pri" onclick="openAuth('register')">${o.cta||kpT('gate.create')}</button>
+        <button class="gg-btn-sec" onclick="openAuth('login')">${kpT('gate.have_account')}</button>
       </div>
     </div>`;
   },
@@ -10112,7 +10115,7 @@ const app={
   renderLessons(){
     if(this._showIntro){this._renderTypingInto('page-lessons');return;}
     if(this.sess&&this.sess.mode==='lesson'){this._renderTypingInto('page-lessons');return;}
-    if(!this._skipModulesHub){this.renderModulesHub();return;}
+    if(!this._skipModulesHub&&kpContentLang()==='fr'){this.renderModulesHub();return;} /* la page « Cours » (programmes belge et français, modules de rédaction) est propre au français : un cours en anglais affiche directement ses modules */
     const goals=this.stats?this.stats.goals:{minWpm:20,maxErrors:8};
     const plan=getUserPlan();
     const statusById={};
@@ -10124,11 +10127,11 @@ const app={
 
     const guestBanner = !currentUser ? this._guestGate({
       icon:ICONS.bookOpen,
-      eyebrow:'Accès aux cours',
-      title:'Commence tes leçons gratuitement',
-      text:"Les 10 premières leçons sont offertes. Crée ton compte pour débloquer le parcours, sauvegarder ta progression et reprendre là où tu t'es arrêté.",
-      feats:['10 leçons gratuites','Progression sauvegardée','Parcours AZERTY complet'],
-      cta:'Créer mon compte et commencer',
+      eyebrow:kpT('les.gate_eyebrow'),
+      title:kpT('les.gate_title'),
+      text:kpT('les.gate_text'),
+      feats:[kpT('les.gate_f1'),kpT('les.gate_f2'),kpT('les.gate_f3')],
+      cta:kpT('les.gate_cta'),
     }) : '';
 
     const modsHTML=ALL_MODULES.map((mod,mi)=>{
@@ -10143,7 +10146,7 @@ const app={
         const dotCls=s.cleared?'c':(expertLocked||guestExpertLocked)?'ex':(!currentUser||progressLocked)?'l':'t';
         const isTodo=currentUser&&!progressLocked&&!s.cleared&&isFree;
         const cardCls=`lesson-card${isTodo?' todo-c':''}${(expertLocked||guestExpertLocked)?' expert-locked':''}`;
-        const clickHandler=!currentUser?`openAuth('register','Crée un compte gratuit pour commencer les leçons.')`
+        const clickHandler=!currentUser?`openAuth('register',${JSON.stringify(kpT('les.auth_msg')).replace(/"/g,'&quot;')})`
           :expertLocked?`openModal('upgrade-modal')`
           :progressLocked?''
           :`app.tryStartLesson('${les.id}')`;
@@ -10154,7 +10157,7 @@ const app={
             <div class="les-title">${les.title}</div>
             <div class="les-keys">${les.keys||''}</div>
           </div>
-          ${s.cleared?`<div class="les-best">${s.best} mpm</div>`:''}
+          ${s.cleared?`<div class="les-best">${s.best} ${kpT('unit.wpm')}</div>`:''}
           ${(expertLocked||guestExpertLocked)?`<div class="expert-tag">EXPERT</div>`:''}
         </button>`;
       }).join('');
@@ -10174,12 +10177,12 @@ const app={
     }).join('');
 
     const goalsHtml=currentUser?`<div class="goals-bar">
-      <div class="goal-item"><span class="goal-label">Objectif vitesse</span><button class="goal-btn" onclick="app.setGoal('minWpm',-1)">–</button><span class="goal-val">${goals.minWpm}</span><button class="goal-btn" onclick="app.setGoal('minWpm',1)">+</button><span style="font-size:13px;color:var(--muted)">mpm</span></div>
-      <div class="goal-item"><span class="goal-label">Max erreurs</span><button class="goal-btn" onclick="app.setGoal('maxErrors',-1)">–</button><span class="goal-val">${goals.maxErrors}</span><button class="goal-btn" onclick="app.setGoal('maxErrors',1)">+</button></div>
+      <div class="goal-item"><span class="goal-label">${kpT('les.goal_speed')}</span><button class="goal-btn" onclick="app.setGoal('minWpm',-1)">–</button><span class="goal-val">${goals.minWpm}</span><button class="goal-btn" onclick="app.setGoal('minWpm',1)">+</button><span style="font-size:13px;color:var(--muted)">${kpT('unit.wpm')}</span></div>
+      <div class="goal-item"><span class="goal-label">${kpT('les.goal_errors')}</span><button class="goal-btn" onclick="app.setGoal('maxErrors',-1)">–</button><span class="goal-val">${goals.maxErrors}</span><button class="goal-btn" onclick="app.setGoal('maxErrors',1)">+</button></div>
     </div>`:'';
 
     document.getElementById('page-lessons').innerHTML=`<div class="lessons-section">
-      <div class="lessons-header"><button onclick="app.backToModulesHub()" style="background:none;border:none;color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;padding:0;margin-bottom:10px;font-family:inherit">← Tous les modules</button><h2>La base de la dactylographie${kpCourseBadgeHTML()}</h2><p>Progresse étape par étape · <span style="color:var(--accent);font-weight:700">${FREE_LESSON_IDS.length} leçons gratuites</span> · ${ALL_LESSONS.length-FREE_LESSON_IDS.length} leçons Expert</p></div>
+      <div class="lessons-header"><button onclick="app.backToModulesHub()" style="background:none;border:none;color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;padding:0;margin-bottom:10px;font-family:inherit${kpContentLang()==='fr'?'':';display:none'}">${kpT('les.all_modules')}</button><h2>${kpT('les.title')}${kpCourseBadgeHTML()}</h2><p>${kpT('les.step_by_step')} · <span style="color:var(--accent);font-weight:700">${kpT('les.free_lessons',{n:FREE_LESSON_IDS.length})}</span> · ${kpT('les.expert_lessons',{n:ALL_LESSONS.length-FREE_LESSON_IDS.length})}</p></div>
       ${guestBanner}${goalsHtml}${currentUser?modsHTML:`<div class="gate-teased">${modsHTML}</div>`}
     </div>`;
   },

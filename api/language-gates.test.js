@@ -6,8 +6,8 @@ const os = require('os');
 const path = require('path');
 const { q10 } = require('../scripts/language-gates');
 
-const TUTO = { intro: 'Introduction.', rules: [{ icon: 'a', t: 'Un', d: 'Texte un.' }, { icon: 'b', t: 'Deux', d: 'Texte deux.' }, { icon: 'c', t: 'Trois', d: 'Texte trois.' }], tip: 'Objectif : bien taper.' };
-const L = (id, keys, teaches, text, extra) => ({ id, title: 'Titre ' + id, keys, teaches, tip: 'Conseil.', tuto: TUTO, text, ...(extra || {}) });
+const TUTO = { intro: 'Introduction.', rules: [{ icon: 'a', t: 'One', d: 'Text one.' }, { icon: 'b', t: 'Two', d: 'Text two.' }, { icon: 'c', t: 'Three', d: 'Text three.' }], tip: 'Goal: type well.' };
+const L = (id, keys, teaches, text, extra) => ({ id, title: 'Title ' + id, keys, teaches, tip: 'Advice.', tuto: TUTO, text, ...(extra || {}) });
 const WORDS = ['ad', 'as', 'sad', 'dad', 'fad', 'fads', 'dads', 'add', 'adds', 'ask', 'asks', 'lad', 'lads', 'lass', 'all', 'fall', 'falls', 'salad', 'flask'];
 const L1 = L('r1', 'f j', 'fj', 'fj jf fj jf fjfj jfjf ffjj jjff fjf jfj ffj jjf fjfj jfjf');
 const L2 = L('r2', 'a s d', 'asd', 'as ad sad dad fad add sas das fas ads adds dads fads ass daa sda fas asd');
@@ -19,7 +19,7 @@ function mk({ en, fr, lexicon, extra, extraCheck, family }) {
   const fam = family || 'qwerty';
   fs.mkdirSync(path.join(dir, 'fr-qwerty')); fs.mkdirSync(path.join(dir, 'en-' + fam));
   fs.writeFileSync(path.join(dir, 'fr-qwerty', '01-x.json'), JSON.stringify({ position: 1, name: '1. Position', row: 'repos', lessons: fr || [L1, L2, L3] }));
-  fs.writeFileSync(path.join(dir, 'en-' + fam, '01-position.json'), JSON.stringify({ position: 1, name: '1. Position de base', row: 'repos', lessons: en || [L1, L2, L3] }));
+  fs.writeFileSync(path.join(dir, 'en-' + fam, '01-position.json'), JSON.stringify({ position: 1, name: '1. Home row', row: 'repos', lessons: en || [L1, L2, L3] }));
   fs.writeFileSync(path.join(dir, 'en-words.json'), JSON.stringify({ words: lexicon || WORDS }));
   if (extra) fs.writeFileSync(path.join(dir, 'en-lexicon-extra-a.json'), JSON.stringify({ words: extra }));
   if (extraCheck) fs.writeFileSync(path.join(dir, 'en-lexicon-extra-a-check.json'), JSON.stringify({ results: extraCheck }));
@@ -82,8 +82,8 @@ test('longueur : trop court, trop long, espaces', () => {
 test('lettre accentuée, orthographe américaine, tiret cadratin, mauvais clavier : refusés', () => {
   assert.ok(has(run({ en: [L1, L2, L('r3', 'k l h t p', 'l', GOOD3 + ' élan')] }), /accentuée/));
   assert.ok(has(run({ en: [L1, L2, L('r3', 'k l h t p', 'l', GOOD3 + ' color')] }), /orthographe américaine/));
-  assert.ok(has(run({ en: [L1, L2, { ...L3, tip: 'Un conseil — avec un tiret.' }] }), /tiret cadratin/));
-  assert.ok(has(run({ en: [L1, L2, { ...L3, tip: 'Sur ton clavier AZERTY.' }] }), /mauvais clavier/));
+  assert.ok(has(run({ en: [L1, L2, { ...L3, tip: 'A tip, with a dash — here.' }] }), /tiret cadratin/));
+  assert.ok(has(run({ en: [L1, L2, { ...L3, tip: 'On your AZERTY keyboard.' }] }), /mauvais clavier/));
 });
 
 test('forme : tutoriel incomplet, module mal numéroté, id en double', () => {
@@ -103,7 +103,7 @@ test('lexique complémentaire : un mot non vérifié ou non confirmé est refus�
 });
 
 test('cours AZERTY : refuse une mention de QWERTY', () => {
-  const dir = mk({ family: 'azerty', en: [L1, L2, { ...L3, tip: 'Sur ton clavier QWERTY.' }] });
+  const dir = mk({ family: 'azerty', en: [L1, L2, { ...L3, tip: 'On your QWERTY keyboard.' }] });
   // la référence AZERTY est celle de la page : les ids r1.. y existent avec leurs touches ; le test vérifie surtout le mauvais clavier
   const r = q10({ srcDir: dir });
   assert.ok(has(r, /mauvais clavier/), r.detail);
@@ -114,7 +114,7 @@ test('majuscules : refusées avant le module des majuscules, admises après', ()
   const dir = mk({});
   const L4 = L('maj1', 'Maj', '', 'Sad Dad ask Lad fall Add salad Lass lads All as ad dads falls asks adds flask');
   fs.writeFileSync(path.join(dir, 'fr-qwerty', '02-m.json'), JSON.stringify({ position: 2, name: '2. Majuscules', kind: 'majuscules', lessons: [L4] }));
-  fs.writeFileSync(path.join(dir, 'en-qwerty', '02-m.json'), JSON.stringify({ position: 2, name: '2. Majuscules', kind: 'majuscules', lessons: [L4] }));
+  fs.writeFileSync(path.join(dir, 'en-qwerty', '02-m.json'), JSON.stringify({ position: 2, name: '2. Capitals', kind: 'majuscules', lessons: [L4] }));
   const r = q10({ srcDir: dir }); assert.ok(r.ok, r.detail);
 });
 
@@ -131,7 +131,7 @@ test('LANG_COURSE / only : ne vérifie que le cours demandé (un agent n\'est pa
 // ── Modules suivants : chiffres, apostrophes, symboles ──
 function withModule2(kind, lesson, enLesson, lexiconExtra, extraCheck) {
   const dir = mk({ extra: lexiconExtra, extraCheck });
-  const mod = (ls) => JSON.stringify({ position: 2, name: '2. Suite', kind, lessons: ls });
+  const mod = (ls) => JSON.stringify({ position: 2, name: '2. Next', kind, lessons: ls });
   fs.writeFileSync(path.join(dir, 'fr-qwerty', '02-s.json'), mod([lesson]));
   fs.writeFileSync(path.join(dir, 'en-qwerty', '02-s.json'), mod([enLesson || lesson]));
   return dir;
@@ -171,4 +171,12 @@ test('https : terme technique admis dans un module de symboles seulement', () =>
   const sym = L('sym1', '$ %', '$%', 'sad $ dad % ask $ lad % all $ add % salad $ lass % https $ falls % ask $ add %');
   assert.ok(q10({ srcDir: withModule2('symboles', sym) }).ok);
   assert.ok(has(q10({ srcDir: withModule2('ponctuation', sym) }), /« https » n'est pas dans le lexique/));
+});
+
+test('interface en anglais : titre, conseil ou étiquette de touches en français refusés ; module de rangée mal nommé refusé', () => {
+  assert.ok(has(run({ en: [L1, L2, { ...L3, tip: 'Garde les doigts sur la rangée de repos.' }] }), /en français/));
+  assert.ok(has(run({ en: [L1, L2, { ...L3, title: 'Les index' }] }), /en français/));
+  assert.ok(has(run({ en: [L1, L2, { ...L3, keys: L3.keys + ' fluidité' }] }), /en français/));
+  const dir = mk({}); fs.writeFileSync(path.join(dir, 'en-qwerty', '01-position.json'), JSON.stringify({ position: 1, name: '1. Position de base', row: 'repos', lessons: [L1, L2, L3] }));
+  assert.ok(has(q10({ srcDir: dir }), /Home row/));
 });

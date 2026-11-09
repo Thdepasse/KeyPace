@@ -62,6 +62,11 @@ function referenceFor(family, srcDir) {
   return ref;
 }
 
+// Mots français courants (mots entiers, majuscules admises en début de phrase) : leur présence dans un titre, un conseil ou un tutoriel montre qu'il reste du français.
+const FR_WORDS = /(^|[^\p{L}'])(le|la|les|des|du|une|est|sont|pour|avec|dans|tu|ton|ta|tes|sur|qui|que|pas|et|ou|vos|votre|ce|cette|ces|ses|aux|au)(?![\p{L}'])/iu;
+// `keys` mêle les touches enseignées (« f j », « é », « ; ») et, parfois, une étiquette en mots (« toutes lettres »). L'étiquette est dans la langue du cours ;
+// seules les touches doivent rester identiques à celles du cours français (ordre d'apprentissage).
+const keysCore = (k) => String(k).split(/\s+/).filter((t) => !/^[\p{L}'’-]{2,}$/u.test(t)).join(' ');
 function checkCourse(dirName, srcDir, lexicon, errs) {
   const [lang, family] = dirName.split('-');
   const dir = path.join(srcDir, dirName);
@@ -73,6 +78,10 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
     const pos = m.position !== undefined ? m.position : [].concat(m.replaces)[0];
     if (pos !== i + 1) errs.push(`${dirName}/${m.file} : position ${pos}, attendu ${i + 1}`);
     if (!/^\d+\. /.test(m.name || '')) errs.push(`${dirName}/${m.file} : le nom du module doit commencer par « ${i + 1}. »`);
+    // l'interface suit la langue du cours : le nom du module est dans la langue du cours, et les trois premiers gardent un nom que les niveaux des jeux reconnaissent (game-levels.js)
+    if (FR_WORDS.test(m.name || '') || FR_ACCENTS.test(m.name || '')) errs.push(`${dirName}/${m.file} : nom du module en français (« ${m.name} »)`);
+    const ROW_NAME = { repos: /^\d+\. Home row$/, haut: /^\d+\. Top row$/, bas: /^\d+\. Bottom row$/ };
+    if (m.row && ROW_NAME[m.row] && !ROW_NAME[m.row].test(m.name || '')) errs.push(`${dirName}/${m.file} : le module « ${m.row} » doit s'appeler « ${i + 1}. ${{ repos: 'Home row', haut: 'Top row', bas: 'Bottom row' }[m.row]} » (les niveaux des jeux le reconnaissent par ce nom)`);
   });
   const lessons = mods.flatMap((m) => m.lessons.map((l) => ({ ...l, _m: m })));
   const ids = new Set(); const cum = new Set(); let majOn = false; const signs = new Set(); const digits = new Set(); let n = 0;
@@ -86,9 +95,10 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
     if (!t || !t.intro || !t.tip || !Array.isArray(t.rules) || t.rules.length < 3 || t.rules.length > 4 || t.rules.some((r) => !r.icon || !r.t || !r.d)) errs.push(`${where} : tutoriel incomplet (intro, 3 ou 4 règles icône/titre/texte, objectif)`);
     const shown = [l.title, l.tip, l.keys, t ? flatTuto(t) : ''].join(' ');
     if (/—/.test(shown) || /—/.test(l.text || '')) errs.push(`${where} : tiret cadratin`);
+    if (FR_ACCENTS.test(shown) || FR_WORDS.test(shown)) errs.push(`${where} : titre, conseil ou tutoriel en français (l'interface d'un cours en anglais est en anglais) : « ${(shown.match(FR_WORDS) || shown.match(FR_ACCENTS) || [''])[0]} »`);
     if (wrong.test(shown)) errs.push(`${where} : mention du mauvais clavier dans un cours ${family.toUpperCase()}`);
     const r = ref[l.id];
-    if (r && String(r.keys) !== String(l.keys)) errs.push(`${where} : touches « ${l.keys} » différentes du cours français (« ${r.keys} ») : l'ordre d'apprentissage doit rester le même`);
+    if (r && keysCore(r.keys) !== keysCore(l.keys)) errs.push(`${where} : touches « ${l.keys} » différentes du cours français (« ${r.keys} ») : l'ordre d'apprentissage doit rester le même`);
     if (r && r.teaches !== undefined && r.teaches !== l.teaches) errs.push(`${where} : teaches « ${l.teaches} » différent du cours français (« ${r.teaches} »)`);
     // touches apprises (cumul) : lettres de `keys`, signes de `keys`
     G.lettersOf(l).forEach((c) => cum.add(c));

@@ -1,6 +1,6 @@
 /* Textes de l'interface par langue. Fichier pur : chargé par index.html (balise script) et par les tests Node.
    Le français est la langue de référence et le REPLI : une clé absente en anglais s'affiche en français, donc migrer écran par écran ne casse rien.
-   Langue de l'interface : français par défaut ; l'anglais est en bêta et se choisit avec ?ui=en dans l'adresse (retenu ensuite), ?ui=fr pour revenir.
+   Langue de l'interface : celle du cours actif (cours d'anglais = interface en anglais, bêta) ; ?ui=en ou ?ui=fr force une langue (retenue), ?ui=auto revient au suivi du cours.
    Valeurs : du HTML (utilisé dans innerHTML) ; les paramètres s'écrivent {nom}. Pluriel : clé_one (1) et clé_other (tout le reste).
    Règles : aucun tiret long ; l'anglais est britannique (colour, centre, whilst). */
 (function (root) {
@@ -78,6 +78,67 @@
       'after.next_title': 'Prêt pour la suite&nbsp;?',
       'after.next_text': 'Retourne à tes leçons et continue ta progression.',
       'after.resume': 'Reprendre les cours →',
+      // ── Écran de leçon ──
+      'unit.wpm': 'mpm',
+      'typ.back_courses': '← Tous les cours',
+      'typ.explain': 'Explication',
+      'typ.tracker_on': 'Traqueur actif',
+      'typ.lesson_sub': 'Touches : {keys}  ·  Objectif {wpm} mpm, max {errors} fautes',
+      'typ.speed': 'Vitesse',
+      'typ.accuracy': 'Précision',
+      'typ.time': 'Temps',
+      'typ.progress': 'Progression',
+      'typ.errors': 'Erreurs',
+      'typ.record': 'Record',
+      'typ.b_excellent': 'Excellent !',
+      'typ.b_good': 'Beau travail !',
+      'typ.b_keep_going': 'Continue, ça vient !',
+      'typ.extra_faults_one': '{n} faute en trop',
+      'typ.extra_faults_other': '{n} fautes en trop',
+      'typ.lesson_done': 'Leçon réussie !',
+      'typ.not_yet': 'Pas encore validée',
+      'typ.passed': 'Leçon validée ✓',
+      'typ.almost': 'Presque !',
+      'typ.next_unlocked': 'La leçon suivante est débloquée.',
+      'typ.course_done': 'Bravo, tu as terminé tout le parcours !',
+      'typ.goal_missing': 'Objectif : {wpm} mpm · max {errors} fautes : il te manque {missing}.',
+      'typ.first_title': 'Premier record établi !',
+      'typ.first_sub': 'Ton score de <b style="color:#1FA971">{wpm} mpm</b> est maintenant ta référence.',
+      'typ.first_label': '1er record',
+      'typ.this_test': '{wpm} mpm (ce test)',
+      'typ.new_title': 'Nouveau record personnel !',
+      'typ.new_sub': 'Tu bats ton ancien record de <b style="color:#1FA971">+{diff} mpm</b>.',
+      'typ.old': 'Ancien : {prev} mpm',
+      'typ.new': 'Nouveau : {wpm} mpm ✓',
+      'typ.equal_title': 'Record égalé !',
+      'typ.beat_title': 'Meilleur score à battre',
+      'typ.equal_sub': 'Tu es au niveau de ton record.',
+      'typ.gap_one': 'Il te manque <b style="color:var(--accent)">1 mpm</b> pour le record.',
+      'typ.gap_other': 'Il te manque <b style="color:var(--accent)">{n} mpm</b> pour le record.',
+      'typ.record_of': 'Record : {prev} mpm',
+      'typ.next_lesson': 'Leçon suivante →',
+      'typ.retry': 'Réessayer',
+      'typ.all_courses': 'Tous les cours',
+      'typ.start_hint': 'Commence à taper pour démarrer le chrono…',
+      'typ.tab_restart': 'Tab pour recommencer',
+      // ── Liste des leçons ──
+      'les.gate_eyebrow': 'Accès aux cours',
+      'les.gate_title': 'Commence tes leçons gratuitement',
+      'les.gate_text': "Les 10 premières leçons sont offertes. Crée ton compte pour débloquer le parcours, sauvegarder ta progression et reprendre là où tu t'es arrêté.",
+      'les.gate_f1': '10 leçons gratuites',
+      'les.gate_f2': 'Progression sauvegardée',
+      'les.gate_f3': 'Parcours AZERTY complet',
+      'les.gate_cta': 'Créer mon compte et commencer',
+      'les.auth_msg': 'Crée un compte gratuit pour commencer les leçons.',
+      'les.goal_speed': 'Objectif vitesse',
+      'les.goal_errors': 'Max erreurs',
+      'les.all_modules': '← Tous les modules',
+      'les.title': 'La base de la dactylographie',
+      'les.step_by_step': 'Progresse étape par étape',
+      'les.free_lessons': '{n} leçons gratuites',
+      'les.expert_lessons': '{n} leçons Expert',
+      'gate.create': 'Créer mon compte gratuit',
+      'gate.have_account': "J'ai déjà un compte",
     },
     en: {
       'test.eyebrow': 'Challenge no. 1: the speed test',
@@ -149,21 +210,86 @@
       'after.next_title': 'Ready for what comes next?',
       'after.next_text': 'Go back to your lessons and carry on with your progress.',
       'after.resume': 'Back to my lessons →',
+      'unit.wpm': 'wpm',
+      'typ.back_courses': '← All courses',
+      'typ.explain': 'Explanation',
+      'typ.tracker_on': 'Tracker on',
+      'typ.lesson_sub': 'Keys: {keys}  ·  Goal {wpm} wpm, max {errors} mistakes',
+      'typ.speed': 'Speed',
+      'typ.accuracy': 'Accuracy',
+      'typ.time': 'Time',
+      'typ.progress': 'Progress',
+      'typ.errors': 'Mistakes',
+      'typ.record': 'Record',
+      'typ.b_excellent': 'Excellent!',
+      'typ.b_good': 'Nice work!',
+      'typ.b_keep_going': 'Keep going, you are getting there!',
+      'typ.extra_faults_one': '{n} mistake too many',
+      'typ.extra_faults_other': '{n} mistakes too many',
+      'typ.lesson_done': 'Lesson passed!',
+      'typ.not_yet': 'Not passed yet',
+      'typ.passed': 'Lesson passed ✓',
+      'typ.almost': 'Almost!',
+      'typ.next_unlocked': 'The next lesson is unlocked.',
+      'typ.course_done': 'Well done, you have finished the whole course!',
+      'typ.goal_missing': 'Goal: {wpm} wpm · max {errors} mistakes: you are {missing} short.',
+      'typ.first_title': 'First record set!',
+      'typ.first_sub': 'Your score of <b style="color:#1FA971">{wpm} wpm</b> is now your benchmark.',
+      'typ.first_label': '1st record',
+      'typ.this_test': '{wpm} wpm (this test)',
+      'typ.new_title': 'New personal record!',
+      'typ.new_sub': 'You beat your old record by <b style="color:#1FA971">+{diff} wpm</b>.',
+      'typ.old': 'Previous: {prev} wpm',
+      'typ.new': 'New: {wpm} wpm ✓',
+      'typ.equal_title': 'Record equalled!',
+      'typ.beat_title': 'Best score to beat',
+      'typ.equal_sub': 'You are level with your record.',
+      'typ.gap_one': 'You are <b style="color:var(--accent)">1 wpm</b> short of the record.',
+      'typ.gap_other': 'You are <b style="color:var(--accent)">{n} wpm</b> short of the record.',
+      'typ.record_of': 'Record: {prev} wpm',
+      'typ.next_lesson': 'Next lesson →',
+      'typ.retry': 'Try again',
+      'typ.all_courses': 'All courses',
+      'typ.start_hint': 'Start typing to start the timer…',
+      'typ.tab_restart': 'Tab to restart',
+      'les.gate_eyebrow': 'Course access',
+      'les.gate_title': 'Start your lessons for free',
+      'les.gate_text': 'The first 10 lessons are free. Create your account to unlock the whole course, save your progress and pick up where you left off.',
+      'les.gate_f1': '10 free lessons',
+      'les.gate_f2': 'Progress saved',
+      'les.gate_f3': 'Full course',
+      'les.gate_cta': 'Create my account and start',
+      'les.auth_msg': 'Create a free account to start the lessons.',
+      'les.goal_speed': 'Speed goal',
+      'les.goal_errors': 'Max mistakes',
+      'les.all_modules': '← All modules',
+      'les.title': 'The basics of touch typing',
+      'les.step_by_step': 'Progress step by step',
+      'les.free_lessons': '{n} free lessons',
+      'les.expert_lessons': '{n} Expert lessons',
+      'gate.create': 'Create my free account',
+      'gate.have_account': 'I already have an account',
     },
   };
 
   const LANGS = Object.keys(dict);
   let forced = null; // langue imposée (tests)
 
-  // Langue de l'interface : ?ui=en|fr dans l'adresse (puis retenue), sinon la valeur retenue, sinon le français.
+  // Langue de l'interface : 1. ?ui=en|fr dans l'adresse (puis retenue : choix explicite), 2. sinon la langue du cours actif (un cours d'anglais =
+  // une interface en anglais), 3. sinon le français. ?ui=auto efface le choix explicite et revient à « suivre le cours ».
+  let courseGetter = null;
+  function setCourseLangGetter(fn) { courseGetter = typeof fn === 'function' ? fn : null; }
   function lang() {
     if (forced) return forced;
+    let v = null;
     try {
-      const q = /[?&]ui=(en|fr)(?:&|#|$)/.exec(root.location.search || '');
-      if (q) root.localStorage.setItem('kp_ui', q[1]);
-      const v = root.localStorage.getItem('kp_ui');
-      return LANGS.includes(v) ? v : 'fr';
-    } catch (e) { return 'fr'; }
+      const q = /[?&]ui=(en|fr|auto)(?:&|#|$)/.exec(root.location.search || '');
+      if (q) { if (q[1] === 'auto') root.localStorage.removeItem('kp_ui'); else root.localStorage.setItem('kp_ui', q[1]); }
+      v = root.localStorage.getItem('kp_ui');
+    } catch (e) { /* stockage indisponible : on suit le cours */ }
+    if (LANGS.includes(v)) return v;
+    try { const c = courseGetter && courseGetter(); if (LANGS.includes(c)) return c; } catch (e) { /* cours pas encore connu */ }
+    return 'fr';
   }
   function setLang(l) { forced = l && LANGS.includes(l) ? l : null; }
 
@@ -179,6 +305,6 @@
   // tn('clé', n, {param}) : pluriel (1 → clé_one, sinon clé_other) ; {n} vaut toujours le nombre.
   function tn(key, n, params) { return t(key + (n === 1 ? '_one' : '_other'), Object.assign({ n }, params || {})); }
 
-  const api = { dict, LANGS, lang, setLang, t, tn };
+  const api = { dict, LANGS, lang, setLang, setCourseLangGetter, t, tn };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.KPI18n = api;
 })(typeof window !== 'undefined' ? window : globalThis);

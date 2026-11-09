@@ -34,9 +34,9 @@
   function levels(lessons) {
     const sets = cumulative(lessons); const out = [];
     const add = (id, label, idx) => { if (idx >= 0) out.push({ id, label, lesson: idx, letters: sets[idx] }); };
-    add('repos', 'Rangée de repos', lastIndexWhere(lessons, (l) => inModule(l, /Position de base/i)));
-    add('haut', 'Rangée du haut', lastIndexWhere(lessons, (l) => inModule(l, /Rang[ée]e du haut/i)));
-    add('alphabet', 'Alphabet complet', lastIndexWhere(lessons, (l) => inModule(l, /Rang[ée]e du bas/i)));
+    add('repos', 'Rangée de repos', lastIndexWhere(lessons, (l) => inModule(l, /Position de base|Home row/i)));
+    add('haut', 'Rangée du haut', lastIndexWhere(lessons, (l) => inModule(l, /Rang[ée]e du haut|Top row/i)));
+    add('alphabet', 'Alphabet complet', lastIndexWhere(lessons, (l) => inModule(l, /Rang[ée]e du bas|Bottom row/i)));
     // accents : première leçon qui apporte une lettre accentuée, jusqu'à la dernière qui en apporte une
     let last = -1; const seen = new Set();
     lessons.forEach((l, i) => { if (lettersOf(l).some((c) => /[^a-z]/.test(c) && !seen.has(c))) last = i; lettersOf(l).forEach((c) => seen.add(c)); });

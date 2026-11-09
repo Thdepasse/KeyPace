@@ -1,110 +1,110 @@
 {
  "position": 9,
- "name": "9. Crochets, accolades et code",
+ "name": "9. Brackets, braces and code",
  "kind": "symboles",
  "lessons": [
   {
    "id": "sym7",
-   "title": "[ ] : les crochets",
+   "title": "[ ]: square brackets",
    "keys": "[ ]",
    "teaches": "[]",
    "row": "haut",
    "fingers": [
     "rp"
    ],
-   "tip": "Les crochets sont à droite du P, tout au bout de la rangée du haut : l'auriculaire droit y monte, sans Maj.",
+   "tip": "Square brackets are to the right of P, at the very end of the top row: your right little finger reaches up to them, without Shift.",
    "tuto": {
-    "intro": "Les crochets [ ] se tapent avec l'auriculaire droit, sur les deux touches à droite du P. Ils servent dans le code (tableau[0]) et pour les compléments entre crochets. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+    "intro": "Square brackets [ ] are typed with your right little finger, on the two keys to the right of P. They are used in code (list[0]) and for added words in square brackets. The exact movement for your keyboard is shown just below.",
     "rules": [
      {
       "icon": "⬆️",
-      "t": "À droite du P",
-      "d": "L'auriculaire droit s'étire au-delà du P : [ est juste à droite, ] juste après. Aucune touche Maj n'est nécessaire."
+      "t": "To the right of P",
+      "d": "Your right little finger stretches past P: [ is just to the right, ] just after it. No Shift is needed."
      },
      {
       "icon": "🔁",
-      "t": "On ouvre, on ferme",
-      "d": "Chaque crochet ouvert se referme. Enchaîne : ouvrir, taper, fermer."
+      "t": "Open, then close",
+      "d": "Every bracket you open must be closed. Chain it together: open, type, close."
      },
      {
       "icon": "💻",
-      "t": "Dans le code",
-      "d": "list[0], data[3], item[i] : le crochet désigne la case d'une liste."
+      "t": "In code",
+      "d": "list[0], data[3], item[i]: the square bracket picks out a slot in a list."
      }
     ],
-    "tip": "Objectif : taper [ et ] avec l'auriculaire droit sans quitter ta position de repos."
+    "tip": "Goal: type [ and ] with your right little finger without leaving your home position."
    },
    "text": "list[0] list[1] [a] [b] item[i] names[2] [yes] [no] [end] data[3] [1] [2]"
   },
   {
    "id": "sym8",
-   "title": "{ } : les accolades",
+   "title": "{ }: curly braces",
    "keys": "{ }",
    "teaches": "{}",
    "row": "haut",
    "fingers": [
     "rp"
    ],
-   "tip": "Les accolades sont sur les mêmes touches que les crochets, avec Maj : l'auriculaire droit monte, l'auriculaire gauche tient Maj.",
+   "tip": "Curly braces are on the same keys as square brackets, with Shift: your right little finger reaches up, and your left little finger holds Shift.",
    "tuto": {
-    "intro": "Les accolades { } partagent les touches des crochets : on les obtient avec Maj. On les rencontre dans le code et les feuilles de style. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+    "intro": "Curly braces { } share the keys of the square brackets: you get them with Shift. You meet them in code and stylesheets. The exact movement for your keyboard is shown just below.",
     "rules": [
      {
       "icon": "⇧",
-      "t": "Maj de la main opposée",
-      "d": "Comme pour les majuscules : tiens Maj avec l'auriculaire de la main qui ne tape pas la touche. Maj + la touche du chiffre donne le symbole."
+      "t": "Use the opposite Shift",
+      "d": "Just like capital letters: hold Shift with the little finger of the hand that is not typing the key. Shift plus the number key gives the symbol."
      },
      {
       "icon": "🔁",
-      "t": "On ouvre, on ferme",
-      "d": "Comme les crochets : une accolade ouverte se referme. Prends l'habitude de les taper par paire."
+      "t": "Open, then close",
+      "d": "Like square brackets: a brace you open must be closed. Get into the habit of typing them in pairs."
      },
      {
       "icon": "💻",
-      "t": "Dans le code",
-      "d": "{style: bold}, {x: 1} : les accolades délimitent un bloc de code ou un objet."
+      "t": "In code",
+      "d": "{style: bold}, {x: 1}: braces mark out a block of code or an object."
      }
     ],
-    "tip": "Objectif : taper { et } avec Maj et l'auriculaire droit."
+    "tip": "Goal: type { and } with Shift and your right little finger."
    },
    "text": "{a} {b} {x: 1} {y: 2} {end} {ok} {style: bold} {name: tom} {yes} {no}"
   },
   {
    "id": "sym9",
-   "title": "\\ et | : barre oblique inverse et barre verticale",
+   "title": "\\ and |: backslash and vertical bar",
    "keys": "\\ |",
    "teaches": "\\|",
    "row": "haut",
    "fingers": [
     "rp"
    ],
-   "tip": "La barre oblique inverse et la barre verticale sont sur la touche juste au-dessus de Entrée, à l'auriculaire droit ; la barre verticale demande Maj.",
+   "tip": "The backslash and the vertical bar are on the key just above Enter, typed with your right little finger; the vertical bar needs Shift.",
    "tuto": {
-    "intro": "La barre oblique inverse \\ et la barre verticale | partagent une même touche, tout au bout de la rangée du haut, au-dessus de Entrée. La barre verticale s'obtient avec Maj. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+    "intro": "The backslash \\ and the vertical bar | share one key, right at the end of the top row, above Enter. You get the vertical bar with Shift. The exact movement for your keyboard is shown just below.",
     "rules": [
      {
       "icon": "⬆️",
-      "t": "Au-dessus d'Entrée",
-      "d": "L'auriculaire droit s'étire au bout de la rangée du haut, après les crochets. \\ se tape seul, | avec Maj."
+      "t": "Above Enter",
+      "d": "Your right little finger stretches to the end of the top row, past the square brackets. \\ is typed on its own, | with Shift."
      },
      {
       "icon": "📁",
-      "t": "Les chemins Windows",
-      "d": "C:\\Users\\Tom : la barre oblique inverse sépare les dossiers sous Windows, alors que la barre oblique simple / les sépare ailleurs."
+      "t": "Windows paths",
+      "d": "C:\\Users\\Tom: the backslash separates folders in Windows, whereas the plain forward slash / separates them elsewhere."
      },
      {
       "icon": "➡️",
-      "t": "La barre verticale",
-      "d": "a | b relie deux commandes ou sépare deux choix : droite | gauche."
+      "t": "The vertical bar",
+      "d": "a | b joins two commands or separates two choices: left | right."
      }
     ],
-    "tip": "Objectif : taper \\ et | avec l'auriculaire droit, avec Maj pour la barre verticale."
+    "tip": "Goal: type \\ and | with your right little finger, with Shift for the vertical bar."
    },
    "text": "C:\\Users\\Tom a|b a||b c\\d \\n \\t left | right /home | grep \\\\ || C:\\Windows"
   },
   {
    "id": "sym10",
-   "title": "< > : les chevrons",
+   "title": "< >: angle brackets",
    "keys": "< >",
    "teaches": "<>",
    "row": "bas",
@@ -112,57 +112,57 @@
     "rm",
     "rr"
    ],
-   "tip": "Les chevrons sont sur les touches de la virgule et du point, avec Maj : le majeur et l'annulaire droits descendent, l'auriculaire gauche tient Maj.",
+   "tip": "Angle brackets are on the comma and full stop keys, with Shift: your right middle and ring fingers reach down, and your left little finger holds Shift.",
    "tuto": {
-    "intro": "Les chevrons < > se tapent avec Maj sur les touches de la virgule et du point. On les voit dans les balises HTML : <p>texte</p>. Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+    "intro": "Angle brackets < > are typed with Shift on the comma and full stop keys. You see them in HTML tags: <p>text</p>. The exact movement for your keyboard is shown just below.",
     "rules": [
      {
       "icon": "⇧",
-      "t": "Maj de la main opposée",
-      "d": "Comme pour les majuscules : tiens Maj avec l'auriculaire de la main qui ne tape pas la touche. Maj + la touche du chiffre donne le symbole."
+      "t": "Use the opposite Shift",
+      "d": "Just like capital letters: hold Shift with the little finger of the hand that is not typing the key. Shift plus the number key gives the symbol."
      },
      {
       "icon": "🏷️",
-      "t": "Les balises HTML",
-      "d": "<p>texte</p> : le chevron ouvrant, le nom de la balise, le chevron fermant. La barre oblique / ferme la balise."
+      "t": "HTML tags",
+      "d": "<p>text</p>: the opening bracket, the name of the tag, the closing bracket. The forward slash / closes the tag."
      },
      {
       "icon": "🔁",
-      "t": "Ouvrir, fermer",
-      "d": "Chaque balise ouverte se referme avec la barre oblique. Entraîne-toi à enchaîner les deux."
+      "t": "Open, then close",
+      "d": "Every tag you open is closed with the forward slash. Practise chaining the two."
      }
     ],
-    "tip": "Objectif : taper < et > avec Maj et les doigts de la main droite."
+    "tip": "Goal: type < and > with Shift and the fingers of your right hand."
    },
    "text": "<html> </html> <p>text</p> <div> </div> <b>bold</b> <i>end</i> <a> </a> <h1>title</h1> <br> <ul> </ul>"
   },
   {
    "id": "sym11",
-   "title": "Révision : tous les symboles en texte",
-   "keys": "tous symboles",
+   "title": "Review: all the symbols in text",
+   "keys": "all symbols",
    "teaches": "",
    "howText": true,
-   "tip": "On réunit tous les symboles dans un texte mêlant adresse, web, code et prix. Repère le geste avant chaque symbole : direct, Maj ou touche morte.",
+   "tip": "We bring all the symbols together in a text mixing an address, the web, code and prices. Spot the movement before each symbol: direct, Shift or dead key.",
    "tuto": {
-    "intro": "On réunit tous les symboles dans un texte mêlant email, web, code et pourcentages. Le grand mélange ! Le geste exact de ton clavier est indiqué juste en dessous, sous « Sur ton clavier ».",
+    "intro": "We bring all the symbols together in a text mixing an email address, the web, code and percentages. The big mix! The exact movement for your keyboard is shown just below.",
     "rules": [
      {
       "icon": "🧩",
-      "t": "Tous les combos",
-      "d": "Maj, touches mortes, signes directs : chaque symbole a son geste. Mobilise tout ce que tu as appris dans les deux modules."
+      "t": "Every combination",
+      "d": "Shift, dead keys, direct signs: each symbol has its own movement. Use everything you learned in the last two modules."
      },
      {
       "icon": "🧭",
-      "t": "Repère le geste",
-      "d": "Avant chaque symbole, identifie : direct, Maj ou touche morte ? Ce réflexe te fait gagner du temps."
+      "t": "Spot the movement",
+      "d": "Before each symbol, identify it: direct, Shift or dead key? This reflex saves you time."
      },
      {
       "icon": "💻",
-      "t": "Le clavier complet",
-      "d": "Maîtriser les symboles, c'est taper une adresse, un bout de code ou une formule sans jamais bloquer."
+      "t": "The whole keyboard",
+      "d": "Mastering the symbols means typing an address, a piece of code or a formula without ever getting stuck."
      }
     ],
-    "tip": "Objectif : enchaîner tous les symboles dans un texte réel, chaque geste au bon moment."
+    "tip": "Goal: chain all the symbols together in real text, each movement at the right moment."
    },
    "text": "hello@school.example (twelve) https://shop.example #tag {css: bold} <html> 50%=ok a+b=c [end] ~/home \"value\" 3*4 C:\\Users a|b"
   }

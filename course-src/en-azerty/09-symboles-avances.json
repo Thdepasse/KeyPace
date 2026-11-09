@@ -1,121 +1,121 @@
 {
  "position": 9,
- "name": "9. Symboles avancés",
+ "name": "9. Advanced symbols",
  "kind": "symboles",
  "lessons": [
   {
    "id": "sym6",
-   "title": "{} et <> : code et HTML",
+   "title": "{} and <>: code and HTML",
    "keys": "{ } < >",
    "teaches": "{}<>",
-   "tip": "Accolades et chevrons vont par paire : ouvre, écris, puis ferme.",
+   "tip": "Curly brackets and angle brackets come in pairs: open, write, then close.",
    "tuto": {
-    "intro": "Les accolades {} et chevrons <> sont les symboles du code et du HTML. Eux aussi vont par paire.",
+    "intro": "Curly brackets {} and angle brackets <> are the symbols of code and HTML. They also come in pairs.",
     "rules": [
      {
       "icon": "⌨️",
-      "t": "Les accolades",
-      "d": "Les accolades { } encadrent des blocs de code : {code}. Leur geste dépend de ton clavier (indiqué plus haut)."
+      "t": "Curly brackets",
+      "d": "Curly brackets { } wrap blocks of code: {code}. How you type them depends on your keyboard (shown above)."
      },
      {
       "icon": "🔠",
-      "t": "Les chevrons",
-      "d": "Les chevrons < > ouvrent et ferment les balises HTML. Selon ton clavier, > se tape avec Maj : le geste est indiqué plus haut."
+      "t": "Angle brackets",
+      "d": "Angle brackets < > open and close HTML tags. Depending on your keyboard, > is typed with Shift: the movement is shown above."
      },
      {
       "icon": "🧩",
-      "t": "Toujours fermer",
-      "d": "Comme les parenthèses, accolades et balises s'ouvrent ET se ferment : &lt;p&gt;text&lt;/p&gt;, {return x}."
+      "t": "Always close",
+      "d": "Like brackets, curly brackets and tags are opened AND closed: &lt;p&gt;text&lt;/p&gt;, {return x}."
      }
     ],
-    "tip": "Objectif : ouvrir et fermer accolades et chevrons."
+    "tip": "Goal: open and close curly brackets and angle brackets."
    },
    "text": "<p>hello</p> <b>go</b> {code} {start} {a} {b} {c} <html> </html> {end} <div> </div>"
   },
   {
    "id": "sym7",
-   "title": "\"\" et ~ : chaînes et chemins",
+   "title": "\"\" and ~: strings and paths",
    "keys": "\" ~",
    "teaches": "\"~",
-   "tip": "Le guillemet droit entoure du texte en code ; le tilde ~ désigne le dossier personnel : ~/work.",
+   "tip": "The straight quotation mark wraps text in code. The tilde ~ stands for the home folder: ~/work.",
    "tuto": {
-    "intro": "Les guillemets droits et le tilde ~ servent aux chaînes de caractères et aux chemins système.",
+    "intro": "Straight quotation marks and the tilde ~ are used for strings of text and system paths.",
     "rules": [
      {
       "icon": "⌨️",
-      "t": "Guillemets droits",
-      "d": "Le guillemet droit (\") entoure les chaînes en code. Son geste dépend de ton clavier (indiqué plus haut)."
+      "t": "Straight quotation marks",
+      "d": "The straight quotation mark (\") wraps strings in code. How you type it depends on your keyboard (shown above)."
      },
      {
       "icon": "〜",
-      "t": "Le tilde ~",
-      "d": "Le tilde désigne le dossier personnel sous Linux et Mac : ~/music."
+      "t": "The tilde ~",
+      "d": "The tilde stands for the home folder on Linux and Mac: ~/music."
      },
      {
       "icon": "💻",
-      "t": "Surtout en code",
-      "d": "Ces deux signes sont rares à l'écrit courant mais essentiels en programmation et au terminal."
+      "t": "Mostly in code",
+      "d": "You rarely need these two signs in everyday writing, but they are essential in programming and at the terminal."
      }
     ],
-    "tip": "Objectif : taper le guillemet droit et ~ sans hésiter."
+    "tip": "Goal: type the straight quotation mark and ~ without hesitating."
    },
    "text": "\"hello\" \"world\" ~/music ~/school \"name\": \"Anna\" ~tom ~/book \"city\": \"York\" ~/work ~/home"
   },
   {
    "id": "sym8",
-   "title": "\\ et ` : code et terminal",
+   "title": "\\ and `: code and terminal",
    "keys": "\\ `",
    "teaches": "\\`",
-   "tip": "L'antislash et le backtick sont purement techniques : ils se trouvent en code, dans les chemins Windows et au terminal.",
+   "tip": "The backslash and the backtick are purely technical: you find them in code, Windows paths and the terminal.",
    "tuto": {
-    "intro": "L'antislash et l'accent grave (le backtick) sont des symboles purement techniques, fréquents en code.",
+    "intro": "The backslash and the backtick are purely technical symbols, common in code.",
     "rules": [
      {
       "icon": "⌨️",
-      "t": "L'antislash",
-      "d": "Il sépare les dossiers sous Windows et marque les caractères spéciaux en code."
+      "t": "The backslash",
+      "d": "It separates folders on Windows and marks special characters in code."
      },
      {
       "icon": "⌨️",
-      "t": "Le backtick",
-      "d": "Le backtick entoure le code en ligne et les variables en programmation. Sur certains claviers, il faut taper la touche puis la barre d'espace."
+      "t": "The backtick",
+      "d": "The backtick wraps inline code and variables in programming. On some keyboards, you have to press the key then the space bar."
      },
      {
       "icon": "💻",
-      "t": "Réservés au technique",
-      "d": "Tu ne t'en serviras qu'en code ou au terminal. Mémorise-les si tu programmes, sinon retiens juste leur existence."
+      "t": "Technical use only",
+      "d": "You will only use them in code or at the terminal. Learn them if you program, otherwise just remember that they exist."
      }
     ],
-    "tip": "Objectif : situer l'antislash et le backtick et les taper sans regarder."
+    "tip": "Goal: find the backslash and the backtick and type them without looking."
    },
    "text": "C:\\Work\\Anna `copy` \\n \\t `name` C:\\School\\Tom `open file` \\r\\n `ls -a`"
   },
   {
    "id": "sym9",
-   "title": "Révision : tous les symboles en texte",
-   "keys": "tous symboles",
+   "title": "Review: all the symbols in text",
+   "keys": "all symbols",
    "teaches": "",
-   "tip": "Avant chaque symbole, demande-toi : direct, Maj ou AltGr ? Ce réflexe te fait gagner du temps.",
+   "tip": "Before each symbol, ask yourself: direct, Shift or AltGr? This habit saves you time.",
    "tuto": {
-    "intro": "On réunit tous les symboles dans un texte mêlant email, web, code et pourcentages. Le grand mélange !",
+    "intro": "We bring all the symbols together in one text mixing email, web, code and percentages. The big mix!",
     "rules": [
      {
       "icon": "🧩",
-      "t": "Tous les combos",
-      "d": "Maj, AltGr, touches spéciales... Chaque symbole a son geste. Mobilise tout ce que tu as appris dans les deux modules."
+      "t": "All the combinations",
+      "d": "Shift, AltGr, special keys... Every symbol has its movement. Use everything you've learned in the last two modules."
      },
      {
       "icon": "🧭",
-      "t": "Repère le geste",
-      "d": "Avant chaque symbole, identifie : direct, Maj ou AltGr ? Ce réflexe te fait gagner du temps."
+      "t": "Spot the movement",
+      "d": "Before each symbol, work out: direct, Shift or AltGr? This habit saves you time."
      },
      {
       "icon": "💻",
-      "t": "Le clavier complet",
-      "d": "Maîtriser les symboles, c'est taper une adresse, un bout de code ou une formule sans jamais bloquer."
+      "t": "The full keyboard",
+      "d": "Mastering symbols means typing an address, a bit of code or a formula without ever getting stuck."
      }
     ],
-    "tip": "Objectif : enchaîner tous les symboles dans un texte réel, chaque combo au bon moment."
+    "tip": "Goal: chain all the symbols in a real text, each combination at the right moment."
    },
    "text": "anna@school.example (2026) www.bank.example/help #leeds {open: true} <html> 50% a+b=c [end] ~/home \"name\" my_file | ls"
   }
