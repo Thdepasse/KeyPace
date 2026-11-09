@@ -424,7 +424,7 @@ async function run(opts = {}) {
           app.activeGame=null;go('games');await new Promise(r=>setTimeout(r,500));
           out.enGames=document.getElementById('page-games').innerText+' | '+[...document.querySelectorAll('#page-games [aria-label]')].map(e=>e.getAttribute('aria-label')).join(' / ');
           out.enGameScreens={};
-          for(const g of ['frappe','sprint']){app.activeGame=g;app.game=null;app.sprint=null;app.renderGames();await new Promise(r=>setTimeout(r,200));out.enGameScreens[g]=document.getElementById('page-games').innerText;}
+          for(const g of ['frappe','sprint','course','ghost','simon']){app.activeGame=g;app.game=null;app.sprint=null;app.course=null;app.ghost=null;app.simon=null;app.renderGames();await new Promise(r=>setTimeout(r,200));out.enGameScreens[g]=document.getElementById('page-games').innerText;}
           app.activeGame=null;
           out.okQ=await kpChooseFamily('qwerty');out.q={course:kpCourseId(),lessons:ALL_LESSONS.length};
           out.okFr=await kpChooseLanguage('fr');
@@ -449,10 +449,10 @@ async function run(opts = {}) {
         if (lg.tutos[1] && !/On your keyboard/.test(lg.tutos[1])) problems.push('BR12 : la fenêtre Explication d\'une leçon de symboles ne dit pas comment taper les touches (« On your keyboard »)');
         for (const w of ['Choose your game', 'Word Strike', 'Challenge of the week', 'Previous game']) if (!lg.enGames.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent de la salle de jeux en anglais`);
         const g1 = ['Choisis ton jeu', 'Frappe-mots', 'Défi de la semaine', 'Jeu précédent', 'Fais défiler', 'Jouer maintenant', 'Précision souris', 'Mémoire'].filter((w) => lg.enGames.toLowerCase().includes(w.toLowerCase())); if (g1.length) problems.push(`BR12 : du français dans la salle de jeux en anglais : ${g1.join(', ')}`);
-        for (const [g, words] of [['frappe', ['Words falling, fingers dancing.', 'Play', 'OR PRESS SPACE', 'Quit']], ['sprint', ['Start the Sprint', 'No going back', 'OR PRESS SPACE', 'Quit']]]) {
+        for (const [g, words] of [['frappe', ['Words falling, fingers dancing.', 'Play', 'OR PRESS SPACE', 'Quit']], ['sprint', ['Start the Sprint', 'No going back', 'OR PRESS SPACE', 'Quit']], ['course', ['Typing Race', 'faster than the bots', 'Start the race', 'OR PRESS SPACE']], ['ghost', ['Race your ghost', 'Start the race', 'OR PRESS SPACE']], ['simon', ['Word Simon', 'Memorise a sequence', 'Play', 'OR PRESS SPACE']]]) {
           const txt = lg.enGameScreens[g] || '';
           for (const w of words) if (!txt.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent de l'écran ${g} en anglais`);
-          const bad = ['Mots qui tombent', 'Jouer', 'OU APPUIE', 'Quitter', 'Lancer le Sprint', 'retour arrière', 'Niveau', 'Meilleur', 'Entraînement'].filter((w) => txt.toLowerCase().includes(w.toLowerCase()));
+          const bad = ['Mots qui tombent', 'Jouer', 'OU APPUIE', 'Quitter', 'Lancer le Sprint', 'retour arrière', 'Niveau', 'Meilleur', 'Entraînement', 'Course de dactylo', 'plus vite que', 'Lancer la course', 'fantôme', 'Simon des mots', 'Mémorise'].filter((w) => txt.toLowerCase().includes(w.toLowerCase()));
           if (bad.length) problems.push(`BR12 : du français sur l'écran ${g} en anglais : ${bad.join(', ')}`);
         }
         if (lg.frUi.t !== 'Vitesse' || lg.frUi.lang !== 'fr') problems.push(`BR12 : retour au français, l'interface reste en anglais (${JSON.stringify(lg.frUi)})`);

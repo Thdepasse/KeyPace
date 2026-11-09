@@ -6258,6 +6258,8 @@ const GAME_VOCAB=[...new Set([...WORDS,...SPRINT_WORDS,...GAME_TIERS.flatMap(t=>
 /* Course de dactylo : textes FR cohérents (réutilise PASSAGES) + bots locaux */
 const RACE_TEXTS=[...PASSAGES,
   "apprendre à taper vite ressemble à une course : au début chaque mot compte, puis le rythme s'installe et les doigts trouvent leur chemin tout seuls."];
+const KP_BOT_TXT={'Tortue':()=>kpT('bot.tortue'),'Lièvre':()=>kpT('bot.lievre'),'Guépard':()=>kpT('bot.guepard'),'Ton fantôme':()=>kpT('race.ghost')};
+const kpBotName=n=>(KP_BOT_TXT[n]?KP_BOT_TXT[n]():n);
 const COURSE_BOTS=[
   {name:'Tortue',emoji:'🐢',wpm:30,color:'#5BA84A'},
   {name:'Lièvre',emoji:'🐇',wpm:50,color:'#6E8BE8'},
@@ -8545,7 +8547,7 @@ const app={
   // au rendu partagé de Fantôme/Duel.
   _courseLanesHTML(lanes){
     return `<div class="course-track">${lanes.map(l=>`<div class="course-lane${l.you?' you':''}${l.finishFlash?' finish-flash':''}">
-      <div class="course-lane-name">${l.you?'TOI':l.name.toUpperCase()+(l.wpm?' · '+l.wpm:'')}${l.finishFlash?' 🏁':''}</div>
+      <div class="course-lane-name">${l.you?kpT('race.you'):kpBotName(l.name).toUpperCase()+(l.wpm?' · '+l.wpm:'')}${l.finishFlash?' 🏁':''}</div>
       <div class="course-strip"><div class="course-car" style="left:${Math.round((l.prog||0)*100)}%"></div></div>
     </div>`).join('')}</div>`;
   },
@@ -13648,7 +13650,7 @@ const app={
       const ahead=playerProg>b.prog;
       if(b._ahead!=null&&b._ahead!==ahead){
         playSound(ahead?'hit':'miss');
-        c._toast={text:ahead?`Tu dépasses ${b.name} !`:`${b.name} te dépasse !`,pos:ahead,until:Date.now()+1400};
+        c._toast={text:ahead?kpT('race.you_pass',{name:kpBotName(b.name)}):kpT('race.passes_you',{name:kpBotName(b.name)}),pos:ahead,until:Date.now()+1400};
       }
       b._ahead=ahead;
     });
@@ -13701,7 +13703,7 @@ const app={
     const liveWpm=c&&c.raceStarted?Math.round((prefix/5)/elapsedMin):0;
     const liveAcc=c&&c.keystrokes?Math.round(100*c.correct/c.keystrokes):100;
     // pistes
-    const lanes=c?[{name:'Toi',emoji:'🏎️',prog:playerProg,color:'var(--accent)',you:true,finishFlash:!!(c._playerFlashUntil&&c._playerFlashUntil>Date.now())},...c.bots.map(b=>({...b,finishFlash:!!(b._flashUntil&&b._flashUntil>Date.now())}))]:[];
+    const lanes=c?[{name:kpT('race.you_name'),emoji:'🏎️',prog:playerProg,color:'var(--accent)',you:true,finishFlash:!!(c._playerFlashUntil&&c._playerFlashUntil>Date.now())},...c.bots.map(b=>({...b,finishFlash:!!(b._flashUntil&&b._flashUntil>Date.now())}))]:[];
     const lanesHTML=this._courseLanesHTML(lanes);
     // texte
     let textHTML='';
@@ -13722,40 +13724,40 @@ const app={
     const shaking=!!(c&&c._shakeUntil&&c._shakeUntil>Date.now());
     let overlay='';
     if(IS_TOUCH_ONLY()&&idle){
-      overlay=`<div class="course-overlay"><h2>⌨️ Clavier requis</h2><p>La Course de dactylo se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+      overlay=`<div class="course-overlay"><h2>${kpT('game.kb_needed')}</h2><p>${kpT('game.kb_needed_text',{game:kpT('game.course.name')})}</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">${kpT('game.back_games')}</button></div>`;
     } else if(c&&!c.raceStarted){
       const cd=Math.max(0,Math.ceil((c.startAt-Date.now())/1000));
       overlay=`<div class="course-overlay"><div class="course-count">${cd>0?cd:kpT('game.go')}</div><p>${kpT('game.get_ready')}</p></div>`;
     }
     const result=over?this._gameResult({
       icon:c.rank===1?'🥇':c.rank===2?'🥈':c.rank===3?'🥉':'🏁',
-      title:c.rank===1?'1ʳᵉ place !':c.rank+'ᵉ place',
-      record:c._isRecord?'Nouveau record de vitesse !':null,
+      title:c.rank===1?kpT('race.first'):kpT('race.nth',{n:c.rank}),
+      record:c._isRecord?kpT('race.speed_record'):null,
       boxes:[
-        {label:'Vitesse',value:c._wpm,unit:'mpm',accent:true},
-        {label:'Précision',value:c._acc,unit:'%'},
-        {label:'Classement',value:c.rank+' / '+(c.bots.length+1)},
+        {label:kpT('typ.speed'),value:c._wpm,unit:kpT('unit.wpm'),accent:true},
+        {label:kpT('typ.accuracy'),value:c._acc,unit:'%'},
+        {label:kpT('race.ranking'),value:c.rank+' / '+(c.bots.length+1)},
       ],
-      bestLine:c&&c.glv&&!c.glv.full?`Niveau d’entraînement : ton record se bat au niveau « Tout le clavier ».`:best?`Record : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best.wpm} mpm</b>`:null,
-      primaryLabel:'Rejouer',primaryOnClick:'app.startCourse()',
+      bestLine:c&&c.glv&&!c.glv.full?kpT('game.train_note'):best?`<span style="font-family:'JetBrains Mono',monospace">${kpT('sprint.record_b',{n:best.wpm})}</span>`:null,
+      primaryLabel:kpT('game.replay'),primaryOnClick:'app.startCourse()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Course de dactylo',ICONS.raceCar)}
+      ${this._gameHeader(kpT('game.course.name'),ICONS.raceCar)}
       <div class="course-arena">
-        ${idle&&!IS_TOUCH_ONLY()?`<div class="course-idle"><h2>Course de dactylo<span class="dot"> .</span></h2><p>Tape le texte plus vite que les bots. Corrige tes fautes pour avancer.${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p>${this._gameLevelPicker('course')}<button class="btn-primary course-cta" autofocus onclick="app.startCourse()">Lancer la course ▸</button><div class="course-espace">${kpT('game.or_space')}</div></div>`:''}
+        ${idle&&!IS_TOUCH_ONLY()?`<div class="course-idle"><h2>${kpT('game.course.name')}<span class="dot"> .</span></h2><p>${kpT('race.idle')}${best?'<br>'+kpT('sprint.record',{n:best.wpm}):''}</p>${this._gameLevelPicker('course')}<button class="btn-primary course-cta" autofocus onclick="app.startCourse()">${kpT('race.launch')}</button><div class="course-espace">${kpT('game.or_space')}</div></div>`:''}
         ${c?`
           <div class="course-hud">
-            <div><div class="course-stat-label">VITESSE</div><div class="course-stat-val">${liveWpm}<span class="course-stat-unit"> mpm</span></div></div>
-            <div style="text-align:right"><div class="course-stat-label">PRÉCISION</div><div class="course-stat-val sec">${liveAcc}<span class="course-stat-unit"> %</span></div></div>
+            <div><div class="course-stat-label">${kpT('sprint.speed')}</div><div class="course-stat-val">${liveWpm}<span class="course-stat-unit"> ${kpT('unit.wpm')}</span></div></div>
+            <div style="text-align:right"><div class="course-stat-label">${kpT('race.accuracy_up')}</div><div class="course-stat-val sec">${liveAcc}<span class="course-stat-unit"> %</span></div></div>
           </div>
           ${toastHTML}
           ${lanesHTML}
           ${over?'':`<div class="course-textbox${shaking?' shake':''}">${textHTML}</div>`}
-          ${over?'':`<div class="course-hint"><span>${c.raceStarted?'Corrige tes fautes (retour arrière) pour continuer à avancer.':'La course démarre dans un instant…'}</span><button class="course-restart" onclick="app.startCourse()">↺ Rejouer</button></div>`}
+          ${over?'':`<div class="course-hint"><span>${c.raceStarted?kpT('race.fix_hint'):kpT('race.starting')}</span><button class="course-restart" onclick="app.startCourse()">↺ ${kpT('game.replay')}</button></div>`}
           ${result}
           ${overlay}
         `:''}
-        <div aria-live="polite" class="sr-live">${over&&c?`Course terminée, ${c.rank}ᵉ place, ${c._wpm} mots par minute.`:''}</div>
+        <div aria-live="polite" class="sr-live">${over&&c?kpT('race.sr_done',{n:c.rank,wpm:c._wpm}):''}</div>
       </div>
     </div>`;
   },
@@ -13875,7 +13877,7 @@ const app={
     // Mêmes capsules à traînée que Course de dactylo (_courseLanesHTML),
     // toujours 2 pistes ici : toi et ton fantôme.
     const lanes=c?[
-      {name:'Toi',prog:playerProg,you:true},
+      {name:kpT('race.you_name'),prog:playerProg,you:true},
       ...(best?[{name:'Ton fantôme',prog:ghostProg}]:[]),
     ]:[];
     const lanesHTML=this._courseLanesHTML(lanes);
@@ -13892,37 +13894,37 @@ const app={
     }
     let overlay='';
     if(IS_TOUCH_ONLY()&&idle){
-      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>Contre ton fantôme se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+      overlay=`<div class="race-overlay"><h2>${kpT('game.kb_needed')}</h2><p>${kpT('game.kb_needed_text',{game:kpT('game.ghost.name')})}</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">${kpT('game.back_games')}</button></div>`;
     } else if(c&&!c.raceStarted){
       overlay=`<div class="race-overlay">${this._raceCountdownHTML(c.startAt)}</div>`;
     }
     const result=over?this._gameResult({
       icon:c._isFirst?'👻':c.won?'🏆':'👻',
-      title:c._isFirst?'Fantôme enregistré !':c.won?'Tu as battu ton fantôme !':'Ton fantôme t\'a battu',
-      record:c._isRecord?'Nouveau record de vitesse !':null,
+      title:c._isFirst?kpT('ghost.recorded'):c.won?kpT('ghost.you_won'):kpT('ghost.you_lost'),
+      record:c._isRecord?kpT('race.speed_record'):null,
       boxes:[
-        {label:'Vitesse',value:c._wpm,unit:'mpm',accent:true},
-        {label:'Précision',value:c._acc,unit:'%'},
+        {label:kpT('typ.speed'),value:c._wpm,unit:kpT('unit.wpm'),accent:true},
+        {label:kpT('typ.accuracy'),value:c._acc,unit:'%'},
       ],
-      bestLine:c&&c.glv&&!c.glv.full?`Niveau d’entraînement : ton record se bat au niveau « Tout le clavier ».`:best&&!c._isFirst?`Fantôme : <b style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${best.wpm} mpm</b>`:null,
-      primaryLabel:'Rejouer',primaryOnClick:'app.startGhost()',
+      bestLine:c&&c.glv&&!c.glv.full?kpT('game.train_note'):best&&!c._isFirst?`<span style="font-family:'JetBrains Mono',monospace">${kpT('ghost.best',{n:best.wpm})}</span>`:null,
+      primaryLabel:kpT('game.replay'),primaryOnClick:'app.startGhost()',
     }):'';
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Contre ton fantôme',ICONS.ghost)}
+      ${this._gameHeader(kpT('game.ghost.name'),ICONS.ghost)}
       <div class="sprint-arena" style="position:relative">
-        ${idle&&!IS_TOUCH_ONLY()?`<div class="gidle"><h2 class="gidle-title">Contre ton fantôme<span class="dot"> .</span></h2><p>${best?'Bats ton meilleur temps sur ce texte : ton fantôme court à ton propre rythme précédent.':'Ta toute première course sur ce texte : elle enregistrera ton fantôme pour la prochaine fois.'}${best?'<br>Record : <b style="color:var(--accent)">'+best.wpm+' mpm</b>':''}</p>${this._gameLevelPicker('ghost')}<button class="btn-primary" autofocus onclick="app.startGhost()">Lancer la course ▸</button><div class="gidle-espace">${kpT('game.or_space')}</div></div>`:''}
+        ${idle&&!IS_TOUCH_ONLY()?`<div class="gidle"><h2 class="gidle-title">${kpT('game.ghost.name')}<span class="dot"> .</span></h2><p>${best?kpT('ghost.idle_best'):kpT('ghost.idle_first')}${best?'<br>'+kpT('sprint.record',{n:best.wpm}):''}</p>${this._gameLevelPicker('ghost')}<button class="btn-primary" autofocus onclick="app.startGhost()">${kpT('race.launch')}</button><div class="gidle-espace">${kpT('game.or_space')}</div></div>`:''}
         ${c?`
           <div class="sprint-hud">
-            <div><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px">VITESSE</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> mpm</span></div></div>
-            <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px">PRÉCISION</div><div class="sprint-score-val sec">${liveAcc}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> %</span></div></div>
+            <div><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px">${kpT('sprint.speed')}</div><div class="sprint-score-val">${liveWpm}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> ${kpT('unit.wpm')}</span></div></div>
+            <div style="text-align:right"><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:2px">${kpT('race.accuracy_up')}</div><div class="sprint-score-val sec">${liveAcc}<span style="font-size:16px;color:rgba(255,255,255,.4);font-weight:500"> %</span></div></div>
           </div>
           ${lanesHTML}
           ${over?'':`<div class="race-text-box">${textHTML}</div>`}
-          ${over?'':`<div class="sprint-hint">${c.raceStarted?'Corrige tes fautes (retour arrière) pour continuer à avancer.':'La course démarre dans un instant…'}</div>`}
+          ${over?'':`<div class="sprint-hint">${c.raceStarted?kpT('race.fix_hint'):kpT('race.starting')}</div>`}
           ${result}
           ${overlay}
         `:''}
-        <div aria-live="polite" class="sr-live">${over&&c?(c._isFirst?'Course terminée, fantôme enregistré, '+c._wpm+' mots par minute.':'Course terminée, '+(c.won?'tu as battu ton fantôme':'ton fantôme a gagné')+', '+c._wpm+' mots par minute.'):''}</div>
+        <div aria-live="polite" class="sr-live">${over&&c?(c._isFirst?kpT('ghost.sr_first',{wpm:c._wpm}):c.won?kpT('ghost.sr_won',{wpm:c._wpm}):kpT('ghost.sr_lost',{wpm:c._wpm})):''}</div>
       </div>
     </div>`;
   },
@@ -14026,7 +14028,7 @@ const app={
     if(s&&s.phase==='show'){
       const rem=Math.max(0,s.showUntil-Date.now());
       const pct=Math.round(100*rem/s._showTotal);
-      stage=`<div class="simon-prompt">Mémorise la séquence…</div>
+      stage=`<div class="simon-prompt">${kpT('simon.memorise')}</div>
         <div class="simon-words">${s.words.map(w=>`<span class="simon-word">${w}</span>`).join('')}</div>
         <div class="simon-bar" style="width:100%"><div class="simon-bar-fill" style="width:${pct}%"></div></div>`;
     } else if(s&&s.phase==='input'){
@@ -14035,46 +14037,46 @@ const app={
         if(i===s.wordIdx)return`<span class="simon-word cur">${s.currentWord||''}<span class="simon-caret"></span></span>`;
         return`<span class="simon-word todo">•••</span>`;
       }).join('');
-      stage=`<div class="simon-prompt">Retape la séquence (${s.wordIdx}/${s.words.length})</div>
+      stage=`<div class="simon-prompt">${kpT('simon.retype',{i:s.wordIdx,n:s.words.length})}</div>
         <div class="simon-words">${chips}</div>
-        <div style="font-size:13px;color:var(--muted)">Espace ou Entrée pour valider chaque mot</div>`;
+        <div style="font-size:13px;color:var(--muted)">${kpT('simon.validate')}</div>`;
     } else if(s&&s.phase==='fail'){
-      stage=`<div class="simon-prompt" style="color:var(--danger);font-size:24px">Raté !</div>
-        <div style="font-size:15px;color:var(--muted)">Il te reste ${s.lives} vie${s.lives>1?'s':''}. Nouvelle séquence…</div>`;
+      stage=`<div class="simon-prompt" style="color:var(--danger);font-size:24px">${kpT('simon.missed')}</div>
+        <div style="font-size:15px;color:var(--muted)">${kpTn('simon.lives_left',s.lives)}</div>`;
     }
     let overlay='';
     if(IS_TOUCH_ONLY()&&idle){
-      overlay=`<div class="race-overlay"><h2>⌨️ Clavier requis</h2><p>Simon des mots se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">← Jeux</button></div>`;
+      overlay=`<div class="race-overlay"><h2>${kpT('game.kb_needed')}</h2><p>${kpT('game.kb_needed_text',{game:kpT('game.simon.name')})}</p><button class="btn-sm btn-dark" onclick="app.exitActiveGame()">${kpT('game.back_games')}</button></div>`;
     } else if(!currentUser){
-      overlay=`<div class="race-overlay"><h2>Simon des mots</h2><p>Crée un compte gratuit pour jouer.</p><button class="btn-primary" onclick="openAuth('register','Crée un compte pour jouer !')">Créer un compte</button></div>`;
+      overlay=`<div class="race-overlay"><h2>${kpT('game.simon.name')}</h2><p>${kpT('game.guest_text')}</p><button class="btn-primary" onclick="openAuth('register',${JSON.stringify(kpT('game.guest_auth')).replace(/"/g,'&quot;')})">${kpT('game.guest_btn')}</button></div>`;
     } else if(idle){
-      overlay=`<div class="race-overlay"><h2 class="gidle-title">Simon des mots<span class="dot"> .</span></h2><p>Mémorise une séquence de mots puis retape-la. Elle s'allonge à chaque réussite.${best?'<br>Record : <b style="color:var(--accent)">'+best.score+' pts</b> (séquence de '+best.maxSeq+')':''}</p>${this._gameLevelPicker('simon')}<button class="btn-primary" autofocus onclick="app.startSimon()">Jouer ▸</button><div class="gidle-espace">${kpT('game.or_space')}</div></div>`;
+      overlay=`<div class="race-overlay"><h2 class="gidle-title">${kpT('game.simon.name')}<span class="dot"> .</span></h2><p>${kpT('simon.idle')}${best?'<br>'+kpT('simon.record',{score:best.score,seq:best.maxSeq}):''}</p>${this._gameLevelPicker('simon')}<button class="btn-primary" autofocus onclick="app.startSimon()">${kpT('frappe.play')}</button><div class="gidle-espace">${kpT('game.or_space')}</div></div>`;
     } else if(over){
-      const badge=s.maxSeq>=8?'Mémoire d\'éléphant !':s.maxSeq>=5?'Excellente mémoire !':s.maxSeq>=3?'Bien joué !':'Continue !';
+      const badge=s.maxSeq>=8?kpT('simon.b_elephant'):s.maxSeq>=5?kpT('simon.b_great'):s.maxSeq>=3?kpT('sprint.r_good'):kpT('sprint.r_keep');
       overlay=`<div class="race-overlay">${this._gameResult({
         icon:'🧠',
         title:badge,
-        record:s._isRecord?'Nouveau record !':null,
+        record:s._isRecord?kpT('frappe.new_record'):null,
         boxes:[
-          {label:'Score',value:s.score,unit:'pts',accent:true},
-          {label:'Séquence max',value:s.maxSeq,unit:'mots'},
+          {label:kpT('frappe.score'),value:s.score,unit:kpT('unit.pts'),accent:true},
+          {label:kpT('simon.max_seq'),value:s.maxSeq,unit:kpT('simon.words_unit')},
         ],
-        bestLine:s.glv&&!s.glv.full?`Niveau d’entraînement : ton record se bat au niveau « Tout le clavier ».`:null,
-        primaryLabel:'Rejouer ▸',primaryOnClick:'app.startSimon()',
+        bestLine:s.glv&&!s.glv.full?kpT('game.train_note'):null,
+        primaryLabel:kpT('frappe.replay'),primaryOnClick:'app.startSimon()',
       })}</div>`;
     }
     document.getElementById('page-games').innerHTML=`<div class="games-section">
-      ${this._gameHeader('Simon des mots',ICONS.brain)}
+      ${this._gameHeader(kpT('game.simon.name'),ICONS.brain)}
       <div class="simon-arena">
         <div class="simon-hud">
           <div style="display:flex;gap:22px;align-items:flex-end">
-            <div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.04em">NIVEAU</div><div class="sprint-score-val sec">${s?s.maxSeq+ (s.over?0:1):1}</div></div>
-            <div><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em">SCORE</div><div class="sprint-score-val">${s?s.score:0}</div></div>
+            <div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.04em">${kpT('simon.level_up')}</div><div class="sprint-score-val sec">${s?s.maxSeq+ (s.over?0:1):1}</div></div>
+            <div><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em">${kpT('simon.score_up')}</div><div class="sprint-score-val">${s?s.score:0}</div></div>
           </div>
           <div class="simon-hearts">${hearts}</div>
         </div>
         <div class="simon-stage">${stage}</div>
-        <div aria-live="polite" class="sr-live">${s&&s.phase==='input'?'À toi de retaper la séquence.':over?'Partie terminée. Score '+s.score+'.':''}</div>
+        <div aria-live="polite" class="sr-live">${s&&s.phase==='input'?kpT('simon.sr_input'):over?kpT('simon.sr_over',{score:s.score}):''}</div>
         ${overlay}
       </div>
     </div>`;
