@@ -418,6 +418,9 @@ async function run(opts = {}) {
           app.sess=app.makeSession('lesson','r1');go('lessons');await new Promise(r=>setTimeout(r,400));
           out.enLesson=document.getElementById('page-lessons').innerText;app.sess=null;
           out.rowEn=[...document.querySelectorAll('#nav-kb-menu .kbc-lang-btn')].map(b=>b.innerText+(b.classList.contains('active')?'*':''));
+          {const sym=ALL_LESSONS.find(l=>/(^| )[@#&$%]( |$)/.test(l.keys));out.tutoLessons=[ALL_LESSONS[0].id,sym&&sym.id];out.tutos=[];
+            for(const id of out.tutoLessons){if(!id)continue;app.openLessonTuto(id);await new Promise(r=>setTimeout(r,150));out.tutos.push(document.getElementById('lesson-tuto-body').innerText);}
+            closeModal('lesson-tuto-modal');}
           out.okQ=await kpChooseFamily('qwerty');out.q={course:kpCourseId(),lessons:ALL_LESSONS.length};
           out.okFr=await kpChooseLanguage('fr');
           out.frUi={t:kpT('typ.speed'),lang:document.documentElement.lang};
@@ -435,6 +438,10 @@ async function run(opts = {}) {
         if (/Choisis ton|module du jour|Mon enseignement/.test(lg.enList)) problems.push('BR12 : la page « Cours » française (programmes) s\'affiche pour un cours en anglais');
         for (const w of ['Speed', 'Accuracy', 'All courses']) if (!lg.enLesson.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent de l'écran de leçon en anglais`);
         const l2 = frInEn(lg.enLesson.toLowerCase(), ['vitesse', 'précision', 'tous les cours', 'explication', 'commence à taper', 'objectif']); if (l2.length) problems.push(`BR12 : du français sur l'écran de leçon en anglais : ${l2.join(', ')}`);
+        if (!lg.tutoLessons[1]) problems.push('BR12 : aucune leçon de symboles trouvée pour contrôler la fenêtre Explication');
+        const tutoFr = ['Commencer la leçon', 'main gauche', 'main droite', 'pouce', 'auriculaire', 'annulaire', 'majeur', 'Sur ton clavier', 'touche ', 'Maj ', 'à droite du', 'à gauche du', 'sans Maj'];
+        lg.tutos.forEach((txt, i) => { const bad = tutoFr.filter((w) => txt.includes(w)); if (bad.length) problems.push(`BR12 : du français dans la fenêtre Explication en anglais (${lg.tutoLessons[i]}) : ${bad.join(', ')}`); if (!txt.includes('Start the lesson')) problems.push(`BR12 : « Start the lesson » absent de la fenêtre Explication (${lg.tutoLessons[i]})`); });
+        if (lg.tutos[1] && !/On your keyboard/.test(lg.tutos[1])) problems.push('BR12 : la fenêtre Explication d\'une leçon de symboles ne dit pas comment taper les touches (« On your keyboard »)');
         if (lg.frUi.t !== 'Vitesse' || lg.frUi.lang !== 'fr') problems.push(`BR12 : retour au français, l'interface reste en anglais (${JSON.stringify(lg.frUi)})`);
         if (lg.rowEn.join('|') !== 'Français|English*') problems.push(`BR12 : langue active après le passage (${lg.rowEn.join('|')})`);
         if (!lg.okQ || lg.q.course !== 'en/qwerty' || lg.q.lessons !== 58) problems.push(`BR12 : en anglais, passer à QWERTY garde la langue (${JSON.stringify(lg.q)})`);

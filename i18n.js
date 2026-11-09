@@ -139,6 +139,28 @@
       'les.expert_lessons': '{n} leçons Expert',
       'gate.create': 'Créer mon compte gratuit',
       'gate.have_account': "J'ai déjà un compte",
+      // ── Fenêtre Explication d'une leçon ──
+      'tuto.shift_to': 'Maj → {ch}',
+      'tuto.via_shift': ' (Maj)',
+      'tuto.via_mod': ' avec {mod}',
+      'tuto.via_mod_shift': ' avec {mod} + Maj',
+      'tuto.mod_to': '{mod} → {ch}',
+      'tuto.mod_shift_to': '{mod} + Maj → {ch}',
+      'tuto.on_keyboard': 'Sur ton clavier ({layout})',
+      'tuto.no_digit_row': 'Sur un clavier 40 %, les chiffres sont sur une couche Fn : repère-les sur la légende de tes touches.',
+      'tuto.start': 'Commencer la leçon →',
+      'finger.p': 'auriculaire',
+      'finger.r': 'annulaire',
+      'finger.m': 'majeur',
+      'finger.i': 'index',
+      'finger.th': 'pouce',
+      'hand.left': 'main gauche',
+      'hand.right': 'main droite',
+      'kb.az_fr': 'Français',
+      'kb.az_be': 'Belge',
+      'kb.az_mac': 'Mac',
+      'kb.az_nf': 'Norme NF Z71-300',
+      'kb.az_short_nf': 'NF',
     },
     en: {
       'test.eyebrow': 'Challenge no. 1: the speed test',
@@ -269,6 +291,27 @@
       'les.expert_lessons': '{n} Expert lessons',
       'gate.create': 'Create my free account',
       'gate.have_account': 'I already have an account',
+      'tuto.shift_to': 'Shift → {ch}',
+      'tuto.via_shift': ' (Shift)',
+      'tuto.via_mod': ' with {mod}',
+      'tuto.via_mod_shift': ' with {mod} + Shift',
+      'tuto.mod_to': '{mod} → {ch}',
+      'tuto.mod_shift_to': '{mod} + Shift → {ch}',
+      'tuto.on_keyboard': 'On your keyboard ({layout})',
+      'tuto.no_digit_row': 'On a 40% keyboard, the numbers are on an Fn layer: find them on the legends of your keys.',
+      'tuto.start': 'Start the lesson →',
+      'finger.p': 'little finger',
+      'finger.r': 'ring finger',
+      'finger.m': 'middle finger',
+      'finger.i': 'index finger',
+      'finger.th': 'thumb',
+      'hand.left': 'left hand',
+      'hand.right': 'right hand',
+      'kb.az_fr': 'French',
+      'kb.az_be': 'Belgian',
+      'kb.az_mac': 'Mac',
+      'kb.az_nf': 'NF Z71-300 standard',
+      'kb.az_short_nf': 'NF',
     },
   };
 
@@ -305,6 +348,41 @@
   // tn('clé', n, {param}) : pluriel (1 → clé_one, sinon clé_other) ; {n} vaut toujours le nombre.
   function tn(key, n, params) { return t(key + (n === 1 ? '_one' : '_other'), Object.assign({ n }, params || {})); }
 
-  const api = { dict, LANGS, lang, setLang, setCourseLangGetter, t, tn };
+  // Gestes de frappe (« touche ù (à droite du M) », « Maj + 1 », « AltGr + é, puis espace ») : textes écrits en français pour tous les claviers, traduits ici
+  // quand l'interface est en anglais. Règles dans l'ordre ; la gate vérifie qu'aucun mot français ne reste dans aucun geste connu.
+  const HOW_RULES = [
+    [/Aucun geste sur ce clavier\. Dans Réglages, rubrique Accents, choisis « Tolérés » : la lettre sans accent sera acceptée/g, 'No gesture on this keyboard. In Settings, under Accents, choose "Tolerated": the plain letter will be accepted'],
+    [/Pas de touche pour ce signe : tape " à la place, c'est accepté/g, 'No key for this sign: type " instead, that is accepted'],
+    [/Pas de touche pour ce signe : tape (\w) puis (\w), c'est accepté/g, 'No key for this sign: type $1 then $2, that is accepted'],
+    [/pas de touche sur ton clavier : tape le guillemet droit " \(accepté\)/g, 'no key on your keyboard: type the straight quote " (accepted)'],
+    [/Tape (\w) puis (\w) : c'est accepté\. Sinon, Alt \+ (\d+) au pavé numérique \(Windows\)/g, 'Type $1 then $2: that is accepted. Otherwise, Alt + $3 on the numeric keypad (Windows)'],
+    [/\. Sinon, Alt \+ (\d+) au pavé numérique \(Windows\)/g, '. Otherwise, Alt + $1 on the numeric keypad (Windows)'],
+    [/ donne « (\d) » : c'est accepté/g, ' gives "$1": that is accepted'],
+    [/\. Maj \+ (\S+) donne « (\d) » : c'est accepté/g, '. Shift + $1 gives "$2": that is accepted'],
+    [/\(à droite du \), sans Maj\)/g, '(to the right of ), without Shift)'],
+    [/\(à droite du (\S+)\)/g, '(to the right of $1)'],
+    [/\(à gauche du (\S+)\)/g, '(to the left of $1)'],
+    [/\(à gauche de Retour arrière\)/g, '(to the left of Backspace)'],
+    [/\(à gauche de Entrée\)/g, '(to the left of Enter)'],
+    [/\(touche à droite du (\S+)\)/g, '(key to the right of $1)'],
+    [/\(rangée du bas, à droite\)/g, '(bottom row, on the right)'],
+    [/\(en haut à droite\)/g, '(top right)'],
+    [/\(touche morte\)/g, '(dead key)'],
+    [/touche accent grave/g, 'the grave accent key'],
+    [/touche à gauche du (\S+)/g, 'the key to the left of $1'],
+    [/touche à droite du (\S+)/g, 'the key to the right of $1'],
+    [/touche (\)|,|[^\s,()]+)/g, 'the $1 key'],
+    [/, sans Maj/g, ', without Shift'],
+    [/, puis la voyelle/g, ', then the vowel'],
+    [/, puis la lettre (\S+)/g, ', then the letter $1'],
+    [/, puis [Ee]space/g, ', then the space bar'],
+    [/puis Maj \+ /g, 'then Shift + '],
+    [/\bMaj\b/g, 'Shift'],
+  ];
+  function howEn(t) { let s = String(t); for (const [re, to] of HOW_RULES) s = s.replace(re, to); return s; }
+  // Mots français qui ne doivent plus apparaître dans un geste traduit (utilisé par la gate et les tests).
+  const HOW_FR_LEFTOVER = /(^|[^\p{L}])(touche|droite|gauche|puis|sans|voyelle|espace|retour|arrière|entrée|sinon|pavé|numérique|accepté|tape|donne|guillemet|rangée|lettre|ton|clavier|pas|sur|donne|Maj|morte)(?![\p{L}])/iu;
+
+  const api = { dict, LANGS, lang, setLang, setCourseLangGetter, t, tn, howEn, HOW_FR_LEFTOVER };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.KPI18n = api;
 })(typeof window !== 'undefined' ? window : globalThis);

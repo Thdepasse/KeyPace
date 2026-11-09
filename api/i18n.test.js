@@ -27,3 +27,17 @@ test('gate I1 : verte aujourd\'hui, rouge si l\'anglais manque, a un tiret long 
   assert.equal(i1({ html: kpFake() }).ok, false);
 });
 function kpFake() { return "kpT('test.speed') kpT('test.inconnue')"; }
+
+test('gestes de frappe : aucun mot français ne reste après traduction, pour tous les gestes connus (AZERTY de la page et claviers QWERTY du cours)', () => {
+  const { loadApp } = require('../scripts/engine-harness');
+  const h = loadApp(); const how = JSON.parse(h.run('JSON.stringify(KB_HOW)'));
+  const all = []; for (const l of Object.keys(how)) for (const c of Object.keys(how[l])) all.push(how[l][c]);
+  const kb = require('../scripts/build-qwerty-keyboards').buildKeyboards('!@#$%^&*()_+-=[]{}|\\;:\'",.<>/?`~ é è ç ù');
+  for (const k of Object.values(kb)) for (const c of Object.keys(k.how || {})) all.push(k.how[c]);
+  assert.ok(all.length > 100);
+  const bad = [...new Set(all)].map((v) => [v, I.howEn(v)]).filter(([, e]) => I.HOW_FR_LEFTOVER.test(e));
+  assert.deepEqual(bad, []);
+  assert.equal(I.howEn('touche ù (à droite du M)'), 'the ù key (to the right of M)');
+  assert.equal(I.howEn('Maj + 1'), 'Shift + 1');
+  assert.equal(I.howEn('AltGr + é, puis espace'), 'AltGr + é, then the space bar');
+});

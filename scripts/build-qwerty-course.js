@@ -36,6 +36,20 @@ function build(LANG_ = LANG, FAMILY_ = FAMILY) {
   const lessons = modules.flatMap((m) => m.lessons);
   const curriculum = { modules, free: lessons.slice(0, 10).map((l) => l.id) };
   const keyboards = FAMILY_ === 'qwerty' ? require('./build-qwerty-keyboards').buildKeyboards(lessons.flatMap((l) => [l.text || '', l.keys])) : {};
+  // Cours dans une autre langue : noms des claviers et gestes de frappe dans la langue du cours (l'interface suit le cours).
+  if (LANG_ === 'en') {
+    const I = require('../i18n.js');
+    const NAMES = {
+      'windows-us': ['United States (US)', 'US'], 'windows-us-intl': ['United States international', 'US intl'], 'windows-uk': ['United Kingdom (UK)', 'UK'],
+      'windows-uk-extended': ['United Kingdom extended', 'UK extended'], 'mac-us': ['Mac, United States (ABC)', 'Mac US'], 'mac-us-intl-pc': ['Mac, United States international PC', 'Mac US intl'],
+      'mac-british': ['Mac, United Kingdom', 'Mac UK'], 'linux-us-intl': ['Linux, United States international', 'Linux US intl'],
+    };
+    for (const [id, k] of Object.entries(keyboards)) {
+      if (!NAMES[id]) throw new Error(`clavier « ${id} » sans nom anglais (scripts/build-qwerty-course.js)`);
+      k.label = NAMES[id][0]; k.short = NAMES[id][1];
+      for (const c of Object.keys(k.how || {})) k.how[c] = I.howEn(k.how[c]);
+    }
+  }
   // Cours dans une autre langue : le vocabulaire des jeux (mots d'entraînement filtrés par les lettres apprises) = lexique vérifié de la langue (les deux claviers partagent le même vocabulaire), mots en minuscules
   // de 2 à 12 lettres sans signe. Le français garde ses propres listes (dans la page).
   let vocab;

@@ -4583,7 +4583,7 @@ function maybeConvNudge(v){
 
 /* ── CURRICULUM ── */
 const FINGERS={lp:'#B7AE9E',lr:'#79C56A',lm:'#E8C13B',li:'#EE6B5E',ri:'#A77BD6',rm:'#E8C13B',rr:'#79C56A',rp:'#B7AE9E',th:'#BCB3A2'};
-const FINGER_LABEL={p:'auriculaire',r:'annulaire',m:'majeur',i:'index'};
+const FINGER_LABEL={get p(){return kpT('finger.p');},get r(){return kpT('finger.r');},get m(){return kpT('finger.m');},get i(){return kpT('finger.i');}};
 /* Positions des touches pour l'onde de choc / lettre qui décolle (page Test 4a) */
 const T4A_KW=61,T4A_RH=65,T4A_SPACE_Y=129;
 function t4aComputeKpos(){
@@ -5006,7 +5006,7 @@ function kbFullPreviewHTML(azertyId,formId){
 function kbLayoutTitle(){return kpCurrentFamily()==='qwerty'?'Disposition QWERTY':'Disposition AZERTY';}
 function kbLayoutBtnsHTML(){
   const fam=kpCurrentFamily(),cur=getKbLayoutId();
-  return Object.keys(KB_LAYOUT_LABELS).filter(id=>kpFamilyOf(id)===fam).map(id=>`<button class="settings-btn kb-layout-btn${cur===id?' active':''}" data-kb-layout="${id}" onclick="app.setKbLayout('${id}')">${KB_LAYOUT_LABELS[id]}</button>`).join('');
+  return Object.keys(KB_LAYOUT_LABELS).filter(id=>kpFamilyOf(id)===fam).map(id=>`<button class="settings-btn kb-layout-btn${cur===id?' active':''}" data-kb-layout="${id}" onclick="app.setKbLayout('${id}')">${kpKbLabel(id)}</button>`).join('');
 }
 function kbFamilyCardsHTML(){
   const fams=kpFamiliesOffered();if(fams.length<2)return'';
@@ -5035,13 +5035,16 @@ function kbFamilyBoxHTML(){
 }
 /* Pastille « clavier » de l'en-tête : le clavier actuel, cliquable pour en changer sans passer par les réglages (visiteur ou connecté). */
 const KB_AZ_SHORT={fr:'Français',be:'Belge',mac:'Mac',nf:'NF'};
-function kbChipText(){const l=getKbLayoutId(),q=KB_QWERTY[l];return q?('QWERTY · '+(q.short||q.label)):('AZERTY · '+(KB_AZ_SHORT[l]||KB_LAYOUT_LABELS[l]||''));}
+/* Nom d'une disposition dans la langue de l'interface : les QWERTY portent leur nom dans les données du cours (déjà dans la langue du cours), les AZERTY sont traduits ici. */
+const KB_AZ_EN={fr:()=>kpT('kb.az_fr'),be:()=>kpT('kb.az_be'),mac:()=>kpT('kb.az_mac'),nf:()=>kpT('kb.az_nf')};
+function kpKbLabel(id,short){if(KPI18n.lang()==='en'&&KB_AZ_EN[id]){return short&&id==='nf'?kpT('kb.az_short_nf'):KB_AZ_EN[id]();}return short?(KB_AZ_SHORT[id]||KB_LAYOUT_LABELS[id]||''):KB_LAYOUT_LABELS[id];}
+function kbChipText(){const l=getKbLayoutId(),q=KB_QWERTY[l];return q?('QWERTY · '+(q.short||q.label)):('AZERTY · '+kpKbLabel(l,true));}
 function kpKbChipRender(){
   kpSyncUiLang();
   const t=document.getElementById('nav-kb-text'),b=document.getElementById('nav-kb-btn'),m=document.getElementById('nav-kb-menu');
   if(!t||!b||!m)return;
   const ct=kbChipText().split(' · ');t.innerHTML='<b>'+ct[0]+'</b>'+(ct[1]?'<span class="kbc-var"> · '+ct[1]+'</span>':'');
-  const full=(kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY')+', '+(KB_LAYOUT_LABELS[getKbLayoutId()]||'');
+  const full=(kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY')+', '+(kpKbLabel(getKbLayoutId())||'');
   b.setAttribute('aria-label','Mon clavier : '+full);b.title='Mon clavier : '+full+' (cliquer pour changer)';
   const acc=getAccentMode();
   m.innerHTML=kbFamilyCardsHTML()+kpLangRowHTML()
@@ -5210,8 +5213,8 @@ function kbHowHTML(les){
   const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const groups=[];
   for(const c of chars){const how=kbHowFor(H,c);const g=groups.find(x=>x.how===how);if(g)g.cs.push(c);else groups.push({how,cs:[c]});}
-  const items=groups.map(g=>`<b>${esc(g.cs.join(' '))}</b> : ${esc(g.how)}`).join('<br>');
-  return`<div class="intro-rule"><div class="intro-rule-icon">⌨️</div><div class="intro-rule-text"><strong>Sur ton clavier (${KB_LAYOUT_LABELS[lay]})</strong>${items}</div></div>`;
+  const items=groups.map(g=>`<b>${esc(g.cs.join(' '))}</b> : ${esc(KPI18n.lang()==='en'?KPI18n.howEn(g.how):g.how)}`).join('<br>');
+  return`<div class="intro-rule"><div class="intro-rule-icon">⌨️</div><div class="intro-rule-text"><strong>${kpT('tuto.on_keyboard',{layout:kpKbLabel(lay)})}</strong>${items}</div></div>`;
 }
 /* Texte qui vient d'ailleurs (devoir d'un prof, défi, duel) : on le ramène à ce qu'un
    clavier AZERTY français/belge sait taper. Guillemets, apostrophes, tirets, points de
@@ -7074,9 +7077,8 @@ const app={
       if(m){key=k;via=m.via;label=m.ch;break;}
     }}
     if(!key)return null;
-    const f=key.f;const side=f[0]==='l'?'gauche':'droite';
-    const finger=f==='th'?'pouce':(FINGER_LABEL[f[1]]||'');
-    return{label,color:FINGERS[f]||'#999',hand:'main '+side,finger,via};
+    const f=key.f;const finger=f==='th'?kpT('finger.th'):(FINGER_LABEL[f[1]]||'');
+    return{label,color:FINGERS[f]||'#999',hand:f[0]==='l'?kpT('hand.left'):kpT('hand.right'),finger,via};
   },
   openLessonTuto(id){
     const les=this.lessonById(id);if(!les)return;
@@ -7089,7 +7091,7 @@ const app={
       let on=false,hint='';
       for(const t of newKeys){
         const m=kbKeyMatch(k,t,r===0);
-        if(m){on=true;if(m.via==='shift')hint='Maj → '+m.ch;else if(m.via==='altgr')hint=`${kbModifierName()} → ${m.ch}`;else if(m.via==='altgrshift')hint=`${kbModifierName()} + Maj → ${m.ch}`;break;}
+        if(m){on=true;if(m.via==='shift')hint=kpT('tuto.shift_to',{ch:m.ch});else if(m.via==='altgr')hint=kpT('tuto.mod_to',{mod:kbModifierName(),ch:m.ch});else if(m.via==='altgrshift')hint=kpT('tuto.mod_shift_to',{mod:kbModifierName(),ch:m.ch});break;}
       }
       return`<div class="tuto-key${on?' on':''}"${on?` style="background:${FINGERS[k.f]};border-color:${FINGERS[k.f]}"`:''}>${k.l.toLowerCase()}${hint?`<span class="tuto-key-altgr">${hint}</span>`:''}</div>`;
     }).join('')}</div>`).join('');
@@ -7099,7 +7101,7 @@ const app={
     const Hlay=KB_HOW[getKbLayoutId()]||KB_HOW.fr;
     const missing=newKeys.filter(k=>!this._fingerInfo(k));
     const showKb=infos.length>0&&missing.every(k=>Hlay[k]!==undefined);
-    const viaHint=v=>v==='shift'?' (Maj)':v==='altgr'?` avec ${kbModifierName()}`:v==='altgrshift'?` avec ${kbModifierName()} + Maj`:'';
+    const viaHint=v=>v==='shift'?kpT('tuto.via_shift'):v==='altgr'?kpT('tuto.via_mod',{mod:kbModifierName()}):v==='altgrshift'?kpT('tuto.via_mod_shift',{mod:kbModifierName()}):'';
     const cards=infos.map(i=>`<div class="tuto-keycard"><div class="k" style="background:${i.color}">${i.label}</div><div class="meta"><b>${i.label}</b>${viaHint(i.via)} · ${i.finger} · ${i.hand}</div></div>`).join('');
     const t=les.tuto||{};
     const rules=(t.rules||[]).map(r=>{
@@ -7116,9 +7118,9 @@ const app={
       ${showKb?`<div class="tuto-kb">${kb}</div><div class="tuto-keys-info">${cards}</div>`:''}
       ${(how||rules)?`<div class="intro-rules" style="margin-bottom:18px">${how}${rules}</div>`:''}
       ${quoteSwitch}
-      ${(KB_FORM_FACTORS[getKbFormFactorId()]||{}).noDigitRow&&(/[0-9]/.test(les.keys||'')||/^num/.test(les.id))?`<p style="font-size:13px;color:var(--muted);margin:0 0 18px">Sur un clavier 40 %, les chiffres sont sur une couche Fn : repère-les sur la légende de tes touches.</p>`:''}
+      ${(KB_FORM_FACTORS[getKbFormFactorId()]||{}).noDigitRow&&(/[0-9]/.test(les.keys||'')||/^num/.test(les.id))?`<p style="font-size:13px;color:var(--muted);margin:0 0 18px">${kpT('tuto.no_digit_row')}</p>`:''}
       ${t.tip?`<div class="lesson-tip"><div class="lesson-tip-icon">🎯</div><div>${t.tip}</div></div>`:''}
-      <button class="intro-start-btn" onclick="app.confirmTuto()">Commencer la leçon →</button>`;
+      <button class="intro-start-btn" onclick="app.confirmTuto()">${kpT('tuto.start')}</button>`;
     // Les leçons sont rédigées pour AZERTY PC (touche "AltGr") : sur Mac, la
     // touche s'appelle "Option" (⌥) et n'est pas nommée "AltGr" sur le
     // capuchon — on adapte le nom sans changer les positions décrites
