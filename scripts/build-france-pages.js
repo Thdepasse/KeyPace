@@ -217,6 +217,7 @@ function build(p) {
 <meta charset="UTF-8">
 <!-- Consentement cookies + Google Analytics (chargé seulement après accord, voir /cookies) -->
 <script src="/cookie-consent.js" defer></script>
+<script src="/field-focus-guard.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(p.title)}</title>
 <meta name="description" content="${esc(p.description)}">
