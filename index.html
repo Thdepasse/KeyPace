@@ -3574,27 +3574,52 @@ async function authSubmit(){
       if(!r.ok){btn.disabled=false;btn.textContent='Se connecter';return showAuthError(d.error||'Erreur.');}
       // Compte importé par CSV : mot de passe temporaire connu du prof, on
       // bloque sur un changement obligatoire avant de terminer la connexion.
-      if(d.mustChangePassword){btn.disabled=false;btn.textContent='Se connecter';showForcedPasswordChangeModal(d,passwordHash);return;}
+      // La fenêtre de connexion est fermée d'abord : restée ouverte dessous, Entrée dans les champs du
+      // nouveau mot de passe relançait la connexion et empilait une 2e fenêtre vide par-dessus.
+      if(d.mustChangePassword){btn.disabled=false;btn.textContent='Se connecter';closeModal('auth-modal');showForcedPasswordChangeModal(d,passwordHash);return;}
       completeLogin(d);
     }
   }catch(e){btn.disabled=false;btn.textContent=currentTab==='login'?'Se connecter':'Créer mon compte';showAuthError('Erreur réseau, réessaie.');}
 }
 
+// Une fenêtre est ouverte : modale classique (.modal-overlay.open) ou fenêtre créée à la volée
+// (.settings-overlay : réglages, mot de passe imposé, suppression du compte…), présente dans la
+// page seulement tant qu'elle est ouverte — elle n'a jamais la classe "open".
+function kpDialogOpen(){return document.querySelectorAll('.modal-overlay.open,.settings-overlay').length>0;}
+function kpIsField(t){return !!t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);}
+
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
-    if(document.getElementById('auth-modal').classList.contains('open'))authSubmit();
+    if(document.getElementById('auth-modal').classList.contains('open')&&!document.querySelector('.settings-overlay'))authSubmit();
   }
   if(e.key==='Escape'){
     closeModal('auth-modal');closeModal('upgrade-modal');closeModal('school-modal');closeModal('lesson-tuto-modal');if(document.getElementById('ob-overlay')?.classList.contains('active'))obClose(false);
   }
   // Tab to restart the current typing session (standard in typing apps)
+  // Jamais quand on écrit dans un champ ou qu'une fenêtre est ouverte (réglages compris) : Tab doit
+  // alors passer au champ suivant. Avant, Tab dans les Réglages était bloqué et relançait le test dessous.
   if(e.key==='Tab'){
-    const anyModalOpen=[...document.querySelectorAll('.modal-overlay')].some(m=>m.classList.contains('open'));
-    if(!anyModalOpen&&app&&(app.view==='test'||app.view==='lessons')&&app.sess){
+    const t=e.target,inPage=!t||t===document.body||t===document.documentElement||!!(t.closest&&t.closest('#page-test,#page-lessons'));
+    if(!kpDialogOpen()&&!kpIsField(t)&&inPage&&app&&(app.view==='test'||app.view==='lessons')&&app.sess){
       e.preventDefault();
       app.restart();
     }
   }
+});
+
+// « ou appuie sur Espace » (Frappe-mots, Sprint) : l'écran de départ comptait sur l'attribut
+// autofocus du bouton Jouer, ignoré par le navigateur quand l'écran est dessiné après le chargement
+// de la page — Espace ne lançait donc rien. On déclenche le bouton nous-mêmes.
+document.addEventListener('keydown',e=>{
+  if(e.code!=='Space'&&e.key!==' ')return;
+  if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||typeof app==='undefined'||app.view!=='games')return;
+  const t=e.target;if(kpIsField(t)||kpDialogOpen())return;
+  const b=document.querySelector('#page-games [autofocus]');
+  if(!b||!b.offsetWidth||b.disabled)return;
+  // Un autre bouton a le focus (Quitter, menu…) : Espace lui revient. Sauf les choix de niveau de ce même écran.
+  const idle=b.closest('.game-overlay,.gidle');
+  if(t&&(t.tagName==='BUTTON'||t.tagName==='A')&&t!==b&&!(idle&&idle.contains(t)))return;
+  e.preventDefault();e.stopPropagation();b.click();
 });
 
 // Close modal on backdrop click
@@ -3637,6 +3662,7 @@ function completeLogin(d){
 // servir à se connecter (donc déjà connu de l'appelant, pas besoin de le
 // redemander).
 function showForcedPasswordChangeModal(d,oldPasswordHash){
+  if(document.getElementById('forced-pw-overlay'))return;
   const overlay=document.createElement('div');
   overlay.className='settings-overlay';overlay.id='forced-pw-overlay';overlay.style.zIndex='1300';
   overlay.innerHTML=`<div class="settings-modal" style="max-width:420px">
@@ -3655,6 +3681,8 @@ function showForcedPasswordChangeModal(d,oldPasswordHash){
   </div>`;
   // Pas de clic-dehors pour fermer, pas de bouton ✕ : le changement est obligatoire.
   document.body.appendChild(overlay);
+  // Entrée valide le formulaire, comme dans la fenêtre de connexion.
+  overlay.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();document.getElementById('fpw-submit').click();}});
   document.getElementById('fpw-submit').addEventListener('click',async()=>{
     const pw=document.getElementById('fpw-new').value||'';
     const pw2=document.getElementById('fpw-confirm').value||'';
@@ -3898,11 +3926,19 @@ function isAdmin(){return (typeof app!=='undefined')&&app.stats&&app.stats.role=
    de vrai, on sait qu'un clavier physique est bel et bien utilisable — quel
    que soit le type de pointeur — et on ré-affiche tout de suite l'écran. */
 let _kbDetected=false;
-window.addEventListener('keydown',()=>{
+window.addEventListener('keydown',e=>{
   if(_kbDetected)return;
+  let before=true;try{before=isMobileLayout()||IS_TOUCH_ONLY();}catch{}
   _kbDetected=true;
-  if(typeof updateNavUser==='function')updateNavUser();
-  if(typeof app!=='undefined'&&app.renderView)app.renderView(app.view||'home');
+  // Ordinateur : la détection ne change rien à l'affichage. Redessiner quand même ramenait la page
+  // en haut à la toute première touche, et effaçait le champ de la page dans lequel on écrivait.
+  if(!before)return;
+  const redraw=()=>{
+    if(typeof updateNavUser==='function')updateNavUser();
+    if(typeof app!=='undefined'&&app.renderView)app.renderView(app.view||'home');
+  };
+  // Tablette + clavier en train d'écrire dans un champ : on attend qu'il le quitte.
+  if(kpIsField(e.target))e.target.addEventListener('blur',redraw,{once:true});else redraw();
 },true);
 
 /* ── Mode mobile (≤768px) ──
