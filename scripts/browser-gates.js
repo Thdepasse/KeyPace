@@ -423,6 +423,8 @@ async function run(opts = {}) {
             closeModal('lesson-tuto-modal');}
           app.activeGame=null;go('games');await new Promise(r=>setTimeout(r,500));
           out.enGames=document.getElementById('page-games').innerText+' | '+[...document.querySelectorAll('#page-games [aria-label]')].map(e=>e.getAttribute('aria-label')).join(' / ');
+          out.enNav=document.getElementById('main-nav').innerText;
+          document.getElementById('nav-kb-btn').click();await new Promise(r=>setTimeout(r,150));out.enChip=document.getElementById('nav-kb-menu').innerText;document.getElementById('nav-kb-btn').click();
           out.enGameScreens={};
           for(const g of ['frappe','sprint','course','ghost','simon']){app.activeGame=g;app.game=null;app.sprint=null;app.course=null;app.ghost=null;app.simon=null;app.renderGames();await new Promise(r=>setTimeout(r,200));out.enGameScreens[g]=document.getElementById('page-games').innerText;}
           app.activeGame=null;
@@ -455,6 +457,10 @@ async function run(opts = {}) {
           const bad = ['Mots qui tombent', 'Jouer', 'OU APPUIE', 'Quitter', 'Lancer le Sprint', 'retour arrière', 'Niveau', 'Meilleur', 'Entraînement', 'Course de dactylo', 'plus vite que', 'Lancer la course', 'fantôme', 'Simon des mots', 'Mémorise'].filter((w) => txt.toLowerCase().includes(w.toLowerCase()));
           if (bad.length) problems.push(`BR12 : du français sur l'écran ${g} en anglais : ${bad.join(', ')}`);
         }
+        for (const w of ['Home', 'Test', 'Courses', 'Games', 'Progress', 'Log out']) if (!lg.enNav.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent du menu en anglais`);
+        const nv = ['Accueil', 'Cours', 'Jeux', 'Progrès', 'Déconnexion', 'Établissements', 'Test sur base'].filter((w) => new RegExp('(^|[^A-Za-zÀ-ÿ])' + w + '([^A-Za-zÀ-ÿ]|$)').test(lg.enNav)); if (nv.length) problems.push(`BR12 : du français dans le menu en anglais : ${nv.join(', ')}`);
+        for (const w of ['Accents', 'Required', 'Tolerated', 'Course language', 'All settings']) if (!lg.enChip.includes(w)) problems.push(`BR12 : « ${w} » absent du menu du clavier en anglais`);
+        const ch = ['Exigés', 'Tolérés', 'Disposition', 'Langue du cours', 'Tous les réglages', 'Famille'].filter((w) => lg.enChip.includes(w)); if (ch.length) problems.push(`BR12 : du français dans le menu du clavier en anglais : ${ch.join(', ')}`);
         if (lg.frUi.t !== 'Vitesse' || lg.frUi.lang !== 'fr') problems.push(`BR12 : retour au français, l'interface reste en anglais (${JSON.stringify(lg.frUi)})`);
         if (lg.rowEn.join('|') !== 'Français|English*') problems.push(`BR12 : langue active après le passage (${lg.rowEn.join('|')})`);
         if (!lg.okQ || lg.q.course !== 'en/qwerty' || lg.q.lessons !== 58) problems.push(`BR12 : en anglais, passer à QWERTY garde la langue (${JSON.stringify(lg.q)})`);

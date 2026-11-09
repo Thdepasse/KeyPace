@@ -2925,8 +2925,8 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <div class="nav-logo-name">KeyPace</div>
     </button>
     <div class="nav-links">
-      <a class="nav-link" id="nav-home" href="/accueil" onclick="go('home');return false">Accueil<span class="underline"></span></a>
-      <div class="nav-dropdown" id="nav-ecoles-wrap">
+      <a class="nav-link" id="nav-home" href="/accueil" onclick="go('home');return false" data-i18n="nav.home">Accueil<span class="underline"></span></a>
+      <div class="nav-dropdown" id="nav-ecoles-wrap" data-lang-hide="en">
         <a class="nav-link" href="/ecoles" style="display:inline-flex;align-items:center;text-decoration:none">Établissements</a>
         <div class="nav-dropdown-menu">
           <a href="/dactylographie-primaire">Primaire</a>
@@ -2935,16 +2935,16 @@ footer{border-top:1px solid var(--border);margin-top:10px}
         </div>
       </div>
       <div class="nav-dropdown" id="nav-test-wrap">
-        <a class="nav-link" id="nav-test" href="/test" onclick="go('testchoix');return false">Test<span class="underline"></span></a>
+        <a class="nav-link" id="nav-test" href="/test" onclick="go('testchoix');return false" data-i18n="nav.test">Test<span class="underline"></span></a>
         <div class="nav-dropdown-menu">
-          <a href="/test-frappe-en-ligne" onclick="go('test');return false">Test sur base de longueur</a>
-          <a href="/test-dactylographie-chronometre" onclick="app.openTimedTest();return false">Test sur base de temps</a>
+          <a href="/test-frappe-en-ligne" onclick="go('test');return false" data-i18n="nav.test_length">Test sur base de longueur</a>
+          <a href="/test-dactylographie-chronometre" onclick="app.openTimedTest();return false" data-i18n="nav.test_time">Test sur base de temps</a>
         </div>
       </div>
-      <a class="nav-link" id="nav-lessons" href="/cours-dactylo-en-ligne" onclick="app._skipModulesHub=false;go('lessons');return false">Cours<span class="underline"></span></a>
-      <a class="nav-link" id="nav-games" href="/jeux-dactylo-en-ligne" onclick="go('games');return false">Jeux<span class="underline"></span></a>
-      <a class="nav-link" id="nav-stats" href="/progres" onclick="go('stats');return false">Progrès<span class="underline"></span></a>
-      <button class="nav-link" id="nav-join" onclick="go('classes')" style="display:none">Classe<span class="underline"></span></button>
+      <a class="nav-link" id="nav-lessons" href="/cours-dactylo-en-ligne" onclick="app._skipModulesHub=false;go('lessons');return false" data-i18n="nav.lessons">Cours<span class="underline"></span></a>
+      <a class="nav-link" id="nav-games" href="/jeux-dactylo-en-ligne" onclick="go('games');return false" data-i18n="nav.games">Jeux<span class="underline"></span></a>
+      <a class="nav-link" id="nav-stats" href="/progres" onclick="go('stats');return false" data-i18n="nav.stats">Progrès<span class="underline"></span></a>
+      <button class="nav-link" id="nav-join" onclick="go('classes')" style="display:none" data-i18n="nav.class">Classe<span class="underline"></span></button>
       <button class="nav-link" id="nav-classes" onclick="go('classes')" style="display:none">Gestion de classes<span class="underline"></span></button>
       <div id="nav-apercu" style="display:none;position:relative;align-items:center">
         <button class="nav-link" onclick="toggleApercu(event)" style="display:inline-flex">Aperçu ▾<span class="underline"></span></button>
@@ -2967,16 +2967,16 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <div class="nav-region-menu nav-kb-menu" id="nav-kb-menu" role="dialog" aria-label="Mon clavier" hidden></div>
     </div>
     <div id="nav-guest" style="display:flex;gap:8px;align-items:center">
-      <button class="nav-login-btn" onclick="openAuth()">Se connecter</button>
-      <button class="nav-signup-btn" onclick="openAuth('register')">Créer un compte</button>
+      <button class="nav-login-btn" onclick="openAuth()" data-i18n="nav.login">Se connecter</button>
+      <button class="nav-signup-btn" onclick="openAuth('register')" data-i18n="nav.signup">Créer un compte</button>
     </div>
     <div id="nav-logged" style="display:none">
       <div class="nav-user">
         <span id="nav-plan-badge" class="nav-plan-badge free">GRATUIT</span>
         <span class="nav-username" id="nav-username"></span>
         <div class="nav-avatar" id="nav-avatar" onclick="app.openSettings()"></div>
-        <button id="nav-upgrade-btn" class="nav-upgrade-btn" onclick="openModal('upgrade-modal')" style="display:none">Passer Expert</button>
-        <button class="nav-logout" onclick="logout()">Déconnexion</button>
+        <button id="nav-upgrade-btn" class="nav-upgrade-btn" onclick="openModal('upgrade-modal')" style="display:none" data-i18n="nav.upgrade">Passer Expert</button>
+        <button class="nav-logout" onclick="logout()" data-i18n="nav.logout">Déconnexion</button>
       </div>
     </div>
     <button class="nav-burger" id="nav-burger" onclick="toggleNavMenu(event)" aria-label="Menu">☰</button>
@@ -3866,7 +3866,7 @@ function updateNavUser(){
   const upgradeBtn=document.getElementById('nav-upgrade-btn');
   const classesBtn=document.getElementById('nav-classes');
   if(teacher){badge.textContent=role==='admin'?'ÉTABLISSEMENT':'ENSEIGNANT';badge.className='nav-plan-badge etab';}
-  else{badge.textContent=plan==='expert'?'EXPERT':'GRATUIT';badge.className='nav-plan-badge '+(plan==='expert'?'expert':'free');}
+  else{badge.textContent=plan==='expert'?'EXPERT':kpT('nav.free');badge.className='nav-plan-badge '+(plan==='expert'?'expert':'free');}
   upgradeBtn.style.display=(plan==='expert'||teacher)?'none':'inline-block';
   if(classesBtn)classesBtn.style.display=(teacher&&!isAdmin())?'inline-flex':'none';
   ['nav-test-wrap','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=teacher?'none':'';});
@@ -4425,7 +4425,15 @@ const KP_LANG_NAMES={fr:'Français',en:'English'};
 const kpT=(k,p)=>KPI18n.t(k,p),kpTn=(k,n,p)=>KPI18n.tn(k,n,p); /* textes de l'interface (i18n.js) : français par défaut, anglais en bêta avec ?ui=en */
 function kpContentLang(){return KP_COURSES[kpCourseId()].content;}
 KPI18n.setCourseLangGetter(()=>kpContentLang()); /* l'interface suit la langue du cours actif (sauf ?ui= explicite) */
-function kpSyncUiLang(){try{document.documentElement.lang=KPI18n.lang();}catch{}}
+/* Textes fixes de la page (menu du haut) : les éléments portent l'attribut data-i18n (valeur : la clé) ; le texte français écrit dans le HTML est le repli. Le texte est le premier noeud texte de l'élément (le soulignement des liens reste intact). */
+function kpApplyStatic(){
+  try{
+    const lang=KPI18n.lang();
+    document.querySelectorAll('[data-i18n]').forEach(el=>{const v=kpT(el.getAttribute('data-i18n'));const n=[...el.childNodes].find(x=>x.nodeType===3);if(n){if(n.nodeValue!==v)n.nodeValue=v;}else el.insertBefore(document.createTextNode(v),el.firstChild);});
+    document.querySelectorAll('[data-lang-hide]').forEach(el=>{el.style.display=el.getAttribute('data-lang-hide')===lang?'none':'';});
+  }catch{}
+}
+function kpSyncUiLang(){try{document.documentElement.lang=KPI18n.lang();}catch{}kpApplyStatic();}
 kpSyncUiLang();
 function kpLanguagesOffered(){return [...new Set(KP_COURSES_OFFERED.map(c=>KP_COURSES[c].content))];}
 function kpFamilyCourse(fam){const id=kpContentLang()+'/'+fam;return KP_COURSES[id]?id:'fr/'+fam;}
@@ -5012,7 +5020,7 @@ function kbFamilyCardsHTML(){
   const fams=kpFamiliesOffered();if(fams.length<2)return'';
   const cur=kpCurrentFamily();
   const card=(f,name,rows,sub)=>`<button type="button" role="radio" aria-checked="${cur===f}" class="kb-family-card${cur===f?' active':''}" onclick="app.askKbFamily('${f}')"><span class="kb-family-keys" aria-hidden="true">${rows.split('').map(c=>'<i>'+c+'</i>').join('')}</span><strong>${name}</strong><span>${sub}</span></button>`;
-  return`<div class="kb-family-cards" role="radiogroup" aria-label="Famille de clavier">${card('azerty','AZERTY','AZERTY','Français, belge, Mac, NF')}${card('qwerty','QWERTY','QWERTY','US, international, UK, Mac')}</div>`;
+  return`<div class="kb-family-cards" role="radiogroup" aria-label="${kpT('chip.family')}">${card('azerty','AZERTY','AZERTY',kpT('chip.az_sub'))}${card('qwerty','QWERTY','QWERTY',kpT('chip.qw_sub'))}</div>`;
 }
 /* Langue du cours : deux boutons quand le compte a droit à plus d'une langue ; sinon rien (comportement actuel). */
 /* Texte d'un test de frappe : un passage français au hasard ; dans un cours en anglais, des mots du vocabulaire du cours (le test mesure la vitesse sur l'anglais,
@@ -5027,11 +5035,11 @@ function kpTestPassage(){
 function kpLangRowHTML(){
   const langs=kpLanguagesOffered();if(langs.length<2)return'';
   const cur=kpContentLang();
-  return'<div class="nav-region-title">Langue du cours</div><div class="kbc-langs kbc-variants-like" role="radiogroup" aria-label="Langue du cours">'+langs.map(l=>'<button type="button" role="radio" aria-checked="'+(cur===l)+'" class="settings-btn kbc-lang-btn'+(cur===l?' active':'')+'" data-lang="'+l+'" onclick="kpChooseLanguage(\''+l+'\')">'+(KP_LANG_NAMES[l]||l)+'</button>').join('')+'</div>';
+  return'<div class="nav-region-title">'+kpT('chip.course_language')+'</div><div class="kbc-langs kbc-variants-like" role="radiogroup" aria-label="'+kpT('chip.course_language')+'">'+langs.map(l=>'<button type="button" role="radio" aria-checked="'+(cur===l)+'" class="settings-btn kbc-lang-btn'+(cur===l?' active':'')+'" data-lang="'+l+'" onclick="kpChooseLanguage(\''+l+'\')">'+(KP_LANG_NAMES[l]||l)+'</button>').join('')+'</div>';
 }
 function kbFamilyBoxHTML(){
   const cards=kbFamilyCardsHTML();if(!cards)return'';
-  return`<div class="settings-row-info"><strong>Mon clavier</strong><span>Choisis la famille de ton clavier : tu travailles le cours qui correspond à tes touches. Chaque famille garde sa propre progression.</span></div>${cards}${kpLangRowHTML()}`;
+  return`<div class="settings-row-info"><strong>${kpT('chip.my_keyboard')}</strong><span>${kpT('chip.family_help')}</span></div>${cards}${kpLangRowHTML()}`;
 }
 /* Pastille « clavier » de l'en-tête : le clavier actuel, cliquable pour en changer sans passer par les réglages (visiteur ou connecté). */
 const KB_AZ_SHORT={fr:'Français',be:'Belge',mac:'Mac',nf:'NF'};
@@ -5045,13 +5053,13 @@ function kpKbChipRender(){
   if(!t||!b||!m)return;
   const ct=kbChipText().split(' · ');t.innerHTML='<b>'+ct[0]+'</b>'+(ct[1]?'<span class="kbc-var"> · '+ct[1]+'</span>':'');
   const full=(kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY')+', '+(kpKbLabel(getKbLayoutId())||'');
-  b.setAttribute('aria-label','Mon clavier : '+full);b.title='Mon clavier : '+full+' (cliquer pour changer)';
+  b.setAttribute('aria-label',kpT('chip.my_keyboard')+' : '+full);b.title=kpT('chip.title',{full});
   const acc=getAccentMode();
   m.innerHTML=kbFamilyCardsHTML()+kpLangRowHTML()
-    +'<div class="nav-region-title">Disposition '+(kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY')+'</div><div class="kbc-variants">'+kbLayoutBtnsHTML()+'</div>'
-    +'<div class="nav-region-title">Accents</div><div class="kbc-variants"><button type="button" class="settings-btn'+(acc==='exact'?' active':'')+'" onclick="app.setAccents(\'exact\')">Exigés</button><button type="button" class="settings-btn'+(acc==='tolerant'?' active':'')+'" onclick="app.setAccents(\'tolerant\')">Tolérés</button></div>'
-    +'<div class="nav-region-note">Exigés : tu apprends à taper é, è, ê… Tolérés : la lettre sans accent est acceptée.</div>'
-    +(currentUser?'<button type="button" class="nav-region-item" onclick="kpCloseKbChip(false);app.openSettings()">Tous les réglages…</button>':'');
+    +'<div class="nav-region-title">'+kpT('chip.layout',{fam:kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY'})+'</div><div class="kbc-variants">'+kbLayoutBtnsHTML()+'</div>'
+    +'<div class="nav-region-title">'+kpT('chip.accents')+'</div><div class="kbc-variants"><button type="button" class="settings-btn'+(acc==='exact'?' active':'')+'" onclick="app.setAccents(\'exact\')">'+kpT('chip.exact')+'</button><button type="button" class="settings-btn'+(acc==='tolerant'?' active':'')+'" onclick="app.setAccents(\'tolerant\')">'+kpT('chip.tolerant')+'</button></div>'
+    +'<div class="nav-region-note">'+kpT('chip.note')+'</div>'
+    +(currentUser?'<button type="button" class="nav-region-item" onclick="kpCloseKbChip(false);app.openSettings()">'+kpT('chip.all_settings')+'</button>':'');
 }
 function kpToggleKbChip(e){
   if(e)e.stopPropagation();

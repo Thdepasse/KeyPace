@@ -34,6 +34,11 @@ function i1(opts) {
       if (m[1] === 'n') { used.add(q[1] + '_one'); used.add(q[1] + '_other'); } else used.add(q[1]);
     }
   }
+  // textes fixes de la page : data-i18n="clé" ; le texte français écrit dans le HTML doit être exactement celui du dictionnaire (c'est le repli avant que le script ne s'applique)
+  for (const m of html.matchAll(/data-i18n="([^"]+)"[^>]*>([^<]*)</g)) {
+    used.add(m[1]);
+    if (m[1] in fr && m[2].trim() !== String(fr[m[1]]).trim()) errs.push(`data-i18n « ${m[1]} » : le HTML dit « ${m[2].trim()} », le dictionnaire français « ${fr[m[1]]} »`);
+  }
   for (const k of used) if (!(k in fr)) errs.push(`la page appelle « ${k} » qui n'existe pas`);
   for (const k of Object.keys(fr)) if (!used.has(k)) errs.push(`« ${k} » n'est utilisée par aucun écran`);
   return errs.length ? { ok: false, detail: errs.slice(0, 8).join('\n') } : { ok: true, detail: `${Object.keys(fr).length} textes, anglais complet, toutes les clés de la page existent` };
