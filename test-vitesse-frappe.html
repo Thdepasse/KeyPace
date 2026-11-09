@@ -39,8 +39,18 @@
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://keypace.be/" },
-    { "@type": "ListItem", "position": 2, "name": "Test de vitesse de frappe", "item": "https://keypace.be/test-vitesse-frappe" }
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Accueil",
+      "item": "https://keypace.be/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Test de vitesse de frappe",
+      "item": "https://keypace.be/test-vitesse-frappe"
+    }
   ]
 }
 </script>
@@ -52,17 +62,50 @@
     {
       "@type": "Question",
       "name": "Qu'est-ce qu'une bonne vitesse de frappe en mots par minute ?",
-      "acceptedAnswer": { "@type": "Answer", "text": "En moyenne, une personne tape autour de 30 à 40 mots par minute. Au-delà de 50, on parle d'un bon niveau, et les dactylographes entraînés dépassent 70 mots par minute. La précision compte autant que la vitesse : viser 95 % ou plus de frappes correctes." }
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En moyenne, une personne tape autour de 30 à 40 mots par minute. Au-delà de 50, on parle d'un bon niveau, et les dactylographes entraînés dépassent 70 mots par minute. La précision compte autant que la vitesse : viser 95 % ou plus de frappes correctes."
+      }
     },
     {
       "@type": "Question",
       "name": "Le test de vitesse de frappe est-il gratuit ?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Oui. Le test KeyPace est gratuit et fonctionne directement dans le navigateur, sans installation ni inscription. Tu obtiens ton résultat en mots par minute et ton taux de précision à la fin." }
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. Le test KeyPace est gratuit et fonctionne directement dans le navigateur, sans installation ni inscription. Tu obtiens ton résultat en mots par minute et ton taux de précision à la fin."
+      }
     },
     {
       "@type": "Question",
       "name": "Comment est calculée la vitesse de frappe ?",
-      "acceptedAnswer": { "@type": "Answer", "text": "La vitesse en mots par minute correspond au nombre de caractères tapés correctement, divisé par cinq (la longueur moyenne d'un mot), ramené à une minute. Les erreurs non corrigées font baisser la précision et le score." }
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La vitesse en mots par minute correspond au nombre de caractères tapés correctement, divisé par cinq (la longueur moyenne d'un mot), ramené à une minute. Les erreurs non corrigées font baisser la précision et le score."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quelle durée de test choisir ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pour une première idée, 30 secondes ou 1 minute suffisent. Pour un résultat plus stable, choisis 3 ou 5 minutes, et 10 minutes pour tester ton endurance."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "MPM et WPM, c'est la même chose ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. MPM veut dire mots par minute, WPM veut dire words per minute en anglais. Dans les deux cas, un mot vaut cinq caractères."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pourquoi mon score change-t-il d'un test à l'autre ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le texte, l'échauffement, la fatigue et le clavier jouent. Fais plusieurs tests et regarde la tendance plutôt qu'un seul résultat."
+      }
     }
   ]
 }
@@ -100,6 +143,8 @@
   th{background:var(--light);font-family:'Bricolage Grotesque',sans-serif;font-weight:700}
   .callout{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin:14px 0}
   .callout h3{margin-top:0}
+  section ul{padding-left:22px;margin:10px 0}
+  section li{margin:6px 0}
   .faq details{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:4px 18px;margin-bottom:10px}
   .faq summary{font-weight:700;cursor:pointer;padding:12px 0;list-style:none;font-size:16px}
   .faq summary::-webkit-details-marker{display:none}
@@ -161,6 +206,50 @@
   </section>
 
   <section>
+    <h2>Comment calculer ses mots par minute</h2>
+    <p>Le calcul est le même partout : on compte les caractères tapés correctement (espaces compris), on divise par 5, car un « mot » vaut cinq caractères, puis on ramène le résultat à une minute.</p>
+    <div class="callout">
+      <h3>Exemples</h3>
+      <p>300 caractères justes en 1 minute : 300 ÷ 5 = <strong>60 mots par minute</strong>.<br>
+      150 caractères justes en 30 secondes : 150 ÷ 5 ÷ 0,5 = <strong>60 mots par minute</strong>.<br>
+      750 caractères justes en 3 minutes : 750 ÷ 5 ÷ 3 = <strong>50 mots par minute</strong>.</p>
+    </div>
+    <p>Seules les frappes correctes comptent : une erreur ne te fait pas gagner de vitesse, elle fait baisser ta précision. Le détail des repères par niveau est dans le <a href="/guide/vitesse-de-frappe-moyenne">guide sur la vitesse de frappe moyenne</a>.</p>
+  </section>
+
+  <section>
+    <h2>MPM, WPM, frappes par minute : quelle différence ?</h2>
+    <p><strong>MPM</strong> (mots par minute) et <strong>WPM</strong> (<em>words per minute</em>, en anglais) désignent la même mesure. Les <strong>frappes par minute</strong> (ou caractères par minute) comptent les touches pressées sans les regrouper en mots : le chiffre est donc environ cinq fois plus grand. Pour comparer deux résultats, vérifie toujours qu'ils utilisent la même unité.</p>
+  </section>
+
+  <section>
+    <h2>Quelle durée de test choisir ?</h2>
+    <table>
+      <thead><tr><th>Durée</th><th>À quoi elle sert</th></tr></thead>
+      <tbody>
+        <tr><td>30 secondes</td><td>Découvrir le test, une première idée de ta vitesse</td></tr>
+        <tr><td>1 minute</td><td>Un aperçu rapide de ta vitesse</td></tr>
+        <tr><td>3 minutes</td><td>Vérifier que ton rythme tient dans la durée</td></tr>
+        <tr><td>5 minutes</td><td>Un résultat plus stable, moins sensible à un bon ou mauvais départ</td></tr>
+        <tr><td>10 minutes</td><td>L'épreuve d'endurance</td></tr>
+      </tbody>
+    </table>
+    <p>Ces cinq durées sont proposées dans le <a href="/test-dactylographie-chronometre">test de frappe chronométré</a>, qui affiche aussi ton rythme tranche par tranche. Le test de 30 secondes est accessible sans compte, une fois par jour.</p>
+  </section>
+
+  <section>
+    <h2>Pourquoi ton score change d'un test à l'autre</h2>
+    <p>Un même clavier peut donner des résultats différents d'un test à l'autre, et c'est normal. Quatre facteurs jouent surtout :</p>
+    <ul>
+      <li><strong>Le texte :</strong> des mots courants se tapent plus vite qu'un texte plein de termes techniques ou de chiffres.</li>
+      <li><strong>L'échauffement :</strong> un premier test à froid est souvent un peu plus lent que les suivants.</li>
+      <li><strong>La fatigue et la concentration :</strong> elles pèsent surtout sur les tests longs.</li>
+      <li><strong>Le clavier :</strong> un clavier inhabituel, un portable ou un clavier tablette ralentit.</li>
+    </ul>
+    <p>Fais donc trois tests à quelques minutes d'intervalle, garde le meilleur et suis la moyenne dans le temps : c'est elle qui montre ta vraie progression.</p>
+  </section>
+
+  <section>
     <h2>Progresser après le test</h2>
     <p>Un test te donne un point de départ. Pour gagner en vitesse durablement, la clé est une pratique régulière et structurée. KeyPace propose 65 leçons progressives pour construire la mémoire musculaire, ainsi que des jeux de frappe pour s'entraîner sans s'ennuyer.</p>
     <p>Pour aller plus loin : découvre notre <a href="/guide/vitesse-de-frappe-moyenne">guide sur la vitesse de frappe moyenne</a>, la méthode pour <a href="/guide/taper-a-10-doigts">taper à dix doigts</a>, ou attaque directement les <a href="/cours-dactylographie">cours de dactylographie</a>. Si ton clavier vient de Belgique, le guide <a href="/clavier-azerty-belge">clavier AZERTY belge</a> détaille ses quelques différences avec le clavier français. Une fois la frappe maîtrisée, les <a href="/guide/raccourcis-clavier-mac">raccourcis clavier Mac</a> et <a href="/guide/raccourcis-clavier-windows">Windows</a> font gagner encore plus de temps.</p>
@@ -179,6 +268,18 @@
     <details>
       <summary>Comment la vitesse est-elle calculée ?</summary>
       <p>Le score en mots par minute correspond aux caractères tapés correctement, divisés par cinq (la longueur moyenne d'un mot), ramenés à une minute. Les erreurs non corrigées font baisser la précision.</p>
+    </details>
+    <details>
+      <summary>Quelle durée de test choisir ?</summary>
+      <p>Pour une première idée, 30 secondes ou 1 minute suffisent. Pour un résultat plus stable, choisis 3 ou 5 minutes, et 10 minutes pour tester ton endurance.</p>
+    </details>
+    <details>
+      <summary>MPM et WPM, c'est la même chose ?</summary>
+      <p>Oui. MPM veut dire mots par minute, WPM veut dire words per minute en anglais. Dans les deux cas, un mot vaut cinq caractères.</p>
+    </details>
+    <details>
+      <summary>Pourquoi mon score change-t-il d'un test à l'autre ?</summary>
+      <p>Le texte, l'échauffement, la fatigue et le clavier jouent. Fais plusieurs tests et regarde la tendance plutôt qu'un seul résultat.</p>
     </details>
   </section>
 
