@@ -421,6 +421,8 @@ async function run(opts = {}) {
           {const sym=ALL_LESSONS.find(l=>/(^| )[@#&$%]( |$)/.test(l.keys));out.tutoLessons=[ALL_LESSONS[0].id,sym&&sym.id];out.tutos=[];
             for(const id of out.tutoLessons){if(!id)continue;app.openLessonTuto(id);await new Promise(r=>setTimeout(r,150));out.tutos.push(document.getElementById('lesson-tuto-body').innerText);}
             closeModal('lesson-tuto-modal');}
+          app.activeGame=null;go('games');await new Promise(r=>setTimeout(r,500));
+          out.enGames=document.getElementById('page-games').innerText+' | '+[...document.querySelectorAll('#page-games [aria-label]')].map(e=>e.getAttribute('aria-label')).join(' / ');
           out.okQ=await kpChooseFamily('qwerty');out.q={course:kpCourseId(),lessons:ALL_LESSONS.length};
           out.okFr=await kpChooseLanguage('fr');
           out.frUi={t:kpT('typ.speed'),lang:document.documentElement.lang};
@@ -442,6 +444,8 @@ async function run(opts = {}) {
         const tutoFr = ['Commencer la leçon', 'main gauche', 'main droite', 'pouce', 'auriculaire', 'annulaire', 'majeur', 'Sur ton clavier', 'touche ', 'Maj ', 'à droite du', 'à gauche du', 'sans Maj'];
         lg.tutos.forEach((txt, i) => { const bad = tutoFr.filter((w) => txt.includes(w)); if (bad.length) problems.push(`BR12 : du français dans la fenêtre Explication en anglais (${lg.tutoLessons[i]}) : ${bad.join(', ')}`); if (!txt.includes('Start the lesson')) problems.push(`BR12 : « Start the lesson » absent de la fenêtre Explication (${lg.tutoLessons[i]})`); });
         if (lg.tutos[1] && !/On your keyboard/.test(lg.tutos[1])) problems.push('BR12 : la fenêtre Explication d\'une leçon de symboles ne dit pas comment taper les touches (« On your keyboard »)');
+        for (const w of ['Choose your game', 'Word Strike', 'Challenge of the week', 'Previous game']) if (!lg.enGames.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent de la salle de jeux en anglais`);
+        const g1 = ['Choisis ton jeu', 'Frappe-mots', 'Défi de la semaine', 'Jeu précédent', 'Fais défiler', 'Jouer maintenant', 'Précision souris', 'Mémoire'].filter((w) => lg.enGames.toLowerCase().includes(w.toLowerCase())); if (g1.length) problems.push(`BR12 : du français dans la salle de jeux en anglais : ${g1.join(', ')}`);
         if (lg.frUi.t !== 'Vitesse' || lg.frUi.lang !== 'fr') problems.push(`BR12 : retour au français, l'interface reste en anglais (${JSON.stringify(lg.frUi)})`);
         if (lg.rowEn.join('|') !== 'Français|English*') problems.push(`BR12 : langue active après le passage (${lg.rowEn.join('|')})`);
         if (!lg.okQ || lg.q.course !== 'en/qwerty' || lg.q.lessons !== 58) problems.push(`BR12 : en anglais, passer à QWERTY garde la langue (${JSON.stringify(lg.q)})`);

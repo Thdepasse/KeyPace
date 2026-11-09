@@ -30,7 +30,7 @@ function i1(opts) {
     let d = 1; let i = m.index + m[0].length; const start = i;
     while (i < html.length && d > 0) { const c = html[i++]; if (c === '(') d++; else if (c === ')') d--; }
     const args = html.slice(start, i - 1);
-    for (const q of args.matchAll(/'([a-z0-9]+\.[a-z0-9_]+)'/g)) {
+    for (const q of args.matchAll(/'([a-z0-9]+(?:\.[A-Za-z0-9_]+)+)'/g)) {
       if (m[1] === 'n') { used.add(q[1] + '_one'); used.add(q[1] + '_other'); } else used.add(q[1]);
     }
   }

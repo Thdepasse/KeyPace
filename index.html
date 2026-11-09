@@ -6333,6 +6333,19 @@ const GCINE_GAMES=[
   {key:'royale',icon:'gamepad',name:'Battle Royale',desc:"Crée une partie, partage le code : 5 épreuves piochées au hasard parmi les jeux de KeyPace, un classement et un podium à la fin.",expert:false,category:'multi'},
 ];
 const GCINE_BOSS={key:'boss',icon:'trophy',name:'Boss de la semaine',desc:"Un défi commun à toute la communauté. Ton meilleur score entre au classement hebdomadaire : grimpe au sommet !",expert:false};
+/* Nom et description d'un jeu dans la langue de l'interface (le catalogue ci-dessus reste le texte français de référence). */
+const KP_GAME_TXT={
+  frappe:()=>[kpT('game.frappe.name'),kpT('game.frappe.desc')],sprint:()=>[kpT('game.sprint.name'),kpT('game.sprint.desc')],course:()=>[kpT('game.course.name'),kpT('game.course.desc')],
+  ghost:()=>[kpT('game.ghost.name'),kpT('game.ghost.desc')],souris:()=>[kpT('game.souris.name'),kpT('game.souris.desc')],sourisGrid:()=>[kpT('game.sourisGrid.name'),kpT('game.sourisGrid.desc')],
+  sourisHybrid:()=>[kpT('game.sourisHybrid.name'),kpT('game.sourisHybrid.desc')],sourisTiles:()=>[kpT('game.sourisTiles.name'),kpT('game.sourisTiles.desc')],simon:()=>[kpT('game.simon.name'),kpT('game.simon.desc')],
+  clavier:()=>[kpT('game.clavier.name'),kpT('game.clavier.desc')],duel:()=>[kpT('game.duel.name'),kpT('game.duel.desc')],royale:()=>[kpT('game.royale.name'),kpT('game.royale.desc')],
+  boss:()=>[kpT('game.boss.name'),kpT('game.boss.desc')],
+};
+const KP_CAT_TXT={vitesse:()=>kpT('cat.speed'),precision:()=>kpT('cat.precision'),memoire:()=>kpT('cat.memory'),multi:()=>kpT('cat.multi')};
+const KP_LEVEL_TXT={repos:()=>kpT('lvl.repos'),haut:()=>kpT('lvl.top'),alphabet:()=>kpT('lvl.alphabet'),accents:()=>kpT('lvl.accents')};
+const kpGameName=g=>(KP_GAME_TXT[g.key]?KP_GAME_TXT[g.key]()[0]:g.name);
+const kpGameDesc=g=>(KP_GAME_TXT[g.key]?KP_GAME_TXT[g.key]()[1]:g.desc);
+const kpLevelLabel=x=>(KP_LEVEL_TXT[x.id]?KP_LEVEL_TXT[x.id]():x.label);
 const CLAVIER_ROWS=['AZERTYUIOP'.split(''),'QSDFGHJKLM'.split(''),'WXCVBN'.split('')];
 // Les 4 jeux ex-Visée partagent un seul state (this.souris) et un seul rendu/
 // routeur clavier (renderSouris/sourisKey), qui dispatchent déjà sur
@@ -8201,11 +8214,12 @@ const app={
     const chip=(id,label)=>`<button type="button" class="gl-chip" aria-pressed="${cur===id}" onclick="app.pickGameLevel('${game}','${id}')">${label}</button>`;
     const lettersOnly=game==='hybrid'; // jeu de lettres : pas de mots à compter
     const duel=game==='duel'; // le texte est le même pour les deux joueurs, le record de victoires continue de compter
-    const info=lv.full?(duel?'Un texte de phrases, comme d’habitude.':lettersOnly?'Toutes les lettres de ta main, avec les paliers et ton record.':'Tous les mots du clavier, avec les paliers de score et ton record.')
-      :duel?`Lettres : <b>${[...lv.letters].map(c=>c.toUpperCase()).join(' ')}</b>. Vous tapez tous les deux le même texte, fait de ces lettres.`
-      :lettersOnly?`Lettres : <b>${[...lv.letters].map(c=>c.toUpperCase()).join(' ')}</b>. Niveau d’entraînement : pas de palier ni de record.`
-      :`Lettres : <b>${[...lv.letters].map(c=>c.toUpperCase()).join(' ')}</b>. ${lv.content.mixed?(lv.content.words.length?`${lv.content.words.length} mots et des suites de lettres.`:'Pas encore de mot possible : des suites de lettres.'):`${lv.content.words.length} mots possibles.`} Niveau d’entraînement : pas de record.`;
-    return`<div class="gl-picker"><div class="gl-lab">Niveau</div><div class="gl-chips">${chip('auto',`Mon niveau (${mine.letters.size} lettres)`)}${list.map(x=>chip(x.id,x.label)).join('')}${chip('tout','Tout le clavier')}</div><div class="gl-info">${info}</div></div>`;
+    const LT=lv.letters?[...lv.letters].map(c=>c.toUpperCase()).join(' '):'';
+    const info=lv.full?(duel?kpT('gl.full_duel'):lettersOnly?kpT('gl.full_letters'):kpT('gl.full_words'))
+      :duel?kpT('gl.duel',{letters:LT})
+      :lettersOnly?kpT('gl.letters_only',{letters:LT})
+      :kpT('gl.words',{letters:LT,content:lv.content.mixed?(lv.content.words.length?kpT('gl.mixed',{n:lv.content.words.length}):kpT('gl.no_word')):kpT('gl.n_words',{n:lv.content.words.length})});
+    return`<div class="gl-picker"><div class="gl-lab">${kpT('gl.level')}</div><div class="gl-chips">${chip('auto',kpT('gl.mine',{n:mine.letters.size}))}${list.map(x=>chip(x.id,kpLevelLabel(x))).join('')}${chip('tout',kpT('gl.all'))}</div><div class="gl-info">${info}</div></div>`;
   },
   startGame(){
     if(!canAccessGame()){openAuth('register','Crée un compte gratuit pour jouer.',()=>this.startGame());return;}
@@ -13167,30 +13181,30 @@ const app={
     const totalPlayable=GCINE_GAMES.filter(g=>!g.comingSoon).length+1; // +1 = Boss de la semaine, hors catégories
     const gamesGate=!currentUser?`<div style="max-width:1120px;margin:0 auto;padding:0 24px">${this._guestGate({
       icon:ICONS.gamepad,
-      eyebrow:'Salle de jeux',
-      title:'Joue pour progresser plus vite',
-      text:`${totalPlayable} jeux pour travailler ta vitesse, ta précision et ta mémoire sans voir le temps passer. Crée ton compte gratuit pour y jouer et enregistrer tes records.`,
-      feats:['Jeux gratuits inclus','Records sauvegardés','Défis et classements'],
-      cta:'Créer mon compte et jouer',
+      eyebrow:kpT('games.gate_eyebrow'),
+      title:kpT('games.gate_title'),
+      text:kpT('games.gate_text',{n:totalPlayable}),
+      feats:[kpT('games.gate_f1'),kpT('games.gate_f2'),kpT('games.gate_f3')],
+      cta:kpT('games.gate_cta'),
     })}</div>`:'';
     const cat=GCINE_CATS.some(c=>c.key===this._gcineCat)?this._gcineCat:GCINE_CATS[0].key;
     this._gcineCat=cat;
     const visible=GCINE_GAMES.filter(g=>g.category===cat);
     this._gcineVisible=visible;
-    const tabsHTML=GCINE_CATS.map(c=>`<button class="gcine-cat-tab${c.key===cat?' is-active':''}" onclick="app.setGcineCat('${c.key}')">${ICONS[c.icon]}<span>${c.label}</span></button>`).join('');
+    const tabsHTML=GCINE_CATS.map(c=>`<button class="gcine-cat-tab${c.key===cat?' is-active':''}" onclick="app.setGcineCat('${c.key}')">${ICONS[c.icon]}<span>${KP_CAT_TXT[c.key]?KP_CAT_TXT[c.key]():c.label}</span></button>`).join('');
     const bossHTML=`<div class="gcine-boss-banner" onclick="app.selectGame('boss')">
       <div class="gcine-boss-icon">${ICONS[GCINE_BOSS.icon]}</div>
       <div class="gcine-boss-body">
-        <div class="gcine-boss-eyebrow">DÉFI DE LA SEMAINE</div>
-        <div class="gcine-boss-name">${GCINE_BOSS.name}</div>
-        <div class="gcine-boss-desc">${GCINE_BOSS.desc}</div>
+        <div class="gcine-boss-eyebrow">${kpT('games.boss_eyebrow')}</div>
+        <div class="gcine-boss-name">${kpGameName(GCINE_BOSS)}</div>
+        <div class="gcine-boss-desc">${kpGameDesc(GCINE_BOSS)}</div>
       </div>
-      <div class="gcine-boss-cta">Relever le défi →</div>
+      <div class="gcine-boss-cta">${kpT('games.boss_cta')}</div>
     </div>`;
     this._advice=this._gamesAdvice();
     const cardsHTML=visible.map((g,i)=>this._gcineCard(g,i)).join('');
     const dotsHTML=visible.map((g,i)=>`<div class="gcine-dot" data-idx="${i}"></div>`).join('');
-    const keysHTML=GCINE_LAYOUT.layout.map((k,i)=>`<div class="gcine-key" id="gk-${i}" style="width:${k.w}px;margin-left:${-k.w/2}px"><div class="gcine-key-base"></div><div class="gcine-key-top"><span class="gcine-key-label">${k.ch}</span></div></div>`).join('');
+    const keysHTML=GCINE_LAYOUT.layout.map((k,i)=>`<div class="gcine-key" id="gk-${i}" style="width:${k.w}px;margin-left:${-k.w/2}px"><div class="gcine-key-base"></div><div class="gcine-key-top"><span class="gcine-key-label">${k.ch==='espace'?kpT('test.space_key'):k.ch}</span></div></div>`).join('');
     document.getElementById('page-games').innerHTML=`<div class="gcine-root">
       <div class="gcine-scroller" id="gcine-scroller">
         <div class="gcine-stage" id="gcine-stage">
@@ -13204,21 +13218,21 @@ const app={
             </div>
           </div>
           <div class="gcine-hero" id="gcine-hero">
-            <div class="gcine-badge">${ICONS.gamepad} ${totalPlayable} jeux de frappe</div>
-            <h1 class="gcine-h1">Apprends à taper<br>en jouant.</h1>
-            <p class="gcine-sub">Vitesse, précision, mémoire, multijoueur. Fais défiler : la touche traverse le clavier jusqu'à tes jeux.</p>
+            <div class="gcine-badge">${ICONS.gamepad} ${kpT('games.badge',{n:totalPlayable})}</div>
+            <h1 class="gcine-h1">${kpT('games.h1')}</h1>
+            <p class="gcine-sub">${kpT('games.sub')}</p>
           </div>
           <div class="gcine-hint" id="gcine-hint">
-            <div class="gcine-hint-lbl">FAIS DÉFILER</div>
+            <div class="gcine-hint-lbl">${kpT('games.scroll')}</div>
             <div class="gcine-hint-arrow">↓</div>
           </div>
         </div>
       </div>
       <div class="gcine-panel">
         <div class="gcine-panel-head">
-          <div class="gcine-eyebrow">LA TOUCHE EST ARRIVÉE</div>
-          <h2 class="gcine-h2">Choisis ton jeu</h2>
-          <p class="gcine-panel-sub">Fais glisser le bandeau. Le jeu au centre est prêt à démarrer.</p>
+          <div class="gcine-eyebrow">${kpT('games.arrived')}</div>
+          <h2 class="gcine-h2">${kpT('games.choose')}</h2>
+          <p class="gcine-panel-sub">${kpT('games.drag')}</p>
         </div>
         ${gamesGate}
         <div class="${currentUser?'':'gate-teased'}">
@@ -13229,9 +13243,9 @@ const app={
             <div class="gcine-cards" id="gcine-cards">${cardsHTML}</div>
           </div>
           <div class="gcine-controls">
-            <button class="gcine-arrow" id="gcine-prev" aria-label="Jeu précédent">←</button>
+            <button class="gcine-arrow" id="gcine-prev" aria-label="${kpT('games.prev')}">←</button>
             <div class="gcine-dots" id="gcine-dots">${dotsHTML}</div>
-            <button class="gcine-arrow" id="gcine-next" aria-label="Jeu suivant">→</button>
+            <button class="gcine-arrow" id="gcine-next" aria-label="${kpT('games.next')}">→</button>
           </div>
         </div>
       </div>
@@ -13246,10 +13260,10 @@ const app={
   /* « Pour toi » : le niveau repéré (lettres des leçons validées) conseille quelques jeux. Tableau fixe, sans règle dynamique ni IA ; rien n'est verrouillé.
      Étapes : repos, haut, bas (jusqu'à l'alphabet complet), puis tout. Les clés sont celles de GCINE_GAMES ; Boss et Clavier vide ne sont jamais conseillés ici. */
   _GAMES_ADVICE:{
-    repos:[{key:'sourisGrid',why:'Une touche s’allume, tu tapes sa lettre : idéal pour la rangée de repos.'},{key:'sourisTiles',why:'Les couloirs des doigts de repos, en commençant par deux touches.'},{key:'frappe',why:'Des suites de lettres qui tombent, avec seulement les lettres que tu connais.'}],
-    haut:[{key:'sourisGrid',why:'Entraîne la rangée du haut, une rangée à la fois.'},{key:'frappe',why:'Tes premiers vrais mots, avec les lettres que tu connais.'},{key:'simon',why:'Retiens de petits mots, sans la pression du temps.'}],
-    bas:[{key:'frappe',why:'Des mots avec toutes les lettres que tu as apprises.'},{key:'sprint',why:'30 secondes pour prendre de la vitesse.'},{key:'simon',why:'Retiens et retape des séquences de mots.'}],
-    tout:[{key:'course',why:'Une course contre des bots, sur de vrais textes.'},{key:'ghost',why:'Bats ta meilleure course passée.'},{key:'sprint',why:'30 secondes de vitesse pure.'}],
+    repos:[{key:'sourisGrid',why:()=>kpT('adv.repos_grid')},{key:'sourisTiles',why:()=>kpT('adv.repos_tiles')},{key:'frappe',why:()=>kpT('adv.repos_frappe')}],
+    haut:[{key:'sourisGrid',why:()=>kpT('adv.haut_grid')},{key:'frappe',why:()=>kpT('adv.haut_frappe')},{key:'simon',why:()=>kpT('adv.haut_simon')}],
+    bas:[{key:'frappe',why:()=>kpT('adv.bas_frappe')},{key:'sprint',why:()=>kpT('adv.bas_sprint')},{key:'simon',why:()=>kpT('adv.bas_simon')}],
+    tout:[{key:'course',why:()=>kpT('adv.tout_course')},{key:'ghost',why:()=>kpT('adv.tout_ghost')},{key:'sprint',why:()=>kpT('adv.tout_sprint')}],
   },
   _gamesAdvice(){
     if(!currentUser||!this.stats)return null;
@@ -13258,26 +13272,26 @@ const app={
     const mine=KPGameLevels.myLevel(ALL_LESSONS,l=>!!this.lessonRec(l.id).cleared),n=mine.letters.size;
     const alpha=lv.find(x=>x.id==='alphabet'),top=lv[lv.length-1];
     const stage=n<=repos.letters.size?'repos':n<=haut.letters.size?'haut':(alpha&&n<alpha.letters.size)||(top&&top.id==='accents'&&n<top.letters.size&&!alpha)?'bas':'tout';
-    const title={repos:'Tu découvres la rangée de repos',haut:'Tu apprends la rangée du haut',bas:'Tu finis l’alphabet',tout:'Tu connais toutes les lettres'}[stage];
+    const title={repos:()=>kpT('adv.t_repos'),haut:()=>kpT('adv.t_haut'),bas:()=>kpT('adv.t_bas'),tout:()=>kpT('adv.t_tout')}[stage]();
     return{stage,letters:n,title,items:this._GAMES_ADVICE[stage]};
   },
   _gamesAdviceHTML(){
     const a=this._advice;if(!a)return'';
     const byKey=Object.fromEntries(GCINE_GAMES.map(g=>[g.key,g]));
-    return`<div class="gcine-advice"><h3>Pour toi : ${a.title}</h3><p>${a.letters} lettres apprises. Voici des jeux qui vont bien avec ton niveau, tu peux jouer à tous les autres quand tu veux.</p><div class="gcine-advice-list">${a.items.map(x=>`<button type="button" class="gcine-advice-item" onclick="app.selectGame('${x.key}')"><b>${byKey[x.key]?byKey[x.key].name:x.key}</b><span>${x.why}</span></button>`).join('')}</div></div>`;
+    return`<div class="gcine-advice"><h3>${kpT('adv.for_you',{title:a.title})}</h3><p>${kpT('adv.intro',{n:a.letters})}</p><div class="gcine-advice-list">${a.items.map(x=>`<button type="button" class="gcine-advice-item" onclick="app.selectGame('${x.key}')"><b>${byKey[x.key]?kpGameName(byKey[x.key]):x.key}</b><span>${x.why()}</span></button>`).join('')}</div></div>`;
   },
   // Les descriptions qui citent des touches suivent la disposition du clavier (AZERTY ou QWERTY).
   _gcineDesc(g){
     const q=typeof KB_QWERTY!=='undefined'&&KB_QWERTY[getKbLayoutId()];
-    if(g.key==='sourisTiles'){const r=(KB_LAYOUTS[getKbLayoutId()]||KB_LAYOUTS.fr)[2].map(k=>String(k.l||'').toUpperCase());return`8 couloirs, ta rangée de repos ${[0,1,2,3].map(i=>r[i]).join('')} ${[6,7,8,9].map(i=>r[i]).join('')} : tape ou tiens la touche avant la ligne.`;}
-    return q?g.desc.replace(/ZQSD/g,'WASD'):g.desc;
+    if(g.key==='sourisTiles'){const r=(KB_LAYOUTS[getKbLayoutId()]||KB_LAYOUTS.fr)[2].map(k=>String(k.l||'').toUpperCase());return kpT('game.tiles_dyn',{left:[0,1,2,3].map(i=>r[i]).join(''),right:[6,7,8,9].map(i=>r[i]).join('')});}
+    return q?kpGameDesc(g).replace(/ZQSD/g,'WASD'):kpGameDesc(g);
   },
   _gcineCard(g,i){
     const locked=typeof g.locked==='function'&&g.locked(this);
     const disabled=g.comingSoon||locked;
     const rec=!!(this._advice&&this._advice.items.some(x=>x.key===g.key));
-    const tag=g.comingSoon?'Bientôt disponible':locked?'🔒 Verrouillé':rec?'CONSEILLÉ POUR TOI':(g.expert?'EXPERT':(currentUser?'GRATUIT':'Compte requis'));
-    const cta=g.comingSoon?'Bientôt disponible ⏳':locked?(g.lockedTag||'Verrouillé'):'Jouer maintenant →';
+    const tag=g.comingSoon?kpT('games.soon'):locked?kpT('games.locked_tag'):rec?kpT('games.advised'):(g.expert?'EXPERT':(currentUser?kpT('games.free'):kpT('games.account_needed')));
+    const cta=g.comingSoon?kpT('games.soon_cta'):locked?(g.lockedTag||kpT('games.locked')):kpT('games.play');
     return `<div class="gcine-card${disabled?' is-disabled':''}" data-idx="${i}">
       <div class="gcine-card-inner"${disabled?' style="--gcine-fill:linear-gradient(140deg,#c9c2b6,#a9a196 64%)"':''}>
         <div class="gcine-blob gcine-blob-a"></div>
@@ -13290,7 +13304,7 @@ const app={
           </div>
         </div>
         <div class="gcine-card-body">
-          <div class="gcine-card-name">${g.name}</div>
+          <div class="gcine-card-name">${kpGameName(g)}</div>
           <div class="gcine-card-desc">${this._gcineDesc(g)}</div>
         </div>
         <div class="gcine-card-foot">
