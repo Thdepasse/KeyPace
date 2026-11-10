@@ -1,6 +1,9 @@
 {
     "regions": ["fra1"],
     "functions": { "api/track.js": { "includeFiles": "index.html" } },
+    "redirects": [
+          { "source": "/((?!\\.well-known/mta-sts\\.txt$).*)", "has": [{ "type": "host", "value": "mta-sts.keypace.be" }], "destination": "https://keypace.be/", "permanent": false }
+    ],
     "rewrites": [
           { "source": "/a-propos", "destination": "/a-propos.html" },
           { "source": "/conditions", "destination": "/conditions.html" },
@@ -78,6 +81,14 @@
             "source": "/((?!ecran\\.html|jeu\\.html).*)",
             "headers": [
                   { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://storage.googleapis.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'" }
+            ]
+          },
+          {
+            "source": "/.well-known/mta-sts.txt",
+            "headers": [
+                  { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
+                  { "key": "Cache-Control", "value": "public, max-age=300" },
+                  { "key": "X-Robots-Tag", "value": "noindex" }
             ]
           },
           {
