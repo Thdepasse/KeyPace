@@ -1005,3 +1005,16 @@ alter table institutions
   add column if not exists onboarding_ip text;
 create index if not exists institutions_onboarding_ip_idx on institutions(onboarding_ip, created_at);
 create index if not exists institutions_contact_email_idx on institutions(contact_email, created_at);
+
+-- ───────────────────────────────────────────────────────────────
+-- Objectifs de leçon fixés par la classe (nov. 2026)
+-- Chaque élève réglait lui-même sa vitesse minimale (mpm) et son nombre
+-- d'erreurs maximal : certains les baissaient pour valider les leçons plus
+-- vite. Un élève rattaché à une classe n'a désormais plus ces boutons : c'est
+-- le prof qui règle ces deux valeurs pour sa classe (action class-goals-set).
+-- NULL = valeur par défaut (20 mpm, 8 erreurs, voir GOAL_DEFAULTS dans
+-- api/_class-logic.js), donc un verrou actif même sans réglage du prof. Un
+-- élève dans plusieurs classes suit la plus stricte. Idempotent.
+-- ───────────────────────────────────────────────────────────────
+alter table classes add column if not exists goal_wpm integer check (goal_wpm is null or goal_wpm between 5 and 80);
+alter table classes add column if not exists goal_errors integer check (goal_errors is null or goal_errors between 0 and 30);

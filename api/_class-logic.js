@@ -421,6 +421,33 @@ function sanitizeEssayStats(raw) {
   };
 }
 
+// Objectifs de leçon fixés par la classe. Un élève rattaché à une classe ne règle
+// plus lui-même sa vitesse minimale ni ses erreurs maximales (il baissait l'objectif
+// pour valider plus vite) : sans réglage du prof, ce sont ces valeurs par défaut.
+const GOAL_DEFAULTS = { minWpm: 20, maxErrors: 8 };
+const GOAL_LIMITS = { minWpm: [5, 80], maxErrors: [0, 30] };
+
+// null = « remettre la valeur par défaut » ; undefined/invalide ou hors bornes = erreur.
+function parseGoalInput(value, [lo, hi]) {
+  if (value === null || value === '') return { ok: true, value: null };
+  const n = typeof value === 'string' && /^\d+$/.test(value.trim()) ? Number(value) : value;
+  if (!Number.isInteger(n) || n < lo || n > hi) return { ok: false };
+  return { ok: true, value: n };
+}
+
+// classRows : lignes de classes (goal_wpm/goal_errors éventuellement absents si la
+// migration n'est pas appliquée). Plusieurs classes : la plus stricte l'emporte.
+function effectiveClassGoals(classRows) {
+  const rows = (Array.isArray(classRows) ? classRows : []).filter((c) => c && !c.archived);
+  if (!rows.length) return null;
+  let minWpm = 0, maxErrors = Infinity;
+  for (const c of rows) {
+    minWpm = Math.max(minWpm, Number.isInteger(c.goal_wpm) ? c.goal_wpm : GOAL_DEFAULTS.minWpm);
+    maxErrors = Math.min(maxErrors, Number.isInteger(c.goal_errors) ? c.goal_errors : GOAL_DEFAULTS.maxErrors);
+  }
+  return { minWpm, maxErrors };
+}
+
 module.exports = { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
   ESSAY_TYPES, essayTypeDef, countWords, essayWordCount, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
-  moduleMastery, studentModuleProgress, MODULE_NAMES };
+  moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals };

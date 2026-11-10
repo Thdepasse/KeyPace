@@ -3450,6 +3450,7 @@ function saveSession(username, plan, token, userId, role, email, displayName, in
 function clearSession(){
   currentUser=null; currentPlan=null; currentToken=null; currentUserId=null;
   currentEmail=null; currentDisplayName=null; currentInstitutionName=null; currentHasClass=false;
+  try{app.classGoals=null;}catch{}
   localStorage.removeItem('klak_session');
 }
 function loadSession(){
@@ -7061,8 +7062,26 @@ const app={
   _timer:null,_gameLoop:null,_sprintLoop:null,_courseLoop:null,_simonLoop:null,_bossLoop:null,_duelLoop:null,_duelSbClient:null,_royalePollTimer:null,_royaleSeq:0,_onKey:null,_wid:0,_gameRec:false,_courseRec:false,
   _gaze:{enabled:false,loaded:false,active:false,_wgRunning:false,_wgPromise:null,_stream:null,_video:null,_landmarker:null,_raf:null,_baseline:null,_baselineBuf:[],_smooth:null,_lastScore:null,_lastGazeOn:null,_calib:null,_sessionThreshold:null,samples:[],permError:null,_fixBaseline:null},
 
+  // Objectifs de leçon imposés par la/les classe(s) de l'élève (null = élève sans classe,
+  // il règle lui-même ses objectifs). Chargés par loadClassGoals() à chaque init().
+  classGoals:null,
+  _goals(){return this.classGoals||(this.stats&&this.stats.goals)||{minWpm:20,maxErrors:8};},
+  async loadClassGoals(){
+    if(!currentToken||isTeacher())return;
+    const tok=currentToken;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'my-goals',token:tok})});
+      if(!r.ok||tok!==currentToken)return;
+      const d=await r.json();
+      const g=d&&d.goals&&typeof d.goals.minWpm==='number'&&typeof d.goals.maxErrors==='number'?{minWpm:d.goals.minWpm,maxErrors:d.goals.maxErrors}:null;
+      const changed=JSON.stringify(g)!==JSON.stringify(this.classGoals);
+      this.classGoals=g;
+      if(changed&&this.view==='lessons'&&!this.sess)this.renderCurrent();
+    }catch{}
+  },
   init(){
     this.stats=loadStats();
+    this.loadClassGoals();
     if(this._onKey)window.removeEventListener('keydown',this._onKey);
     this._onKey=e=>this.handleKey(e);
     window.addEventListener('keydown',this._onKey);
@@ -7093,11 +7112,34 @@ const app={
     return Math.max(0,...tests.filter(t=>!t.assignmentId&&!t.dur).map(t=>t.wpm));
   },
   setGoal(key,delta){
-    if(!currentUser)return;
+    if(!currentUser||this.classGoals)return;
     const g=this.stats.goals;
     if(key==='minWpm')g.minWpm=Math.max(5,Math.min(80,g.minWpm+delta));
     else g.maxErrors=Math.max(0,Math.min(30,g.maxErrors+delta));
     saveStats(this.stats);this.renderCurrent();
+  },
+  // Prof : règle les objectifs de leçon de SA classe (reset=true : valeurs par défaut).
+  async saveClassGoals(classId,reset){
+    const msg=document.getElementById('cg-msg'),wEl=document.getElementById('cg-wpm'),eEl=document.getElementById('cg-err');
+    const sv=document.getElementById('cg-save'),rs=document.getElementById('cg-reset');
+    if(!msg||!wEl||!eEl)return;
+    const say=(t,ok)=>{msg.textContent=t;msg.style.color=ok?'var(--success)':'var(--danger)';};
+    const w=reset?null:Number(wEl.value),e=reset?null:Number(eEl.value);
+    if(!reset){
+      if(wEl.value.trim()===''||!Number.isInteger(w)||w<5||w>80)return say('La vitesse minimale doit être un nombre entier entre 5 et 80.',false);
+      if(eEl.value.trim()===''||!Number.isInteger(e)||e<0||e>30)return say("Le nombre d'erreurs maximum doit être un nombre entier entre 0 et 30.",false);
+    }
+    if(sv)sv.disabled=true;if(rs)rs.disabled=true;
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-goals-set',token:currentToken,classId,minWpm:w,maxErrors:e})});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok){say(d.error||'Enregistrement impossible.',false);return;}
+      wEl.value=d.goals.minWpm;eEl.value=d.goals.maxErrors;
+      const df=document.getElementById('cg-default');if(df)df.style.display=d.goals.custom?'none':'';
+      if(this._classDetail&&this._classDetail.id===classId)this._classDetail.goals=d.goals;
+      say(reset?'Valeurs par défaut rétablies. Tes élèves les verront à leur prochaine connexion.':'Enregistré. Tes élèves verront ces objectifs à leur prochaine connexion.',true);
+    }catch{say('Erreur réseau, réessaie.',false);}
+    finally{if(sv)sv.disabled=false;if(rs)rs.disabled=false;}
   },
 
   makeSession(mode,lessonId){
@@ -8185,7 +8227,7 @@ const app={
       this._myAssignments=null;
     }
     if(mode==='lesson'&&lessonId){
-      const g=this.stats.goals;let rec=course().lessons[lessonId];
+      const g=this._goals();let rec=course().lessons[lessonId];
       if(!rec||typeof rec==='number')rec={bestWpm:typeof rec==='number'?rec:0,bestErr:null,cleared:typeof rec==='number'};
       const _wasCleared=!!rec.cleared;
       rec.bestWpm=Math.max(rec.bestWpm||0,res.wpm);
@@ -9594,7 +9636,7 @@ const app={
       </div>`;
       return;
     }
-    const s=this.sess;const isLesson=s&&s.mode==='lesson';const goals=this.stats?this.stats.goals:{minWpm:20,maxErrors:8};
+    const s=this.sess;const isLesson=s&&s.mode==='lesson';const goals=this._goals();
     let liveWpm=0,liveAcc='·',liveTime=0,progress=0;
     if(s){
       progress=Math.round(100*s.idx/s.text.length);
@@ -10185,7 +10227,7 @@ const app={
     if(this._showIntro){this._renderTypingInto('page-lessons');return;}
     if(this.sess&&this.sess.mode==='lesson'){this._renderTypingInto('page-lessons');return;}
     if(!this._skipModulesHub&&kpContentLang()==='fr'){this.renderModulesHub();return;} /* la page « Cours » (programmes belge et français, modules de rédaction) est propre au français : un cours en anglais affiche directement ses modules */
-    const goals=this.stats?this.stats.goals:{minWpm:20,maxErrors:8};
+    const goals=this._goals();
     const plan=getUserPlan();
     const statusById={};
     ALL_LESSONS.forEach((les,i)=>{
@@ -10245,9 +10287,12 @@ const app={
       </div>`;
     }).join('');
 
+    // Élève dans une classe : objectifs fixés par son professeur, pas de boutons + / −.
+    const locked=!!this.classGoals;
     const goalsHtml=currentUser?`<div class="goals-bar">
-      <div class="goal-item"><span class="goal-label">${kpT('les.goal_speed')}</span><button class="goal-btn" onclick="app.setGoal('minWpm',-1)">–</button><span class="goal-val">${goals.minWpm}</span><button class="goal-btn" onclick="app.setGoal('minWpm',1)">+</button><span style="font-size:13px;color:var(--muted)">${kpT('unit.wpm')}</span></div>
-      <div class="goal-item"><span class="goal-label">${kpT('les.goal_errors')}</span><button class="goal-btn" onclick="app.setGoal('maxErrors',-1)">–</button><span class="goal-val">${goals.maxErrors}</span><button class="goal-btn" onclick="app.setGoal('maxErrors',1)">+</button></div>
+      <div class="goal-item"><span class="goal-label">${kpT('les.goal_speed')}</span>${locked?'':`<button class="goal-btn" onclick="app.setGoal('minWpm',-1)">–</button>`}<span class="goal-val">${goals.minWpm}</span>${locked?'':`<button class="goal-btn" onclick="app.setGoal('minWpm',1)">+</button>`}<span style="font-size:13px;color:var(--muted)">${kpT('unit.wpm')}</span></div>
+      <div class="goal-item"><span class="goal-label">${kpT('les.goal_errors')}</span>${locked?'':`<button class="goal-btn" onclick="app.setGoal('maxErrors',-1)">–</button>`}<span class="goal-val">${goals.maxErrors}</span>${locked?'':`<button class="goal-btn" onclick="app.setGoal('maxErrors',1)">+</button>`}</div>
+      ${locked?`<div class="goal-item" style="font-size:12.5px;color:var(--muted)">🔒 ${kpT('les.goal_locked')}</div>`:''}
     </div>`:'';
 
     document.getElementById('page-lessons').innerHTML=`<div class="lessons-section">
@@ -16935,6 +16980,20 @@ const app={
         </tr>`;
       }).join('')}</tbody></table></div>
     </div>`:'';
+    const cg=d.goals||{minWpm:20,maxErrors:8,custom:false};
+    const cgFld='width:96px;margin-top:6px;padding:9px 11px;border:1.5px solid var(--border);border-radius:10px;font:inherit;background:var(--bg);color:var(--txt);box-sizing:border-box';
+    const cgLbl='display:block;font-size:12px;font-weight:700;color:var(--muted)';
+    const goalsCard=`<div id="class-goals-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;margin-bottom:24px">
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px">Objectifs de leçon de la classe</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:14px">Une leçon est validée quand l'élève atteint la vitesse minimale avec au plus ce nombre d'erreurs. Tes élèves ne peuvent pas modifier ces valeurs.<span id="cg-default" style="${cg.custom?'display:none':''}"> Valeurs par défaut en ce moment.</span></div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">
+        <label style="${cgLbl}">Vitesse minimale (mpm)<input id="cg-wpm" type="number" inputmode="numeric" min="5" max="80" value="${cg.minWpm}" style="${cgFld};display:block"></label>
+        <label style="${cgLbl}">Erreurs maximum<input id="cg-err" type="number" inputmode="numeric" min="0" max="30" value="${cg.maxErrors}" style="${cgFld};display:block"></label>
+        <button id="cg-save" onclick="app.saveClassGoals('${d.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Enregistrer</button>
+        <button id="cg-reset" onclick="app.saveClassGoals('${d.id}',true)" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Valeurs par défaut (20 / 8)</button>
+      </div>
+      <div id="cg-msg" role="status" style="font-size:12.5px;margin-top:10px;min-height:16px"></div>
+    </div>`;
     const asgHtml=`<div id="class-asg-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)">
         <div style="font-size:15px;font-weight:700">Devoirs ${asg.length?`<span style="font-size:13px;font-weight:600;color:var(--muted)">· ${asg.length}</span>`:''}</div>
@@ -16989,6 +17048,7 @@ const app={
         ${todoHtml}
         ${skillsCard}
         ${hmHtml}
+        ${goalsCard}
         ${asgHtml}
 
         ${students.length===0?`

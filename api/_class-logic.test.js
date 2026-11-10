@@ -2,7 +2,7 @@
 // Lancer : node --test api/_class-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, moduleMastery, studentModuleProgress, MODULE_NAMES } = require('./_class-logic');
+const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals } = require('./_class-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -178,4 +178,36 @@ test('canAdministerClass : les profs de la classe et l\'établissement peuvent r
   assert.equal(canAdministerClass(admin, cls), true);
   assert.equal(canAdministerClass(admin, { ...cls, institution_id: 'i2' }), false);
   assert.equal(canAdministerClass({ role: 'eleve', id: 's1' }, cls), false);
+});
+
+test('effectiveClassGoals : élève sans classe active = pas de verrou', () => {
+  assert.equal(effectiveClassGoals([]), null);
+  assert.equal(effectiveClassGoals(undefined), null);
+  assert.equal(effectiveClassGoals([{ archived: true, goal_wpm: 50 }]), null);
+});
+
+test('effectiveClassGoals : classe sans réglage = valeurs par défaut (20 mpm, 8 erreurs)', () => {
+  assert.deepEqual(effectiveClassGoals([{ name: '4A' }]), { minWpm: 20, maxErrors: 8 });
+  assert.deepEqual(effectiveClassGoals([{ goal_wpm: null, goal_errors: null }]), { minWpm: 20, maxErrors: 8 });
+});
+
+test('effectiveClassGoals : réglage du prof appliqué, y compris plus bas que le défaut', () => {
+  assert.deepEqual(effectiveClassGoals([{ goal_wpm: 12, goal_errors: 15 }]), { minWpm: 12, maxErrors: 15 });
+});
+
+test('effectiveClassGoals : plusieurs classes, la plus stricte gagne ; archivées ignorées', () => {
+  const r = effectiveClassGoals([{ goal_wpm: 12, goal_errors: 15 }, { goal_wpm: 30, goal_errors: 5 }, { archived: true, goal_wpm: 80, goal_errors: 0 }]);
+  assert.deepEqual(r, { minWpm: 30, maxErrors: 5 });
+  assert.deepEqual(effectiveClassGoals([{ goal_wpm: 12 }, {}]), { minWpm: 20, maxErrors: 8 });
+});
+
+test('parseGoalInput : bornes, entiers, null = défaut', () => {
+  assert.deepEqual(parseGoalInput(null, GOAL_LIMITS.minWpm), { ok: true, value: null });
+  assert.deepEqual(parseGoalInput('', GOAL_LIMITS.minWpm), { ok: true, value: null });
+  assert.deepEqual(parseGoalInput(25, GOAL_LIMITS.minWpm), { ok: true, value: 25 });
+  assert.deepEqual(parseGoalInput('25', GOAL_LIMITS.minWpm), { ok: true, value: 25 });
+  assert.deepEqual(parseGoalInput(0, GOAL_LIMITS.maxErrors), { ok: true, value: 0 });
+  for (const bad of [4, 81, 2.5, 'abc', -1, NaN, {}, [], true]) assert.equal(parseGoalInput(bad, GOAL_LIMITS.minWpm).ok, false, String(bad));
+  assert.equal(parseGoalInput(31, GOAL_LIMITS.maxErrors).ok, false);
+  assert.deepEqual(GOAL_DEFAULTS, { minWpm: 20, maxErrors: 8 });
 });

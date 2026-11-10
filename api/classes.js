@@ -2,7 +2,7 @@
 // Tout passe par la clé service (RLS deny-anon). Logique pure dans _class-logic.
 const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary,
   essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
-  moduleMastery, studentModuleProgress } = require('./_class-logic');
+  moduleMastery, studentModuleProgress, GOAL_LIMITS, parseGoalInput, effectiveClassGoals } = require('./_class-logic');
 const { hashPassword, safeEqual } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
 
@@ -264,6 +264,36 @@ async function classRename(req, res) {
   return res.json({ ok: true });
 }
 
+// Objectifs de leçon de la classe (vitesse minimale, erreurs maximales) : seul un
+// prof de la classe (ou l'établissement) les règle ; l'élève ne les modifie plus.
+// null (ou champ vide) remet la valeur par défaut (20 mpm, 8 erreurs).
+async function classGoalsSet(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  const wpm = parseGoalInput(req.body.minWpm === undefined ? null : req.body.minWpm, GOAL_LIMITS.minWpm);
+  const err = parseGoalInput(req.body.maxErrors === undefined ? null : req.body.maxErrors, GOAL_LIMITS.maxErrors);
+  if (!wpm.ok) return res.status(400).json({ error: `La vitesse minimale doit être un entier entre ${GOAL_LIMITS.minWpm[0]} et ${GOAL_LIMITS.minWpm[1]} mpm.` });
+  if (!err.ok) return res.status(400).json({ error: `Le nombre d'erreurs maximal doit être un entier entre ${GOAL_LIMITS.maxErrors[0]} et ${GOAL_LIMITS.maxErrors[1]}.` });
+  const { cls, error, status } = await loadClassForManage(user, req.body.classId);
+  if (error) return res.status(status).json({ error });
+  const r = await sb(`/classes?id=eq.${cls.id}`, { method: 'PATCH', body: JSON.stringify({ goal_wpm: wpm.value, goal_errors: err.value }) });
+  if (!r.ok) return res.status(503).json({ error: "Les objectifs de classe ne sont pas encore activés (mise à jour de la base en attente). Réessaie dans un instant." });
+  const goals = effectiveClassGoals([{ goal_wpm: wpm.value, goal_errors: err.value }]);
+  goals.custom = wpm.value !== null || err.value !== null;
+  return res.json({ ok: true, goals });
+}
+
+// Élève : objectifs effectifs de ses classes (null s'il n'est dans aucune classe,
+// auquel cas il règle lui-même ses objectifs comme avant).
+async function myGoals(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const r = await sb(`/class_members?student_id=eq.${encodeURIComponent(user.id)}&select=classes(*)`);
+  if (!r.ok || !Array.isArray(r.data)) throw new Error('myGoals ' + r.status);
+  return res.json({ goals: effectiveClassGoals(r.data.map((m) => m.classes)) });
+}
+
 async function classArchive(req, res) {
   const user = await userFromToken(req.body.token);
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
@@ -332,7 +362,9 @@ async function classDetail(req, res) {
   // EST tout le progrès de la classe, il n'est "en retard" sur rien.
   const weakest = started.length >= 2 ? started.reduce((a, b) => (b.avgPct < a.avgPct ? b : a)) : null;
 
-  return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now), modules, weakestModule: weakest });
+  const goals = effectiveClassGoals([cls]);
+  goals.custom = Number.isInteger(cls.goal_wpm) || Number.isInteger(cls.goal_errors);
+  return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now), modules, weakestModule: weakest, goals });
 }
 function alertRank(s) { return s.alertStuck ? 0 : s.alertInactive ? 1 : 2; }
 
@@ -1368,6 +1400,8 @@ module.exports = async function handler(req, res) {
       case 'teacher-today': return await teacherToday(req, res);
       case 'class-create': return await classCreate(req, res);
       case 'class-rename': return await classRename(req, res);
+      case 'class-goals-set': return await classGoalsSet(req, res);
+      case 'my-goals': return await myGoals(req, res);
       case 'class-archive': return await classArchive(req, res);
       case 'class-restore': return await classRestore(req, res);
       case 'archived-classes': return await archivedClasses(req, res);
