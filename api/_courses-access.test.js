@@ -32,8 +32,8 @@ const blob = () => ({ lessons: { r1: R1 }, courses: { 'fr/qwerty': { lessons: { 
 test('en statut bêta, la liste des testeurs vient de l\'environnement', () => {
   assert.deepEqual(COURSE_ACCESS['fr/qwerty'], { status: 'bêta' });
   assert.deepEqual(betaTesters(), ['testeur1', 'testeur2']);
-  assert.deepEqual(courseIdsFor({ username: 'testeur1' }), ['fr/qwerty', 'en/azerty', 'en/qwerty']);
-  assert.deepEqual(courseIdsFor({ username: 'TESTEUR2' }), ['fr/qwerty', 'en/azerty', 'en/qwerty'], 'sans distinction de casse');
+  assert.deepEqual(courseIdsFor({ username: 'testeur1' }), ['fr/qwerty', 'en/azerty', 'en/qwerty', 'nl/azerty']);
+  assert.deepEqual(courseIdsFor({ username: 'TESTEUR2' }), ['fr/qwerty', 'en/azerty', 'en/qwerty', 'nl/azerty'], 'sans distinction de casse');
   for (const u of [{ username: 'autre', role: 'eleve' }, { username: 'chef', role: 'admin' }, { username: 'p', role: 'prof' }, {}, null]) assert.deepEqual(courseIdsFor(u), [], JSON.stringify(u));
 });
 
@@ -49,7 +49,7 @@ test('variable vide ou absente : personne n\'a accès', () => {
 test('requête access : le serveur dit à quels cours le compte a droit, sans toucher à la progression', async () => {
   USER = { id: 1, role: 'eleve', username: 'testeur1' }; PROGRESS = { lessons: { r1: R1 } }; CALLS = [];
   let r = await call({ token: 't', access: true });
-  assert.deepEqual(r.body, { ok: true, coursAcces: ['fr/qwerty', 'en/azerty', 'en/qwerty'] });
+  assert.deepEqual(r.body, { ok: true, coursAcces: ['fr/qwerty', 'en/azerty', 'en/qwerty', 'nl/azerty'] });
   USER = { id: 2, role: 'admin', username: 'chef' };
   r = await call({ token: 't', access: true });
   assert.deepEqual(r.body.coursAcces, []);

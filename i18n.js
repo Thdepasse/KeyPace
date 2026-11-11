@@ -343,6 +343,7 @@
       'simon.sr_over': 'Partie terminée. Score {score}.',
       // ── Menu du haut et pastille clavier ──
       'lessons.course_badge_en': 'Cours d’anglais, {kb}',
+      'lessons.course_badge_nl': 'Cours de néerlandais, {kb}',
       'lessons.course_badge_qwerty': 'Cours QWERTY',
       'nav.home': 'Accueil',
       'nav.test': 'Test',
@@ -1857,6 +1858,7 @@
       'simon.sr_input': 'Your turn to type the sequence back.',
       'simon.sr_over': 'Game over. Score {score}.',
       'lessons.course_badge_en': 'English course, {kb}',
+      'lessons.course_badge_nl': 'Dutch course, {kb}',
       'lessons.course_badge_qwerty': 'QWERTY course',
       'nav.home': 'Home',
       'nav.test': 'Test',

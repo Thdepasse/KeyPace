@@ -412,6 +412,10 @@ async function run(opts = {}) {
           document.getElementById('nav-region-btn').click();await new Promise(r=>setTimeout(r,150));
           {const m=document.getElementById('nav-region-menu').getBoundingClientRect();out.inFrame=m.left>=0&&m.right<=innerWidth&&m.width>0;}
           document.getElementById('nav-region-btn').click();
+          kpSetAllowed(['fr/qwerty','en/azerty','en/qwerty','nl/azerty']);out.rowNl=items();
+          await kpSetSiteLanguage('nl');await new Promise(r=>setTimeout(r,300));
+          out.nl={course:kpCourseId(),content:kpContentLang(),lessons:ALL_LESSONS.length,first:ALL_LESSONS[0].id+':'+ALL_LESSONS[0].keys,names:[...new Set(ALL_LESSONS.map(l=>l.title))].length,vocab:GAME_VOCAB.length,ui:KPI18n.lang(),sel:items(),badge:kpCourseBadgeHTML(),test:app.makeSession('test').text};
+          kpSetAllowed(['fr/qwerty','en/azerty','en/qwerty']);await new Promise(r=>setTimeout(r,300));out.nlGone={course:kpCourseId(),items:items()};
           await kpSetSiteLanguage('en');out.okEn=kpCourseId()==='en/azerty';
           out.en={course:kpCourseId(),lang:kpContentLang(),lessons:ALL_LESSONS.length,first:ALL_LESSONS[0].id+':'+ALL_LESSONS[0].keys,vocab:GAME_VOCAB.length,test:app.makeSession('test').text,badge:/anglais|English/.test(kpCourseBadgeHTML())&&!/bêta|beta/i.test(kpCourseBadgeHTML())};
           out.enUi={t:kpT('typ.speed'),lang:document.documentElement.lang};
@@ -445,6 +449,11 @@ async function run(opts = {}) {
         if (lg.guestItems.join('|') !== 'Belgique*|France|Français*|English') problems.push(`BR12 : choix de langue pour un visiteur (${lg.guestItems.join('|')})`);
         if (lg.row.join('|') !== 'Belgique*|France|Français*|English') problems.push(`BR12 : choix de langue pour un testeur (${lg.row.join('|')})`);
         if (!lg.inFrame) problems.push('BR12 : le menu du drapeau sort de l\'écran avec la ligne de langue');
+        if (lg.rowNl.join('|') !== 'Belgique*|France|Français*|English|Nederlands') problems.push(`BR12 : choix de langue pour un testeur du néerlandais (${lg.rowNl.join('|')})`);
+        if (lg.nl.course !== 'nl/azerty' || lg.nl.content !== 'nl' || lg.nl.lessons !== 54 || lg.nl.first !== 'r1:f j' || lg.nl.vocab < 300 || lg.nl.ui !== 'fr' || !/néerlandais/.test(lg.nl.badge) || /bêta/.test(lg.nl.badge)) problems.push(`BR12 : passage au néerlandais (${JSON.stringify(lg.nl)})`);
+        if (lg.nl.sel.join('|') !== 'Belgique*|France|Français|English|Nederlands*') problems.push(`BR12 : la langue cochée n'est pas le néerlandais (${lg.nl.sel.join('|')})`);
+        if (!/^[a-z ]+$/.test(lg.nl.test || '')) problems.push(`BR12 : le texte de test d'un cours en néerlandais n'est pas fait de lettres seules (${(lg.nl.test || '').slice(0, 60)})`);
+        if (lg.nlGone.course !== 'fr/azerty' || lg.nlGone.items.join('|') !== 'Belgique*|France|Français*|English') problems.push(`BR12 : le retrait du néerlandais ne ramène pas le français (${JSON.stringify(lg.nlGone)})`);
         if (!lg.okEn || lg.en.course !== 'en/azerty' || lg.en.lang !== 'en' || lg.en.lessons !== 54 || lg.en.first !== 'r1:f j' || lg.en.vocab < 300 || !lg.en.badge) problems.push(`BR12 : passage à l'anglais (${JSON.stringify(lg.en)})`);
         if (/[éèêàùç]/.test(lg.en.test || '') || !/^[a-z ]+$/.test(lg.en.test || '')) problems.push(`BR12 : le texte de test d'un cours en anglais n'est pas de l'anglais (${(lg.en.test || '').slice(0, 60)})`);
         if (lg.enUi.t !== 'Speed' || lg.enUi.lang !== 'en') problems.push(`BR12 : l'interface ne suit pas le cours en anglais (${JSON.stringify(lg.enUi)})`);

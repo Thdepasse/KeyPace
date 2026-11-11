@@ -1,0 +1,152 @@
+{
+ "position": 8,
+ "name": "8. Veelgebruikte symbolen",
+ "kind": "symboles",
+ "lessons": [
+  {
+   "id": "sym1",
+   "title": "@ en #: e-mail en hashtag",
+   "keys": "@ #",
+   "teaches": "@#",
+   "tip": "Hoe je @ en # typt, hangt af van je toetsenbord: de beweging staat hieronder. Houd je vingers tussen de symbolen op de basisrij.",
+   "tuto": {
+    "intro": "Symbolen zoals @ en # vragen een toetsencombinatie die per toetsenbord verschilt. Die van jou staat hieronder.",
+    "rules": [
+     {
+      "icon": "⌨️",
+      "t": "Bijzondere toetsen",
+      "d": "Afhankelijk van je toetsenbord typ je een symbool direct, met Shift of met AltGr (de toets rechts van de spatiebalk, ingedrukt met je rechterduim)."
+     },
+     {
+      "icon": "📧",
+      "t": "@ voor e-mails",
+      "d": "Het @-teken verbindt de naam en het domein van een adres: anna@school.be. Je hebt het elke dag nodig."
+     },
+     {
+      "icon": "#️⃣",
+      "t": "# de hashtag",
+      "d": "Het hekje gebruik je voor trefwoorden op sociale media en in code."
+     }
+    ],
+    "tip": "Doel: @ en # typen met de juiste beweging, zonder je basispositie te verlaten."
+   },
+   "text": "anna@school.be #regen @tom #team info@bank.be #zon @lars #blij hallo@club.be @noor #taart #lekker @jan"
+  },
+  {
+   "id": "sym2",
+   "title": "Haakjes () en vierkante haken []",
+   "keys": "( ) [ ]",
+   "teaches": "[]",
+   "tip": "Haakjes en vierkante haken komen in paren: typ het paar en ga dan terug om in het midden te schrijven.",
+   "tuto": {
+    "intro": "Haakjes en vierkante haken komen in paren: je leert altijd te openen EN te sluiten.",
+    "rules": [
+     {
+      "icon": "🧩",
+      "t": "Altijd in paren",
+      "d": "Een haakje of vierkante haak die je opent, moet je ook sluiten. Typ het paar en ga dan terug om in het midden te schrijven."
+     },
+     {
+      "icon": "⌨️",
+      "t": "Haakjes die je kent",
+      "d": "( en ) ken je al van het onderdeel over haakjes. Hier combineren we ze met vierkante haken."
+     },
+     {
+      "icon": "⌨️",
+      "t": "Vierkante haken",
+      "d": "Voor vierkante haken [ ] heb je een toetsencombinatie nodig (de beweging voor jouw toetsenbord staat hierboven). Handig voor code en lijsten."
+     }
+    ],
+    "tip": "Doel: haakjes en vierkante haken openen en sluiten, zonder er een te vergeten."
+   },
+   "text": "lijst[0] lijst[1] totaal(2) score[3] items[4] (ok) [einde] aantal(5) index[i] pagina[6] (ja) [nee]"
+  },
+  {
+   "id": "sym3",
+   "title": "/ en |: paden en pijpen",
+   "keys": "/ |",
+   "teaches": "/|",
+   "tip": "De schuine streep / scheidt de delen van een adres of een pad. De verticale streep | verbindt twee opdrachten.",
+   "tuto": {
+    "intro": "De schuine streep / en de verticale streep | gebruik je in webadressen, bestandspaden en opdrachten.",
+    "rules": [
+     {
+      "icon": "🌐",
+      "t": "De schuine streep /",
+      "d": "De schuine streep scheidt de delen van een webadres of een pad: www.school.be/nieuws, thuis/anna."
+     },
+     {
+      "icon": "⌨️",
+      "t": "De pijp |",
+      "d": "De verticale streep vraagt een toetsencombinatie. In de informatica verbindt hij twee opdrachten: ls | grep bestand."
+     },
+     {
+      "icon": "💻",
+      "t": "Computersymbolen",
+      "d": "Deze twee tekens kom je overal tegen als je met het web of een terminal werkt. Leer hun combinaties."
+     }
+    ],
+    "tip": "Doel: / en | typen voor paden en opdrachten."
+   },
+   "text": "www.school.be/nieuws ls | grep bestand | sort | head | more ja/nee en/of thuis/school a/b | c/d links | rechts"
+  },
+  {
+   "id": "sym4",
+   "title": "* = +: sommen en code",
+   "keys": "* = +",
+   "teaches": "*=+",
+   "tip": "In een eenvoudige formule staan de tekens vaak tegen elkaar aan: x*y+z. Voel het ritme toets na toets.",
+   "tuto": {
+    "intro": "De tekens * = + gebruik je in sommen en code. Je rijgt ze aan elkaar in uitdrukkingen.",
+    "rules": [
+     {
+      "icon": "🧮",
+      "t": "De bewerkingstekens",
+      "d": "* om te vermenigvuldigen, + om op te tellen, = voor de uitkomst of een toewijzing: 2*3=6, a+b=c."
+     },
+     {
+      "icon": "⇧",
+      "t": "Waar zitten + en =?",
+      "d": "Hun plaats verschilt per toetsenbord: kijk naar de beweging voor jouw toetsenbord, hierboven."
+     },
+     {
+      "icon": "🔗",
+      "t": "Geen spaties in formules",
+      "d": "In een eenvoudige uitdrukking staan de tekens vaak tegen elkaar aan: x*y+z. Voel het ritme toets na toets."
+     }
+    ],
+    "tip": "Doel: * = + aan elkaar rijgen in uitdrukkingen, zonder te twijfelen over de juiste beweging."
+   },
+   "text": "2*3=6 a+b=c x*y+z=0 totaal=prijs*8 score=tijd*9+1 aantal=a+b+c snelheid=5*2 4+5=9 oppervlakte=4*7=28"
+  },
+  {
+   "id": "sym5",
+   "title": "% en _: percentages en variabelen",
+   "keys": "% _",
+   "teaches": "%_",
+   "tip": "Het % plak je aan het getal (50%). Het liggend streepje _ verbindt woorden zonder spatie in technische namen.",
+   "tuto": {
+    "intro": "Het procentteken % en het liggend streepje _ kom je vaak tegen in cijfers en technische namen.",
+    "rules": [
+     {
+      "icon": "📊",
+      "t": "Het procentteken %",
+      "d": "Het plakt aan het getal: 50%, 100%."
+     },
+     {
+      "icon": "➿",
+      "t": "Het liggend streepje _",
+      "d": "Het verbindt woorden zonder spatie in technische namen: mijn_naam, bestand_naam."
+     },
+     {
+      "icon": "💻",
+      "t": "Technisch gebruik",
+      "d": "% en _ zijn vooral nuttig in de informatica en bij gegevens. Leer waar ze zitten, zodat je niet vertraagt."
+     }
+    ],
+    "tip": "Doel: % en _ plaatsen zonder te kijken."
+   },
+   "text": "50% 75% mijn_naam bestand_naam 100% top_snelheid 20% woord_aantal 5% totaal_punten 90% thee_tijd"
+  }
+ ]
+}

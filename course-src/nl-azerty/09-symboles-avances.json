@@ -1,0 +1,123 @@
+{
+ "position": 9,
+ "name": "9. Geavanceerde symbolen",
+ "kind": "symboles",
+ "lessons": [
+  {
+   "id": "sym6",
+   "title": "{} en <>: code en HTML",
+   "keys": "{ } < >",
+   "teaches": "{}<>",
+   "tip": "Accolades en punthaken komen in paren: openen, schrijven, dan sluiten.",
+   "tuto": {
+    "intro": "Accolades {} en punthaken <> zijn de symbolen van code en HTML. Ook zij komen in paren.",
+    "rules": [
+     {
+      "icon": "⌨️",
+      "t": "Accolades",
+      "d": "Accolades { } omringen blokken code: {code}. Hoe je ze typt, hangt af van je toetsenbord (hierboven weergegeven)."
+     },
+     {
+      "icon": "🔠",
+      "t": "Punthaken",
+      "d": "Punthaken < > openen en sluiten HTML-tags. Afhankelijk van je toetsenbord typ je > met Shift: de beweging staat hierboven."
+     },
+     {
+      "icon": "🧩",
+      "t": "Altijd sluiten",
+      "d": "Net als haakjes worden accolades en tags geopend EN gesloten: <p>tekst</p>, {einde}."
+     }
+    ],
+    "tip": "Doel: accolades en punthaken openen en sluiten."
+   },
+   "text": "<p>hallo</p> <b>ga</b> {code} {start} {a} {b} {c} <html> </html> {eind} <div> </div>"
+  },
+  {
+   "id": "sym7",
+   "title": "\"\" en ~: tekst en paden",
+   "keys": "\" ~",
+   "teaches": "\"~",
+   "tip": "Het rechte aanhalingsteken omsluit tekst in code. De tilde ~ staat voor de thuismap: ~/werk.",
+   "tuto": {
+    "intro": "Rechte aanhalingstekens en de tilde ~ gebruik je voor tekstreeksen en paden in een systeem.",
+    "rules": [
+     {
+      "icon": "⌨️",
+      "t": "Rechte aanhalingstekens",
+      "d": "Het rechte aanhalingsteken (\") omsluit tekst in code. Hoe je het typt, hangt af van je toetsenbord (hierboven weergegeven)."
+     },
+     {
+      "icon": "〜",
+      "t": "De tilde ~",
+      "d": "De tilde staat voor de thuismap op Linux en Mac: ~/muziek."
+     },
+     {
+      "icon": "💻",
+      "t": "Vooral in code",
+      "d": "In gewone teksten heb je deze twee tekens zelden nodig, maar bij programmeren en in de terminal zijn ze onmisbaar."
+     }
+    ],
+    "tip": "Doel: het rechte aanhalingsteken en ~ typen zonder te aarzelen."
+   },
+   "text": "\"hallo\" \"wereld\" ~/muziek ~/school \"naam\": \"Anna\" ~tom ~/boek \"stad\": \"Gent\" ~/werk ~/thuis"
+  },
+  {
+   "id": "sym8",
+   "title": "\\ en `: code en terminal",
+   "keys": "\\ `",
+   "teaches": "\\`",
+   "tip": "De backslash en de backtick zijn puur technisch: je vindt ze in code, Windows-paden en de terminal.",
+   "tuto": {
+    "intro": "De backslash en de backtick zijn zuiver technische symbolen, veel gebruikt in code.",
+    "rules": [
+     {
+      "icon": "⌨️",
+      "t": "De backslash",
+      "d": "Hij scheidt mappen in Windows en markeert speciale tekens in code."
+     },
+     {
+      "icon": "⌨️",
+      "t": "De backtick",
+      "d": "De backtick omsluit code binnen een tekst en variabelen bij het programmeren. Op sommige toetsenborden moet je eerst de toets en dan de spatiebalk indrukken."
+     },
+     {
+      "icon": "💻",
+      "t": "Alleen technisch gebruik",
+      "d": "Je gebruikt ze alleen in code of in de terminal. Leer ze als je programmeert, anders onthoud je alleen dat ze bestaan."
+     }
+    ],
+    "tip": "Doel: de backslash en de backtick vinden en zonder te kijken typen."
+   },
+   "text": "C:\\Werk\\Anna `bewaar` \\n \\t `naam` C:\\School\\Tom `open bestand` \\r\\n `ls -a`"
+  },
+  {
+   "id": "sym9",
+   "title": "Herhaling: alle symbolen in tekst",
+   "keys": "alle symbolen",
+   "teaches": "",
+   "tip": "Vraag je voor elk symbool af: direct, met Shift of met AltGr? Die gewoonte bespaart je tijd.",
+   "tuto": {
+    "intro": "We brengen alle symbolen samen in een tekst met e-mail, web, code en percentages. De grote mix!",
+    "rules": [
+     {
+      "icon": "🧩",
+      "t": "Alle combinaties",
+      "d": "Shift, AltGr, bijzondere toetsen... Elk symbool heeft zijn beweging. Gebruik alles wat je in de laatste twee modules hebt geleerd."
+     },
+     {
+      "icon": "🧭",
+      "t": "Zie de beweging",
+      "d": "Bepaal voor elk symbool: direct, met Shift of met AltGr? Die gewoonte bespaart je tijd."
+     },
+     {
+      "icon": "💻",
+      "t": "Het volledige toetsenbord",
+      "d": "Symbolen beheersen betekent een adres, een stukje code of een formule typen zonder ooit vast te lopen."
+     }
+    ],
+    "tip": "Doel: alle symbolen in een echte tekst aan elkaar rijgen, elke combinatie op het juiste moment."
+   },
+   "text": "anna@school.be (2026) www.bank.be/hulp #gent {open: true} <html> 50% a+b=c [einde] ~/thuis \"naam\" mijn_bestand | ls"
+  }
+ ]
+}
