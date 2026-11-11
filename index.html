@@ -13827,7 +13827,7 @@ const app={
     }
     const onResize=()=>{setIntroH();fitScene();if(phase==='done')render(FINAL,0,true);};
     window.addEventListener('resize',onResize);
-    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(document.body.contains(intro))onResize();});
+    if(document.fonts&&document.fonts.ready&&typeof document.fonts.ready.then==='function')document.fonts.ready.then(()=>{if(document.body.contains(intro))onResize();});
 
     this._gcineTeardown=()=>{
       window.removeEventListener('resize',onResize);
