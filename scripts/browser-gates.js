@@ -426,6 +426,7 @@ async function run(opts = {}) {
           out.enNav=document.getElementById('main-nav').innerText;
           document.getElementById('nav-kb-btn').click();await new Promise(r=>setTimeout(r,150));out.enChip=document.getElementById('nav-kb-menu').innerText;document.getElementById('nav-kb-btn').click();
           go('stats');await new Promise(r=>setTimeout(r,500));out.enStats=document.getElementById('page-stats').innerText;
+          await app.openSettings();await new Promise(r=>setTimeout(r,600));{const o=document.getElementById('settings-overlay');out.enSettings=o?o.innerText:'(pas de fenêtre)';app.closeSettings();}
           out.enGameScreens={};
           for(const g of ['frappe','sprint','course','ghost','simon']){app.activeGame=g;app.game=null;app.sprint=null;app.course=null;app.ghost=null;app.simon=null;app.renderGames();await new Promise(r=>setTimeout(r,200));out.enGameScreens[g]=document.getElementById('page-games').innerText;}
           app.activeGame=null;
@@ -464,6 +465,8 @@ async function run(opts = {}) {
         const ch = ['Exigés', 'Tolérés', 'Disposition', 'Langue du cours', 'Tous les réglages', 'Famille'].filter((w) => lg.enChip.includes(w)); if (ch.length) problems.push(`BR12 : du français dans le menu du clavier en anglais : ${ch.join(', ')}`);
         for (const w of ['Your speed', 'Your records', 'Take a test', 'Best speed', 'Average accuracy', 'Lessons passed', 'Word Strike']) if (!lg.enStats.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent de la page Progrès en anglais`);
         const ps = ['Ta vitesse', 'Tes records', 'Faire un test', 'Meilleure vitesse', 'Précision moyenne', 'Leçons validées', 'Frappe-mots', 'certificat', 'Certification', 'Série', 'Aucun test'].filter((w) => lg.enStats.toLowerCase().includes(w.toLowerCase())); if (ps.length) problems.push(`BR12 : du français sur la page Progrès en anglais : ${ps.join(', ')}`);
+        for (const w of ['Gaze tracker', 'Sounds', 'Game sounds', 'Keyboard format', 'Profile', 'Account', 'Privacy (GDPR)', 'Export my data', 'Delete my account', 'Log out']) if (!lg.enSettings.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent des Réglages en anglais`);
+        const st = ['Traqueur du regard', 'Sons de jeu', 'Format du clavier', 'Profil', 'Confidentialité', 'Exporter mes données', 'Supprimer mon compte', 'Enregistrer', 'Mot de passe', 'Adresse actuelle'].filter((w) => new RegExp('(^|[^a-zà-ÿ])' + w.toLowerCase() + '([^a-zà-ÿ]|$)').test(lg.enSettings.toLowerCase())); if (st.length) problems.push(`BR12 : du français dans les Réglages en anglais : ${st.join(', ')}`);
         if (lg.frUi.t !== 'Vitesse' || lg.frUi.lang !== 'fr') problems.push(`BR12 : retour au français, l'interface reste en anglais (${JSON.stringify(lg.frUi)})`);
         if (lg.rowEn.join('|') !== 'Français|English*') problems.push(`BR12 : langue active après le passage (${lg.rowEn.join('|')})`);
         if (!lg.okQ || lg.q.course !== 'en/qwerty' || lg.q.lessons !== 58) problems.push(`BR12 : en anglais, passer à QWERTY garde la langue (${JSON.stringify(lg.q)})`);

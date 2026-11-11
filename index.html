@@ -4777,14 +4777,16 @@ function kbFormFactorIdsFor(azertyId){
     return isMac?!ff.macExcluded:!ff.macOnly;
   });
 }
+const KP_FF_TXT={port_avec:()=>kpT('set.ff_with_numpad'),port_sans:()=>kpT('set.ff_without_numpad'),port_ultra:()=>kpT('set.ff_ultra')};
+const kpFormLabel=id=>(KP_FF_TXT[id]?KP_FF_TXT[id]():KB_FORM_FACTORS[id].label);
 function kbFormBtnsHTML(azertyId){
   const activeId=getKbFormFactorId();
-  const btn=id=>`<button class="settings-btn kb-form-btn${activeId===id?' active':''}" data-kb-form="${id}" onclick="app.setKbFormFactor('${id}')">${KB_FORM_FACTORS[id].label}</button>`;
+  const btn=id=>`<button class="settings-btn kb-form-btn${activeId===id?' active':''}" data-kb-form="${id}" onclick="app.setKbFormFactor('${id}')">${kpFormLabel(id)}</button>`;
   const ids=kbFormFactorIdsFor(azertyId);
   const fixeIds=ids.filter(id=>!KB_FORM_FACTORS[id].portable);
   const portIds=ids.filter(id=>KB_FORM_FACTORS[id].portable);
   const group=(label,groupIds)=>groupIds.length?`<div class="kb-form-group"><span class="kb-form-group-label">${label}</span><div class="kb-form-group-btns">${groupIds.map(btn).join('')}</div></div>`:'';
-  return group('Fixe',fixeIds)+group('Portable',portIds);
+  return group(kpT('set.fixed'),fixeIds)+group(kpT('set.portable'),portIds);
 }
 /* Moteur de rendu de l'aperçu clavier des réglages : grille en positions
    absolues (unité = px), même principe que le prototype des 26 configurations
@@ -5057,7 +5059,7 @@ function kbFullPreviewHTML(azertyId,formId){
   return`<div class="kb-full-preview">${_kbpRenderGrid(keys)}</div>${note40}${noteMac}${noteCluster}${noteHalf}<div class="kb-preview-note">${KB_LAYOUT_NOTES[azertyId]||''}</div>`;
 }
 /* « Mon clavier » : deux cartes (AZERTY, QWERTY) quand le site propose plus d'une famille ; sinon rien (comportement actuel). */
-function kbLayoutTitle(){return kpCurrentFamily()==='qwerty'?'Disposition QWERTY':'Disposition AZERTY';}
+function kbLayoutTitle(){return kpT('chip.layout',{fam:kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY'});}
 function kbLayoutBtnsHTML(){
   const fam=kpCurrentFamily(),cur=getKbLayoutId();
   return Object.keys(KB_LAYOUT_LABELS).filter(id=>kpFamilyOf(id)===fam).map(id=>`<button class="settings-btn kb-layout-btn${cur===id?' active':''}" data-kb-layout="${id}" onclick="app.setKbLayout('${id}')">${kpKbLabel(id)}</button>`).join('');
@@ -15144,7 +15146,7 @@ const app={
     const plan=getUserPlan()||'free'; // même source que le badge nav (évite l'incohérence Gratuit/Expert)
     const role=this.stats&&this.stats.role;
     const isEtab=role==='admin';
-    const planLabel=isEtab?'Compte Établissement':role==='prof'?'Compte Enseignant':plan==='expert'?'Compte Expert':'Compte Gratuit';
+    const planLabel=isEtab?kpT('set.plan_school'):role==='prof'?kpT('set.plan_teacher'):plan==='expert'?kpT('set.plan_expert'):kpT('set.plan_free');
     const planColor=(isEtab||role==='prof'||plan==='expert')?'var(--accent)':'var(--muted)';
     const calibRaw=localStorage.getItem('keypace-gaze-calib');
     let calibData=null;try{calibData=calibRaw?JSON.parse(calibRaw):null;}catch{}
@@ -15156,7 +15158,7 @@ const app={
       <div class="settings-modal-head">
         <div class="settings-modal-avatar">${user?user[0].toUpperCase():'?'}</div>
         <div class="settings-modal-head-info">
-          <strong>${user||'Invité'}</strong>
+          <strong>${user||kpT('set.guest')}</strong>
           <span style="display:flex;align-items:center;gap:6px;margin-top:3px">
             <span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.04em;background:${(isEtab||role==='prof'||plan==='expert')?'rgba(255,77,46,0.1)':'var(--light)'};color:${planColor}">${planLabel.toUpperCase()}</span>
           </span>
@@ -15165,163 +15167,163 @@ const app={
       </div>
       <div class="settings-modal-body">
       <div class="settings-section" id="settings-gaze-section">
-        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.eye}</span> Traqueur du regard</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.eye}</span> ${kpT('set.gaze')}</div>
         <div class="settings-row">
           <div class="settings-row-info">
-            <strong>Calibration du regard</strong>
-            <span>${calibrated?`Calibré le ${new Date(calibData.date).toLocaleDateString('fr-FR')} · seuil ${calibData.threshold.toFixed(3)}`:'Clique sur les zones affichées en les regardant pour calibrer la détection haut/bas.'}</span>
+            <strong>${kpT('set.gaze_calib')}</strong>
+            <span>${calibrated?kpT('set.calibrated_on',{date:new Date(calibData.date).toLocaleDateString(kpLocale()),thr:calibData.threshold.toFixed(3)}):kpT('set.calib_help')}</span>
           </div>
-          ${calibrated?'<span class="gaze-calibrated-badge">✓ Calibré</span>':''}
+          ${calibrated?'<span class="gaze-calibrated-badge">'+kpT('set.calibrated')+'</span>':''}
         </div>
         <div style="display:flex;gap:10px;margin-top:4px">
-          <button class="settings-btn" onclick="app.startCalibration()">${calibrated?'Recalibrer':'Calibrer maintenant'}</button>
-          ${calibrated?'<button class="settings-btn danger" onclick="app.resetCalibration()">Réinitialiser</button>':''}
+          <button class="settings-btn" onclick="app.startCalibration()">${calibrated?kpT('set.recalibrate'):kpT('set.calibrate_now')}</button>
+          ${calibrated?'<button class="settings-btn danger" onclick="app.resetCalibration()">'+kpT('set.reset')+'</button>':''}
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.volume}</span> Sons</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.volume}</span> ${kpT('set.sounds')}</div>
         <div class="settings-row">
           <div class="settings-row-info">
-            <strong>Sons de jeu</strong>
-            <span>Réussite, record, victoire… désactivables à tout moment</span>
+            <strong>${kpT('set.game_sounds')}</strong>
+            <span>${kpT('set.game_sounds_help')}</span>
           </div>
-          <button class="settings-btn" id="sound-toggle-btn" onclick="app.toggleSound()">${isSoundMuted()?'Activer':'Désactiver'}</button>
+          <button class="settings-btn" id="sound-toggle-btn" onclick="app.toggleSound()">${isSoundMuted()?kpT('set.enable'):kpT('set.disable')}</button>
         </div>
         <div class="settings-row" style="margin-top:10px">
           <div class="settings-row-info">
-            <strong>Musique (Magic Tiles)</strong>
-            <span>Le morceau qui joue en fond pendant la partie, indépendant des bruitages ci-dessus</span>
+            <strong>${kpT('set.music')}</strong>
+            <span>${kpT('set.music_help')}</span>
           </div>
-          <button class="settings-btn" id="music-toggle-btn" onclick="app.toggleMusic()">${isMusicMuted()?'Activer':'Désactiver'}</button>
+          <button class="settings-btn" id="music-toggle-btn" onclick="app.toggleMusic()">${isMusicMuted()?kpT('set.enable'):kpT('set.disable')}</button>
         </div>
-        <div style="font-size:12px;color:var(--muted);margin-top:8px">Musiques : ${[...new Set(TILES_SONGS.map(s=>s.artist))].join(', ')} (Pixabay Content License, usage libre)</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px">${kpT('set.music_credits',{artists:[...new Set(TILES_SONGS.map(s=>s.artist))].join(', ')})}</div>
       </div>
       <div class="settings-section" id="settings-keyboard-section">
-        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.keyboard}</span> Clavier</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.keyboard}</span> ${kpT('set.keyboard')}</div>
         <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
           <div id="kb-family-box">${kbFamilyBoxHTML()}</div>
           <div class="settings-row-info">
             <strong id="kb-layout-title">${kbLayoutTitle()}</strong>
-            <span>Le clavier affiché dans les leçons s'adapte à ton clavier physique. Choisis ta disposition.</span>
+            <span>${kpT('set.layout_help')}</span>
           </div>
           <div id="kb-layout-btns" style="display:flex;gap:8px;flex-wrap:wrap">
             ${kbLayoutBtnsHTML()}
           </div>
           <div class="settings-row-info" style="margin-top:4px">
-            <strong>Format du clavier</strong>
-            <span>La taille de ton clavier (pavé numérique, flèches, rangée de fonction…).</span>
+            <strong>${kpT('set.form')}</strong>
+            <span>${kpT('set.form_help')}</span>
           </div>
           <div id="kb-form-btns" style="display:flex;flex-direction:column;gap:10px">
             ${kbFormBtnsHTML(getKbLayoutId())}
           </div>
           <div class="settings-row-info" style="margin-top:4px">
-            <strong>Guillemets dans les leçons</strong>
-            <span>Si ton clavier n'a pas les touches « et », choisis les guillemets droits (").</span>
+            <strong>${kpT('set.quotes')}</strong>
+            <span>${kpT('set.quotes_help')}</span>
           </div>
           <div id="quote-btns" style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="settings-btn${getQuoteStyle()==='fr'?' active':''}" onclick="app.setQuotes('fr')">« Français »</button>
-            <button class="settings-btn${getQuoteStyle()==='droits'?' active':''}" onclick="app.setQuotes('droits')">"Droits"</button>
+            <button class="settings-btn${getQuoteStyle()==='fr'?' active':''}" onclick="app.setQuotes('fr')">${kpT('set.quotes_fr')}</button>
+            <button class="settings-btn${getQuoteStyle()==='droits'?' active':''}" onclick="app.setQuotes('droits')">${kpT('set.quotes_straight')}</button>
           </div>
           <div class="settings-row-info" style="margin-top:4px">
-            <strong>Accents</strong>
-            <span>Exigés : tu apprends à taper é, è, ê… avec ton clavier. Tolérés : la lettre sans accent est acceptée (ton score est marqué « accents tolérés », et le certificat reste exigeant). Ce réglage vaut pour cet appareil.</span>
+            <strong>${kpT('chip.accents')}</strong>
+            <span>${kpT('set.accents_help')}</span>
           </div>
           <div id="accent-btns" style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="settings-btn${getAccentMode()==='exact'?' active':''}" onclick="app.setAccents('exact')">Exigés</button>
-            <button class="settings-btn${getAccentMode()==='tolerant'?' active':''}" onclick="app.setAccents('tolerant')">Tolérés</button>
+            <button class="settings-btn${getAccentMode()==='exact'?' active':''}" onclick="app.setAccents('exact')">${kpT('chip.exact')}</button>
+            <button class="settings-btn${getAccentMode()==='tolerant'?' active':''}" onclick="app.setAccents('tolerant')">${kpT('chip.tolerant')}</button>
           </div>
           <div id="kb-layout-preview" style="width:100%;overflow-x:auto">${kbFullPreviewHTML(getKbLayoutId(),getKbFormFactorId())}</div>
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.user}</span> Profil</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.user}</span> ${kpT('set.profile')}</div>
         <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px">
           <div class="settings-row-info" style="width:100%">
-            <strong>Nom d'utilisateur</strong>
-            <span>Ton identifiant de connexion. Les élèves rattachés à un établissement ne peuvent pas le modifier : utilise le nom affiché ci-dessous à la place.</span>
+            <strong>${kpT('auth.username')}</strong>
+            <span>${kpT('set.username_help')}</span>
           </div>
           <div style="display:flex;gap:8px;width:100%">
             <input id="settings-username-input" value="${user.replace(/"/g,'&quot;')}" maxlength="24" style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
-            <button class="settings-btn" id="settings-username-btn" onclick="app.updateUsername()">Enregistrer</button>
+            <button class="settings-btn" id="settings-username-btn" onclick="app.updateUsername()">${kpT('set.save')}</button>
           </div>
           <div id="settings-username-msg" style="display:none;font-size:13px;padding:8px 10px;border-radius:9px;width:100%;box-sizing:border-box"></div>
         </div>
         <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px;margin-top:14px">
           <div class="settings-row-info" style="width:100%">
-            <strong>Nom affiché (pseudo)</strong>
-            <span>Visible par les autres joueurs en Duel 1v1 et au classement du Boss de la semaine. Laisse vide pour utiliser ton nom d'utilisateur.</span>
+            <strong>${kpT('set.display_name')}</strong>
+            <span>${kpT('set.display_name_help')}</span>
           </div>
           <div style="display:flex;gap:8px;width:100%">
             <input id="settings-displayname-input" value="${(currentDisplayName||'').replace(/"/g,'&quot;')}" maxlength="24" placeholder="${user.replace(/"/g,'&quot;')}" style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
-            <button class="settings-btn" id="settings-displayname-btn" onclick="app.updateDisplayName()">Enregistrer</button>
+            <button class="settings-btn" id="settings-displayname-btn" onclick="app.updateDisplayName()">${kpT('set.save')}</button>
           </div>
           <div id="settings-displayname-msg" style="display:none;font-size:13px;padding:8px 10px;border-radius:9px;width:100%;box-sizing:border-box"></div>
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.mail}</span> Email</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.mail}</span> ${kpT('set.email')}</div>
         <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px">
           <div class="settings-row-info" style="width:100%">
-            <strong>Adresse actuelle</strong>
-            <span>${currentEmail?this._esc(currentEmail):'Non renseignée'}</span>
+            <strong>${kpT('set.current_address')}</strong>
+            <span>${currentEmail?this._esc(currentEmail):kpT('set.not_set')}</span>
           </div>
           <div style="display:flex;gap:8px;width:100%;flex-wrap:wrap">
-            <input type="email" id="settings-email-input" placeholder="nouvelle-adresse@exemple.com" style="flex:1;min-width:180px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
-            <input type="password" id="settings-email-pw" placeholder="Mot de passe actuel" autocomplete="current-password" style="flex:1;min-width:150px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
-            <button class="settings-btn" id="settings-email-btn" onclick="app.requestEmailChange()">Changer</button>
+            <input type="email" id="settings-email-input" placeholder="${kpT('set.new_email_ph')}" style="flex:1;min-width:180px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+            <input type="password" id="settings-email-pw" placeholder="${kpT('set.current_pw')}" autocomplete="current-password" style="flex:1;min-width:150px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+            <button class="settings-btn" id="settings-email-btn" onclick="app.requestEmailChange()">${kpT('set.change')}</button>
           </div>
           <div id="settings-email-msg" style="display:none;font-size:13px;padding:8px 10px;border-radius:9px;width:100%;box-sizing:border-box"></div>
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.lock}</span> Compte</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.lock}</span> ${kpT('set.account')}</div>
         <div class="settings-row">
           <div class="settings-row-info">
-            <strong>Tutoriel de démarrage</strong>
-            <span>Revoir le guide d'introduction à KeyPace</span>
+            <strong>${kpT('set.tutorial')}</strong>
+            <span>${kpT('set.tutorial_help')}</span>
           </div>
-          <button class="settings-btn" onclick="obReplay()">Revoir</button>
+          <button class="settings-btn" onclick="obReplay()">${kpT('set.replay')}</button>
         </div>
         <div class="settings-row" style="align-items:flex-start;flex-direction:column;gap:8px;margin-top:10px">
           <div class="settings-row-info" style="width:100%">
-            <strong>Mot de passe</strong>
-            <span>Modifie-le directement, ou <a href="#" onclick="app.requestPasswordReset(this);return false" style="color:var(--accent);font-weight:600">reçois un lien par email</a> si tu l'as oublié.</span>
+            <strong>${kpT('auth.password')}</strong>
+            <span>${kpT('set.pw_help')}</span>
           </div>
           <div style="display:flex;gap:8px;width:100%;flex-wrap:wrap">
-            <input type="password" id="settings-pw-old" placeholder="Mot de passe actuel" autocomplete="current-password" style="flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
-            <input type="password" id="settings-pw-new" placeholder="Nouveau mot de passe" autocomplete="new-password" style="flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
-            <button class="settings-btn" id="settings-pw-btn" onclick="app.changePasswordInline()">Enregistrer</button>
+            <input type="password" id="settings-pw-old" placeholder="${kpT('set.current_pw')}" autocomplete="current-password" style="flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+            <input type="password" id="settings-pw-new" placeholder="${kpT('set.new_pw')}" autocomplete="new-password" style="flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
+            <button class="settings-btn" id="settings-pw-btn" onclick="app.changePasswordInline()">${kpT('set.save')}</button>
           </div>
           <div id="settings-pw-msg" style="display:none;font-size:13px;padding:8px 10px;border-radius:9px;width:100%;box-sizing:border-box"></div>
         </div>
         <div id="reset-pw-msg" style="display:none;font-size:13px;margin-top:6px;padding:10px 12px;border-radius:10px"></div>
         ${currentPlan==='expert'?`<div class="settings-row" style="margin-top:10px">
           <div class="settings-row-info">
-            <strong>Abonnement Expert</strong>
-            <span>Factures, moyen de paiement, résiliation : via le portail sécurisé Stripe</span>
+            <strong>${kpT('set.expert_sub')}</strong>
+            <span>${kpT('set.expert_sub_help')}</span>
           </div>
-          <button class="settings-btn" id="billing-portal-btn" onclick="app.openBillingPortal(this)">Gérer</button>
+          <button class="settings-btn" id="billing-portal-btn" onclick="app.openBillingPortal(this)">${kpT('set.manage')}</button>
         </div>`:''}
         <div class="settings-row" style="margin-top:10px">
-          <div class="settings-row-info"><strong>Déconnexion</strong><span>Te déconnecter de KeyPace</span></div>
-          <button class="settings-btn danger" onclick="app.closeSettings();logout()">Se déconnecter</button>
+          <div class="settings-row-info"><strong>${kpT('nav.logout')}</strong><span>${kpT('set.logout_help')}</span></div>
+          <button class="settings-btn danger" onclick="app.closeSettings();logout()">${kpT('set.logout_btn')}</button>
         </div>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.shield}</span> Confidentialité (RGPD)</div>
+        <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.shield}</span> ${kpT('set.privacy')}</div>
         <div class="settings-row">
           <div class="settings-row-info">
-            <strong>Exporter mes données</strong>
-            <span>Télécharger toutes tes données personnelles au format JSON</span>
+            <strong>${kpT('set.export')}</strong>
+            <span>${kpT('set.export_help')}</span>
           </div>
-          <button class="settings-btn" id="export-data-btn" onclick="app.exportMyData(this)">Exporter</button>
+          <button class="settings-btn" id="export-data-btn" onclick="app.exportMyData(this)">${kpT('set.export_btn')}</button>
         </div>
         <div class="settings-row" style="margin-top:10px">
           <div class="settings-row-info">
-            <strong>Supprimer mon compte</strong>
-            <span>Effacement définitif de ton compte et de toutes tes données. Irréversible.</span>
+            <strong>${kpT('set.delete')}</strong>
+            <span>${kpT('set.delete_help')}</span>
           </div>
-          <button class="settings-btn danger" onclick="app.deleteMyAccount()">Supprimer</button>
+          <button class="settings-btn danger" onclick="app.deleteMyAccount()">${kpT('set.delete_btn')}</button>
         </div>
       </div>
       </div>
@@ -15334,13 +15336,13 @@ const app={
   toggleSound(){
     setSoundMuted(!isSoundMuted());
     const btn=document.getElementById('sound-toggle-btn');
-    if(btn)btn.textContent=isSoundMuted()?'Activer':'Désactiver';
+    if(btn)btn.textContent=isSoundMuted()?kpT('set.enable'):kpT('set.disable');
     if(!isSoundMuted())playSound('hit'); // aperçu immédiat au moment d'activer
   },
   toggleMusic(){
     setMusicMuted(!isMusicMuted());
     const btn=document.getElementById('music-toggle-btn');
-    if(btn)btn.textContent=isMusicMuted()?'Activer':'Désactiver';
+    if(btn)btn.textContent=isMusicMuted()?kpT('set.enable'):kpT('set.disable');
     if(this._sourisAudio){ // applique tout de suite si un morceau tourne déjà
       this._sourisAudio.muted=isMusicMuted();
       if(!isMusicMuted())this._sourisAudio.volume=0.35;
