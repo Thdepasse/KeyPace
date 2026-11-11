@@ -404,21 +404,22 @@ async function run(opts = {}) {
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2500); exceptions.splice(0);
         const lg = await ev(`(async()=>{
           const out={};
-          out.guestRow=!!document.querySelector('.kbc-langs');
+          const items=()=>{kpRegionRender();return [...document.querySelectorAll('#nav-region-menu .nav-region-item')].map(b=>b.innerText.replace('✓','').trim()+(b.getAttribute('aria-checked')==='true'?'*':''));};
+          out.guestItems=items();
           currentUser='testeur-en';currentToken='tok-testeur-en';currentUserId='uid';_statsLoaded=true;app.stats=mergeStats();_kpAccessFor=null;
           kpSetAllowed(['fr/qwerty','en/azerty','en/qwerty']);updateNavUser();
-          document.getElementById('nav-kb-btn').click();await new Promise(r=>setTimeout(r,150));
-          const m=document.getElementById('nav-kb-menu').getBoundingClientRect();
-          out.row=[...document.querySelectorAll('#nav-kb-menu .kbc-lang-btn')].map(b=>b.innerText+(b.classList.contains('active')?'*':''));
-          out.inFrame=m.left>=0&&m.right<=innerWidth;
-          out.okEn=await kpChooseLanguage('en');
+          out.row=items();
+          document.getElementById('nav-region-btn').click();await new Promise(r=>setTimeout(r,150));
+          {const m=document.getElementById('nav-region-menu').getBoundingClientRect();out.inFrame=m.left>=0&&m.right<=innerWidth&&m.width>0;}
+          document.getElementById('nav-region-btn').click();
+          await kpSetSiteLanguage('en');out.okEn=kpCourseId()==='en/azerty';
           out.en={course:kpCourseId(),lang:kpContentLang(),lessons:ALL_LESSONS.length,first:ALL_LESSONS[0].id+':'+ALL_LESSONS[0].keys,vocab:GAME_VOCAB.length,test:app.makeSession('test').text,badge:kpCourseBadgeHTML().includes('anglais')};
           out.enUi={t:kpT('typ.speed'),lang:document.documentElement.lang};
           app._skipModulesHub=false;app.sess=null;go('lessons');await new Promise(r=>setTimeout(r,400));
           out.enList=document.getElementById('page-lessons').innerText;
           app.sess=app.makeSession('lesson','r1');go('lessons');await new Promise(r=>setTimeout(r,400));
           out.enLesson=document.getElementById('page-lessons').innerText;app.sess=null;
-          out.rowEn=[...document.querySelectorAll('#nav-kb-menu .kbc-lang-btn')].map(b=>b.innerText+(b.classList.contains('active')?'*':''));
+          out.rowEn=items();out.flagEn=document.getElementById('nav-region-btn').getAttribute('aria-label');
           {const sym=ALL_LESSONS.find(l=>/(^| )[@#&$%]( |$)/.test(l.keys));out.tutoLessons=[ALL_LESSONS[0].id,sym&&sym.id];out.tutos=[];
             for(const id of out.tutoLessons){if(!id)continue;app.openLessonTuto(id);await new Promise(r=>setTimeout(r,150));out.tutos.push(document.getElementById('lesson-tuto-body').innerText);}
             closeModal('lesson-tuto-modal');}
@@ -435,13 +436,13 @@ async function run(opts = {}) {
           for(const g of ['frappe','sprint','course','ghost','simon']){app.activeGame=g;app.game=null;app.sprint=null;app.course=null;app.ghost=null;app.simon=null;app.renderGames();await new Promise(r=>setTimeout(r,200));out.enGameScreens[g]=document.getElementById('page-games').innerText;}
           app.activeGame=null;
           out.okQ=await kpChooseFamily('qwerty');out.q={course:kpCourseId(),lessons:ALL_LESSONS.length};
-          out.okFr=await kpChooseLanguage('fr');
+          await kpSetSiteLanguage('fr');out.okFr=kpCourseId()==='fr/qwerty';
           out.frUi={t:kpT('typ.speed'),lang:document.documentElement.lang};
           out.fr={course:kpCourseId(),lessons:ALL_LESSONS.length,vocab:GAME_VOCAB.length,testFr:!/^[a-z' ,.]*$/.test('x')&&app.makeSession('test').text.length>20};
           return out})()`);
-        if (lg.guestRow) problems.push('BR12 : la langue du cours est proposée à un visiteur');
-        if (lg.row.join('|') !== 'Français*|English') problems.push(`BR12 : choix de langue pour un testeur (${lg.row.join('|')})`);
-        if (!lg.inFrame) problems.push('BR12 : le menu du clavier sort de l\'écran avec la ligne de langue');
+        if (lg.guestItems.join('|') !== 'Belgique*|France|Français*') problems.push(`BR12 : choix de langue pour un visiteur (${lg.guestItems.join('|')})`);
+        if (lg.row.join('|') !== 'Belgique*|France|Français*|English') problems.push(`BR12 : choix de langue pour un testeur (${lg.row.join('|')})`);
+        if (!lg.inFrame) problems.push('BR12 : le menu du drapeau sort de l\'écran avec la ligne de langue');
         if (!lg.okEn || lg.en.course !== 'en/azerty' || lg.en.lang !== 'en' || lg.en.lessons !== 54 || lg.en.first !== 'r1:f j' || lg.en.vocab < 300 || !lg.en.badge) problems.push(`BR12 : passage à l'anglais (${JSON.stringify(lg.en)})`);
         if (/[éèêàùç]/.test(lg.en.test || '') || !/^[a-z ]+$/.test(lg.en.test || '')) problems.push(`BR12 : le texte de test d'un cours en anglais n'est pas de l'anglais (${(lg.en.test || '').slice(0, 60)})`);
         if (lg.enUi.t !== 'Speed' || lg.enUi.lang !== 'en') problems.push(`BR12 : l'interface ne suit pas le cours en anglais (${JSON.stringify(lg.enUi)})`);
@@ -465,8 +466,8 @@ async function run(opts = {}) {
         }
         for (const w of ['Home', 'Test', 'Courses', 'Games', 'Progress', 'Log out']) if (!lg.enNav.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent du menu en anglais`);
         const nv = ['Accueil', 'Cours', 'Jeux', 'Progrès', 'Déconnexion', 'Établissements', 'Test sur base'].filter((w) => new RegExp('(^|[^A-Za-zÀ-ÿ])' + w + '([^A-Za-zÀ-ÿ]|$)').test(lg.enNav)); if (nv.length) problems.push(`BR12 : du français dans le menu en anglais : ${nv.join(', ')}`);
-        for (const w of ['Accents', 'Required', 'Tolerated', 'Course language', 'All settings']) if (!lg.enChip.includes(w)) problems.push(`BR12 : « ${w} » absent du menu du clavier en anglais`);
-        const ch = ['Exigés', 'Tolérés', 'Disposition', 'Langue du cours', 'Tous les réglages', 'Famille'].filter((w) => lg.enChip.includes(w)); if (ch.length) problems.push(`BR12 : du français dans le menu du clavier en anglais : ${ch.join(', ')}`);
+        for (const w of ['Accents', 'Required', 'Tolerated', 'All settings']) if (!lg.enChip.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent du menu du clavier en anglais`);
+        const ch = ['Exigés', 'Tolérés', 'Disposition', 'Langue du cours', 'Tous les réglages', 'Famille'].filter((w) => lg.enChip.toLowerCase().includes(w.toLowerCase())); if (ch.length) problems.push(`BR12 : du français dans le menu du clavier en anglais : ${ch.join(', ')}`);
         for (const w of ['Your speed', 'Your records', 'Take a test', 'Best speed', 'Average accuracy', 'Lessons passed', 'Word Strike']) if (!lg.enStats.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent de la page Progrès en anglais`);
         const ps = ['Ta vitesse', 'Tes records', 'Faire un test', 'Meilleure vitesse', 'Précision moyenne', 'Leçons validées', 'Frappe-mots', 'certificat', 'Certification', 'Série', 'Aucun test'].filter((w) => lg.enStats.toLowerCase().includes(w.toLowerCase())); if (ps.length) problems.push(`BR12 : du français sur la page Progrès en anglais : ${ps.join(', ')}`);
         for (const w of ['Gaze tracker', 'Sounds', 'Game sounds', 'Keyboard format', 'Profile', 'Account', 'Privacy (GDPR)', 'Export my data', 'Delete my account', 'Log out']) if (!lg.enSettings.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent des Réglages en anglais`);
@@ -478,7 +479,8 @@ async function run(opts = {}) {
         for (const w of ['Delete my account', 'PASSWORD', 'Delete permanently', 'Cancel', 'cannot be undone']) if (!lg.enDelete.includes(w)) problems.push(`BR12 : « ${w} » absent de la fenêtre de suppression du compte en anglais`);
         for (const w of ['Supprimer', 'MOT DE PASSE', 'Annuler', 'irréversible']) if (lg.enDelete.includes(w)) problems.push(`BR12 : du français dans la fenêtre de suppression du compte : ${w}`);
         if (lg.frUi.t !== 'Vitesse' || lg.frUi.lang !== 'fr') problems.push(`BR12 : retour au français, l'interface reste en anglais (${JSON.stringify(lg.frUi)})`);
-        if (lg.rowEn.join('|') !== 'Français|English*') problems.push(`BR12 : langue active après le passage (${lg.rowEn.join('|')})`);
+        if (lg.rowEn.join('|') !== 'Belgium*|France|Français|English*') problems.push(`BR12 : langue active après le passage (${lg.rowEn.join('|')})`);
+        if (lg.flagEn !== 'Country and language: Belgium, English') problems.push(`BR12 : le bouton du drapeau ne suit pas la langue (${lg.flagEn})`);
         if (!lg.okQ || lg.q.course !== 'en/qwerty' || lg.q.lessons !== 58) problems.push(`BR12 : en anglais, passer à QWERTY garde la langue (${JSON.stringify(lg.q)})`);
         if (!lg.okFr || lg.fr.course !== 'fr/qwerty' || lg.fr.lessons !== 68 || lg.fr.vocab < 400) problems.push(`BR12 : retour au français (${JSON.stringify(lg.fr)})`);
         exceptions.splice(0).forEach((e) => problems.push(`BR12 : exception : ${e}`));
@@ -531,6 +533,9 @@ async function run(opts = {}) {
         if (/Choisis ton|module du jour|Mon enseignement/.test(e1.lessons)) problems.push('BR14 : la page « Cours » française s\'affiche sur /en/typing-lessons');
         if (e1.path3 !== '/en' || !/Learn to type/.test(e1.home)) problems.push(`BR14 : accueil /en (${e1.path3})`);
         const fr14 = ['Accueil', 'Jeux', 'Progrès', 'Déconnexion'].filter((w) => new RegExp('(^|[^A-Za-zÀ-ÿ])' + w + '([^A-Za-zÀ-ÿ]|$)').test(e1.navText)); if (fr14.length) problems.push(`BR14 : du français dans le menu de /en : ${fr14.join(', ')}`);
+        const swLang = await ev(`(async()=>{go('games');await new Promise(r=>setTimeout(r,400));kpRegionRender();const items=[...document.querySelectorAll('#nav-region-menu .nav-region-item')].map(b=>b.innerText.replace('✓','').trim()+(b.getAttribute('aria-checked')==='true'?'*':''));await kpSetSiteLanguage('fr');await new Promise(r=>setTimeout(r,500));const o={items,path:location.pathname,lang:document.documentElement.lang,games:document.getElementById('page-games').innerText};localStorage.removeItem('kp_ui');return o})()`);
+        if (swLang.items.join('|') !== 'Belgium*|France|Français|English*') problems.push(`BR14 : menu du drapeau sur /en (${swLang.items.join('|')})`);
+        if (swLang.path !== '/jeux-dactylo-en-ligne' || swLang.lang !== 'fr' || !/Choisis ton jeu/i.test(swLang.games)) problems.push(`BR14 : choisir Français dans le menu du drapeau sur /en/typing-games ne revient pas à l'adresse française (${JSON.stringify({ path: swLang.path, lang: swLang.lang })})`);
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2500); exceptions.splice(0);
         const f1 = await ev(`({lang:document.documentElement.lang,href:document.getElementById('nav-lessons').getAttribute('href'),text:document.getElementById('main-nav').innerText})`);
         if (f1.lang !== 'fr' || f1.href !== '/cours-dactylo-en-ligne' || !/Accueil/.test(f1.text)) problems.push(`BR14 : « / » n'est plus en français (${f1.lang}, ${f1.href})`);
