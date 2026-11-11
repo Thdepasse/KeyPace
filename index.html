@@ -4691,7 +4691,7 @@ function showConvertPopup(kind,res){
   } : {
     icon:ICONS.zap, eyebrow:kpT('conv.u_eyebrow'), title:kpT('conv.u_title'),
     body:kpT('conv.u_body'),
-    feats:[kpT('up.f_full'),kpT('conv.u_f2'),kpT('conv.u_f3')],
+    feats:[kpT('up.f_full'),kpT('conv.u_f2')].concat(KPI18n.lang()==='fr'?[kpT('conv.u_f3')]:[]), /* la certification de niveau n'existe pas en anglais */
     cta:kpT('conv.u_cta'),
     act:()=>openModal('upgrade-modal')
   };
