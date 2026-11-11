@@ -284,7 +284,9 @@ module.exports = async function handler(req, res) {
 
     await sb(`/users?id=eq.${user.id}`, {
       method: 'PATCH',
-      body: JSON.stringify({ verification_token: resetToken, verification_expires_at: expiresAt }),
+      // Colonnes dédiées : réutiliser verification_token écrasait le lien de
+      // confirmation d'inscription encore en attente (compte non vérifié).
+      body: JSON.stringify({ reset_token: resetToken, reset_expires_at: expiresAt }),
     });
 
     if (RESEND_API_KEY && user.email) {
@@ -306,11 +308,11 @@ module.exports = async function handler(req, res) {
     const { resetToken, newPasswordHash } = body;
     if (!resetToken || !newPasswordHash) return res.status(400).json({ error: 'Paramètres manquants.' });
 
-    const r = await sb(`/users?verification_token=eq.${encodeURIComponent(resetToken)}&select=id,verification_expires_at`);
+    const r = await sb(`/users?reset_token=eq.${encodeURIComponent(resetToken)}&select=id,reset_expires_at`);
     const user = r.data && r.data[0];
     if (!user) return res.status(404).json({ error: 'Lien invalide ou déjà utilisé.' });
 
-    if (new Date(user.verification_expires_at) < new Date())
+    if (!user.reset_expires_at || new Date(user.reset_expires_at) < new Date())
       return res.status(410).json({ error: 'Ce lien a expiré. Fais une nouvelle demande.' });
 
     const newSession = require('crypto').randomUUID();
@@ -318,8 +320,8 @@ module.exports = async function handler(req, res) {
       method: 'PATCH',
       body: JSON.stringify({
         password_hash: hashPassword(newPasswordHash),
-        verification_token: null,
-        verification_expires_at: null,
+        reset_token: null,
+        reset_expires_at: null,
         session_token: newSession,
         session_expires_at: sessionExpiresAt(),
         last_seen_at: new Date().toISOString(),

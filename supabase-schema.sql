@@ -1018,3 +1018,15 @@ create index if not exists institutions_contact_email_idx on institutions(contac
 -- ───────────────────────────────────────────────────────────────
 alter table classes add column if not exists goal_wpm integer check (goal_wpm is null or goal_wpm between 5 and 80);
 alter table classes add column if not exists goal_errors integer check (goal_errors is null or goal_errors between 0 and 30);
+
+-- ───────────────────────────────────────────────────────────────
+-- Jeton de réinitialisation du mot de passe séparé (nov. 2026)
+-- reset-request (api/login.js) écrivait son jeton dans verification_token :
+-- chez un compte pas encore vérifié, il écrasait le lien de confirmation
+-- d'inscription envoyé par email, qui ne fonctionnait plus. Il a désormais
+-- ses propres colonnes ; verification_token ne sert plus qu'à la confirmation
+-- d'inscription et au changement d'email. Idempotent.
+-- ───────────────────────────────────────────────────────────────
+alter table users
+  add column if not exists reset_token text,
+  add column if not exists reset_expires_at timestamptz;

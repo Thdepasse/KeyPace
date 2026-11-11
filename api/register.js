@@ -342,7 +342,11 @@ async function verifyEmail(req, res) {
         return redirect(res, `${APP_URL}?verified=expired`);
       await sb(`/users?id=eq.${user.id}`, {
         method: 'PATCH',
-        body: JSON.stringify({ email: user.pending_email, pending_email: null, verification_token: null, verification_expires_at: null }),
+        // email_verified : le clic prouve que la nouvelle adresse (désormais
+        // celle du compte) est bien la sienne. Sans ça, un compte non vérifié
+        // qui changeait d'email avant de confirmer (son jeton d'inscription
+        // ayant été remplacé par celui-ci) ne passait jamais « vérifié ».
+        body: JSON.stringify({ email: user.pending_email, email_verified: true, pending_email: null, verification_token: null, verification_expires_at: null }),
       });
       return redirect(res, `${APP_URL}?verified=email-changed`);
     }
