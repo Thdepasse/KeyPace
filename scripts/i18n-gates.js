@@ -29,7 +29,10 @@ function i1(opts) {
   for (const m of html.matchAll(/\bkpT(n?)\(/g)) { // arguments lus jusqu'à la parenthèse fermante (les appels peuvent contenir des parenthèses)
     let d = 1; let i = m.index + m[0].length; const start = i;
     while (i < html.length && d > 0) { const c = html[i++]; if (c === '(') d++; else if (c === ')') d--; }
-    const args = html.slice(start, i - 1);
+    // seule la clé (premier argument, jusqu'à la première virgule hors parenthèses) compte : les appels imbriqués dans les paramètres sont lus à part
+    const all = html.slice(start, i - 1); let dd = 0; let cut = all.length;
+    for (let k = 0; k < all.length; k++) { const c = all[k]; if ('([{'.includes(c)) dd++; else if (')]}'.includes(c)) dd--; else if (c === ',' && dd === 0) { cut = k; break; } }
+    const args = all.slice(0, cut);
     for (const q of args.matchAll(/'([a-z0-9]+(?:\.[A-Za-z0-9_]+)+)'/g)) {
       if (m[1] === 'n') { used.add(q[1] + '_one'); used.add(q[1] + '_other'); } else used.add(q[1]);
     }
