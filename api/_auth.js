@@ -56,4 +56,14 @@ function safeEqual(a, b) {
   return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
 }
 
-module.exports = { hashPassword, verifyPassword, safeEqual };
+// La colonne verification_token sert à trois jetons : confirmation
+// d'inscription, réinitialisation du mot de passe (reset-request) et
+// changement d'email (pending_email). Seul le premier doit bloquer la
+// connexion : un compte déjà vérifié qui a demandé un nouveau mot de passe
+// sans cliquer le lien, ou un changement d'adresse pas encore confirmé, doit
+// toujours pouvoir se connecter.
+function needsEmailVerification(user) {
+  return !!(user && !user.email_verified && user.verification_token);
+}
+
+module.exports = { hashPassword, verifyPassword, safeEqual, needsEmailVerification };

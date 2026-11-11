@@ -3,7 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const crypto = require('crypto');
-const { hashPassword, verifyPassword } = require('./_auth');
+const { hashPassword, verifyPassword, needsEmailVerification } = require('./_auth');
 
 const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
 
@@ -47,4 +47,15 @@ test('entrées vides ou nulles ne cassent pas', () => {
   assert.equal(verifyPassword('x', null).ok, false);
   assert.equal(verifyPassword(null, hashPassword('x')).ok, false);
   assert.equal(verifyPassword('x', 'scrypt$deadbeef').ok, false); // format tronqué
+});
+
+test('needsEmailVerification : seul un compte non vérifié avec jeton est bloqué', () => {
+  assert.equal(needsEmailVerification({ email_verified: false, verification_token: 'abc' }), true);
+  // Compte vérifié avec un jeton de réinitialisation de mot de passe en attente
+  assert.equal(needsEmailVerification({ email_verified: true, verification_token: 'abc' }), false);
+  // Compte vérifié avec un changement d'email en attente
+  assert.equal(needsEmailVerification({ email_verified: true, verification_token: 'abc', pending_email: 'x@y.be' }), false);
+  // Anciens comptes sans jeton émis
+  assert.equal(needsEmailVerification({ email_verified: false, verification_token: null }), false);
+  assert.equal(needsEmailVerification(null), false);
 });

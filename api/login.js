@@ -1,5 +1,5 @@
 const { Resend } = require('resend');
-const { hashPassword, verifyPassword, safeEqual } = require('./_auth');
+const { hashPassword, verifyPassword, safeEqual, needsEmailVerification } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -574,7 +574,7 @@ module.exports = async function handler(req, res) {
     }
     return res.status(401).json({ error: 'Identifiants incorrects.' });
   }
-  if (user.verification_token) return res.status(403).json({ error: 'Confirme ton adresse email avant de te connecter. Vérifie ta boîte mail.', code: 'EMAIL_NOT_VERIFIED' });
+  if (needsEmailVerification(user)) return res.status(403).json({ error: 'Confirme ton adresse email avant de te connecter. Vérifie ta boîte mail.', code: 'EMAIL_NOT_VERIFIED' });
 
   // RGPD mineurs : un compte < 13 ans (hors établissement) reste utilisable
   // dès l'inscription, mais parent_consent_token (voir api/register.js —
