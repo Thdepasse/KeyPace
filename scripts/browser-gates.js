@@ -413,7 +413,7 @@ async function run(opts = {}) {
           {const m=document.getElementById('nav-region-menu').getBoundingClientRect();out.inFrame=m.left>=0&&m.right<=innerWidth&&m.width>0;}
           document.getElementById('nav-region-btn').click();
           await kpSetSiteLanguage('en');out.okEn=kpCourseId()==='en/azerty';
-          out.en={course:kpCourseId(),lang:kpContentLang(),lessons:ALL_LESSONS.length,first:ALL_LESSONS[0].id+':'+ALL_LESSONS[0].keys,vocab:GAME_VOCAB.length,test:app.makeSession('test').text,badge:kpCourseBadgeHTML().includes('anglais')};
+          out.en={course:kpCourseId(),lang:kpContentLang(),lessons:ALL_LESSONS.length,first:ALL_LESSONS[0].id+':'+ALL_LESSONS[0].keys,vocab:GAME_VOCAB.length,test:app.makeSession('test').text,badge:/anglais|English/.test(kpCourseBadgeHTML())&&!/bêta|beta/i.test(kpCourseBadgeHTML())};
           out.enUi={t:kpT('typ.speed'),lang:document.documentElement.lang};
           app._skipModulesHub=false;app.sess=null;go('lessons');await new Promise(r=>setTimeout(r,400));
           out.enList=document.getElementById('page-lessons').innerText;
@@ -622,8 +622,8 @@ async function run(opts = {}) {
         const intro = await ev("(()=>{app._showIntro=true;app.renderView('lessons');const t=document.getElementById('page-lessons').innerText;app._showIntro=false;return t})()");
         if (!/A·S·D·F/.test(intro) || /Q·S·D·F/.test(intro)) problems.push('BR8 : l\'écran d\'introduction cite encore la position de repos AZERTY (Q·S·D·F) en cours QWERTY');
         await ev("app.renderView('test');true");
-        const badge = await ev("(()=>{app._skipModulesHub=true;app.sess=null;app._showIntro=false;go('lessons');const t=document.getElementById('page-lessons').innerText;const ok={badge:/Cours QWERTY \\(bêta\\)/.test(t),r4:/A et point-virgule/.test(t),azerty:/Q et M/.test(t)};app._skipModulesHub=false;return ok})()");
-        if (!badge.badge) problems.push('BR8 : la page des leçons n\'affiche pas « Cours QWERTY (bêta) » en cours QWERTY');
+        const badge = await ev("(()=>{app._skipModulesHub=true;app.sess=null;app._showIntro=false;go('lessons');const t=document.getElementById('page-lessons').innerText;const ok={badge:/Cours QWERTY/.test(t)&&!/Cours QWERTY \\(bêta\\)/.test(t),r4:/A et point-virgule/.test(t),azerty:/Q et M/.test(t)};app._skipModulesHub=false;return ok})()");
+        if (!badge.badge) problems.push('BR8 : la page des leçons n\'affiche pas « Cours QWERTY » (sans « bêta ») en cours QWERTY');
         if (!badge.r4 || badge.azerty) problems.push(`BR8 : la liste des leçons du cours QWERTY n'est pas celle du QWERTY (A et point-virgule : ${badge.r4}, Q et M : ${badge.azerty})`);
         await shot('pastille-clavier-qwerty.png');
         await ev("[...document.querySelectorAll('#nav-kb-menu .kb-layout-btn')].find(b=>b.dataset.kbLayout==='mac-us').click();true"); await sleep(150);

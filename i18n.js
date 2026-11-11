@@ -1,6 +1,6 @@
 /* Textes de l'interface par langue. Fichier pur : chargé par index.html (balise script) et par les tests Node.
    Le français est la langue de référence et le REPLI : une clé absente en anglais s'affiche en français, donc migrer écran par écran ne casse rien.
-   Langue de l'interface : celle du cours actif (cours d'anglais = interface en anglais, bêta) ; ?ui=en ou ?ui=fr force une langue (retenue), ?ui=auto revient au suivi du cours.
+   Langue de l'interface : celle du cours actif (cours d'anglais = interface en anglais) ; ?ui=en ou ?ui=fr force une langue (retenue), ?ui=auto revient au suivi du cours.
    Valeurs : du HTML (utilisé dans innerHTML) ; les paramètres s'écrivent {nom}. Pluriel : clé_one (1) et clé_other (tout le reste).
    Règles : aucun tiret long ; l'anglais est britannique (colour, centre, whilst). */
 (function (root) {
@@ -342,6 +342,8 @@
       'simon.sr_input': 'À toi de retaper la séquence.',
       'simon.sr_over': 'Partie terminée. Score {score}.',
       // ── Menu du haut et pastille clavier ──
+      'lessons.course_badge_en': 'Cours d’anglais, {kb}',
+      'lessons.course_badge_qwerty': 'Cours QWERTY',
       'nav.home': 'Accueil',
       'nav.test': 'Test',
       'nav.test_length': 'Test sur base de longueur',
@@ -933,6 +935,8 @@
       'simon.score_up': 'SCORE',
       'simon.sr_input': 'Your turn to type the sequence back.',
       'simon.sr_over': 'Game over. Score {score}.',
+      'lessons.course_badge_en': 'English course, {kb}',
+      'lessons.course_badge_qwerty': 'QWERTY course',
       'nav.home': 'Home',
       'nav.test': 'Test',
       'nav.test_length': 'Test by length',
