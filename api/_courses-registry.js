@@ -15,6 +15,7 @@ const COURSE_ACCESS = {
   'en/qwerty': { status: 'en ligne' },
   // Néerlandais (Belgique, clavier AZERTY belge) : cours seulement, interface encore en français ; bêta (comptes testeurs) le temps de la relecture par un néerlandophone.
   'nl/azerty': { status: 'bêta' },
+  'nl/qwerty': { status: 'bêta' }, // Pays-Bas et claviers US/UK ; mêmes conditions que nl/azerty
 };
 const COURSE_IDS = Object.keys(COURSE_ACCESS);
 const COURSE_ID_RE = /^[a-z]{2,3}(-[A-Z]{2})?\/[a-z0-9-]{2,24}$/;

@@ -37,17 +37,25 @@ function build(LANG_ = LANG, FAMILY_ = FAMILY) {
   const curriculum = { modules, free: lessons.slice(0, 10).map((l) => l.id) };
   const keyboards = FAMILY_ === 'qwerty' ? require('./build-qwerty-keyboards').buildKeyboards(lessons.flatMap((l) => [l.text || '', l.keys])) : {};
   // Cours dans une autre langue : noms des claviers et gestes de frappe dans la langue du cours (l'interface suit le cours).
-  if (LANG_ === 'en') {
+  if (LANG_ === 'en' || LANG_ === 'nl') {
     const I = require('../i18n.js');
-    const NAMES = {
-      'windows-us': ['United States (US)', 'US'], 'windows-us-intl': ['United States international', 'US intl'], 'windows-uk': ['United Kingdom (UK)', 'UK'],
-      'windows-uk-extended': ['United Kingdom extended', 'UK extended'], 'mac-us': ['Mac, United States (ABC)', 'Mac US'], 'mac-us-intl-pc': ['Mac, United States international PC', 'Mac US intl'],
-      'mac-british': ['Mac, United Kingdom', 'Mac UK'], 'linux-us-intl': ['Linux, United States international', 'Linux US intl'],
+    const NAMES_BY_LANG = {
+      en: {
+        'windows-us': ['United States (US)', 'US'], 'windows-us-intl': ['United States international', 'US intl'], 'windows-uk': ['United Kingdom (UK)', 'UK'],
+        'windows-uk-extended': ['United Kingdom extended', 'UK extended'], 'mac-us': ['Mac, United States (ABC)', 'Mac US'], 'mac-us-intl-pc': ['Mac, United States international PC', 'Mac US intl'],
+        'mac-british': ['Mac, United Kingdom', 'Mac UK'], 'linux-us-intl': ['Linux, United States international', 'Linux US intl'],
+      },
+      nl: {
+        'windows-us': ['Verenigde Staten (US)', 'US'], 'windows-us-intl': ['Verenigde Staten internationaal', 'US intl'], 'windows-uk': ['Verenigd Koninkrijk (UK)', 'UK'],
+        'windows-uk-extended': ['Verenigd Koninkrijk uitgebreid', 'UK uitgebreid'], 'mac-us': ['Mac, Verenigde Staten (ABC)', 'Mac US'], 'mac-us-intl-pc': ['Mac, Verenigde Staten internationaal pc', 'Mac US intl'],
+        'mac-british': ['Mac, Verenigd Koninkrijk', 'Mac UK'], 'linux-us-intl': ['Linux, Verenigde Staten internationaal', 'Linux US intl'],
+      },
     };
+    const NAMES = NAMES_BY_LANG[LANG_]; const how = LANG_ === 'en' ? I.howEn : I.howNl;
     for (const [id, k] of Object.entries(keyboards)) {
-      if (!NAMES[id]) throw new Error(`clavier « ${id} » sans nom anglais (scripts/build-qwerty-course.js)`);
+      if (!NAMES[id]) throw new Error(`clavier « ${id} » sans nom ${LANG_ === 'en' ? 'anglais' : 'néerlandais'} (scripts/build-qwerty-course.js)`);
       k.label = NAMES[id][0]; k.short = NAMES[id][1];
-      for (const c of Object.keys(k.how || {})) k.how[c] = I.howEn(k.how[c]);
+      for (const c of Object.keys(k.how || {})) k.how[c] = how(k.how[c]);
     }
   }
   // Cours dans une autre langue : le vocabulaire des jeux (mots d'entraînement filtrés par les lettres apprises) = lexique vérifié de la langue (les deux claviers partagent le même vocabulaire), mots en minuscules

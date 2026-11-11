@@ -166,6 +166,78 @@ module.exports = {
     "alternates": {"en-GB": "/en/class"},
     "jsonld": []
   },
+  "nl-home": {
+    "path": "/nl",
+    "lang": "nl",
+    "title": "KeyPace: leer blind typen, test je snelheid, speel typspellen",
+    "description": "Gratis blind-typtrainer: snelheidstest, lessen stap voor stap voor AZERTY- en QWERTY-toetsenborden, typspellen en voortgang.",
+    "index": false,
+    "alternates": {"nl-BE": "/nl"},
+    "jsonld": []
+  },
+  "nl-test": {
+    "path": "/nl/typtest",
+    "lang": "nl",
+    "title": "Typtest: tik de zin en zie je woorden per minuut | KeyPace",
+    "description": "Tik de zin en ontdek je snelheid in woorden per minuut, je nauwkeurigheid en je badge. Gratis typtest van KeyPace.",
+    "index": false,
+    "alternates": {"nl-BE": "/nl/typtest"},
+    "jsonld": []
+  },
+  "nl-testtime": {
+    "path": "/nl/typtest-tijd",
+    "lang": "nl",
+    "title": "Typtest op tijd: 30 s, 1, 3, 5 of 10 min | KeyPace",
+    "description": "Meet je typsnelheid en nauwkeurigheid in 30 seconden, 1, 3, 5 of 10 minuten. Gratis typtest op tijd in je browser.",
+    "index": false,
+    "alternates": {"nl-BE": "/nl/typtest-tijd"},
+    "jsonld": []
+  },
+  "nl-testchoix": {
+    "path": "/nl/typtesten",
+    "lang": "nl",
+    "title": "Kies je typtest: een zin of een timer | KeyPace",
+    "description": "Een zin overtypen of een test op tijd van 30 seconden tot 10 minuten: kies de typtest die bij je past.",
+    "index": false,
+    "alternates": {"nl-BE": "/nl/typtesten"},
+    "jsonld": []
+  },
+  "nl-lessons": {
+    "path": "/nl/typlessen",
+    "lang": "nl",
+    "title": "Blind typen leren: lessen stap voor stap | KeyPace",
+    "description": "Typlessen stap voor stap voor AZERTY- en QWERTY-toetsenborden: basisrij, bovenste rij, onderste rij, hoofdletters, leestekens, cijfers en symbolen.",
+    "index": false,
+    "alternates": {"nl-BE": "/nl/typlessen"},
+    "jsonld": []
+  },
+  "nl-games": {
+    "path": "/nl/typspellen",
+    "lang": "nl",
+    "title": "Typspellen: Woordenslag, Sprint, Typrace en meer | KeyPace",
+    "description": "Oefen snel typen al spelend: Woordenslag, de Sprint, Typrace, Woordensimon en de Baas van de week.",
+    "index": false,
+    "alternates": {"nl-BE": "/nl/typspellen"},
+    "jsonld": []
+  },
+  "nl-stats": {
+    "path": "/nl/voortgang",
+    "lang": "nl",
+    "title": "Mijn voortgang | KeyPace",
+    "description": "Volg je typvoortgang: snelheid, nauwkeurigheid, reeks dagen, behaalde lessen en moeilijke toetsen.",
+    "index": false,
+    "alternates": {"nl-BE": "/nl/voortgang"},
+    "jsonld": []
+  },
+  "nl-classes": {
+    "path": "/nl/klas",
+    "lang": "nl",
+    "title": "Mijn klas | KeyPace",
+    "description": "Klassen en huiswerk op KeyPace.",
+    "index": false,
+    "alternates": {"nl-BE": "/nl/klas"},
+    "jsonld": []
+  },
   "fr-home": {
     "path": "/fr",
     "title": "KeyPace France : apprendre à taper au clavier, du CE2 à la terminale",

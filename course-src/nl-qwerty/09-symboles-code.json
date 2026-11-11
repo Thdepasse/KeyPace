@@ -1,0 +1,171 @@
+{
+ "position": 9,
+ "name": "9. Geavanceerde symbolen",
+ "kind": "symboles",
+ "lessons": [
+  {
+   "id": "sym7",
+   "title": "[ ]: vierkante haken",
+   "keys": "[ ]",
+   "teaches": "[]",
+   "row": "haut",
+   "fingers": [
+    "rp"
+   ],
+   "tip": "De vierkante haken staan rechts van de P, aan het eind van de bovenste rij: je rechterpink reikt ernaartoe, zonder Shift.",
+   "tuto": {
+    "intro": "Vierkante haken [ ] typ je met je rechterpink, op de twee toetsen rechts van de P. Je gebruikt ze in code (lijst[0]) en voor toegevoegde woorden tussen haken. De exacte beweging voor jouw toetsenbord staat hieronder.",
+    "rules": [
+     {
+      "icon": "⬆️",
+      "t": "Rechts van de P",
+      "d": "Je rechterpink strekt zich voorbij de P uit: [ zit er direct rechts van, ] net daarna. Shift heb je niet nodig."
+     },
+     {
+      "icon": "🔁",
+      "t": "Openen en sluiten",
+      "d": "Elke haak die je opent, sluit je ook. Typ ze achter elkaar: openen, typen, sluiten."
+     },
+     {
+      "icon": "💻",
+      "t": "In code",
+      "d": "lijst[0], data[3], item[i]: de vierkante haak wijst een plek in een lijst aan."
+     }
+    ],
+    "tip": "Doel: [ en ] typen met je rechterpink zonder je basispositie te verlaten."
+   },
+   "text": "lijst[0] lijst[1] [a] [b] item[i] namen[2] [ja] [nee] [einde] data[3] [1] [2]"
+  },
+  {
+   "id": "sym8",
+   "title": "{ }: accolades",
+   "keys": "{ }",
+   "teaches": "{}",
+   "row": "haut",
+   "fingers": [
+    "rp"
+   ],
+   "tip": "De accolades staan op dezelfde toetsen als de vierkante haken, met Shift: je rechterpink reikt omhoog en je linkerpink houdt Shift vast.",
+   "tuto": {
+    "intro": "Accolades { } delen de toetsen van de vierkante haken: je typt ze met Shift. Je ziet ze in code en in opmaakbestanden. De exacte beweging voor jouw toetsenbord staat hieronder.",
+    "rules": [
+     {
+      "icon": "⇧",
+      "t": "Shift met de andere hand",
+      "d": "Net als bij hoofdletters: houd Shift ingedrukt met de pink van de hand die de toets niet typt. Shift plus de toets geeft het teken."
+     },
+     {
+      "icon": "🔁",
+      "t": "Openen en sluiten",
+      "d": "Net als bij vierkante haken: een accolade die je opent, sluit je ook. Wen eraan om ze in paren te typen."
+     },
+     {
+      "icon": "💻",
+      "t": "In code",
+      "d": "{stijl: vet}, {x: 1}: accolades omsluiten een blok code of een object."
+     }
+    ],
+    "tip": "Doel: { en } typen met Shift en je rechterpink."
+   },
+   "text": "{a} {b} {x: 1} {y: 2} {einde} {ok} {stijl: vet} {naam: tom} {ja} {nee}"
+  },
+  {
+   "id": "sym9",
+   "title": "\\ en |: backslash en verticale streep",
+   "keys": "\\ |",
+   "teaches": "\\|",
+   "row": "haut",
+   "fingers": [
+    "rp"
+   ],
+   "tip": "De backslash en de verticale streep staan op de toets boven Enter, met je rechterpink; de verticale streep vraagt Shift.",
+   "tuto": {
+    "intro": "De backslash \\ en de verticale streep | delen een toets, helemaal aan het eind van de bovenste rij, boven Enter. De verticale streep typ je met Shift. De exacte beweging voor jouw toetsenbord staat hieronder.",
+    "rules": [
+     {
+      "icon": "⬆️",
+      "t": "Boven Enter",
+      "d": "Je rechterpink strekt zich uit tot het eind van de bovenste rij, voorbij de vierkante haken. \\ typ je los, | met Shift."
+     },
+     {
+      "icon": "📁",
+      "t": "Windows-paden",
+      "d": "C:\\School\\Tom: de backslash scheidt mappen in Windows, terwijl de gewone schuine streep / ze elders scheidt."
+     },
+     {
+      "icon": "➡️",
+      "t": "De verticale streep",
+      "d": "a | b verbindt twee opdrachten of scheidt twee keuzes: links | rechts."
+     }
+    ],
+    "tip": "Doel: \\ en | typen met je rechterpink, met Shift voor de verticale streep."
+   },
+   "text": "C:\\School\\Tom a|b a||b c\\d \\n \\t links | rechts /thuis | grep \\\\ || C:\\Werk"
+  },
+  {
+   "id": "sym10",
+   "title": "< >: punthaken",
+   "keys": "< >",
+   "teaches": "<>",
+   "row": "bas",
+   "fingers": [
+    "rm",
+    "rr"
+   ],
+   "tip": "De punthaken staan op de komma- en de puntentoets, met Shift: je rechtermiddelvinger en -ringvinger reiken naar beneden en je linkerpink houdt Shift vast.",
+   "tuto": {
+    "intro": "Punthaken < > typ je met Shift op de komma- en de puntentoets. Je ziet ze in HTML-tags: <p>tekst</p>. De exacte beweging voor jouw toetsenbord staat hieronder.",
+    "rules": [
+     {
+      "icon": "⇧",
+      "t": "Shift met de andere hand",
+      "d": "Net als bij hoofdletters: houd Shift ingedrukt met de pink van de hand die de toets niet typt. Shift plus de toets geeft het teken."
+     },
+     {
+      "icon": "🏷️",
+      "t": "HTML-tags",
+      "d": "<p>tekst</p>: de openende punthaak, de naam van de tag, de sluitende punthaak. De schuine streep / sluit de tag."
+     },
+     {
+      "icon": "🔁",
+      "t": "Openen en sluiten",
+      "d": "Elke tag die je opent, sluit je met de schuine streep. Oefen die twee achter elkaar."
+     }
+    ],
+    "tip": "Doel: < en > typen met Shift en de vingers van je rechterhand."
+   },
+   "text": "<html> </html> <p>tekst</p> <div> </div> <b>vet</b> <i>schuin</i> <a> </a> <h1>titel</h1> <br> <ul> </ul>"
+  },
+  {
+   "id": "sym11",
+   "title": "Herhaling: alle symbolen in tekst",
+   "keys": "alle symbolen",
+   "teaches": "",
+   "howText": true,
+   "tip": "Je brengt alle symbolen samen in een tekst met een adres, het web, code en percentages. Zie de beweging vooraf aankomen: direct, met Shift of dode toets.",
+   "tuto": {
+    "intro": "Je brengt alle symbolen samen in een tekst met een e-mailadres, het web, code en percentages. De grote mix! De exacte beweging voor jouw toetsenbord staat hieronder.",
+    "rules": [
+     {
+      "icon": "🧩",
+      "t": "Alle combinaties",
+      "d": "Shift, dode toetsen, directe tekens: elk symbool heeft zijn eigen beweging. Gebruik alles wat je in de laatste modules hebt geleerd."
+     },
+     {
+      "icon": "🧭",
+      "t": "Zie de beweging aankomen",
+      "d": "Bepaal voor elk symbool: direct, met Shift of dode toets? Die reflex bespaart je tijd."
+     },
+     {
+      "icon": "💻",
+      "t": "Het hele toetsenbord",
+      "d": "De symbolen beheersen betekent een adres, een stukje code of een formule typen zonder ooit vast te lopen."
+     }
+    ],
+    "tip": "Doel: alle symbolen aan elkaar rijgen in echte tekst, elke beweging op het juiste moment."
+   },
+   "text": "hallo@school.be (twaalf) https://winkel.nl #tag {css: vet} <html> 50%=ok a+b=c [einde] ~/thuis \"waarde\" 3*4 C:\\School a|b",
+   "maxLen": 160
+  }
+ ]
+}

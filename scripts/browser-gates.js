@@ -412,10 +412,11 @@ async function run(opts = {}) {
           document.getElementById('nav-region-btn').click();await new Promise(r=>setTimeout(r,150));
           {const m=document.getElementById('nav-region-menu').getBoundingClientRect();out.inFrame=m.left>=0&&m.right<=innerWidth&&m.width>0;}
           document.getElementById('nav-region-btn').click();
-          kpSetAllowed(['fr/qwerty','en/azerty','en/qwerty','nl/azerty']);out.rowNl=items();
+          kpSetAllowed(['fr/qwerty','en/azerty','en/qwerty','nl/azerty','nl/qwerty']);out.rowNl=items();
           await kpSetSiteLanguage('nl');await new Promise(r=>setTimeout(r,300));
           out.nl={course:kpCourseId(),content:kpContentLang(),lessons:ALL_LESSONS.length,first:ALL_LESSONS[0].id+':'+ALL_LESSONS[0].keys,names:[...new Set(ALL_LESSONS.map(l=>l.title))].length,vocab:GAME_VOCAB.length,ui:KPI18n.lang(),sel:items(),badge:kpCourseBadgeHTML(),test:app.makeSession('test').text};
-          kpSetAllowed(['fr/qwerty','en/azerty','en/qwerty']);await new Promise(r=>setTimeout(r,300));out.nlGone={course:kpCourseId(),items:items()};
+          {const okq=await kpSetCourse('nl/qwerty');out.nlq={ok:okq,course:kpCourseId(),lessons:ALL_LESSONS.length,first:ALL_LESSONS[0].id+':'+ALL_LESSONS[0].keys,kb:Object.values(KB_QWERTY).map(k=>k.label).join('|'),test:app.makeSession('test').text,badge:kpCourseBadgeHTML()};}
+          kpSetAllowed(['fr/qwerty','en/azerty','en/qwerty']);await new Promise(r=>setTimeout(r,300));out.nlGone={course:kpCourseId(),ui:KPI18n.lang()};await kpSetSiteLanguage('fr');out.nlBack={course:kpCourseId(),items:items()};
           await kpSetSiteLanguage('en');out.okEn=kpCourseId()==='en/azerty';
           out.en={course:kpCourseId(),lang:kpContentLang(),lessons:ALL_LESSONS.length,first:ALL_LESSONS[0].id+':'+ALL_LESSONS[0].keys,vocab:GAME_VOCAB.length,test:app.makeSession('test').text,badge:/anglais|English/.test(kpCourseBadgeHTML())&&!/bêta|beta/i.test(kpCourseBadgeHTML())};
           out.enUi={t:kpT('typ.speed'),lang:document.documentElement.lang};
@@ -450,10 +451,12 @@ async function run(opts = {}) {
         if (lg.row.join('|') !== 'Belgique*|France|Français*|English') problems.push(`BR12 : choix de langue pour un testeur (${lg.row.join('|')})`);
         if (!lg.inFrame) problems.push('BR12 : le menu du drapeau sort de l\'écran avec la ligne de langue');
         if (lg.rowNl.join('|') !== 'Belgique*|France|Français*|English|Nederlands') problems.push(`BR12 : choix de langue pour un testeur du néerlandais (${lg.rowNl.join('|')})`);
-        if (lg.nl.course !== 'nl/azerty' || lg.nl.content !== 'nl' || lg.nl.lessons !== 54 || lg.nl.first !== 'r1:f j' || lg.nl.vocab < 300 || lg.nl.ui !== 'fr' || !/néerlandais/.test(lg.nl.badge) || /bêta/.test(lg.nl.badge)) problems.push(`BR12 : passage au néerlandais (${JSON.stringify(lg.nl)})`);
-        if (lg.nl.sel.join('|') !== 'Belgique*|France|Français|English|Nederlands*') problems.push(`BR12 : la langue cochée n'est pas le néerlandais (${lg.nl.sel.join('|')})`);
+        if (lg.nl.course !== 'nl/azerty' || lg.nl.content !== 'nl' || lg.nl.lessons !== 54 || lg.nl.first !== 'r1:f j' || lg.nl.vocab < 300 || lg.nl.ui !== 'nl' || !/Nederlands|Nederlandse/.test(lg.nl.badge) || /bêta|beta/i.test(lg.nl.badge)) problems.push(`BR12 : passage au néerlandais (${JSON.stringify(lg.nl)})`);
+        if (lg.nl.sel.join('|') !== 'België*|Frankrijk|Français|English|Nederlands*') problems.push(`BR12 : la langue cochée n'est pas le néerlandais (${lg.nl.sel.join('|')})`);
         if (!/^[a-z ]+$/.test(lg.nl.test || '')) problems.push(`BR12 : le texte de test d'un cours en néerlandais n'est pas fait de lettres seules (${(lg.nl.test || '').slice(0, 60)})`);
-        if (lg.nlGone.course !== 'fr/azerty' || lg.nlGone.items.join('|') !== 'Belgique*|France|Français*|English') problems.push(`BR12 : le retrait du néerlandais ne ramène pas le français (${JSON.stringify(lg.nlGone)})`);
+        if (!lg.nlq.ok || lg.nlq.course !== 'nl/qwerty' || lg.nlq.lessons !== 58 || !/Verenigde Staten/.test(lg.nlq.kb) || /United States/.test(lg.nlq.kb) || !/^[a-z ]+$/.test(lg.nlq.test) || !/QWERTY/.test(lg.nlq.badge)) problems.push(`BR12 : le cours nl/qwerty ne s'applique pas comme attendu (${JSON.stringify(lg.nlq).slice(0, 300)})`);
+        if (lg.nlGone.course !== 'fr/azerty' || lg.nlGone.ui !== 'nl') problems.push(`BR12 : sans le cours néerlandais, le cours revient au français et l'interface néerlandaise reste choisie (${JSON.stringify(lg.nlGone)})`);
+        if (lg.nlBack.course !== 'fr/azerty' || lg.nlBack.items.join('|') !== 'Belgique*|France|Français*|English') problems.push(`BR12 : choisir Français après le néerlandais ne ramène pas le français (${JSON.stringify(lg.nlBack)})`);
         if (!lg.okEn || lg.en.course !== 'en/azerty' || lg.en.lang !== 'en' || lg.en.lessons !== 54 || lg.en.first !== 'r1:f j' || lg.en.vocab < 300 || !lg.en.badge) problems.push(`BR12 : passage à l'anglais (${JSON.stringify(lg.en)})`);
         if (/[éèêàùç]/.test(lg.en.test || '') || !/^[a-z ]+$/.test(lg.en.test || '')) problems.push(`BR12 : le texte de test d'un cours en anglais n'est pas de l'anglais (${(lg.en.test || '').slice(0, 60)})`);
         if (lg.enUi.t !== 'Speed' || lg.enUi.lang !== 'en') problems.push(`BR12 : l'interface ne suit pas le cours en anglais (${JSON.stringify(lg.enUi)})`);
@@ -559,6 +562,38 @@ async function run(opts = {}) {
         exceptions.splice(0).forEach((e) => problems.push(`BR13 : exception : ${e}`));
         info.interfaceEn = 'ok';
       } catch (e) { problems.push(`BR13 : ${e.message}`); }
+
+      // BR15 : interface en néerlandais (bêta, ?ui=nl) en visiteur : accueil, test, jeux, progrès, connexion, menu : aucun mot français, aucune clé ni paramètre visible, langue retenue, adresses /nl
+      try {
+        await ev("localStorage.clear();true");
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/?ui=nl` }); await sleep(2500); exceptions.splice(0);
+        const nlS = await ev(`(async()=>{const out={lang:document.documentElement.lang,ui:localStorage.getItem('kp_ui'),course:kpCourseId()};
+          const T=async(f,id,ms)=>{f();await new Promise(r=>setTimeout(r,ms||500));const e=document.getElementById(id);const c=e.cloneNode(true);c.querySelectorAll('[data-lang-hide]').forEach(x=>x.remove());return c.innerText};
+          out.nav=document.getElementById('main-nav').innerText;
+          out.home=await T(()=>go('home'),'page-home',600);
+          app._challenge={name:'Ana',wpm:40,acc:95};out.test=await T(()=>go('test'),'page-test',500);app._challenge=null;
+          out.lessons=await T(()=>{app._skipModulesHub=false;go('lessons')},'page-lessons',500);
+          app.activeGame=null;out.games=await T(()=>go('games'),'page-games',600);
+          out.stats=await T(()=>go('stats'),'page-stats',600);
+          openAuth('register');await new Promise(r=>setTimeout(r,300));{const m=document.getElementById('auth-modal');out.auth=m.innerText+' | '+[...m.querySelectorAll('input')].map(i=>i.placeholder).join(' / ');closeModal('auth-modal');}
+          await app.openSettings();await new Promise(r=>setTimeout(r,600));{const o=document.getElementById('settings-overlay');out.settings=o?o.innerText:'(pas de fenêtre)';app.closeSettings();}
+          return out})()`);
+        if (nlS.lang !== 'nl' || nlS.ui !== 'nl') problems.push(`BR15 : langue de l'interface non prise en compte (${nlS.lang}/${nlS.ui})`);
+        const frNl = /[èêàâôîûùçœ]|(^|[^A-Za-z])(les|des|une|pour|avec|dans|tes|vous|vos|votre|cette|ces|mes|ses|sont|nous|ils|mais|chez|très|élève|gratuitement|apprends|taper|vitesse|précision|connexion|déconnexion|réglages|leçons|jeux|mots)([^A-Za-z]|$)/i;
+        for (const k of ['nav', 'home', 'test', 'games', 'stats', 'auth', 'settings']) {
+          const clean = nlS[k].split('\n').filter((l) => (l.match(/·/g) || []).length < 3 && l.trim().length > 2 && !/^\s*(\S{1,3}\s+){6,}/.test(l)).join('\n').replace(/é, è, ê…|é, è, à, ê, û, î, ô…|à\/é\/è\/ê|œ/g, ''); // le texte à taper (français tant que le cours est français) les exemples d'accents et les légendes des touches du clavier ne comptent pas
+          const m = frNl.exec(clean); if (m) problems.push(`BR15 : du français sur l'écran ${k} en néerlandais : « ${m[0].trim()} » dans « ${clean.slice(Math.max(0, m.index - 25), m.index + 35).replace(/\n/g, ' ')} »`);
+          if (/\{\w+\}|(^|[^A-Za-z0-9])(test|nav|home|game|set|prog|auth|typ|tt|tc|les)\.[a-z0-9_]+/.test(nlS[k])) problems.push(`BR15 : une clé ou un paramètre non remplacé est visible sur l'écran ${k} en néerlandais`);
+        }
+        for (const [k, w] of [['nav', 'Cursus'], ['nav', 'Spellen'], ['nav', 'Voortgang'], ['home', 'typen'], ['test', 'Typ de zin'], ['games', 'Woordenslag'], ['stats', 'snelheid'], ['auth', 'Wachtwoord']]) if (!nlS[k].toLowerCase().includes(w.toLowerCase())) problems.push(`BR15 : « ${w} » absent de l'écran ${k} en néerlandais`);
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/nl/typspellen` }); await sleep(2800); exceptions.splice(0);
+        const nlP = await ev(`({path:location.pathname,lang:document.documentElement.lang,title:document.title,games:document.getElementById('page-games').innerText,navHref:document.getElementById('nav-lessons').getAttribute('href')})`);
+        if (nlP.lang !== 'nl' || nlP.path !== '/nl/typspellen') problems.push(`BR15 : /nl/typspellen ne passe pas l'interface en néerlandais (${nlP.path}, ${nlP.lang})`);
+        if (nlP.navHref !== '/nl/typlessen') problems.push(`BR15 : le lien « Cursus » du menu ne pointe pas vers /nl (${nlP.navHref})`);
+        if (!/Typspellen/.test(nlP.title)) problems.push(`BR15 : titre de la page /nl/typspellen (${nlP.title})`);
+        await ev("localStorage.clear();true");
+        exceptions.splice(0).forEach((e) => problems.push(`BR15 : exception : ${e}`));
+      } catch (e) { problems.push(`BR15 : ${e.message}`); }
 
       // BR14 : adresses /en : l'interface est en anglais sans ?ui, l'adresse reste en /en en naviguant, et "/" reste français
       try {

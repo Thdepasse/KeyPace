@@ -1,0 +1,5115 @@
+{
+ "schema": 1,
+ "id": "nl/qwerty",
+ "note": "Généré par scripts/build-qwerty-course.js à partir de course-src/nl-qwerty/ (textes écrits à la main, relus par l'utilisateur). Ne pas modifier à la main.",
+ "handwritten": [
+  "r1",
+  "r2",
+  "r3",
+  "r4",
+  "r5",
+  "r6",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "b1",
+  "b2",
+  "b3",
+  "b4",
+  "b5",
+  "b6",
+  "w1",
+  "w2",
+  "w3",
+  "w4",
+  "w5",
+  "maj1",
+  "maj2",
+  "maj3",
+  "maj5",
+  "maj6",
+  "pon1",
+  "pon2",
+  "pon3",
+  "pon4",
+  "pon5",
+  "pon6",
+  "pon7",
+  "num1",
+  "num2",
+  "num3",
+  "num4",
+  "num5",
+  "num6",
+  "sym1",
+  "sym2",
+  "sym3",
+  "sym4",
+  "sym5",
+  "sym6",
+  "sym7",
+  "sym8",
+  "sym9",
+  "sym10",
+  "sym11",
+  "flu1",
+  "flu2",
+  "flu3",
+  "flu4",
+  "flu5",
+  "flu6"
+ ],
+ "keyboards": {
+  "windows-us": {
+   "label": "Verenigde Staten (US)",
+   "short": "US",
+   "os": "Windows",
+   "iso": false,
+   "mac": false,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "#"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "("
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp"
+     },
+     {
+      "l": "W",
+      "f": "lr"
+     },
+     {
+      "l": "E",
+      "f": "lm"
+     },
+     {
+      "l": "R",
+      "f": "li"
+     },
+     {
+      "l": "T",
+      "f": "li"
+     },
+     {
+      "l": "Y",
+      "f": "ri"
+     },
+     {
+      "l": "U",
+      "f": "ri"
+     },
+     {
+      "l": "I",
+      "f": "rm"
+     },
+     {
+      "l": "O",
+      "f": "rr"
+     },
+     {
+      "l": "P",
+      "f": "rp"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp"
+     },
+     {
+      "l": "S",
+      "f": "lr"
+     },
+     {
+      "l": "D",
+      "f": "lm"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li"
+     },
+     {
+      "l": "H",
+      "f": "ri"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm"
+     },
+     {
+      "l": "L",
+      "f": "rr"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":"
+     }
+    ],
+    [
+     {
+      "l": "Z",
+      "f": "lp"
+     },
+     {
+      "l": "X",
+      "f": "lr"
+     },
+     {
+      "l": "C",
+      "f": "lm"
+     },
+     {
+      "l": "V",
+      "f": "li"
+     },
+     {
+      "l": "B",
+      "f": "li"
+     },
+     {
+      "l": "N",
+      "f": "ri"
+     },
+     {
+      "l": "M",
+      "f": "ri"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "~"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\""
+     }
+    ]
+   },
+   "how": {
+    "!": "Shift + 1",
+    "\"": "Shift + '",
+    "#": "Shift + 3",
+    "$": "Shift + 4",
+    "%": "Shift + 5",
+    "&": "Shift + 7",
+    "'": "de '-toets",
+    "(": "Shift + 9",
+    ")": "Shift + 0",
+    "*": "Shift + 8",
+    "+": "Shift + =",
+    ",": "de ,-toets",
+    "-": "de --toets",
+    ".": "de .-toets",
+    "/": "de /-toets",
+    ":": "Shift + ;",
+    ";": "de ;-toets",
+    "<": "Shift + ,",
+    "=": "de =-toets",
+    ">": "Shift + .",
+    "?": "Shift + /",
+    "@": "Shift + 2",
+    "[": "de [-toets",
+    "\\": "de \\-toets",
+    "]": "de ]-toets",
+    "^": "Shift + 6",
+    "_": "Shift + -",
+    "`": "de `-toets",
+    "{": "Shift + [",
+    "|": "Shift + \\",
+    "}": "Shift + ]",
+    "~": "Shift + `",
+    "²": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "À": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "Ç": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "È": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "É": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd"
+   }
+  },
+  "windows-us-intl": {
+   "label": "Verenigde Staten internationaal",
+   "short": "US intl",
+   "os": "Windows",
+   "iso": false,
+   "mac": false,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!",
+      "g": "¡",
+      "gs": "¹"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@",
+      "g": "²"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "#",
+      "g": "³"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "¤",
+      "gs": "£"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%",
+      "g": "€"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "¼"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&",
+      "g": "½"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*",
+      "g": "¾"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "(",
+      "g": "‘"
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")",
+      "g": "’"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp",
+      "g": "ä",
+      "gs": "Ä"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "å",
+      "gs": "Å"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "g": "é",
+      "gs": "É"
+     },
+     {
+      "l": "R",
+      "f": "li",
+      "g": "®"
+     },
+     {
+      "l": "T",
+      "f": "li",
+      "g": "þ",
+      "gs": "Þ"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "ü",
+      "gs": "Ü"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "g": "ú",
+      "gs": "Ú"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "g": "í",
+      "gs": "Í"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ó",
+      "gs": "Ó"
+     },
+     {
+      "l": "P",
+      "f": "rp",
+      "g": "ö",
+      "gs": "Ö"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "á",
+      "gs": "Á"
+     },
+     {
+      "l": "S",
+      "f": "lr",
+      "g": "ß",
+      "gs": "§"
+     },
+     {
+      "l": "D",
+      "f": "lm",
+      "g": "ð",
+      "gs": "Ð"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li"
+     },
+     {
+      "l": "H",
+      "f": "ri"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm"
+     },
+     {
+      "l": "L",
+      "f": "rr",
+      "g": "ø",
+      "gs": "Ø"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":",
+      "g": "¶",
+      "gs": "°"
+     }
+    ],
+    [
+     {
+      "l": "Z",
+      "f": "lp",
+      "g": "æ",
+      "gs": "Æ"
+     },
+     {
+      "l": "X",
+      "f": "lr"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "©",
+      "gs": "¢"
+     },
+     {
+      "l": "V",
+      "f": "li"
+     },
+     {
+      "l": "B",
+      "f": "li"
+     },
+     {
+      "l": "N",
+      "f": "ri",
+      "g": "ñ",
+      "gs": "Ñ"
+     },
+     {
+      "l": "M",
+      "f": "ri",
+      "g": "µ"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?",
+      "g": "¿"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "~"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_",
+      "g": "¥"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+",
+      "g": "×",
+      "gs": "÷"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{",
+      "g": "«"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "g": "»"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|",
+      "g": "¬",
+      "gs": "¦"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\"",
+      "g": "´",
+      "gs": "¨"
+     }
+    ]
+   },
+   "how": {
+    "!": "Shift + 1",
+    "\"": "Shift + ' (dode toets), dan de spatiebalk",
+    "#": "Shift + 3",
+    "$": "Shift + 4",
+    "%": "Shift + 5",
+    "&": "Shift + 7",
+    "'": "de '-toets (dode toets), dan de spatiebalk",
+    "(": "Shift + 9",
+    ")": "Shift + 0",
+    "*": "Shift + 8",
+    "+": "Shift + =",
+    ",": "de ,-toets",
+    "-": "de --toets",
+    ".": "de .-toets",
+    "/": "de /-toets",
+    ":": "Shift + ;",
+    ";": "de ;-toets",
+    "<": "Shift + ,",
+    "=": "de =-toets",
+    ">": "Shift + .",
+    "?": "Shift + /",
+    "@": "Shift + 2",
+    "[": "de [-toets",
+    "\\": "de \\-toets",
+    "]": "de ]-toets",
+    "^": "Shift + 6 (dode toets), dan de spatiebalk",
+    "_": "Shift + -",
+    "`": "de `-toets (dode toets), dan de spatiebalk",
+    "{": "Shift + [",
+    "|": "Shift + \\",
+    "}": "Shift + ]",
+    "~": "Shift + ` (dode toets), dan de spatiebalk",
+    "²": "AltGr + 2",
+    "À": "de `-toets (dode toets), dan Shift + A",
+    "Ç": "Shift + AltGr + ,",
+    "È": "de `-toets (dode toets), dan Shift + E",
+    "É": "Shift + AltGr + E"
+   }
+  },
+  "windows-uk": {
+   "label": "Verenigd Koninkrijk (UK)",
+   "short": "UK",
+   "os": "Windows",
+   "iso": true,
+   "mac": false,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "\""
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "£"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "€"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "("
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp"
+     },
+     {
+      "l": "W",
+      "f": "lr"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "g": "é",
+      "gs": "É"
+     },
+     {
+      "l": "R",
+      "f": "li"
+     },
+     {
+      "l": "T",
+      "f": "li"
+     },
+     {
+      "l": "Y",
+      "f": "ri"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "g": "ú",
+      "gs": "Ú"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "g": "í",
+      "gs": "Í"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ó",
+      "gs": "Ó"
+     },
+     {
+      "l": "P",
+      "f": "rp"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "á",
+      "gs": "Á"
+     },
+     {
+      "l": "S",
+      "f": "lr"
+     },
+     {
+      "l": "D",
+      "f": "lm"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li"
+     },
+     {
+      "l": "H",
+      "f": "ri"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm"
+     },
+     {
+      "l": "L",
+      "f": "rr"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":"
+     }
+    ],
+    [
+     {
+      "l": "\\",
+      "f": "lp",
+      "s": "|"
+     },
+     {
+      "l": "Z",
+      "f": "lp"
+     },
+     {
+      "l": "X",
+      "f": "lr"
+     },
+     {
+      "l": "C",
+      "f": "lm"
+     },
+     {
+      "l": "V",
+      "f": "li"
+     },
+     {
+      "l": "B",
+      "f": "li"
+     },
+     {
+      "l": "N",
+      "f": "ri"
+     },
+     {
+      "l": "M",
+      "f": "ri"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "¬",
+      "g": "¦"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "@"
+     },
+     {
+      "l": "#",
+      "f": "rp",
+      "s": "~",
+      "g": "\\",
+      "gs": "|"
+     }
+    ]
+   },
+   "how": {
+    "!": "Shift + 1",
+    "\"": "Shift + 2",
+    "#": "de #-toets",
+    "$": "Shift + 4",
+    "%": "Shift + 5",
+    "&": "Shift + 7",
+    "'": "de '-toets",
+    "(": "Shift + 9",
+    ")": "Shift + 0",
+    "*": "Shift + 8",
+    "+": "Shift + =",
+    ",": "de ,-toets",
+    "-": "de --toets",
+    ".": "de .-toets",
+    "/": "de /-toets",
+    ":": "Shift + ;",
+    ";": "de ;-toets",
+    "<": "Shift + ,",
+    "=": "de =-toets",
+    ">": "Shift + .",
+    "?": "Shift + /",
+    "@": "Shift + '",
+    "[": "de [-toets",
+    "\\": "de \\-toets",
+    "]": "de ]-toets",
+    "^": "Shift + 6",
+    "_": "Shift + -",
+    "`": "de `-toets",
+    "{": "Shift + [",
+    "|": "Shift + \\",
+    "}": "Shift + ]",
+    "~": "Shift + #",
+    "²": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "À": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "Ç": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "È": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "É": "Shift + AltGr + E"
+   }
+  },
+  "windows-uk-extended": {
+   "label": "Verenigd Koninkrijk uitgebreid",
+   "short": "UK uitgebreid",
+   "os": "Windows",
+   "iso": true,
+   "mac": false,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "\"",
+      "g": "¨"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "£"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "€"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "^"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "("
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "ẃ",
+      "gs": "Ẃ"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "g": "é",
+      "gs": "É"
+     },
+     {
+      "l": "R",
+      "f": "li"
+     },
+     {
+      "l": "T",
+      "f": "li"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "ý",
+      "gs": "Ý"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "g": "ú",
+      "gs": "Ú"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "g": "í",
+      "gs": "Í"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ó",
+      "gs": "Ó"
+     },
+     {
+      "l": "P",
+      "f": "rp"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "á",
+      "gs": "Á"
+     },
+     {
+      "l": "S",
+      "f": "lr"
+     },
+     {
+      "l": "D",
+      "f": "lm"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li"
+     },
+     {
+      "l": "H",
+      "f": "ri"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm"
+     },
+     {
+      "l": "L",
+      "f": "rr"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":"
+     }
+    ],
+    [
+     {
+      "l": "\\",
+      "f": "lp",
+      "s": "|"
+     },
+     {
+      "l": "Z",
+      "f": "lp"
+     },
+     {
+      "l": "X",
+      "f": "lr"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": "V",
+      "f": "li"
+     },
+     {
+      "l": "B",
+      "f": "li"
+     },
+     {
+      "l": "N",
+      "f": "ri"
+     },
+     {
+      "l": "M",
+      "f": "ri"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "¬",
+      "g": "¦"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "gs": "|"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "@",
+      "g": "´",
+      "gs": "`"
+     },
+     {
+      "l": "#",
+      "f": "rp",
+      "s": "~",
+      "g": "~",
+      "gs": "\\"
+     }
+    ]
+   },
+   "how": {
+    "!": "Shift + 1",
+    "\"": "Shift + 2",
+    "#": "de #-toets",
+    "$": "Shift + 4",
+    "%": "Shift + 5",
+    "&": "Shift + 7",
+    "'": "de '-toets",
+    "(": "Shift + 9",
+    ")": "Shift + 0",
+    "*": "Shift + 8",
+    "+": "Shift + =",
+    ",": "de ,-toets",
+    "-": "de --toets",
+    ".": "de .-toets",
+    "/": "de /-toets",
+    ":": "Shift + ;",
+    ";": "de ;-toets",
+    "<": "Shift + ,",
+    "=": "de =-toets",
+    ">": "Shift + .",
+    "?": "Shift + /",
+    "@": "Shift + '",
+    "[": "de [-toets",
+    "\\": "de \\-toets",
+    "]": "de ]-toets",
+    "^": "Shift + 6",
+    "_": "Shift + -",
+    "`": "Shift + AltGr + '",
+    "{": "Shift + [",
+    "|": "Shift + \\",
+    "}": "Shift + ]",
+    "~": "Shift + #",
+    "²": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "À": "de `-toets (dode toets), dan Shift + A",
+    "Ç": "Shift + AltGr + C",
+    "È": "de `-toets (dode toets), dan Shift + E",
+    "É": "Shift + AltGr + E"
+   }
+  },
+  "mac-us": {
+   "label": "Mac, Verenigde Staten (ABC)",
+   "short": "Mac US",
+   "os": "macOS",
+   "iso": false,
+   "mac": true,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!",
+      "g": "¡",
+      "gs": "⁄"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@",
+      "g": "™",
+      "gs": "€"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "#",
+      "g": "£",
+      "gs": "‹"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "¢",
+      "gs": "›"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%",
+      "g": "∞",
+      "gs": "ﬁ"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "§",
+      "gs": "ﬂ"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&",
+      "g": "¶",
+      "gs": "‡"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*",
+      "g": "•",
+      "gs": "°"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "(",
+      "g": "ª",
+      "gs": "·"
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")",
+      "g": "º",
+      "gs": "‚"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp",
+      "g": "œ",
+      "gs": "Œ"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "∑",
+      "gs": "„"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "gs": "´"
+     },
+     {
+      "l": "R",
+      "f": "li",
+      "g": "®",
+      "gs": "‰"
+     },
+     {
+      "l": "T",
+      "f": "li",
+      "g": "†",
+      "gs": "ˇ"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "¥",
+      "gs": "Á"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "gs": "¨"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "gs": "ˆ"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ø",
+      "gs": "Ø"
+     },
+     {
+      "l": "P",
+      "f": "rp",
+      "g": "π",
+      "gs": "∏"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "å",
+      "gs": "Å"
+     },
+     {
+      "l": "S",
+      "f": "lr",
+      "g": "ß",
+      "gs": "Í"
+     },
+     {
+      "l": "D",
+      "f": "lm",
+      "g": "∂",
+      "gs": "Î"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "g": "ƒ",
+      "gs": "Ï",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li",
+      "g": "©",
+      "gs": "˝"
+     },
+     {
+      "l": "H",
+      "f": "ri",
+      "g": "˙",
+      "gs": "Ó"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "g": "∆",
+      "gs": "Ô",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm",
+      "g": "˚",
+      "gs": ""
+     },
+     {
+      "l": "L",
+      "f": "rr",
+      "g": "¬",
+      "gs": "Ò"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":",
+      "g": "…",
+      "gs": "Ú"
+     }
+    ],
+    [
+     {
+      "l": "Z",
+      "f": "lp",
+      "g": "Ω",
+      "gs": "¸"
+     },
+     {
+      "l": "X",
+      "f": "lr",
+      "g": "≈",
+      "gs": "˛"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": "V",
+      "f": "li",
+      "g": "√",
+      "gs": "◊"
+     },
+     {
+      "l": "B",
+      "f": "li",
+      "g": "∫",
+      "gs": "ı"
+     },
+     {
+      "l": "N",
+      "f": "ri",
+      "gs": "˜"
+     },
+     {
+      "l": "M",
+      "f": "ri",
+      "g": "µ",
+      "gs": "Â"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<",
+      "g": "≤",
+      "gs": "¯"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">",
+      "g": "≥",
+      "gs": "˘"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?",
+      "g": "÷",
+      "gs": "¿"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "§",
+      "f": "lp",
+      "s": "±"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_",
+      "g": "–",
+      "gs": "—"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+",
+      "g": "≠",
+      "gs": "±"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{",
+      "g": "“",
+      "gs": "”"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "g": "‘",
+      "gs": "’"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|",
+      "g": "«",
+      "gs": "»"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\"",
+      "g": "æ",
+      "gs": "Æ"
+     }
+    ]
+   },
+   "how": {
+    "!": "Shift + 1",
+    "\"": "Shift + '",
+    "#": "Shift + 3",
+    "$": "Shift + 4",
+    "%": "Shift + 5",
+    "&": "Shift + 7",
+    "'": "de '-toets",
+    "(": "Shift + 9",
+    ")": "Shift + 0",
+    "*": "Shift + 8",
+    "+": "Shift + =",
+    ",": "de ,-toets",
+    "-": "de --toets",
+    ".": "de .-toets",
+    "/": "de /-toets",
+    ":": "Shift + ;",
+    ";": "de ;-toets",
+    "<": "Shift + ,",
+    "=": "de =-toets",
+    ">": "Shift + .",
+    "?": "Shift + /",
+    "@": "Shift + 2",
+    "[": "de [-toets",
+    "\\": "de \\-toets",
+    "]": "de ]-toets",
+    "^": "Shift + 6",
+    "_": "Shift + -",
+    "`": "de `-toets",
+    "{": "Shift + [",
+    "|": "Shift + \\",
+    "}": "Shift + ]",
+    "~": "Shift + `",
+    "²": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "À": "Option (⌥) + ` (dode toets), dan Shift + A",
+    "Ç": "Shift + Option (⌥) + C",
+    "È": "Option (⌥) + ` (dode toets), dan Shift + E",
+    "É": "Option (⌥) + E (dode toets), dan Shift + E"
+   }
+  },
+  "mac-us-intl-pc": {
+   "label": "Mac, Verenigde Staten internationaal pc",
+   "short": "Mac US intl",
+   "os": "macOS",
+   "iso": false,
+   "mac": true,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!",
+      "g": "¡",
+      "gs": "⁄"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@",
+      "g": "™",
+      "gs": "€"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "#",
+      "g": "£",
+      "gs": "‹"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "¢",
+      "gs": "›"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%",
+      "g": "∞",
+      "gs": "ﬁ"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "§",
+      "gs": "ﬂ"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&",
+      "g": "¶",
+      "gs": "‡"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*",
+      "g": "•",
+      "gs": "°"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "(",
+      "g": "ª",
+      "gs": "·"
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")",
+      "g": "º",
+      "gs": "‚"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp",
+      "g": "œ",
+      "gs": "Œ"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "∑",
+      "gs": "„"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "gs": "´"
+     },
+     {
+      "l": "R",
+      "f": "li",
+      "g": "®",
+      "gs": "‰"
+     },
+     {
+      "l": "T",
+      "f": "li",
+      "g": "†",
+      "gs": "ˇ"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "¥",
+      "gs": "Á"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "gs": "¨"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "gs": "ˆ"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ø",
+      "gs": "Ø"
+     },
+     {
+      "l": "P",
+      "f": "rp",
+      "g": "π",
+      "gs": "∏"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "å",
+      "gs": "Å"
+     },
+     {
+      "l": "S",
+      "f": "lr",
+      "g": "ß",
+      "gs": "Í"
+     },
+     {
+      "l": "D",
+      "f": "lm",
+      "g": "∂",
+      "gs": "Î"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "g": "ƒ",
+      "gs": "Ï",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li",
+      "g": "©",
+      "gs": "˝"
+     },
+     {
+      "l": "H",
+      "f": "ri",
+      "g": "˙",
+      "gs": "Ó"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "g": "∆",
+      "gs": "Ô",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm",
+      "g": "˚",
+      "gs": ""
+     },
+     {
+      "l": "L",
+      "f": "rr",
+      "g": "¬",
+      "gs": "Ò"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":",
+      "g": "…",
+      "gs": "Ú"
+     }
+    ],
+    [
+     {
+      "l": "Z",
+      "f": "lp",
+      "g": "Ω",
+      "gs": "¸"
+     },
+     {
+      "l": "X",
+      "f": "lr",
+      "g": "≈",
+      "gs": "˛"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": "V",
+      "f": "li",
+      "g": "√",
+      "gs": "◊"
+     },
+     {
+      "l": "B",
+      "f": "li",
+      "g": "∫",
+      "gs": "ı"
+     },
+     {
+      "l": "N",
+      "f": "ri",
+      "gs": "˜"
+     },
+     {
+      "l": "M",
+      "f": "ri",
+      "g": "µ",
+      "gs": "Â"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<",
+      "g": "≤",
+      "gs": "¯"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">",
+      "g": "≥",
+      "gs": "˘"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?",
+      "g": "÷",
+      "gs": "¿"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "§",
+      "f": "lp",
+      "s": "±"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_",
+      "g": "–",
+      "gs": "—"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+",
+      "g": "≠",
+      "gs": "±"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{",
+      "g": "“",
+      "gs": "”"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "g": "‘",
+      "gs": "’"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|",
+      "g": "«",
+      "gs": "»"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\"",
+      "g": "æ",
+      "gs": "Æ"
+     }
+    ]
+   },
+   "how": {
+    "!": "Shift + 1",
+    "\"": "Shift + null (dode toets), dan de spatiebalk",
+    "#": "Shift + 3",
+    "$": "Shift + 4",
+    "%": "Shift + 5",
+    "&": "Shift + 7",
+    "'": "de null-toets (dode toets), dan de spatiebalk",
+    "(": "Shift + 9",
+    ")": "Shift + 0",
+    "*": "Shift + 8",
+    "+": "Shift + =",
+    ",": "de ,-toets",
+    "-": "de --toets",
+    ".": "de .-toets",
+    "/": "de /-toets",
+    ":": "Shift + ;",
+    ";": "de ;-toets",
+    "<": "Shift + ,",
+    "=": "de =-toets",
+    ">": "Shift + .",
+    "?": "Shift + /",
+    "@": "Shift + 2",
+    "[": "de [-toets",
+    "\\": "de \\-toets",
+    "]": "de ]-toets",
+    "^": "Shift + 6 (dode toets), dan de spatiebalk",
+    "_": "Shift + -",
+    "`": "Shift + Option (⌥) + null",
+    "{": "Shift + [",
+    "|": "Shift + \\",
+    "}": "Shift + ]",
+    "~": "Option (⌥) + N (dode toets), dan de spatiebalk",
+    "²": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "À": "Option (⌥) + null (dode toets), dan Shift + A",
+    "Ç": "Shift + Option (⌥) + C",
+    "È": "Option (⌥) + null (dode toets), dan Shift + E",
+    "É": "Option (⌥) + E (dode toets), dan Shift + E"
+   }
+  },
+  "mac-british": {
+   "label": "Mac, Verenigd Koninkrijk",
+   "short": "Mac UK",
+   "os": "macOS",
+   "iso": true,
+   "mac": true,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!",
+      "g": "¡",
+      "gs": "⁄"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@",
+      "g": "€",
+      "gs": "™"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "£",
+      "g": "#",
+      "gs": "‹"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "¢",
+      "gs": "›"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%",
+      "g": "∞",
+      "gs": "ﬁ"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "§",
+      "gs": "ﬂ"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&",
+      "g": "¶",
+      "gs": "‡"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*",
+      "g": "•",
+      "gs": "°"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "(",
+      "g": "ª",
+      "gs": "·"
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")",
+      "g": "º",
+      "gs": "‚"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp",
+      "g": "œ",
+      "gs": "Œ"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "∑",
+      "gs": "„"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "gs": "‰"
+     },
+     {
+      "l": "R",
+      "f": "li",
+      "g": "®",
+      "gs": "Â"
+     },
+     {
+      "l": "T",
+      "f": "li",
+      "g": "†",
+      "gs": "Ê"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "¥",
+      "gs": "Á"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "gs": "Ë"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "gs": "È"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ø",
+      "gs": "Ø"
+     },
+     {
+      "l": "P",
+      "f": "rp",
+      "g": "π",
+      "gs": "∏"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "å",
+      "gs": "Å"
+     },
+     {
+      "l": "S",
+      "f": "lr",
+      "g": "ß",
+      "gs": "Í"
+     },
+     {
+      "l": "D",
+      "f": "lm",
+      "g": "∂",
+      "gs": "Î"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "g": "ƒ",
+      "gs": "Ï",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li",
+      "g": "©",
+      "gs": "Ì"
+     },
+     {
+      "l": "H",
+      "f": "ri",
+      "g": "˙",
+      "gs": "Ó"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "g": "∆",
+      "gs": "Ô",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm",
+      "g": "˚",
+      "gs": ""
+     },
+     {
+      "l": "L",
+      "f": "rr",
+      "g": "¬",
+      "gs": "Ò"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":",
+      "g": "…",
+      "gs": "Ú"
+     }
+    ],
+    [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "~",
+      "gs": "Ÿ"
+     },
+     {
+      "l": "Z",
+      "f": "lp",
+      "g": "Ω",
+      "gs": "Û"
+     },
+     {
+      "l": "X",
+      "f": "lr",
+      "g": "≈",
+      "gs": "Ù"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": "V",
+      "f": "li",
+      "g": "√",
+      "gs": "◊"
+     },
+     {
+      "l": "B",
+      "f": "li",
+      "g": "∫",
+      "gs": "ı"
+     },
+     {
+      "l": "N",
+      "f": "ri",
+      "gs": "ˆ"
+     },
+     {
+      "l": "M",
+      "f": "ri",
+      "g": "µ",
+      "gs": "˜"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<",
+      "g": "≤",
+      "gs": "¯"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">",
+      "g": "≥",
+      "gs": "˘"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?",
+      "g": "÷",
+      "gs": "¿"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "§",
+      "f": "lp",
+      "s": "±"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_",
+      "g": "–",
+      "gs": "—"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+",
+      "g": "≠",
+      "gs": "±"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{",
+      "g": "“",
+      "gs": "”"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "g": "‘",
+      "gs": "’"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\"",
+      "g": "æ",
+      "gs": "Æ"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|",
+      "g": "«",
+      "gs": "»"
+     }
+    ]
+   },
+   "how": {
+    "!": "Shift + 1",
+    "\"": "Shift + '",
+    "#": "Option (⌥) + 3",
+    "$": "Shift + 4",
+    "%": "Shift + 5",
+    "&": "Shift + 7",
+    "'": "de '-toets",
+    "(": "Shift + 9",
+    ")": "Shift + 0",
+    "*": "Shift + 8",
+    "+": "Shift + =",
+    ",": "de ,-toets",
+    "-": "de --toets",
+    ".": "de .-toets",
+    "/": "de /-toets",
+    ":": "Shift + ;",
+    ";": "de ;-toets",
+    "<": "Shift + ,",
+    "=": "de =-toets",
+    ">": "Shift + .",
+    "?": "Shift + /",
+    "@": "Shift + 2",
+    "[": "de [-toets",
+    "\\": "de \\-toets",
+    "]": "de ]-toets",
+    "^": "Shift + 6",
+    "_": "Shift + -",
+    "`": "de `-toets",
+    "{": "Shift + [",
+    "|": "Shift + \\",
+    "}": "Shift + ]",
+    "~": "Shift + `",
+    "²": "Geen toetscombinatie op dit toetsenbord. Kies in Instellingen, bij Accenten, \"Toegestaan\": de gewone letter wordt dan geaccepteerd",
+    "À": "Option (⌥) + ` (dode toets), dan Shift + A",
+    "Ç": "Shift + Option (⌥) + C",
+    "È": "Shift + Option (⌥) + I",
+    "É": "Option (⌥) + E (dode toets), dan Shift + E"
+   }
+  },
+  "linux-us-intl": {
+   "label": "Linux, Verenigde Staten internationaal",
+   "short": "Linux US intl",
+   "os": "Linux",
+   "iso": false,
+   "mac": false,
+   "status": "brouillon",
+   "rows": [
+    [
+     {
+      "l": "1",
+      "f": "lp",
+      "s": "!",
+      "g": "¡",
+      "gs": "¹"
+     },
+     {
+      "l": "2",
+      "f": "lr",
+      "s": "@",
+      "g": "²"
+     },
+     {
+      "l": "3",
+      "f": "lm",
+      "s": "#",
+      "g": "³"
+     },
+     {
+      "l": "4",
+      "f": "li",
+      "s": "$",
+      "g": "¤",
+      "gs": "£"
+     },
+     {
+      "l": "5",
+      "f": "li",
+      "s": "%",
+      "g": "€"
+     },
+     {
+      "l": "6",
+      "f": "ri",
+      "s": "^",
+      "g": "¼"
+     },
+     {
+      "l": "7",
+      "f": "ri",
+      "s": "&",
+      "g": "½"
+     },
+     {
+      "l": "8",
+      "f": "rm",
+      "s": "*",
+      "g": "¾"
+     },
+     {
+      "l": "9",
+      "f": "rr",
+      "s": "(",
+      "g": "‘"
+     },
+     {
+      "l": "0",
+      "f": "rp",
+      "s": ")",
+      "g": "’"
+     }
+    ],
+    [
+     {
+      "l": "Q",
+      "f": "lp",
+      "g": "ä",
+      "gs": "Ä"
+     },
+     {
+      "l": "W",
+      "f": "lr",
+      "g": "å",
+      "gs": "Å"
+     },
+     {
+      "l": "E",
+      "f": "lm",
+      "g": "é",
+      "gs": "É"
+     },
+     {
+      "l": "R",
+      "f": "li",
+      "g": "®",
+      "gs": "™"
+     },
+     {
+      "l": "T",
+      "f": "li",
+      "g": "þ",
+      "gs": "Þ"
+     },
+     {
+      "l": "Y",
+      "f": "ri",
+      "g": "ü",
+      "gs": "Ü"
+     },
+     {
+      "l": "U",
+      "f": "ri",
+      "g": "ú",
+      "gs": "Ú"
+     },
+     {
+      "l": "I",
+      "f": "rm",
+      "g": "í",
+      "gs": "Í"
+     },
+     {
+      "l": "O",
+      "f": "rr",
+      "g": "ó",
+      "gs": "Ó"
+     },
+     {
+      "l": "P",
+      "f": "rp",
+      "g": "ö",
+      "gs": "Ö"
+     }
+    ],
+    [
+     {
+      "l": "A",
+      "f": "lp",
+      "g": "á",
+      "gs": "Á"
+     },
+     {
+      "l": "S",
+      "f": "lr",
+      "g": "ß",
+      "gs": "§"
+     },
+     {
+      "l": "D",
+      "f": "lm",
+      "g": "ð",
+      "gs": "Ð"
+     },
+     {
+      "l": "F",
+      "f": "li",
+      "g": "ë",
+      "gs": "Ë",
+      "home": true
+     },
+     {
+      "l": "G",
+      "f": "li"
+     },
+     {
+      "l": "H",
+      "f": "ri"
+     },
+     {
+      "l": "J",
+      "f": "ri",
+      "g": "ï",
+      "gs": "Ï",
+      "home": true
+     },
+     {
+      "l": "K",
+      "f": "rm",
+      "g": "œ",
+      "gs": "Œ"
+     },
+     {
+      "l": "L",
+      "f": "rr",
+      "g": "ø",
+      "gs": "Ø"
+     },
+     {
+      "l": ";",
+      "f": "rp",
+      "s": ":",
+      "g": "¶",
+      "gs": "°"
+     }
+    ],
+    [
+     {
+      "l": "Z",
+      "f": "lp",
+      "g": "æ",
+      "gs": "Æ"
+     },
+     {
+      "l": "X",
+      "f": "lr",
+      "g": "·"
+     },
+     {
+      "l": "C",
+      "f": "lm",
+      "g": "©",
+      "gs": "¢"
+     },
+     {
+      "l": "V",
+      "f": "li"
+     },
+     {
+      "l": "B",
+      "f": "li"
+     },
+     {
+      "l": "N",
+      "f": "ri",
+      "g": "ñ",
+      "gs": "Ñ"
+     },
+     {
+      "l": "M",
+      "f": "ri",
+      "g": "µ",
+      "gs": "±"
+     },
+     {
+      "l": ",",
+      "f": "rm",
+      "s": "<",
+      "g": "ç",
+      "gs": "Ç"
+     },
+     {
+      "l": ".",
+      "f": "rr",
+      "s": ">"
+     },
+     {
+      "l": "/",
+      "f": "rp",
+      "s": "?",
+      "g": "¿"
+     }
+    ]
+   ],
+   "extra": {
+    "tlde": [
+     {
+      "l": "`",
+      "f": "lp",
+      "s": "~"
+     }
+    ],
+    "ae": [
+     {
+      "l": "-",
+      "f": "rp",
+      "s": "_",
+      "g": "¥"
+     },
+     {
+      "l": "=",
+      "f": "rp",
+      "s": "+",
+      "g": "×",
+      "gs": "÷"
+     }
+    ],
+    "ad": [
+     {
+      "l": "[",
+      "f": "rp",
+      "s": "{",
+      "g": "«",
+      "gs": "“"
+     },
+     {
+      "l": "]",
+      "f": "rp",
+      "s": "}",
+      "g": "»",
+      "gs": "”"
+     },
+     {
+      "l": "\\",
+      "f": "rp",
+      "s": "|",
+      "g": "¬",
+      "gs": "¦"
+     }
+    ],
+    "ac": [
+     {
+      "l": "'",
+      "f": "rp",
+      "s": "\""
+     }
+    ]
+   },
+   "how": {
+    "!": "Shift + 1",
+    "\"": "Shift + AltGr + null",
+    "#": "Shift + 3",
+    "$": "Shift + 4",
+    "%": "Shift + 5",
+    "&": "Shift + 7",
+    "'": "AltGr + null",
+    "(": "Shift + 9",
+    ")": "Shift + 0",
+    "*": "Shift + 8",
+    "+": "Shift + =",
+    ",": "de ,-toets",
+    "-": "de --toets",
+    ".": "de .-toets",
+    "/": "de /-toets",
+    ":": "Shift + ;",
+    ";": "de ;-toets",
+    "<": "Shift + ,",
+    "=": "de =-toets",
+    ">": "Shift + .",
+    "?": "Shift + /",
+    "@": "Shift + 2",
+    "[": "de [-toets",
+    "\\": "de \\-toets",
+    "]": "de ]-toets",
+    "^": "Shift + AltGr + 6",
+    "_": "Shift + -",
+    "`": "AltGr + null",
+    "{": "Shift + [",
+    "|": "Shift + \\",
+    "}": "Shift + ]",
+    "~": "Shift + AltGr + null",
+    "²": "AltGr + 2",
+    "À": "de null-toets (dode toets), dan Shift + A",
+    "Ç": "Shift + AltGr + ,",
+    "È": "de null-toets (dode toets), dan Shift + E",
+    "É": "Shift + AltGr + E"
+   }
+  }
+ },
+ "curriculum": {
+  "modules": [
+   {
+    "name": "1. Basisrij",
+    "row": "repos",
+    "lessons": [
+     {
+      "id": "r1",
+      "keys": "f j",
+      "teaches": "fj",
+      "title": "F en J, de wijsvingers",
+      "tip": "Welkom! Leg je wijsvingers op de F (linkerhand) en de J (rechterhand). Dat zijn je ankertoetsen: op elke toets voel je een klein streepje of bultje. Kijk niet naar het toetsenbord en vertrouw op je vingers.",
+      "tuto": {
+       "intro": "Welkom bij je allereerste oefening! Neem even de tijd voor de basis van blind typen. Daardoor wordt alles wat daarna komt veel makkelijker.",
+       "rules": [
+        {
+         "icon": "🤲",
+         "t": "De beginpositie",
+         "d": "Leg al je acht vingers op de middelste rij. Je wijsvingers liggen op de F en de J, waar je een klein streepje voelt. Zo weet je waar je bent zonder te kijken."
+        },
+        {
+         "icon": "👁️",
+         "t": "Kijk naar het scherm",
+         "d": "Kijk niet naar je vingers. Als je stopt met op het toetsenbord te kijken, begin je het gevoel op te bouwen waardoor je echt snel wordt."
+        },
+        {
+         "icon": "📍",
+         "t": "Een vinger, een toets",
+         "d": "Typ de F met je linkerwijsvinger en de J met je rechterwijsvinger. Na elke toetsaanslag gaat je vinger terug naar zijn plek."
+        },
+        {
+         "icon": "🐢",
+         "t": "Eerst rustig",
+         "d": "Typ langzaam en netjes. Elke fout wordt een slechte gewoonte. De snelheid komt vanzelf als je de beweging kent."
+        }
+       ],
+       "tip": "Doel: leer de plek van je twee wijsvingers kennen door alleen F en J te typen. Forceer niets. Zoek een rustig, regelmatig ritme."
+      },
+      "text": "fj jf fj jf fjf jfj ffjj jjff fj jf fjfj jfjf ffj jjf fj jf ffjj jjff"
+     },
+     {
+      "id": "r2",
+      "keys": "d k",
+      "teaches": "dk",
+      "title": "D en K, de middelvingers",
+      "tip": "Je middelvingers liggen vanzelf op de D en de K, vlak naast je wijsvingers. Houd je wijsvingers op F en J als anker. Na elke aanslag gaat elke vinger terug naar zijn plek.",
+      "tuto": {
+       "intro": "Nu komen je middelvingers erbij. De D en de K liggen naast je wijsvingers, op dezelfde middelste rij.",
+       "rules": [
+        {
+         "icon": "🖐️",
+         "t": "Middelvingers in rust",
+         "d": "Je linkermiddelvinger typt de D en je rechtermiddelvinger de K. Ze liggen vanzelf op die toetsen, vlak naast de F en de J."
+        },
+        {
+         "icon": "⚓",
+         "t": "Wijsvingers blijven liggen",
+         "d": "Beweeg je wijsvingers niet. Ze blijven op F en J liggen terwijl je middelvingers typen. Zo vind je de weg terug zonder te kijken."
+        },
+        {
+         "icon": "🎯",
+         "t": "Kleine bewegingen",
+         "d": "Een lichte aanslag is genoeg. Til niet je hele hand op. Laat de vinger naar beneden gaan en weer terugkomen."
+        }
+       ],
+       "tip": "Doel: speel F D K J uit je hoofd en houd alle vier de vingers dicht bij hun plek."
+      },
+      "text": "dk kd fd jk dkf jkd fdk kjd dkdk kdkd ddkk kkdd fdjk jkfd dk kd fjdk"
+     },
+     {
+      "id": "r3",
+      "keys": "s l",
+      "teaches": "sl",
+      "title": "S en L, de ringvingers",
+      "tip": "Je ringvingers liggen op de S en de L. Dan liggen er zes vingers op hun plek. Houd je vingers licht gebogen, zodat je kunt typen zonder je pols op te tillen.",
+      "tuto": {
+       "intro": "Leg je ringvingers op de S (links) en de L (rechts). Nu liggen er zes vingers op de basisrij.",
+       "rules": [
+        {
+         "icon": "🖐️",
+         "t": "Zwakkere vingers",
+         "d": "Je ringvingers zijn minder beweeglijk dan je wijs- en middelvingers. Dat is normaal. Ga rustig: netjes typen is belangrijker dan snel typen."
+        },
+        {
+         "icon": "🌙",
+         "t": "Gebogen vingers",
+         "d": "Houd je vingers licht gebogen, alsof je ze op een klein balletje legt. Je pols blijft ontspannen en zakt niet op het bureau."
+        },
+        {
+         "icon": "⚓",
+         "t": "Terug naar de rust",
+         "d": "Na elke S of L gaat de ringvinger terug naar zijn plek. Je wijsvingers op F en J blijven je houvast."
+        }
+       ],
+       "tip": "Doel: typ S en L zonder je hand te draaien en ga na elke aanslag terug naar de basisrij."
+      },
+      "text": "sl ls sd lk sls lsl slsl lsls ssll llss sdfl lkjs sl ls fsjl dlsk"
+     },
+     {
+      "id": "r4",
+      "keys": "a ;",
+      "teaches": "a;",
+      "title": "A en de puntkomma, de pinken",
+      "tip": "Je pinken zijn de zwakste vingers en dat is normaal. De A ligt links en de puntkomma rechts. Draai niet je hele pols: strek alleen je pink een beetje.",
+      "tuto": {
+       "intro": "Nu zijn je pinken aan de beurt: de A links en de puntkomma rechts. Met deze twee toetsen is je basisrij compleet: A S D F en J K L ;.",
+       "rules": [
+        {
+         "icon": "🤏",
+         "t": "De zwakste vingers",
+         "d": "In het begin hebben je pinken weinig kracht en weinig precisie. Iedereen begint zo, zelfs de beste typisten. Heb geduld."
+        },
+        {
+         "icon": "↔️",
+         "t": "Sleep niet je hele hand mee",
+         "d": "Strek alleen je pink naar de A of de puntkomma. Als je je pols draait, raken je andere vingers hun plek kwijt."
+        },
+        {
+         "icon": "⚓",
+         "t": "Meteen terug",
+         "d": "Je pink blijft graag in de lucht hangen. Breng hem terug naar zijn plek zodra hij getypt heeft."
+        }
+       ],
+       "tip": "Doel: maak je pinken wakker zonder je beginpositie te verliezen. Ga rustig en regelmatig."
+      },
+      "text": "ja; al; dak; kas; jas; sla; kaal; las; lak; als; dal; daal; kaas; ja; al"
+     },
+     {
+      "id": "r5",
+      "keys": "g h",
+      "teaches": "gh",
+      "title": "G en H, de wijsvingers in het midden",
+      "tip": "Je wijsvingers reiken naar het midden voor de G en de H. Maak de beweging klein: de vinger glijdt, hij springt niet. Ga na elke aanslag terug naar F of J.",
+      "tuto": {
+       "intro": "De G en de H liggen in het midden van het toetsenbord. Je wijsvingers strekken zich een stukje uit om ze te bereiken.",
+       "rules": [
+        {
+         "icon": "👉",
+         "t": "Wijsvingers reiken",
+         "d": "Je linkerwijsvinger glijdt naar rechts voor de G en je rechterwijsvinger naar links voor de H. Het is een kleine zijwaartse beweging, geen sprong."
+        },
+        {
+         "icon": "⚓",
+         "t": "Terug naar F en J",
+         "d": "Breng je wijsvinger direct na de G of de H terug naar zijn plek. Dit zijn de toetsen die het verst van je beginpositie liggen."
+        },
+        {
+         "icon": "🎯",
+         "t": "Verwar je handen niet",
+         "d": "De G typ je altijd met links en de H altijd met rechts. Onthoud deze regel goed."
+        }
+       ],
+       "tip": "Doel: het hele midden van de basisrij bestrijken zonder je andere vingers te verplaatsen."
+      },
+      "text": "gh hg glad hals slag dag gas hal haak haal gaaf gaf ha hak"
+     },
+     {
+      "id": "r6",
+      "keys": "a s d f g h j k l ;",
+      "teaches": "",
+      "title": "Herhaling: de hele basisrij",
+      "tip": "Een complete herhaling van de basisrij. Dit is de belangrijkste rij: het vertrekpunt van elke beweging, de plek waar je vingers steeds naar terugkeren. Neem de tijd. Regelmaat is belangrijker dan snelheid.",
+      "tuto": {
+       "intro": "Je kent nu de hele basisrij, de belangrijkste rij van het toetsenbord.",
+       "rules": [
+        {
+         "icon": "📊",
+         "t": "De startrij",
+         "d": "Je vingers vertrekken hier en komen na elke aanslag weer terug. Als je deze rij beheerst, kun je later elk woord blind typen."
+        },
+        {
+         "icon": "🔁",
+         "t": "Elke toets uit je hoofd",
+         "d": "In deze oefening staan alle tien de toetsen door elkaar. Als je twijfelt, ga dan langzamer. Het doel is elke toets uit je hoofd te vinden, niet snel typen."
+        },
+        {
+         "icon": "⚓",
+         "t": "Een vaste beginpositie",
+         "d": "Voel tussen de aanslagen door dat al je acht vingers weer op de basisrij liggen."
+        }
+       ],
+       "tip": "Doel: de hele basisrij typen met ankervingers en je ogen op het scherm."
+      },
+      "text": "asdf jkl; glad dag slak hals slag gas haak kaas jas; als dag glas; ja; sla; haal; gaaf"
+     }
+    ]
+   },
+   {
+    "name": "2. Bovenste rij",
+    "row": "haut",
+    "lessons": [
+     {
+      "id": "h1",
+      "keys": "r u",
+      "teaches": "ru",
+      "title": "R en U, je eerste echte woorden",
+      "tip": "De R typ je met je linkerwijsvinger, die omhoog reikt, en de U met je rechterwijsvinger. Goed gedaan: met deze twee toetsen kun je al echte woorden maken! Houd je ogen op het scherm.",
+      "tuto": {
+       "intro": "Je gaat naar de bovenste rij. Met de R en de U typ je je eerste echte Nederlandse woorden.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Wijsvingers omhoog",
+         "d": "Je linkerwijsvinger reikt omhoog voor de R en je rechter voor de U. De vinger gaat een rij omhoog en komt daarna meteen terug naar F of J."
+        },
+        {
+         "icon": "⚓",
+         "t": "Houd je basis",
+         "d": "Alleen de wijsvinger beweegt. De andere zeven vingers blijven op de basisrij liggen. Dat is je vangnet, zodat je niet hoeft te kijken."
+        },
+        {
+         "icon": "💬",
+         "t": "Echte woorden",
+         "d": "uur, muur, rug, kus, dus... Je kunt al hele woorden schrijven. Lees het hele woord voor je het typt, niet letter voor letter."
+        }
+       ],
+       "tip": "Doel: omhoog reiken naar de R en de U zonder je ogen van het scherm te halen en zonder je andere vingers van de basisrij te tillen."
+      },
+      "text": "uur huur duur druk rug kus dus klus krul kruk jurk jaar haar gras kaars uur huur druk rug"
+     },
+     {
+      "id": "h2",
+      "keys": "e i",
+      "teaches": "ei",
+      "title": "E en I, steeds meer woorden",
+      "tip": "De E is de meest gebruikte letter in het Nederlands, dus je linkermiddelvinger heeft het druk. De I typ je met je rechtermiddelvinger. Vanaf deze oefening kun je tientallen echte woorden schrijven. Gebruik ze om je bewegingen soepeler te maken.",
+      "tuto": {
+       "intro": "De E en de I doen mee. De E komt in bijna elk Nederlands woord voor, dus het wordt je meest gebruikte toets.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Middelvingers omhoog",
+         "d": "Je linkermiddelvinger gaat omhoog voor de E en je rechter voor de I. Net als bij de R en de U is het een snelle reis naar de bovenste rij en terug."
+        },
+        {
+         "icon": "🔥",
+         "t": "De E, de koningin van de letters",
+         "d": "De E komt steeds terug in Nederlandse woorden. Let extra goed op deze beweging: als je hem beheerst, ga je veel sneller typen."
+        },
+        {
+         "icon": "💬",
+         "t": "Je woordenschat groeit",
+         "d": "hier, mier, dier, geel, heel, lekker... Er zijn nu tientallen woorden mogelijk. Zoek vloeiend typen, geen topprestatie."
+        }
+       ],
+       "tip": "Doel: maak E en I automatisch, met een vloeiende beweging en elke keer een terugkeer naar de basisrij."
+      },
+      "text": "ik kies ijs; hij is heel gelukkig; de leraar is hier; de reus is er; ik leer alles"
+     },
+     {
+      "id": "h3",
+      "keys": "w o",
+      "teaches": "wo",
+      "title": "W en O, de ringvingers op de bovenste rij",
+      "tip": "De W typ je met je linkerringvinger (bovenste rij) en de O met je rechterringvinger. Probeer het volgende woord al te lezen terwijl je het huidige typt. Dat heet vooruitlezen.",
+      "tuto": {
+       "intro": "De W en de O zijn de toetsen voor je ringvingers op de bovenste rij. Je woordenschat groeit weer.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Ringvingers omhoog",
+         "d": "Je linkerringvinger gaat omhoog voor de W en je rechter voor de O. Deze vingers zijn zwakker, dus een kleine, precieze beweging is genoeg."
+        },
+        {
+         "icon": "👀",
+         "t": "Oefen met vooruitlezen",
+         "d": "Lees het volgende woord terwijl je het huidige typt. Door vooruit te lezen typ je vloeiend en zonder haperen."
+        },
+        {
+         "icon": "🔤",
+         "t": "Meer afwisseling",
+         "d": "wie, ook, goed, rood, woord, wolk... Houd een rustig ritme van woord tot woord en vergeet de spaties niet."
+        }
+       ],
+       "tip": "Doel: typ W en O netjes en begin met vooruitlezen naar het volgende woord."
+      },
+      "text": "wie wil ook goed werk; de koe is rood; de wolk is hoog; waar is uw woord; ook uw woord is weer goed"
+     },
+     {
+      "id": "h4",
+      "keys": "q p",
+      "teaches": "qp",
+      "title": "Q en P, de pinken op de bovenste rij",
+      "tip": "De Q typ je met je linkerpink (bovenste rij) en de P met je rechterpink. Pinken op de bovenste rij moeten zich een beetje uitstrekken. Houd je pols stil en laat de vinger het werk doen.",
+      "tuto": {
+       "intro": "De Q en de P zijn de pinktoetsen op de bovenste rij. De Q gebruik je in het Nederlands bijna nooit, dus hier oefen je vooral de beweging.",
+       "rules": [
+        {
+         "icon": "🤏",
+         "t": "Pinken omhoog",
+         "d": "Je linkerpink reikt naar de Q en je rechterpink naar de P. Dit is een van de lastigste bewegingen, dus ga rustig."
+        },
+        {
+         "icon": "🤚",
+         "t": "Houd je pols stil",
+         "d": "Til niet je hele hand op om je pink te helpen. Je pols blijft stil en alleen de pink strekt zich uit."
+        },
+        {
+         "icon": "💬",
+         "t": "Eerst de beweging, dan de woorden",
+         "d": "Bij de Q typ je korte lettergroepjes zonder betekenis. Bij de P kun je al echte woorden maken: pak, pap, poes, pijl."
+        }
+       ],
+       "tip": "Doel: beheers Q en P zonder je beginpositie te verliezen, ook als je pinken nog weinig kracht hebben."
+      },
+      "text": "qpqp pqpq qqpp ppqq pak pap pols pijl paars poes puur peper pop pauw lap pas kap"
+     },
+     {
+      "id": "h5",
+      "keys": "t y",
+      "teaches": "ty",
+      "title": "T en Y, woorden en korte zinnen",
+      "tip": "De T en de Y typ je allebei met je wijsvingers: de linker reikt naar de T en de rechter naar de Y. Het is een spiegelbeweging. Zoek in dit stadium een regelmatig ritme en haast je niet.",
+      "tuto": {
+       "intro": "De T en de Y maken de bovenste rij af. Je wijsvingers zijn weer aan de slag, naar het midden bovenaan het toetsenbord.",
+       "rules": [
+        {
+         "icon": "👐",
+         "t": "Een spiegelbeweging",
+         "d": "Je linkerwijsvinger reikt naar de T en je rechter naar de Y. Beide handen maken dezelfde beweging, maar gespiegeld."
+        },
+        {
+         "icon": "🎵",
+         "t": "Zoek je ritme",
+         "d": "Zoek in dit stadium een gelijkmatig tempo, geen uitbarstingen van snelheid. Een regelmatig ritme geeft minder fouten."
+        },
+        {
+         "icon": "⚓",
+         "t": "Kom altijd terug",
+         "d": "Na de T of de Y keert je wijsvinger terug naar F of J. Door die gewoonte raak je nooit je plek kwijt."
+        }
+       ],
+       "tip": "Doel: maak van T en Y een vloeiende, gelijkmatige beweging van beide wijsvingers."
+      },
+      "text": "yoga yoghurt typ type typt yoga yoghurt yoga tas taart tafel stoel tijd tekst post kat pot pet kip"
+     },
+     {
+      "id": "h6",
+      "keys": "q w e r t y u i o p",
+      "teaches": "",
+      "title": "Herhaling: de hele bovenste rij",
+      "tip": "Je beheerst nu twee hele rijen. Let in deze herhaling vooral op de overgang tussen de rijen. Van de basisrij naar de bovenste rij gaan moet lukken zonder je polsen op te tillen.",
+      "tuto": {
+       "intro": "Je kent nu twee hele rijen. In deze herhaling staan alle letters van de bovenste rij door elkaar.",
+       "rules": [
+        {
+         "icon": "🔁",
+         "t": "Basisrij en bovenste rij, zonder haperen",
+         "d": "De uitdaging is niet meer elke toets, maar de overgang tussen de rijen. Van de basisrij naar boven gaan moet soepel voelen."
+        },
+        {
+         "icon": "🤚",
+         "t": "Polsen blijven laag",
+         "d": "Til je polsen niet op om van rij te wisselen. Alleen je vingers gaan omhoog en omlaag."
+        },
+        {
+         "icon": "📖",
+         "t": "Lees in groepjes",
+         "d": "Probeer twee of drie woorden vooruit te lezen. Je hersenen bereiden je vingers voor terwijl je typt."
+        }
+       ],
+       "tip": "Doel: tussen de basisrij en de bovenste rij wisselen zonder te kijken, met een soepele vingerbeweging."
+      },
+      "text": "de leraar is hier; uw tafel is groot; yoghurt is lekker; hij plakt uw pet"
+     }
+    ]
+   },
+   {
+    "name": "3. Onderste rij",
+    "row": "bas",
+    "lessons": [
+     {
+      "id": "b1",
+      "keys": "v m",
+      "teaches": "vm",
+      "title": "V en M, de wijsvingers op de onderste rij",
+      "tip": "De V typ je met je linkerwijsvinger (onderste rij) en de M met je rechter. Je wijsvingers hebben veel toetsen te doen, dus oefen het snel wisselen tussen de rijen zonder F en J als houvast te verliezen.",
+      "tuto": {
+       "intro": "De V en de M liggen onder je wijsvingers. Daarmee kun je veel woorden uit het dagelijks leven typen.",
+       "rules": [
+        {
+         "icon": "⬇️",
+         "t": "Wijsvingers omlaag",
+         "d": "Je linkerwijsvinger zakt naar de V en je rechter naar de M. Je wijsvingers bedienen nu drie rijen: boven, midden en onder."
+        },
+        {
+         "icon": "🔀",
+         "t": "Leer wisselen",
+         "d": "Je wijsvingers werken hard. Oefen het wisselen tussen de rijen zonder F en J als houvast kwijt te raken."
+        },
+        {
+         "icon": "💬",
+         "t": "Woorden uit het dagelijks leven",
+         "d": "vader, moeder, mama, vogel, melk... Je typt nu heel gewone woorden. Zoek een doorlopende beweging."
+        }
+       ],
+       "tip": "Doel: omlaag reiken naar de V en de M en het wisselen tussen de rijen soepeler maken."
+      },
+      "text": "vader moeder mama oma vier vijf vis vuur vlag vogel mier melk meer mooi muur kamer lamp vlam"
+     },
+     {
+      "id": "b2",
+      "keys": "c ,",
+      "teaches": "c,",
+      "title": "V en N, woorden uit het dagelijks leven",
+      "tip": "De V typ je met je linkerwijsvinger (onderste rij) en de N met je rechter. Je wijsvingers hebben veel toetsen te doen, dus oefen het snel wisselen tussen de rijen zonder F en J als houvast te verliezen.",
+      "tuto": {
+       "intro": "De V en de N liggen onder je wijsvingers. Daarmee kun je bijna alle woorden uit het dagelijks leven typen.",
+       "rules": [
+        {
+         "icon": "⬇️",
+         "t": "Wijsvingers omlaag",
+         "d": "Je linkerwijsvinger zakt naar de V en je rechter naar de N. Je wijsvingers bedienen nu drie rijen: boven, midden en onder."
+        },
+        {
+         "icon": "🔀",
+         "t": "Leer wisselen",
+         "d": "Je wijsvingers werken hard. Oefen het wisselen tussen de rijen zonder F en J als houvast kwijt te raken."
+        },
+        {
+         "icon": "💬",
+         "t": "Woorden uit het dagelijks leven",
+         "d": "zeven, vader, vogel, konijn, hond... Je typt nu heel gewone woorden. Zoek een doorlopende beweging."
+        }
+       ],
+       "tip": "Doel: omlaag reiken naar de V en de N en het wisselen tussen de rijen soepeler maken."
+      },
+      "text": "school, schaap, chocola, cake, cola, cirkel, cadeau, computer, cijfer, circus"
+     },
+     {
+      "id": "b3",
+      "keys": "x .",
+      "teaches": "x.",
+      "title": "X en de punt, de ringvingers op de onderste rij",
+      "tip": "De X typ je met je linkerringvinger op de onderste rij: het is een schuine beweging die je niet vaak nodig hebt. De punt zit rechts, onder de L. Zoek eerst rustig waar elke toets zit voor je sneller gaat.",
+      "tuto": {
+       "intro": "De X en de punt komen op de onderste rij, onder je ringvingers. De punt zet je aan het einde van elke zin.",
+       "rules": [
+        {
+         "icon": "↘️",
+         "t": "Een schuine beweging",
+         "d": "Je linkerringvinger zakt schuin naar de X. Het is een ongewone beweging, dus doe hem langzaam om hem te onthouden."
+        },
+        {
+         "icon": "🔎",
+         "t": "Zoek voor je aanslaat",
+         "d": "De X gebruik je niet vaak. Als je twijfelt, voel dan met je vinger naar de toets in plaats van te kijken."
+        },
+        {
+         "icon": "✍️",
+         "t": "De punt",
+         "d": "Met een punt maak je een zin af. De punt hoort bij het woord ervoor en daarna volgt een spatie."
+        }
+       ],
+       "tip": "Doel: leer waar de X en de punt zitten, zonder naar het toetsenbord te kijken."
+      },
+      "text": "taxi. extra. expres. excuus. luxe. maximaal. exact. relax. fax. extra."
+     },
+     {
+      "id": "b4",
+      "keys": "z /",
+      "teaches": "z/",
+      "title": "Z en de schuine streep, de pinken op de onderste rij",
+      "tip": "De Z typ je met je linkerpink op de onderste rij en de schuine streep (/) met je rechterpink, helemaal rechtsonder. Houd je pols stil: alleen de pink strekt zich uit.",
+      "tuto": {
+       "intro": "De Z komt linksonder en de schuine streep rechtsonder. Beide typ je met een pink.",
+       "rules": [
+        {
+         "icon": "🤏",
+         "t": "Z met de pink",
+         "d": "Je linkerpink zakt naar de Z, linksonder. Houd je pols stil: alleen de pink strekt zich uit."
+        },
+        {
+         "icon": "⌨️",
+         "t": "De schuine streep",
+         "d": "De schuine streep zit rechtsonder, naast de punt. Je gebruikt hem tussen twee woorden, bijvoorbeeld bij oma/opa."
+        },
+        {
+         "icon": "🤝",
+         "t": "Een toets per vinger",
+         "d": "Zoals altijd heeft elke toets zijn eigen vinger. Verplaats niet je hele hand voor een enkele aanslag."
+        }
+       ],
+       "tip": "Doel: vind de Z en de schuine streep, elk met de juiste vinger, zonder je hand te verkrampen."
+      },
+      "text": "hij/zij oma/opa mama/papa zoet/zuur zwart/wit zout/zoet zacht zwaar zeker zalm zes zus"
+     },
+     {
+      "id": "b5",
+      "keys": "b n",
+      "teaches": "bn",
+      "title": "B en N, de wijsvingers in het midden",
+      "tip": "De B typ je met je linkerwijsvinger en de N met je rechter, allebei op de onderste rij richting het midden. Nu ken je alle 26 letters van het alfabet. Dat is een grote stap! Elke echte tekst is nu binnen bereik.",
+      "tuto": {
+       "intro": "De B en de N maken het alfabet compleet. Een mijlpaal: je kent nu alle 26 letters.",
+       "rules": [
+        {
+         "icon": "⬇️",
+         "t": "B en N, onderaan in het midden",
+         "d": "Je wijsvingers strekken zich naar het midden en zakken dan naar de B en de N. Het is een vrij grote beweging, dus ga snel terug naar de F en de J."
+        },
+        {
+         "icon": "🏁",
+         "t": "Alle 26 letters samen",
+         "d": "Met de B en de N ken je het hele alfabet. Vanaf nu kun je elk Nederlands woord typen."
+        },
+        {
+         "icon": "🔁",
+         "t": "Terug naar de basis",
+         "d": "Na elke B of N keert je wijsvinger terug naar de basisrij. Zo blijf je je plek altijd vinden."
+        }
+       ],
+       "tip": "Doel: vind de B en de N en geniet ervan dat je het hele alfabet kent."
+      },
+      "text": "de nieuwe bal is blauw. een bruine beer eet brood. negen bananen en een boek zijn bij mij."
+     },
+     {
+      "id": "b6",
+      "keys": "z x c v b n m , . /",
+      "teaches": "",
+      "title": "Herhaling: alle 26 letters samen",
+      "tip": "Alle letters zijn er. Het doel van deze herhaling is helemaal niet naar het toetsenbord te kijken. Als je twijfelt over een toets, stop dan even, stel je voor waar hij zit en tik dan. Kijk niet: voel met je vinger.",
+      "tuto": {
+       "intro": "Je hebt nu elke letter van het alfabet onder je vingers. In deze herhaling staan ze allemaal door elkaar.",
+       "rules": [
+        {
+         "icon": "🚫",
+         "t": "Niet gluren",
+         "d": "Het enige doel hier is nooit naar het toetsenbord te kijken. Nu kun je controleren of je spiergeheugen het houdt."
+        },
+        {
+         "icon": "🧭",
+         "t": "Voel met je vinger",
+         "d": "Als je twijfelt over een toets, kijk dan niet omlaag. Stel hem je voor vanaf F en J en tik dan."
+        },
+        {
+         "icon": "🐢",
+         "t": "Netjes gaat voor snel",
+         "d": "Het is beter om langzaam zonder te kijken te typen dan snel met spieken. De snelheid komt en de goede gewoonte blijft."
+        }
+       ],
+       "tip": "Doel: schrijf met alle 26 letters zonder een enkele blik op het toetsenbord."
+      },
+      "text": "twee jonge honden zagen een bruine kat met blauwe ogen, en zij zwaaien naar mama/papa in de taxi."
+     }
+    ]
+   },
+   {
+    "name": "4. Zinnen maken",
+    "lessons": [
+     {
+      "id": "w1",
+      "keys": "alle letters",
+      "teaches": "",
+      "title": "Ritme en korte woorden",
+      "tip": "Typ deze korte woorden alsof je telt: een beweging, een tel. Houd van begin tot eind hetzelfde tempo, zonder sneller of langzamer te worden.",
+      "tuto": {
+       "intro": "Je hebt nu alle letters onder je vingers. Nu komt het ritme: korte, gelijkmatige woorden aan elkaar rijgen maakt je typen soepeler.",
+       "rules": [
+        {
+         "icon": "🎵",
+         "t": "Een vast tempo",
+         "d": "Typ woorden in een gelijkmatig tempo, als een metronoom. Regelmaat is beter dan snelle schokjes."
+        },
+        {
+         "icon": "🔗",
+         "t": "Denk in kleine groepjes",
+         "d": "Je hersenen typen niet letter voor letter maar in kleine groepjes. \"op en neer\" voelt als een enkele beweging."
+        },
+        {
+         "icon": "😌",
+         "t": "Blijf ontspannen",
+         "d": "Houd je schouders en polsen los. Spanning verstoort je ritme en maakt je handen moe."
+        }
+       ],
+       "tip": "Doel: een regelmatig, soepel ritme vinden bij korte Nederlandse woorden."
+      },
+      "text": "op en neer, in en uit, aan en uit, hier en daar, nu en dan, een twee drie, zes zeven acht"
+     },
+     {
+      "id": "w2",
+      "keys": "woorden",
+      "teaches": "",
+      "title": "Kleine woordjes die je overal tegenkomt",
+      "tip": "Kleine woordjes uit het dagelijks leven komen in elke zin voor. Probeer elk woord in een keer te typen, zonder letter voor letter te denken.",
+      "tuto": {
+       "intro": "Kleine woordjes (de, en, van, het, een...) komen in elke Nederlandse zin voor. Als je ze automatisch typt, ga je overal sneller.",
+       "rules": [
+        {
+         "icon": "⚡",
+         "t": "Superhandige woorden",
+         "d": "Deze woorden vormen een groot deel van elke tekst. Hoe automatischer ze gaan, hoe sneller je in het algemeen typt."
+        },
+        {
+         "icon": "🔗",
+         "t": "Een woord, een beweging",
+         "d": "Probeer elk klein woord in een keer te typen, zonder letter voor letter te denken."
+        },
+        {
+         "icon": "👀",
+         "t": "Kijk vooruit",
+         "d": "Lees het volgende woord terwijl je vingers het vorige afmaken."
+        }
+       ],
+       "tip": "Doel: de kleine woordjes zonder aarzelen typen, als een reflex."
+      },
+      "text": "de, en, van, het, een, ik, je, dat, is, op, te, zijn, met, voor, niet, ze, ook, maar, aan, er, nog, bij, uit"
+     },
+     {
+      "id": "w3",
+      "keys": "woorden",
+      "teaches": "",
+      "title": "Woorden uit het dagelijks leven",
+      "tip": "Woorden over eten en drinken. Word niet ineens langzamer bij een langer woord: houd een gelijkmatig tempo over de hele regel.",
+      "tuto": {
+       "intro": "Nu gaan we naar gewone woorden uit het dagelijks leven. Hoe meer woorden je op de automatische piloot typt, hoe soepeler het gaat.",
+       "rules": [
+        {
+         "icon": "🧠",
+         "t": "Bouw automatismen op",
+         "d": "Een woord dat je vaak genoeg herhaalt, typt zichzelf uiteindelijk. Dat is het doel: je hoofd blijft vrij om over de betekenis na te denken."
+        },
+        {
+         "icon": "🎵",
+         "t": "Houd het ritme",
+         "d": "Word niet ineens langzamer bij een langer woord. Houd een gelijkmatig tempo over de hele regel."
+        },
+        {
+         "icon": "✅",
+         "t": "Eerst netjes",
+         "d": "Als een woord je vaak laat struikelen, ga er dan een paar keer langzaam doorheen en pak daarna het tempo weer op."
+        }
+       ],
+       "tip": "Doel: gewone woorden met gemak en in een vast ritme aan elkaar typen."
+      },
+      "text": "brood, boter, kaas, rijst, soep, sla, melk, koffie, thee, suiker, honing, appel, koek, water"
+     },
+     {
+      "id": "w4",
+      "keys": "woorden",
+      "teaches": "",
+      "title": "Langere woorden",
+      "tip": "Langere, concrete woorden. Deel ze op in kleine bewegingen (keu-ken, va-kan-tie) en houd van begin tot eind een gelijkmatig ritme.",
+      "tuto": {
+       "intro": "Langere, concrete woorden. Een mooie kans om je ritme vast te houden bij woorden met meerdere lettergrepen.",
+       "rules": [
+        {
+         "icon": "🔗",
+         "t": "Verdeel in lettergrepen",
+         "d": "Een lang woord typ je als een reeks kleine bewegingen. keu-ken, va-kan-tie, com-pu-ter: denk in stukjes."
+        },
+        {
+         "icon": "🎯",
+         "t": "Netjes bij lengte",
+         "d": "Hoe langer het woord, hoe meer een fout kost. Typ liever schoon dan gehaast."
+        },
+        {
+         "icon": "👀",
+         "t": "Kijk tot het einde van het woord",
+         "d": "Terwijl je het begin typt, heeft je oog het einde al gezien. Laat je vingers volgen."
+        }
+       ],
+       "tip": "Doel: langere woorden typen zonder je ritme of je nauwkeurigheid te verliezen."
+      },
+      "text": "keuken, tuin, raam, leraar, computer, vliegveld, vakantie, avond, ochtend, kinderen, buurman, school, dorp"
+     },
+     {
+      "id": "w5",
+      "keys": "vlot",
+      "teaches": "",
+      "title": "Je eerste echte zinnen",
+      "tip": "Je typt nu echte zinnen. Lees in kleine groepjes woorden en houd je beweging doorlopend, ook bij de komma en de puntkomma.",
+      "tuto": {
+       "intro": "Nu ga je over op echte zinnen. De uitdaging is niet meer de toets, maar de vloeiende lijn van het begin tot het einde van de zin.",
+       "rules": [
+        {
+         "icon": "➡️",
+         "t": "Denk in woordgroepjes",
+         "d": "Lees en typ in kleine groepjes (de kat / zit / op de mat) in plaats van een los woord tegelijk."
+        },
+        {
+         "icon": "👍",
+         "t": "Vergeet de spatie niet",
+         "d": "Je slaat de spatiebalk aan met je duim, zonder je ritme te onderbreken. Het is de meest gebruikte toets van het toetsenbord."
+        },
+        {
+         "icon": "✍️",
+         "t": "Zet netjes leestekens",
+         "d": "De komma, de puntkomma en het uitroepteken horen bij het laatste woord en daarna volgt een spatie."
+        }
+       ],
+       "tip": "Doel: hele zinnen typen in een doorlopende, soepele beweging."
+      },
+      "text": "het is koud vandaag, dus we blijven thuis; mijn zus zet thee, en we eten brood met kaas; de kat slaapt op de bank."
+     }
+    ]
+   },
+   {
+    "name": "5. Hoofdletters",
+    "kind": "majuscules",
+    "lessons": [
+     {
+      "id": "maj1",
+      "title": "Hoofdletters van de linkerhand (rechter Shift)",
+      "keys": "Q W E R T A S D F G",
+      "teaches": "QWERTASDFG",
+      "hand": "gauche",
+      "tip": "Bij een letter van je linkerhand houd je de rechter Shift ingedrukt met je rechterpink. Shift vasthouden, de letter typen, loslaten.",
+      "tuto": {
+       "intro": "Een hoofdletter typ je door Shift ingedrukt te houden en dan de letter aan te slaan. De gouden regel: gebruik de Shift aan de andere kant dan de letter. We beginnen met de letters van de linkerhand.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Shift van de andere hand",
+         "d": "Voor een letter van je linkerhand houd je de rechter Shift ingedrukt met je rechterpink. Voor een letter van je rechterhand gebruik je de linker Shift. Je twee handen delen het werk."
+        },
+        {
+         "icon": "🔒",
+         "t": "Indrukken, typen, loslaten",
+         "d": "Druk Shift in en houd hem vast, sla de letter aan en laat dan beide los. Laat je Shift te vroeg los, dan krijg je een kleine letter."
+        },
+        {
+         "icon": "🧑",
+         "t": "Hele woorden in hoofdletters",
+         "d": "Bij woorden als WATER en STRAAT houd je Shift het hele woord vast. Bij een woord als Quiz of Qatar is alleen de eerste letter een hoofdletter."
+        }
+       ],
+       "tip": "Doel: hoofdletters van de linkerhand typen met de rechter Shift, zonder te aarzelen."
+      },
+      "text": "Quiz Quiche Quote Quinoa Qatar Quiz Quiche Quote WATER STRAAT TAART GRAS DWERG FEEST FASE FRET WEST GEWEST STAD DRAAD WEG WEGEN GAST FEEST FASE WATER TWEE DAG FRET WAGEN DWERG FEEST FASE DAGEN DRAAD GAS",
+      "maxLen": 250
+     },
+     {
+      "id": "maj2",
+      "title": "Hoofdletters van de rechterhand (linker Shift)",
+      "keys": "Y U I O P H J K L",
+      "teaches": "YUIOPHJKL",
+      "hand": "droite",
+      "tip": "Bij een letter van je rechterhand houd je de linker Shift ingedrukt met je linkerpink. Dezelfde beweging als daarnet, maar aan de andere kant.",
+      "tuto": {
+       "intro": "Hetzelfde principe aan de andere kant: voor een letter van je rechterhand houd je de linker Shift ingedrukt met je linkerpink.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Shift van de andere hand",
+         "d": "Voor een letter van je rechterhand houd je de linker Shift ingedrukt met je linkerpink. Het is het spiegelbeeld van de vorige oefening."
+        },
+        {
+         "icon": "🔒",
+         "t": "Indrukken, typen, loslaten",
+         "d": "Houd Shift vast, sla de letter aan en laat dan beide los. Zo blijft je ritme gelijkmatig en blijven je handen rustig."
+        },
+        {
+         "icon": "🧑",
+         "t": "Namen en woorden in hoofdletters",
+         "d": "Yves, Julia, Kim, Hugo: namen beginnen met een hoofdletter. Bij woorden in hoofdletters (YOGA, HOOG, KOUD) houd je Shift wat langer vast."
+        }
+       ],
+       "tip": "Doel: hoofdletters van de rechterhand typen met de linker Shift, met rustige handen."
+      },
+      "text": "Yves Julia Kim Jules Lois Joris Kobe Hugo Ilse Pieter YOGA YOGHURT PONY HOBBY YOGA YOGHURT UIL KUIL HULP JOKER OLIJF KOP HOOP HUIL PIJL KILO JOUW KIJK HOUT PUPIL PONY",
+      "maxLen": 200
+     },
+     {
+      "id": "maj3",
+      "title": "Hoofdletters van de onderste rij",
+      "keys": "Z X C V B N M",
+      "teaches": "ZXCVBNM",
+      "tip": "Z X C V B typ je met je linkerhand, dus met de rechter Shift. N en M typ je met je rechterhand, dus met de linker Shift.",
+      "tuto": {
+       "intro": "De laatste hoofdletters zitten op de onderste rij. Dezelfde regel als altijd: Shift met de andere hand dan de letter.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Links en rechts",
+         "d": "Z X C V B zijn letters van je linkerhand: rechter Shift. N en M zijn letters van je rechterhand: linker Shift."
+        },
+        {
+         "icon": "🎯",
+         "t": "Ook de zeldzame letters",
+         "d": "X en Z komen minder vaak voor, maar ze horen erbij: TAXI, EXTRA, ZEE. Oefen ze net zo rustig als de andere."
+        },
+        {
+         "icon": "🧑",
+         "t": "Namen en woorden in hoofdletters",
+         "d": "Zoe, Max, Victor, Nick: namen krijgen een hoofdletter. Een woord als CIRCUS typ je helemaal met Shift."
+        }
+       ],
+       "tip": "Doel: hoofdletters van de onderste rij typen, links met de rechter Shift en rechts met de linker Shift."
+      },
+      "text": "Zoe Max Victor Nick Marie Bram Noor Carla Nina TAXI EXTRA BOX MIX FAX LUXE EXACT RELAX ZON ZES ZEVEN ZEE VIER VUUR BUS CIRCUS COLA MAAN NEGEN ZWART ZUS ZOOM CAKE CIRKEL BAL VIS MAMA VIJF VAN VOGEL BEER BOEK BERG MIER CADEAU BROOD",
+      "maxLen": 250
+     },
+     {
+      "id": "maj5",
+      "title": "Namen en plaatsen",
+      "keys": "hoofdletters",
+      "teaches": "",
+      "tip": "Voornamen en plaatsnamen krijgen altijd een hoofdletter. Alleen de eerste letter, de rest van het woord blijft klein.",
+      "tuto": {
+       "intro": "Nu gebruik je hoofdletters bij echte namen: voornamen, steden en landen. Alleen de eerste letter is een hoofdletter.",
+       "rules": [
+        {
+         "icon": "🔠",
+         "t": "Hoofdletter, dan kleine letters",
+         "d": "Alleen de eerste letter krijgt Shift. Laat Shift meteen los en typ de rest van het woord met kleine letters."
+        },
+        {
+         "icon": "🌍",
+         "t": "Eigennamen",
+         "d": "Voornamen, steden en landen beginnen met een hoofdletter: Anna, Gent, Brussel, Nederland. Dat is een regel, geen keuze."
+        },
+        {
+         "icon": "🎯",
+         "t": "Maak je klaar voor Shift",
+         "d": "Zet je pink net voor de letter al op Shift. De beweging gaat soepeler als je hem ziet aankomen."
+        }
+       ],
+       "tip": "Doel: namen en plaatsen met een hoofdletter typen, met Shift alleen op de eerste letter."
+      },
+      "text": "Anna, Emma, Tom, Lars, Noor, Jan, Gent, Brussel, Antwerpen, Brugge, Vlaanderen, Nederland, Amsterdam, Rotterdam."
+     },
+     {
+      "id": "maj6",
+      "title": "Zinnen met hoofdletters",
+      "keys": "hoofdletters in zinnen",
+      "teaches": "",
+      "tip": "Een zin begint met een hoofdletter, en namen van mensen en plaatsen krijgen er ook een. Dagen en maanden schrijf je met een kleine letter, behalve aan het begin van een zin.",
+      "tuto": {
+       "intro": "De laatste stap: hoofdletters in echte zinnen. De punt kende je al, dus nu kun je zinnen netjes laten beginnen en eindigen.",
+       "rules": [
+        {
+         "icon": "🔠",
+         "t": "Het begin van een zin",
+         "d": "Elke zin begint met een hoofdletter. Denk eraan terwijl je typt, niet erna."
+        },
+        {
+         "icon": "📅",
+         "t": "Dagen en maanden",
+         "d": "In het Nederlands schrijf je maandag en maart met een kleine letter. Alleen aan het begin van een zin krijgen ze een hoofdletter."
+        },
+        {
+         "icon": "👀",
+         "t": "Controleer wat je typt",
+         "d": "Kijk even na of je zinnen en eigennamen een hoofdletter hebben. Dat laat zien dat je netjes werkt."
+        }
+       ],
+       "tip": "Doel: een hoofdletter gebruiken aan het begin van zinnen en bij namen, zonder je ritme te verliezen."
+      },
+      "text": "Anna woont in Gent, en Tom woont in Brugge. Op maandag gaan ze samen naar Antwerpen; Noor komt ook mee. Het wordt een leuke dag."
+     }
+    ]
+   },
+   {
+    "name": "6. Leestekens",
+    "kind": "ponctuation",
+    "lessons": [
+     {
+      "id": "pon1",
+      "title": "De dubbele punt: Shift + puntkomma",
+      "keys": ":",
+      "teaches": ":",
+      "tip": "De dubbele punt zit op dezelfde toets als de puntkomma: houd Shift ingedrukt met je linkerpink en sla de toets aan met je rechterpink.",
+      "tuto": {
+       "intro": "De dubbele punt kondigt een opsomming of een uitleg aan. Op dit toetsenbord deelt hij de toets met de puntkomma: je typt hem met Shift. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Shift + de puntkomma-toets",
+         "d": "Houd Shift ingedrukt met je linkerpink (de andere hand), sla de puntkomma-toets aan met je rechterpink en laat dan los."
+        },
+        {
+         "icon": "␣",
+         "t": "Geen spatie ervoor",
+         "d": "In het Nederlands zet je nooit een spatie voor : ; ? of !. Het teken plakt aan het woord ervoor, daarna komt een spatie."
+        },
+        {
+         "icon": "🎯",
+         "t": "Hij kondigt iets aan",
+         "d": "Mijn lijstje: brood, melk, kaas. De dubbele punt kondigt een opsomming, een uitleg of een citaat aan."
+        }
+       ],
+       "tip": "Doel: de dubbele punt typen met Shift + puntkomma, vlak tegen het woord ervoor."
+      },
+      "text": "Mijn lijstje: brood, melk, kaas. Let op: het is laat. Kijk: de zon schijnt. Onthoud: blijf kalm. Twee dingen: thee, suiker. Ik zie drie dieren: een kat, een hond.",
+      "maxLen": 170
+     },
+     {
+      "id": "pon2",
+      "title": "De apostrof",
+      "keys": "'",
+      "teaches": "'",
+      "tip": "De apostrof zit rechts van de puntkomma en je typt hem met je rechterpink. Op een VS-internationaal toetsenbord is het een dode toets: druk hem in en dan de spatiebalk.",
+      "tuto": {
+       "intro": "De apostrof vervangt weggelaten letters (m'n, z'n, 's avonds) en staat in meervouden als auto's en foto's. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "🔤",
+         "t": "Rechts van de puntkomma",
+         "d": "Je typt hem met je rechterpink, op de toets net rechts van de puntkomma, zonder Shift."
+        },
+        {
+         "icon": "⏳",
+         "t": "Pas op: dode toets",
+         "d": "Op een VS-internationaal toetsenbord is de apostrof een dode toets: druk hem in en dan de spatiebalk, anders smelt hij samen met de volgende letter tot een letter met accent. Op een gewoon VS-toetsenbord werkt hij meteen."
+        },
+        {
+         "icon": "✍️",
+         "t": "Hij plakt aan de woorden",
+         "d": "Typ het begin, de apostrof en het einde zonder enige spatie: m'n, z'n, auto's, foto's."
+        }
+       ],
+       "tip": "Doel: de apostrof typen met de juiste beweging voor jouw toetsenbord, zonder spaties eromheen."
+      },
+      "text": "'s Avonds speel ik met m'n zus en z'n hond. We maken foto's van auto's en baby's. Zo'n dag is lekker."
+     },
+     {
+      "id": "pon3",
+      "title": "Het koppelteken",
+      "keys": "-",
+      "teaches": "-",
+      "tip": "Het koppelteken zit rechts van de 0, helemaal rechtsboven: je rechterpink reikt ernaartoe, zonder Shift. Het verbindt delen van een samenstelling.",
+      "tuto": {
+       "intro": "Het koppelteken verbindt de delen van een samenstelling (zwart-wit, noord-zuid, e-mail). De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Rechtsboven",
+         "d": "Je rechterpink reikt naar de toets rechts van de 0, zonder Shift. Dat is de koppeltekentoets."
+        },
+        {
+         "icon": "✍️",
+         "t": "Geen spaties eromheen",
+         "d": "Het koppelteken plakt aan beide woorden: noord-zuid, zwart-wit, e-mail, rood-wit-blauw."
+        },
+        {
+         "icon": "🔠",
+         "t": "Niet het liggend streepje",
+         "d": "Het liggend streepje (_) op dezelfde toets heeft Shift nodig: dat komt later, bij de symbolen. Hier typ je het gewone koppelteken."
+        }
+       ],
+       "tip": "Doel: met je rechterpink omhoog reiken naar het koppelteken en terugkeren naar de basisrij."
+      },
+      "text": "Op het bord staat noord-zuid en oost-west. De vlag is rood-wit-blauw, de foto is zwart-wit. We spelen ping-pong en sturen een e-mail.",
+      "maxLen": 140
+     },
+     {
+      "id": "pon4",
+      "title": "Het vraagteken: Shift + schuine streep",
+      "keys": "?",
+      "teaches": "?",
+      "tip": "Het vraagteken zit op dezelfde toets als de schuine streep: houd Shift ingedrukt met je linkerpink en sla de toets aan met je rechterpink.",
+      "tuto": {
+       "intro": "Het vraagteken sluit een vraag af. Op dit toetsenbord deelt hij de toets met de schuine streep: je typt hem met Shift. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Shift + de schuine-streeptoets",
+         "d": "Houd Shift ingedrukt met je linkerpink, sla de schuine-streeptoets aan met je rechterpink en laat dan los."
+        },
+        {
+         "icon": "␣",
+         "t": "Geen spatie ervoor",
+         "d": "In het Nederlands zet je nooit een spatie voor : ; ? of !. Het teken plakt aan het woord ervoor, daarna komt een spatie."
+        },
+        {
+         "icon": "🎭",
+         "t": "Om te vragen",
+         "d": "Waar is Tom? Wat eten we? Een vraagteken aan het einde van de vraag is genoeg."
+        }
+       ],
+       "tip": "Doel: het vraagteken typen met Shift + schuine streep, vlak tegen het laatste woord."
+      },
+      "text": "Waar is Tom? Wie is dat? Wat eten we? Is papa thuis? Mag ik buiten spelen? Waarom niet? Hoe oud ben je?"
+     },
+     {
+      "id": "pon5",
+      "title": "Het uitroepteken: Shift + 1",
+      "keys": "!",
+      "teaches": "!",
+      "tip": "Het uitroepteken zit op de 1-toets, linksboven: houd Shift ingedrukt met je rechterpink en sla de 1 aan met je linkerpink.",
+      "tuto": {
+       "intro": "Het uitroepteken geeft gevoel mee: een bevel, een verrassing, een feestelijk bericht. Op dit toetsenbord zit hij op de 1-toets: je typt hem met Shift. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Shift + de 1-toets",
+         "d": "Houd Shift ingedrukt met je rechterpink (de andere hand), sla de 1-toets aan met je linkerpink en laat dan los."
+        },
+        {
+         "icon": "␣",
+         "t": "Geen spatie ervoor",
+         "d": "In het Nederlands zet je nooit een spatie voor : ; ? of !. Het teken plakt aan het woord ervoor, daarna komt een spatie."
+        },
+        {
+         "icon": "🎭",
+         "t": "Niet overdrijven",
+         "d": "Stop! Goed gedaan! Een uitroepteken is genoeg: stapel ze niet op elkaar."
+        }
+       ],
+       "tip": "Doel: het uitroepteken typen met Shift + 1, vlak tegen het laatste woord."
+      },
+      "text": "Stop! Kijk uit! Goed gedaan! Wat een dag! Gelukkige verjaardag! Welkom thuis! Veel succes! Dank je wel! Hallo!"
+     },
+     {
+      "id": "pon6",
+      "title": "Haakjes en aanhalingstekens",
+      "keys": "( ) \"",
+      "teaches": "()\"",
+      "tip": "Ronde haakjes zitten op de 9- en 0-toets, het rechte aanhalingsteken op de apostroftoets: alle drie vragen Shift, ingedrukt met je linkerpink.",
+      "tuto": {
+       "intro": "Met haakjes voeg je een detail toe en aanhalingstekens omsluiten wat iemand zegt. Alle drie typ je met Shift, op toetsen van je rechterhand. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Shift + 9, Shift + 0 en Shift + apostrof",
+         "d": "Houd Shift ingedrukt met je linkerpink. Het openende haakje zit op de 9, het sluitende op de 0 en het aanhalingsteken op de apostroftoets."
+        },
+        {
+         "icon": "🔁",
+         "t": "Openen en sluiten",
+         "d": "Elk haakje en elk aanhalingsteken dat je opent, sluit je ook. Oefen het openen, de tekst en het sluiten achter elkaar, zonder spatie binnen de haakjes."
+        },
+        {
+         "icon": "💬",
+         "t": "Rechte aanhalingstekens",
+         "d": "Ze omsluiten gesproken tekst: Tom zegt: \"hallo\". Op het toetsenbord zijn ze recht."
+        }
+       ],
+       "tip": "Doel: haakjes en aanhalingstekens typen met Shift, eerst openen en dan sluiten."
+      },
+      "text": "Tom (tien jaar) zegt: \"hallo\". Anna (negen jaar) zegt: \"dank je\" (nog eens). Papa (op zijn werk) zegt: \"wacht\" (even) (nu)."
+     },
+     {
+      "id": "pon7",
+      "title": "Leestekens in echte tekst",
+      "keys": "alle leestekens",
+      "teaches": "",
+      "tip": "Nu breng je alle leestekens samen in een echte tekst. Zie het volgende teken vooraf aankomen en maak zo nodig je Shift klaar.",
+      "tuto": {
+       "intro": "Je brengt alle leestekens samen in een levendige tekst: koppeltekens, apostroffen, aanhalingstekens, haakjes, uitroep- en vraagtekens.",
+       "rules": [
+        {
+         "icon": "🧭",
+         "t": "Zie het teken aankomen",
+         "d": "Weet voor je het teken bereikt welk teken het is: direct (apostrof, koppelteken, komma, punt) of met Shift (? ! : ( ) \")."
+        },
+        {
+         "icon": "⇧",
+         "t": "Shift van de andere hand",
+         "d": "Elk teken dat Shift nodig heeft, typ je met de Shift aan de andere kant dan de toets zelf: dezelfde regel als bij hoofdletters."
+        },
+        {
+         "icon": "✅",
+         "t": "Een nette tekst",
+         "d": "Goede leestekens maken een tekst prettig leesbaar. Neem de tijd: snelheid komt vanzelf."
+        }
+       ],
+       "tip": "Doel: alle leestekens aan elkaar rijgen in een tekst, zonder je ritme te verliezen."
+      },
+      "text": "\"Kom snel!\" roept Anna. Tom antwoordt: \"Wacht even; ik zoek m'n jas (de zwart-witte).\" Wat een dag! Waar is het perron? 's Avonds weet hij het.",
+      "maxLen": 170
+     }
+    ]
+   },
+   {
+    "name": "7. Cijfers",
+    "row": "chiffres",
+    "lessons": [
+     {
+      "id": "num1",
+      "title": "4 5 6 7: de wijsvingers reiken omhoog",
+      "keys": "4 5 6 7",
+      "teaches": "4567",
+      "tip": "Je wijsvingers bedienen vier cijfers: links 4 en 5, rechts 6 en 7. Ze reiken twee rijen omhoog, typen en vallen terug op F en J.",
+      "tuto": {
+       "intro": "De cijferrij ligt helemaal bovenaan, boven de bovenste letterrij. We beginnen met de wijsvingers, die de meeste cijfers bedienen: 4 en 5 voor de linkerhand, 6 en 7 voor de rechter.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "De wijsvinger reikt twee rijen omhoog",
+         "d": "Je linkerwijsvinger gaat naar 4 en 5, je rechter naar 6 en 7. De beweging begint op F en J, gaat over de bovenste rij en komt weer terug."
+        },
+        {
+         "icon": "🔢",
+         "t": "Cijfers zonder Shift",
+         "d": "Op dit toetsenbord staat de cijferrij direct onder je vingers: een toetsaanslag is genoeg, zonder Shift. De symbolen op dezelfde toetsen (zoals ! en het haakje) heb je met Shift."
+        },
+        {
+         "icon": "⚓",
+         "t": "Terug naar de basisrij",
+         "d": "Laat je vinger na elk cijfer terugvallen op zijn rustplek. Je andere vingers blijven staan: zo hoef je nooit naar beneden te kijken."
+        }
+       ],
+       "tip": "Doel: 4 5 6 7 typen met je wijsvingers en dan zonder kijken terugkeren naar F en J."
+      },
+      "text": "Bus 45 vertrekt om 6.57 uur, bus 67 om 7.46 uur. Kamer 54, kamer 65, kamer 74, kamer 46, plaats 47, plaats 56, plaats 57."
+     },
+     {
+      "id": "num2",
+      "title": "3 en 8: de middelvingers",
+      "keys": "3 8",
+      "teaches": "38",
+      "tip": "Je linkermiddelvinger reikt naar 3, je rechtermiddelvinger naar 8. Laat je wijsvingers verankerd op F en J.",
+      "tuto": {
+       "intro": "Nu de middelvingers: 3 voor de linkerhand, 8 voor de rechter. Ze gaan recht omhoog, boven E en I.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "De middelvinger gaat recht omhoog",
+         "d": "Je linkermiddelvinger gaat naar de 3, boven E. Je rechtermiddelvinger gaat naar de 8, boven I. Een rechte beweging, zonder je hand te draaien."
+        },
+        {
+         "icon": "⚓",
+         "t": "Houd je wijsvingers verankerd",
+         "d": "Je wijsvingers blijven op F en J terwijl je middelvingers omhoog reiken: zij zijn je gids om zonder kijken terug te komen."
+        },
+        {
+         "icon": "🔢",
+         "t": "Cijfers zonder Shift",
+         "d": "Op dit toetsenbord staat de cijferrij direct onder je vingers: een toetsaanslag is genoeg, zonder Shift. De symbolen op dezelfde toetsen (zoals ! en het haakje) heb je met Shift."
+        }
+       ],
+       "tip": "Doel: 3 en 8 typen met je middelvingers, terwijl je andere vingers blijven rusten."
+      },
+      "text": "Bus 38 vertrekt om 8.38 uur van halte 3, bus 83 om 8.43 uur van halte 8. Kamer 38 ligt op verdieping 3, kamer 83 op verdieping 8."
+     },
+     {
+      "id": "num3",
+      "title": "2 en 9: de ringvingers",
+      "keys": "2 9",
+      "teaches": "29",
+      "tip": "Je linkerringvinger reikt naar 2, je rechterringvinger naar 9. Deze vingers zijn minder lenig: ga langzaam.",
+      "tuto": {
+       "intro": "De ringvingers bedienen 2 en 9. We naderen de randen van de rij: deze vingers zijn minder lenig, dus we gaan langzaam.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Ringvingers strekken zich uit",
+         "d": "Je linkerringvinger gaat naar de 2, boven W. Je rechterringvinger gaat naar de 9, boven O. De beweging is langer: blijf nauwkeurig."
+        },
+        {
+         "icon": "🎯",
+         "t": "Nauwkeurigheid gaat voor",
+         "d": "Hoe verder van het midden, hoe meer fouten er insluipen. Langzaam en goed is beter dan snel en fout."
+        },
+        {
+         "icon": "🔢",
+         "t": "Cijfers zonder Shift",
+         "d": "Op dit toetsenbord staat de cijferrij direct onder je vingers: een toetsaanslag is genoeg, zonder Shift. De symbolen op dezelfde toetsen (zoals ! en het haakje) heb je met Shift."
+        }
+       ],
+       "tip": "Doel: 2 en 9 bereiken met je ringvingers, zonder te kijken."
+      },
+      "text": "Er zitten 29 leerlingen in klas 2. Lees bladzijde 92, bladzijde 29 en bladzijde 9. Bus 22 vertrekt om 9.29 uur, bus 99 om 2.29."
+     },
+     {
+      "id": "num4",
+      "title": "1 en 0: de pinken",
+      "keys": "1 0",
+      "teaches": "10",
+      "tip": "Je linkerpink reikt naar 1, je rechterpink naar 0, aan de uiteinden van de rij. Laat alleen de pink zich uitstrekken.",
+      "tuto": {
+       "intro": "De pinken bedienen 1 en 0, aan beide uiteinden van de cijferrij. Dit zijn je zwakste vingers, dus geef ze de tijd.",
+       "rules": [
+        {
+         "icon": "🤏",
+         "t": "Pinken reiken omhoog",
+         "d": "Je linkerpink gaat naar de 1, boven Q. Je rechterpink gaat naar de 0, boven P. Draai niet je hele hand."
+        },
+        {
+         "icon": "🧘",
+         "t": "Houd je pols rustig",
+         "d": "Je pols blijft stil en alleen de pink strekt zich uit. Til niet je hele hand op om 1 of 0 te bereiken."
+        },
+        {
+         "icon": "🔢",
+         "t": "Cijfers zonder Shift",
+         "d": "Op dit toetsenbord staat de cijferrij direct onder je vingers: een toetsaanslag is genoeg, zonder Shift. De symbolen op dezelfde toetsen (zoals ! en het haakje) heb je met Shift."
+        }
+       ],
+       "tip": "Doel: 1 en 0 typen met je pinken, zonder je basispositie te verlaten."
+      },
+      "text": "Ik heb 10 potloden, 100 pennen en 1 liniaal. Vandaag is het 10 maart. Kamer 101 is open tot 10.10 uur; kamer 1 is vrij."
+     },
+     {
+      "id": "num5",
+      "title": "Herhaling: alle cijfers",
+      "keys": "0 1 2 3 4 5 6 7 8 9",
+      "teaches": "",
+      "tip": "Je kent nu de hele cijferrij. Rijg de cijfers aan elkaar in alle richtingen: het doel is dat je ze zonder kijken vindt.",
+      "tuto": {
+       "intro": "Je kent nu alle tien de cijfers. Deze herhaling mengt ze door elkaar om elke beweging vast te zetten.",
+       "rules": [
+        {
+         "icon": "🔁",
+         "t": "In alle richtingen",
+         "d": "Oplopend, aflopend, afwisselend: elk cijfer moet zonder aarzelen komen, in welke volgorde ook."
+        },
+        {
+         "icon": "🧠",
+         "t": "Denk in groepjes",
+         "d": "Een datum of een kamernummer typ je in groepjes van twee of drie cijfers. Voel elk groepje als een enkele beweging."
+        },
+        {
+         "icon": "⚓",
+         "t": "Terug naar de basisrij",
+         "d": "Laat je vinger na elk cijfer terugvallen op zijn rustplek. Je andere vingers blijven staan: zo hoef je nooit naar beneden te kijken."
+        }
+       ],
+       "tip": "Doel: alle tien de cijfers aan elkaar rijgen, zonder naar het toetsenbord te kijken."
+      },
+      "text": "Tel op: 0 1 2 3 4 5 6 7 8 9. Tel af: 9 8 7 6 5 4 3 2 1 0. Daarna: 12 34 56 78 90."
+     },
+     {
+      "id": "num6",
+      "title": "Cijfers in echte tekst",
+      "keys": "cijfers in zinnen",
+      "teaches": "",
+      "tip": "Cijfers staan tussen de letters: uren, adressen, telefoonnummers. Houd je ritme vast terwijl je wisselt tussen de letterrijen en de cijferrij.",
+      "tuto": {
+       "intro": "In het echte leven staan cijfers tussen de letters: uren, aantallen, kamernummers, telefoonnummers. Dat typ je hier.",
+       "rules": [
+        {
+         "icon": "🔀",
+         "t": "Letters, dan cijfers",
+         "d": "De wissel van de ene rij naar de andere moet soepel blijven: reik omhoog naar het cijfer, typ het en laat je vinger terugvallen op de basisrij."
+        },
+        {
+         "icon": "📞",
+         "t": "Bekende groepjes",
+         "d": "0472 12 34 56, 8.30 uur, 12 maart: zie het groepje cijfers vooraf aankomen en typ het in een keer."
+        },
+        {
+         "icon": "✅",
+         "t": "Eerst nauwkeurig",
+         "d": "Een fout in een nummer verandert alles. Ga bij cijfers gerust wat langzamer: de snelheid komt met herhaling."
+        }
+       ],
+       "tip": "Doel: cijfers midden in een tekst typen zonder je ritme te verliezen."
+      },
+      "text": "Bel me op 0472 12 34 56 of op 06 12 34 56 78. Het kaartje kost 9,50 euro. De match begint op 12 maart om 8.30 uur; het werd 3 tegen 2.",
+      "maxLen": 160
+     }
+    ]
+   },
+   {
+    "name": "8. Veelgebruikte symbolen",
+    "kind": "symboles",
+    "lessons": [
+     {
+      "id": "sym1",
+      "title": "$ % ^ &: de wijsvingers",
+      "keys": "$ % ^ &",
+      "teaches": "$%^&",
+      "row": "chiffres",
+      "fingers": [
+       "li",
+       "ri"
+      ],
+      "tip": "Deze vier symbolen staan op de toetsen 4, 5, 6 en 7, met Shift: je wijsvingers reiken ernaartoe, net als bij de cijfers.",
+      "tuto": {
+       "intro": "De symbolen op de cijferrij typ je met Shift. We beginnen bij de wijsvingers: $ en % op de 4 en 5 voor de linkerhand, ^ en & op de 6 en 7 voor de rechter. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Shift met de andere hand",
+         "d": "Net als bij hoofdletters: houd Shift ingedrukt met de pink van de hand die de toets niet typt. Shift plus de toets geeft het teken."
+        },
+        {
+         "icon": "📍",
+         "t": "Dezelfde toetsen als de cijfers",
+         "d": "Deze toetsen ken je al: 4 5 6 7. Alleen de Shift komt erbij. Je wijsvinger reikt omhoog, typt en valt terug op F of J."
+        },
+        {
+         "icon": "⏳",
+         "t": "Dode toetsen op VS-internationaal",
+         "d": "Op een VS-internationaal toetsenbord zijn ^ ~ en ` dode toetsen: typ het teken en druk dan op de spatiebalk, zodat het teken alleen verschijnt."
+        }
+       ],
+       "tip": "Doel: $ % ^ & typen met Shift en je wijsvingers, zonder te kijken."
+      },
+      "text": "$naam $totaal $prijs $kost $een $twee 50% 25% 10% 75% 5% 90% 3^2 2^4 5^3 7^2 2^3 6^2 zout&peper thee&koek brood&boter mama&papa oma&opa vis&friet",
+      "maxLen": 200
+     },
+     {
+      "id": "sym2",
+      "title": "# en *: de middelvingers",
+      "keys": "# *",
+      "teaches": "#*",
+      "row": "chiffres",
+      "fingers": [
+       "lm",
+       "rm"
+      ],
+      "tip": "Het hekje zit op de 3-toets en de asterisk op de 8-toets, met Shift: je middelvingers reiken omhoog.",
+      "tuto": {
+       "intro": "De middelvingers bedienen het hekje # (3-toets, linkerhand) en de asterisk * (8-toets, rechterhand). Het hekje begint een hashtag en de asterisk gebruik je in sommen en lijstjes. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Shift met de andere hand",
+         "d": "Net als bij hoofdletters: houd Shift ingedrukt met de pink van de hand die de toets niet typt. Shift plus de toets geeft het teken."
+        },
+        {
+         "icon": "🏷️",
+         "t": "Het hekje van hashtags",
+         "d": "#nieuws #hulp #muziek: een woord met # ervoor is een hashtag. Typ het hekje en dan het woord, zonder spatie."
+        },
+        {
+         "icon": "✖️",
+         "t": "De asterisk",
+         "d": "3*4 lees je als drie keer vier. Je ziet de asterisk ook als markering rond een woord: *let op*."
+        }
+       ],
+       "tip": "Doel: # en * typen met Shift en je middelvingers."
+      },
+      "text": "#nieuws #hulp #sport #reizen #eten #muziek 3*4 5*6 7*8 2*9 *let op* *tip* *hallo* #ok"
+     },
+     {
+      "id": "sym3",
+      "title": "@: het apenstaartje",
+      "keys": "@",
+      "teaches": "@",
+      "row": "chiffres",
+      "fingers": [
+       "lr"
+      ],
+      "tip": "Het apenstaartje zit op de 2-toets, met Shift: je linkerringvinger reikt omhoog en je rechterpink houdt Shift vast.",
+      "tuto": {
+       "intro": "Het apenstaartje verbindt de naam en het domein in een e-mailadres: anna@mail.nl. Op dit toetsenbord zit het op de 2-toets, met Shift. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Shift met de andere hand",
+         "d": "Net als bij hoofdletters: houd Shift ingedrukt met de pink van de hand die de toets niet typt. Shift plus de toets geeft het teken."
+        },
+        {
+         "icon": "📧",
+         "t": "Het hart van een e-mailadres",
+         "d": "info@winkel.nl: de naam, dan @, dan het domein. In een adres staan geen spaties."
+        },
+        {
+         "icon": "🐢",
+         "t": "De ringvinger strekt zich uit",
+         "d": "Je ringvinger is minder lenig dan je wijsvinger: reik rustig omhoog naar de 2 en houd Shift vast met je rechterpink."
+        }
+       ],
+       "tip": "Doel: @ typen met Shift + 2, in complete adressen."
+      },
+      "text": "anna@school.be jan@werk.be info@winkel.nl lars@mail.nl @emma @tom @noor tom@thuis.be"
+     },
+     {
+      "id": "sym4",
+      "title": "_ + =: de rechterpink",
+      "keys": "_ + =",
+      "teaches": "_+=",
+      "row": "chiffres",
+      "fingers": [
+       "rp"
+      ],
+      "tip": "Het liggend streepje, de plus en het is-gelijk-teken staan rechts van de 0: je rechterpink reikt naar rechts, tot het eind van de rij.",
+      "tuto": {
+       "intro": "Helemaal aan het eind van de cijferrij bedient je rechterpink drie tekens: het liggend streepje _ (Shift + koppelteken), de plus + (Shift + is-gelijk) en het is-gelijk-teken = (zonder Shift). De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "De pink strekt zich uit",
+         "d": "De toetsen rechts van de 0 liggen het verst weg: laat alleen je pink reiken en houd je pols rustig."
+        },
+        {
+         "icon": "⇧",
+         "t": "Twee met Shift, een zonder",
+         "d": "_ en + typ je met Shift (ingedrukt met je linkerpink), = typ je los. Het gewone koppelteken van eerder is dezelfde toets als _, zonder Shift."
+        },
+        {
+         "icon": "💻",
+         "t": "Variabelen en sommen",
+         "d": "mijn_naam, bestand_naam, a+b=c: het liggend streepje verbindt woorden in codenamen, plus en is-gelijk zijn voor de sommen."
+        }
+       ],
+       "tip": "Doel: _ + = typen met je rechterpink en terugkeren naar de basisrij."
+      },
+      "text": "a+b=c x_y mijn_naam bestand_naam 2+3=5 totaal_score a_b+c_d 4+4=8 een_twee 1+1=2 9=9 groot_huis+tuin=thuis"
+     },
+     {
+      "id": "sym5",
+      "title": "` en ~: de linkerpink",
+      "keys": "` ~",
+      "teaches": "`~",
+      "row": "chiffres",
+      "fingers": [
+       "lp"
+      ],
+      "tip": "De backtick en de tilde staan op de toets linksboven, onder Esc: je linkerpink reikt ernaartoe, met Shift voor de tilde.",
+      "tuto": {
+       "intro": "Helemaal linksboven bedient je linkerpink de toets voor de backtick ` en de tilde ~ (met Shift). Je ziet ze in code en in bestandspaden: ~/documenten. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "De linkerpink reikt omhoog",
+         "d": "Deze toets zit links van de 1. Je linkerpink bereikt hem; voor de tilde heb je Shift nodig met je rechterpink."
+        },
+        {
+         "icon": "⏳",
+         "t": "Dode toetsen op VS-internationaal",
+         "d": "Op een VS-internationaal toetsenbord zijn ^ ~ en ` dode toetsen: typ het teken en druk dan op de spatiebalk, zodat het teken alleen verschijnt."
+        },
+        {
+         "icon": "💻",
+         "t": "In code en paden",
+         "d": "`code` omsluit een stukje code; ~/documenten wijst naar de thuismap. Twee tekens, een en dezelfde uitstrekkende beweging."
+        }
+       ],
+       "tip": "Doel: ` en ~ typen met je linkerpink, met de juiste beweging voor jouw toetsenbord."
+      },
+      "text": "`code` ~/documenten `start` ~jan `naam` ~/muziek `tab` ~/thuis `einde` ~/bureau ~/foto"
+     },
+     {
+      "id": "sym6",
+      "title": "Herhaling: de symbolen van de cijferrij",
+      "keys": "$ % ^ & # * @ _ + = ` ~",
+      "teaches": "",
+      "howText": true,
+      "tip": "Je brengt alle symbolen van de cijferrij samen in een tekst. Bepaal de vinger en de Shift voor je het teken aanslaat.",
+      "tuto": {
+       "intro": "Je brengt de symbolen van de cijferrij samen in een tekst: adressen, bedragen, sommen, variabelen, paden. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "🧭",
+         "t": "Herken het teken voor je typt",
+         "d": "Welke vinger? Welke hand voor Shift? Deze reflex bespaart je tijd bij elk symbool."
+        },
+        {
+         "icon": "🔁",
+         "t": "Shift, teken, loslaten",
+         "d": "De beweging is altijd dezelfde: Shift van de andere hand, de toets, dan beide loslaten."
+        },
+        {
+         "icon": "✅",
+         "t": "Eerst nauwkeurig",
+         "d": "Een verkeerd symbool breekt een adres of een opdracht. Ga langzamer bij de tekens die je moeite kosten."
+        }
+       ],
+       "tip": "Doel: alle symbolen van de cijferrij aan elkaar rijgen in echte tekst."
+      },
+      "text": "hallo@school.be $naam 50% a&b #tag 3*4 x_y 2+3=5 `code` ~/thuis 3^2 info@winkel.nl 10% a+b=c"
+     }
+    ]
+   },
+   {
+    "name": "9. Geavanceerde symbolen",
+    "kind": "symboles",
+    "lessons": [
+     {
+      "id": "sym7",
+      "title": "[ ]: vierkante haken",
+      "keys": "[ ]",
+      "teaches": "[]",
+      "row": "haut",
+      "fingers": [
+       "rp"
+      ],
+      "tip": "De vierkante haken staan rechts van de P, aan het eind van de bovenste rij: je rechterpink reikt ernaartoe, zonder Shift.",
+      "tuto": {
+       "intro": "Vierkante haken [ ] typ je met je rechterpink, op de twee toetsen rechts van de P. Je gebruikt ze in code (lijst[0]) en voor toegevoegde woorden tussen haken. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Rechts van de P",
+         "d": "Je rechterpink strekt zich voorbij de P uit: [ zit er direct rechts van, ] net daarna. Shift heb je niet nodig."
+        },
+        {
+         "icon": "🔁",
+         "t": "Openen en sluiten",
+         "d": "Elke haak die je opent, sluit je ook. Typ ze achter elkaar: openen, typen, sluiten."
+        },
+        {
+         "icon": "💻",
+         "t": "In code",
+         "d": "lijst[0], data[3], item[i]: de vierkante haak wijst een plek in een lijst aan."
+        }
+       ],
+       "tip": "Doel: [ en ] typen met je rechterpink zonder je basispositie te verlaten."
+      },
+      "text": "lijst[0] lijst[1] [a] [b] item[i] namen[2] [ja] [nee] [einde] data[3] [1] [2]"
+     },
+     {
+      "id": "sym8",
+      "title": "{ }: accolades",
+      "keys": "{ }",
+      "teaches": "{}",
+      "row": "haut",
+      "fingers": [
+       "rp"
+      ],
+      "tip": "De accolades staan op dezelfde toetsen als de vierkante haken, met Shift: je rechterpink reikt omhoog en je linkerpink houdt Shift vast.",
+      "tuto": {
+       "intro": "Accolades { } delen de toetsen van de vierkante haken: je typt ze met Shift. Je ziet ze in code en in opmaakbestanden. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Shift met de andere hand",
+         "d": "Net als bij hoofdletters: houd Shift ingedrukt met de pink van de hand die de toets niet typt. Shift plus de toets geeft het teken."
+        },
+        {
+         "icon": "🔁",
+         "t": "Openen en sluiten",
+         "d": "Net als bij vierkante haken: een accolade die je opent, sluit je ook. Wen eraan om ze in paren te typen."
+        },
+        {
+         "icon": "💻",
+         "t": "In code",
+         "d": "{stijl: vet}, {x: 1}: accolades omsluiten een blok code of een object."
+        }
+       ],
+       "tip": "Doel: { en } typen met Shift en je rechterpink."
+      },
+      "text": "{a} {b} {x: 1} {y: 2} {einde} {ok} {stijl: vet} {naam: tom} {ja} {nee}"
+     },
+     {
+      "id": "sym9",
+      "title": "\\ en |: backslash en verticale streep",
+      "keys": "\\ |",
+      "teaches": "\\|",
+      "row": "haut",
+      "fingers": [
+       "rp"
+      ],
+      "tip": "De backslash en de verticale streep staan op de toets boven Enter, met je rechterpink; de verticale streep vraagt Shift.",
+      "tuto": {
+       "intro": "De backslash \\ en de verticale streep | delen een toets, helemaal aan het eind van de bovenste rij, boven Enter. De verticale streep typ je met Shift. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⬆️",
+         "t": "Boven Enter",
+         "d": "Je rechterpink strekt zich uit tot het eind van de bovenste rij, voorbij de vierkante haken. \\ typ je los, | met Shift."
+        },
+        {
+         "icon": "📁",
+         "t": "Windows-paden",
+         "d": "C:\\School\\Tom: de backslash scheidt mappen in Windows, terwijl de gewone schuine streep / ze elders scheidt."
+        },
+        {
+         "icon": "➡️",
+         "t": "De verticale streep",
+         "d": "a | b verbindt twee opdrachten of scheidt twee keuzes: links | rechts."
+        }
+       ],
+       "tip": "Doel: \\ en | typen met je rechterpink, met Shift voor de verticale streep."
+      },
+      "text": "C:\\School\\Tom a|b a||b c\\d \\n \\t links | rechts /thuis | grep \\\\ || C:\\Werk"
+     },
+     {
+      "id": "sym10",
+      "title": "< >: punthaken",
+      "keys": "< >",
+      "teaches": "<>",
+      "row": "bas",
+      "fingers": [
+       "rm",
+       "rr"
+      ],
+      "tip": "De punthaken staan op de komma- en de puntentoets, met Shift: je rechtermiddelvinger en -ringvinger reiken naar beneden en je linkerpink houdt Shift vast.",
+      "tuto": {
+       "intro": "Punthaken < > typ je met Shift op de komma- en de puntentoets. Je ziet ze in HTML-tags: <p>tekst</p>. De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "⇧",
+         "t": "Shift met de andere hand",
+         "d": "Net als bij hoofdletters: houd Shift ingedrukt met de pink van de hand die de toets niet typt. Shift plus de toets geeft het teken."
+        },
+        {
+         "icon": "🏷️",
+         "t": "HTML-tags",
+         "d": "<p>tekst</p>: de openende punthaak, de naam van de tag, de sluitende punthaak. De schuine streep / sluit de tag."
+        },
+        {
+         "icon": "🔁",
+         "t": "Openen en sluiten",
+         "d": "Elke tag die je opent, sluit je met de schuine streep. Oefen die twee achter elkaar."
+        }
+       ],
+       "tip": "Doel: < en > typen met Shift en de vingers van je rechterhand."
+      },
+      "text": "<html> </html> <p>tekst</p> <div> </div> <b>vet</b> <i>schuin</i> <a> </a> <h1>titel</h1> <br> <ul> </ul>"
+     },
+     {
+      "id": "sym11",
+      "title": "Herhaling: alle symbolen in tekst",
+      "keys": "alle symbolen",
+      "teaches": "",
+      "howText": true,
+      "tip": "Je brengt alle symbolen samen in een tekst met een adres, het web, code en percentages. Zie de beweging vooraf aankomen: direct, met Shift of dode toets.",
+      "tuto": {
+       "intro": "Je brengt alle symbolen samen in een tekst met een e-mailadres, het web, code en percentages. De grote mix! De exacte beweging voor jouw toetsenbord staat hieronder.",
+       "rules": [
+        {
+         "icon": "🧩",
+         "t": "Alle combinaties",
+         "d": "Shift, dode toetsen, directe tekens: elk symbool heeft zijn eigen beweging. Gebruik alles wat je in de laatste modules hebt geleerd."
+        },
+        {
+         "icon": "🧭",
+         "t": "Zie de beweging aankomen",
+         "d": "Bepaal voor elk symbool: direct, met Shift of dode toets? Die reflex bespaart je tijd."
+        },
+        {
+         "icon": "💻",
+         "t": "Het hele toetsenbord",
+         "d": "De symbolen beheersen betekent een adres, een stukje code of een formule typen zonder ooit vast te lopen."
+        }
+       ],
+       "tip": "Doel: alle symbolen aan elkaar rijgen in echte tekst, elke beweging op het juiste moment."
+      },
+      "text": "hallo@school.be (twaalf) https://winkel.nl #tag {css: vet} <html> 50%=ok a+b=c [einde] ~/thuis \"waarde\" 3*4 C:\\School a|b",
+      "maxLen": 160
+     }
+    ]
+   },
+   {
+    "name": "10. Snelheid en vlotheid",
+    "lessons": [
+     {
+      "id": "flu1",
+      "title": "Korte zinnen aan elkaar rijgen",
+      "keys": "vlotheid",
+      "teaches": "",
+      "tip": "Rijg de zinnen zonder pauze aan elkaar: de punt, de spatie en de volgende hoofdletter horen bij dezelfde beweging.",
+      "tuto": {
+       "intro": "Tijd voor snelheid. We rijgen korte zinnen aan elkaar om je vlotheid van begin tot eind te trainen.",
+       "rules": [
+        {
+         "icon": "🎵",
+         "t": "Een doorlopende stroom",
+         "d": "Stop niet tussen de zinnen. De punt, de spatie en de hoofdletter gaan in een beweging."
+        },
+        {
+         "icon": "👀",
+         "t": "Lees vooruit",
+         "d": "Houd je ogen een stap voor je vingers. Dat is het geheim van snel en vloeiend typen."
+        },
+        {
+         "icon": "😌",
+         "t": "Blijf ontspannen",
+         "d": "Snelheid komt voort uit soepelheid, niet uit kracht. Laat je schouders en polsen los."
+        }
+       ],
+       "tip": "Doel: korte zinnen aan elkaar rijgen zonder dode tijd ertussen."
+      },
+      "text": "De zon schijnt. De vogels fluiten. De thee is heet. We vertrekken om acht uur, dus laten we gaan. Fijne dag nog!"
+     },
+     {
+      "id": "flu2",
+      "title": "Natuurlijke zinnen van gemiddelde lengte",
+      "keys": "vlotheid",
+      "teaches": "",
+      "tip": "Blijf bij een lange zin niet hangen als je een fout maakt. Typ in groepjes woorden die bij elkaar horen.",
+      "tuto": {
+       "intro": "Langere zinnen, zoals in het echte leven. Het doel: je ritme vasthouden.",
+       "rules": [
+        {
+         "icon": "🌬️",
+         "t": "Adem en ga door",
+         "d": "Blijf bij een lange zin niet hangen als je een fout maakt. Doorgaan komt eerst."
+        },
+        {
+         "icon": "➡️",
+         "t": "In groepjes met betekenis",
+         "d": "Typ in groepjes woorden die bij elkaar horen, niet woord voor woord. De zin wordt een reeks korte uitbarstingen."
+        },
+        {
+         "icon": "🎯",
+         "t": "Houd je nauwkeurigheid",
+         "d": "Hoe langer de zin, hoe duurder een fout. Mik op een snelheid die je netjes kunt volhouden."
+        }
+       ],
+       "tip": "Doel: een zin van gemiddelde lengte in een stroom typen, zonder je ritme te verliezen."
+      },
+      "text": "Elke ochtend opent ze het raam en gaat ze met een kopje thee zitten voordat ze aan het werk begint."
+     },
+     {
+      "id": "flu3",
+      "title": "Een volledige alinea",
+      "keys": "alinea",
+      "teaches": "",
+      "tip": "Een alinea vraagt uithoudingsvermogen. Zoek een prettig ritme dat je tot het einde kunt volhouden, zonder je ogen van het scherm te halen.",
+      "tuto": {
+       "intro": "Een hele alinea om te typen. Het gaat om uithoudingsvermogen: je concentratie en regelmaat vasthouden tot het einde.",
+       "rules": [
+        {
+         "icon": "🏃",
+         "t": "Houd de afstand vol",
+         "d": "Een alinea vraagt uithoudingsvermogen. Zoek een prettig ritme dat je kunt volhouden zonder moe te worden."
+        },
+        {
+         "icon": "👀",
+         "t": "Blijf naar het scherm kijken",
+         "d": "Hoe langer de tekst, hoe groter de neiging om naar het toetsenbord te kijken. Houd je ogen omhoog."
+        },
+        {
+         "icon": "✍️",
+         "t": "Leestekens inbegrepen",
+         "d": "Komma's, punten en apostroffen horen bij de stroom. Pas ze in zonder je tempo te breken."
+        }
+       ],
+       "tip": "Doel: een volledige alinea in een gelijkmatig tempo typen, van begin tot eind."
+      },
+      "text": "Blind typen vraagt geduld, maar elke dag oefenen maakt je vingers sneller. Het is gewoon een kwestie van gewoonte, en na een paar weken gaat het vanzelf.",
+      "maxLen": 200
+     },
+     {
+      "id": "flu4",
+      "title": "Een zakelijke tekst",
+      "keys": "zakelijke stijl",
+      "teaches": "",
+      "tip": "Let in een zakelijke tekst goed op hoofdletters, leestekens en cijfers: mik op nul fouten.",
+      "tuto": {
+       "intro": "Een tekst in zakelijke stijl: een e-mail of een brief, met een adres en een nummer. Het soort tekst dat je echt gaat schrijven.",
+       "rules": [
+        {
+         "icon": "💼",
+         "t": "De zakelijke toon",
+         "d": "Beleefde formules, hoofdletters, nette leestekens: in een zakelijke tekst is geen ruimte voor slordigheid."
+        },
+        {
+         "icon": "🔀",
+         "t": "Letters, cijfers, symbolen",
+         "d": "Nummers, e-mailadressen, @: je mengt alles wat je hebt geleerd. Het is de samenvatting van je training."
+        },
+        {
+         "icon": "🎯",
+         "t": "Mik op nul fouten",
+         "d": "In een zakelijke omgeving telt nauwkeurigheid evenveel als snelheid. Lees in gedachten mee terwijl je typt."
+        }
+       ],
+       "tip": "Doel: een nette zakelijke tekst typen, met letters, cijfers en symbolen door elkaar."
+      },
+      "text": "Geachte mevrouw, hierbij sturen wij u onze offerte. Aarzel niet om contact met ons op te nemen via e-mail: info@winkel.nl. Met vriendelijke groeten, Jan",
+      "maxLen": 200
+     },
+     {
+      "id": "flu5",
+      "title": "Een technische tekst met symbolen",
+      "keys": "volledige mix",
+      "teaches": "",
+      "tip": "Code en instellingen: accolades, aanhalingstekens, paden en cijfers. Zie de beweging voor elk teken vooraf aankomen.",
+      "tuto": {
+       "intro": "De volledige uitdaging: code en instellingen, met accolades, aanhalingstekens, paden en cijfers.",
+       "rules": [
+        {
+         "icon": "💻",
+         "t": "Alles tegelijk",
+         "d": "Accolades, aanhalingstekens, dubbele punten, cijfers... Deze tekst houdt je Shift en je dode toetsen voortdurend bezig. Het is de test met de meeste symbolen."
+        },
+        {
+         "icon": "🧭",
+         "t": "Zie elke combinatie aankomen",
+         "d": "Bedenk vooraf of het volgende teken direct gaat, met Shift of met een dode toets. Voorbereiding voorkomt dat je vastloopt."
+        },
+        {
+         "icon": "🎯",
+         "t": "Maximale nauwkeurigheid",
+         "d": "In code breekt een fout alles. Hier verslaat langzaam en precies snel en slordig."
+        }
+       ],
+       "tip": "Doel: een technische tekst met code, symbolen en cijfers netjes typen."
+      },
+      "text": "Het bestand instellingen.json: {\"geluid\": \"aan\", \"poort\": 3000}. Typ: `start` in ~/spel."
+     },
+     {
+      "id": "flu6",
+      "title": "Snelheidssprint: een lange tekst",
+      "keys": "topsnelheid",
+      "teaches": "",
+      "tip": "Dit is de laatste test: een lange tekst die je zo snel en zo nauwkeurig mogelijk typt, zonder naar het toetsenbord te kijken.",
+      "tuto": {
+       "intro": "De laatste test: een lange tekst die je zo snel en zo precies mogelijk typt. Geef alles!",
+       "rules": [
+        {
+         "icon": "🚀",
+         "t": "Zet je snelheid door",
+         "d": "Dit is het moment om je grenzen te testen. Zoek je topsnelheid en blijf leesbaar."
+        },
+        {
+         "icon": "⚖️",
+         "t": "Snelheid EN nauwkeurigheid",
+         "d": "Een nette sprint is beter dan een sprint vol fouten. Zoek het punt waarop je snel gaat zonder uit te glijden."
+        },
+        {
+         "icon": "🏆",
+         "t": "Het einde van de weg",
+         "d": "Typ je deze tekst zonder naar het toetsenbord te kijken? Dan heb je het doel van KeyPace bereikt. Gefeliciteerd!"
+        }
+       ],
+       "tip": "Doel: een lange tekst op topsnelheid typen, zonder naar het toetsenbord te kijken."
+      },
+      "text": "Snel typen leer je door regelmatig te oefenen: doe het elke dag, houd je ogen op het scherm en laat je vingers zelf hun weg vinden over de toetsen. Veel succes!",
+      "maxLen": 250
+     }
+    ]
+   }
+  ],
+  "free": [
+   "r1",
+   "r2",
+   "r3",
+   "r4",
+   "r5",
+   "r6",
+   "h1",
+   "h2",
+   "h3",
+   "h4"
+  ]
+ },
+ "vocab": [
+  "aan",
+  "aantal",
+  "aarzel",
+  "acht",
+  "af",
+  "al",
+  "alles",
+  "als",
+  "amsterdam",
+  "anna",
+  "antwerpen",
+  "antwoordt",
+  "appel",
+  "appels",
+  "avond",
+  "avonds",
+  "baby",
+  "bal",
+  "bananen",
+  "bank",
+  "bed",
+  "beer",
+  "begint",
+  "bel",
+  "ben",
+  "bestand",
+  "bewaar",
+  "bij",
+  "bladzijde",
+  "blauw",
+  "blauwe",
+  "blij",
+  "blije",
+  "blijf",
+  "blijven",
+  "blind",
+  "boek",
+  "boot",
+  "bord",
+  "boter",
+  "box",
+  "bram",
+  "brood",
+  "brugge",
+  "bruin",
+  "bruine",
+  "brussel",
+  "buiten",
+  "bureau",
+  "bus",
+  "buurman",
+  "cadeau",
+  "cake",
+  "carla",
+  "chocola",
+  "cijfer",
+  "circus",
+  "cirkel",
+  "club",
+  "code",
+  "cola",
+  "computer",
+  "contact",
+  "daal",
+  "daar",
+  "daarna",
+  "dachten",
+  "dag",
+  "dagen",
+  "dak",
+  "dal",
+  "dan",
+  "dank",
+  "dat",
+  "data",
+  "de",
+  "dier",
+  "dieren",
+  "dingen",
+  "dit",
+  "documenten",
+  "doe",
+  "door",
+  "dorp",
+  "draad",
+  "drie",
+  "drinken",
+  "druk",
+  "dus",
+  "duur",
+  "dwerg",
+  "een",
+  "eens",
+  "eerlijk",
+  "eet",
+  "eieren",
+  "eind",
+  "einde",
+  "eindelijk",
+  "elke",
+  "emma",
+  "en",
+  "er",
+  "eten",
+  "euro",
+  "even",
+  "exact",
+  "examen",
+  "excuus",
+  "expres",
+  "extra",
+  "fax",
+  "feest",
+  "fiets",
+  "fijne",
+  "fluiten",
+  "foto",
+  "friet",
+  "fruit",
+  "ga",
+  "gaaf",
+  "gaan",
+  "gaat",
+  "gaf",
+  "garage",
+  "gas",
+  "gast",
+  "geachte",
+  "gedaan",
+  "geduld",
+  "geef",
+  "geel",
+  "geluid",
+  "gelukkig",
+  "gelukkige",
+  "gent",
+  "gewest",
+  "gewoon",
+  "gewoonte",
+  "gisteren",
+  "glad",
+  "glas",
+  "goed",
+  "gras",
+  "grijs",
+  "groeten",
+  "groot",
+  "grote",
+  "gym",
+  "ha",
+  "haak",
+  "haal",
+  "haan",
+  "haar",
+  "haas",
+  "hak",
+  "hal",
+  "hallo",
+  "hals",
+  "halte",
+  "heb",
+  "hebben",
+  "heel",
+  "heet",
+  "het",
+  "hier",
+  "hierbij",
+  "hij",
+  "hobby",
+  "hoe",
+  "hond",
+  "honden",
+  "honing",
+  "hoog",
+  "houd",
+  "hout",
+  "hugo",
+  "huis",
+  "hulp",
+  "hun",
+  "huur",
+  "ijs",
+  "ik",
+  "ilse",
+  "in",
+  "index",
+  "info",
+  "instellingen",
+  "is",
+  "item",
+  "items",
+  "ja",
+  "jaar",
+  "jam",
+  "jan",
+  "jas",
+  "je",
+  "joker",
+  "jonge",
+  "joris",
+  "jules",
+  "julia",
+  "jurk",
+  "kaal",
+  "kaars",
+  "kaartje",
+  "kaas",
+  "kalm",
+  "kamer",
+  "kap",
+  "kas",
+  "kat",
+  "keuken",
+  "kies",
+  "kijk",
+  "kim",
+  "kind",
+  "kinderen",
+  "kip",
+  "klas",
+  "kleuren",
+  "klus",
+  "kobe",
+  "koe",
+  "koek",
+  "koffie",
+  "kom",
+  "komt",
+  "konijn",
+  "kool",
+  "kop",
+  "kopje",
+  "kost",
+  "koud",
+  "kruk",
+  "krul",
+  "kuil",
+  "kus",
+  "kwestie",
+  "laag",
+  "laat",
+  "lak",
+  "lamp",
+  "lap",
+  "lars",
+  "las",
+  "laten",
+  "leer",
+  "leerlingen",
+  "lees",
+  "lekker",
+  "leraar",
+  "let",
+  "leuk",
+  "leuke",
+  "lief",
+  "ligt",
+  "lijst",
+  "lijstje",
+  "liniaal",
+  "links",
+  "luxe",
+  "maakt",
+  "maan",
+  "maandag",
+  "maar",
+  "maart",
+  "mag",
+  "mail",
+  "maken",
+  "mama",
+  "marie",
+  "match",
+  "max",
+  "maximaal",
+  "me",
+  "mee",
+  "meer",
+  "meisje",
+  "melk",
+  "met",
+  "mevrouw",
+  "mier",
+  "mij",
+  "mijn",
+  "mix",
+  "moe",
+  "moeder",
+  "mooi",
+  "muur",
+  "muziek",
+  "na",
+  "naam",
+  "naar",
+  "nacht",
+  "namen",
+  "nederland",
+  "nee",
+  "neer",
+  "negen",
+  "nemen",
+  "nick",
+  "niet",
+  "nieuwe",
+  "nieuws",
+  "nina",
+  "nog",
+  "noor",
+  "noord",
+  "nu",
+  "nul",
+  "ochtend",
+  "oefenen",
+  "of",
+  "offerte",
+  "ogen",
+  "olijf",
+  "om",
+  "oma",
+  "ons",
+  "onthoud",
+  "onze",
+  "oog",
+  "ook",
+  "oom",
+  "oost",
+  "op",
+  "opa",
+  "open",
+  "opent",
+  "oppervlakte",
+  "oud",
+  "over",
+  "paar",
+  "paard",
+  "paars",
+  "pagina",
+  "pak",
+  "pap",
+  "papa",
+  "papier",
+  "pas",
+  "pauw",
+  "peer",
+  "pen",
+  "pennen",
+  "peper",
+  "perron",
+  "pet",
+  "pieter",
+  "pijl",
+  "pizza",
+  "plaat",
+  "plaats",
+  "plakt",
+  "poes",
+  "pols",
+  "pony",
+  "poort",
+  "pop",
+  "post",
+  "pot",
+  "potloden",
+  "prachtig",
+  "prijs",
+  "pruim",
+  "punten",
+  "pupil",
+  "puur",
+  "qatar",
+  "quiche",
+  "quinoa",
+  "quiz",
+  "quote",
+  "raam",
+  "radio",
+  "rechts",
+  "regelmatig",
+  "regels",
+  "regen",
+  "reis",
+  "reizen",
+  "relax",
+  "reus",
+  "rijst",
+  "roept",
+  "rood",
+  "roos",
+  "rotterdam",
+  "roze",
+  "rug",
+  "rustig",
+  "samen",
+  "schaap",
+  "scherm",
+  "schijnt",
+  "school",
+  "schuin",
+  "score",
+  "sla",
+  "slaap",
+  "slaapt",
+  "slag",
+  "slak",
+  "snel",
+  "snelheid",
+  "sneller",
+  "soep",
+  "speel",
+  "speelt",
+  "spel",
+  "spelen",
+  "spoor",
+  "sport",
+  "staan",
+  "staat",
+  "stad",
+  "start",
+  "stijl",
+  "stil",
+  "stoel",
+  "stop",
+  "straat",
+  "sturen",
+  "stuur",
+  "succes",
+  "suiker",
+  "taart",
+  "tafel",
+  "tas",
+  "taxi",
+  "te",
+  "team",
+  "tegen",
+  "tekst",
+  "tel",
+  "thee",
+  "thuis",
+  "tien",
+  "tijd",
+  "tip",
+  "titel",
+  "toetsen",
+  "tom",
+  "top",
+  "tot",
+  "totaal",
+  "tuin",
+  "twaalf",
+  "twee",
+  "typ",
+  "type",
+  "typen",
+  "typt",
+  "uil",
+  "uit",
+  "uur",
+  "uw",
+  "vader",
+  "vakantie",
+  "van",
+  "vanavond",
+  "vandaag",
+  "vanzelf",
+  "veel",
+  "verdieping",
+  "verjaardag",
+  "vertrekken",
+  "vertrekt",
+  "vet",
+  "via",
+  "victor",
+  "vier",
+  "vijf",
+  "vinden",
+  "vingers",
+  "vis",
+  "vlaanderen",
+  "vlag",
+  "vlam",
+  "vliegveld",
+  "vlinder",
+  "vogel",
+  "vogels",
+  "voor",
+  "voordat",
+  "vos",
+  "vraagt",
+  "vriendelijke",
+  "vrij",
+  "vuur",
+  "waar",
+  "waarde",
+  "waarom",
+  "wacht",
+  "wagen",
+  "was",
+  "wat",
+  "water",
+  "we",
+  "week",
+  "weer",
+  "wees",
+  "weet",
+  "weg",
+  "wegen",
+  "weken",
+  "wel",
+  "welkom",
+  "werd",
+  "wereld",
+  "werk",
+  "west",
+  "wie",
+  "wij",
+  "wil",
+  "wind",
+  "winkel",
+  "wit",
+  "witte",
+  "wolk",
+  "woont",
+  "woord",
+  "wordt",
+  "xylofoon",
+  "yoga",
+  "yoghurt",
+  "yves",
+  "zacht",
+  "zagen",
+  "zalm",
+  "ze",
+  "zeer",
+  "zegt",
+  "zeker",
+  "zelf",
+  "zes",
+  "zet",
+  "zeven",
+  "zie",
+  "zij",
+  "zijn",
+  "zitten",
+  "zo",
+  "zoe",
+  "zoek",
+  "zoet",
+  "zon",
+  "zoom",
+  "zoon",
+  "zout",
+  "zuid",
+  "zus",
+  "zuur",
+  "zwaaien",
+  "zwaar",
+  "zwart",
+  "zwarte"
+ ]
+}

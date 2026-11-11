@@ -40,4 +40,24 @@ test('gestes de frappe : aucun mot français ne reste après traduction, pour to
   assert.equal(I.howEn('touche ù (à droite du M)'), 'the ù key (to the right of M)');
   assert.equal(I.howEn('Maj + 1'), 'Shift + 1');
   assert.equal(I.howEn('AltGr + é, puis espace'), 'AltGr + é, then the space bar');
+  const badNl = [...new Set(all)].map((v) => [v, I.howNl(v)]).filter(([, e]) => I.HOW_FR_LEFTOVER.test(e));
+  assert.deepEqual(badNl, []);
+  assert.equal(I.howNl('touche ù (à droite du M)'), 'de ù-toets (rechts van M)');
+  assert.equal(I.howNl('Maj + 1'), 'Shift + 1');
+  assert.equal(I.howNl('AltGr + é, puis espace'), 'AltGr + é, dan de spatiebalk');
+});
+
+test('néerlandais : dictionnaire complet, la langue suit l\'adresse /nl et ?ui=nl, how() suit la langue', () => {
+  assert.ok(I.LANGS.includes('nl'));
+  assert.deepEqual(Object.keys(I.dict.nl).sort(), Object.keys(I.dict.fr).sort());
+  const saved = { loc: globalThis.location, ls: globalThis.localStorage };
+  const store = {}; globalThis.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } };
+  try {
+    I.setLang(null);
+    globalThis.location = { pathname: '/nl/typtest', search: '' }; assert.strictEqual(I.lang(), 'nl');
+    globalThis.location = { pathname: '/nlx', search: '' }; assert.strictEqual(I.lang(), 'fr');
+    globalThis.location = { pathname: '/', search: '?ui=nl' }; assert.strictEqual(I.lang(), 'nl'); assert.strictEqual(store.kp_ui, 'nl');
+    assert.strictEqual(I.how('Maj + 1'), 'Shift + 1'); assert.strictEqual(I.how('touche ù (à droite du M)'), 'de ù-toets (rechts van M)');
+    globalThis.location = { pathname: '/', search: '?ui=auto' }; assert.strictEqual(I.lang(), 'fr'); assert.strictEqual(I.how('Maj + 1'), 'Maj + 1');
+  } finally { globalThis.location = saved.loc; globalThis.localStorage = saved.ls; I.setLang(null); }
 });

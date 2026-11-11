@@ -60,8 +60,8 @@ test('les cours d\'anglais sont en ligne : tout compte connecté les reçoit, sa
 });
 
 test('le néerlandais (nl/azerty) est en bêta : un testeur le reçoit, un compte ordinaire non', () => {
-  assert.deepEqual(COURSE_ACCESS['nl/azerty'], { status: 'bêta' });
-  assert.deepEqual(courseIdsFor({ username: 'testeur1', role: 'eleve' }), ['fr/qwerty', 'en/azerty', 'en/qwerty', 'nl/azerty']);
-  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.ok(!courseIdsFor({ username: 'autre', role }).includes('nl/azerty'), role);
+  assert.deepEqual(COURSE_ACCESS['nl/azerty'], { status: 'bêta' }); assert.deepEqual(COURSE_ACCESS['nl/qwerty'], { status: 'bêta' });
+  assert.deepEqual(courseIdsFor({ username: 'testeur1', role: 'eleve' }), ['fr/qwerty', 'en/azerty', 'en/qwerty', 'nl/azerty', 'nl/qwerty']);
+  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.ok(!courseIdsFor({ username: 'autre', role }).some((id) => id.startsWith('nl/')), role);
   assert.ok(!courseIdsFor(null).includes('nl/azerty'));
 });

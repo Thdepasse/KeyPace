@@ -22,8 +22,21 @@ function i1(opts) {
     if (tags(fr[k]) !== tags(en[k])) errs.push(`balises différentes pour « ${k} »`);
     if (/[—–]/.test(en[k])) errs.push(`tiret long dans « ${k} » (anglais)`);
   }
+  // néerlandais : même exigence que l'anglais (mêmes clés, mêmes paramètres et balises, rien de vide, aucun tiret long)
+  const nl = I.dict.nl;
+  if (nl) {
+    for (const k of Object.keys(fr)) if (!(k in nl)) errs.push(`clé « ${k} » absente en néerlandais`);
+    for (const k of Object.keys(nl)) if (!(k in fr)) errs.push(`clé « ${k} » néerlandaise sans équivalent français`);
+    for (const k of Object.keys(fr)) {
+      if (!(k in nl)) continue;
+      if (!String(nl[k]).trim()) errs.push(`texte vide pour « ${k} » (néerlandais)`);
+      if (params(fr[k]) !== params(nl[k])) errs.push(`paramètres différents pour « ${k} » (fr ${params(fr[k]) || 'aucun'}, nl ${params(nl[k]) || 'aucun'})`);
+      if (tags(fr[k]) !== tags(nl[k])) errs.push(`balises différentes pour « ${k} » (néerlandais)`);
+      if (/[—–]/.test(nl[k])) errs.push(`tiret long dans « ${k} » (néerlandais)`);
+    }
+  }
   // clés plurielles : _one et _other ensemble
-  for (const d of [fr, en]) for (const k of Object.keys(d)) { const m = /^(.*)_(one|other)$/.exec(k); if (m && !(m[1] + (m[2] === 'one' ? '_other' : '_one') in d)) errs.push(`pluriel incomplet pour « ${m[1]} »`); }
+  for (const d of [fr, en, nl || {}]) for (const k of Object.keys(d)) { const m = /^(.*)_(one|other)$/.exec(k); if (m && !(m[1] + (m[2] === 'one' ? '_other' : '_one') in d)) errs.push(`pluriel incomplet pour « ${m[1]} »`); }
   // usage dans la page
   const used = new Set();
   for (const m of html.matchAll(/\bkpT(n?)\(/g)) { // arguments lus jusqu'à la parenthèse fermante (les appels peuvent contenir des parenthèses)
@@ -53,6 +66,6 @@ function i1(opts) {
   }
   for (const k of used) if (!(k in fr)) errs.push(`la page appelle « ${k} » qui n'existe pas`);
   for (const k of Object.keys(fr)) if (!used.has(k)) errs.push(`« ${k} » n'est utilisée par aucun écran`);
-  return errs.length ? { ok: false, detail: errs.slice(0, 8).join('\n') } : { ok: true, detail: `${Object.keys(fr).length} textes, anglais complet, toutes les clés de la page existent` };
+  return errs.length ? { ok: false, detail: errs.slice(0, 8).join('\n') } : { ok: true, detail: `${Object.keys(fr).length} textes, anglais et néerlandais complets, toutes les clés de la page existent` };
 }
 module.exports = { i1 };

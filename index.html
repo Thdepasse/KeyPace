@@ -2964,7 +2964,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
     </button>
     <div class="nav-links">
       <a class="nav-link" id="nav-home" href="/accueil" data-href-en="/en" onclick="go('home');return false" data-i18n="nav.home">Accueil<span class="underline"></span></a>
-      <div class="nav-dropdown" id="nav-ecoles-wrap" data-lang-hide="en">
+      <div class="nav-dropdown" id="nav-ecoles-wrap" data-lang-hide="en nl">
         <a class="nav-link" href="/ecoles" style="display:inline-flex;align-items:center;text-decoration:none">Établissements</a>
         <div class="nav-dropdown-menu" id="nav-ecoles-menu">
           <a href="/cours-dactylo-en-ligne#tronc-commun" onclick="kpOpenProgram('tronc-commun');return false">Tronc commun</a>
@@ -3252,6 +3252,38 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <p class="lead">Practise typing fast by playing: Word Strike, The Sprint, Typing Race, Race your ghost, Word Simon and more.</p></section>
 <section><h2>Games that follow your level</h2>
 <p>Choose "My level" and the games only use the letters you have already learned, or play with the whole keyboard to chase records.</p></section>
+</div>
+<div class="seo-sec" data-route="nl-home" hidden>
+<section class="seo-hero"><p class="eyebrow">KeyPace</p>
+<h2 class="seo-h1">Leer blind typen, les na korte les</h2>
+<p class="lead">Een gratis typtrainer met een snelheidstest, lessen stap voor stap voor AZERTY- en QWERTY-toetsenborden, typspellen en voortgang.</p></section>
+<section><h2>Hoe het werkt</h2>
+<p>Je begint met de basisrij en voegt daarna de bovenste en onderste rij, hoofdletters, leestekens, cijfers en symbolen toe. Elke les duurt enkele minuten en zegt welke vinger welke toets typt, zodat je kunt typen zonder naar het toetsenbord te kijken.</p>
+<p><a href="/nl/typlessen">Bekijk de lessen →</a></p></section>
+<section><h2>Meet je snelheid</h2>
+<p>De typtest toont je snelheid in woorden per minuut en je nauwkeurigheid. Doe de test nu en nog eens na enkele weken oefenen om je vooruitgang te zien.</p>
+<p><a href="/nl/typtest">Doe de typtest →</a></p></section>
+<section><h2>Oefen al spelend</h2>
+<p>Typspellen zoals Woordenslag, de Sprint en Typrace trainen snelheid, nauwkeurigheid en geheugen. De spellen volgen de letters die je al kent.</p>
+<p><a href="/nl/typspellen">Speel typspellen →</a></p></section>
+</div>
+<div class="seo-sec" data-route="nl-test" hidden>
+<section class="seo-hero"><h2 class="seo-h1">Typtest</h2>
+<p class="lead">Tik de zin zo snel en nauwkeurig mogelijk. De timer start vanzelf bij de eerste toets.</p></section>
+<section><h2>Wat de test meet</h2>
+<p>De snelheid wordt geteld in woorden per minuut, waarbij een woord vijf tekens telt. Nauwkeurigheid is het aandeel juiste toetsaanslagen. Beide zie je op het einde, samen met je badge.</p></section>
+</div>
+<div class="seo-sec" data-route="nl-lessons" hidden>
+<section class="seo-hero"><h2 class="seo-h1">Lessen blind typen</h2>
+<p class="lead">Leer typen zonder naar het toetsenbord te kijken, met korte lessen voor AZERTY- en QWERTY-toetsenborden.</p></section>
+<section><h2>Een duidelijke volgorde</h2>
+<p>Eerst de basisrij, daarna de bovenste en onderste rij, hoofdletters, leestekens, cijfers en symbolen, en ten slotte snelheid en vlotheid. Elke les toont de toetsen die je leert en de vinger die je gebruikt.</p></section>
+</div>
+<div class="seo-sec" data-route="nl-games" hidden>
+<section class="seo-hero"><h2 class="seo-h1">Typspellen</h2>
+<p class="lead">Oefen snel typen al spelend: Woordenslag, de Sprint, Typrace, Tegen je spook, Woordensimon en meer.</p></section>
+<section><h2>Spellen die je niveau volgen</h2>
+<p>Kies "Mijn niveau" en de spellen gebruiken alleen de letters die je al kent, of speel met het hele toetsenbord om records te jagen.</p></section>
 </div>
 <div class="seo-sec" data-route="fr-home" hidden>
 <section class="seo-hero"><p class="eyebrow">KeyPace France</p>
@@ -3951,7 +3983,7 @@ function updateNavUser(){
     const cb=document.getElementById('nav-classes');if(cb)cb.style.display='none';
     const ap=document.getElementById('nav-apercu');if(ap)ap.style.display='none';
     const jb=document.getElementById('nav-join');if(jb)jb.style.display='none';
-    const eb=document.getElementById('nav-ecoles-wrap');if(eb)eb.style.display=KPI18n.lang()==='en'?'none':'';
+    const eb=document.getElementById('nav-ecoles-wrap');if(eb)eb.style.display=KPI18n.lang()!=='fr'?'none':'';
     applyMobileNav();
     return;
   }
@@ -3979,7 +4011,7 @@ function updateNavUser(){
   const joinBtn=document.getElementById('nav-join');if(joinBtn)joinBtn.style.display=(!teacher&&(currentInstitutionName||currentHasClass))?'inline-flex':'none';
   // "Établissements" fait la promotion des licences pour écoles : sans objet
   // pour un compte déjà rattaché à un établissement (élève ou enseignant).
-  const ecolesWrap=document.getElementById('nav-ecoles-wrap');if(ecolesWrap)ecolesWrap.style.display=(currentInstitutionName||isAdmin()||KPI18n.lang()==='en')?'none':'';
+  const ecolesWrap=document.getElementById('nav-ecoles-wrap');if(ecolesWrap)ecolesWrap.style.display=(currentInstitutionName||isAdmin()||KPI18n.lang()!=='fr')?'none':'';
   // Compte établissement : plus aucun lien de menu, la page de gestion est la seule destination.
   if(isAdmin()){const bgA=document.getElementById('nav-burger');if(bgA)bgA.style.display='none';}
   applyMobileNav();
@@ -4030,8 +4062,13 @@ const VIEW_PATHS={home:'/accueil',test:'/test-frappe-en-ligne',testtime:'/test-d
 const FR_VIEW_PATHS={home:'/fr',lessons:'/fr/cours-dactylo-en-ligne'};
 /* Interface en anglais : adresses /en (même appli, textes anglais ; pages non indexées tant que le cours d'anglais est en bêta, voir api/_page-routes.js). */
 const EN_VIEW_PATHS={home:'/en',test:'/en/typing-test',testtime:'/en/timed-typing-test',testchoix:'/en/typing-tests',lessons:'/en/typing-lessons',games:'/en/typing-games',stats:'/en/progress',classes:'/en/class'};
-const kpInEnPath=()=>/^\/en(\/|$)/.test(location.pathname);
-const VIEW_FROM_PATH=Object.fromEntries([...Object.entries(VIEW_PATHS),...Object.entries(FR_VIEW_PATHS),...Object.entries(EN_VIEW_PATHS)].map(([v,p])=>[p,v]));
+/* Interface en néerlandais : adresses /nl (même appli, textes néerlandais ; pages non indexées tant que le néerlandais est en bêta). */
+const NL_VIEW_PATHS={home:'/nl',test:'/nl/typtest',testtime:'/nl/typtest-tijd',testchoix:'/nl/typtesten',lessons:'/nl/typlessen',games:'/nl/typspellen',stats:'/nl/voortgang',classes:'/nl/klas'};
+const LANG_VIEW_PATHS={en:EN_VIEW_PATHS,nl:NL_VIEW_PATHS};
+const kpPathLang=()=>/^\/en(\/|$)/.test(location.pathname)?'en':/^\/nl(\/|$)/.test(location.pathname)?'nl':null;
+const kpInEnPath=()=>kpPathLang()==='en';
+const VIEW_FROM_PATH=Object.fromEntries([...Object.entries(VIEW_PATHS),...Object.entries(FR_VIEW_PATHS),...Object.entries(EN_VIEW_PATHS),...Object.entries(NL_VIEW_PATHS)].map(([v,p])=>[p,v]));
+const VIEW_OF_EN_PATH=Object.fromEntries(Object.entries(EN_VIEW_PATHS).map(([v,p])=>[p,v]));
 function normPath(p){return p.length>1?p.replace(/\/+$/,''):p;}
 const MOBILE_BLOCKED_VIEWS=['test','testtime','testchoix','lessons','games'];
 function applyMobileNav(){
@@ -4065,7 +4102,7 @@ window.addEventListener('resize',()=>{
 /* ── Pays et langue (espace drapeau, en haut à droite) ──
    Aujourd'hui : la Belgique, en français. Le registre est fait pour plusieurs pays, chacun avec ses langues : ajouter une entrée
    à KP_REGIONS suffit à la faire apparaître. Le choix est gardé sur cet appareil (kp_region, kp_lang), rien n'est envoyé au serveur. */
-const kpT=(k,p)=>KPI18n.t(k,p),kpTn=(k,n,p)=>KPI18n.tn(k,n,p); const kpLocale=()=>KPI18n.lang()==='en'?'en-GB':'fr-FR'; /* textes de l'interface (i18n.js) : français par défaut, anglais en bêta avec ?ui=en */
+const kpT=(k,p)=>KPI18n.t(k,p),kpTn=(k,n,p)=>KPI18n.tn(k,n,p); const kpLocale=()=>({en:'en-GB',nl:'nl-BE'}[KPI18n.lang()]||'fr-FR'); /* textes de l'interface (i18n.js) : français par défaut, anglais en bêta avec ?ui=en */
 const KP_REGIONS=[
   {id:'be',name:'Belgique',langs:[{id:'fr',name:'Français'}],
    flag:'<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg" focusable="false"><rect width="1" height="2" fill="#000"/><rect x="1" width="1" height="2" fill="#FAE042"/><rect x="2" width="1" height="2" fill="#ED2939"/></svg>'},
@@ -4092,11 +4129,11 @@ const kpRegionName=r=>(KP_REGION_NAME[r.id]?KP_REGION_NAME[r.id]():r.name);
 /* L'anglais est proposé à tous, visiteurs compris : sans compte il ne traduit que l'interface (les cours anglais viennent avec le compte). */
 function kpSiteLangs(){const r=kpRegionObj(),l=r.langs.slice();let n='English';try{n=KP_LANG_NAMES.en;}catch{}l.push({id:'en',name:n});try{if(kpLanguagesOffered().includes('nl'))l.push({id:'nl',name:KP_LANG_NAMES.nl});}catch{} /* néerlandais : seulement quand un cours en néerlandais est proposé au compte (bêta) ; avant le chargement des cours, sans effet */return l;}
 /* Langue cochée dans le menu du drapeau : le néerlandais n'a pas encore d'interface, il est coché quand le cours actif est néerlandais. */
-function kpSiteLangId(){let c=null;try{c=kpContentLang();}catch{}return c==='nl'?'nl':KPI18n.lang();}
+function kpSiteLangId(){return KPI18n.lang();}
 async function kpSetSiteLanguage(lang){
   try{if(KPI18n.LANGS.includes(lang))localStorage.setItem('kp_ui',lang);else localStorage.removeItem('kp_ui');}catch{} // le néerlandais n'a pas d'interface : l'interface suit alors le cours (français)
-  // Une adresse /en impose l'anglais : choisir une autre langue ramène à l'adresse française de la même page
-  if(kpInEnPath()&&lang!=='en'){const want=VIEW_PATHS[app.view];if(want){try{history.replaceState(null,'',want);}catch{}}}
+  // Une adresse /en ou /nl impose sa langue : choisir une autre langue ramène à la même page dans cette langue
+  {const pl=kpPathLang();if(pl&&lang!==pl){const want=(LANG_VIEW_PATHS[lang]||VIEW_PATHS)[app.view];if(want){try{history.replaceState(null,'',want);}catch{}}}}
   // le cours suit la langue du site quand il existe dans cette langue (sinon on garde le cours actuel)
   if(KP_COURSES_OFFERED.some(c=>KP_COURSES[c].content===lang)&&kpContentLang()!==lang)await kpChooseLanguage(lang);
   kpSyncUiLang();kpKbChipRender();
@@ -4408,8 +4445,9 @@ const KP_COURSES={
   /* Anglais britannique (bêta : comptes testeurs, côté serveur). L'interface reste en français ; seuls les textes à taper et le vocabulaire des jeux sont en anglais. */
   'en/azerty':{id:'en/azerty',family:'azerty',content:'en',src:'/courses-src/en-azerty.json'},
   'en/qwerty':{id:'en/qwerty',family:'qwerty',content:'en',src:'/courses-src/en-qwerty.json'},
-  /* Néerlandais (Belgique) : cours seulement pour l'instant (l'interface reste en français), clavier AZERTY belge. */
-  'nl/azerty':{id:'nl/azerty',family:'azerty',content:'nl',src:'/courses-src/nl-azerty.json'}
+  /* Néerlandais : AZERTY belge (Flandre) et QWERTY (Pays-Bas), interface en néerlandais (dictionnaire nl), en bêta. */
+  'nl/azerty':{id:'nl/azerty',family:'azerty',content:'nl',src:'/courses-src/nl-azerty.json'},
+  'nl/qwerty':{id:'nl/qwerty',family:'qwerty',content:'nl',src:'/courses-src/nl-qwerty.json'}
 };
 /* Cours que le site propose aujourd'hui. Le QWERTY s'ajoute ici quand il est ouvert (bêta côté serveur, puis public). */
 const KP_COURSES_OFFERED=['fr/azerty'];
@@ -4434,7 +4472,7 @@ async function kpFetchAccess(){
 function kpRefreshOffered(){
   try{ // peut être appelée avant que le reste du script soit chargé : sans effet dans ce cas
   if(typeof app==='undefined'||typeof ALL_LESSONS==='undefined')return;
-  const want=['fr/azerty'].concat(currentUser?_kpAllowed:(kpInEnPath()?['en/azerty']:[])); /* visiteur : le cours d'anglais seulement sur les adresses /en, ailleurs « English » ne traduit que l'interface */
+  const want=['fr/azerty'].concat(currentUser?_kpAllowed:({en:['en/azerty'],nl:['nl/azerty']}[kpPathLang()]||[])); /* visiteur : le cours d'anglais seulement sur les adresses /en, ailleurs « English » ne traduit que l'interface */
   if(want.join()===KP_COURSES_OFFERED.join())return;
   KP_COURSES_OFFERED.splice(0,KP_COURSES_OFFERED.length,...want);
   kpKbChipRender();
@@ -4447,7 +4485,7 @@ function kpRefreshOffered(){
   }catch{}
 }
 /* Adresses /en : sans choix de cours retenu, le cours est celui d'anglais (la page est faite pour un anglophone : texte à taper en anglais). */
-function kpCourseId(){try{const v=localStorage.getItem('kp_course');if(KP_COURSES_OFFERED.includes(v)&&KP_COURSES[v])return v;}catch{}return kpInEnPath()&&KP_COURSES_OFFERED.includes('en/azerty')?'en/azerty':'fr/azerty';}
+function kpCourseId(){try{const v=localStorage.getItem('kp_course');if(KP_COURSES_OFFERED.includes(v)&&KP_COURSES[v])return v;}catch{}{const pc=kpPathLang()&&kpPathLang()+'/azerty';return pc&&KP_COURSES_OFFERED.includes(pc)?pc:'fr/azerty';}}
 /* Les données du cours actif : leçons, tests, statistiques de touches. Cours par défaut : la progression elle-même (identique à avant). */
 function course(){
   const id=kpCourseId();
@@ -4584,8 +4622,8 @@ function kpApplyStatic(){
     document.querySelectorAll('[data-i18n]').forEach(el=>{const v=kpT(el.getAttribute('data-i18n'));const n=[...el.childNodes].find(x=>x.nodeType===3);if(n){if(n.nodeValue!==v)n.nodeValue=v;}else el.insertBefore(document.createTextNode(v),el.firstChild);});
     document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.setAttribute('placeholder',kpT(el.getAttribute('data-i18n-ph')));});
     document.querySelectorAll('[data-i18n-html]').forEach(el=>{const v=kpT(el.getAttribute('data-i18n-html'));if(el.innerHTML!==v)el.innerHTML=v;});
-    document.querySelectorAll('[data-href-en]').forEach(el=>{if(!el.hasAttribute('data-href-fr'))el.setAttribute('data-href-fr',el.getAttribute('href')||'');el.setAttribute('href',kpInEnPath()?el.getAttribute('data-href-en'):el.getAttribute('data-href-fr'));});
-    document.querySelectorAll('[data-lang-hide]').forEach(el=>{el.style.display=el.getAttribute('data-lang-hide')===lang?'none':'';});
+    document.querySelectorAll('[data-href-en]').forEach(el=>{if(!el.hasAttribute('data-href-fr'))el.setAttribute('data-href-fr',el.getAttribute('href')||'');{const pl=kpPathLang(),e=el.getAttribute('data-href-en');el.setAttribute('href',pl==='en'?e:pl==='nl'?(NL_VIEW_PATHS[VIEW_OF_EN_PATH[e]]||e):el.getAttribute('data-href-fr'));}});
+    document.querySelectorAll('[data-lang-hide]').forEach(el=>{el.style.display=(el.getAttribute('data-lang-hide')||'').split(/\s+/).includes(lang)?'none':'';});
   }catch{}
 }
 function kpSyncUiLang(){try{document.documentElement.lang=KPI18n.lang();}catch{}kpApplyStatic();try{if(typeof kpRegionRender==='function')kpRegionRender();}catch{}}
@@ -5198,7 +5236,7 @@ function kbFamilyBoxHTML(){
 const KB_AZ_SHORT={fr:'Français',be:'Belge',mac:'Mac',nf:'NF'};
 /* Nom d'une disposition dans la langue de l'interface : les QWERTY portent leur nom dans les données du cours (déjà dans la langue du cours), les AZERTY sont traduits ici. */
 const KB_AZ_EN={fr:()=>kpT('kb.az_fr'),be:()=>kpT('kb.az_be'),mac:()=>kpT('kb.az_mac'),nf:()=>kpT('kb.az_nf')};
-function kpKbLabel(id,short){if(KPI18n.lang()==='en'&&KB_AZ_EN[id]){return short&&id==='nf'?kpT('kb.az_short_nf'):KB_AZ_EN[id]();}return short?(KB_AZ_SHORT[id]||KB_LAYOUT_LABELS[id]||''):KB_LAYOUT_LABELS[id];}
+function kpKbLabel(id,short){if(KPI18n.lang()!=='fr'&&KB_AZ_EN[id]){return short&&id==='nf'?kpT('kb.az_short_nf'):KB_AZ_EN[id]();}return short?(KB_AZ_SHORT[id]||KB_LAYOUT_LABELS[id]||''):KB_LAYOUT_LABELS[id];}
 function kbChipText(){const l=getKbLayoutId(),q=KB_QWERTY[l];return q?('QWERTY · '+(q.short||q.label)):('AZERTY · '+kpKbLabel(l,true));}
 function kpKbChipRender(){
   kpSyncUiLang();
@@ -5338,7 +5376,7 @@ function kpAccentBannerShow(ch){
     n.querySelector('#kp-acc-text').textContent=kpT('acc.cant',{ch});
     n.querySelector('#kp-acc-how').onclick=()=>{
       const H=KB_HOW[getKbLayoutId()]||{};
-      n.querySelector('#kp-acc-text').textContent=H[ch]?kpT('acc.how_to',{ch,how:KPI18n.lang()==='en'?KPI18n.howEn(H[ch]):H[ch]}):kpT('acc.check');
+      n.querySelector('#kp-acc-text').textContent=H[ch]?kpT('acc.how_to',{ch,how:KPI18n.how(H[ch])}):kpT('acc.check');
     };
     n.querySelector('#kp-acc-skip').onclick=()=>{setAccentMode('tolerant');n.remove();kbNotice(kpT('acc.tolerated'));};
     n.querySelector('#kp-acc-close').onclick=()=>n.remove();
@@ -5375,7 +5413,7 @@ function kbHowHTML(les){
   const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const groups=[];
   for(const c of chars){const how=kbHowFor(H,c);const g=groups.find(x=>x.how===how);if(g)g.cs.push(c);else groups.push({how,cs:[c]});}
-  const items=groups.map(g=>`<b>${esc(g.cs.join(' '))}</b> : ${esc(KPI18n.lang()==='en'?KPI18n.howEn(g.how):g.how)}`).join('<br>');
+  const items=groups.map(g=>`<b>${esc(g.cs.join(' '))}</b> : ${esc(KPI18n.how(g.how))}`).join('<br>');
   return`<div class="intro-rule"><div class="intro-rule-icon">⌨️</div><div class="intro-rule-text"><strong>${kpT('tuto.on_keyboard',{layout:kpKbLabel(lay)})}</strong>${items}</div></div>`;
 }
 /* Texte qui vient d'ailleurs (devoir d'un prof, défi, duel) : on le ramène à ce qu'un
@@ -8624,6 +8662,16 @@ const app={
       stats:['Mes progrès – KeyPace','Suivez votre progression en dactylographie : vitesse (mots/min), précision, série de jours, leçons validées et touches difficiles.'],
       classes:['Ma classe – KeyPace','Gérez vos classes, suivez vos élèves et assignez des devoirs depuis votre tableau de bord KeyPace.'],
     };
+    const _metaNl={
+      home:['KeyPace: leer blind typen, test je snelheid, speel typspellen','Gratis blind-typtrainer: snelheidstest, lessen stap voor stap voor AZERTY- en QWERTY-toetsenborden, typspellen en voortgang.'],
+      lessons:['Blind typen leren: lessen stap voor stap | KeyPace','Typlessen stap voor stap voor AZERTY- en QWERTY-toetsenborden: basisrij, bovenste rij, onderste rij, hoofdletters, leestekens, cijfers en symbolen.'],
+      testchoix:['Kies je typtest: een zin of een timer | KeyPace','Een zin overtypen of een test op tijd van 30 seconden tot 10 minuten: kies de typtest die bij je past.'],
+      testtime:['Typtest op tijd: 30 s, 1, 3, 5 of 10 min | KeyPace','Meet je typsnelheid en nauwkeurigheid in 30 seconden, 1, 3, 5 of 10 minuten. Gratis typtest op tijd in je browser.'],
+      test:['Typtest: tik de zin en zie je woorden per minuut | KeyPace','Tik de zin en ontdek je snelheid in woorden per minuut, je nauwkeurigheid en je badge. Gratis typtest van KeyPace.'],
+      games:['Typspellen: Woordenslag, Sprint, Typrace en meer | KeyPace','Oefen snel typen al spelend: Woordenslag, de Sprint, Typrace, Woordensimon en de Baas van de week.'],
+      stats:['Mijn voortgang | KeyPace','Volg je typvoortgang: snelheid, nauwkeurigheid, reeks dagen, behaalde lessen en moeilijke toetsen.'],
+      classes:['Mijn klas | KeyPace','Klassen en huiswerk op KeyPace.'],
+    };
     const _metaEn={
       home:['KeyPace: learn to touch type, test your speed, play typing games','Free touch typing trainer: speed test, step-by-step lessons for AZERTY and QWERTY keyboards, typing games and progress tracking.'],
       lessons:['Touch typing lessons: learn to type without looking | KeyPace','Step-by-step touch typing lessons for AZERTY and QWERTY keyboards: home row, top row, bottom row, capitals, punctuation, numbers and symbols.'],
@@ -8634,7 +8682,7 @@ const app={
       stats:['My progress | KeyPace','Follow your typing progress: speed, accuracy, daily streak, passed lessons and difficult keys.'],
       classes:['My class | KeyPace','Classes and homework on KeyPace.'],
     };
-    const [t,d]=(kpInEnPath()&&_metaEn[v])||(KPProg.getCountry()==='fr'&&KPProg.META_FR[v])||_meta[v]||_meta.home;
+    const [t,d]=(kpInEnPath()&&_metaEn[v])||(kpPathLang()==='nl'&&_metaNl[v])||(KPProg.getCountry()==='fr'&&KPProg.META_FR[v])||_meta[v]||_meta.home;
     document.title=t;
     const desc=document.querySelector('meta[name="description"]');
     if(desc)desc.setAttribute('content',d);
@@ -8646,7 +8694,7 @@ const app={
   _syncUrl(v,req){
     const first=!this._urlInit;this._urlInit=true;
     if(this._popping||v!==req)return; // retour navigateur, ou vue remplacée (mobile) : l'adresse demandée reste
-    const want=(kpInEnPath()&&EN_VIEW_PATHS[v])||(KPProg.getCountry()==='fr'&&FR_VIEW_PATHS[v])||VIEW_PATHS[v];
+    const want=(kpPathLang()&&LANG_VIEW_PATHS[kpPathLang()][v])||(KPProg.getCountry()==='fr'&&FR_VIEW_PATHS[v])||VIEW_PATHS[v];
     if(!want||normPath(location.pathname)===want)return;
     const legacy=new URLSearchParams(location.search).has('view');
     if(first&&location.pathname==='/'&&!legacy)return;
@@ -8659,7 +8707,7 @@ const app={
   _seoSync(req){
     const z=document.getElementById('seo-zone');if(!z)return;
     let any=false;
-    const key=kpInEnPath()&&z.querySelector('.seo-sec[data-route="en-'+req+'"]')?'en-'+req:KPProg.getCountry()==='fr'&&z.querySelector('.seo-sec[data-route="fr-'+req+'"]')?'fr-'+req:req;
+    const pl=kpPathLang(),key=pl&&z.querySelector('.seo-sec[data-route="'+pl+'-'+req+'"]')?pl+'-'+req:KPProg.getCountry()==='fr'&&z.querySelector('.seo-sec[data-route="fr-'+req+'"]')?'fr-'+req:req;
     z.querySelectorAll('.seo-sec').forEach(el=>{const on=el.dataset.route===key;el.hidden=!on;if(on)any=true;});
     z.style.display=any?'':'none';
   },
@@ -9022,7 +9070,7 @@ const app={
       </div>
 
       <div class="home-mobile-cta">
-        <div class="home-mobile-cta-price" data-lang-hide="en">${kpT('home.price_line')}</div>
+        <div class="home-mobile-cta-price" data-lang-hide="en nl">${kpT('home.price_line')}</div>
         <button class="btn-primary" style="width:100%;padding:16px;font-size:17px;border-radius:16px" onclick="${isGuest?"openAuth('register')":'go(\'stats\')'}">
           ${isGuest ? kpT('home.create_free') : kpT('home.see_progress')}
         </button>
@@ -9030,14 +9078,14 @@ const app={
         <div style="margin-top:18px;background:var(--light);border-radius:14px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.55;text-align:left"><span style="color:var(--accent)">${ICONS.monitor}</span> ${kpT('home.desktop_note')}</div>
       </div>
 
-      <div class="features-grid home-features-desktop" data-lang-hide="en">
+      <div class="features-grid home-features-desktop" data-lang-hide="en nl">
         <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.gradCap}</div><h3>Adapté à chaque établissement</h3><p>Programmes ajustés au <a href="/dactylographie-primaire">primaire</a>, au <a href="/dactylographie-secondaire">secondaire</a> et au <a href="/dactylographie-superieur">supérieur</a>, alignés sur les référentiels pédagogiques en vigueur.</p></div>
         <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.award}</div><h3>Éligible à la subvention MANOLO</h3><p>Réduisez le coût pour votre établissement grâce au dispositif de subvention de la Fédération Wallonie-Bruxelles.</p></div>
         <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.keyboard}</div><h3>65 leçons et 8+ jeux</h3><p>65 leçons progressives de dactylographie et plus de 8 jeux pour travailler précision, mémoire et vitesse au clavier.</p></div>
       </div>
       `}
       ${!isGuest?'':`
-      <div class="trust" data-lang-hide="en">
+      <div class="trust" data-lang-hide="en nl">
         <div class="trust-inner">
           <div class="trust-hdr">
             <div class="trust-title">Déjà adopté par <b style="color:var(--accent)">9 établissements</b></div>
@@ -9050,7 +9098,7 @@ const app={
       </div>
       `}
       ${!isGuest?'':`
-      <div class="school-banner" data-lang-hide="en">
+      <div class="school-banner" data-lang-hide="en nl">
         <div class="school-banner-inner">
           <div class="school-banner-content">
             <span class="school-banner-badge">${ICONS.gradCap} Écoles · Universités · Centres de formation</span>
@@ -9071,7 +9119,7 @@ const app={
       </div>
       `}
 
-      <div class="reviews-section" id="home-reviews" data-lang-hide="en">
+      <div class="reviews-section" id="home-reviews" data-lang-hide="en nl">
         <h2>Ce qu'ils en pensent</h2>
         <div class="reviews-summary"><span class="reviews-skel" style="display:inline-block;width:160px;height:18px;vertical-align:middle"></span></div>
         <div class="reviews-carousel">
@@ -9080,7 +9128,7 @@ const app={
         <div class="reviews-cta">Vous voulez vous aussi laisser un avis ? <a href="https://www.google.com/maps/place//data=!4m3!3m2!1s0x6f3215aaace62d5d:0x4a1a6693a216ba34!12e1?source=g.page.m._&laa=merchant-review-solicitation" target="_blank" rel="noopener">Cliquez ici</a></div>
       </div>
 
-      ${getUserPlan()!=='expert'?`<div class="pricing-section" data-lang-hide="en">
+      ${getUserPlan()!=='expert'?`<div class="pricing-section" data-lang-hide="en nl">
         <h2>Simple et transparent</h2>
         <p>Commence gratuitement, passe Expert quand tu veux.</p>
         <div class="pricing-grid">
@@ -9119,7 +9167,7 @@ const app={
         </div>
       </div>`:''}
 
-      <div class="home-faq" data-lang-hide="en" style="max-width:1120px;margin:0 auto 72px;padding:0 24px">
+      <div class="home-faq" data-lang-hide="en nl" style="max-width:1120px;margin:0 auto 72px;padding:0 24px">
         <div style="text-align:center;margin-bottom:32px"><h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(20px,2.5vw,30px);margin:0">Questions fréquentes</h2></div>
         <div style="display:flex;flex-direction:column;gap:2px">
           ${homeFaqs.map(([q,a],i)=>`<details style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden" ${i===0?'open':''}><summary style="padding:16px 20px;font-weight:700;font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">${q}<span style="color:${A};font-size:18px;flex-shrink:0;margin-left:12px">+</span></summary><div style="padding:0 20px 18px;color:var(--muted);font-size:14px;line-height:1.65">${a}</div></details>`).join('')}
