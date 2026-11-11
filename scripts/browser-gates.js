@@ -434,6 +434,7 @@ async function run(opts = {}) {
           app.deleteMyAccount();out.enDelete=(document.getElementById('delete-acct-overlay')||{innerText:'(pas de fenêtre)'}).innerText;{const o=document.getElementById('delete-acct-overlay');if(o)o.remove();}
           out.enGameScreens={};
           for(const g of ['frappe','sprint','course','ghost','simon']){app.activeGame=g;app.game=null;app.sprint=null;app.course=null;app.ghost=null;app.simon=null;app.renderGames();await new Promise(r=>setTimeout(r,200));out.enGameScreens[g]=document.getElementById('page-games').innerText;}
+          out.enSouris=await ${require('./souris-screens')};
           app.activeGame=null;
           out.okQ=await kpChooseFamily('qwerty');out.q={course:kpCourseId(),lessons:ALL_LESSONS.length};
           await kpSetSiteLanguage('fr');out.okFr=kpCourseId()==='fr/qwerty';
@@ -463,6 +464,19 @@ async function run(opts = {}) {
           for (const w of words) if (!txt.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent de l'écran ${g} en anglais`);
           const bad = ['Mots qui tombent', 'Jouer', 'OU APPUIE', 'Quitter', 'Lancer le Sprint', 'retour arrière', 'Niveau', 'Meilleur', 'Entraînement', 'Course de dactylo', 'plus vite que', 'Lancer la course', 'fantôme', 'Simon des mots', 'Mémorise'].filter((w) => txt.toLowerCase().includes(w.toLowerCase()));
           if (bad.length) problems.push(`BR12 : du français sur l'écran ${g} en anglais : ${bad.join(', ')}`);
+        }
+        // Précision souris et variantes (menu, règles des 12 niveaux, parties, pause, fin, Grille réflexe, Duo, Magic Tiles) : états simulés, rendu en anglais, aucun mot français
+        {
+          const sc = lg.enSouris || {}; const names = Object.keys(sc);
+          if (names.length < 90) problems.push(`BR12 : les écrans de Précision souris en anglais ne sont pas tous rendus (${names.length})`);
+          const frWord = /[éèêàùçœôîâ]|(^|[^A-Za-z])(le|la|les|des|une|un|du|et|ou|pour|tu|ton|ta|tes|vous|niveau|niveaux|jouer|rejouer|quitter|commencer|reprendre|recommencer|touche|cible|cibles|vie|vies|série|précision|souris|clavier|lettre|lettres|tuile|tuiles|morceau|piège|pièges|règles|palier|joué|vise|tape|clique|évite|rangée|réussite|réussites|raté|trop|tard|pose|curseur|dans|sur|avec|sans|pas)([^A-Za-z]|$)/i;
+          const leaked = names.filter((n) => frWord.test(sc[n].t)).map((n) => `${n} (${(sc[n].t.match(new RegExp(frWord.source, 'i')) || [''])[0].trim()})`);
+          if (leaked.length) problems.push(`BR12 : du français dans Précision souris en anglais : ${leaked.slice(0, 6).join(', ')}`);
+          const keyLeft = names.filter((n) => /(^|[^A-Za-z0-9])(sm|sfs|sgr|sg|tiles|duo)\.[a-z0-9_]+/.test(sc[n].t));
+          if (keyLeft.length) problems.push(`BR12 : clé de texte affichée telle quelle dans Précision souris : ${keyLeft.slice(0, 4).join(', ')}`);
+          for (const [n, w] of [['menu', 'Accuracy game'], ['menu', 'levels completed'], ['brief6', 'How to play'], ['p3', 'Heart hit'], ['p8ok', 'Well sorted'], ['p10reach', 'Reached'], ['pause12', 'Rules reminder'], ['end3', 'Chaos conquered'], ['sgrBrief1', 'Middle row'], ['sgrCombo2', 'Combo ×2, keep going!'], ['sgrEnd1', 'New record on this level!'], ['duoConfig', 'Where is your mouse?'], ['duoEnd0', 'Tier reached!'], ['tilesSelect', 'Free mode'], ['tilesGlossary', 'Long tile'], ['tilesBrief', 'KEYS FOR THIS GAME'], ['tilesPerfect', 'PERFECT'], ['tilesChordJudge', 'CHORD!'], ['tilesEnd', 'Song rank']]) {
+            if (!(sc[n] && sc[n].t.toLowerCase().includes(w.toLowerCase()))) problems.push(`BR12 : « ${w} » absent de l'écran ${n} (Précision souris en anglais)`);
+          }
         }
         for (const w of ['Home', 'Test', 'Courses', 'Games', 'Progress', 'Log out']) if (!lg.enNav.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent du menu en anglais`);
         const nv = ['Accueil', 'Cours', 'Jeux', 'Progrès', 'Déconnexion', 'Établissements', 'Test sur base'].filter((w) => new RegExp('(^|[^A-Za-zÀ-ÿ])' + w + '([^A-Za-zÀ-ÿ]|$)').test(lg.enNav)); if (nv.length) problems.push(`BR12 : du français dans le menu en anglais : ${nv.join(', ')}`);

@@ -5477,10 +5477,10 @@ const TILES_RANK_SCORE=[0,120,280,480,750,1100,1600];
 // voir maxStage sur TILES_SONGS et TILES_STAGE_RATIOS ci-dessous, qui répartit
 // ces paliers sur toute la durée du morceau plutôt que de tout ouvrir d'un coup.
 const TILES_STAGE_DEFS=[
-  {lanes:[3,4],label:'2 TOUCHES · F · J'},
-  {lanes:[2,3,4,5],label:'4 TOUCHES · D F J K'},
-  {lanes:[1,2,3,4,5,6],label:'6 TOUCHES · S D F J K L'},
-  {lanes:[0,1,2,3,4,5,6,7],label:'8 TOUCHES · CLAVIER COMPLET'},
+  {lanes:[3,4],get label(){return kpT('tiles.stage_2')}},
+  {lanes:[2,3,4,5],get label(){return kpT('tiles.stage_4')}},
+  {lanes:[1,2,3,4,5,6],get label(){return kpT('tiles.stage_6')}},
+  {lanes:[0,1,2,3,4,5,6,7],get label(){return kpT('tiles.stage_8')}},
 ];
 // Ratios (proportion de la durée du morceau) auxquels apparaît chaque palier,
 // selon l'index du dernier palier utilisé (maxStage de TILES_SONGS) : 1 = le
@@ -5496,10 +5496,10 @@ const TILES_STAGE_RATIOS={
 // Libellé court affiché sur chaque carte de morceau (écran de sélection) pour
 // annoncer d'emblée jusqu'où ce niveau monte en touches, avant même de lancer
 // la partie.
-const TILES_MAX_LABEL={1:'max 4 touches · F D J K',2:'max 6 touches · F D S J K L',3:'8 touches · clavier complet'};
+const TILES_MAX_LABEL={get 1(){return kpT('tiles.max_1')},get 2(){return kpT('tiles.max_2')},get 3(){return kpT('tiles.max_3')}};
 // Palier bonus réservé aux contextes "expert" (morceau Extrême, Mode libre) :
 // ouvre les 4 couloirs étendus (rangée du dessus) en plus des 8 de base.
-const TILES_EXPERT_STAGE={lanes:[0,1,2,3,4,5,6,7,8,9,10,11],label:'12 TOUCHES · EXPERT'};
+const TILES_EXPERT_STAGE={lanes:[0,1,2,3,4,5,6,7,8,9,10,11],get label(){return kpT('tiles.stage_12')}};
 // Morceaux jouables (vocabulaire volontairement distinct de "piste", déjà pris
 // par les 3 variantes de Précision souris grid/hybrid/tiles — voir
 // _sourisTrackBestField). Le tempo est celui, réel, du morceau : contrairement
@@ -5514,9 +5514,9 @@ const TILES_EXPERT_STAGE={lanes:[0,1,2,3,4,5,6,7,8,9,10,11],label:'12 TOUCHES ·
 // TILES_STAGE_RATIOS. Facile ne dépasse jamais F D J K, Difficile ajoute S et
 // L (F D S J K L), Extrême seul ouvre les 8 touches Q S D F J K L M.
 const TILES_SONGS=[
-  {id:'facile',title:'I can see you all',artist:'ThisIsBeatKitchen',bpm:90,file:'/sounds/tiles-facile-90bpm.mp3',diffLabel:'Facile',diffColor:'#1FA971',offsetMs:0,maxStage:1},
-  {id:'difficile',title:'Flashbacks',artist:'ThisIsBeatKitchen',bpm:120,file:'/sounds/tiles-difficile-120bpm.mp3',diffLabel:'Difficile',diffColor:'#FF8A5C',offsetMs:0,maxStage:2},
-  {id:'extreme',title:'Sell your Soul',artist:'ThisIsBeatKitchen',bpm:140,file:'/sounds/tiles-extreme-140bpm.mp3',diffLabel:'Extrême',diffColor:'#E5484D',offsetMs:0,expert:true,maxStage:3},
+  {id:'facile',title:'I can see you all',artist:'ThisIsBeatKitchen',bpm:90,file:'/sounds/tiles-facile-90bpm.mp3',get diffLabel(){return kpT('tiles.diff_easy')},diffColor:'#1FA971',offsetMs:0,maxStage:1},
+  {id:'difficile',title:'Flashbacks',artist:'ThisIsBeatKitchen',bpm:120,file:'/sounds/tiles-difficile-120bpm.mp3',get diffLabel(){return kpT('tiles.diff_hard')},diffColor:'#FF8A5C',offsetMs:0,maxStage:2},
+  {id:'extreme',title:'Sell your Soul',artist:'ThisIsBeatKitchen',bpm:140,file:'/sounds/tiles-extreme-140bpm.mp3',get diffLabel(){return kpT('tiles.diff_extreme')},diffColor:'#E5484D',offsetMs:0,expert:true,maxStage:3},
 ];
 // Mode libre : l'ancien système procédural (sans musique, durée infinie, BPM
 // qui grimpe avec le combo au lieu d'être calé sur un morceau réel) — gardé
@@ -5524,8 +5524,8 @@ const TILES_SONGS=[
 // qu'avant l'introduction des morceaux (0/9000/20000/32000 ms), puisqu'il n'y
 // a plus de durée totale sur laquelle calculer des proportions. Palier expert
 // ajouté 18s après le plein clavier, puisque le mode libre n'a pas de fin.
-const TILES_FREE_STAGES=TILES_STAGE_DEFS.map((d,i)=>({lanes:d.lanes,label:d.label,t:[0,9000,20000,32000][i]}))
-  .concat([{...TILES_EXPERT_STAGE,t:50000}]);
+const TILES_FREE_STAGES=TILES_STAGE_DEFS.map((d,i)=>({lanes:d.lanes,get label(){return d.label},t:[0,9000,20000,32000][i]}))
+  .concat([{lanes:TILES_EXPERT_STAGE.lanes,get label(){return TILES_EXPERT_STAGE.label},t:50000}]);
 const PASSAGES=["le matin, la lumière douce traverse les rideaux et réveille doucement la maison encore endormie sous un ciel calme et clair.", "le petit renard roux traverse le champ gelé, observe les oiseaux au loin, puis disparaît derrière la vieille grange en bois.", "la pluie tombe sur les toits de la vieille ville, les rues brillent sous les lampadaires et un chat traverse sans bruit la place déserte.", "le train file à travers la campagne verte, les collines défilent derrière la vitre et le voyageur sourit en pensant au bord de mer qui l'attend.", "en automne, les feuilles rousses tombent une à une sur le chemin de terre, formant un tapis doré que le vent balaie doucement.", "la neige recouvre les toits du village et étouffe les bruits de la rue, laissant place à un silence blanc et paisible.", "au bord du lac, les roseaux ploient sous la brise tandis qu'un héron immobile guette patiemment le passage d'un poisson.", "le soleil se couche lentement derrière les montagnes, teintant le ciel d'orange et de rose avant que la nuit ne tombe.", "un orage gronde au loin, les nuages s'assombrissent et les premières gouttes viennent frapper les vitres de la cuisine.", "dans la forêt humide, la mousse recouvre les pierres et l'odeur de terre mouillée se mêle à celle des feuilles pourries.", "le vent d'hiver siffle entre les branches nues des arbres, faisant claquer les volets de la vieille ferme abandonnée.", "les vagues viennent mourir sur le sable fin, laissant derrière elles des coquillages que les enfants ramassent avec joie.", "au printemps, les premières fleurs percent la terre encore froide et annoncent le retour des beaux jours pour tous.", "la brume matinale enveloppe la vallée, cachant les sommets et donnant au paysage une allure mystérieuse et calme.", "un arc-en-ciel apparaît après l'averse, dessinant ses couleurs vives au-dessus des champs encore luisants de pluie.", "les étoiles scintillent dans le ciel dégagé de la montagne, loin des lumières de la ville qui les cachent d'habitude.", "le ruisseau serpente entre les rochers, son eau claire reflétant les branches des saules penchés au-dessus de lui.", "la chaleur de l'été rend l'air épais et immobile, poussant chacun à chercher l'ombre fraîche des grands platanes.", "un vol d'oies sauvages traverse le ciel gris de novembre, formant un grand triangle qui s'éloigne vers le sud.", "la rosée du matin perle sur les toiles d'araignée tendues entre les herbes hautes du jardin encore silencieux.", "le petit chat gris se glisse entre les pots de fleurs, curieux de découvrir ce qui se cache derrière la haie du voisin.", "un troupeau de moutons traverse lentement la route de campagne, guidé par un vieux berger et son chien fidèle.", "les hirondelles reviennent chaque printemps construire leur nid sous le toit de la vieille maison familiale.", "le hérisson sort de sa cachette à la tombée de la nuit pour chercher quelques insectes dans l'herbe humide.", "dans l'étable, les vaches ruminent tranquillement pendant que le fermier prépare le foin pour l'hiver prochain.", "un écureuil bondit de branche en branche, cherchant les noisettes qu'il a cachées un peu partout dans le parc.", "le chien attend patiemment devant la porte, la queue frétillante, guettant le retour de son maître chaque soir.", "les abeilles butinent les fleurs du jardin, transportant le pollen d'une plante à l'autre sous le soleil de juin.", "un cerf traverse la clairière au petit matin, immobile un instant avant de disparaître dans les fourrés épais.", "les poules picorent dans la cour de la ferme, tandis que le coq surveille attentivement les alentours du poulailler.", "le dauphin saute hors de l'eau près du bateau, ravissant les touristes venus observer la vie marine côtière.", "un papillon multicolore se pose délicatement sur une fleur, restant immobile quelques secondes avant de repartir.", "les chevaux galopent dans le pré, profitant des premiers rayons du soleil après une longue nuit d'hiver.", "le lapin détale à travers le potager dès qu'il entend le moindre bruit venant de la maison voisine.", "les grenouilles chantent près de l'étang, créant un concert nocturne qui accompagne les longues soirées d'été.", "le café fume doucement sur la table de la cuisine pendant que la radio annonce les nouvelles du matin.", "chaque dimanche, la famille se retrouve autour d'un grand repas préparé avec soin par les grands-parents.", "la lessive sèche sur le fil tendu entre deux arbres, se balançant doucement au rythme léger du vent.", "après le dîner, les enfants rangent leurs jouets pendant que les parents discutent tranquillement au salon.", "le réveil sonne trop tôt ce matin-là, et il faut se dépêcher pour ne pas rater le bus habituel.", "la vieille horloge du couloir sonne midi, rappelant à chacun qu'il est temps de passer à table.", "un livre oublié traîne sur la table basse, marque-page glissé entre deux pages depuis plusieurs jours déjà.", "la maison sent bon le pain frais, tout juste sorti du four que la grand-mère surveille avec attention.", "le chat s'installe confortablement sur le canapé, roulé en boule près de la fenêtre baignée de soleil.", "chaque soir, avant de dormir, les enfants demandent une histoire que leur mère raconte avec plaisir.", "la boîte aux lettres déborde de publicités, cachant presque la lettre attendue depuis plusieurs semaines.", "le grenier renferme de vieilles photographies jaunies qui racontent l'histoire de plusieurs générations.", "le jardin réclame quelques soins avant l'arrivée du printemps : tailler les rosiers, retourner la terre.", "une odeur de gâteau au chocolat envahit la maison, annonçant l'anniversaire tant attendu par les enfants.", "le samedi matin, le marché du village s'anime tôt avec les cris joyeux des commerçants installant leurs étals.", "la clé tourne difficilement dans la serrure de la vieille porte, usée par des années d'ouverture quotidienne.", "les volets claquent doucement sous la brise, rappelant qu'il faudrait les réparer avant l'hiver prochain.", "un plateau de fruits frais trône sur la table, prêt à être partagé après le repas de midi.", "la cave garde une fraîcheur agréable même pendant les journées les plus chaudes de l'été.", "le linge propre s'empile sur le lit, attendant d'être plié avant que la soirée ne commence.", "le professeur explique lentement la leçon du jour pendant que les élèves prennent des notes attentivement.", "chaque exercice de dactylographie demande de la patience, mais les progrès arrivent plus vite qu'on ne le pense.", "apprendre à taper vite ressemble à une course : au début chaque mot compte, puis le rythme s'installe naturellement.", "la bibliothèque de l'école reste ouverte tard le soir pour permettre aux élèves de réviser avant les examens.", "un cahier neuf sent toujours particulièrement bon, avec ses pages blanches encore vierges de toute écriture.", "la cloche sonne la fin des cours, libérant dans la cour une foule d'élèves pressés de rentrer chez eux.", "chaque champion a commencé débutant : la vraie différence se joue dans la régularité et le plaisir de progresser.", "le tableau noir se remplit peu à peu de formules que les élèves recopient avec application dans leur cahier.", "réviser régulièrement, même quelques minutes chaque jour, aide bien plus qu'une longue session juste avant l'examen.", "la salle informatique bourdonne du bruit des claviers pendant que chacun termine son exercice de frappe.", "un élève lève la main timidement pour poser une question sur l'exercice qu'il n'a pas bien compris.", "la rentrée approche et il faut déjà préparer le nouveau cartable ainsi que les fournitures scolaires.", "progresser demande de la constance : mieux vaut s'entraîner quinze minutes chaque jour qu'une heure une seule fois.", "le dictionnaire posé sur le bureau permet de vérifier l'orthographe des mots les plus difficiles à retenir.", "chaque niveau franchi apporte une nouvelle confiance, poussant l'élève à viser encore un peu plus haut.", "le bureau reste silencieux tôt le matin, avant que les collègues n'arrivent un à un pour commencer la journée.", "un rapport urgent doit être terminé avant midi, ce qui pousse chacun à taper plus vite que d'habitude.", "la réunion s'éternise autour de la table, tandis que certains prennent des notes sur leur ordinateur portable.", "écrire vite, c'est surtout écrire juste : vise la précision avant la vitesse, et la cadence viendra naturellement.", "le téléphone sonne sans arrêt ce matin-là, interrompant sans cesse la rédaction du courrier important.", "chaque employé dispose désormais d'un poste équipé d'un clavier confortable pour limiter la fatigue des mains.", "la pause déjeuner permet à toute l'équipe de se retrouver autour d'un café loin des écrans lumineux.", "un nouveau logiciel de gestion vient d'être installé, obligeant chacun à apprendre de nouvelles habitudes.", "le responsable relit attentivement chaque document avant de l'envoyer aux clients pour validation finale.", "taper un courrier professionnel demande autant de clarté que de rapidité pour convaincre le destinataire.", "les dossiers s'empilent sur le bureau, mais un peu d'organisation permet toujours d'y voir plus clair.", "le télétravail change les habitudes : certains préfèrent désormais travailler tôt le matin dans le calme.", "la présentation de fin d'année demande plusieurs jours de préparation minutieuse avant d'être enfin prête.", "un simple courriel bien tapé peut parfois éviter des heures de discussion inutile entre collègues.", "chaque projet avance étape par étape, et la patience finit toujours par porter ses fruits au bureau.", "le coureur accélère dans la dernière ligne droite, puisant dans ses dernières forces pour franchir la ligne.", "chaque samedi matin, le club de football se retrouve sur le terrain pour un entraînement intensif.", "la piscine municipale accueille de nombreux nageurs dès l'ouverture, profitant du calme avant la foule.", "un match de tennis serré tient les spectateurs en haleine jusqu'au tout dernier point de la rencontre.", "grimper en montagne demande autant d'endurance que de concentration pour ne jamais perdre l'équilibre.", "le vélo reste le moyen préféré des habitants pour se déplacer dans les petites rues du centre-ville.", "une partie d'échecs peut durer des heures, chaque joueur réfléchissant longuement avant de bouger une pièce.", "le groupe de randonneurs s'arrête au sommet pour admirer le paysage avant de redescendre lentement.", "la salle de danse résonne de musique joyeuse pendant que les élèves répètent leur chorégraphie du spectacle.", "jouer aux cartes en famille reste une tradition du dimanche soir, entre rires et petites disputes amicales.", "le pêcheur attend patiemment sur la rive, sa ligne tendue vers l'eau calme du fleuve tranquille.", "chaque compétition de dactylographie attire des passionnés venus mesurer leur vitesse face à d'autres joueurs.", "la course cycliste traverse plusieurs villages avant d'arriver enfin dans la ville qui accueille l'arrivée.", "le yoga du matin aide à retrouver calme et concentration avant de commencer une longue journée chargée.", "un tournoi de basket réunit chaque été les équipes des quartiers voisins autour d'une compétition amicale.", "la gare grouille de voyageurs pressés, valises à la main, cherchant le quai de leur prochain train.", "le tramway glisse silencieusement le long des avenues, s'arrêtant à chaque station pour laisser monter les passagers.", "un vieux pont de pierre relie les deux rives de la rivière, offrant une vue magnifique sur la vallée.", "la ville s'éveille doucement, les commerces ouvrent leurs volets et les premiers passants arpentent les trottoirs.", "un long voyage en voiture traverse plusieurs régions, chacune offrant des paysages différents et surprenants.", "le port bruisse d'activité dès l'aube, entre pêcheurs qui rentrent et bateaux qui se préparent à partir.", "les ruelles étroites du centre historique cachent de petites boutiques que seuls les habitués connaissent vraiment.", "l'avion survole les nuages, offrant aux passagers une vue imprenable sur les montagnes enneigées en contrebas.", "chaque quartier de la capitale possède son propre caractère, entre marchés animés et places tranquilles.", "le bateau quitte lentement le port, laissant derrière lui une traînée blanche sur l'eau bleue et calme.", "visiter une nouvelle ville demande de se perdre un peu, loin des itinéraires trop connus des guides.", "la place centrale se remplit chaque soir de terrasses animées où les gens discutent jusque tard.", "un long chemin de montagne mène jusqu'au village perché, accessible seulement à pied ou à vélo.", "le métro traverse la ville sous terre, transportant chaque jour des milliers de passagers pressés.", "les phares du bord de mer guident encore aujourd'hui les bateaux perdus dans la brume nocturne.", "la soupe mijote doucement sur le feu, embaumant toute la cuisine d'une odeur chaude et réconfortante.", "préparer une tarte demande du temps, mais le résultat récompense toujours les efforts fournis en cuisine.", "le pain croustillant sort du four juste à temps pour accompagner le repas du soir en famille.", "chaque marché propose des légumes frais cueillis le matin même dans les fermes des environs.", "la recette de grand-mère se transmet depuis plusieurs générations, gardée précieusement dans un vieux carnet.", "un plat mijoté toute la journée développe des saveurs bien plus riches qu'une cuisson rapide.", "la table du dîner s'orne d'une nappe blanche, préparée avec soin pour un repas de fête.", "couper les légumes finement demande de l'entraînement, mais le geste devient vite naturel avec la pratique.", "le café du matin accompagne toujours une lecture rapide du journal avant de partir travailler.", "préparer un repas simple mais soigné reste souvent plus satisfaisant qu'une recette compliquée et longue.", "la boulangerie du coin ouvre tôt chaque matin pour proposer croissants et pains frais aux habitants.", "une salade colorée réunit tomates, concombres et herbes fraîches directement cueillies dans le jardin.", "taper sans regarder ses doigts demande un peu de patience, mais chaque jour de pratique rend tes mains plus rapides.", "un clavier bien positionné évite les douleurs aux poignets lors de longues sessions de frappe quotidienne.", "la précision compte autant que la vitesse : mieux vaut taper juste plutôt que corriger sans cesse.", "apprendre la position des doigts sur la rangée de base constitue la première étape vers une frappe rapide.", "chaque exercice répété renforce la mémoire des doigts, rendant les mouvements de plus en plus naturels.", "un ordinateur récent facilite grandement le travail quotidien, à condition de savoir l'utiliser efficacement.", "la disposition du clavier belge diffère légèrement du clavier français, ce qui surprend parfois les débutants.", "suivre sa progression au fil des semaines motive à continuer, même quand les résultats semblent lents.", "un bon éclairage aide à mieux voir l'écran sans fatiguer les yeux pendant une longue session de travail.", "la régularité prime sur l'intensité : dix minutes chaque jour valent mieux qu'une heure une fois par semaine.", "maîtriser son clavier permet d'écrire ses idées presque aussi vite qu'on les pense, sans y réfléchir.", "chaque touche du clavier correspond à un doigt précis, une règle simple qui change tout une fois assimilée.", "les jeux de frappe rendent l'entraînement plus amusant tout en améliorant discrètement la vitesse et la précision.", "garder le dos droit et les poignets détendus améliore grandement le confort pendant les longues séances de frappe.", "apprendre à taper à dix doigts change durablement la façon de travailler devant un ordinateur au quotidien.", "la patience d'aujourd'hui prépare l'aisance de demain : avance avec calme, précision et constance chaque jour.", "les petites habitudes répétées chaque jour finissent toujours par produire de grands changements avec le temps.", "il vaut mieux avancer lentement mais sûrement que de se précipiter et abandonner après quelques essais.", "chaque erreur apprend quelque chose de nouveau, à condition de prendre le temps de la comprendre vraiment.", "se fixer un petit objectif chaque semaine aide à garder la motivation sur le long terme.", "la persévérance finit toujours par payer, même quand les progrès semblent invisibles au jour le jour.", "prendre le temps de bien faire les choses évite souvent d'avoir à les recommencer plus tard.", "comparer ses résultats d'une semaine à l'autre montre des progrès qu'on ne remarque pas au quotidien.", "apprendre une nouvelle compétence demande du temps, mais chaque effort investi finit par porter ses fruits.", "garder une attitude positive face aux difficultés aide à surmonter plus facilement les obstacles du quotidien.", "fixer des objectifs clairs et atteignables rend le chemin vers la réussite beaucoup plus motivant.", "le calme et la concentration valent souvent mieux que la précipitation pour réussir une tâche difficile.", "chaque jour offre une nouvelle occasion de progresser un peu, même par de tout petits pas.", "accepter ses erreurs sans se décourager reste la meilleure façon d'apprendre durablement quelque chose de nouveau.", "la confiance en soi se construit progressivement, à force de petites réussites accumulées au fil du temps.", "les grands-parents racontent souvent des histoires anciennes que les petits-enfants écoutent avec grand intérêt.", "un simple appel téléphonique suffit parfois à réchauffer l'âme d'une personne qui se sentait seule.", "retrouver de vieux amis après plusieurs années procure une joie difficile à décrire avec des mots.", "les enfants grandissent si vite que chaque moment partagé avec eux mérite d'être pleinement savouré.", "un simple sourire échangé dans la rue peut parfois illuminer toute une journée compliquée.", "écrire une lettre à un proche demande plus de temps qu'un message, mais elle touche davantage.", "les repas de famille rassemblent plusieurs générations autour d'une même table, entre rires et souvenirs partagés.", "apprendre à écouter vraiment quelqu'un reste l'une des compétences les plus précieuses dans une relation.", "un anniversaire fêté simplement, entourée des siens, vaut souvent bien plus qu'une grande célébration.", "partager un projet avec un ami renforce souvent une amitié bien plus qu'une simple conversation."];
 const CURRICULUM=[
   /* ── MODULE 1 : touches de repos ─────────────────────────────────────────── */
@@ -10426,52 +10426,52 @@ const app={
    ═══════════════════════════════════════════════════════════════ */
 
   _sourisLevels:[
-    {n:1,icon:'👆',name:'Survol',tag:'Vise avec la souris',
-     brief:'Des cercles apparaissent. <b>Pose le curseur dessus</b> et garde-le un instant : pas besoin de cliquer.',
+    {n:1,icon:'👆',get name(){return kpT('sm.l1.name')},get tag(){return kpT('sm.l1.tag')},
+     get brief(){return kpT('sm.l1.brief')},
      newThing:'Déplacer la souris avec précision.',
      dur:30,bronze:18,silver:30,gold:38},
-    {n:2,icon:'🖱️',name:'Clic',tag:'Vise et clique',
-     brief:'Cette fois il faut <b>cliquer</b> sur les cibles. Elles rétrécissent avec le temps : sois rapide.',
+    {n:2,icon:'🖱️',get name(){return kpT('sm.l2.name')},get tag(){return kpT('sm.l2.tag')},
+     get brief(){return kpT('sm.l2.brief')},
      newThing:'Le clic, et des cibles qui disparaissent.',
      dur:30,bronze:16,silver:28,gold:38},
-    {n:3,icon:'🎯',name:'Le cœur de cible',tag:'Vise le centre',
-     brief:'Chaque cible a un <b style="color:#FFD84D">cœur doré</b>, plus petit que la cible. Le toucher rapporte <b>3 points</b> au lieu d’un, et <b>5 cœurs d’affilée rendent une vie</b>.',
+    {n:3,icon:'🎯',get name(){return kpT('sm.l3.name')},get tag(){return kpT('sm.l3.tag')},
+     get brief(){return kpT('sm.l3.brief')},
      newThing:'La précision paie : vise le centre, pas le bord.',
      dur:32,bronze:30,silver:54,gold:80},
-    {n:4,icon:'⚡',name:'Cibles express',tag:'Réagis vite',
-     brief:'Les cibles ne restent qu’un <b>court instant</b>. Enchaîne sans hésiter pour garder le rythme.',
+    {n:4,icon:'⚡',get name(){return kpT('sm.l4.name')},get tag(){return kpT('sm.l4.tag')},
+     get brief(){return kpT('sm.l4.brief')},
      newThing:'La vitesse de réaction pure.',
      dur:30,bronze:26,silver:48,gold:70},
-    {n:5,icon:'⚠️',name:'Pièges',tag:'Ne clique pas n’importe quoi',
-     brief:'Les <b style="color:#1FA971">vertes</b> rapportent, les <b style="color:#E5484D">rouges</b> te coûtent des points. Mais toutes ne se ressemblent pas : <b>lis avant de cliquer</b>.',
+    {n:5,icon:'⚠️',get name(){return kpT('sm.l5.name')},get tag(){return kpT('sm.l5.tag')},
+     get brief(){return kpT('sm.l5.brief')},
      newThing:'Distinguer le bon du piège : le rouge se déguise.',
      dur:34,bronze:22,silver:40,gold:52},
-    {n:6,icon:'💎',name:'Bonus & choix',tag:'Choisis bien',
-     brief:'Des cibles spéciales apparaissent : <b style="color:#3B82F6">bleue</b> = points doublés un temps, <b style="color:#A855F7">violette</b> = +2 s au chrono, <b style="color:#FFD84D">dorée</b> = jackpot bref. Elles disparaissent vite : <b>vaut-il mieux la chasser ou rester sur les vertes ?</b>',
+    {n:6,icon:'💎',get name(){return kpT('sm.l6.name')},get tag(){return kpT('sm.l6.tag')},
+     get brief(){return kpT('sm.l6.brief')},
      newThing:'Arbitrer : chaque bonus coûte le temps de l’attraper.',
      dur:34,bronze:32,silver:60,gold:100},
-    {n:7,icon:'⏱️',name:'Pièges express',tag:'Décide vite et bien',
-     brief:'Pièges déguisés <b>et</b> cibles pressées, avec les bonus. La lecture doit être instantanée.',
+    {n:7,icon:'⏱️',get name(){return kpT('sm.l7.name')},get tag(){return kpT('sm.l7.tag')},
+     get brief(){return kpT('sm.l7.brief')},
      newThing:'Discriminer sous pression de temps.',
      dur:34,bronze:18,silver:34,gold:52},
-    {n:8,icon:'✋',name:'Glisser-déposer',tag:'Attrape et dépose',
-     brief:'Attrape chaque forme et <b>fais-la glisser</b> dans la zone de sa couleur, sans lâcher le bouton.',
+    {n:8,icon:'✋',get name(){return kpT('sm.l8.name')},get tag(){return kpT('sm.l8.tag')},
+     get brief(){return kpT('sm.l8.brief')},
      newThing:'Maintenir le clic en déplaçant la souris.',
      dur:34,bronze:14,silver:23,gold:34},
-    {n:9,icon:'🎨',name:'Tri rapide',tag:'Trie sous pression',
-     brief:'Comme le glisser-déposer, mais <b>trois couleurs</b> et un chrono plus serré. Range vite et juste.',
+    {n:9,icon:'🎨',get name(){return kpT('sm.l9.name')},get tag(){return kpT('sm.l9.tag')},
+     get brief(){return kpT('sm.l9.brief')},
      newThing:'Trier plusieurs catégories à la fois.',
      dur:34,bronze:13,silver:21,gold:32},
-    {n:10,icon:'🕹️',name:'ZQSD seul',tag:'Apprends à te déplacer',
-     brief:'Pose la souris. Déplace ton personnage avec <b>Z Q S D</b> pour <b>entrer dans les cercles verts</b> et esquiver les zones rouges.',
+    {n:10,icon:'🕹️',get name(){return kpT('sm.l10.name')},get tag(){return kpT('sm.l10.tag')},
+     get brief(){return kpT('sm.l10.brief')},
      newThing:'Le clavier pour bouger, main gauche seule.',
      dur:34,bronze:14,silver:22,gold:27},
-    {n:11,icon:'🎮',name:'Souris + clavier',tag:'Tout en même temps',
-     brief:'Déplace-toi avec <b>Z Q S D</b> pour esquiver les zones rouges, <b>tout en cliquant</b> les cibles et leurs cœurs.',
+    {n:11,icon:'🎮',get name(){return kpT('sm.l11.name')},get tag(){return kpT('sm.l11.tag')},
+     get brief(){return kpT('sm.l11.brief')},
      newThing:'Les deux mains à la fois, comme un vrai jeu.',
      dur:36,bronze:28,silver:54,gold:76},
-    {n:12,icon:'🔥',name:'Chaos',tag:'La totale',
-     brief:'Tout, en même temps, plus vite : cœurs, pièges déguisés, bonus, déplacement et zones mobiles. Le test ultime de la coordination.',
+    {n:12,icon:'🔥',get name(){return kpT('sm.l12.name')},get tag(){return kpT('sm.l12.tag')},
+     get brief(){return kpT('sm.l12.brief')},
      newThing:'Maîtrise complète : rien ne t’est épargné.',
      dur:40,bronze:17,silver:38,gold:56},
   ],
@@ -10539,7 +10539,7 @@ const app={
   },
 
   selectSouris(lvl){
-    if(!currentUser){openAuth('register','Crée un compte pour jouer.',()=>this.selectSouris(lvl));return;}
+    if(!currentUser){openAuth('register',kpT('sm.need_account'),()=>this.selectSouris(lvl));return;}
     if(lvl>this._sourisUnlocked())return;
     this.activeGame='souris';
     this.souris={phase:'brief',track:'mouse',lvl,score:0,lives:3,hit:0,miss:0,t0:0};
@@ -10579,10 +10579,10 @@ const app={
 
   // Thèmes du menu : regroupent les 12 niveaux par ce qu'on y apprend
   _sfsChapters:[
-    {t:'Viser',d:'Survol, clic, précision, vitesse',from:1,to:4},
-    {t:'Décider',d:'Pièges et bonus : lis avant de cliquer',from:5,to:7},
-    {t:'Glisser',d:'Attrape et dépose au bon endroit',from:8,to:9},
-    {t:'Au clavier',d:'Z Q S D pour te déplacer',from:10,to:12},
+    {get t(){return kpT('sm.ch0.t')},get d(){return kpT('sm.ch0.d')},from:1,to:4},
+    {get t(){return kpT('sm.ch1.t')},get d(){return kpT('sm.ch1.d')},from:5,to:7},
+    {get t(){return kpT('sm.ch2.t')},get d(){return kpT('sm.ch2.d')},from:8,to:9},
+    {get t(){return kpT('sm.ch3.t')},get d(){return kpT('sm.ch3.d')},from:10,to:12},
   ],
   // Icône de niveau : le même dessin que l'élément principal du niveau
   _sfsLevelSwatch:{1:'orange',2:'good',3:'heart',4:'good',5:'bad',6:'x2',7:'dis',8:'pg',9:'pi',10:'pad',11:'haz',12:'jack'},
@@ -10597,7 +10597,7 @@ const app={
     const best=this._sourisBest();
     const tiers=(this.stats&&this.stats.sourisTiers)||{};
     const lv=this._sourisLevels;
-    const tierName={gold:'Or',silver:'Argent',bronze:'Bronze'};
+    const tierName={gold:kpT('sm.tier_gold'),silver:kpT('sm.tier_silver'),bronze:kpT('sm.tier_bronze')};
     const counts={gold:0,silver:0,bronze:0};
     lv.forEach(l=>{if(l.n<=best&&counts[tiers[l.n]]!=null)counts[tiers[l.n]]++;});
     // Niveau conseillé : le premier niveau ouvert pas encore validé, sinon le
@@ -10609,39 +10609,39 @@ const app={
     const allGold=allDone&&lv.every(l=>tiers[l.n]==='gold');
     const seg=lv.map(l=>{
       const t=l.n<=best?(tiers[l.n]||'done'):'';
-      return `<i class="sm-seg ${t}${l.n===next.n&&!allDone?' now':''}" title="Niveau ${l.n}"></i>`;
+      return `<i class="sm-seg ${t}${l.n===next.n&&!allDone?' now':''}" title="${kpT('sm.level_n',{n:l.n})}"></i>`;
     }).join('');
     const medals=['gold','silver','bronze'].map(t=>`<span class="sm-med ${t}">${this._sfsMedalSvg(t,20)}<b>${counts[t]}</b> ${tierName[t].toLowerCase()}</span>`).join('');
     const card=(l)=>{
       const open=l.n<=unlocked,done=l.n<=best,tier=tiers[l.n];
       const isNext=!allDone&&l.n===next.n;
-      const status=!open?`<span class="sm-st lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>Valide le niveau ${l.n-1}</span>`
-        :done?(tier?`<span class="sm-st done">${this._sfsMedalSvg(tier,18)}${tierName[tier]}</span>`:'<span class="sm-st done">Validé</span>')
-        :isNext?'<span class="sm-st now">Prochain niveau</span>':'<span class="sm-st todo">À faire</span>';
-      return `<button type="button" class="sm-card${isNext?' next':''}${open?'':' locked'}" ${open?`onclick="app.selectSouris(${l.n})"`:'disabled'} aria-label="Niveau ${l.n}, ${this._esc(l.name)}">
+      const status=!open?`<span class="sm-st lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>${kpT('sm.validate_lvl',{n:l.n-1})}</span>`
+        :done?(tier?`<span class="sm-st done">${this._sfsMedalSvg(tier,18)}${tierName[tier]}</span>`:`<span class="sm-st done">${kpT('sm.validated')}</span>`)
+        :isNext?`<span class="sm-st now">${kpT('sm.next_level')}</span>`:`<span class="sm-st todo">${kpT('sm.todo')}</span>`;
+      return `<button type="button" class="sm-card${isNext?' next':''}${open?'':' locked'}" ${open?`onclick="app.selectSouris(${l.n})"`:'disabled'} aria-label="${kpT('sm.card_aria',{n:l.n,name:this._esc(l.name)})}">
         <span class="sm-ic">${this._sfsSwatch(this._sfsLevelSwatch[l.n])}</span>
-        <span class="sm-tx"><small>Niveau ${l.n}</small><b>${this._esc(l.name)}</b><em>${this._esc(l.tag)}</em>${status}</span>
+        <span class="sm-tx"><small>${kpT('sm.level_n',{n:l.n})}</small><b>${this._esc(l.name)}</b><em>${this._esc(l.tag)}</em>${status}</span>
       </button>`;
     };
     const chapters=this._sfsChapters.map(ch=>`<section class="sm-ch">
       <div class="sm-ch-h"><h3>${ch.t}</h3><span>${ch.d}</span></div>
       <div class="sm-grid">${lv.filter(l=>l.n>=ch.from&&l.n<=ch.to).map(card).join('')}</div>
     </section>`).join('');
-    const cta=allGold?`<button type="button" class="sm-cta" onclick="app.selectSouris(1)">Rejouer depuis le début</button>`
-      :`<button type="button" class="sm-cta" onclick="app.selectSouris(${next.n})"><span><small>${allDone?'Viser mieux':(best?'Continuer':'Commencer')}</small>Niveau ${next.n} · ${this._esc(next.name)}</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>`;
+    const cta=allGold?`<button type="button" class="sm-cta" onclick="app.selectSouris(1)">${kpT('sm.replay_start')}</button>`
+      :`<button type="button" class="sm-cta" onclick="app.selectSouris(${next.n})"><span><small>${allDone?kpT('sm.aim_higher'):(best?kpT('sm.continue'):kpT('sm.start'))}</small>${kpT('sm.level_n',{n:next.n})} · ${this._esc(next.name)}</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>`;
     document.getElementById('page-games').innerHTML=`<div class="games-section"><div class="sm">
       <div class="sm-top">
-        <button type="button" class="sm-back" onclick="app.exitActiveGame()">← Jeux</button>
+        <button type="button" class="sm-back" onclick="app.exitActiveGame()">${kpT('game.back_games')}</button>
       </div>
       <div class="sm-hero">
         <div class="sm-hero-l">
-          <div class="sm-kick">Jeu de précision</div>
-          <h2>Précision souris</h2>
-          <p>Vise, clique, glisse, puis ajoute le clavier. Chaque niveau dure environ 30 secondes avec 3 vies. Ton score décide de la médaille : <b>le bronze valide le niveau</b> et débloque le suivant.</p>
+          <div class="sm-kick">${kpT('sm.kick')}</div>
+          <h2>${kpT('game.souris.name')}</h2>
+          <p>${kpT('sm.intro')}</p>
           <div class="sm-meds">${medals}</div>
         </div>
         <div class="sm-hero-r">
-          <div class="sm-prog-t"><b>${best}</b> sur 12 niveaux validés</div>
+          <div class="sm-prog-t">${kpT('sm.progress',{n:best})}</div>
           <div class="sm-segs">${seg}</div>
           ${cta}
         </div>
@@ -10686,54 +10686,54 @@ const app={
   // affichée pendant la partie. Les textes décrivent exactement la logique
   // de _sfsTick / _sfsClick (à garder alignés).
   _sfsGuide:{
-    1:{scene:'hover',hint:'Pose le curseur sur un cercle et garde-le jusqu’à ce que l’anneau soit plein',
-       how:['Un cercle apparaît : <b>pose ton curseur dessus</b>, sans cliquer.','Garde-le immobile jusqu’à ce que <b>l’anneau blanc soit plein</b>.','Plus ta série est longue, plus le verrouillage est rapide.'],
-       legend:[['orange','Cercle à valider : 1 point'],['dot','Point blanc au centre : 3 points'],['x2','Cercle bleu : points doublés pendant 5 s']],
-       risk:'Un cercle qui disparaît avant d’être validé te coûte <b>1 vie</b>.'},
-    2:{scene:'click',hint:'Clique chaque cible avant qu’elle disparaisse',
-       how:['<b>Clique</b> sur chaque cible qui apparaît.','Elle <b>rétrécit</b> : quand l’anneau est vide, elle disparaît.','Vise la cible : un clic dans le vide casse ta série.'],
-       legend:[['good','Cible verte : 1 point']],
-       risk:'Une cible qui disparaît avant ton clic te coûte <b>1 vie</b>.'},
-    3:{scene:'core',hint:'Le cœur doré vaut 3 points, 5 cœurs d’affilée rendent une vie',
-       how:['Clique les cibles comme au niveau précédent.','Le <b>cœur doré</b> au centre vaut <b>3 points</b> au lieu d’un.','<b>5 cœurs d’affilée</b> te rendent une vie.'],
-       legend:[['good','Cible verte : 1 point'],['heart','Cœur doré : 3 points']],
-       risk:'Une cible qui disparaît te coûte <b>1 vie</b>. Toucher le bord au lieu du cœur casse ta série.'},
-    4:{scene:'click',hint:'Cibles rapides : enchaîne sans hésiter',
-       how:['Les cibles sont <b>plus petites</b> et disparaissent <b>plus vite</b>.','Enchaîne les clics sans hésiter.','Le cœur doré vaut toujours 3 points.'],
-       legend:[['good','Cible verte : 1 point'],['heart','Cœur doré : 3 points']],
-       risk:'Une cible qui disparaît te coûte <b>1 vie</b>.'},
-    5:{scene:'traps',hint:'Vert : clique. Rouge ou orange : ne touche pas',
-       how:['<b>Vert</b> : clique.','<b>Rouge avec une croix</b> : ne touche pas.','<b>Orange</b> : c’est un rouge déguisé, ne touche pas non plus.'],
-       legend:[['good','Cible verte : à cliquer'],['bad','Rouge avec croix : piège'],['dis','Orange : piège déguisé']],
-       risk:'Cliquer un piège te coûte <b>2 points</b>. Une cible verte qui disparaît te coûte <b>1 vie</b>.'},
-    6:{scene:'bonus',hint:'Les bonus sont brefs : bleu ×2, violet +2 s, doré +8 points',
-       how:['Des <b>cibles spéciales</b> apparaissent un court instant.','Les attraper rapporte gros, mais elles disparaissent vite.','À toi de choisir : un bonus ou les cibles vertes ?'],
-       legend:[['x2','Bleu : points ×2 pendant 5 s'],['time','Violet : 2 secondes en plus'],['jack','Doré : 8 points']],
-       risk:'Rater un bonus ne coûte rien. Une cible verte qui disparaît te coûte <b>1 vie</b>.'},
-    7:{scene:'traps',hint:'Vert et bonus : clique. Rouge ou orange : ne touche pas',
-       how:['Des cibles <b>pressées</b>, des <b>pièges déguisés</b> et des bonus en même temps.','Lis la couleur d’un coup d’œil avant de cliquer.','Vert et bonus : oui. Rouge et orange : non.'],
-       legend:[['good','Cible verte : à cliquer'],['bad','Rouge ou orange : piège'],['x2','Bonus : à attraper']],
-       risk:'Cliquer un piège te coûte <b>2 points</b>. Une cible verte qui disparaît te coûte <b>1 vie</b>.'},
-    8:{scene:'drag',hint:'Glisse chaque forme dans la zone de sa couleur',
-       how:['<b>Appuie</b> sur une forme et garde le bouton enfoncé.','<b>Glisse-la</b> jusqu’à la zone de la même couleur, en bas.','<b>Lâche</b> : bonne zone, 1 point. Mauvaise zone, 1 point en moins.'],
-       legend:[['pg','Forme verte : zone verte'],['pb','Forme bleue : zone bleue']],
-       risk:'Une forme laissée plus de <b>8 secondes</b> te coûte <b>1 vie</b>.'},
-    9:{scene:'drag',hint:'Glisse chaque forme dans la zone de sa couleur : vert, bleu ou indigo',
-       how:['<b>Appuie</b> sur une forme et garde le bouton enfoncé.','<b>Glisse-la</b> dans la zone de sa couleur : il y en a maintenant trois.','<b>Lâche</b> : bonne zone, 1 point. Mauvaise zone, 1 point en moins.'],
-       legend:[['pg','Verte'],['pb','Bleue'],['pi','Indigo']],
-       risk:'Une forme laissée plus de <b>8 secondes</b> te coûte <b>1 vie</b>.'},
-    10:{scene:'move',hint:'Z Q S D (ou les flèches) : entre dans les cercles verts, évite les zones rouges',
-       how:['<b>Z Q S D</b> (ou les flèches) déplacent ton personnage. La souris ne sert pas.','Entre dans un <b>cercle vert</b> et reste dedans un instant.','Évite les <b>zones rouges</b> qui se déplacent.'],
-       legend:[['pad','Cercle vert : 1 point'],['haz','Zone rouge : 1 vie en moins']],
-       risk:'Toucher une zone rouge te coûte <b>1 vie</b>. Un cercle vert qui disparaît ne coûte rien.'},
-    11:{scene:'move',hint:'Z Q S D pour bouger et éviter le rouge, la souris pour cliquer',
-       how:['<b>Z Q S D</b> (ou les flèches) déplacent ton personnage pour éviter les zones rouges.','<b>La souris</b> clique les cibles et leurs cœurs.','Les deux mains en même temps.'],
-       legend:[['good','Cible verte : 1 point'],['heart','Cœur doré : 3 points'],['haz','Zone rouge : 1 point en moins']],
-       risk:'Une cible qui disparaît te coûte <b>1 vie</b>. Une zone rouge touchée te coûte 1 point.'},
-    12:{scene:'traps',hint:'Tout en même temps : clique, esquive, attrape les bonus',
-       how:['Tout ce que tu as appris, <b>en même temps et plus vite</b>.','Clique les vertes et les bonus, évite les rouges et les orange.','Déplace-toi avec Z Q S D pour éviter les zones rouges.'],
-       legend:[['good','Verte : à cliquer'],['bad','Rouge ou orange : piège'],['x2','Bonus : à attraper'],['haz','Zone rouge : à éviter']],
-       risk:'Cible verte perdue : <b>1 vie</b>. Piège cliqué : 2 points. Zone rouge touchée : 1 point.'},
+    1:{scene:'hover',get hint(){return kpT('sg.1.hint')},
+       get how(){return [kpT('sg.1.h1'),kpT('sg.1.h2'),kpT('sg.1.h3')]},
+       get legend(){return [['orange',kpT('sg.1.l1')],['dot',kpT('sg.1.l2')],['x2',kpT('sg.1.l3')]]},
+       get risk(){return kpT('sg.1.risk')}},
+    2:{scene:'click',get hint(){return kpT('sg.2.hint')},
+       get how(){return [kpT('sg.2.h1'),kpT('sg.2.h2'),kpT('sg.2.h3')]},
+       get legend(){return [['good',kpT('sg.2.l1')]]},
+       get risk(){return kpT('sg.2.risk')}},
+    3:{scene:'core',get hint(){return kpT('sg.3.hint')},
+       get how(){return [kpT('sg.3.h1'),kpT('sg.3.h2'),kpT('sg.3.h3')]},
+       get legend(){return [['good',kpT('sg.3.l1')],['heart',kpT('sg.3.l2')]]},
+       get risk(){return kpT('sg.3.risk')}},
+    4:{scene:'click',get hint(){return kpT('sg.4.hint')},
+       get how(){return [kpT('sg.4.h1'),kpT('sg.4.h2'),kpT('sg.4.h3')]},
+       get legend(){return [['good',kpT('sg.4.l1')],['heart',kpT('sg.4.l2')]]},
+       get risk(){return kpT('sg.4.risk')}},
+    5:{scene:'traps',get hint(){return kpT('sg.5.hint')},
+       get how(){return [kpT('sg.5.h1'),kpT('sg.5.h2'),kpT('sg.5.h3')]},
+       get legend(){return [['good',kpT('sg.5.l1')],['bad',kpT('sg.5.l2')],['dis',kpT('sg.5.l3')]]},
+       get risk(){return kpT('sg.5.risk')}},
+    6:{scene:'bonus',get hint(){return kpT('sg.6.hint')},
+       get how(){return [kpT('sg.6.h1'),kpT('sg.6.h2'),kpT('sg.6.h3')]},
+       get legend(){return [['x2',kpT('sg.6.l1')],['time',kpT('sg.6.l2')],['jack',kpT('sg.6.l3')]]},
+       get risk(){return kpT('sg.6.risk')}},
+    7:{scene:'traps',get hint(){return kpT('sg.7.hint')},
+       get how(){return [kpT('sg.7.h1'),kpT('sg.7.h2'),kpT('sg.7.h3')]},
+       get legend(){return [['good',kpT('sg.7.l1')],['bad',kpT('sg.7.l2')],['x2',kpT('sg.7.l3')]]},
+       get risk(){return kpT('sg.7.risk')}},
+    8:{scene:'drag',get hint(){return kpT('sg.8.hint')},
+       get how(){return [kpT('sg.8.h1'),kpT('sg.8.h2'),kpT('sg.8.h3')]},
+       get legend(){return [['pg',kpT('sg.8.l1')],['pb',kpT('sg.8.l2')]]},
+       get risk(){return kpT('sg.8.risk')}},
+    9:{scene:'drag',get hint(){return kpT('sg.9.hint')},
+       get how(){return [kpT('sg.9.h1'),kpT('sg.9.h2'),kpT('sg.9.h3')]},
+       get legend(){return [['pg',kpT('sg.9.l1')],['pb',kpT('sg.9.l2')],['pi',kpT('sg.9.l3')]]},
+       get risk(){return kpT('sg.9.risk')}},
+    10:{scene:'move',get hint(){return kpT('sg.10.hint')},
+       get how(){return [kpT('sg.10.h1'),kpT('sg.10.h2'),kpT('sg.10.h3')]},
+       get legend(){return [['pad',kpT('sg.10.l1')],['haz',kpT('sg.10.l2')]]},
+       get risk(){return kpT('sg.10.risk')}},
+    11:{scene:'move',get hint(){return kpT('sg.11.hint')},
+       get how(){return [kpT('sg.11.h1'),kpT('sg.11.h2'),kpT('sg.11.h3')]},
+       get legend(){return [['good',kpT('sg.11.l1')],['heart',kpT('sg.11.l2')],['haz',kpT('sg.11.l3')]]},
+       get risk(){return kpT('sg.11.risk')}},
+    12:{scene:'traps',get hint(){return kpT('sg.12.hint')},
+       get how(){return [kpT('sg.12.h1'),kpT('sg.12.h2'),kpT('sg.12.h3')]},
+       get legend(){return [['good',kpT('sg.12.l1')],['bad',kpT('sg.12.l2')],['x2',kpT('sg.12.l3')],['haz',kpT('sg.12.l4')]]},
+       get risk(){return kpT('sg.12.risk')}},
   },
 
   // Pastille de la légende (miniature fidèle de l’élément du jeu)
@@ -10757,39 +10757,39 @@ const app={
       case 'hover':
         return wrap(50,47,
           tg('o gone-late',50,46,104,'<svg class="d-prog" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/></svg><i class="d-dot"></i>')+pop(50,22,'+1','late'),
-          'Reste sur le cercle jusqu’à ce que l’anneau soit plein','dh');
+          kpT('sfs.cap_hover'),'dh');
       case 'click':
         return wrap(50,48,
           tg('g gone-early',50,48,96,'<svg class="d-shrink" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/></svg>')+'<span class="d-press" style="--x:50%;--y:48%"></span>'+pop(50,22,'+1','early'),
-          'Clique avant que l’anneau soit vide','dc');
+          kpT('sfs.cap_click'),'dc');
       case 'core':
         return wrap(50,48,
           tg('g gone-early',50,48,112,'<svg class="d-shrink" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/></svg><i class="d-heart"></i>')+'<span class="d-press" style="--x:50%;--y:48%"></span>'+pop(50,20,'+3','early gold'),
-          'Le cœur doré vaut 3 points','dc');
+          kpT('sfs.cap_core'),'dc');
       case 'traps':
         return wrap(22,46,
           tg('g gone-early',22,46,84)+tg('r',50,46,84,'<b class="d-x">✕</b>')+tg('d',78,46,84)+
-          '<span class="d-lab" style="--x:22%;--y:78%">Clique</span><span class="d-lab no" style="--x:50%;--y:78%">Évite</span><span class="d-lab no" style="--x:78%;--y:78%">Évite aussi</span>'+
+          '<span class="d-lab" style="--x:22%;--y:78%">'+kpT('sfs.lab_click')+'</span><span class="d-lab no" style="--x:50%;--y:78%">'+kpT('sfs.lab_avoid')+'</span><span class="d-lab no" style="--x:78%;--y:78%">'+kpT('sfs.lab_avoid2')+'</span>'+
           '<span class="d-press" style="--x:22%;--y:46%"></span>'+pop(22,16,'+1','early'),
-          'Vert : oui. Rouge et orange : non','dt');
+          kpT('sfs.cap_traps'),'dt');
       case 'bonus':
         return wrap(22,46,
           tg('b x2 gone-early',22,46,76,'<em>×2</em>')+tg('b tm',50,46,76,'<em>+2s</em>')+tg('b jk',78,46,76,'<em>★</em>')+
-          '<span class="d-lab" style="--x:22%;--y:78%">Points ×2</span><span class="d-lab" style="--x:50%;--y:78%">+2 secondes</span><span class="d-lab" style="--x:78%;--y:78%">Jackpot</span>'+
+          '<span class="d-lab" style="--x:22%;--y:78%">'+kpT('sfs.lab_x2')+'</span><span class="d-lab" style="--x:50%;--y:78%">'+kpT('sfs.lab_time')+'</span><span class="d-lab" style="--x:78%;--y:78%">'+kpT('sfs.lab_jackpot')+'</span>'+
           '<span class="d-press" style="--x:22%;--y:46%"></span>'+pop(22,16,'×2','early blue'),
-          'Les bonus durent peu : attrape-les vite','dt');
+          kpT('sfs.cap_bonus'),'dt');
       case 'drag':
         return wrap(27,68,
-          '<div class="d-zone g" style="--x:6%;--w:42%"><span>Verte</span></div><div class="d-zone b" style="--x:52%;--w:42%"><span>Bleue</span></div>'+
+          '<div class="d-zone g" style="--x:6%;--w:42%"><span>'+kpT('sfs.zone_green')+'</span></div><div class="d-zone b" style="--x:52%;--w:42%"><span>'+kpT('sfs.zone_blue')+'</span></div>'+
           '<div class="d-piece" style="--x:27%;--y:68%"></div>'+pop(27,48,'+1','drag'),
-          'Appuie, glisse, puis lâche dans la zone de la même couleur','dd');
+          kpT('sfs.cap_drag'),'dd');
       case 'move':
         return wrap(60,44,
           '<div class="d-t pad" style="--x:72%;--y:44%;--s:84px"><svg class="d-prog" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/></svg></div>'+
           '<div class="d-haz" style="--x:40%;--y:30%;--s:90px"></div>'+
           '<div class="d-player" style="--x:68%;--y:46%"><i></i><i></i></div>'+
           '<div class="d-keys"><kbd>Z</kbd><div><kbd>Q</kbd><kbd>S</kbd><kbd class="k-d">D</kbd></div></div>'+pop(72,20,'+1','late'),
-          'Z Q S D déplacent ton personnage','dm');
+          kpT('sfs.cap_move'),'dm');
     }
     return '';
   },
@@ -10813,14 +10813,14 @@ const app={
     const I=this._sfsIc;
     const o=document.createElement('div');
     o.id='sfs';o.className='sfs';
-    o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Précision souris');
+    o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label',kpT('game.souris.name'));
     o.innerHTML=`<header class="sfs-bar">
-      <button class="sfs-btn" id="sfs-back" type="button" onclick="app._sfsBack()">${I.back}<span id="sfs-back-l">Niveaux</span></button>
+      <button class="sfs-btn" id="sfs-back" type="button" onclick="app._sfsBack()">${I.back}<span id="sfs-back-l">${kpT('sfs.levels')}</span></button>
       <div class="sfs-ttl"><small id="sfs-lvl"></small><b id="sfs-name"></b></div>
       <div class="sfs-bar-r">
-        <button class="sfs-btn" id="sfs-pause" type="button" onclick="app._sfsPause()" title="Pause (Échap)" hidden>${I.pause}<span>Pause</span></button>
-        <button class="sfs-btn sq" id="sfs-fs" type="button" onclick="app._sfsToggleFs()" title="Plein écran du navigateur" aria-label="Plein écran du navigateur">${I.full}</button>
-        <button class="sfs-btn quit" type="button" onclick="app._sfsQuit()" title="Quitter et revenir aux jeux">${I.x}<span>Quitter</span></button>
+        <button class="sfs-btn" id="sfs-pause" type="button" onclick="app._sfsPause()" title="${kpT('sfs.pause_title')}" hidden>${I.pause}<span>${kpT('sfs.pause')}</span></button>
+        <button class="sfs-btn sq" id="sfs-fs" type="button" onclick="app._sfsToggleFs()" title="${kpT('sfs.fullscreen')}" aria-label="${kpT('sfs.fullscreen')}">${I.full}</button>
+        <button class="sfs-btn quit" type="button" onclick="app._sfsQuit()" title="${kpT('sfs.quit_title')}">${I.x}<span>${kpT('sfs.quit')}</span></button>
       </div>
     </header><div class="sfs-stage" id="sfs-stage"></div>`;
     // Aucune sélection de texte, aucun glisser natif, aucun menu contextuel
@@ -10944,7 +10944,7 @@ const app={
     this._sfsOpen();
     const l=this._sourisLevels[s.lvl-1],ph=s.phase;
     const set=(id,t)=>{const el=document.getElementById(id);if(el)el.textContent=t;};
-    set('sfs-lvl','Niveau '+s.lvl+' sur 12');set('sfs-name',l.name);
+    set('sfs-lvl',kpT('sfs.lvl_of',{n:s.lvl}));set('sfs-name',l.name);
     const pb=document.getElementById('sfs-pause');if(pb)pb.hidden=!(ph==='play'||(ph==='countdown'&&!s.fresh));
         if(ph==='brief'){this._sfsDropShell();this._sfsRenderBrief();}
     else if(ph==='over'||ph==='win'){this._sfsDropShell();this._sfsRenderEnd();}
@@ -10968,19 +10968,19 @@ const app={
     stage.innerHTML=`<div class="sfs-brief"><div class="sfs-brief-in">
       <div class="sfs-brief-demo">${this._sfsDemo(g.scene)}</div>
       <div class="sfs-brief-txt">
-        <div class="sfs-kick">Comment jouer</div>
+        <div class="sfs-kick">${kpT('sfs.how_to')}</div>
         <h2 class="sfs-h">${this._esc(l.name)}</h2>
         <ol class="sfs-steps">${g.how.map(h=>`<li>${h}</li>`).join('')}</ol>
         <ul class="sfs-leg">${this._sfsLegendHtml(g)}</ul>
         <p class="sfs-risk">${g.risk}</p>
         <div class="sfs-goal">
-          <div class="sfs-goal-t">Pour valider le niveau : <b>${l.bronze} points</b> en ${l.dur||30} secondes</div>
-          <div class="sfs-meds"><span class="m b">Bronze ${l.bronze}</span><span class="m s">Argent ${l.silver}</span><span class="m g">Or ${l.gold}</span><span class="m v">3 vies</span></div>
+          <div class="sfs-goal-t">${kpT('sfs.goal',{n:l.bronze,s:l.dur||30})}</div>
+          <div class="sfs-meds"><span class="m b">${kpT('sm.tier_bronze')} ${l.bronze}</span><span class="m s">${kpT('sm.tier_silver')} ${l.silver}</span><span class="m g">${kpT('sm.tier_gold')} ${l.gold}</span><span class="m v">${kpT('sfs.three_lives')}</span></div>
         </div>
-        ${needKb?'<p class="sfs-warn">Ce niveau se joue au clavier (Z Q S D). Reviens sur un ordinateur pour y jouer.</p>':''}
+        ${needKb?`<p class="sfs-warn">${kpT('sfs.need_kb')}</p>`:''}
         <div class="sfs-cta">
-          <button class="sfs-go" id="sfs-go" type="button" ${needKb?'disabled':''} onclick="app._sfsBegin()">${this._sfsIc.play}<span>Commencer</span></button>
-          <span class="sfs-key">ou appuie sur Espace</span>
+          <button class="sfs-go" id="sfs-go" type="button" ${needKb?'disabled':''} onclick="app._sfsBegin()">${this._sfsIc.play}<span>${kpT('sm.start')}</span></button>
+          <span class="sfs-key">${kpT('sfs.or_space')}</span>
         </div>
       </div></div></div>`;
     const b=document.getElementById('sfs-go');if(b&&!needKb)b.focus({preventScroll:true});
@@ -11002,9 +11002,9 @@ const app={
             <span class="mk g" data-v="${l.gold}" style="left:${pos(l.gold)}%"></span>
           </div>
           <div class="sfs-marks">
-            <span class="b" style="left:${pos(l.bronze)}%">Bronze ${l.bronze}</span>
-            <span class="s" style="left:${pos(l.silver)}%">Argent ${l.silver}</span>
-            <span class="g" style="left:${pos(l.gold)}%">Or ${l.gold}</span>
+            <span class="b" style="left:${pos(l.bronze)}%">${kpT('sm.tier_bronze')} ${l.bronze}</span>
+            <span class="s" style="left:${pos(l.silver)}%">${kpT('sm.tier_silver')} ${l.silver}</span>
+            <span class="g" style="left:${pos(l.gold)}%">${kpT('sm.tier_gold')} ${l.gold}</span>
           </div>
         </div>
         <div class="sfs-right"><div class="sfs-time" id="sfs-time">${l.dur||30}</div><div class="sfs-lives" id="sfs-lives"></div></div>
@@ -11017,10 +11017,10 @@ const app={
         <div class="sfs-count" id="sfs-count"></div>
       </div>
       <div class="sfs-foot">
-        <div><small>Précision</small><b id="sfs-acc">100%</b></div>
-        <div><small>Série</small><b id="sfs-streak" class="acc">0</b></div>
-        <div><small>Réaction</small><b id="sfs-react">-</b></div>
-        <div class="r"><span id="sfs-gold"></span><button class="sfs-replay" type="button" onclick="app._sfsRestart()">Recommencer</button></div>
+        <div><small>${kpT('sfs.accuracy')}</small><b id="sfs-acc">100%</b></div>
+        <div><small>${kpT('sfs.streak')}</small><b id="sfs-streak" class="acc">0</b></div>
+        <div><small>${kpT('sfs.reaction')}</small><b id="sfs-react">-</b></div>
+        <div class="r"><span id="sfs-gold"></span><button class="sfs-replay" type="button" onclick="app._sfsRestart()">${kpT('sfs.restart')}</button></div>
       </div>
     </div>`;
     const a=document.getElementById('souris-arena');
@@ -11049,18 +11049,18 @@ const app={
     const d=document.createElement('div');
     d.id='sfs-pausecard';d.className='sfs-pause';
     d.innerHTML=`<div class="sfs-pause-card">
-      <div class="sfs-kick">En pause</div>
+      <div class="sfs-kick">${kpT('sfs.paused')}</div>
       <h3 class="sfs-h2">${this._esc(l.name)}</h3>
       <div class="sfs-pause-body">
         <div class="sfs-pause-btns">
-          <button class="sfs-go" id="sfs-resume" type="button" onclick="app._sfsResume()">${this._sfsIc.play}<span>Reprendre</span></button>
-          <button class="sfs-sec" type="button" onclick="app._sfsRestart()">Recommencer le niveau</button>
-          <button class="sfs-sec" type="button" onclick="app._sfsToMenu()">Choisir un autre niveau</button>
-          <button class="sfs-sec" type="button" onclick="app._sfsQuit()">Quitter vers les jeux</button>
-          <span class="sfs-key">Échap ou Espace pour reprendre</span>
+          <button class="sfs-go" id="sfs-resume" type="button" onclick="app._sfsResume()">${this._sfsIc.play}<span>${kpT('sfs.resume')}</span></button>
+          <button class="sfs-sec" type="button" onclick="app._sfsRestart()">${kpT('sfs.restart_lvl')}</button>
+          <button class="sfs-sec" type="button" onclick="app._sfsToMenu()">${kpT('sfs.other_lvl')}</button>
+          <button class="sfs-sec" type="button" onclick="app._sfsQuit()">${kpT('sfs.quit_games')}</button>
+          <span class="sfs-key">${kpT('sfs.esc_resume')}</span>
         </div>
         <div class="sfs-pause-rules">
-          <div class="sfs-rules-t">Rappel des règles</div>
+          <div class="sfs-rules-t">${kpT('sfs.rules_recap')}</div>
           <ol class="sfs-steps small">${g.how.map(h=>`<li>${h}</li>`).join('')}</ol>
           <ul class="sfs-leg small">${this._sfsLegendHtml(g)}</ul>
           <p class="sfs-risk small">${g.risk}</p>
@@ -11074,42 +11074,42 @@ const app={
     const s=this.souris,l=this._sourisLevels[s.lvl-1];
     const win=s.phase==='win',last=s.lvl>=12;
     const tot=s.hit+s.miss,acc=tot?Math.round(s.hit/tot*100):0;
-    const tiers={gold:['#FFD84D','#E0A800','Médaille d’or'],silver:['#E3E7ED','#9AA3AF','Médaille d’argent'],bronze:['#E39A5B','#A85F2A','Médaille de bronze']};
+    const tiers={gold:['#FFD84D','#E0A800',kpT('sfs.medal_gold')],silver:['#E3E7ED','#9AA3AF',kpT('sfs.medal_silver')],bronze:['#E39A5B','#A85F2A',kpT('sfs.medal_bronze')]};
     const T=tiers[s.tier];
     const medal=win?`<svg viewBox="0 0 64 64" width="96" height="96" aria-hidden="true"><defs><linearGradient id="sfsmg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${T[0]}"/><stop offset="1" stop-color="${T[1]}"/></linearGradient></defs><path d="M19 3h10l5 15H24z" fill="#FF4D2E"/><path d="M45 3H35l-5 15h10z" fill="#C93A20"/><circle cx="32" cy="40" r="20" fill="url(#sfsmg)" stroke="rgba(255,255,255,.45)" stroke-width="2"/><path d="M32 28l3.4 6.9 7.6 1.1-5.5 5.3 1.3 7.6L32 45.4l-6.8 3.5 1.3-7.6-5.5-5.3 7.6-1.1z" fill="rgba(255,255,255,.88)"/></svg>`
       :`<svg viewBox="0 0 64 64" width="96" height="96" aria-hidden="true"><circle cx="32" cy="32" r="22" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="3" stroke-dasharray="6 5"/><circle cx="32" cy="32" r="9" fill="none" stroke="#FF4D2E" stroke-width="3"/><circle cx="32" cy="32" r="2.5" fill="#FF4D2E"/></svg>`;
-    const title=win?(last?'Chaos vaincu !':T[2]):'Pas cette fois';
+    const title=win?(last?kpT('sfs.chaos_beaten'):T[2]):kpT('sfs.not_this_time');
     // Barre vers le prochain palier
     const nextVal=!win?l.bronze:s.tier==='bronze'?l.silver:s.tier==='silver'?l.gold:null;
-    const nextName=!win?'bronze':s.tier==='bronze'?'argent':s.tier==='silver'?'or':null;
-    const prog=nextVal?`<div class="sfs-next"><div class="sfs-next-t">${win?'Prochain palier':'Pour valider le niveau'} : <b>${nextName} à ${nextVal} points</b>${s.score<nextVal?', il t’en manquait '+(nextVal-s.score):''}</div><div class="sfs-next-bar"><i style="width:${Math.min(100,s.score/nextVal*100)}%"></i></div></div>`:'<div class="sfs-next"><div class="sfs-next-t"><b>Or décroché.</b> Tu ne peux pas faire mieux sur ce niveau.</div></div>';
+    const nextName=!win?kpT('sm.tier_bronze').toLowerCase():s.tier==='bronze'?kpT('sm.tier_silver').toLowerCase():s.tier==='silver'?kpT('sm.tier_gold').toLowerCase():null;
+    const prog=nextVal?`<div class="sfs-next"><div class="sfs-next-t">${kpT(win?'sfs.next_win':'sfs.next_fail',{tier:nextName,n:nextVal,miss:s.score<nextVal?kpT('sfs.missing',{n:nextVal-s.score}):''})}</div><div class="sfs-next-bar"><i style="width:${Math.min(100,s.score/nextVal*100)}%"></i></div></div>`:`<div class="sfs-next"><div class="sfs-next-t">${kpT('sfs.gold_done')}</div></div>`;
     // Conseil : la cause la plus fréquente de points perdus
     const adv=[];
-    if(s.expired>=3)adv.push('Des cibles ont disparu avant ton clic. Garde les yeux sur toute l’arène, pas seulement sur une cible.');
-    if(s.trapHits>=2)adv.push('Tu as cliqué des pièges. Regarde la couleur avant de cliquer : vert oui, rouge et orange non.');
-    if(s.wrongDrops>=2)adv.push('Plusieurs formes ont été déposées dans la mauvaise zone. Vérifie la couleur avant de lâcher.');
-    if(s.hazardHits>=2)adv.push('Les zones rouges t’ont touché. Garde un œil sur elles en te déplaçant.');
-    if(tot>=8&&acc<65)adv.push('Beaucoup de clics à côté. Ralentis un peu et vise le centre des cibles.');
+    if(s.expired>=3)adv.push(kpT('sfs.tip_expired'));
+    if(s.trapHits>=2)adv.push(kpT('sfs.tip_traps'));
+    if(s.wrongDrops>=2)adv.push(kpT('sfs.tip_drops'));
+    if(s.hazardHits>=2)adv.push(kpT('sfs.tip_haz'));
+    if(tot>=8&&acc<65)adv.push(kpT('sfs.tip_clicks'));
     const cw=this._sourisCaps(s.lvl);
-    const tip=adv[0]||(win?(cw.core?'Bien joué. Vise le cœur doré ou enchaîne plus vite pour monter d’une médaille.':cw.hover?'Bien joué. Garde ta série pour verrouiller plus vite et vise le point blanc au centre.':'Bien joué. Enchaîne plus vite et sans erreur pour monter d’une médaille.'):'Tu y es presque. Relis les règles, puis relance : la deuxième tentative est souvent bien meilleure.');
-    const primary=win&&!last?'Niveau '+(s.lvl+1):'Rejouer';
+    const tip=adv[0]||(win?(cw.core?kpT('sfs.tip_win_core'):cw.hover?kpT('sfs.tip_win_hover'):kpT('sfs.tip_win')):kpT('sfs.tip_lose'));
+    const primary=win&&!last?kpT('sm.level_n',{n:s.lvl+1}):kpT('game.replay');
     const stage=document.getElementById('sfs-stage');
     stage.innerHTML=`<div class="sfs-end"><div class="sfs-end-in">
       <div class="sfs-medal">${medal}</div>
       <h2 class="sfs-h">${title}</h2>
-      <div class="sfs-final"><b>${s.score}</b><span>points</span></div>
+      <div class="sfs-final"><b>${s.score}</b><span>${kpT('sfs.points')}</span></div>
       <div class="sfs-stats">
-        <div><b>${s.hit}</b><small>réussite${s.hit>1?'s':''}</small></div>
-        <div><b>${acc}%</b><small>précision</small></div>
-        <div><b>${s.bestStreak||0}</b><small>meilleure série</small></div>
-        ${s.cores?`<div><b>${s.cores}</b><small>cœur${s.cores>1?'s':''} doré${s.cores>1?'s':''}</small></div>`:''}
+        <div><b>${s.hit}</b><small>${kpT(s.hit>1?'sfs.hit_n':'sfs.hit_1')}</small></div>
+        <div><b>${acc}%</b><small>${kpT('sfs.accuracy_l')}</small></div>
+        <div><b>${s.bestStreak||0}</b><small>${kpT('sfs.best_streak')}</small></div>
+        ${s.cores?`<div><b>${s.cores}</b><small>${kpT(s.cores>1?'sfs.core_n':'sfs.core_1')}</small></div>`:''}
       </div>
       ${prog}
       <p class="sfs-tip">${tip}</p>
       <div class="sfs-end-btns">
         <button class="sfs-go" id="sfs-primary" type="button" onclick="app._sfsPrimary()">${this._sfsIc.play}<span>${primary}</span></button>
-        <button class="sfs-sec" type="button" onclick="${win&&!last?'app._sfsRestart()':'app._sfsRules()'}">${win&&!last?(s.tier!=='gold'?'Viser mieux':'Rejouer'):'Revoir les règles'}</button>
-        <button class="sfs-sec" type="button" onclick="app._sfsToMenu()">Tous les niveaux</button>
+        <button class="sfs-sec" type="button" onclick="${win&&!last?'app._sfsRestart()':'app._sfsRules()'}">${win&&!last?(s.tier!=='gold'?kpT('sm.aim_higher'):kpT('game.replay')):kpT('sfs.review_rules')}</button>
+        <button class="sfs-sec" type="button" onclick="app._sfsToMenu()">${kpT('sfs.all_levels')}</button>
       </div>
     </div></div>`;
     const b=document.getElementById('sfs-primary');if(b)b.focus({preventScroll:true});
@@ -11169,7 +11169,7 @@ const app={
         },ms);
       }else{
         // « C'est parti ! » s'affiche pendant le décompte : la partie ne démarre qu'une fois le message disparu
-        this._sfsShowCount('C’est parti !',true);
+        this._sfsShowCount(kpT('sfs.go'),true);
         this._sfsCdT=setTimeout(()=>{const s2=this.souris;if(!s2||s2.phase!=='countdown')return;this._sfsGo();},540);
       }
     };
@@ -11321,11 +11321,11 @@ const app={
       s.score++;s.hit++;this._sfsStreak(1);s.lastReaction=s.clock-t.born;
       s.targets=s.targets.filter(x=>x!==t);
       playSound('hit');this._sfsFlash('good');
-      this._sfsFx('Bien rangé','+1 · série '+s.streak,'',t.x,t.y);
+      this._sfsFx(kpT('sfs.fx_sorted'),kpT('sfs.pts_streak',{pts:1,n:s.streak}),'',t.x,t.y);
     }else{
       s.miss++;s.streak=0;s.wrongDrops++;s.score=Math.max(0,s.score-1);
       playSound('miss');this._sfsFlash('bad');
-      this._sfsFx('Mauvaise zone','−1','bad',t.x,t.y);
+      this._sfsFx(kpT('sfs.fx_wrong_zone'),'−1','bad',t.x,t.y);
       t.x=t.hx;t.y=t.hy;
     }
   },
@@ -11338,22 +11338,22 @@ const app={
     const t=this._sfsTargetAt(s.px,s.py);
     if(!t){
       s.miss++;s.streak=0;
-      this._sfsFx('Raté','','miss',s.mx,s.my,true);
+      this._sfsFx(kpT('sfs.fx_miss'),'','miss',s.mx,s.my,true);
       return;
     }
     if(t.bonus){
       s.targets=s.targets.filter(x=>x!==t);
       s.hit++;playSound('hit');
-      if(t.bonus==='points'){s.mult=2;s.multUntil=s.clock+5000;this._sfsFlash('blue');this._sfsFx('Points ×2','pendant 5 s','bonus',t.x,t.y);}
-      else if(t.bonus==='time'){s.tLeft=(s.tLeft||0)+2000;this._sfsFlash('violet');this._sfsFx('+2 secondes','','bonus',t.x,t.y);}
-      else if(t.bonus==='jackpot'){s.score+=8;this._sfsFlash('gold');this._sfsFx('Jackpot','+8','bonus',t.x,t.y);}
+      if(t.bonus==='points'){s.mult=2;s.multUntil=s.clock+5000;this._sfsFlash('blue');this._sfsFx(kpT('sfs.lab_x2'),kpT('sfs.fx_for5'),'bonus',t.x,t.y);}
+      else if(t.bonus==='time'){s.tLeft=(s.tLeft||0)+2000;this._sfsFlash('violet');this._sfsFx(kpT('sfs.lab_time'),'','bonus',t.x,t.y);}
+      else if(t.bonus==='jackpot'){s.score+=8;this._sfsFlash('gold');this._sfsFx(kpT('sfs.lab_jackpot'),'+8','bonus',t.x,t.y);}
       return;
     }
     if(t.bad){
       s.miss++;s.streak=0;s.trapHits++;
       s.score=Math.max(0,s.score-2);
       playSound('miss');this._sfsFlash('bad');
-      this._sfsFx('Piège','−2','bad',t.x,t.y);
+      this._sfsFx(kpT('sfs.fx_trap'),'−2','bad',t.x,t.y);
       s.targets=s.targets.filter(x=>x!==t);
       return;
     }
@@ -11364,14 +11364,14 @@ const app={
     s.lastReaction=s.clock-t.born;
     if(core){
       this._sfsStreak(1);s.cores=(s.cores||0)+1;
-      if(s.streak%5===0&&s.lives<3){s.lives++;s.regen=(s.regen||0)+1;this._sfsFlash('gold');this._sfsFxBig('+1 vie');}
+      if(s.streak%5===0&&s.lives<3){s.lives++;s.regen=(s.regen||0)+1;this._sfsFlash('gold');this._sfsFxBig(kpT('sfs.plus_life'));}
       else this._sfsFlash('gold');
     }else if(c.core){
       s.streak=0;this._sfsFlash('good'); // niveaux à cœur : seul un cœur enchaîne
     }else{
       this._sfsStreak(1);this._sfsFlash('good');
     }
-    this._sfsFx(core?'Plein cœur':'Touché','+'+pts+' · série '+s.streak,core?'bonus':'',t.x,t.y);
+    this._sfsFx(core?kpT('sfs.fx_heart'):kpT('sfs.fx_hit'),kpT('sfs.pts_streak',{pts:pts,n:s.streak}),core?'bonus':'',t.x,t.y);
     s.targets=s.targets.filter(x=>x!==t);
   },
 
@@ -11424,19 +11424,19 @@ const app={
       const palette=c.sort3?['#1FA971','#3B82F6','#818CF8']:['#1FA971','#3B82F6'];
       const color=palette[Math.floor(Math.random()*palette.length)];
       const{x,y}=this._sfsSpot(T.r[0],{yMax:42});
-      s.targets.push({id,x,y,hx:x,hy:y,r:T.r[0],piece:true,life:T.life,color,shape:Math.random()<.5?'circle':'square',born:s.clock,tag:this._sfsCoach(s,'drag','GLISSE')});
+      s.targets.push({id,x,y,hx:x,hy:y,r:T.r[0],piece:true,life:T.life,color,shape:Math.random()<.5?'circle':'square',born:s.clock,tag:this._sfsCoach(s,'drag',kpT('sfs.tag_drag'))});
       return;
     }
     if(c.pads){
       const{x,y}=this._sfsSpot(T.padR);
-      s.targets.push({id,x,y,r:T.padR,pad:true,born:s.clock,life:T.padLife,hover:0,tag:this._sfsCoach(s,'pad','ENTRE ICI')});
+      s.targets.push({id,x,y,r:T.padR,pad:true,born:s.clock,life:T.padLife,hover:0,tag:this._sfsCoach(s,'pad',kpT('sfs.tag_pad'))});
       return;
     }
     if(c.bonus&&Math.random()<T.bonusP&&!(s.targets||[]).some(t=>t.bonus)){
       const kinds=[
-        {bonus:'points',color:'#3B82F6',icon:'×2',life:T.bonusLife[0],lab:'POINTS ×2'},
-        {bonus:'time',color:'#A855F7',icon:'+2s',life:T.bonusLife[1],lab:'+2 SECONDES'},
-        {bonus:'jackpot',color:'#FFD84D',icon:'★',life:T.bonusLife[2],lab:'JACKPOT'},
+        {bonus:'points',color:'#3B82F6',icon:'×2',life:T.bonusLife[0],lab:kpT('sfs.tag_x2')},
+        {bonus:'time',color:'#A855F7',icon:'+2s',life:T.bonusLife[1],lab:kpT('sfs.tag_time')},
+        {bonus:'jackpot',color:'#FFD84D',icon:'★',life:T.bonusLife[2],lab:kpT('sfs.tag_jackpot')},
       ];
       const k=kinds[Math.floor(Math.random()*kinds.length)];
       const{x,y}=this._sfsSpot(4.4);
@@ -11445,14 +11445,14 @@ const app={
     }
     if(c.hover&&Math.random()<T.bonusP&&!(s.targets||[]).some(t=>t.bonus)){
       const{x,y}=this._sfsSpot(5.2);
-      s.targets.push({id,x,y,r:5.2,bonus:'points',color:'#3B82F6',icon:'×2',born:s.clock,life:2600,hover:0,tag:this._sfsCoach(s,'bhov','BONUS ×2')});
+      s.targets.push({id,x,y,r:5.2,bonus:'points',color:'#3B82F6',icon:'×2',born:s.clock,life:2600,hover:0,tag:this._sfsCoach(s,'bhov',kpT('sfs.tag_bonus_x2'))});
       return;
     }
     const bad=!!c.traps&&Math.random()<T.badP;
     const r=rnd(T.r[0],T.r[1]);
     const{x,y}=this._sfsSpot(r);
     const key=c.hover?'hov':bad?'bad':'ok';
-    const label=c.hover?'POSE LE CURSEUR':bad?'ÉVITE':'CLIQUE';
+    const label=c.hover?kpT('sfs.tag_hover'):bad?kpT('sfs.tag_avoid'):kpT('sfs.tag_click');
     s.targets.push({
       id,x,y,r,bad,
       disguised:bad&&!!c.disguise&&Math.random()<.6,
@@ -11518,7 +11518,7 @@ const app={
           if(t.bonus){
             s.mult=2;s.multUntil=now+5000;s.hit++;
             playSound('hit');this._sfsFlash('blue');
-            this._sfsFx('Bonus','×2 pendant 5 s','bonus',t.x,t.y);
+            this._sfsFx(kpT('sfs.fx_bonus'),kpT('sfs.fx_x2_for5'),'bonus',t.x,t.y);
           }else{
             const mult=(s.mult>1&&now<s.multUntil)?s.mult:1;
             const core=this._sfsInCore(t,s.px,s.py,0.16);
@@ -11527,7 +11527,7 @@ const app={
             if(core)s.cores=(s.cores||0)+1;
             this._sfsStreak(1);
             playSound('hit');this._sfsFlash(core?'gold':'good');
-            this._sfsFx(core?'Plein centre':'Validé','+'+pts+' · série '+s.streak,core?'bonus':'',t.x,t.y);
+            this._sfsFx(core?kpT('sfs.fx_centre'):kpT('sfs.fx_locked'),kpT('sfs.pts_streak',{pts:pts,n:s.streak}),core?'bonus':'',t.x,t.y);
           }
         }
       }
@@ -11539,7 +11539,7 @@ const app={
       if(gone.length){
         playSound('miss');
         s.targets=s.targets.filter(t=>!gone.includes(t));
-        for(const t of gone){s.miss++;s.streak=0;s.expired++;this._sfsFx('Trop tard','−1 vie','bad',t.x,t.y);this._sfsLoseLife();if(s.phase!=='play')return;}
+        for(const t of gone){s.miss++;s.streak=0;s.expired++;this._sfsFx(kpT('sfs.fx_late'),kpT('sfs.minus_life'),'bad',t.x,t.y);this._sfsLoseLife();if(s.phase!=='play')return;}
       }
     }
     // Expiration : une cible utile qui disparaît coûte une vie (pas les
@@ -11550,7 +11550,7 @@ const app={
       if(gone.length)playSound('miss');
       for(const t of gone){
         s.miss++;s.streak=0;
-        if(!c.pads){s.expired++;this._sfsFx('Disparue','−1 vie','bad',t.x,t.y);this._sfsLoseLife();if(s.phase!=='play')return;}
+        if(!c.pads){s.expired++;this._sfsFx(kpT('sfs.fx_gone'),kpT('sfs.minus_life'),'bad',t.x,t.y);this._sfsLoseLife();if(s.phase!=='play')return;}
       }
     }
 
@@ -11575,7 +11575,7 @@ const app={
             s.lastReaction=t._enteredAt-t.born;
             s.targets=s.targets.filter(x=>x!==t);
             playSound('hit');this._sfsFlash('good');
-            this._sfsFx('Atteint','+1 · série '+s.streak,'',t.x,t.y);
+            this._sfsFx(kpT('sfs.fx_reached'),kpT('sfs.pts_streak',{pts:1,n:s.streak}),'',t.x,t.y);
           }
         }else t.hover=0;
       });
@@ -11607,8 +11607,8 @@ const app={
         s.invUntil=s.clock+((lifeCost?this._sfsT(s.lvl).padHaz.inv:this._sfsT(s.lvl).haz.inv)||1400);
         s.hazardHits++;
         playSound('miss');this._sfsFlash('bad');
-        if(lifeCost){this._sfsFx('Zone rouge','−1 vie','bad',s.player.x,s.player.y);this._sfsLoseLife();if(s.phase!=='play')return;}
-        else{s.score=Math.max(0,s.score-1);s.streak=0;this._sfsFx('Zone rouge','−1','bad',s.player.x,s.player.y);}
+        if(lifeCost){this._sfsFx(kpT('sfs.fx_red'),kpT('sfs.minus_life'),'bad',s.player.x,s.player.y);this._sfsLoseLife();if(s.phase!=='play')return;}
+        else{s.score=Math.max(0,s.score-1);s.streak=0;this._sfsFx(kpT('sfs.fx_red'),'−1','bad',s.player.x,s.player.y);}
       }
     }
   },
@@ -11661,7 +11661,7 @@ const app={
     set('sfs-acc',(tot?Math.round(100*s.hit/tot):100)+'%');
     set('sfs-streak',String(s.streak||0));
     set('sfs-react',s.lastReaction?s.lastReaction+' ms':'-');
-    set('sfs-gold',Math.max(0,l.gold-s.score)>0?(l.gold-s.score)+' pts pour l’or':'Or atteint');
+    set('sfs-gold',Math.max(0,l.gold-s.score)>0?kpT('sfs.pts_for_gold',{n:l.gold-s.score}):kpT('sfs.gold_reached'));
   },
 
   // Réconciliation des éléments de jeu : un nœud par cible/zone/joueur,
@@ -11683,7 +11683,7 @@ const app={
     const place=(el,x,y,d)=>{el.style.left=x+'%';el.style.top=y+'%';if(d!=null){el.style.width=d+'px';el.style.height=d+'px';}};
 
     if(c.drag){
-      const zones=c.sort3?[['#1FA971','Verte',0,33.3],['#3B82F6','Bleue',33.3,66.6],['#818CF8','Indigo',66.6,100]]:[['#1FA971','Verte',0,50],['#3B82F6','Bleue',50,100]];
+      const zones=c.sort3?[['#1FA971',kpT('sfs.zone_green'),0,33.3],['#3B82F6',kpT('sfs.zone_blue'),33.3,66.6],['#818CF8',kpT('sfs.zone_indigo'),66.6,100]]:[['#1FA971',kpT('sfs.zone_green'),0,50],['#3B82F6',kpT('sfs.zone_blue'),50,100]];
       zones.forEach(([col,lbl,a,b],i)=>{
         const el=put('z'+i,`<div class="sfs-zone"><span></span></div>`);
         if(!el._init){el._init=1;el.style.cssText=`left:calc(${a}% + 6px);width:calc(${b-a}% - 12px);--zc:${col}`;el.firstElementChild.textContent=lbl;}
@@ -11760,7 +11760,7 @@ const app={
     if(c.core&&(s.streak||0)>0){
       const el=put('chain','<div class="sfs-chain"></div>');
       const n=s.streak%5||5;
-      el.innerHTML=[0,1,2,3,4].map(i=>`<span class="${i<n?'on':''}"></span>`).join('')+`<em>${s.lives>=3?'vies au max':'5 cœurs = 1 vie'}</em>`;
+      el.innerHTML=[0,1,2,3,4].map(i=>`<span class="${i<n?'on':''}"></span>`).join('')+`<em>${s.lives>=3?kpT('sfs.chain_max'):kpT('sfs.chain_hearts')}</em>`;
     }
     // Retire ce qui n'existe plus
     for(const [k,el] of this._sfsNodes){
@@ -11798,13 +11798,13 @@ const app={
   // pool : lettres tirées au dernier moment dans l'un des 9 emplacements vides.
   // tiers : seuils de médaille du niveau.
   _sgrLevelsBase:[
-    {n:1,id:'r1',name:'Rangée du milieu',short:'Milieu',intro:'Les lettres de la rangée de repos ({L}) apparaissent au dernier moment, dans l’une des neuf cases.',
+    {n:1,id:'r1',get name(){return kpT('sgr.l1.name')},get short(){return kpT('sgr.l1.short')},get intro(){return kpT('sgr.l1.intro')},
      pool:'QSDFGHJKLM',tiers:{bronze:150,silver:245,gold:345},tune:{dur0:3000,durMin:1800,durStep:20}},
-    {n:2,id:'r2',name:'Rangée du haut',short:'Haut',intro:'Les lettres de la rangée du haut ({L}) apparaissent au dernier moment. Tes doigts montent puis reviennent à leur place.',
+    {n:2,id:'r2',get name(){return kpT('sgr.l2.name')},get short(){return kpT('sgr.l2.short')},get intro(){return kpT('sgr.l2.intro')},
      pool:'AZERTYUIOP',tiers:{bronze:120,silver:205,gold:310},tune:{dur0:3000,durMin:1800,durStep:20}},
-    {n:3,id:'r3',name:'Rangée du bas',short:'Bas',intro:'Les lettres de la rangée du bas ({L}) apparaissent au dernier moment. Tes doigts descendent, la rangée la plus difficile à atteindre.',
+    {n:3,id:'r3',get name(){return kpT('sgr.l3.name')},get short(){return kpT('sgr.l3.short')},get intro(){return kpT('sgr.l3.intro')},
      pool:'WXCVBN',tiers:{bronze:105,silver:175,gold:265},tune:{dur0:3200,durMin:2000,durStep:20}},
-    {n:4,id:'r4',name:'Tout le clavier',short:'Expert',intro:'Les lettres de tout le clavier apparaissent au dernier moment, n’importe lesquelles. À toi de retrouver la touche.',
+    {n:4,id:'r4',get name(){return kpT('sgr.l4.name')},get short(){return kpT('sgr.l4.short')},get intro(){return kpT('sgr.l4.intro')},
      pool:'AZERTYUIOPQSDFGHJKLMWXCVBN',tiers:{bronze:100,silver:230,gold:335},tune:{}},
   ],
   // Les lettres de chaque niveau viennent de la disposition courante (AZERTY ou QWERTY) : rangée du milieu, du haut, du bas, puis tout le clavier.
@@ -11815,8 +11815,8 @@ const app={
     // 5e niveau, d'entraînement : les lettres déjà apprises (toutes rangées confondues), sans médaille ni record. Jamais « verrouillé ».
     const mine=this._sgrMineInfo(),known=pools[3].filter(c=>mine.letters.has(c.toLowerCase()));
     const mp=known.length>=2?known:pools[1].slice(0,4);
-    out.push({n:5,id:'mine',name:'Mon niveau',short:'Mon niveau',training:true,pool:mp.join(''),tiers:{bronze:0,silver:0,gold:0},tune:{dur0:3200,durMin:2000,durStep:20},
-      intro:`Les lettres que tu as déjà apprises (${mp.join(' ')}) apparaissent au dernier moment, dans l’une des neuf cases. Entraînement : pas de médaille.`});
+    out.push({n:5,id:'mine',name:kpT('sgr.mine'),short:kpT('sgr.mine'),training:true,pool:mp.join(''),tiers:{bronze:0,silver:0,gold:0},tune:{dur0:3200,durMin:2000,durStep:20},
+      intro:kpT('sgr.mine_intro',{letters:mp.join(' ')})});
     return out;
   },
   _sgrMineInfo(){return KPGameLevels.myLevel(ALL_LESSONS,l=>!!this.lessonRec(l.id).cleared);},
@@ -11859,15 +11859,15 @@ const app={
     const I=this._sfsIc;
     const o=document.createElement('div');
     o.id='sgr';o.className='sgr';
-    o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Grille réflexe');
+    o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label',kpT('game.sourisGrid.name'));
     o.innerHTML=`<header class="sgr-bar">
-      <button class="sgr-btn" type="button" onclick="app._sgrQuit()">${I.back}<span>Jeux</span></button>
-      <div class="sgr-ttl"><small id="sgr-lvl">Précision</small><b id="sgr-name">Grille réflexe</b></div>
+      <button class="sgr-btn" type="button" onclick="app._sgrQuit()">${I.back}<span>${kpT('sm.games')}</span></button>
+      <div class="sgr-ttl"><small id="sgr-lvl">${kpT('sfs.accuracy')}</small><b id="sgr-name">${kpT('game.sourisGrid.name')}</b></div>
       <div class="sgr-bar-r">
-        <button class="sgr-btn" id="sgr-pause" type="button" onclick="app._sgrPause()" title="Pause (Échap)" hidden>${I.pause}<span>Pause</span></button>
+        <button class="sgr-btn" id="sgr-pause" type="button" onclick="app._sgrPause()" title="${kpT('sfs.pause_title')}" hidden>${I.pause}<span>${kpT('sfs.pause')}</span></button>
         <button class="sgr-btn sq" id="sgr-snd" type="button" onclick="app._sgrToggleSound()">${isSoundMuted()?I.mute:I.snd}</button>
-        <button class="sgr-btn sq" id="sgr-fs" type="button" onclick="app._sgrToggleFs()" title="Plein écran du navigateur" aria-label="Plein écran du navigateur">${I.full}</button>
-        <button class="sgr-btn quit" type="button" onclick="app._sgrQuit()" title="Quitter et revenir aux jeux">${I.x}<span>Quitter</span></button>
+        <button class="sgr-btn sq" id="sgr-fs" type="button" onclick="app._sgrToggleFs()" title="${kpT('sfs.fullscreen')}" aria-label="${kpT('sfs.fullscreen')}">${I.full}</button>
+        <button class="sgr-btn quit" type="button" onclick="app._sgrQuit()" title="${kpT('sfs.quit_title')}">${I.x}<span>${kpT('sfs.quit')}</span></button>
       </div>
     </header>
     <div class="sgr-stage" id="sgr-stage">
@@ -11876,7 +11876,7 @@ const app={
         <div class="sgr-mid"><div class="sgr-tbar"><i id="sgr-tb"></i></div><div class="sgr-tsec"><span id="sgr-ts">45 s</span><span class="sgr-combo" id="sgr-cb"></span></div></div>
         <div class="sgr-lv" id="sgr-lv"></div>
       </div>
-      <div class="sgr-hint" id="sgr-hint">Tape la lettre qui s’allume en vert</div>
+      <div class="sgr-hint" id="sgr-hint">${kpT('sgr.hint')}</div>
       <div class="sgr-bw">
         <div class="sgr-board" id="sgr-board"></div>
         <div class="sgr-fx" id="sgr-fx"></div>
@@ -11962,7 +11962,7 @@ const app={
     const b=document.getElementById('sgr-snd');if(!b)return;
     const m=isSoundMuted(),I=this._sfsIc;
     b.innerHTML=m?I.mute:I.snd;
-    b.title=m?'Remettre le son':'Couper le son';b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed',m?'true':'false');
+    b.title=m?kpT('sgr.unmute'):kpT('sgr.mute');b.setAttribute('aria-label',b.title);b.setAttribute('aria-pressed',m?'true':'false');
   },
   // Échap : pause, reprise, ou un cran en arrière
   _sgrEsc(){
@@ -12002,7 +12002,7 @@ const app={
     const ph=s.phase,L=this._sgrLevel(s.lvl);
     const stg=document.getElementById('sgr-stage');if(stg)stg.classList.toggle('ov',ph==='brief'||ph==='paused'||ph==='end');
     const set=(id,t)=>{const el=document.getElementById(id);if(el&&el.textContent!==t)el.textContent=t;};
-    set('sgr-lvl',L.training?'Entraînement':'Niveau '+L.n+' sur 4');set('sgr-name',L.name);
+    set('sgr-lvl',L.training?kpT('sgr.training'):kpT('sgr.lvl_of',{n:L.n}));set('sgr-name',L.name);
     const pb=document.getElementById('sgr-pause');if(pb)pb.hidden=!(ph==='play'||(ph==='countdown'&&!s.fresh));
     this._sgrCellsUpdate();this._sgrHud();
     const ov=document.getElementById('sgr-ov');
@@ -12031,25 +12031,25 @@ const app={
     const set=(id,v,html)=>{if(C[id]===v)return;C[id]=v;const el=document.getElementById(id);if(el){if(html)el.innerHTML=v;else el.textContent=v;}};
     set('sgr-score',String(s.score||0));
     // Meilleur score du niveau : se transforme en « nouveau record » une fois dépassé
-    const bestTxt=s.beat?'<span class="g">★ Nouveau record</span>':(s.best>0?`Record <b>${s.best}</b>`:'');
+    const bestTxt=s.beat?`<span class="g">★ ${kpT('sgr.new_record')}</span>`:(s.best>0?kpT('sgr.record',{n:s.best}):'');
     set('sgr-best',bestTxt,true);
     const scEl=document.getElementById('sgr-sc');if(scEl&&scEl.classList.contains('rec')!==!!s.beat)scEl.classList.toggle('rec',!!s.beat);
     const tb=document.getElementById('sgr-tb');
     if(tb)tb.style.transform=`scaleX(${Math.max(0,(s.left==null?T.left:s.left)/T.left).toFixed(3)})`;
     const sec=Math.ceil(((s.left==null?T.left:s.left))/1000);
-    if(s.phase==='play'&&sec===10&&!s._tenSaid){s._tenSaid=true;this._sgrSay('Dix dernières secondes !',2200,5);}
+    if(s.phase==='play'&&sec===10&&!s._tenSaid){s._tenSaid=true;this._sgrSay(kpT('sgr.say_ten'),2200,5);}
     set('sgr-ts',sec<=10?`<span class="lo">${sec} s</span>`:sec+' s',true);
     const lives=s.lives==null?T.lives:s.lives;
     if(C.lives!==lives){
-      if(lives===1&&C.lives>1&&s.phase==='play')this._sgrSay('Plus qu’une vie, concentre-toi !',2400,14);
+      if(lives===1&&C.lives>1&&s.phase==='play')this._sgrSay(kpT('sgr.say_one_life'),2400,14);
       C.lives=lives;const lv=document.getElementById('sgr-lv');if(lv)lv.innerHTML=[0,1,2].map(i=>`<i class="${i<lives?'on':''}"></i>`).join('');}
     const combo=s.combo||0,mult=combo>=8?3:combo>=4?2:1,into=mult===3?4:(combo-(mult===2?4:0));
     const pips=[0,1,2,3].map(i=>`<i class="${(mult===3||i<into)?'on':''}"></i>`).join('');
-    set('sgr-cb',`<span class="pp">${pips}</span><b>×${mult}</b>${mult<3?`<em>prochain ×${mult+1}</em>`:'<em>max</em>'}`,true);
+    set('sgr-cb',`<span class="pp">${pips}</span><b>×${mult}</b>${mult<3?`<em>${kpT('sgr.next_mult',{n:mult+1})}</em>`:'<em>max</em>'}`,true);
     this._sgrApplyIdle();
     if(s.phase==='play'){
       const tr=(s.cells||[]).some(c=>c.state==='trap');
-      set('sgr-hint',tr?'Attention : ne tape pas les touches rouges':'Tape la lettre qui s’allume en vert');
+      set('sgr-hint',tr?kpT('sgr.hint_trap'):kpT('sgr.hint'));
     }
   },
 
@@ -12129,55 +12129,55 @@ const app={
     const bests=this._sgrBests(),unlocked=this._sgrUnlocked();
     const best=this._sgrTop(L.n);
     const needKb=matchMedia('(hover:none)').matches;
-    const tierName={gold:'Or',silver:'Argent',bronze:'Bronze'};
+    const tierName={gold:kpT('sm.tier_gold'),silver:kpT('sm.tier_silver'),bronze:kpT('sm.tier_bronze')};
     const picker=this._sgrLevels.map(l=>{
       const open=l.n<=unlocked||l.training,b=bests[l.id],sel=l.n===s.lvl;
-      const st=!open?`<span class="sgr-lst lock">Valide le niveau ${l.n-1}</span>`:b?`<span class="sgr-lst done">${this._sfsMedalSvg(b.tier,16)}${tierName[b.tier]||'Validé'}</span>`:`<span class="sgr-lst todo">${l.training?'Entraînement':sel?'Choisi':'À faire'}</span>`;
-      return `<button type="button" class="sgr-lv-card${sel?' sel':''}${open?'':' locked'}" ${open?`onclick="app._sgrPick(${l.n})"`:'disabled'} aria-label="Niveau ${l.n}, ${this._esc(l.name)}">
-        ${this._sgrMini()}<b>${this._esc(l.short)}</b><em class="sgr-lt">${l.pool.length>10?'26 lettres':l.pool}</em>${st}</button>`;
+      const st=!open?`<span class="sgr-lst lock">${kpT('sm.validate_lvl',{n:l.n-1})}</span>`:b?`<span class="sgr-lst done">${this._sfsMedalSvg(b.tier,16)}${tierName[b.tier]||kpT('sm.validated')}</span>`:`<span class="sgr-lst todo">${l.training?kpT('sgr.training'):sel?kpT('sgr.selected'):kpT('sm.todo')}</span>`;
+      return `<button type="button" class="sgr-lv-card${sel?' sel':''}${open?'':' locked'}" ${open?`onclick="app._sgrPick(${l.n})"`:'disabled'} aria-label="${kpT('sm.card_aria',{n:l.n,name:this._esc(l.name)})}">
+        ${this._sgrMini()}<b>${this._esc(l.short)}</b><em class="sgr-lt">${l.pool.length>10?kpT('sgr.n_letters'):l.pool}</em>${st}</button>`;
     }).join('');
     this._sgrOv(`<div class="sgr-card">
       <img class="sgr-cm" src="${this._sgrPoseUrl(3)}" alt="">
-      <div class="sgr-kick">${L.training?'Entraînement':'Niveau '+L.n+' sur 4'}</div><h2>${this._esc(L.name)}</h2>
+      <div class="sgr-kick">${L.training?kpT('sgr.training'):kpT('sgr.lvl_of',{n:L.n})}</div><h2>${this._esc(L.name)}</h2>
       <p class="sgr-intro">${this._esc(L.intro)}</p>
       <div class="sgr-pick">${picker}</div>
-      <ol class="sgr-rules"><li>Une case <b>s’allume en vert</b> et révèle une lettre : tape-la au clavier.</li><li>Elle s’éteint vite. Une touche verte ratée te coûte <b>1 vie</b>.</li><li>Après ${T.trapFrom} réussites, des <b>touches rouges</b> apparaissent : ne les tape pas.</li></ol>
-      <div class="sgr-legend"><span><i style="background:#1FA971"></i>Verte : à taper</span><span><i style="background:#E5484D"></i>Rouge : piège, ne tape pas</span></div>
-      <div class="sgr-meds">${L.training?'<span>Pas de médaille</span>':`<span class="b">Bronze ${L.tiers.bronze}</span><span class="s">Argent ${L.tiers.silver}</span><span class="g">Or ${L.tiers.gold}</span>`}<span>${T.lives} vies</span><span>${T.left/1000} secondes</span>${best?`<span class="r">Ton record ${best}</span>`:''}</div>
-      <p class="sgr-sub"><b>4 réussites de suite</b> doublent tes points, <b>8 de suite</b> les triplent. Une erreur ou une touche à côté remet le combo à zéro.</p>
-      ${needKb?'<p class="sgr-warn">Ce jeu se joue au clavier. Reviens sur un ordinateur pour y jouer.</p>':''}
-      <div class="sgr-row2"><button class="sgr-go" type="button" data-focus ${needKb?'disabled':''} onclick="app._sgrBegin()">${I.play}<span>Commencer</span></button></div>
-      <span class="sgr-keyh">ou appuie sur Espace</span></div>`,'brief');
+      <ol class="sgr-rules"><li>${kpT('sgr.rule1')}</li><li>${kpT('sgr.rule2')}</li><li>${kpT('sgr.rule3',{n:T.trapFrom})}</li></ol>
+      <div class="sgr-legend"><span><i style="background:#1FA971"></i>${kpT('sgr.leg_green')}</span><span><i style="background:#E5484D"></i>${kpT('sgr.leg_red')}</span></div>
+      <div class="sgr-meds">${L.training?`<span>${kpT('sgr.no_medal')}</span>`:`<span class="b">${kpT('sm.tier_bronze')} ${L.tiers.bronze}</span><span class="s">${kpT('sm.tier_silver')} ${L.tiers.silver}</span><span class="g">${kpT('sm.tier_gold')} ${L.tiers.gold}</span>`}<span>${kpT('sgr.n_lives',{n:T.lives})}</span><span>${kpT('sgr.n_seconds',{n:T.left/1000})}</span>${best?`<span class="r">${kpT('sgr.your_record',{n:best})}</span>`:''}</div>
+      <p class="sgr-sub">${kpT('sgr.sub')}</p>
+      ${needKb?`<p class="sgr-warn">${kpT('sgr.need_kb')}</p>`:''}
+      <div class="sgr-row2"><button class="sgr-go" type="button" data-focus ${needKb?'disabled':''} onclick="app._sgrBegin()">${I.play}<span>${kpT('sm.start')}</span></button></div>
+      <span class="sgr-keyh">${kpT('sfs.or_space')}</span></div>`,'brief');
   },
   _sgrShowPause(){
     const I=this._sfsIc,L=this._sgrLevel(this.souris.lvl);
-    this._sgrOv(`<div class="sgr-card"><img class="sgr-cm" src="${this._sgrPoseUrl(11)}" alt=""><div class="sgr-kick">En pause</div><h2>${this._esc(L.name)}</h2>
-      <ol class="sgr-rules"><li>Tape la lettre de la touche <b>verte</b>.</li><li>Ne tape jamais les touches <b>rouges</b>.</li><li>Une touche verte ratée coûte <b>1 vie</b>.</li></ol>
-      <div class="sgr-row2"><button class="sgr-go" type="button" data-focus onclick="app._sgrResume()">${I.play}<span>Reprendre</span></button><button class="sgr-sec" type="button" onclick="app._sgrBegin()">Recommencer</button><button class="sgr-sec" type="button" onclick="app._sgrQuit()">Quitter vers les jeux</button></div>
-      <span class="sgr-keyh">Échap ou Espace pour reprendre</span></div>`,'paused');
+    this._sgrOv(`<div class="sgr-card"><img class="sgr-cm" src="${this._sgrPoseUrl(11)}" alt=""><div class="sgr-kick">${kpT('sfs.paused')}</div><h2>${this._esc(L.name)}</h2>
+      <ol class="sgr-rules"><li>${kpT('sgr.pr1')}</li><li>${kpT('sgr.pr2')}</li><li>${kpT('sgr.pr3')}</li></ol>
+      <div class="sgr-row2"><button class="sgr-go" type="button" data-focus onclick="app._sgrResume()">${I.play}<span>${kpT('sfs.resume')}</span></button><button class="sgr-sec" type="button" onclick="app._sgrBegin()">${kpT('sfs.restart')}</button><button class="sgr-sec" type="button" onclick="app._sgrQuit()">${kpT('sfs.quit_games')}</button></div>
+      <span class="sgr-keyh">${kpT('sfs.esc_resume')}</span></div>`,'paused');
   },
   _sgrShowEnd(){
     const s=this.souris,L=this._sgrLevel(s.lvl),r=s._result||{},t=r.tier,tiers=L.tiers,I=this._sfsIc;
-    const tv={gold:['#FFD84D','#B98300','Médaille d’or'],silver:['#E3E7ED','#7D8794','Médaille d’argent'],bronze:['#E39A5B','#8F4F20','Médaille de bronze']}[t];
+    const tv={gold:['#FFD84D','#B98300',kpT('sfs.medal_gold')],silver:['#E3E7ED','#7D8794',kpT('sfs.medal_silver')],bronze:['#E39A5B','#8F4F20',kpT('sfs.medal_bronze')]}[t];
     const medal=t?`<svg viewBox="0 0 64 64" width="92" height="92" aria-hidden="true"><path d="M19 3h10l5 15H24z" fill="#FF4D2E"/><path d="M45 3H35l-5 15h10z" fill="#C93A20"/><circle cx="32" cy="40" r="20" fill="${tv[0]}" stroke="${tv[1]}" stroke-width="2"/><path d="M32 28l3.4 6.9 7.6 1.1-5.5 5.3 1.3 7.6L32 45.4l-6.8 3.5 1.3-7.6-5.5-5.3 7.6-1.1z" fill="${tv[1]}" opacity=".55"/></svg>`
       :'';
     const girl=`<img class="sgr-cm" src="${this._sgrPoseUrl(t||s._newTop?8:12)}" alt="">`; // fille : idée à la victoire, haussement d'épaules sinon
-    const next=L.training?null:t==='gold'?null:t==='silver'?['or',tiers.gold]:t==='bronze'?['argent',tiers.silver]:['bronze',tiers.bronze];
-    const prog=next?`<div class="sgr-nx">${t?'Prochain palier':'Pour valider le niveau'} : <b>${next[0]} à ${next[1]} points</b>${s.score<next[1]?', il t’en manquait '+(next[1]-s.score):''}<div class="bar2"><i style="width:${Math.min(100,s.score/next[1]*100)}%"></i></div></div>`:L.training?'<div class="sgr-nx">Niveau d’entraînement : pas de médaille. Tes médailles se gagnent sur les niveaux Milieu, Haut, Bas et Expert.</div>':'<div class="sgr-nx"><b>Or décroché.</b> Tu ne peux pas faire mieux sur ce niveau.</div>';
-    let tip='Bien joué. Enchaîne plus de réussites d’affilée pour faire monter le combo.';
-    if(s.traps>=2)tip='Tu as tapé des touches rouges. Regarde la couleur avant de taper : vert oui, rouge non.';
-    else if(s.expired>=3)tip='Des touches se sont éteintes avant ta frappe. Garde les yeux sur tout le clavier, pas seulement sur une touche.';
-    else if(s.stray>=4)tip='Plusieurs touches à côté ont cassé ton combo. Pose bien tes doigts sur la rangée de repos et ne tape que la lettre allumée.';
+    const next=L.training?null:t==='gold'?null:t==='silver'?[kpT('sm.tier_gold').toLowerCase(),tiers.gold]:t==='bronze'?[kpT('sm.tier_silver').toLowerCase(),tiers.silver]:[kpT('sm.tier_bronze').toLowerCase(),tiers.bronze];
+    const prog=next?`<div class="sgr-nx">${kpT(t?'sfs.next_win':'sfs.next_fail',{tier:next[0],n:next[1],miss:s.score<next[1]?kpT('sfs.missing',{n:next[1]-s.score}):''})}<div class="bar2"><i style="width:${Math.min(100,s.score/next[1]*100)}%"></i></div></div>`:L.training?`<div class="sgr-nx">${kpT('sgr.train_note')}</div>`:`<div class="sgr-nx">${kpT('sfs.gold_done')}</div>`;
+    let tip=kpT('sgr.tip_default');
+    if(s.traps>=2)tip=kpT('sgr.tip_traps');
+    else if(s.expired>=3)tip=kpT('sgr.tip_expired');
+    else if(s.stray>=4)tip=kpT('sgr.tip_stray');
     const mc=s.bestCombo>=8?3:s.bestCombo>=4?2:1;
     const nextLvl=t&&L.n<4;
     this._sgrOv(`<div class="sgr-card"><div class="sgr-top">${girl}${medal}</div>
-      <h2>${t?tv[2]:L.training?'Bien joué !':'Pas cette fois'}</h2>
-      ${(s._newTop||r.isNewBest)?'<div class="sgr-rec">Nouveau record sur ce niveau !</div>':''}
-      <div class="sgr-final"><b>${s.score}</b><span>points</span></div>
-      ${(!s._newTop&&s._prevTop>0)?`<div class="sgr-prevtop">Ton record : <b>${s._prevTop}</b></div>`:''}
-      <div class="sgr-stats"><div><b>${s.hits}</b><small>réussites</small></div><div><b>${s._acc}%</b><small>précision</small></div><div><b>×${mc}</b><small>meilleur combo</small></div><div><b>${s.bestCombo}</b><small>meilleure série</small></div></div>
+      <h2>${t?tv[2]:L.training?kpT('sgr.well_done'):kpT('sfs.not_this_time')}</h2>
+      ${(s._newTop||r.isNewBest)?`<div class="sgr-rec">${kpT('sgr.new_top')}</div>`:''}
+      <div class="sgr-final"><b>${s.score}</b><span>${kpT('sfs.points')}</span></div>
+      ${(!s._newTop&&s._prevTop>0)?`<div class="sgr-prevtop">${kpT('sgr.prev_top',{n:s._prevTop})}</div>`:''}
+      <div class="sgr-stats"><div><b>${s.hits}</b><small>${kpT('sfs.hit_n')}</small></div><div><b>${s._acc}%</b><small>${kpT('sfs.accuracy_l')}</small></div><div><b>×${mc}</b><small>${kpT('sgr.st_best_combo')}</small></div><div><b>${s.bestCombo}</b><small>${kpT('sfs.best_streak')}</small></div></div>
       ${prog}<p class="sgr-tip">${tip}</p>
-      <div class="sgr-row2"><button class="sgr-go" type="button" data-focus onclick="app._sgrPrimary()">${I.play}<span>${nextLvl?'Niveau '+(L.n+1):'Rejouer'}</span></button><button class="sgr-sec" type="button" onclick="app._sgrRules()">${nextLvl?'Rejouer ou changer de niveau':'Règles et niveaux'}</button><button class="sgr-sec" type="button" onclick="app._sgrQuit()">Retour aux jeux</button></div></div>`,'end');
+      <div class="sgr-row2"><button class="sgr-go" type="button" data-focus onclick="app._sgrPrimary()">${I.play}<span>${nextLvl?kpT('sm.level_n',{n:L.n+1}):kpT('game.replay')}</span></button><button class="sgr-sec" type="button" onclick="app._sgrRules()">${nextLvl?kpT('sgr.again_or_change'):kpT('sgr.rules_levels')}</button><button class="sgr-sec" type="button" onclick="app._sgrQuit()">${kpT('sgr.back_games')}</button></div></div>`,'end');
   },
   _sgrRules(){const s=this.souris;if(!s)return;this._sgrStopLoop();s.phase='brief';this._sgrRender();},
   // Bouton principal de l'écran de fin : niveau suivant si validé, sinon rejouer
@@ -12221,8 +12221,8 @@ const app={
         },ms);
       }else{
         // « C'est parti ! » s'affiche pendant le décompte : la partie ne démarre qu'une fois le message disparu
-        this._sgrShowCount('C’est parti !',true);
-        this._sgrSay('Allez, on y va !',520,2);
+        this._sgrShowCount(kpT('sfs.go'),true);
+        this._sgrSay(kpT('sgr.say_go'),520,2);
         this._sgrCdT=setTimeout(()=>{const s2=this.souris;if(!s2||s2.phase!=='countdown')return;this._sgrGo();},540);
       }
     };step();
@@ -12265,8 +12265,8 @@ const app={
       if(c.life<=0){
         if(c.state==='target'){
           s.misses++;s.expired++;s.combo=0;s.lives--;
-          playSound('late');this._sgrPop(c.id,'Trop tard',true);this._sgrPress(c.id,'bad');
-          this._sgrSay('Trop tard, vise plus vite la prochaine.',2000,14);
+          playSound('late');this._sgrPop(c.id,kpT('sfs.fx_late'),true);this._sgrPress(c.id,'bad');
+          this._sgrSay(kpT('sgr.say_late'),2000,14);
           this._sgrClear(c);
           if(s.lives<=0){s.lives=0;this._sgrEnd();return;}
         }else this._sgrClear(c);
@@ -12283,15 +12283,15 @@ const app={
     const s=this.souris;if(!s||s.phase!=='play')return;
     const c=s.cells.find(x=>x.letter===L&&x.state);
     if(!c){ // touche à côté : seul le combo en pâtit
-      if(s.combo>0){this._sgrPop((s.cells.find(x=>x.state)||s.cells[0]).id,'Combo perdu',true);playSound('stray');}
+      if(s.combo>0){this._sgrPop((s.cells.find(x=>x.state)||s.cells[0]).id,kpT('sgr.pop_combo_lost'),true);playSound('stray');}
       s.combo=0;s.stray++;
       this._sgrHud();return;
     }
     this._sgrPress(c.id,c.state==='trap'?'bad':'ok');
     if(c.state==='trap'){
       s.misses++;s.traps++;s.combo=0;s.lives--;
-      playSound('trap');this._sgrPop(c.id,'Piège',true);
-      this._sgrSay('Oups, les touches rouges sont des pièges.',2200,10);
+      playSound('trap');this._sgrPop(c.id,kpT('sfs.fx_trap'),true);
+      this._sgrSay(kpT('sgr.say_trap'),2200,10);
       this._sgrClear(c);
       if(s.lives<=0){s.lives=0;this._sgrEnd();return;}
     }else{
@@ -12299,12 +12299,12 @@ const app={
       s.score+=m;s.hits++;s.combo++;s.bestCombo=Math.max(s.bestCombo,s.combo);
       playSound('hit',{pitch:this._sgrPitch(s.combo-1)});this._sgrPop(c.id,'+'+m);
       this._sgrPose(13,700); // pouce levé à chaque réussite
-      if(s.combo===4){playSound('combo2');this._sgrSay('Combo ×2, continue !',1900,13);}
-      else if(s.combo===8){playSound('combo3');this._sgrSay('Combo ×3, incroyable !',2000,6);}
-      else if(s.hits===1)this._sgrSay('Bien joué !',1500,13);
-      else if(s.hits===this._sgrTuneOf(s.lvl).trapFrom)this._sgrSay('Les touches rouges arrivent, fais attention.',2400,5);
+      if(s.combo===4){playSound('combo2');this._sgrSay(kpT('sgr.say_c2'),1900,13);}
+      else if(s.combo===8){playSound('combo3');this._sgrSay(kpT('sgr.say_c3'),2000,6);}
+      else if(s.hits===1)this._sgrSay(kpT('sgr.well_done'),1500,13);
+      else if(s.hits===this._sgrTuneOf(s.lvl).trapFrom)this._sgrSay(kpT('sgr.say_red_coming'),2400,5);
       if(s.best>0&&!s.beat&&s.score>s.best){ // premier dépassement du record : une seule fois par partie
-        s.beat=true;setTimeout(()=>playSound('recordbeat'),180);this._sgrSay('Nouveau record !',2600,6);
+        s.beat=true;setTimeout(()=>playSound('recordbeat'),180);this._sgrSay(kpT('frappe.new_record'),2600,6);
       }
       this._sgrClear(c);
     }
@@ -12361,22 +12361,22 @@ const app={
       .map(l=>`<span style="flex:1;border:1.5px solid ${dim?'rgba(255,255,255,.15)':'#fff'};background:${dim?'rgba(255,255,255,.04)':'rgba(255,77,46,.15)'};border-radius:7px;text-align:center;padding:7px 0;font:700 12px 'JetBrains Mono',monospace;color:${dim?'rgba(255,255,255,.3)':'#fff'}">${l}</span>`).join('');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:600px;margin:0 auto;padding:0 24px">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">${kpT('game.back_games')}</button>
         <div class="game-arena" style="height:auto;padding:36px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#fff;margin:0">Où est ta souris ?</h2>
-          <p style="color:rgba(255,255,255,.7);font-size:14px;margin:0">Le jeu ne proposera que les lettres atteignables par la main restée au clavier. Modifiable à tout moment.</p>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#fff;margin:0">${kpT('duo.where')}</h2>
+          <p style="color:rgba(255,255,255,.7);font-size:14px;margin:0">${kpT('duo.where_sub')}</p>
           <div style="display:flex;gap:12px;width:100%;margin-top:6px">
             <div onclick="app._sourisHybridSetHand('mouse-right')" style="flex:1;border:2.5px solid var(--accent);background:rgba(255,77,46,.1);border-radius:14px;padding:16px;cursor:pointer">
-              <div style="font:800 16px 'Bricolage Grotesque',sans-serif;color:#fff">Souris à droite</div>
-              <div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px">clavier = main gauche</div>
+              <div style="font:800 16px 'Bricolage Grotesque',sans-serif;color:#fff">${kpT('duo.mouse_right')}</div>
+              <div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px">${kpT('duo.kb_left')}</div>
             </div>
             <div onclick="app._sourisHybridSetHand('mouse-left')" style="flex:1;border:1.5px dashed rgba(255,255,255,.25);border-radius:14px;padding:16px;cursor:pointer">
-              <div style="font:800 16px 'Bricolage Grotesque',sans-serif;color:#fff">Souris à gauche</div>
-              <div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px">clavier = main droite</div>
+              <div style="font:800 16px 'Bricolage Grotesque',sans-serif;color:#fff">${kpT('duo.mouse_left')}</div>
+              <div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px">${kpT('duo.kb_right')}</div>
             </div>
           </div>
           <div style="width:100%;text-align:left;margin-top:8px">
-            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Touches qui seront proposées si tu choisis « souris à droite »</div>
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">${kpT('duo.keys_offered')}</div>
             <div style="display:flex;flex-direction:column;gap:6px">
               <div style="display:flex;gap:6px">${kb('l',false)}</div>
               <div style="display:flex;gap:6px">${kb('r',true)}</div>
@@ -12388,20 +12388,20 @@ const app={
   },
   _sourisHybridBrief(){
     const hand=this.stats.sourisHybridHand;
-    const label=hand==='mouse-left'?'Souris à gauche · clavier main droite':'Souris à droite · clavier main gauche';
+    const label=hand==='mouse-left'?kpT('duo.label_left'):kpT('duo.label_right');
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">← Jeux</button>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 18px">${kpT('game.back_games')}</button>
         <div class="game-arena" style="height:auto;padding:44px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px">
           <div style="color:var(--accent)">${ICONS.hand}</div>
-          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">Duo souris + clavier</h2>
-          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:420px;margin:0">Survole la cible avec la souris, puis tape sa lettre <b>pendant que le curseur reste dedans</b>. 15 cibles, deux scores : rapidité de visée et précision de frappe.</p>
-          <div style="font-size:12.5px;color:rgba(255,255,255,.55)">${label} · <span onclick="app.souris={phase:'config'};app.renderSouris()" style="color:var(--accent);cursor:pointer;text-decoration:underline">changer</span></div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;margin:0">${kpT('game.sourisHybrid.name')}</h2>
+          <p style="color:rgba(255,255,255,.82);font-size:16.5px;line-height:1.65;max-width:420px;margin:0">${kpT('duo.brief')}</p>
+          <div style="font-size:12.5px;color:rgba(255,255,255,.55)">${label} · <span onclick="app.souris={phase:'config'};app.renderSouris()" style="color:var(--accent);cursor:pointer;text-decoration:underline">${kpT('duo.change')}</span></div>
           <div style="display:flex;gap:26px;margin-top:4px">
-            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">OBJECTIFS (POINTS)</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${this._sourisTiers.hybrid.bronze} · 🥈${this._sourisTiers.hybrid.silver} · 🥇${this._sourisTiers.hybrid.gold}</div></div>
+            <div><div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.05em">${kpT('duo.goals')}</div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#fff">🥉${this._sourisTiers.hybrid.bronze} · 🥈${this._sourisTiers.hybrid.silver} · 🥇${this._sourisTiers.hybrid.gold}</div></div>
           </div>
           ${this._gameLevelPicker('hybrid')}
-          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisHybridStart()">Commencer</button>
+          <button class="game-play-btn" style="margin-top:8px" onclick="app._sourisHybridStart()">${kpT('sm.start')}</button>
         </div>
       </div>
     </div>`;
@@ -12490,7 +12490,7 @@ const app={
             <div class="game-score-val">${s.score} <span style="font-size:12px">pts</span></div>
             <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:rgba(255,255,255,.5)">${s.rounds}/15</div>
           </div>
-          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin:6px 0 10px">Curseur dans la cible + touche = valide</div>
+          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin:6px 0 10px">${kpT('duo.hint')}</div>
           <div id="souris-arena" style="position:relative;flex:1;min-height:300px">
             <div id="hybrid-target" style="position:absolute;left:${s.tx}%;top:${s.ty}%;width:${s.tr*2}%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid var(--accent);background:radial-gradient(circle at 35% 30%,rgba(255,77,46,.5),rgba(255,77,46,.12) 70%);box-shadow:0 8px 24px rgba(255,77,46,.3);display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3);animation:calib-pulse 1s infinite">${s.letter}</div>
           </div>
@@ -12507,11 +12507,11 @@ const app={
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:auto;padding:28px 20px">
           ${this._gameResult({
-            icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-            record:r.isNewBest?'Nouveau record sur cette piste !':null,
-            boxes:[{label:'Score',value:s.score,accent:true},{label:'Visée',value:s._avgAim,unit:'ms'},{label:'Frappe',value:s._acc,unit:'%'}],
-            bestLine:r.training?'Niveau d’entraînement : ton score ne compte pas pour les paliers.':null,
-            primaryLabel:'Rejouer ▸',primaryOnClick:'app._sourisHybridStart()',
+            icon:medal,title:r.tier?kpT('duo.done_tier'):kpT('duo.done'),
+            record:r.isNewBest?kpT('duo.new_record'):null,
+            boxes:[{label:kpT('frappe.score'),value:s.score,accent:true},{label:kpT('duo.aim'),value:s._avgAim,unit:'ms'},{label:kpT('duo.typing'),value:s._acc,unit:'%'}],
+            bestLine:r.training?kpT('duo.train_note'):null,
+            primaryLabel:kpT('frappe.replay'),primaryOnClick:'app._sourisHybridStart()',
           })}
         </div>
       </div>
@@ -12573,7 +12573,7 @@ const app={
     const pct=nextTier?Math.max(0,Math.min(100,Math.round(100*(curScore-prevThreshold)/(thresholds[nextTier]-prevThreshold)))):100;
     return `<span style="display:flex;align-items:center;gap:8px;width:100%">
         <span class="tiles-rank-bar" style="width:auto;flex:1"><span class="tiles-rank-bar-fill" style="display:block;width:${pct}%"></span></span>
-        <span style="font-size:10.5px;color:rgba(255,255,255,.4);font-family:'JetBrains Mono',monospace;white-space:nowrap;flex-shrink:0">${nextTier?`${medalIcon[nextTier]} dans ${Math.max(0,thresholds[nextTier]-curScore)} pts`:'🏆 or atteint'}</span>
+        <span style="font-size:10.5px;color:rgba(255,255,255,.4);font-family:'JetBrains Mono',monospace;white-space:nowrap;flex-shrink:0">${nextTier?`${medalIcon[nextTier]} ${kpT('tiles.in_pts',{n:Math.max(0,thresholds[nextTier]-curScore)})}`:kpT('tiles.gold_reached')}</span>
       </span>`;
   },
   _sourisTilesSelect(){
@@ -12588,7 +12588,7 @@ const app={
       const topRow=`<span style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:14px">
           <span>
             <span style="display:block;font-weight:700;font-size:15.5px">${unlocked?song.title:'🔒 '+song.title}</span>
-            <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">${unlocked?`${song.artist} · ${song.bpm} BPM · ${TILES_MAX_LABEL[song.maxStage]||''}`:`Termine « ${TILES_SONGS[idx-1].title} » pour débloquer`}</span>
+            <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">${unlocked?`${song.artist} · ${song.bpm} BPM · ${TILES_MAX_LABEL[song.maxStage]||''}`:kpT('tiles.unlock',{title:TILES_SONGS[idx-1].title})}</span>
           </span>
           <span style="display:flex;align-items:center;gap:10px;flex-shrink:0">
             ${b?`<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(255,255,255,.5)">${b.score} pts</span>`:''}
@@ -12604,8 +12604,8 @@ const app={
     const freeBest=best.libre;
     const freeTop=`<span style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:14px">
         <span>
-          <span style="display:block;font-weight:700;font-size:15.5px">🎲 Mode libre</span>
-          <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">Sans musique, sans fin : le tempo grimpe tant que tu tiens le combo</span>
+          <span style="display:block;font-weight:700;font-size:15.5px">${kpT('tiles.free_title')}</span>
+          <span style="display:block;font-size:12.5px;color:rgba(255,255,255,.45);margin-top:2px">${kpT('tiles.free_desc')}</span>
         </span>
         <span style="display:flex;align-items:center;gap:10px;flex-shrink:0">
           ${freeBest?`<span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:rgba(255,255,255,.5)">${freeBest.score} pts</span>`:''}
@@ -12618,15 +12618,15 @@ const app={
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:900px;margin:0 auto;padding:0 24px">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:0 0 18px">
-          <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">← Jeux</button>
-          <button onclick="app._sourisTilesShowGlossary()" title="Comment jouer" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);width:28px;height:28px;border-radius:50%;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:rgba(255,255,255,.75);display:flex;align-items:center;justify-content:center">?</button>
+          <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0">${kpT('game.back_games')}</button>
+          <button onclick="app._sourisTilesShowGlossary()" title="${kpT('sfs.how_to')}" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);width:28px;height:28px;border-radius:50%;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:rgba(255,255,255,.75);display:flex;align-items:center;justify-content:center">?</button>
         </div>
         <div class="game-arena" style="height:auto;padding:0">
           <div class="tiles-intro">
             <div class="tiles-intro-deco l"></div>
             <div class="tiles-intro-deco r"></div>
-            <h2 class="tiles-intro-title">Magic Tiles</h2>
-            <p class="tiles-intro-sub">Choisis un morceau. Tape la tuile pile sur la ligne, ne rate aucun temps.<br><span style="opacity:.7;font-size:14px">Au fil du morceau : tuiles à deux mains, pièges (✕) à laisser passer.</span></p>
+            <h2 class="tiles-intro-title">${kpT('game.sourisTiles.name')}</h2>
+            <p class="tiles-intro-sub">${kpT('tiles.intro_sub')}</p>
             <div class="tiles-intro-keys">${keysHtml}</div>
             <div style="width:100%;max-width:460px;margin-top:14px">${songsHtml}${freeHtml}</div>
           </div>
@@ -12642,11 +12642,11 @@ const app={
   _sourisTilesShowGlossary(){
     if(document.getElementById('tiles-glossary-overlay'))return;
     const rows=[
-      {label:'Tuile normale',demo:`<div class="tiles-tile" style="position:relative;width:44px;height:34px;background:${TILES_NORMAL_BG}">Q</div>`,txt:'Tape la touche pile quand la tuile touche la ligne.'},
-      {label:'Tuile longue',demo:`<div class="tiles-tile" style="position:relative;width:44px;height:64px;background:${TILES_NORMAL_BG}"><div class="tiles-hold-icon" style="position:relative;margin-top:6px">▼</div></div>`,txt:'Maintiens la touche enfoncée jusqu’à la fin de la tuile.'},
-      {label:'Bonus ♥',demo:`<div class="tiles-tile bonus" style="position:relative;width:44px;height:38px">♥</div>`,txt:'Tape-la pour regagner une vie. La rater ne pénalise pas.'},
-      {label:'Piège ✕',demo:`<div class="tiles-tile trap" style="position:relative;width:44px;height:34px">✕</div>`,txt:'Ne la tape pas : laisse-la passer sans rien faire.'},
-      {label:'Accord',demo:`<div class="tiles-tile chord" style="position:relative;width:44px;height:34px;background:${TILES_NORMAL_BG}">Q</div>`,txt:'Deux tuiles à la même hauteur : tape les deux touches ensemble.'},
+      {get label(){return kpT('tiles.t_normal')},demo:`<div class="tiles-tile" style="position:relative;width:44px;height:34px;background:${TILES_NORMAL_BG}">Q</div>`,get txt(){return kpT('tiles.g_normal')}},
+      {get label(){return kpT('tiles.t_long')},demo:`<div class="tiles-tile" style="position:relative;width:44px;height:64px;background:${TILES_NORMAL_BG}"><div class="tiles-hold-icon" style="position:relative;margin-top:6px">▼</div></div>`,get txt(){return kpT('tiles.g_long')}},
+      {get label(){return kpT('tiles.t_bonus')},demo:`<div class="tiles-tile bonus" style="position:relative;width:44px;height:38px">♥</div>`,get txt(){return kpT('tiles.g_bonus')}},
+      {get label(){return kpT('tiles.t_trap')},demo:`<div class="tiles-tile trap" style="position:relative;width:44px;height:34px">✕</div>`,get txt(){return kpT('tiles.g_trap')}},
+      {get label(){return kpT('tiles.t_chord')},demo:`<div class="tiles-tile chord" style="position:relative;width:44px;height:34px;background:${TILES_NORMAL_BG}">Q</div>`,get txt(){return kpT('tiles.g_chord')}},
     ];
     const rowsHtml=rows.map(r=>`<div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)">
         <div style="flex-shrink:0;width:44px;display:flex;justify-content:center">${r.demo}</div>
@@ -12663,14 +12663,14 @@ const app={
     // donnait l'impression d'un popup cassé.
     div.innerHTML=`<div style="background:#1A1712;border:1px solid rgba(255,255,255,.12);border-radius:20px;max-width:440px;width:100%;max-height:82vh;overflow:hidden;display:flex;flex-direction:column;padding:26px 28px 20px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0">
-          <h3 style="margin:0;font-size:19px;font-weight:800;color:#fff">Comment jouer</h3>
-          <button onclick="app._sourisTilesCloseGlossary()" title="Passer" style="background:rgba(255,255,255,.08);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;color:rgba(255,255,255,.75);font-size:13px;font-weight:700;flex-shrink:0">✕</button>
+          <h3 style="margin:0;font-size:19px;font-weight:800;color:#fff">${kpT('sfs.how_to')}</h3>
+          <button onclick="app._sourisTilesCloseGlossary()" title="${kpT('tiles.skip')}" style="background:rgba(255,255,255,.08);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;color:rgba(255,255,255,.75);font-size:13px;font-weight:700;flex-shrink:0">✕</button>
         </div>
         <div style="flex:1 1 auto;min-height:0;overflow-y:auto">
-          <p style="margin:0 0 18px;font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.7)">Pose tes doigts sur ta rangée de repos (<b style="color:#fff">Q S D F</b> à gauche, <b style="color:#fff">J K L M</b> à droite). Une tuile tombe dans chaque couloir : tape la lettre correspondante pile quand elle touche la ligne. Au fil du morceau, de nouvelles touches s'ajoutent et des tuiles spéciales apparaissent :</p>
+          <p style="margin:0 0 18px;font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.7)">${kpT('tiles.glossary_intro')}</p>
           <div>${rowsHtml}</div>
         </div>
-        <button onclick="app._sourisTilesCloseGlossary()" style="width:100%;margin-top:18px;padding:13px;border:none;border-radius:12px;background:var(--accent,#FF7A45);color:#fff;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer;flex-shrink:0">Compris, on y va !</button>
+        <button onclick="app._sourisTilesCloseGlossary()" style="width:100%;margin-top:18px;padding:13px;border:none;border-radius:12px;background:var(--accent,#FF7A45);color:#fff;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer;flex-shrink:0">${kpT('tiles.got_it')}</button>
       </div>`;
     document.body.appendChild(div);
   },
@@ -12682,8 +12682,8 @@ const app={
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:520px;margin:80px auto;text-align:center">
         <div class="tiles-loading-dots">${dots}</div>
-        <div style="color:var(--muted);font-size:14px;margin:14px 0">Chargement du morceau…</div>
-        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted)">← Jeux</button>
+        <div style="color:var(--muted);font-size:14px;margin:14px 0">${kpT('tiles.loading')}</div>
+        <button onclick="app.exitActiveGame()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted)">${kpT('game.back_games')}</button>
       </div>
     </div>`;
   },
@@ -12758,9 +12758,9 @@ const app={
       <div style="max-width:460px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:auto;padding:48px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
           <div style="font-size:40px;line-height:1">⌨️</div>
-          <h2 style="margin:0;font-size:21px;font-weight:800;color:#fff">Clavier requis</h2>
-          <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.6)">Magic Tiles se joue au clavier physique. As-tu un clavier connecté ? Appuie sur une touche pour continuer, sinon reviens sur ordinateur.</p>
-          <button class="res-btn sec" style="flex:none;padding:13px 26px;margin-top:6px" onclick="app.exitActiveGame()">← Jeux</button>
+          <h2 style="margin:0;font-size:21px;font-weight:800;color:#fff">${kpT('tiles.kb_title')}</h2>
+          <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.6)">${kpT('game.kb_needed_text',{game:kpT('game.sourisTiles.name')})}</p>
+          <button class="res-btn sec" style="flex:none;padding:13px 26px;margin-top:6px" onclick="app.exitActiveGame()">${kpT('game.back_games')}</button>
         </div>
       </div>
     </div>`;
@@ -12773,11 +12773,11 @@ const app={
     const finalLanes=s.stages[s.stages.length-1].lanes;
     const lettersHtml=finalLanes.map((laneIdx,i)=>`<div class="tiles-intro-key" style="animation-delay:${(i*-0.4).toFixed(2)}s">${s.lanes[laneIdx].letter}</div>`).join('');
     const rows=[
-      {label:'Tuile normale',demo:`<div class="tiles-tile" style="position:relative;width:40px;height:32px;background:${TILES_NORMAL_BG}">Q</div>`,txt:'Appuie pile quand elle touche la ligne.'},
-      {label:'Tuile longue',demo:`<div class="tiles-tile" style="position:relative;width:40px;height:58px;background:${TILES_NORMAL_BG}"><div class="tiles-hold-icon" style="position:relative;margin-top:5px">▼</div></div>`,txt:'Maintiens la touche enfoncée jusqu’à la fin.'},
-      {label:'Bonus ♥',demo:`<div class="tiles-tile bonus" style="position:relative;width:40px;height:34px">♥</div>`,txt:'Appuie pour regagner une vie.'},
-      {label:'Piège ✕',demo:`<div class="tiles-tile trap" style="position:relative;width:40px;height:32px">✕</div>`,txt:'N’appuie pas : laisse-la passer.'},
-      {label:'Accord',demo:`<div class="tiles-tile chord" style="position:relative;width:40px;height:32px;background:${TILES_NORMAL_BG}">Q</div>`,txt:'Appuie les deux touches ensemble.'},
+      {get label(){return kpT('tiles.t_normal')},demo:`<div class="tiles-tile" style="position:relative;width:40px;height:32px;background:${TILES_NORMAL_BG}">Q</div>`,get txt(){return kpT('tiles.b_normal')}},
+      {get label(){return kpT('tiles.t_long')},demo:`<div class="tiles-tile" style="position:relative;width:40px;height:58px;background:${TILES_NORMAL_BG}"><div class="tiles-hold-icon" style="position:relative;margin-top:5px">▼</div></div>`,get txt(){return kpT('tiles.b_long')}},
+      {get label(){return kpT('tiles.t_bonus')},demo:`<div class="tiles-tile bonus" style="position:relative;width:40px;height:34px">♥</div>`,get txt(){return kpT('tiles.b_bonus')}},
+      {get label(){return kpT('tiles.t_trap')},demo:`<div class="tiles-tile trap" style="position:relative;width:40px;height:32px">✕</div>`,get txt(){return kpT('tiles.b_trap')}},
+      {get label(){return kpT('tiles.t_chord')},demo:`<div class="tiles-tile chord" style="position:relative;width:40px;height:32px;background:${TILES_NORMAL_BG}">Q</div>`,get txt(){return kpT('tiles.b_chord')}},
     ];
     const rowsHtml=rows.map(r=>`<div style="display:flex;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08)">
         <div style="flex-shrink:0;width:40px;display:flex;justify-content:center">${r.demo}</div>
@@ -12786,13 +12786,13 @@ const app={
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:460px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:auto;padding:26px 22px">
-          <h2 style="margin:0 0 4px;font-size:21px;font-weight:800;color:#fff;text-align:center">${isFree?'Mode libre':song.title}</h2>
-          <p style="margin:0 0 16px;text-align:center;font-size:13px;color:rgba(255,255,255,.5)">Tape la lettre pile quand la tuile touche la ligne.</p>
-          <div style="text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:8px">TOUCHES DE CETTE PARTIE</div>
+          <h2 style="margin:0 0 4px;font-size:21px;font-weight:800;color:#fff;text-align:center">${isFree?kpT('tiles.free_mode'):song.title}</h2>
+          <p style="margin:0 0 16px;text-align:center;font-size:13px;color:rgba(255,255,255,.5)">${kpT('tiles.brief_sub')}</p>
+          <div style="text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:8px">${kpT('tiles.this_game_keys')}</div>
           <div class="tiles-intro-keys" style="margin-bottom:20px">${lettersHtml}</div>
           <div>${rowsHtml}</div>
-          <button onclick="app._sourisTilesBeginPlay()" style="width:100%;margin-top:20px;padding:13px;border:none;border-radius:12px;background:var(--accent,#FF7A45);color:#fff;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer">Commencer ▸</button>
-          <div style="text-align:center;margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12px;text-decoration:underline">quitter</button></div>
+          <button onclick="app._sourisTilesBeginPlay()" style="width:100%;margin-top:20px;padding:13px;border:none;border-radius:12px;background:var(--accent,#FF7A45);color:#fff;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer">${kpT('tiles.start_arrow')}</button>
+          <div style="text-align:center;margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12px;text-decoration:underline">${kpT('tiles.quit_link')}</button></div>
         </div>
       </div>
     </div>`;
@@ -12805,7 +12805,7 @@ const app={
     if(IS_TOUCH_ONLY()){this.stopSouris();this._sourisTilesKbRequiredScreen();return;}
     this.stopSouris();
     this.souris={phase:'tutorial',track:'tiles',onDone,done:false,
-      msg:'Tape la touche F quand la tuile touche la ligne',
+      get msg(){return kpT('tiles.tuto_msg')},
       tileBorn:Date.now(),tileDur:2600};
     this._tutorialKeyH=(e)=>{
       const s=this.souris;
@@ -12840,13 +12840,13 @@ const app={
     document.getElementById('page-games').innerHTML=`<div class="games-section">
       <div style="max-width:420px;margin:60px auto;padding:0 24px;text-align:center">
         <div class="game-arena" style="padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:16px">
-          <div style="font-size:14px;color:rgba(255,255,255,.75);min-height:20px">${s.done?'Voilà l\'idée ! ✓':s.msg}</div>
+          <div style="font-size:14px;color:rgba(255,255,255,.75);min-height:20px">${s.done?kpT('tiles.tuto_done'):s.msg}</div>
           <div style="position:relative;width:100px;height:220px;background:rgba(255,255,255,.03);border-radius:14px;overflow:hidden">
             ${!s.done?`<div class="tiles-tile" style="left:8px;right:8px;top:${y}%;height:34px;transform:translateY(-50%);background:${TILES_NORMAL_BG}">F</div>`:''}
             <div class="tiles-hitline" style="top:${this._sourisTilesHitLineY}%"></div>
           </div>
           <div class="tiles-key" style="width:60px">f</div>
-          <button onclick="app._sourisTilesTutorialFinish()" style="background:none;border:none;color:var(--muted);font-size:12.5px;cursor:pointer;text-decoration:underline">Passer</button>
+          <button onclick="app._sourisTilesTutorialFinish()" style="background:none;border:none;color:var(--muted);font-size:12.5px;cursor:pointer;text-decoration:underline">${kpT('tiles.skip')}</button>
         </div>
       </div>
     </div>`;
@@ -12960,7 +12960,7 @@ const app={
     this._sourisTilesTrackResult(s,false);
     s.lifeLostAt=Date.now();s.lifeLostIdx=s.lives; // le cœur qui vient de s'éteindre
     playSound('miss');this._sourisTilesFlash('#E5484D');
-    s.judge={text:'RATÉ',pts:null,multi:null,kind:'bad',start:Date.now(),until:Date.now()+550};
+    s.judge={text:kpT('tiles.j_miss'),pts:null,multi:null,kind:'bad',start:Date.now(),until:Date.now()+550};
     if(s.intenseActive)s.intenseLostLife=true;
     if(s.lives<=0){this._sourisTilesEnd();return true;}
     return false;
@@ -12979,9 +12979,9 @@ const app={
       if(s.songId==='libre'&&s.combo>0&&s.combo%10===0)s.bpm=Math.min(170,(s.bpm||100)+10);
       // le multiplicateur de score grimpe tous les 10 combos, quel que soit
       // le mode : un petit repère visuel pour que ça se sente vraiment
-      if(s.combo>0&&s.combo%10===0)s.banner={text:`COMBO ×${1+Math.min(3,Math.floor(s.combo/10))} !`,kind:'success',start:Date.now(),until:Date.now()+1400};
+      if(s.combo>0&&s.combo%10===0)s.banner={text:kpT('tiles.combo',{n:1+Math.min(3,Math.floor(s.combo/10))}),kind:'success',start:Date.now(),until:Date.now()+1400};
       playSound('hit',{pitch:1+Math.min(.5,s.combo*.015)});this._sourisTilesFlash(j==='perfect'?'#FFD84D':'#1FA971'); // le son grimpe légèrement avec le combo
-      s.judge={text:label||(j==='perfect'?'PARFAIT':'BIEN'),pts,multi,kind:'good',tier:j,start:Date.now(),until:Date.now()+550};
+      s.judge={text:label||(j==='perfect'?kpT('tiles.j_perfect'):kpT('tiles.j_good')),pts,multi,kind:'good',tier:j,start:Date.now(),until:Date.now()+550};
     }
     this.renderSouris();
   },
@@ -13009,7 +13009,7 @@ const app={
       s.lives=Math.min(4,s.lives+1);s.score+=15;
       if(s.lives>prevLives){s.lifeGainedAt=Date.now();s.lifeGainedIdx=prevLives;} // le cœur qui vient de s'allumer
       playSound('life');this._sourisTilesFlash('#FFD84D');
-      s.judge={text:'+1 VIE',pts:15,multi:null,kind:'bonus',start:Date.now(),until:Date.now()+650};
+      s.judge={text:kpT('tiles.j_life'),pts:15,multi:null,kind:'bonus',start:Date.now(),until:Date.now()+650};
       return;
     }
     if(t.chordId){
@@ -13030,7 +13030,7 @@ const app={
       const rank={bad:0,good:1,perfect:2};
       const worst=rank[j1]<=rank[j2]?j1:j2;
       s.tiles[laneIdx]=null;s.tiles[partnerIdx]=null;
-      this._sourisTilesApply(worst,worst==='bad'?undefined:'ACCORD !');
+      this._sourisTilesApply(worst,worst==='bad'?undefined:kpT('tiles.j_chord'));
       return;
     }
     if(t.long){
@@ -13079,10 +13079,10 @@ const app={
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">
           <div style="font-size:40px;line-height:1">⏸</div>
-          <h2 style="margin:0;font-size:22px;font-weight:800;color:#fff">Pause</h2>
+          <h2 style="margin:0;font-size:22px;font-weight:800;color:#fff">${kpT('sfs.pause')}</h2>
           <div style="display:flex;gap:12px">
-            <button class="res-btn pri" style="flex:none;padding:13px 28px" onclick="app._sourisTilesResume()">Reprendre ▸</button>
-            <button class="res-btn sec" style="flex:none;padding:13px 28px" onclick="app.exitActiveGame()">Quitter</button>
+            <button class="res-btn pri" style="flex:none;padding:13px 28px" onclick="app._sourisTilesResume()">${kpT('tiles.resume_arrow')}</button>
+            <button class="res-btn sec" style="flex:none;padding:13px 28px" onclick="app.exitActiveGame()">${kpT('sfs.quit')}</button>
           </div>
         </div>
       </div>
@@ -13124,8 +13124,8 @@ const app={
     const intenseEnd=intenseStart+3500;
     const wasIntense=s.intenseActive;
     s.intenseActive=intenseStart>=0&&elapsed>=intenseStart&&elapsed<intenseEnd;
-    if(s.intenseActive&&!wasIntense){s.banner={text:'⚡ PASSAGE INTENSE ⚡',kind:'intense',start:now,until:now+1800};s.intenseLostLife=false;}
-    if(wasIntense&&!s.intenseActive&&!s.intenseLostLife){s.score+=20;s.banner={text:'SECTION RÉUSSIE · +20',kind:'success',start:now,until:now+1800};playSound('record');}
+    if(s.intenseActive&&!wasIntense){s.banner={text:kpT('tiles.b_intense'),kind:'intense',start:now,until:now+1800};s.intenseLostLife=false;}
+    if(wasIntense&&!s.intenseActive&&!s.intenseLostLife){s.score+=20;s.banner={text:kpT('tiles.b_cleared'),kind:'success',start:now,until:now+1800};playSound('record');}
     for(let i=0;i<s.lanes.length;i++){
       const t=s.tiles[i];if(!t)continue;
       if(t.holding){
@@ -13139,7 +13139,7 @@ const app={
         if(t.bonus)continue; // bonus optionnelle : aucune pénalité si ratée
         if(t.trap){ // laissée passer sans la taper : c'était le but
           s.score+=5;
-          s.judge={text:'ÉVITÉ',pts:5,multi:null,kind:'bonus',start:now,until:now+550};
+          s.judge={text:kpT('tiles.j_avoided'),pts:5,multi:null,kind:'bonus',start:now,until:now+550};
           this.renderSouris();
           continue;
         }
@@ -13186,16 +13186,16 @@ const app={
             const chordId=`${now}-${i1}-${i2}`;
             s.tiles[i1]={y:0,born:elapsed,dur:cdur,letter:s.lanes[i1].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,chordId,chordHit:false,chordArmY:0};
             s.tiles[i2]={y:0,born:elapsed,dur:cdur,letter:s.lanes[i2].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,chordId,chordHit:false,chordArmY:0};
-            this._sourisTilesAnnounce(s,'chord','🤝 ACCORD · les 2 touches ENSEMBLE',now);
+            this._sourisTilesAnnounce(s,'chord',kpT('tiles.a_chord'),now);
           } else if(roll<pChord+pTrap){
             const i=free[Math.floor(Math.random()*free.length)];
             s.tiles[i]={y:0,born:elapsed,dur,letter:s.lanes[i].letter,long:false,holding:false,holdStart:0,holdDur:0,bonus:false,trap:true};
-            this._sourisTilesAnnounce(s,'trap','✕ PIÈGE · ne la tape pas, laisse-la passer',now);
+            this._sourisTilesAnnounce(s,'trap',kpT('tiles.a_trap'),now);
           } else {
             const i=free[Math.floor(Math.random()*free.length)];
             const long=Math.random()<0.18;
             s.tiles[i]={y:0,born:elapsed,dur,letter:s.lanes[i].letter,long,holding:false,holdStart:0,holdDur:500+Math.random()*300,bonus:false};
-            if(long)this._sourisTilesAnnounce(s,'long','▼ TUILE LONGUE · maintiens la touche',now);
+            if(long)this._sourisTilesAnnounce(s,'long',kpT('tiles.a_long'),now);
           }
         }
       }
@@ -13281,7 +13281,7 @@ const app={
     const judgePop=judge?this._sourisTilesPop(judge.start):0;
     const judgeHtml=judge?`<div class="tiles-judge ${judgeCls}" style="opacity:${judgePop};transform:translate(-50%,-50%) scale(${(0.6+0.4*judgePop).toFixed(3)})">
       <div class="tiles-judge-text">${judge.text}</div>
-      ${judge.pts?`<div class="tiles-judge-pill" style="background:${judgeGold?'rgba(255,216,77,.9)':'rgba(31,169,113,.88)'};color:${judgeGold?'#16140F':'#fff'}">+${judge.pts}${judge.multi>1?` · MULTI ×${judge.multi}`:''}</div>`:''}
+      ${judge.pts?`<div class="tiles-judge-pill" style="background:${judgeGold?'rgba(255,216,77,.9)':'rgba(31,169,113,.88)'};color:${judgeGold?'#16140F':'#fff'}">+${judge.pts}${judge.multi>1?` · ${kpT('tiles.multi',{n:judge.multi})}`:''}</div>`:''}
     </div>`:'';
     const banner=s.banner&&s.banner.until>Date.now()?s.banner:null;
     const bannerPop=banner?this._sourisTilesPop(banner.start):0;
@@ -13317,22 +13317,22 @@ const app={
       <div style="max-width:${boardMaxWidth}px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="padding:16px 20px 20px;display:flex;flex-direction:column${flashStyle}">
           <div class="tiles-hud">
-            <div><div class="tiles-hud-label">SCORE</div><div class="tiles-hud-val">${s.score}</div></div>
+            <div><div class="tiles-hud-label">${kpT('tiles.hud_score')}</div><div class="tiles-hud-val">${s.score}</div></div>
             <div class="tiles-rank">
-              <div class="tiles-hud-label">RANG DU MORCEAU</div>
+              <div class="tiles-hud-label">${kpT('tiles.hud_rank')}</div>
               <div class="tiles-rank-row">
                 <span class="tiles-rank-cur">${rank.label}</span>
                 <div class="tiles-rank-bar"><div class="tiles-rank-bar-fill" style="width:${rank.pct}%"></div></div>
                 <span class="tiles-rank-next">${rank.next||'MAX'}</span>
               </div>
             </div>
-            <div style="text-align:right"><div class="tiles-hud-label">COMBO</div><div class="tiles-hud-val sec">${s.combo}<span style="font-size:14px"> ✱</span></div></div>
+            <div style="text-align:right"><div class="tiles-hud-label">${kpT('tiles.hud_combo')}</div><div class="tiles-hud-val sec">${s.combo}<span style="font-size:14px"> ✱</span></div></div>
           </div>
           <div class="tiles-meta">
-            <div class="tiles-bpm${s.intenseActive?' hot':''}">${isFree?'Mode libre':song.title} · ${Math.round((isFree?s.bpm:song.bpm)*(s.intenseActive?1.2:1))} BPM${s.intenseActive?' · INTENSE':''}</div>
+            <div class="tiles-bpm${s.intenseActive?' hot':''}">${isFree?kpT('tiles.free_mode'):song.title} · ${Math.round((isFree?s.bpm:song.bpm)*(s.intenseActive?1.2:1))} BPM${s.intenseActive?' · INTENSE':''}</div>
             <div style="display:flex;align-items:center;gap:10px">
               <div class="tiles-hearts">${heartsHtml}</div>
-              <button onclick="app._sourisTilesPause()" title="Pause" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);width:26px;height:26px;border-radius:50%;cursor:pointer;color:rgba(255,255,255,.8);font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">⏸</button>
+              <button onclick="app._sourisTilesPause()" title="${kpT('sfs.pause')}" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);width:26px;height:26px;border-radius:50%;cursor:pointer;color:rgba(255,255,255,.8);font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">⏸</button>
             </div>
           </div>
           <div class="tiles-board">
@@ -13342,7 +13342,7 @@ const app={
             ${judgeHtml}
           </div>
           <div class="tiles-keys">${keysHtml}</div>
-          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin-top:10px">${hasLong?'TUILE LONGUE · MAINTIENS LA TOUCHE':hasChord?'ACCORD · LES DEUX TOUCHES ENSEMBLE':hasTrap?'TUILE PIÈGE (✕) · NE LA TAPE PAS':'Frappe la lettre avant la ligne'}</div>
+          <div style="text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.5);margin-top:10px">${hasLong?kpT('tiles.f_long'):hasChord?kpT('tiles.f_chord'):hasTrap?kpT('tiles.f_trap'):kpT('tiles.f_default')}</div>
         </div>
         <div style="text-align:center;margin-top:10px"><button class="btn-quit" onclick="app.exitActiveGame()" title="${kpT('game.quit_title')}">${kpT('game.quit')}</button></div>
       </div>
@@ -13355,7 +13355,7 @@ const app={
     const medal={gold:'🥇',silver:'🥈',bronze:'🥉'}[r.tier]||'💥';
     const rank=this._sourisTilesRank(s.score);
     const extra=`<div style="display:flex;align-items:center;justify-content:center;gap:10px;font-family:'JetBrains Mono',monospace">
-      <span style="font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase">Rang du morceau</span>
+      <span style="font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase">${kpT('tiles.song_rank')}</span>
       <span style="font-weight:800;font-size:19px;color:var(--accent)">${rank.label}</span>
       ${!isFree?`<span style="font-size:11px;font-weight:700;letter-spacing:.06em;padding:3px 10px;border-radius:999px;background:${song.diffColor}22;color:${song.diffColor};border:1px solid ${song.diffColor}55">${song.diffLabel.toUpperCase()}</span>`:''}
     </div>`;
@@ -13364,15 +13364,15 @@ const app={
       <div style="max-width:760px;margin:0 auto;padding:0 24px">
         <div class="game-arena" style="height:auto;padding:28px 20px">
           ${this._gameResult({
-            icon:medal,title:r.tier?'Palier franchi !':'Partie terminée',
-            record:r.isNewBest?(isFree?'Nouveau record en mode libre !':`Nouveau record sur ${song.title} !`):null,
-            boxes:[{label:'Score',value:s.score,accent:true},{label:'Meilleur combo',value:'×'+s.bestCombo},{label:'Précision',value:s._acc,unit:'%',color:accColor}],
+            icon:medal,title:r.tier?kpT('duo.done_tier'):kpT('duo.done'),
+            record:r.isNewBest?(isFree?kpT('tiles.rec_free'):kpT('tiles.rec_song',{title:song.title})):null,
+            boxes:[{label:kpT('frappe.score'),value:s.score,accent:true},{label:kpT('tiles.best_combo'),value:'×'+s.bestCombo},{label:kpT('typ.accuracy'),value:s._acc,unit:'%',color:accColor}],
             extra,
-            primaryLabel:'Rejouer ▸',primaryOnClick:`app._sourisTilesStart('${s.songId}',true)`,
-            secondaryLabel:'Autre morceau',secondaryOnClick:`app.souris={phase:'select',track:'tiles'};app.renderSouris()`,
+            primaryLabel:kpT('frappe.replay'),primaryOnClick:`app._sourisTilesStart('${s.songId}',true)`,
+            secondaryLabel:kpT('tiles.other_song'),secondaryOnClick:`app.souris={phase:'select',track:'tiles'};app.renderSouris()`,
           })}
         </div>
-        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">← Jeux</button></div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-top:10px"><button onclick="app.exitActiveGame()" style="background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12.5px;text-decoration:underline">${kpT('game.back_games')}</button></div>
       </div>
     </div>`;
     this._animateStatCountUp('.game-arena',['','×','']);
