@@ -91,6 +91,78 @@ module.exports = {
     "index": false,
     "jsonld": []
   },
+  "en-home": {
+    "path": "/en",
+    "lang": "en",
+    "title": "KeyPace: learn to touch type, test your speed, play typing games",
+    "description": "Free touch typing trainer: speed test, step-by-step lessons for AZERTY and QWERTY keyboards, typing games and progress tracking.",
+    "index": false,
+    "alternates": {"en-GB": "/en"},
+    "jsonld": []
+  },
+  "en-test": {
+    "path": "/en/typing-test",
+    "lang": "en",
+    "title": "Typing test: type the sentence and see your words per minute | KeyPace",
+    "description": "Type the sentence and find out your speed in words per minute, your accuracy and your badge. Free typing test by KeyPace.",
+    "index": false,
+    "alternates": {"en-GB": "/en/typing-test"},
+    "jsonld": []
+  },
+  "en-testtime": {
+    "path": "/en/timed-typing-test",
+    "lang": "en",
+    "title": "Timed typing test online: 30 s, 1, 3, 5 or 10 min | KeyPace",
+    "description": "Measure your typing speed and accuracy over 30 seconds, 1, 3, 5 or 10 minutes. Free timed typing test in your browser.",
+    "index": false,
+    "alternates": {"en-GB": "/en/timed-typing-test"},
+    "jsonld": []
+  },
+  "en-testchoix": {
+    "path": "/en/typing-tests",
+    "lang": "en",
+    "title": "Choose your typing test: one sentence or a timer | KeyPace",
+    "description": "A sentence to copy or a timed test from 30 seconds to 10 minutes: choose the typing test that suits you.",
+    "index": false,
+    "alternates": {"en-GB": "/en/typing-tests"},
+    "jsonld": []
+  },
+  "en-lessons": {
+    "path": "/en/typing-lessons",
+    "lang": "en",
+    "title": "Touch typing lessons: learn to type without looking | KeyPace",
+    "description": "Step-by-step touch typing lessons for AZERTY and QWERTY keyboards: home row, top row, bottom row, capitals, punctuation, numbers and symbols.",
+    "index": false,
+    "alternates": {"en-GB": "/en/typing-lessons"},
+    "jsonld": []
+  },
+  "en-games": {
+    "path": "/en/typing-games",
+    "lang": "en",
+    "title": "Typing games: Word Strike, Sprint, Typing Race and more | KeyPace",
+    "description": "Practise typing fast by playing: Word Strike, The Sprint, Typing Race, Word Simon and the Boss of the week.",
+    "index": false,
+    "alternates": {"en-GB": "/en/typing-games"},
+    "jsonld": []
+  },
+  "en-stats": {
+    "path": "/en/progress",
+    "lang": "en",
+    "title": "My progress | KeyPace",
+    "description": "Follow your typing progress: speed, accuracy, daily streak, passed lessons and difficult keys.",
+    "index": false,
+    "alternates": {"en-GB": "/en/progress"},
+    "jsonld": []
+  },
+  "en-classes": {
+    "path": "/en/class",
+    "lang": "en",
+    "title": "My class | KeyPace",
+    "description": "Classes and homework on KeyPace.",
+    "index": false,
+    "alternates": {"en-GB": "/en/class"},
+    "jsonld": []
+  },
   "fr-home": {
     "path": "/fr",
     "title": "KeyPace France : apprendre à taper au clavier, du CE2 à la terminale",

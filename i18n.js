@@ -1181,12 +1181,14 @@
   const LANGS = Object.keys(dict);
   let forced = null; // langue imposée (tests)
 
-  // Langue de l'interface : 1. ?ui=en|fr dans l'adresse (puis retenue : choix explicite), 2. sinon la langue du cours actif (un cours d'anglais =
+  // Langue de l'interface : 0. une adresse /en ou /en/... (l'adresse décide), 1. ?ui=en|fr dans l'adresse (puis retenue : choix explicite), 2. sinon la langue du cours actif (un cours d'anglais =
   // une interface en anglais), 3. sinon le français. ?ui=auto efface le choix explicite et revient à « suivre le cours ».
   let courseGetter = null;
   function setCourseLangGetter(fn) { courseGetter = typeof fn === 'function' ? fn : null; }
   function lang() {
     if (forced) return forced;
+    // Adresses /en et /en/... : interface en anglais (l'adresse décide, rien n'est retenu)
+    try { if (/^\/en(\/|$)/.test(root.location.pathname || '')) return 'en'; } catch (e) { /* pas d'adresse */ }
     let v = null;
     try {
       const q = /[?&]ui=(en|fr|auto)(?:&|#|$)/.exec(root.location.search || '');

@@ -2925,7 +2925,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <div class="nav-logo-name">KeyPace</div>
     </button>
     <div class="nav-links">
-      <a class="nav-link" id="nav-home" href="/accueil" onclick="go('home');return false" data-i18n="nav.home">Accueil<span class="underline"></span></a>
+      <a class="nav-link" id="nav-home" href="/accueil" data-href-en="/en" onclick="go('home');return false" data-i18n="nav.home">Accueil<span class="underline"></span></a>
       <div class="nav-dropdown" id="nav-ecoles-wrap" data-lang-hide="en">
         <a class="nav-link" href="/ecoles" style="display:inline-flex;align-items:center;text-decoration:none">Établissements</a>
         <div class="nav-dropdown-menu">
@@ -2935,15 +2935,15 @@ footer{border-top:1px solid var(--border);margin-top:10px}
         </div>
       </div>
       <div class="nav-dropdown" id="nav-test-wrap">
-        <a class="nav-link" id="nav-test" href="/test" onclick="go('testchoix');return false" data-i18n="nav.test">Test<span class="underline"></span></a>
+        <a class="nav-link" id="nav-test" href="/test" data-href-en="/en/typing-tests" onclick="go('testchoix');return false" data-i18n="nav.test">Test<span class="underline"></span></a>
         <div class="nav-dropdown-menu">
-          <a href="/test-frappe-en-ligne" onclick="go('test');return false" data-i18n="nav.test_length">Test sur base de longueur</a>
-          <a href="/test-dactylographie-chronometre" onclick="app.openTimedTest();return false" data-i18n="nav.test_time">Test sur base de temps</a>
+          <a href="/test-frappe-en-ligne" data-href-en="/en/typing-test" onclick="go('test');return false" data-i18n="nav.test_length">Test sur base de longueur</a>
+          <a href="/test-dactylographie-chronometre" data-href-en="/en/timed-typing-test" onclick="app.openTimedTest();return false" data-i18n="nav.test_time">Test sur base de temps</a>
         </div>
       </div>
-      <a class="nav-link" id="nav-lessons" href="/cours-dactylo-en-ligne" onclick="app._skipModulesHub=false;go('lessons');return false" data-i18n="nav.lessons">Cours<span class="underline"></span></a>
-      <a class="nav-link" id="nav-games" href="/jeux-dactylo-en-ligne" onclick="go('games');return false" data-i18n="nav.games">Jeux<span class="underline"></span></a>
-      <a class="nav-link" id="nav-stats" href="/progres" onclick="go('stats');return false" data-i18n="nav.stats">Progrès<span class="underline"></span></a>
+      <a class="nav-link" id="nav-lessons" href="/cours-dactylo-en-ligne" data-href-en="/en/typing-lessons" onclick="app._skipModulesHub=false;go('lessons');return false" data-i18n="nav.lessons">Cours<span class="underline"></span></a>
+      <a class="nav-link" id="nav-games" href="/jeux-dactylo-en-ligne" data-href-en="/en/typing-games" onclick="go('games');return false" data-i18n="nav.games">Jeux<span class="underline"></span></a>
+      <a class="nav-link" id="nav-stats" href="/progres" data-href-en="/en/progress" onclick="go('stats');return false" data-i18n="nav.stats">Progrès<span class="underline"></span></a>
       <button class="nav-link" id="nav-join" onclick="go('classes')" style="display:none" data-i18n="nav.class">Classe<span class="underline"></span></button>
       <button class="nav-link" id="nav-classes" onclick="go('classes')" style="display:none">Gestion de classes<span class="underline"></span></button>
       <div id="nav-apercu" style="display:none;position:relative;align-items:center">
@@ -3183,6 +3183,38 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 </section>
 
 </div></div>
+<div class="seo-sec" data-route="en-home" hidden>
+<section class="seo-hero"><p class="eyebrow">KeyPace</p>
+<h2 class="seo-h1">Learn to touch type, one short lesson at a time</h2>
+<p class="lead">A free touch typing trainer with a speed test, step-by-step lessons for AZERTY and QWERTY keyboards, typing games and progress tracking.</p></section>
+<section><h2>How it works</h2>
+<p>You start with the home row, then add the top and bottom rows, capital letters, punctuation, numbers and symbols. Each lesson takes a few minutes and tells you which finger presses which key, so you can type without looking at the keyboard.</p>
+<p><a href="/en/typing-lessons">See the lessons →</a></p></section>
+<section><h2>Measure your speed</h2>
+<p>The typing test shows your speed in words per minute and your accuracy. Take it now, then again after a few weeks of practice to see your progress.</p>
+<p><a href="/en/typing-test">Take the typing test →</a></p></section>
+<section><h2>Practise by playing</h2>
+<p>Typing games such as Word Strike, The Sprint and Typing Race train speed, accuracy and memory. The games follow the letters you have already learned.</p>
+<p><a href="/en/typing-games">Play typing games →</a></p></section>
+</div>
+<div class="seo-sec" data-route="en-test" hidden>
+<section class="seo-hero"><h2 class="seo-h1">Typing test</h2>
+<p class="lead">Type the sentence as fast and as accurately as you can. The timer starts by itself when you press the first key.</p></section>
+<section><h2>What the test measures</h2>
+<p>Speed is counted in words per minute, where a word is five characters. Accuracy is the share of correct keystrokes. Both appear at the end, with your badge.</p></section>
+</div>
+<div class="seo-sec" data-route="en-lessons" hidden>
+<section class="seo-hero"><h2 class="seo-h1">Touch typing lessons</h2>
+<p class="lead">Learn to type without looking at the keyboard, with short lessons for AZERTY and QWERTY keyboards.</p></section>
+<section><h2>A clear order</h2>
+<p>Home row first, then the top and bottom rows, capital letters, punctuation, numbers and symbols, and finally speed and fluency. Each lesson shows the keys it teaches and the finger to use.</p></section>
+</div>
+<div class="seo-sec" data-route="en-games" hidden>
+<section class="seo-hero"><h2 class="seo-h1">Typing games</h2>
+<p class="lead">Practise typing fast by playing: Word Strike, The Sprint, Typing Race, Race your ghost, Word Simon and more.</p></section>
+<section><h2>Games that follow your level</h2>
+<p>Choose "My level" and the games only use the letters you have already learned, or play with the whole keyboard to chase records.</p></section>
+</div>
 <div class="seo-sec" data-route="fr-home" hidden>
 <section class="seo-hero"><p class="eyebrow">KeyPace France</p>
 <h2 class="seo-h1">Apprendre à taper au clavier, du CE2 à la terminale</h2>
@@ -3958,7 +3990,10 @@ function isMobileLayout(){
 const VIEW_PATHS={home:'/accueil',test:'/test-frappe-en-ligne',testtime:'/test-dactylographie-chronometre',testchoix:'/test',lessons:'/cours-dactylo-en-ligne',games:'/jeux-dactylo-en-ligne',stats:'/progres',classes:'/classe'};
 /* France : adresses propres au pays (même contenu de cours, référentiel et texte d'accueil français). Les autres pages restent communes. */
 const FR_VIEW_PATHS={home:'/fr',lessons:'/fr/cours-dactylo-en-ligne'};
-const VIEW_FROM_PATH=Object.fromEntries([...Object.entries(VIEW_PATHS),...Object.entries(FR_VIEW_PATHS)].map(([v,p])=>[p,v]));
+/* Interface en anglais : adresses /en (même appli, textes anglais ; pages non indexées tant que le cours d'anglais est en bêta, voir api/_page-routes.js). */
+const EN_VIEW_PATHS={home:'/en',test:'/en/typing-test',testtime:'/en/timed-typing-test',testchoix:'/en/typing-tests',lessons:'/en/typing-lessons',games:'/en/typing-games',stats:'/en/progress',classes:'/en/class'};
+const kpInEnPath=()=>/^\/en(\/|$)/.test(location.pathname);
+const VIEW_FROM_PATH=Object.fromEntries([...Object.entries(VIEW_PATHS),...Object.entries(FR_VIEW_PATHS),...Object.entries(EN_VIEW_PATHS)].map(([v,p])=>[p,v]));
 function normPath(p){return p.length>1?p.replace(/\/+$/,''):p;}
 const MOBILE_BLOCKED_VIEWS=['test','testtime','testchoix','lessons','games'];
 function applyMobileNav(){
@@ -4476,6 +4511,7 @@ function kpApplyStatic(){
     document.querySelectorAll('[data-i18n]').forEach(el=>{const v=kpT(el.getAttribute('data-i18n'));const n=[...el.childNodes].find(x=>x.nodeType===3);if(n){if(n.nodeValue!==v)n.nodeValue=v;}else el.insertBefore(document.createTextNode(v),el.firstChild);});
     document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.setAttribute('placeholder',kpT(el.getAttribute('data-i18n-ph')));});
     document.querySelectorAll('[data-i18n-html]').forEach(el=>{const v=kpT(el.getAttribute('data-i18n-html'));if(el.innerHTML!==v)el.innerHTML=v;});
+    document.querySelectorAll('[data-href-en]').forEach(el=>{if(!el.hasAttribute('data-href-fr'))el.setAttribute('data-href-fr',el.getAttribute('href')||'');el.setAttribute('href',kpInEnPath()?el.getAttribute('data-href-en'):el.getAttribute('data-href-fr'));});
     document.querySelectorAll('[data-lang-hide]').forEach(el=>{el.style.display=el.getAttribute('data-lang-hide')===lang?'none':'';});
   }catch{}
 }
@@ -8516,7 +8552,17 @@ const app={
       stats:['Mes progrès – KeyPace','Suivez votre progression en dactylographie : vitesse (mots/min), précision, série de jours, leçons validées et touches difficiles.'],
       classes:['Ma classe – KeyPace','Gérez vos classes, suivez vos élèves et assignez des devoirs depuis votre tableau de bord KeyPace.'],
     };
-    const [t,d]=(KPProg.getCountry()==='fr'&&KPProg.META_FR[v])||_meta[v]||_meta.home;
+    const _metaEn={
+      home:['KeyPace: learn to touch type, test your speed, play typing games','Free touch typing trainer: speed test, step-by-step lessons for AZERTY and QWERTY keyboards, typing games and progress tracking.'],
+      lessons:['Touch typing lessons: learn to type without looking | KeyPace','Step-by-step touch typing lessons for AZERTY and QWERTY keyboards: home row, top row, bottom row, capitals, punctuation, numbers and symbols.'],
+      testchoix:['Choose your typing test: one sentence or a timer | KeyPace','A sentence to copy or a timed test from 30 seconds to 10 minutes: choose the typing test that suits you.'],
+      testtime:['Timed typing test online: 30 s, 1, 3, 5 or 10 min | KeyPace','Measure your typing speed and accuracy over 30 seconds, 1, 3, 5 or 10 minutes. Free timed typing test in your browser.'],
+      test:['Typing test: type the sentence and see your words per minute | KeyPace','Type the sentence and find out your speed in words per minute, your accuracy and your badge. Free typing test by KeyPace.'],
+      games:['Typing games: Word Strike, Sprint, Typing Race and more | KeyPace','Practise typing fast by playing: Word Strike, The Sprint, Typing Race, Word Simon and the Boss of the week.'],
+      stats:['My progress | KeyPace','Follow your typing progress: speed, accuracy, daily streak, passed lessons and difficult keys.'],
+      classes:['My class | KeyPace','Classes and homework on KeyPace.'],
+    };
+    const [t,d]=(kpInEnPath()&&_metaEn[v])||(KPProg.getCountry()==='fr'&&KPProg.META_FR[v])||_meta[v]||_meta.home;
     document.title=t;
     const desc=document.querySelector('meta[name="description"]');
     if(desc)desc.setAttribute('content',d);
@@ -8528,7 +8574,7 @@ const app={
   _syncUrl(v,req){
     const first=!this._urlInit;this._urlInit=true;
     if(this._popping||v!==req)return; // retour navigateur, ou vue remplacée (mobile) : l'adresse demandée reste
-    const want=(KPProg.getCountry()==='fr'&&FR_VIEW_PATHS[v])||VIEW_PATHS[v];
+    const want=(kpInEnPath()&&EN_VIEW_PATHS[v])||(KPProg.getCountry()==='fr'&&FR_VIEW_PATHS[v])||VIEW_PATHS[v];
     if(!want||normPath(location.pathname)===want)return;
     const legacy=new URLSearchParams(location.search).has('view');
     if(first&&location.pathname==='/'&&!legacy)return;
@@ -8541,7 +8587,7 @@ const app={
   _seoSync(req){
     const z=document.getElementById('seo-zone');if(!z)return;
     let any=false;
-    const key=KPProg.getCountry()==='fr'&&z.querySelector('.seo-sec[data-route="fr-'+req+'"]')?'fr-'+req:req;
+    const key=kpInEnPath()&&z.querySelector('.seo-sec[data-route="en-'+req+'"]')?'en-'+req:KPProg.getCountry()==='fr'&&z.querySelector('.seo-sec[data-route="fr-'+req+'"]')?'fr-'+req:req;
     z.querySelectorAll('.seo-sec').forEach(el=>{const on=el.dataset.route===key;el.hidden=!on;if(on)any=true;});
     z.style.display=any?'':'none';
   },
@@ -10231,7 +10277,7 @@ const app={
   renderLessons(){
     if(this._showIntro){this._renderTypingInto('page-lessons');return;}
     if(this.sess&&this.sess.mode==='lesson'){this._renderTypingInto('page-lessons');return;}
-    if(!this._skipModulesHub&&kpContentLang()==='fr'){this.renderModulesHub();return;} /* la page « Cours » (programmes belge et français, modules de rédaction) est propre au français : un cours en anglais affiche directement ses modules */
+    if(!this._skipModulesHub&&kpContentLang()==='fr'&&KPI18n.lang()==='fr'){this.renderModulesHub();return;} /* la page « Cours » (programmes belge et français, modules de rédaction) est propre au français : un cours en anglais affiche directement ses modules */
     const goals=this._goals();
     const plan=getUserPlan();
     const statusById={};
@@ -10301,7 +10347,7 @@ const app={
     </div>`:'';
 
     document.getElementById('page-lessons').innerHTML=`<div class="lessons-section">
-      <div class="lessons-header"><button onclick="app.backToModulesHub()" style="background:none;border:none;color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;padding:0;margin-bottom:10px;font-family:inherit${kpContentLang()==='fr'?'':';display:none'}">${kpT('les.all_modules')}</button><h2>${kpT('les.title')}${kpCourseBadgeHTML()}</h2><p>${kpT('les.step_by_step')} · <span style="color:var(--accent);font-weight:700">${kpT('les.free_lessons',{n:FREE_LESSON_IDS.length})}</span> · ${kpT('les.expert_lessons',{n:ALL_LESSONS.length-FREE_LESSON_IDS.length})}</p></div>
+      <div class="lessons-header"><button onclick="app.backToModulesHub()" style="background:none;border:none;color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;padding:0;margin-bottom:10px;font-family:inherit${kpContentLang()==='fr'&&KPI18n.lang()==='fr'?'':';display:none'}">${kpT('les.all_modules')}</button><h2>${kpT('les.title')}${kpCourseBadgeHTML()}</h2><p>${kpT('les.step_by_step')} · <span style="color:var(--accent);font-weight:700">${kpT('les.free_lessons',{n:FREE_LESSON_IDS.length})}</span> · ${kpT('les.expert_lessons',{n:ALL_LESSONS.length-FREE_LESSON_IDS.length})}</p></div>
       ${guestBanner}${goalsHtml}${currentUser?modsHTML:`<div class="gate-teased">${modsHTML}</div>`}
     </div>`;
   },

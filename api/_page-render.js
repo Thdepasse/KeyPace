@@ -16,6 +16,7 @@ function render(html, key) {
   if (!r) return html;
   const url = BASE + r.path;
   let out = html;
+  if (r.lang) out = out.replace(/<html lang="[a-zA-Z-]+"/, () => `<html lang="${r.lang}"`);
   out = out.replace(/<title>[\s\S]*?<\/title>/, () => `<title>${esc(r.title)}</title>`);
   out = setMeta(out, /<meta name="description"[^>]*>/, `<meta name="description" content="${esc(r.description)}">`);
   out = setMeta(out, /<meta name="robots"[^>]*>/, r.index

@@ -517,6 +517,26 @@ async function run(opts = {}) {
         info.interfaceEn = 'ok';
       } catch (e) { problems.push(`BR13 : ${e.message}`); }
 
+      // BR14 : adresses /en : l'interface est en anglais sans ?ui, l'adresse reste en /en en naviguant, et "/" reste français
+      try {
+        await ev("localStorage.clear();true");
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/en/typing-games` }); await sleep(2800); exceptions.splice(0);
+        const e1 = await ev(`(async()=>{await new Promise(r=>setTimeout(r,300));const t=document.getElementById('page-games').innerText;const out={path:location.pathname,lang:document.documentElement.lang,games:t,navHref:document.getElementById('nav-lessons').getAttribute('href'),navText:document.getElementById('main-nav').innerText,title:document.title};go('lessons');await new Promise(r=>setTimeout(r,500));out.path2=location.pathname;out.lessons=document.getElementById('page-lessons').innerText;out.title2=document.title;go('home');await new Promise(r=>setTimeout(r,500));out.path3=location.pathname;out.home=document.getElementById('page-home').innerText;return out})()`);
+        if (e1.path !== '/en/typing-games' || e1.lang !== 'en') problems.push(`BR14 : /en/typing-games ne passe pas l'interface en anglais (${e1.path}, ${e1.lang})`);
+        for (const w of ['Choose your game', 'Word Strike']) if (!e1.games.includes(w)) problems.push(`BR14 : « ${w} » absent de /en/typing-games`);
+        if (e1.navHref !== '/en/typing-lessons') problems.push(`BR14 : le lien « Courses » du menu ne pointe pas vers /en (${e1.navHref})`);
+        if (!/Typing games/.test(e1.title)) problems.push(`BR14 : titre de la page /en/typing-games (${e1.title})`);
+        if (e1.path2 !== '/en/typing-lessons' || !/The basics of touch typing/i.test(e1.lessons)) problems.push(`BR14 : navigation vers les cours depuis /en (${e1.path2})`);
+        if (/Choisis ton|module du jour|Mon enseignement/.test(e1.lessons)) problems.push('BR14 : la page « Cours » française s\'affiche sur /en/typing-lessons');
+        if (e1.path3 !== '/en' || !/Learn to type/.test(e1.home)) problems.push(`BR14 : accueil /en (${e1.path3})`);
+        const fr14 = ['Accueil', 'Jeux', 'Progrès', 'Déconnexion'].filter((w) => new RegExp('(^|[^A-Za-zÀ-ÿ])' + w + '([^A-Za-zÀ-ÿ]|$)').test(e1.navText)); if (fr14.length) problems.push(`BR14 : du français dans le menu de /en : ${fr14.join(', ')}`);
+        await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2500); exceptions.splice(0);
+        const f1 = await ev(`({lang:document.documentElement.lang,href:document.getElementById('nav-lessons').getAttribute('href'),text:document.getElementById('main-nav').innerText})`);
+        if (f1.lang !== 'fr' || f1.href !== '/cours-dactylo-en-ligne' || !/Accueil/.test(f1.text)) problems.push(`BR14 : « / » n'est plus en français (${f1.lang}, ${f1.href})`);
+        exceptions.splice(0).forEach((e) => problems.push(`BR14 : exception : ${e}`));
+        info.pagesEn = 'ok';
+      } catch (e) { problems.push(`BR14 : ${e.message}`); }
+
       // BR8 : la pastille « clavier » de l'en-tête (visiteur puis compte testeur)
       try {
         const shot = async (name) => { if (!opts.screenshotDir) return; const sh = await S('Page.captureScreenshot', { format: 'png' }); fs.mkdirSync(opts.screenshotDir, { recursive: true }); fs.writeFileSync(path.join(opts.screenshotDir, name), Buffer.from(sh.data, 'base64')); };
