@@ -29,7 +29,7 @@ test('/fr/cours-dactylo-en-ligne : texte du programme visible, autre section cac
 
 test('hreflang : la France et la Belgique se déclarent mutuellement (accueil et cours)', () => {
   const fr = hreflangs(render(html, 'fr-home'));
-  assert.deepStrictEqual(fr, { 'fr-FR': BASE + '/fr', 'fr-BE': BASE + '/', 'x-default': BASE + '/' });
+  assert.deepStrictEqual(fr, { 'fr-FR': BASE + '/fr', 'fr-BE': BASE + '/', 'en-GB': BASE + '/en', 'x-default': BASE + '/' });
   // la page d'accueil belge est le fichier statique index.html : elle doit renvoyer vers /fr
   const be = hreflangs(html);
   assert.strictEqual(be['fr-FR'], BASE + '/fr');
@@ -39,10 +39,10 @@ test('hreflang : la France et la Belgique se déclarent mutuellement (accueil et
   assert.strictEqual(beL['fr-FR'], BASE + ROUTES['fr-lessons'].path); assert.strictEqual(beL['fr-BE'], BASE + ROUTES.lessons.path);
 });
 
-test('Les pages belges sans équivalent français gardent leur hreflang d\'origine (leur propre adresse)', () => {
+test('Les pages belges sans équivalent français gardent leur hreflang d\'origine (leur propre adresse), plus leur page /en', () => {
   for (const key of ['test', 'games', 'testtime']) {
     const h = hreflangs(render(html, key));
-    for (const v of Object.values(h)) assert.strictEqual(v, BASE + ROUTES[key].path, key);
+    for (const [l, v] of Object.entries(h)) assert.strictEqual(v, l === 'en-GB' ? BASE + ROUTES['en-' + key].path : BASE + ROUTES[key].path, key + ' ' + l); // seul équivalent : la page /en
   }
 });
 
@@ -75,7 +75,7 @@ test('Sitemap : les deux adresses françaises y sont, chacune avec ses alternati
   for (const p of ['/fr', '/fr/cours-dactylo-en-ligne']) assert.ok(sm.includes(`<loc>${BASE}${p}</loc>`), p);
   assert.ok(sm.includes('xmlns:xhtml='));
   const n = (sm.match(/hreflang="fr-FR" href="https:\/\/keypace\.be\/fr(\/cours-dactylo-en-ligne)?"/g) || []).length;
-  assert.strictEqual(n, 4, 'chaque page du couple déclare l\'autre (2 pages belges + 2 pages françaises)');
+  assert.strictEqual(n, 6, 'chaque page du couple déclare l\'autre (2 pages belges + 2 pages françaises) et chaque page /en indexée correspondante (/en, /en/typing-lessons)');
 });
 
 test('vercel.json : les deux adresses françaises sont servies par la page de l\'appli', () => {

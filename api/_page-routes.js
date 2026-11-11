@@ -10,13 +10,14 @@ module.exports = {
     "twDescription": "Tape la phrase et découvre ta vitesse, ta précision et ton badge.",
     "ogType": "website",
     "index": true,
+    "alternates": {"fr-BE": "/test-frappe-en-ligne", "fr-FR": "/test-frappe-en-ligne", "fr": "/test-frappe-en-ligne", "en-GB": "/en/typing-test", "x-default": "/test-frappe-en-ligne"},
     "jsonld": [
       "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"BreadcrumbList\",\n  \"itemListElement\": [\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 1,\n      \"name\": \"Accueil\",\n      \"item\": \"https://keypace.be/\"\n    },\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 2,\n      \"name\": \"Test de frappe\",\n      \"item\": \"https://keypace.be/test-frappe-en-ligne\"\n    }\n  ]\n}"
     ]
   },
   "lessons": {
     "path": "/cours-dactylo-en-ligne",
-    "alternates": {"fr-BE": "/cours-dactylo-en-ligne", "fr-FR": "/fr/cours-dactylo-en-ligne", "x-default": "/cours-dactylo-en-ligne"},
+    "alternates": {"fr-BE": "/cours-dactylo-en-ligne", "fr-FR": "/fr/cours-dactylo-en-ligne", "en-GB": "/en/typing-lessons", "x-default": "/cours-dactylo-en-ligne"},
     "title": "Les 65 leçons de dactylographie KeyPace : commence ton parcours",
     "description": "Accède aux 65 leçons progressives KeyPace sur clavier AZERTY : touches de repos, accents, chiffres et symboles. 10 leçons gratuites.",
     "ogTitle": "Les 65 leçons de dactylographie KeyPace",
@@ -39,6 +40,7 @@ module.exports = {
     "twDescription": "Entraîne-toi à taper vite en t'amusant : Frappe-mots, Sprint, Course, Simon et plus.",
     "ogType": "website",
     "index": true,
+    "alternates": {"fr-BE": "/jeux-dactylo-en-ligne", "fr-FR": "/jeux-dactylo-en-ligne", "fr": "/jeux-dactylo-en-ligne", "en-GB": "/en/typing-games", "x-default": "/jeux-dactylo-en-ligne"},
     "jsonld": [
       "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"BreadcrumbList\",\n  \"itemListElement\": [\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 1,\n      \"name\": \"Accueil\",\n      \"item\": \"https://keypace.be/\"\n    },\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 2,\n      \"name\": \"Jeux de frappe\",\n      \"item\": \"https://keypace.be/jeux-dactylo-en-ligne\"\n    }\n  ]\n}"
     ]
@@ -65,6 +67,7 @@ module.exports = {
     "twDescription": "Vitesse et précision sur 30 secondes, 1, 3, 5 ou 10 minutes, sur clavier AZERTY.",
     "ogType": "article",
     "index": true,
+    "alternates": {"fr-BE": "/test-dactylographie-chronometre", "fr-FR": "/test-dactylographie-chronometre", "fr": "/test-dactylographie-chronometre", "en-GB": "/en/timed-typing-test", "x-default": "/test-dactylographie-chronometre"},
     "jsonld": [
       "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"BreadcrumbList\",\n  \"itemListElement\": [\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 1,\n      \"name\": \"Accueil\",\n      \"item\": \"https://keypace.be/\"\n    },\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 2,\n      \"name\": \"Test de frappe chronométré\",\n      \"item\": \"https://keypace.be/test-dactylographie-chronometre\"\n    }\n  ]\n}",
       "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"FAQPage\",\n  \"mainEntity\": [\n    {\n      \"@type\": \"Question\",\n      \"name\": \"Quelle durée choisir pour mon test de frappe ?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Pour une première mesure, 30 secondes ou 1 minute suffisent. Pour vérifier que ton rythme tient dans la durée, choisis 3, 5 ou 10 minutes : plus le test est long, plus le résultat reflète ta vitesse réelle et ta régularité.\"\n      }\n    },\n    {\n      \"@type\": \"Question\",\n      \"name\": \"Pourquoi ma vitesse baisse-t-elle sur un test long ?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Sur plusieurs minutes, la concentration et la fatigue des mains jouent un rôle. C'est pour cela que KeyPace affiche la vitesse tranche par tranche : tu vois où ton rythme se maintient et où il flanche.\"\n      }\n    },\n    {\n      \"@type\": \"Question\",\n      \"name\": \"Le test chronométré est-il gratuit ?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Oui. Sans compte, tu peux faire le test de 30 secondes une fois par jour. Un compte gratuit débloque les durées de 1, 3, 5 et 10 minutes, sans limite, et enregistre tes records.\"\n      }\n    }\n  ]\n}"
@@ -96,8 +99,8 @@ module.exports = {
     "lang": "en",
     "title": "KeyPace: learn to touch type, test your speed, play typing games",
     "description": "Free touch typing trainer: speed test, step-by-step lessons for AZERTY and QWERTY keyboards, typing games and progress tracking.",
-    "index": false,
-    "alternates": {"en-GB": "/en"},
+    "index": true,
+    "alternates": {"en-GB": "/en", "fr-BE": "/", "fr-FR": "/fr", "x-default": "/"},
     "jsonld": []
   },
   "en-test": {
@@ -105,8 +108,8 @@ module.exports = {
     "lang": "en",
     "title": "Typing test: type the sentence and see your words per minute | KeyPace",
     "description": "Type the sentence and find out your speed in words per minute, your accuracy and your badge. Free typing test by KeyPace.",
-    "index": false,
-    "alternates": {"en-GB": "/en/typing-test"},
+    "index": true,
+    "alternates": {"en-GB": "/en/typing-test", "fr-BE": "/test-frappe-en-ligne", "fr-FR": "/test-frappe-en-ligne", "x-default": "/test-frappe-en-ligne"},
     "jsonld": []
   },
   "en-testtime": {
@@ -114,8 +117,8 @@ module.exports = {
     "lang": "en",
     "title": "Timed typing test online: 30 s, 1, 3, 5 or 10 min | KeyPace",
     "description": "Measure your typing speed and accuracy over 30 seconds, 1, 3, 5 or 10 minutes. Free timed typing test in your browser.",
-    "index": false,
-    "alternates": {"en-GB": "/en/timed-typing-test"},
+    "index": true,
+    "alternates": {"en-GB": "/en/timed-typing-test", "fr-BE": "/test-dactylographie-chronometre", "fr-FR": "/test-dactylographie-chronometre", "x-default": "/test-dactylographie-chronometre"},
     "jsonld": []
   },
   "en-testchoix": {
@@ -132,8 +135,8 @@ module.exports = {
     "lang": "en",
     "title": "Touch typing lessons: learn to type without looking | KeyPace",
     "description": "Step-by-step touch typing lessons for AZERTY and QWERTY keyboards: home row, top row, bottom row, capitals, punctuation, numbers and symbols.",
-    "index": false,
-    "alternates": {"en-GB": "/en/typing-lessons"},
+    "index": true,
+    "alternates": {"en-GB": "/en/typing-lessons", "fr-BE": "/cours-dactylo-en-ligne", "fr-FR": "/fr/cours-dactylo-en-ligne", "x-default": "/cours-dactylo-en-ligne"},
     "jsonld": []
   },
   "en-games": {
@@ -141,8 +144,8 @@ module.exports = {
     "lang": "en",
     "title": "Typing games: Word Strike, Sprint, Typing Race and more | KeyPace",
     "description": "Practise typing fast by playing: Word Strike, The Sprint, Typing Race, Word Simon and the Boss of the week.",
-    "index": false,
-    "alternates": {"en-GB": "/en/typing-games"},
+    "index": true,
+    "alternates": {"en-GB": "/en/typing-games", "fr-BE": "/jeux-dactylo-en-ligne", "fr-FR": "/jeux-dactylo-en-ligne", "x-default": "/jeux-dactylo-en-ligne"},
     "jsonld": []
   },
   "en-stats": {
@@ -171,11 +174,7 @@ module.exports = {
     "ogDescription": "Un parcours de dactylographie par classe, en lien avec le CRCN et Pix.",
     "ogType": "website",
     "index": true,
-    "alternates": {
-      "fr-FR": "/fr",
-      "fr-BE": "/",
-      "x-default": "/"
-    },
+    "alternates": {"fr-FR": "/fr", "fr-BE": "/", "en-GB": "/en", "x-default": "/"},
     "jsonld": [
       "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"BreadcrumbList\",\n  \"itemListElement\": [\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 1,\n      \"name\": \"KeyPace France\",\n      \"item\": \"https://keypace.be/fr\"\n    }\n  ]\n}"
     ]
@@ -188,11 +187,7 @@ module.exports = {
     "ogDescription": "Leçons et jalons officiels, du CE2 à la terminale.",
     "ogType": "website",
     "index": true,
-    "alternates": {
-      "fr-FR": "/fr/cours-dactylo-en-ligne",
-      "fr-BE": "/cours-dactylo-en-ligne",
-      "x-default": "/cours-dactylo-en-ligne"
-    },
+    "alternates": {"fr-FR": "/fr/cours-dactylo-en-ligne", "fr-BE": "/cours-dactylo-en-ligne", "en-GB": "/en/typing-lessons", "x-default": "/cours-dactylo-en-ligne"},
     "jsonld": [
       "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"BreadcrumbList\",\n  \"itemListElement\": [\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 1,\n      \"name\": \"Accueil\",\n      \"item\": \"https://keypace.be/fr\"\n    },\n    {\n      \"@type\": \"ListItem\",\n      \"position\": 2,\n      \"name\": \"Programme par classe\",\n      \"item\": \"https://keypace.be/fr/cours-dactylo-en-ligne\"\n    }\n  ]\n}"
     ]
