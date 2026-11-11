@@ -440,7 +440,7 @@ async function run(opts = {}) {
           out.frUi={t:kpT('typ.speed'),lang:document.documentElement.lang};
           out.fr={course:kpCourseId(),lessons:ALL_LESSONS.length,vocab:GAME_VOCAB.length,testFr:!/^[a-z' ,.]*$/.test('x')&&app.makeSession('test').text.length>20};
           return out})()`);
-        if (lg.guestItems.join('|') !== 'Belgique*|France|Français*') problems.push(`BR12 : choix de langue pour un visiteur (${lg.guestItems.join('|')})`);
+        if (lg.guestItems.join('|') !== 'Belgique*|France|Français*|English') problems.push(`BR12 : choix de langue pour un visiteur (${lg.guestItems.join('|')})`);
         if (lg.row.join('|') !== 'Belgique*|France|Français*|English') problems.push(`BR12 : choix de langue pour un testeur (${lg.row.join('|')})`);
         if (!lg.inFrame) problems.push('BR12 : le menu du drapeau sort de l\'écran avec la ligne de langue');
         if (!lg.okEn || lg.en.course !== 'en/azerty' || lg.en.lang !== 'en' || lg.en.lessons !== 54 || lg.en.first !== 'r1:f j' || lg.en.vocab < 300 || !lg.en.badge) problems.push(`BR12 : passage à l'anglais (${JSON.stringify(lg.en)})`);

@@ -4088,7 +4088,8 @@ function kpSetRegion(id,lang){
 const KP_REGION_NAME={be:()=>kpT('region.be'),fr:()=>kpT('region.fr')};
 const kpRegionName=r=>(KP_REGION_NAME[r.id]?KP_REGION_NAME[r.id]():r.name);
 /* Langues du site : celles du pays, plus l'anglais quand le compte a droit au cours d'anglais (ou sur une adresse /en). Choisir une langue change tout le site, cours compris. */
-function kpSiteLangs(){const r=kpRegionObj(),l=r.langs.slice();let off=[];try{off=kpLanguagesOffered();}catch{} /* appelée au chargement, avant que les cours soient déclarés */if(off.includes('en')||KPI18n.lang()==='en'){let n='English';try{n=KP_LANG_NAMES.en;}catch{}l.push({id:'en',name:n});}return l;}
+/* L'anglais est proposé à tous, visiteurs compris : sans compte il ne traduit que l'interface (les cours anglais viennent avec le compte). */
+function kpSiteLangs(){const r=kpRegionObj(),l=r.langs.slice();let n='English';try{n=KP_LANG_NAMES.en;}catch{}l.push({id:'en',name:n});return l;}
 async function kpSetSiteLanguage(lang){
   try{localStorage.setItem('kp_ui',lang);}catch{}
   // Une adresse /en impose l'anglais : choisir une autre langue ramène à l'adresse française de la même page
