@@ -23,25 +23,47 @@ const BRITISH_OK = new Set(['colour', 'colours', 'favourite', 'favourites', 'nei
 const FR_ACCENTS = /[éèêëàâîïôûùçœæ]/i;
 const TECH_TOKENS = new Set(['https']); // termes techniques admis tels quels dans les modules de symboles (adresses, code) ; un mot de plus de 4 lettres qui n'est pas anglais doit sinon être au lexique
 
+// Profil par langue du cours : noms des trois premiers modules (reconnus par game-levels.js), français résiduel interdit dans ce que l'élève lit,
+// lettres admises dans les textes, critère de vérification d'un mot du lexique et script de vérification.
+const FR_ONLY_ACCENTS = /[èêàâîôûùçœæ]/i; // accents qui n'existent pas en néerlandais (é, ë, ï, ü, ö existent)
+const PROFILES = {
+  en: {
+    rows: { repos: 'Home row', haut: 'Top row', bas: 'Bottom row' }, checker: 'check-en-words.js', spelling: true,
+    shownBad: (shown) => FR_ACCENTS.test(shown) || FR_WORDS.test(shown) ? (shown.match(FR_WORDS) || shown.match(FR_ACCENTS) || [''])[0] : null,
+    nameBad: (name) => FR_WORDS.test(name) || FR_ACCENTS.test(name), textBad: (text) => FR_ACCENTS.test(text), textBadMsg: 'lettre accentuée dans un texte anglais',
+    lexOk: (c, w) => c.dict === 'oui' || c.wik === 'oui' || (c.freq !== null && c.freq >= 1 && w.length <= 3),
+    lexWhy: (c) => `dict ${c.dict}, wiktionary ${c.wik}`,
+  },
+  nl: {
+    rows: { repos: 'Basisrij', haut: 'Bovenste rij', bas: 'Onderste rij' }, checker: 'check-nl-words.js', spelling: false,
+    // « pas », « au », « ce », « ton » existent aussi en néerlandais ou ne sont pas probants : on ne garde que des mots français sans emploi néerlandais
+    shownBad: (shown) => { const m = shown.match(FR_WORDS_NL) || shown.match(FR_ONLY_ACCENTS); return m ? m[0] : null; },
+    nameBad: (name) => FR_WORDS_NL.test(name) || FR_ONLY_ACCENTS.test(name), textBad: (text) => /[^\x00-\x7f]/.test(text), textBadMsg: 'lettre accentuée dans un texte néerlandais (les accents ne sont pas encore enseignés)',
+    lexOk: (c) => c.dict === 'oui' && (c.freq !== null || c.wik === 'oui') && !(c.labels || []).includes('vulgair'),
+    lexWhy: (c) => `OpenTaal ${c.dict}, fréquence ${c.freq}, nl.wiktionary ${c.wik}${(c.labels || []).includes('vulgair') ? ', vulgair' : ''}`,
+  },
+};
+const FR_WORDS_NL = /(^|[^\p{L}'])(les|des|du|une|est|sont|pour|avec|dans|tu|ta|tes|sur|qui|que|et|ou|vos|votre|cette|ces|ses|aux)(?![\p{L}'])/iu;
+
 function readJson(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
 const flatTuto = (t) => [t.intro, t.tip, ...(t.rules || []).flatMap((r) => [r.t, r.d])].join(' ');
 
-function loadLexicon(srcDir, errs, only) {
-  const words = new Set();
-  const base = path.join(srcDir, 'en-words.json');
+function loadLexicon(srcDir, errs, only, lang = 'en') {
+  const P = PROFILES[lang]; const words = new Set();
+  const base = path.join(srcDir, `${lang}-words.json`);
   if (fs.existsSync(base)) readJson(base).words.forEach((w) => words.add(w));
   // `only` (ex. « en-azerty ») : ne charge que le lexique complémentaire de ce cours (en-lexicon-extra-azerty.json), pour qu'un agent ne soit pas gêné par le travail en cours d'un autre
-  for (const f of fs.readdirSync(srcDir).filter((x) => /^en-lexicon-extra.*\.json$/.test(x) && !/-check\.json$/.test(x) && (!only || x === `en-lexicon-extra-${only.split('-')[1]}.json`))) {
+  const extra = new RegExp(`^${lang}-lexicon-extra.*\\.json$`);
+  for (const f of fs.readdirSync(srcDir).filter((x) => extra.test(x) && !/-check\.json$/.test(x) && (!only || x.startsWith(`${lang}-lexicon-extra-${only.split('-')[1]}`)))) {
     const list = readJson(path.join(srcDir, f)).words || [];
     const checkFile = path.join(srcDir, f.replace(/\.json$/, '-check.json'));
     const checked = fs.existsSync(checkFile) ? Object.fromEntries(readJson(checkFile).results.map((r) => [r.w, r])) : {};
     for (const w of list) {
       const c = checked[w];
-      if (!/^[a-z]+('[a-z]+)?$/.test(w)) { errs.push(`${f} : « ${w} » n'est pas un mot en minuscules (une apostrophe est admise : don't)`); continue; }
-      if (US_SPELLINGS.test(w) && !BRITISH_OK.has(w)) { errs.push(`${f} : « ${w} » est une orthographe américaine (anglais britannique attendu)`); continue; }
-      if (!c) { errs.push(`${f} : « ${w} » n'a pas été vérifié (lancer scripts/check-en-words.js --in ${f})`); continue; }
-      const ok = c.dict === 'oui' || c.wik === 'oui' || (c.freq !== null && c.freq >= 1 && w.length <= 3);
-      if (!ok) errs.push(`${f} : « ${w} » n'est confirmé par aucun dictionnaire (dict ${c.dict}, wiktionary ${c.wik})`);
+      if (!/^[a-z]+('[a-z]+)?$/.test(w)) { errs.push(`${f} : « ${w} » n'est pas un mot en minuscules (une apostrophe est admise)`); continue; }
+      if (P.spelling && US_SPELLINGS.test(w) && !BRITISH_OK.has(w)) { errs.push(`${f} : « ${w} » est une orthographe américaine (anglais britannique attendu)`); continue; }
+      if (!c) { errs.push(`${f} : « ${w} » n'a pas été vérifié (lancer scripts/${P.checker} --in course-src/${f})`); continue; }
+      if (!P.lexOk(c, w)) errs.push(`${f} : « ${w} » n'est confirmé par aucun dictionnaire (${P.lexWhy(c)})`);
       else words.add(w);
     }
   }
@@ -68,7 +90,8 @@ const FR_WORDS = /(^|[^\p{L}'])(le|la|les|des|du|une|est|sont|pour|avec|dans|tu|
 // seules les touches doivent rester identiques à celles du cours français (ordre d'apprentissage).
 const keysCore = (k) => String(k).split(/\s+/).filter((t) => !/^[\p{L}'’-]{2,}$/u.test(t)).join(' ');
 function checkCourse(dirName, srcDir, lexicon, errs) {
-  const [lang, family] = dirName.split('-');
+  const [lang, family] = dirName.split('-'); const P = PROFILES[lang];
+  if (!P) { errs.push(`${dirName} : langue « ${lang} » sans profil dans scripts/language-gates.js (PROFILES)`); return { lessons: 0 }; }
   const dir = path.join(srcDir, dirName);
   const files = fs.readdirSync(dir).filter((f) => /^\d\d-.*\.json$/.test(f)).sort();
   if (!files.length) return { lessons: 0 };
@@ -79,9 +102,9 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
     if (pos !== i + 1) errs.push(`${dirName}/${m.file} : position ${pos}, attendu ${i + 1}`);
     if (!/^\d+\. /.test(m.name || '')) errs.push(`${dirName}/${m.file} : le nom du module doit commencer par « ${i + 1}. »`);
     // l'interface suit la langue du cours : le nom du module est dans la langue du cours, et les trois premiers gardent un nom que les niveaux des jeux reconnaissent (game-levels.js)
-    if (FR_WORDS.test(m.name || '') || FR_ACCENTS.test(m.name || '')) errs.push(`${dirName}/${m.file} : nom du module en français (« ${m.name} »)`);
-    const ROW_NAME = { repos: /^\d+\. Home row$/, haut: /^\d+\. Top row$/, bas: /^\d+\. Bottom row$/ };
-    if (m.row && ROW_NAME[m.row] && !ROW_NAME[m.row].test(m.name || '')) errs.push(`${dirName}/${m.file} : le module « ${m.row} » doit s'appeler « ${i + 1}. ${{ repos: 'Home row', haut: 'Top row', bas: 'Bottom row' }[m.row]} » (les niveaux des jeux le reconnaissent par ce nom)`);
+    if (P.nameBad(m.name || '')) errs.push(`${dirName}/${m.file} : nom du module en français (« ${m.name} »)`);
+    const ROW_NAME = Object.fromEntries(Object.entries(P.rows).map(([k, v]) => [k, new RegExp(`^\\d+\\. ${v}$`)]));
+    if (m.row && ROW_NAME[m.row] && !ROW_NAME[m.row].test(m.name || '')) errs.push(`${dirName}/${m.file} : le module « ${m.row} » doit s'appeler « ${i + 1}. ${P.rows[m.row]} » (les niveaux des jeux le reconnaissent par ce nom)`);
   });
   const lessons = mods.flatMap((m) => m.lessons.map((l) => ({ ...l, _m: m })));
   const ids = new Set(); const cum = new Set(); let majOn = false; const signs = new Set(); const digits = new Set(); let n = 0;
@@ -95,7 +118,8 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
     if (!t || !t.intro || !t.tip || !Array.isArray(t.rules) || t.rules.length < 3 || t.rules.length > 4 || t.rules.some((r) => !r.icon || !r.t || !r.d)) errs.push(`${where} : tutoriel incomplet (intro, 3 ou 4 règles icône/titre/texte, objectif)`);
     const shown = [l.title, l.tip, l.keys, t ? flatTuto(t) : ''].join(' ');
     if (/—/.test(shown) || /—/.test(l.text || '')) errs.push(`${where} : tiret cadratin`);
-    if (FR_ACCENTS.test(shown) || FR_WORDS.test(shown)) errs.push(`${where} : titre, conseil ou tutoriel en français (l'interface d'un cours en anglais est en anglais) : « ${(shown.match(FR_WORDS) || shown.match(FR_ACCENTS) || [''])[0]} »`);
+    const bad = P.shownBad(shown);
+    if (bad) errs.push(`${where} : titre, conseil ou tutoriel en français (l'interface d'un cours de langue est dans la langue du cours) : « ${bad} »`);
     if (wrong.test(shown)) errs.push(`${where} : mention du mauvais clavier dans un cours ${family.toUpperCase()}`);
     const r = ref[l.id];
     if (r && keysCore(r.keys) !== keysCore(l.keys)) errs.push(`${where} : touches « ${l.keys} » différentes du cours français (« ${r.keys} ») : l'ordre d'apprentissage doit rester le même`);
@@ -109,7 +133,7 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
     if (text.length < 30) errs.push(`${where} : texte trop court (${text.length})`);
     if (text.length > (l.maxLen || 130)) errs.push(`${where} : texte trop long (${text.length} signes, maximum ${l.maxLen || 130})`);
     if (/  |^ | $/.test(text)) errs.push(`${where} : espaces en double ou en bordure`);
-    if (FR_ACCENTS.test(text)) errs.push(`${where} : lettre accentuée dans un texte anglais`);
+    if (P.textBad(text)) errs.push(`${where} : ${P.textBadMsg}`);
     for (const ch of text) {
       if (ch === ' ') continue;
       const lower = ch.toLowerCase();
@@ -127,14 +151,14 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
     const toks = text.toLowerCase().match(/[a-z]+(?:'[a-z]+)*/g) || []; let suites = 0;
     for (const w of toks) {
       if (w.includes("'")) { // contraction (don't, it's) : toujours un mot du lexique, jamais un exercice de doigts
-        if (!lexicon.has(w)) errs.push(`${where} : « ${w} » n'est pas dans le lexique vérifié (ajouter la contraction à course-src/en-lexicon-extra-*.json)`);
+        if (!lexicon.has(w)) errs.push(`${where} : « ${w} » n'est pas dans le lexique vérifié (ajouter la contraction à course-src/${lang}-lexicon-extra-*.json)`);
         continue;
       }
-      if (US_SPELLINGS.test(w) && !BRITISH_OK.has(w)) { errs.push(`${where} : « ${w} » est une orthographe américaine`); continue; }
+      if (P.spelling && US_SPELLINGS.test(w) && !BRITISH_OK.has(w)) { errs.push(`${where} : « ${w} » est une orthographe américaine`); continue; }
       if (lexicon.has(w) || (l._m.kind === 'symboles' && TECH_TOKENS.has(w))) continue;
       if (w.length <= 4 && playable < 15) { suites++; continue; }
       if (w.length <= 4) { suites++; continue; }
-      errs.push(`${where} : « ${w} » n'est pas dans le lexique vérifié (ajouter au fichier course-src/en-lexicon-extra-*.json puis lancer scripts/check-en-words.js)`);
+      errs.push(`${where} : « ${w} » n'est pas dans le lexique vérifié (ajouter au fichier course-src/${lang}-lexicon-extra-*.json puis lancer scripts/${P.checker})`);
     }
     // les modules de symboles (adresses, prix, code) mêlent des éléments qui ne sont pas des mots : pas de limite de proportion pour eux
     if (l._m.kind !== 'symboles' && playable >= 15 && toks.length && suites / toks.length > 0.25) errs.push(`${where} : ${suites} suites de lettres sur ${toks.length} éléments alors que ${playable} mots sont possibles : écrire de vrais mots`);
@@ -145,10 +169,10 @@ function checkCourse(dirName, srcDir, lexicon, errs) {
 function q10(opts) {
   const srcDir = (opts && opts.srcDir) || path.join(root, 'course-src');
   const only = (opts && opts.only) || process.env.LANG_COURSE || ''; // ex. LANG_COURSE=en-qwerty : ne vérifier que ce cours
-  const dirs = fs.existsSync(srcDir) ? fs.readdirSync(srcDir).filter((d) => /^[a-z]{2}-(qwerty|azerty)$/.test(d) && !d.startsWith('fr-') && (!only || d === only) && fs.statSync(path.join(srcDir, d)).isDirectory()) : [];
+  const dirs = fs.existsSync(srcDir) ? fs.readdirSync(srcDir).filter((d) => /^[a-z]{2}-(qwerty|azerty)$/.test(d) && !d.startsWith('fr-') && PROFILES[d.slice(0, 2)] && (!only || d === only) && fs.statSync(path.join(srcDir, d)).isDirectory()) : [];
   if (!dirs.length) return { ok: true, detail: 'aucun cours de langue à vérifier' };
-  const errs = []; const lexicon = loadLexicon(srcDir, errs, only); const done = [];
-  for (const d of dirs) { const r = checkCourse(d, srcDir, lexicon, errs); if (r.lessons) done.push(`${d} : ${r.lessons} leçons`); }
+  const errs = []; const lexicons = {}; const done = [];
+  for (const d of dirs) { const lang = d.slice(0, 2); if (!lexicons[lang]) lexicons[lang] = loadLexicon(srcDir, errs, only, lang); const r = checkCourse(d, srcDir, lexicons[lang], errs); if (r.lessons) done.push(`${d} : ${r.lessons} leçons`); }
   // Le fichier que le site charge (courses-src/<langue>-<clavier>.json), s'il existe, est EXACTEMENT ce que produit l'assembleur : jamais périmé, jamais écrit à la main.
   if (!(opts && opts.srcDir)) {
     const { build } = require('./build-qwerty-course');
@@ -159,6 +183,6 @@ function q10(opts) {
       if (JSON.stringify(readJson(file)) !== JSON.stringify(JSON.parse(JSON.stringify(built)))) errs.push(`courses-src/${d}.json n'est pas à jour avec ses sources (relancer node scripts/build-qwerty-course.js ${lang} ${family})`);
     }
   }
-  return errs.length ? { ok: false, detail: `${errs.length} problème(s) :\n` + errs.slice(0, 15).join('\n') } : { ok: true, detail: `${done.join(' ; ') || 'dossiers vides'} (lexique de ${lexicon.size} mots)` };
+  return errs.length ? { ok: false, detail: `${errs.length} problème(s) :\n` + errs.slice(0, 15).join('\n') } : { ok: true, detail: `${done.join(' ; ') || 'dossiers vides'} (lexique${Object.keys(lexicons).length > 1 ? 's' : ''} de ${Object.entries(lexicons).map(([l, x]) => `${x.size} mots ${l}`).join(', ')})` };
 }
 module.exports = { q10 };

@@ -180,3 +180,45 @@ test('interface en anglais : titre, conseil ou étiquette de touches en françai
   const dir = mk({}); fs.writeFileSync(path.join(dir, 'en-qwerty', '01-position.json'), JSON.stringify({ position: 1, name: '1. Position de base', row: 'repos', lessons: [L1, L2, L3] }));
   assert.ok(has(q10({ srcDir: dir }), /Home row/));
 });
+
+// ── Néerlandais (profil nl) : mêmes règles, autre lexique (OpenTaal + fréquence + nl.wiktionary), autres noms de rangées, pas de règle « orthographe américaine »
+const NL_WORDS = ['dak', 'tak', 'pad', 'lap', 'kas', 'jas', 'hal', 'pak', 'plak', 'slak', 'slap', 'stap', 'klas', 'plaat', 'taal', 'kaal', 'daal', 'haast', 'kalk', 'pasta', 'plas', 'hals', 'half', 'hand', 'dals'];
+const NL3 = 'dak tak pad lap kas jas hal pak plak slak slap stap klas plaat taal kaal daal haast kalk pasta plas hals half';
+const NL_TEXT2 = 'as ad dad daa sad dsa asd sda das ads dsa asd daa sad das as ad dad asd';
+const NL_L2 = L('r2', 'a s d', 'asd', NL_TEXT2);
+const NL_L3 = L('r3', 'k l h t p', 'l', NL3);
+function mkNl({ nl, extra, extraCheck, name }) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kp-lang-'));
+  fs.mkdirSync(path.join(dir, 'fr-qwerty')); fs.mkdirSync(path.join(dir, 'nl-qwerty'));
+  fs.writeFileSync(path.join(dir, 'fr-qwerty', '01-x.json'), JSON.stringify({ position: 1, name: '1. Position', row: 'repos', lessons: [L1, NL_L2, NL_L3] }));
+  fs.writeFileSync(path.join(dir, 'nl-qwerty', '01-basis.json'), JSON.stringify({ position: 1, name: name || '1. Basisrij', row: 'repos', lessons: nl || [L1, NL_L2, NL_L3] }));
+  fs.writeFileSync(path.join(dir, 'nl-words.json'), JSON.stringify({ words: NL_WORDS }));
+  if (extra) fs.writeFileSync(path.join(dir, 'nl-lexicon-extra-a.json'), JSON.stringify({ words: extra }));
+  if (extraCheck) fs.writeFileSync(path.join(dir, 'nl-lexicon-extra-a-check.json'), JSON.stringify({ results: extraCheck }));
+  return dir;
+}
+test('néerlandais : un cours conforme est accepté, la gate nomme la langue', () => {
+  const r = q10({ srcDir: mkNl({}) });
+  assert.ok(r.ok, r.detail);
+  assert.match(r.detail, /nl-qwerty : 3 leçons/);
+  assert.match(r.detail, /\d+ mots nl/);
+});
+test('néerlandais : module de rangée mal nommé, français dans le titre ou dans le nom, accent dans le texte : refusés', () => {
+  assert.ok(has(q10({ srcDir: mkNl({ name: '1. Home row' }) }), /Basisrij/));
+  assert.ok(has(q10({ srcDir: mkNl({ name: '1. Rangée de repos' }) }), /en français|Basisrij/));
+  assert.ok(has(q10({ srcDir: mkNl({ nl: [L1, NL_L2, { ...NL_L3, tip: 'Garde les doigts sur la rangée de repos.' }] }) }), /en français/));
+  assert.ok(has(q10({ srcDir: mkNl({ nl: [L1, NL_L2, { ...NL_L3, text: NL3 + ' één' }] }) }), /lettre accentuée dans un texte néerlandais/));
+});
+test('néerlandais : « é », « ë » dans un conseil ne comptent pas comme du français ; « è », « à » oui', () => {
+  assert.ok(q10({ srcDir: mkNl({ nl: [L1, NL_L2, { ...NL_L3, tip: 'Typ één woord per keer.' }] }) }).ok);
+  assert.ok(has(q10({ srcDir: mkNl({ nl: [L1, NL_L2, { ...NL_L3, tip: 'Voilà le conseil.' }] }) }), /en français/));
+});
+test('néerlandais : mot du lexique complémentaire : vérifié par OpenTaal et fréquence requis, vulgair refusé, non vérifié refusé', () => {
+  const good = { w: 'pastaplaat', dict: 'oui', freq: 3.2, wik: 'oui', labels: [] };
+  const withExtra = (c, words) => q10({ srcDir: mkNl({ nl: [L1, NL_L2, { ...NL_L3, text: NL3 + ' pastaplaat' }], extra: words || ['pastaplaat'], extraCheck: c }) });
+  assert.ok(withExtra([good]).ok);
+  assert.ok(has(withExtra([{ ...good, dict: 'non' }]), /n'est confirmé par aucun dictionnaire \(OpenTaal non/));
+  assert.ok(has(withExtra([{ ...good, freq: null, wik: 'non' }]), /fréquence null/));
+  assert.ok(has(withExtra([{ ...good, labels: ['vulgair'] }]), /vulgair/));
+  assert.ok(has(withExtra([]), /n'a pas été vérifié \(lancer scripts\/check-nl-words\.js/));
+});
