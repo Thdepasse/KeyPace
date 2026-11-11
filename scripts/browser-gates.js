@@ -277,10 +277,11 @@ async function run(opts = {}) {
           const h=s=>{let x=5381;for(let i=0;i<s.length;i++)x=((x<<5)+x+s.charCodeAt(i))|0;return (x>>>0).toString(36)};
           const o={};const nets=[...r.querySelectorAll('#menu1 button')].map(b=>b.dataset.id);const yrs=[...r.querySelectorAll('#menu2 button')].map(b=>b.dataset.l);
           for(const n of nets){for(const y of yrs){r.querySelector('#menu1 button[data-id="'+n+'"]').click();r.querySelector('#menu2 button[data-l="'+y+'"]').click();if(!r.getElementById('pfold').classList.contains('open'))r.getElementById('pgo').click();o[n+'|'+y]=h(r.getElementById('pc').innerHTML);}}
-          return{nets,o,pressed:r.querySelector('#ctry button[aria-pressed=true]').dataset.c,guest:!(typeof currentUser!=='undefined'&&currentUser)}})()`);
+          return{nets,o,pressed:KPProg.getCountry(),doors:!r.querySelector('.doors').hidden,guest:!(typeof currentUser!=='undefined'&&currentUser)}})()`);
         if (got.nets.length !== 4) problems.push(`BR9 : ${got.nets.length} réseaux au lieu de 4`);
         if (!got.guest) problems.push('BR9 : le test devait se faire en visiteur non connecté');
         if (got.pressed !== 'be') problems.push(`BR9 : le pays par défaut n'est pas la Belgique (${got.pressed})`);
+        if (!got.doors) problems.push('BR9 : les trois portes (tronc commun, général, qualifiant) sont cachées en Belgique');
         const bad = [];
         for (const n of got.nets) for (const y of Object.keys(ref)) if (got.o[n + '|' + y] !== ref[y]) bad.push(n + ' / ' + y);
         if (bad.length) problems.push(`BR9 : la page programme belge a changé (${bad.length} sur 40, ex. ${bad.slice(0, 3).join(', ')})`);
