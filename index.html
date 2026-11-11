@@ -4430,7 +4430,7 @@ async function kpFetchAccess(){
 function kpRefreshOffered(){
   try{ // peut être appelée avant que le reste du script soit chargé : sans effet dans ce cas
   if(typeof app==='undefined'||typeof ALL_LESSONS==='undefined')return;
-  const want=['fr/azerty'].concat(currentUser?_kpAllowed:[]);
+  const want=['fr/azerty'].concat(currentUser?_kpAllowed:(kpInEnPath()?['en/azerty']:[])); /* visiteur : le cours d'anglais seulement sur les adresses /en, ailleurs « English » ne traduit que l'interface */
   if(want.join()===KP_COURSES_OFFERED.join())return;
   KP_COURSES_OFFERED.splice(0,KP_COURSES_OFFERED.length,...want);
   kpKbChipRender();
@@ -4442,7 +4442,8 @@ function kpRefreshOffered(){
   }
   }catch{}
 }
-function kpCourseId(){try{const v=localStorage.getItem('kp_course');return KP_COURSES_OFFERED.includes(v)&&KP_COURSES[v]?v:'fr/azerty';}catch{return'fr/azerty';}}
+/* Adresses /en : sans choix de cours retenu, le cours est celui d'anglais (la page est faite pour un anglophone : texte à taper en anglais). */
+function kpCourseId(){try{const v=localStorage.getItem('kp_course');if(KP_COURSES_OFFERED.includes(v)&&KP_COURSES[v])return v;}catch{}return kpInEnPath()&&KP_COURSES_OFFERED.includes('en/azerty')?'en/azerty':'fr/azerty';}
 /* Les données du cours actif : leçons, tests, statistiques de touches. Cours par défaut : la progression elle-même (identique à avant). */
 function course(){
   const id=kpCourseId();
