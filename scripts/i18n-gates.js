@@ -42,6 +42,15 @@ function i1(opts) {
     used.add(m[1]);
     if (m[1] in fr && m[2].trim() !== String(fr[m[1]]).trim()) errs.push(`data-i18n « ${m[1]} » : le HTML dit « ${m[2].trim()} », le dictionnaire français « ${fr[m[1]]} »`);
   }
+  // placeholders (data-i18n-ph) et fragments HTML (data-i18n-html) : même exigence, le repli français du HTML est celui du dictionnaire
+  for (const m of html.matchAll(/<[a-z]+ [^>]*data-i18n-ph="([^"]+)"[^>]*>/g)) {
+    used.add(m[1]); const ph = /placeholder="([^"]*)"/.exec(m[0]);
+    if (m[1] in fr && ph && ph[1] !== fr[m[1]]) errs.push(`data-i18n-ph « ${m[1]} » : le HTML dit « ${ph[1]} », le dictionnaire français « ${fr[m[1]]} »`);
+  }
+  for (const m of html.matchAll(/data-i18n-html="([^"]+)"[^>]*>([\s\S]*?)<\/span>/g)) {
+    used.add(m[1]);
+    if (m[1] in fr && m[2].trim() !== String(fr[m[1]]).trim()) errs.push(`data-i18n-html « ${m[1]} » : le HTML ne correspond pas au dictionnaire français`);
+  }
   for (const k of used) if (!(k in fr)) errs.push(`la page appelle « ${k} » qui n'existe pas`);
   for (const k of Object.keys(fr)) if (!used.has(k)) errs.push(`« ${k} » n'est utilisée par aucun écran`);
   return errs.length ? { ok: false, detail: errs.slice(0, 8).join('\n') } : { ok: true, detail: `${Object.keys(fr).length} textes, anglais complet, toutes les clés de la page existent` };

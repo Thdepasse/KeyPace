@@ -2784,37 +2784,37 @@ footer{border-top:1px solid var(--border);margin-top:10px}
     </div>
     <div id="auth-context-msg" style="background:rgba(255,77,46,0.07);border-radius:10px;padding:10px 13px;font-size:13px;color:#7A7365;margin-bottom:16px;display:none"></div>
     <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Connexion</button>
-      <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Créer un compte</button>
+      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')" data-i18n="auth.tab_login">Connexion</button>
+      <button class="auth-tab" id="tab-register" onclick="switchTab('register')" data-i18n="nav.signup">Créer un compte</button>
     </div>
     <div id="auth-error" class="auth-error"></div>
-    <div class="auth-field"><label>Nom d'utilisateur</label><input type="text" id="auth-username" placeholder="ex: jean42" autocomplete="username"></div>
+    <div class="auth-field"><label data-i18n="auth.username">Nom d'utilisateur</label><input type="text" id="auth-username" placeholder="ex: jean42" data-i18n-ph="auth.username_ph" autocomplete="username"></div>
     <div class="auth-field" id="auth-email-wrap" style="display:none">
-      <label>Adresse email</label>
-      <input type="email" id="auth-email" placeholder="ex: jean@email.com" autocomplete="email" onblur="checkInstitutionDomain()">
+       <label data-i18n="auth.email">Adresse email</label>
+      <input type="email" id="auth-email" placeholder="ex: jean@email.com" data-i18n-ph="auth.email_ph" autocomplete="email" onblur="checkInstitutionDomain()">
       <div id="auth-domain-hint" style="display:none;margin-top:6px;font-size:12.5px;font-weight:600;color:#1FA971"></div>
     </div>
-    <div class="auth-field"><label>Mot de passe</label><input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password"></div>
-    <div class="auth-field" id="auth-confirm-wrap" style="display:none"><label>Confirmer le mot de passe</label><input type="password" id="auth-confirm" placeholder="••••••••" autocomplete="new-password"></div>
-    <div class="auth-field" id="auth-birth-wrap" style="display:none"><label>Date de naissance</label><input type="date" id="auth-birth" oninput="onBirthChange()"></div>
-    <div class="auth-field" id="auth-parent-wrap" style="display:none"><label>Email d'un responsable légal</label><input type="email" id="auth-parent" placeholder="parent@email.com" autocomplete="email"></div>
-    <label id="auth-consent-wrap" style="display:none;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--muted);line-height:1.5;margin:2px 0 14px;cursor:pointer"><input type="checkbox" id="auth-consent" style="margin-top:2px;flex-shrink:0"><span>J'accepte les <a href="/conditions" target="_blank" style="color:var(--accent)">conditions d'utilisation</a> et la <a href="/confidentialite" target="_blank" style="color:var(--accent)">politique de confidentialité</a>.</span></label>
+     <div class="auth-field"><label data-i18n="auth.password">Mot de passe</label><input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password"></div>
+    <div class="auth-field" id="auth-confirm-wrap" style="display:none"><label data-i18n="auth.confirm">Confirmer le mot de passe</label><input type="password" id="auth-confirm" placeholder="••••••••" autocomplete="new-password"></div>
+    <div class="auth-field" id="auth-birth-wrap" style="display:none"><label data-i18n="auth.birth">Date de naissance</label><input type="date" id="auth-birth" oninput="onBirthChange()"></div>
+    <div class="auth-field" id="auth-parent-wrap" style="display:none"><label data-i18n="auth.parent">Email d'un responsable légal</label><input type="email" id="auth-parent" placeholder="parent@email.com" data-i18n-ph="auth.parent_ph" autocomplete="email"></div>
+    <label id="auth-consent-wrap" style="display:none;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--muted);line-height:1.5;margin:2px 0 14px;cursor:pointer"><input type="checkbox" id="auth-consent" style="margin-top:2px;flex-shrink:0"><span data-i18n-html="auth.consent">J'accepte les <a href="/conditions" target="_blank" style="color:var(--accent)">conditions d'utilisation</a> et la <a href="/confidentialite" target="_blank" style="color:var(--accent)">politique de confidentialité</a>.</span></label>
     <div id="auth-forgot-wrap" style="text-align:right;margin-top:-4px;margin-bottom:8px">
-      <a href="mailto:contact@keypace.be?subject=Mot de passe oublié" style="font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:2px">Mot de passe oublié ?</a>
+      <a href="mailto:contact@keypace.be?subject=Mot de passe oublié" style="font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:2px" data-i18n="auth.forgot">Mot de passe oublié ?</a>
     </div>
-    <button class="auth-btn" id="auth-submit" onclick="authSubmit()">Se connecter</button>
+    <button class="auth-btn" id="auth-submit" onclick="authSubmit()" data-i18n="nav.login">Se connecter</button>
     <div style="display:flex;align-items:center;gap:12px;margin:16px 0 12px">
       <div style="flex:1;height:1px;background:var(--border)"></div>
-      <span style="font-size:12px;color:var(--muted)">ou</span>
+      <span style="font-size:12px;color:var(--muted)" data-i18n="auth.or">ou</span>
       <div style="flex:1;height:1px;background:var(--border)"></div>
     </div>
     <button type="button" onclick="ssoLogin('google')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--card);color:var(--txt);border:1.5px solid var(--border);border-radius:11px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:8px">
       <svg width="17" height="17" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-      Continuer avec Google
+      <span data-i18n="auth.google">Continuer avec Google</span>
     </button>
     <button type="button" onclick="ssoLogin('microsoft')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--card);color:var(--txt);border:1.5px solid var(--border);border-radius:11px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
       <svg width="16" height="16" viewBox="0 0 23 23" style="flex-shrink:0"><path fill="#F25022" d="M1 1h10v10H1z"/><path fill="#7FBA00" d="M12 1h10v10H12z"/><path fill="#00A4EF" d="M1 12h10v10H1z"/><path fill="#FFB900" d="M12 12h10v10H12z"/></svg>
-      Continuer avec Microsoft
+      <span data-i18n="auth.microsoft">Continuer avec Microsoft</span>
     </button>
   </div>
 </div>
@@ -3487,7 +3487,7 @@ function switchTab(tab){
   document.getElementById('auth-birth-wrap').style.display=tab==='register'?'block':'none';
   document.getElementById('auth-consent-wrap').style.display=tab==='register'?'flex':'none';
   document.getElementById('auth-parent-wrap').style.display='none';
-  document.getElementById('auth-submit').textContent=tab==='login'?'Se connecter':'Créer mon compte';
+  document.getElementById('auth-submit').textContent=tab==='login'?kpT('nav.login'):kpT('auth.submit_register');
   document.getElementById('auth-forgot-wrap').style.display=tab==='login'?'block':'none';
   document.getElementById('auth-error').classList.remove('show');
   const dh=document.getElementById('auth-domain-hint');if(dh)dh.style.display='none';
@@ -3512,7 +3512,7 @@ async function checkInstitutionDomain(){
     const r=await fetch('/api/institutions?domain='+encodeURIComponent(domain));
     const d=await r.json();
     if(seq!==_domainCheckSeq)return;
-    if(d.matched){hint.textContent='✓ Compte rattaché à '+d.name+' : accès Expert offert';hint.style.display='block';}
+    if(d.matched){hint.textContent=kpT('auth.attached',{name:d.name});hint.style.display='block';}
     else hint.style.display='none';
   }catch{if(seq===_domainCheckSeq)hint.style.display='none';}
 }
@@ -3528,27 +3528,27 @@ async function authSubmit(){
   const username=document.getElementById('auth-username').value.trim().toLowerCase();
   const password=document.getElementById('auth-password').value;
   const confirm=document.getElementById('auth-confirm').value;
-  if(!username)return showAuthError("Entre un nom d'utilisateur.");
-  if(!password)return showAuthError('Entre un mot de passe.');
+  if(!username)return showAuthError(kpT('auth.e_username'));
+  if(!password)return showAuthError(kpT('auth.e_password'));
   const btn=document.getElementById('auth-submit');
-  btn.disabled=true; btn.textContent='Chargement…';
+  btn.disabled=true; btn.textContent=kpT('auth.loading');
   try{
     const passwordHash=await hashPw(password);
     if(currentTab==='register'){
       const email=document.getElementById('auth-email').value.trim().toLowerCase();
-      if(password!==confirm){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Les mots de passe ne correspondent pas.');}
-      if(password.length<6){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Mot de passe trop court (6 caractères min).');}
-      if(!email||!email.includes('@')){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Entre une adresse email valide.');}
+      if(password!==confirm){btn.disabled=false;btn.textContent=kpT('auth.submit_register');return showAuthError(kpT('auth.e_mismatch'));}
+      if(password.length<6){btn.disabled=false;btn.textContent=kpT('auth.submit_register');return showAuthError(kpT('auth.e_short'));}
+      if(!email||!email.includes('@')){btn.disabled=false;btn.textContent=kpT('auth.submit_register');return showAuthError(kpT('auth.e_email'));}
       // RGPD : consentement obligatoire côté client. La règle « email d'un parent
       // si < 13 ans » est appliquée par le SERVEUR : il l'exige pour une inscription
       // individuelle et l'ignore pour un élève d'établissement (base légale de l'école),
       // ce que le client ne peut pas déterminer (il ne connaît pas les domaines scolaires).
-      if(!document.getElementById('auth-consent').checked){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Tu dois accepter les conditions et la politique de confidentialité.');}
+      if(!document.getElementById('auth-consent').checked){btn.disabled=false;btn.textContent=kpT('auth.submit_register');return showAuthError(kpT('auth.e_consent'));}
       const birth=document.getElementById('auth-birth').value||'';
       // Requise pour repérer les mineurs de moins de 13 ans (email d'un parent
       // exigé dans ce cas côté serveur) — auparavant facultative, ce qui
       // permettait de simplement laisser le champ vide pour contourner ce contrôle.
-      if(!birth){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError('Date de naissance requise.');}
+      if(!birth){btn.disabled=false;btn.textContent=kpT('auth.submit_register');return showAuthError(kpT('auth.e_birth'));}
       const parentEmail=(document.getElementById('auth-parent').value||'').trim().toLowerCase();
       // Le rattachement à un établissement se fait automatiquement via le domaine de l'email scolaire (côté serveur).
       const body={username,email,passwordHash,consent:true,birthdate:birth};
@@ -3556,9 +3556,9 @@ async function authSubmit(){
       if(window._profInviteToken)body.profInviteToken=window._profInviteToken;
       const r=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
       const d=await r.json();
-      if(!r.ok){btn.disabled=false;btn.textContent='Créer mon compte';return showAuthError(d.error||'Erreur.');}
+      if(!r.ok){btn.disabled=false;btn.textContent=kpT('auth.submit_register');return showAuthError(d.error||'Erreur.');}
       // Reset form and switch to login with email-pending message
-      btn.disabled=false;btn.textContent='Créer mon compte';
+      btn.disabled=false;btn.textContent=kpT('auth.submit_register');
       document.getElementById('auth-password').value='';
       document.getElementById('auth-confirm').value='';
       const wasProf=!!window._profInviteToken;window._profInviteToken=null;
@@ -3572,15 +3572,15 @@ async function authSubmit(){
     } else {
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,passwordHash})});
       const d=await r.json();
-      if(!r.ok){btn.disabled=false;btn.textContent='Se connecter';return showAuthError(d.error||'Erreur.');}
+      if(!r.ok){btn.disabled=false;btn.textContent=kpT('nav.login');return showAuthError(d.error||'Erreur.');}
       // Compte importé par CSV : mot de passe temporaire connu du prof, on
       // bloque sur un changement obligatoire avant de terminer la connexion.
       // La fenêtre de connexion est fermée d'abord : restée ouverte dessous, Entrée dans les champs du
       // nouveau mot de passe relançait la connexion et empilait une 2e fenêtre vide par-dessus.
-      if(d.mustChangePassword){btn.disabled=false;btn.textContent='Se connecter';closeModal('auth-modal');showForcedPasswordChangeModal(d,passwordHash);return;}
+      if(d.mustChangePassword){btn.disabled=false;btn.textContent=kpT('nav.login');closeModal('auth-modal');showForcedPasswordChangeModal(d,passwordHash);return;}
       completeLogin(d);
     }
-  }catch(e){btn.disabled=false;btn.textContent=currentTab==='login'?'Se connecter':'Créer mon compte';showAuthError('Erreur réseau, réessaie.');}
+  }catch(e){btn.disabled=false;btn.textContent=currentTab==='login'?kpT('nav.login'):kpT('auth.submit_register');showAuthError(kpT('auth.e_network'));}
 }
 
 // Une fenêtre est ouverte : modale classique (.modal-overlay.open) ou fenêtre créée à la volée
@@ -3709,7 +3709,7 @@ function loginUser(username){
   document.getElementById('auth-password').value='';
   document.getElementById('auth-confirm').value='';
   const btn=document.getElementById('auth-submit');
-  btn.disabled=false;btn.textContent=currentTab==='login'?'Se connecter':'Créer mon compte';
+  btn.disabled=false;btn.textContent=currentTab==='login'?kpT('nav.login'):kpT('auth.submit_register');
   updateNavUser();
   // Prof/établissement : atterrir sur son tableau de bord, pas sur la vue Test
   // par défaut (déjà fait pour mobile via MOBILE_BLOCKED_VIEWS, manquant sur desktop).
@@ -4474,6 +4474,8 @@ function kpApplyStatic(){
   try{
     const lang=KPI18n.lang();
     document.querySelectorAll('[data-i18n]').forEach(el=>{const v=kpT(el.getAttribute('data-i18n'));const n=[...el.childNodes].find(x=>x.nodeType===3);if(n){if(n.nodeValue!==v)n.nodeValue=v;}else el.insertBefore(document.createTextNode(v),el.firstChild);});
+    document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.setAttribute('placeholder',kpT(el.getAttribute('data-i18n-ph')));});
+    document.querySelectorAll('[data-i18n-html]').forEach(el=>{const v=kpT(el.getAttribute('data-i18n-html'));if(el.innerHTML!==v)el.innerHTML=v;});
     document.querySelectorAll('[data-lang-hide]').forEach(el=>{el.style.display=el.getAttribute('data-lang-hide')===lang?'none':'';});
   }catch{}
 }

@@ -478,6 +478,10 @@ async function run(opts = {}) {
         await ev("localStorage.clear();true");
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/?ui=en` }); await sleep(2500); exceptions.splice(0);
         const en = await ev(readTest);
+        const readAuth = `(async()=>{openAuth('register');await new Promise(r=>setTimeout(r,300));const m=document.getElementById('auth-modal');const t=m.innerText+' | '+[...m.querySelectorAll('input')].map(i=>i.placeholder).join(' / ');closeModal('auth-modal');return t})()`;
+        const enAuth = await ev(readAuth);
+        for (const w of ['Log in', 'Create an account', 'Username', 'Email address', 'Password', 'Confirm password', 'Date of birth', 'terms of use', 'Continue with Google', 'Continue with Microsoft', 'e.g. jean42']) if (!enAuth.includes(w)) problems.push(`BR13 : « ${w} » absent de la fenêtre de connexion en anglais`);
+        const fa = ['Connexion', "Nom d'utilisateur", 'Mot de passe', 'Adresse email', 'Date de naissance', "conditions d'utilisation", 'Continuer avec', 'ex: jean42'].filter((w) => enAuth.includes(w)); if (fa.length) problems.push(`BR13 : du français dans la fenêtre de connexion en anglais : ${fa.join(', ')}`);
         const frLeft = ['Tape la phrase', 'ta vitesse', 'Recommencer', 'Autre texte', 'PRÉCISION', 'VITESSE', 'PROGRESSION', 'Commence à taper', 'Règle l', 'Espaces visibles', 'Lecture facile', 'caractères', 'mots / min', 'te défie', 'Son score', 'Après le test', 'Créer mon compte'].filter((w) => en.text.toLowerCase().includes(w.toLowerCase()));
         if (en.lang !== 'en' || en.ui !== 'en') problems.push(`BR13 : langue de l'interface non prise en compte (${en.lang}/${en.ui})`);
         for (const w of ['Type the sentence', 'your speed.', 'ACCURACY', 'SPEED', 'PROGRESS', 'words / min', 'Show spaces:', 'Restart', 'Another text', 'Ana is challenging you!', 'Their score:', 'After the test', 'Create my free account']) if (!en.text.toLowerCase().includes(w.toLowerCase()) && !en.btns.some((b) => b.toLowerCase().includes(w.toLowerCase()))) problems.push(`BR13 : « ${w} » absent de l'écran Test en anglais`);
@@ -488,6 +492,8 @@ async function run(opts = {}) {
         if (keep.lang !== 'en' || !keep.text.includes('Type the sentence')) problems.push('BR13 : la langue de l\'interface n\'est pas retenue au rechargement');
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/?ui=fr` }); await sleep(2500); exceptions.splice(0);
         const fr = await ev(readTest);
+        const frAuth = await ev(readAuth);
+        if (!frAuth.includes('Mot de passe') || !frAuth.includes('Continuer avec Google') || !frAuth.includes('ex: jean42')) problems.push('BR13 : ?ui=fr ne ramène pas la fenêtre de connexion en français');
         if (fr.lang !== 'fr' || !fr.text.includes('Tape la phrase') || !fr.text.includes('Ana te défie') || !fr.text.toLowerCase().includes('après le test') || !fr.btns.includes('Recommencer') || /Type the sentence|ACCURACY/.test(fr.text)) problems.push('BR13 : ?ui=fr ne ramène pas le français');
         exceptions.splice(0).forEach((e) => problems.push(`BR13 : exception : ${e}`));
         info.interfaceEn = 'ok';
