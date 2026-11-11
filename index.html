@@ -4027,6 +4027,7 @@ window.addEventListener('resize',()=>{
 /* ── Pays et langue (espace drapeau, en haut à droite) ──
    Aujourd'hui : la Belgique, en français. Le registre est fait pour plusieurs pays, chacun avec ses langues : ajouter une entrée
    à KP_REGIONS suffit à la faire apparaître. Le choix est gardé sur cet appareil (kp_region, kp_lang), rien n'est envoyé au serveur. */
+const kpT=(k,p)=>KPI18n.t(k,p),kpTn=(k,n,p)=>KPI18n.tn(k,n,p); const kpLocale=()=>KPI18n.lang()==='en'?'en-GB':'fr-FR'; /* textes de l'interface (i18n.js) : français par défaut, anglais en bêta avec ?ui=en */
 const KP_REGIONS=[
   {id:'be',name:'Belgique',langs:[{id:'fr',name:'Français'}],
    flag:'<svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg" focusable="false"><rect width="1" height="2" fill="#000"/><rect x="1" width="1" height="2" fill="#FAE042"/><rect x="2" width="1" height="2" fill="#ED2939"/></svg>'},
@@ -4047,19 +4048,34 @@ function kpSetRegion(id,lang){
   try{window.dispatchEvent(new CustomEvent('kp:region',{detail:{region:r.id,lang:l}}));}catch{}
   return true;
 }
+const KP_REGION_NAME={be:()=>kpT('region.be'),fr:()=>kpT('region.fr')};
+const kpRegionName=r=>(KP_REGION_NAME[r.id]?KP_REGION_NAME[r.id]():r.name);
+/* Langues du site : celles du pays, plus l'anglais quand le compte a droit au cours d'anglais (ou sur une adresse /en). Choisir une langue change tout le site, cours compris. */
+function kpSiteLangs(){const r=kpRegionObj(),l=r.langs.slice();let off=[];try{off=kpLanguagesOffered();}catch{} /* appelée au chargement, avant que les cours soient déclarés */if(off.includes('en')||KPI18n.lang()==='en'){let n='English';try{n=KP_LANG_NAMES.en;}catch{}l.push({id:'en',name:n});}return l;}
+async function kpSetSiteLanguage(lang){
+  try{localStorage.setItem('kp_ui',lang);}catch{}
+  // Une adresse /en impose l'anglais : choisir une autre langue ramène à l'adresse française de la même page
+  if(kpInEnPath()&&lang!=='en'){const want=VIEW_PATHS[app.view];if(want){try{history.replaceState(null,'',want);}catch{}}}
+  // le cours suit la langue du site quand il existe dans cette langue (sinon on garde le cours actuel)
+  if(KP_COURSES_OFFERED.some(c=>KP_COURSES[c].content===lang)&&kpContentLang()!==lang)await kpChooseLanguage(lang);
+  kpSyncUiLang();kpKbChipRender();
+  try{if(typeof app!=='undefined'&&app.renderView)app.renderView(app.view||'home');}catch{}
+  try{if(document.getElementById('settings-overlay')){app.closeSettings();app.openSettings();}}catch{}
+}
 function kpRegionRender(){
   const btn=document.getElementById('nav-region-btn'),fl=document.getElementById('nav-region-flag'),menu=document.getElementById('nav-region-menu');
   if(!btn||!fl||!menu)return;
-  const r=kpRegionObj(),lang=kpLangId(),ln=(r.langs.find(l=>l.id===lang)||r.langs[0]).name;
+  const r=kpRegionObj(),lang=KPI18n.lang(),langs=kpSiteLangs(),ln=(langs.find(l=>l.id===lang)||langs[0]).name;
   fl.innerHTML=r.flag;
-  btn.setAttribute('aria-label','Pays et langue : '+r.name+', '+ln);
-  btn.title='Pays et langue : '+r.name+', '+ln;
+  const full=kpT('region.title',{country:kpRegionName(r),lang:ln});
+  btn.setAttribute('aria-label',full);
+  btn.title=full;menu.setAttribute('aria-label',kpT('region.aria'));
   const item=(on,inner,onclick)=>'<button type="button" role="menuitemradio" aria-checked="'+(on?'true':'false')+'" class="nav-region-item" onclick="'+onclick+'">'+inner+'<span class="nav-region-tick" aria-hidden="true">✓</span></button>';
-  menu.innerHTML='<div class="nav-region-title">Pays</div>'
-    +KP_REGIONS.map(x=>item(x.id===r.id,'<span class="nav-region-flag" aria-hidden="true">'+x.flag+'</span><span>'+x.name+'</span>',"kpPickRegion('"+x.id+"')")).join('')
-    +'<div class="nav-region-title">Langue</div>'
-    +r.langs.map(l=>item(l.id===lang,'<span>'+l.name+'</span>',"kpSetRegion('"+r.id+"','"+l.id+"');kpCloseRegion(false)")).join('')
-    +'<div class="nav-region-note">D\'autres pays et langues arrivent bientôt.</div>';
+  menu.innerHTML='<div class="nav-region-title">'+kpT('region.country')+'</div>'
+    +KP_REGIONS.map(x=>item(x.id===r.id,'<span class="nav-region-flag" aria-hidden="true">'+x.flag+'</span><span>'+kpRegionName(x)+'</span>',"kpPickRegion('"+x.id+"')")).join('')
+    +'<div class="nav-region-title">'+kpT('region.language')+'</div>'
+    +langs.map(l=>item(l.id===lang,'<span>'+l.name+'</span>',(r.langs.some(x=>x.id===l.id)?"kpSetRegion('"+r.id+"','"+l.id+"');":'')+"kpSetSiteLanguage('"+l.id+"');kpCloseRegion(false)")).join('')
+    +'<div class="nav-region-note">'+kpT('region.note')+'</div>';
 }
 /* Choisir un pays ouvre SON adresse (la France a la sienne, /fr, pour le référencement) : la page en cours si elle existe pour ce pays, sinon l'accueil. */
 function kpRegionTarget(id,v){return id==='fr'?(FR_VIEW_PATHS[v]||'/fr'):(v==='home'?'/':VIEW_PATHS[v]||'/');}
@@ -4501,7 +4517,6 @@ function kpRedrawKeyboard(){
 /* Famille de clavier choisie par l'élève = cours. Chaque famille retient sa dernière variante (kp_kb_layout_azerty / _qwerty). */
 /* Langue du cours : s'ajoute à la famille de clavier. Un cours = langue + famille (fr/azerty, fr/qwerty, en/azerty, en/qwerty). */
 const KP_LANG_NAMES={fr:'Français',en:'English'};
-const kpT=(k,p)=>KPI18n.t(k,p),kpTn=(k,n,p)=>KPI18n.tn(k,n,p); const kpLocale=()=>KPI18n.lang()==='en'?'en-GB':'fr-FR'; /* textes de l'interface (i18n.js) : français par défaut, anglais en bêta avec ?ui=en */
 function kpContentLang(){return KP_COURSES[kpCourseId()].content;}
 KPI18n.setCourseLangGetter(()=>kpContentLang()); /* l'interface suit la langue du cours actif (sauf ?ui= explicite) */
 /* Textes fixes de la page (menu du haut) : les éléments portent l'attribut data-i18n (valeur : la clé) ; le texte français écrit dans le HTML est le repli. Le texte est le premier noeud texte de l'élément (le soulignement des liens reste intact). */
@@ -4515,7 +4530,7 @@ function kpApplyStatic(){
     document.querySelectorAll('[data-lang-hide]').forEach(el=>{el.style.display=el.getAttribute('data-lang-hide')===lang?'none':'';});
   }catch{}
 }
-function kpSyncUiLang(){try{document.documentElement.lang=KPI18n.lang();}catch{}kpApplyStatic();}
+function kpSyncUiLang(){try{document.documentElement.lang=KPI18n.lang();}catch{}kpApplyStatic();try{if(typeof kpRegionRender==='function')kpRegionRender();}catch{}}
 kpSyncUiLang();
 function kpLanguagesOffered(){return [...new Set(KP_COURSES_OFFERED.map(c=>KP_COURSES[c].content))];}
 function kpFamilyCourse(fam){const id=kpContentLang()+'/'+fam;return KP_COURSES[id]?id:'fr/'+fam;}
@@ -5106,7 +5121,6 @@ function kbFamilyCardsHTML(){
   const card=(f,name,rows,sub)=>`<button type="button" role="radio" aria-checked="${cur===f}" class="kb-family-card${cur===f?' active':''}" onclick="app.askKbFamily('${f}')"><span class="kb-family-keys" aria-hidden="true">${rows.split('').map(c=>'<i>'+c+'</i>').join('')}</span><strong>${name}</strong><span>${sub}</span></button>`;
   return`<div class="kb-family-cards" role="radiogroup" aria-label="${kpT('chip.family')}">${card('azerty','AZERTY','AZERTY',kpT('chip.az_sub'))}${card('qwerty','QWERTY','QWERTY',kpT('chip.qw_sub'))}</div>`;
 }
-/* Langue du cours : deux boutons quand le compte a droit à plus d'une langue ; sinon rien (comportement actuel). */
 /* Texte d'un test de frappe : un passage français au hasard ; dans un cours en anglais, des mots du vocabulaire du cours (le test mesure la vitesse sur l'anglais,
    pas sur du français). */
 function kpTestPassage(){
@@ -5116,14 +5130,9 @@ function kpTestPassage(){
   }
   return PASSAGES[Math.floor(Math.random()*PASSAGES.length)];
 }
-function kpLangRowHTML(){
-  const langs=kpLanguagesOffered();if(langs.length<2)return'';
-  const cur=kpContentLang();
-  return'<div class="nav-region-title">'+kpT('chip.course_language')+'</div><div class="kbc-langs kbc-variants-like" role="radiogroup" aria-label="'+kpT('chip.course_language')+'">'+langs.map(l=>'<button type="button" role="radio" aria-checked="'+(cur===l)+'" class="settings-btn kbc-lang-btn'+(cur===l?' active':'')+'" data-lang="'+l+'" onclick="kpChooseLanguage(\''+l+'\')">'+(KP_LANG_NAMES[l]||l)+'</button>').join('')+'</div>';
-}
 function kbFamilyBoxHTML(){
   const cards=kbFamilyCardsHTML();if(!cards)return'';
-  return`<div class="settings-row-info"><strong>${kpT('chip.my_keyboard')}</strong><span>${kpT('chip.family_help')}</span></div>${cards}${kpLangRowHTML()}`;
+  return`<div class="settings-row-info"><strong>${kpT('chip.my_keyboard')}</strong><span>${kpT('chip.family_help')}</span></div>${cards}`;
 }
 /* Pastille « clavier » de l'en-tête : le clavier actuel, cliquable pour en changer sans passer par les réglages (visiteur ou connecté). */
 const KB_AZ_SHORT={fr:'Français',be:'Belge',mac:'Mac',nf:'NF'};
@@ -5139,7 +5148,7 @@ function kpKbChipRender(){
   const full=(kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY')+', '+(kpKbLabel(getKbLayoutId())||'');
   b.setAttribute('aria-label',kpT('chip.my_keyboard')+' : '+full);b.title=kpT('chip.title',{full});
   const acc=getAccentMode();
-  m.innerHTML=kbFamilyCardsHTML()+kpLangRowHTML()
+  m.innerHTML=kbFamilyCardsHTML()
     +'<div class="nav-region-title">'+kpT('chip.layout',{fam:kpCurrentFamily()==='qwerty'?'QWERTY':'AZERTY'})+'</div><div class="kbc-variants">'+kbLayoutBtnsHTML()+'</div>'
     +'<div class="nav-region-title">'+kpT('chip.accents')+'</div><div class="kbc-variants"><button type="button" class="settings-btn'+(acc==='exact'?' active':'')+'" onclick="app.setAccents(\'exact\')">'+kpT('chip.exact')+'</button><button type="button" class="settings-btn'+(acc==='tolerant'?' active':'')+'" onclick="app.setAccents(\'tolerant\')">'+kpT('chip.tolerant')+'</button></div>'
     +'<div class="nav-region-note">'+kpT('chip.note')+'</div>'
