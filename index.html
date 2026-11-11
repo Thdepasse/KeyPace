@@ -15356,13 +15356,13 @@ const app={
     if(fam===kpCurrentFamily())return;
     const old=document.getElementById('kb-switch-confirm');if(old)old.remove();
     const to=fam==='qwerty'?'QWERTY':'AZERTY',from=fam==='qwerty'?'AZERTY':'QWERTY';
-    const o=document.createElement('div');o.id='kb-switch-confirm';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Changer de clavier');
+    const o=document.createElement('div');o.id='kb-switch-confirm';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label',kpT('setm.switch_aria'));
     o.style.cssText='position:fixed;inset:0;background:rgba(22,20,15,.45);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px';
-    o.innerHTML='<div style="background:var(--card);border-radius:16px;padding:22px;max-width:420px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25)"><h3 style="margin:0 0 8px;font-size:18px">Passer au clavier '+to+' ?</h3><p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:var(--muted)">Ta progression '+from+' est gardée. '+(fam==='qwerty'?'Tu reprends le cours QWERTY depuis le début (ou là où tu l\'avais laissé), ':'Tu retrouves ta progression AZERTY, ')+'et tu pourras changer de nouveau quand tu veux.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" id="kb-sw-yes" class="btn-primary" style="padding:10px 16px">Passer au '+to+'</button><button type="button" id="kb-sw-no" class="settings-btn">Rester en '+from+'</button></div></div>';
+    o.innerHTML='<div style="background:var(--card);border-radius:16px;padding:22px;max-width:420px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25)"><h3 style="margin:0 0 8px;font-size:18px">'+kpT('setm.switch_title',{to})+'</h3><p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:var(--muted)">'+kpT('setm.switch_body',{from,resume:fam==='qwerty'?kpT('setm.resume_qwerty'):kpT('setm.resume_azerty')})+'</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" id="kb-sw-yes" class="btn-primary" style="padding:10px 16px">'+kpT('setm.switch_yes',{to})+'</button><button type="button" id="kb-sw-no" class="settings-btn">'+kpT('setm.switch_no',{from})+'</button></div></div>';
     document.body.appendChild(o);
     const close=()=>o.remove();
     o.querySelector('#kb-sw-no').onclick=close;
-    o.querySelector('#kb-sw-yes').onclick=async()=>{close();const ok=await kpChooseFamily(fam);if(!ok)kbNotice('Le cours n\'a pas pu être chargé. Réessaie dans un instant.');this._refreshKbSettings();};
+    o.querySelector('#kb-sw-yes').onclick=async()=>{close();const ok=await kpChooseFamily(fam);if(!ok)kbNotice(kpT('setm.load_fail'));this._refreshKbSettings();};
     o.addEventListener('click',e=>{if(e.target===o)close();});
     o.querySelector('#kb-sw-yes').focus();
   },
@@ -15399,29 +15399,29 @@ const app={
   },
   async openBillingPortal(btn){
     if(!currentToken)return;
-    const old=btn.textContent;btn.disabled=true;btn.textContent='Ouverture…';
+    const old=btn.textContent;btn.disabled=true;btn.textContent=kpT('setm.opening');
     _syncTokenFromStorage();
     try{
       const {status,d}=await _billingCall({action:'portal'});
-      if(status===401){btn.disabled=false;btn.textContent=old;_reloginForBilling('Ta session a expiré. Reconnecte-toi pour gérer ton abonnement.');return;}
-      if(!d.url)throw new Error(d.error||'Erreur');
+      if(status===401){btn.disabled=false;btn.textContent=old;_reloginForBilling(kpT('setm.session_expired'));return;}
+      if(!d.url)throw new Error(d.error||kpT('setm.error'));
       location.href=d.url;
-    }catch(e){btn.disabled=false;btn.textContent=old;alert(e.message||'Impossible d\'ouvrir le portail de facturation.');}
+    }catch(e){btn.disabled=false;btn.textContent=old;alert(e.message||kpT('setm.portal_fail'));}
   },
   async exportMyData(btn){
     if(!currentToken)return;
-    const old=btn.textContent;btn.disabled=true;btn.textContent='Export…';
+    const old=btn.textContent;btn.disabled=true;btn.textContent=kpT('setm.exporting');
     try{
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'export-me',token:currentToken})});
       const d=await r.json();
-      if(!r.ok)throw new Error(d.error||'Erreur');
+      if(!r.ok)throw new Error(d.error||kpT('setm.error'));
       const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');a.href=url;a.download='keypace-mes-donnees.json';
       document.body.appendChild(a);a.click();a.remove();
       setTimeout(()=>URL.revokeObjectURL(url),1000);
-      btn.textContent='Téléchargé ✓';setTimeout(()=>{btn.disabled=false;btn.textContent=old;},2000);
-    }catch(e){btn.disabled=false;btn.textContent=old;alert(e.message||'Erreur lors de l\'export.');}
+      btn.textContent=kpT('setm.downloaded');setTimeout(()=>{btn.disabled=false;btn.textContent=old;},2000);
+    }catch(e){btn.disabled=false;btn.textContent=old;alert(e.message||kpT('setm.export_fail'));}
   },
   deleteMyAccount(){
     const overlay=document.createElement('div');
@@ -15429,16 +15429,16 @@ const app={
     overlay.innerHTML=`<div class="settings-modal" style="max-width:420px">
       <div class="settings-modal-head">
         <div class="settings-modal-avatar" style="background:#E5484D">⚠</div>
-        <div class="settings-modal-head-info"><strong>Supprimer mon compte</strong><span style="color:var(--muted);font-size:12px">Cette action est définitive</span></div>
+        <div class="settings-modal-head-info"><strong>${kpT('set.delete')}</strong><span style="color:var(--muted);font-size:12px">${kpT('setm.del_final')}</span></div>
       </div>
       <div class="settings-section">
-        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin:0 0 14px">Toutes tes données seront effacées : progression, statistiques${isTeacher()?', et tes classes':''}. Cette action est <strong style="color:var(--txt)">irréversible</strong>. Saisis ton mot de passe pour confirmer.</p>
-        <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">MOT DE PASSE</label>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin:0 0 14px">${isTeacher()?kpT('setm.del_text_teacher'):kpT('setm.del_text')}</p>
+        <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px">${kpT('setm.pw_caps')}</label>
         <input type="password" id="del-acct-pw" placeholder="••••••••" autocomplete="current-password" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
         <div id="del-acct-msg" style="display:none;font-size:13px;margin-top:10px;padding:10px 12px;border-radius:10px"></div>
         <div style="display:flex;gap:10px;margin-top:14px">
-          <button onclick="document.getElementById('delete-acct-overlay').remove()" style="flex:1;background:none;border:1px solid var(--border);border-radius:11px;padding:11px;font:inherit;font-size:14px;cursor:pointer">Annuler</button>
-          <button id="del-acct-confirm" onclick="app._confirmDeleteAccount()" style="flex:1;background:#E5484D;color:#fff;border:none;border-radius:11px;padding:11px;font:inherit;font-size:14px;font-weight:700;cursor:pointer">Supprimer définitivement</button>
+          <button onclick="document.getElementById('delete-acct-overlay').remove()" style="flex:1;background:none;border:1px solid var(--border);border-radius:11px;padding:11px;font:inherit;font-size:14px;cursor:pointer">${kpT('setm.cancel')}</button>
+          <button id="del-acct-confirm" onclick="app._confirmDeleteAccount()" style="flex:1;background:#E5484D;color:#fff;border:none;border-radius:11px;padding:11px;font:inherit;font-size:14px;font-weight:700;cursor:pointer">${kpT('setm.del_confirm')}</button>
         </div>
       </div>
     </div>`;
@@ -15450,37 +15450,37 @@ const app={
     const msg=document.getElementById('del-acct-msg');
     const btn=document.getElementById('del-acct-confirm');
     const showErr=(t)=>{msg.style.display='block';msg.style.background='rgba(229,72,77,0.1)';msg.style.color='#E5484D';msg.textContent=t;};
-    if(!pw)return showErr('Saisis ton mot de passe.');
-    btn.disabled=true;btn.textContent='Suppression…';
+    if(!pw)return showErr(kpT('setm.enter_pw'));
+    btn.disabled=true;btn.textContent=kpT('setm.deleting');
     try{
       const passwordHash=await hashPw(pw);
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete-me',token:currentToken,passwordHash})});
       const d=await r.json();
-      if(!r.ok)throw new Error(d.error||'Erreur');
+      if(!r.ok)throw new Error(d.error||kpT('setm.error'));
       document.getElementById('delete-acct-overlay')?.remove();
       this.closeSettings();
       this.admin=null;
       logout();
-      alert('Ton compte et tes données ont été supprimés. À bientôt.');
-    }catch(e){btn.disabled=false;btn.textContent='Supprimer définitivement';showErr(e.message||'Erreur.');}
+      alert(kpT('setm.deleted'));
+    }catch(e){btn.disabled=false;btn.textContent=kpT('setm.del_confirm');showErr(e.message||kpT('setm.error'));}
   },
   async requestPasswordReset(btn){
     if(!currentToken)return;
-    btn.disabled=true;btn.textContent='Envoi…';
+    btn.disabled=true;btn.textContent=kpT('setm.sending');
     const msg=document.getElementById('reset-pw-msg');
     try{
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'reset-request',token:currentToken})});
       const d=await r.json();
-      if(!r.ok)throw new Error(d.error||'Erreur');
+      if(!r.ok)throw new Error(d.error||kpT('setm.error'));
       msg.style.display='block';
       msg.style.background='rgba(31,169,113,0.1)';msg.style.color='#1FA971';
-      msg.textContent='Email envoyé ! Vérifie ta boîte mail pour choisir un nouveau mot de passe.';
-      btn.textContent='Email envoyé';
+      msg.textContent=kpT('setm.reset_sent');
+      btn.textContent=kpT('setm.email_sent');
     }catch(e){
       msg.style.display='block';
       msg.style.background='rgba(229,72,77,0.1)';msg.style.color='#E5484D';
       msg.textContent=e.message;
-      btn.disabled=false;btn.textContent='Réinitialiser';
+      btn.disabled=false;btn.textContent=kpT('set.reset');
     }
   },
   async updateUsername(){
@@ -15489,16 +15489,16 @@ const app={
     const msg=document.getElementById('settings-username-msg');
     const showMsg=(text,ok)=>{msg.style.display='block';msg.style.background=ok?'rgba(31,169,113,0.1)':'rgba(229,72,77,0.1)';msg.style.color=ok?'var(--success)':'var(--danger)';msg.textContent=text;};
     const val=(input.value||'').trim();
-    if(!val)return showMsg("Nom d'utilisateur requis.",false);
-    const old=btn.textContent;btn.disabled=true;btn.textContent='Enregistrement…';
+    if(!val)return showMsg(kpT('setm.username_required'),false);
+    const old=btn.textContent;btn.disabled=true;btn.textContent=kpT('setm.saving');
     try{
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update-username',token:currentToken,username:val})});
       const d=await r.json();
-      if(!r.ok)throw new Error(d.error||'Erreur.');
+      if(!r.ok)throw new Error(d.error||kpT('setm.error'));
       currentUser=d.username;input.value=d.username;
       const s=kpReadSession();s.username=d.username;localStorage.setItem('klak_session',JSON.stringify(s));
       updateNavUser();
-      showMsg("Nom d'utilisateur mis à jour !",true);
+      showMsg(kpT('setm.username_updated'),true);
     }catch(e){showMsg(e.message,false);}
     finally{btn.disabled=false;btn.textContent=old;}
   },
@@ -15508,14 +15508,14 @@ const app={
     const msg=document.getElementById('settings-displayname-msg');
     const showMsg=(text,ok)=>{msg.style.display='block';msg.style.background=ok?'rgba(31,169,113,0.1)':'rgba(229,72,77,0.1)';msg.style.color=ok?'var(--success)':'var(--danger)';msg.textContent=text;};
     const val=(input.value||'').trim();
-    const old=btn.textContent;btn.disabled=true;btn.textContent='Enregistrement…';
+    const old=btn.textContent;btn.disabled=true;btn.textContent=kpT('setm.saving');
     try{
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update-display-name',token:currentToken,displayName:val})});
       const d=await r.json();
-      if(!r.ok)throw new Error(d.error||'Erreur.');
+      if(!r.ok)throw new Error(d.error||kpT('setm.error'));
       currentDisplayName=d.displayName||null;
       const s=kpReadSession();s.displayName=currentDisplayName;localStorage.setItem('klak_session',JSON.stringify(s));
-      showMsg(currentDisplayName?'Nom affiché mis à jour !':"Nom affiché réinitialisé : ton nom d'utilisateur sera utilisé.",true);
+      showMsg(currentDisplayName?kpT('setm.display_updated'):kpT('setm.display_reset'),true);
     }catch(e){showMsg(e.message,false);}
     finally{btn.disabled=false;btn.textContent=old;}
   },
@@ -15527,15 +15527,15 @@ const app={
     const showMsg=(text,ok)=>{msg.style.display='block';msg.style.background=ok?'rgba(31,169,113,0.1)':'rgba(229,72,77,0.1)';msg.style.color=ok?'var(--success)':'var(--danger)';msg.textContent=text;};
     const newEmail=(emailInput.value||'').trim();
     const pw=pwInput.value||'';
-    if(!newEmail)return showMsg('Nouvelle adresse requise.',false);
-    if(!pw)return showMsg('Mot de passe requis.',false);
-    const old=btn.textContent;btn.disabled=true;btn.textContent='Envoi…';
+    if(!newEmail)return showMsg(kpT('setm.new_address_required'),false);
+    if(!pw)return showMsg(kpT('setm.password_required'),false);
+    const old=btn.textContent;btn.disabled=true;btn.textContent=kpT('setm.sending');
     try{
       const currentPasswordHash=await hashPw(pw);
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'update-email-request',token:currentToken,newEmail,currentPasswordHash})});
       const d=await r.json();
-      if(!r.ok)throw new Error(d.error||'Erreur.');
-      showMsg('Email de confirmation envoyé à '+newEmail+' ! Clique sur le lien reçu pour valider le changement.',true);
+      if(!r.ok)throw new Error(d.error||kpT('setm.error'));
+      showMsg(kpT('setm.email_confirm_sent',{email:newEmail}),true);
       emailInput.value='';pwInput.value='';
     }catch(e){showMsg(e.message,false);}
     finally{btn.disabled=false;btn.textContent=old;}
@@ -15547,14 +15547,14 @@ const app={
     const msg=document.getElementById('settings-pw-msg');
     const showMsg=(text,ok)=>{msg.style.display='block';msg.style.background=ok?'rgba(31,169,113,0.1)':'rgba(229,72,77,0.1)';msg.style.color=ok?'var(--success)':'var(--danger)';msg.textContent=text;};
     const oldPw=oldInput.value||'',newPw=newInput.value||'';
-    if(!oldPw||!newPw)return showMsg('Renseigne les deux champs.',false);
-    if(newPw.length<6)return showMsg('Le nouveau mot de passe doit faire au moins 6 caractères.',false);
-    const old=btn.textContent;btn.disabled=true;btn.textContent='Enregistrement…';
+    if(!oldPw||!newPw)return showMsg(kpT('setm.both_fields'),false);
+    if(newPw.length<6)return showMsg(kpT('setm.new_pw_short'),false);
+    const old=btn.textContent;btn.disabled=true;btn.textContent=kpT('setm.saving');
     try{
       const [oldPasswordHash,newPasswordHash]=await Promise.all([hashPw(oldPw),hashPw(newPw)]);
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'change-password',token:currentToken,oldPasswordHash,newPasswordHash})});
       const d=await r.json();
-      if(!r.ok)throw new Error(d.error||'Erreur.');
+      if(!r.ok)throw new Error(d.error||kpT('setm.error'));
       // Le serveur régénère le jeton de session au changement de mot de passe
       // (ancienne session potentiellement compromise invalidée) — on le
       // reprend pour ne pas se retrouver déconnecté à la prochaine action.
@@ -15562,7 +15562,7 @@ const app={
         currentToken=d.token;
         const s=kpReadSession();s.token=d.token;localStorage.setItem('klak_session',JSON.stringify(s));
       }
-      showMsg('Mot de passe mis à jour !',true);
+      showMsg(kpT('setm.pw_updated'),true);
       oldInput.value='';newInput.value='';
     }catch(e){showMsg(e.message,false);}
     finally{btn.disabled=false;btn.textContent=old;}

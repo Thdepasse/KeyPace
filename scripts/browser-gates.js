@@ -428,6 +428,8 @@ async function run(opts = {}) {
           go('stats');await new Promise(r=>setTimeout(r,500));out.enStats=document.getElementById('page-stats').innerText;
           await app.openSettings();await new Promise(r=>setTimeout(r,600));{const o=document.getElementById('settings-overlay');out.enSettings=o?o.innerText:'(pas de fenêtre)';app.closeSettings();}
           go('home');await new Promise(r=>setTimeout(r,500));out.enHome=document.getElementById('page-home').innerText;
+          app.askKbFamily('qwerty');out.enSwitch=(document.getElementById('kb-switch-confirm')||{innerText:'(pas de fenêtre)'}).innerText;{const o=document.getElementById('kb-switch-confirm');if(o)o.remove();}
+          app.deleteMyAccount();out.enDelete=(document.getElementById('delete-acct-overlay')||{innerText:'(pas de fenêtre)'}).innerText;{const o=document.getElementById('delete-acct-overlay');if(o)o.remove();}
           out.enGameScreens={};
           for(const g of ['frappe','sprint','course','ghost','simon']){app.activeGame=g;app.game=null;app.sprint=null;app.course=null;app.ghost=null;app.simon=null;app.renderGames();await new Promise(r=>setTimeout(r,200));out.enGameScreens[g]=document.getElementById('page-games').innerText;}
           app.activeGame=null;
@@ -470,6 +472,10 @@ async function run(opts = {}) {
         const st = ['Traqueur du regard', 'Sons de jeu', 'Format du clavier', 'Profil', 'Confidentialité', 'Exporter mes données', 'Supprimer mon compte', 'Enregistrer', 'Mot de passe', 'Adresse actuelle'].filter((w) => new RegExp('(^|[^a-zà-ÿ])' + w.toLowerCase() + '([^a-zà-ÿ]|$)').test(lg.enSettings.toLowerCase())); if (st.length) problems.push(`BR12 : du français dans les Réglages en anglais : ${st.join(', ')}`);
         for (const w of ['Learn to type', 'Welcome back', 'Back to my lessons']) if (!lg.enHome.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent de l'accueil en anglais`);
         const hm = ['Apprends à taper', 'Te revoilà', 'Questions fréquentes', 'MANOLO', 'Ce qu', 'Simple et transparent', 'Établissements', 'Reprendre'].filter((w) => lg.enHome.toLowerCase().includes(w.toLowerCase())); if (hm.length) problems.push(`BR12 : du français sur l'accueil en anglais : ${hm.join(', ')}`);
+        for (const w of ['Switch to the QWERTY keyboard?', 'Stay on AZERTY', 'Your AZERTY progress is kept']) if (!lg.enSwitch.includes(w)) problems.push(`BR12 : « ${w} » absent de la fenêtre de changement de clavier en anglais`);
+        for (const w of ['Passer au clavier', 'Rester en', 'progression']) if (lg.enSwitch.includes(w)) problems.push(`BR12 : du français dans la fenêtre de changement de clavier : ${w}`);
+        for (const w of ['Delete my account', 'PASSWORD', 'Delete permanently', 'Cancel', 'cannot be undone']) if (!lg.enDelete.includes(w)) problems.push(`BR12 : « ${w} » absent de la fenêtre de suppression du compte en anglais`);
+        for (const w of ['Supprimer', 'MOT DE PASSE', 'Annuler', 'irréversible']) if (lg.enDelete.includes(w)) problems.push(`BR12 : du français dans la fenêtre de suppression du compte : ${w}`);
         if (lg.frUi.t !== 'Vitesse' || lg.frUi.lang !== 'fr') problems.push(`BR12 : retour au français, l'interface reste en anglais (${JSON.stringify(lg.frUi)})`);
         if (lg.rowEn.join('|') !== 'Français|English*') problems.push(`BR12 : langue active après le passage (${lg.rowEn.join('|')})`);
         if (!lg.okQ || lg.q.course !== 'en/qwerty' || lg.q.lessons !== 58) problems.push(`BR12 : en anglais, passer à QWERTY garde la langue (${JSON.stringify(lg.q)})`);
