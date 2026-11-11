@@ -28,7 +28,7 @@ test('le registre déclare le cours QWERTY en ligne', () => {
 });
 
 test('tout compte connecté a accès au cours QWERTY, quel que soit son rôle ; sans compte, rien', () => {
-  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.deepEqual(courseIdsFor({ username: 'quelquun', role }), ['fr/qwerty'], role);
+  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.deepEqual(courseIdsFor({ username: 'quelquun', role }), ['fr/qwerty', 'en/azerty', 'en/qwerty'], role);
   assert.deepEqual(courseIdsFor(null), []);
   assert.deepEqual(courseIdsFor(undefined), []);
 });
@@ -36,7 +36,7 @@ test('tout compte connecté a accès au cours QWERTY, quel que soit son rôle ; 
 test('requête access : un compte ordinaire reçoit le cours QWERTY', async () => {
   USER = { id: 9, role: 'eleve', username: 'eleve-ordinaire' };
   const r = await call({ token: 't', access: true });
-  assert.deepEqual(r.body, { ok: true, coursAcces: ['fr/qwerty'] });
+  assert.deepEqual(r.body, { ok: true, coursAcces: ['fr/qwerty', 'en/azerty', 'en/qwerty'] });
 });
 
 test('un compte ordinaire enregistre la progression du cours QWERTY, sans écraser la progression AZERTY', async () => {
@@ -52,9 +52,9 @@ test('un cours qui n\'est pas au registre reste refusé', async () => {
   assert.equal(PROGRESS.courses && PROGRESS.courses['nl/azerty'], undefined);
 });
 
-test('les cours d\'anglais restent en bêta : un testeur les reçoit, un compte ordinaire non', () => {
-  assert.deepEqual(COURSE_ACCESS['en/qwerty'], { status: 'bêta' });
-  assert.deepEqual(COURSE_ACCESS['en/azerty'], { status: 'bêta' });
-  assert.deepEqual(courseIdsFor({ username: 'testeur1', role: 'eleve' }), ['fr/qwerty', 'en/azerty', 'en/qwerty']);
-  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.deepEqual(courseIdsFor({ username: 'autre', role }), ['fr/qwerty'], role);
+test('les cours d\'anglais sont en ligne : tout compte connecté les reçoit, sans compte rien', () => {
+  assert.deepEqual(COURSE_ACCESS['en/qwerty'], { status: 'en ligne' });
+  assert.deepEqual(COURSE_ACCESS['en/azerty'], { status: 'en ligne' });
+  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.deepEqual(courseIdsFor({ username: 'autre', role }), ['fr/qwerty', 'en/azerty', 'en/qwerty'], role);
+  assert.deepEqual(courseIdsFor(null), []);
 });

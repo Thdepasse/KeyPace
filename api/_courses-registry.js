@@ -10,9 +10,9 @@
 const DEFAULT_COURSE = 'fr/azerty';
 const COURSE_ACCESS = {
   'fr/qwerty': { status: 'en ligne' }, // ouvert à tous les comptes connectés le 2026-11-06 (avant : 'bêta', comptes testeurs)
-  // Anglais britannique (interface en français) : bêta, comptes testeurs seulement, le temps de la relecture et de l'essai.
-  'en/azerty': { status: 'bêta' },
-  'en/qwerty': { status: 'bêta' },
+  // Anglais britannique : ouvert à tous les comptes connectés le 2026-11-11 (avant : 'bêta', comptes testeurs).
+  'en/azerty': { status: 'en ligne' },
+  'en/qwerty': { status: 'en ligne' },
 };
 const COURSE_IDS = Object.keys(COURSE_ACCESS);
 const COURSE_ID_RE = /^[a-z]{2,3}(-[A-Z]{2})?\/[a-z0-9-]{2,24}$/;
