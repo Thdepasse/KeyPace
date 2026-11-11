@@ -1538,27 +1538,65 @@ a.nav-link{text-decoration:none;display:inline-block}
 /* GAMES – hero cinématique + carrousel */
 @keyframes gcineHintBob{0%,100%{transform:translateY(0);opacity:.75}50%{transform:translateY(7px);opacity:1}}
 .gcine-root{background:var(--bg)}
-.gcine-scroller{height:230vh;position:relative}
-.gcine-stage{position:sticky;top:0;height:100vh;overflow:hidden}
-.gcine-glow{position:absolute;inset:0;background:radial-gradient(900px 520px at 50% 18%,rgba(255,77,46,.12),transparent 70%),radial-gradient(700px 460px at 85% 80%,rgba(255,140,60,.07),transparent 72%)}
-.gcine-fade{position:absolute;left:0;right:0;bottom:0;height:26vh;background:linear-gradient(to bottom,rgba(250,249,245,0),rgba(250,249,245,.94) 82%);z-index:12;pointer-events:none}
-.gcine-persp{position:absolute;inset:0;perspective:1250px;perspective-origin:50% 42%}
-.gcine-3d{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
-.gcine-floor{position:absolute;left:50%;top:50%;width:1700px;height:1000px;margin-left:-850px;margin-top:-500px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,90,40,.32),transparent 65%),radial-gradient(closest-side,rgba(60,35,20,.14),transparent 50%);transform:translateZ(-40px)}
-.gcine-key{position:absolute;left:50%;top:50%;width:74px;height:74px;margin-left:-37px;margin-top:-37px;transform-style:preserve-3d;transition:transform .35s ease-out;will-change:transform}
-.gcine-key-base{position:absolute;inset:0;border-radius:14px;background:var(--border);transform:translateZ(-24px);box-shadow:0 0 0 1px rgba(0,0,0,.03)}
-.gcine-key-top{position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#ffffff,var(--light));border:1px solid var(--border);box-shadow:inset 0 1px 0 #fff;transition:background .3s,box-shadow .3s,border-color .3s}
-.gcine-key-label{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:17px;color:#B5AE9F;transition:color .3s}
-.gcine-traveler{position:absolute;left:50%;top:50%;width:74px;height:74px;margin-left:-37px;margin-top:-37px;transform-style:preserve-3d;z-index:50;will-change:transform}
-.gcine-traveler-face{position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;background:linear-gradient(150deg,#ff8a5c,var(--accent) 66%);border:1px solid rgba(255,210,190,.6);box-shadow:0 0 40px rgba(255,77,46,.4), inset 0 2px 0 rgba(255,255,255,.35)}
-.gcine-traveler-face span{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:26px;color:#fff}
-.gcine-hero{position:absolute;left:8%;top:9%;z-index:20;max-width:640px}
-.gcine-badge{display:inline-flex;align-items:center;gap:9px;background:rgba(255,77,46,.1);border:1px solid rgba(255,77,46,.28);color:var(--accent);font-size:13px;font-weight:700;border-radius:999px;padding:8px 16px;margin-bottom:22px;white-space:nowrap}
-.gcine-h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:64px;line-height:.98;letter-spacing:-.03em;color:var(--txt);margin:0}
-.gcine-sub{font-size:17px;line-height:1.6;color:var(--muted);max-width:460px;margin-top:22px}
-.gcine-hint{position:absolute;left:50%;bottom:38px;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;align-items:center;gap:10px}
-.gcine-hint-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.28em;color:var(--muted)}
-.gcine-hint-arrow{font-size:18px;color:var(--muted);animation:gcineHintBob 1.8s ease-in-out infinite}
+.gcine-intro{--gk-nav:64px;position:relative;height:calc(100vh - var(--gk-nav));min-height:500px;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:clamp(18px,5vh,56px) 16px 0}
+@supports (height:100svh){.gcine-intro{height:calc(100svh - var(--gk-nav))}}
+.gcine-glow{position:absolute;inset:0;pointer-events:none;background:radial-gradient(900px 520px at 50% 30%,rgba(255,77,46,.11),transparent 70%),radial-gradient(700px 460px at 85% 85%,rgba(255,140,60,.07),transparent 72%)}
+.gcine-hero{position:relative;z-index:2;transform-origin:50% 0;display:flex;flex-direction:column;align-items:center;text-align:center;max-width:720px}
+.gcine-badge{display:inline-flex;align-items:center;gap:9px;background:rgba(255,77,46,.1);border:1px solid rgba(255,77,46,.28);color:var(--accent);font-size:13px;font-weight:700;border-radius:999px;padding:8px 16px;margin-bottom:18px;white-space:nowrap}
+.gcine-h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(34px,min(5.4vw,7.4vh),60px);line-height:.98;letter-spacing:-.03em;color:var(--txt);margin:0}
+.gcine-sub{font-size:17px;line-height:1.6;color:var(--muted);max-width:520px;margin-top:14px}
+.gcine-scene{position:relative;z-index:1;flex:1;width:100%;min-height:0}
+.gcine-fit{position:absolute;left:50%;top:50%;transform-origin:50% 50%}
+.gcine-hint{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;margin:6px 0 20px;padding:6px 14px;background:none;border:none;border-radius:12px;cursor:pointer;color:var(--muted);font:inherit}
+.gcine-hint:hover{color:var(--accent)}
+.gcine-hint-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.28em}
+.gcine-hint-arrow{font-size:18px;animation:gcineHintBob 1.8s ease-in-out infinite}
+@media(max-height:760px){.gcine-sub{display:none}.gcine-badge{margin-bottom:10px}}
+@media(prefers-reduced-motion:reduce){.gcine-hint-arrow,.gk-eyes{animation:none}}
+/* Clavier moelleux + touche K mascotte qui saute jusqu'aux jeux */
+.gk-ground{position:absolute;left:8%;right:8%;height:46px;border-radius:50%;background:radial-gradient(closest-side,rgba(130,60,25,.24),rgba(130,60,25,0));pointer-events:none}
+.gk-stage{position:absolute;left:0}
+.gk-persp{position:absolute;inset:0;perspective:1100px;perspective-origin:50% 20%}
+.gk-board{position:absolute;inset:0;transform-origin:50% 55%}
+.gk-over{position:absolute;inset:0;pointer-events:none}
+.gk-shell{position:absolute;inset:0;border-radius:46px;background:linear-gradient(180deg,#FFFFFF,#F2ECE2);box-shadow:0 16px 0 #E6DCCC,0 44px 70px -26px rgba(140,70,30,.38),inset 0 2px 0 #fff}
+.gk-key{position:absolute}
+.gk-cap{position:absolute;inset:0;border-radius:22px;display:grid;place-items:center;transform-origin:50% 100%;background:linear-gradient(180deg,#fff,#F5EFE6);box-shadow:0 8px 0 #E0D3C1,0 15px 16px -4px rgba(150,70,30,.16),inset 0 2px 0 rgba(255,255,255,.95)}
+.gk-cap::before{content:'';position:absolute;left:10px;right:22px;top:6px;height:13px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,0));pointer-events:none}
+.gk-key.sp .gk-cap::before{right:40%}
+.gk-cap span{position:relative;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;line-height:1;color:#B3A895}
+.gk-key.sp .gk-cap span{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;letter-spacing:.06em}
+.gk-ring{position:absolute;inset:-6px;border-radius:27px;border:3px solid var(--accent);opacity:0;pointer-events:none}
+.gk-socket{position:absolute;border-radius:22px;background:#ECE4D7;box-shadow:inset 0 5px 10px rgba(120,80,40,.2),inset 0 -1px 0 #fff}
+.gk-socket::after{content:'K';position:absolute;inset:0;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#D9CDBB}
+.gk-shadow{position:absolute;left:0;top:0;width:54px;height:14px;margin:-7px 0 0 -27px;border-radius:50%;background:radial-gradient(closest-side,rgba(120,50,20,.32),transparent);opacity:0}
+.gk-dust{position:absolute;left:0;top:0;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#EDE4D6);opacity:0;pointer-events:none;z-index:31}
+.gk-char{position:absolute;left:0;top:0;width:64px;height:64px;z-index:30}
+.gk-rot{position:absolute;inset:0;transform-origin:50% 60%}
+.gk-sq{position:absolute;inset:0;transform-origin:50% 100%}
+.gk-body{position:absolute;inset:0;border-radius:23px;background:linear-gradient(160deg,#FF9A6C,#FF4D2E 72%);box-shadow:0 6px 0 #CC391B,inset 0 3px 0 rgba(255,255,255,.4),0 16px 24px -10px rgba(200,60,20,.55)}
+.gk-tuft{position:absolute;left:50%;top:-13px;width:44px;height:22px;margin-left:-22px}
+.gk-tuft i{position:absolute;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#E6E3DE)}
+.gk-tuft i:nth-child(1){width:20px;height:20px;left:2px;top:6px}
+.gk-tuft i:nth-child(2){width:24px;height:24px;left:11px;top:0}
+.gk-tuft i:nth-child(3){width:18px;height:18px;left:25px;top:7px}
+.gk-eyes{position:absolute;left:0;right:0;top:21px;display:flex;justify-content:center;gap:15px;animation:gkBlink 3.6s infinite}
+.gk-eyes i{width:10px;height:13px;border-radius:50%;background:#3A1A0E;position:relative}
+.gk-eyes i::after{content:'';position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;left:2px;top:2px}
+@keyframes gkBlink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.gk-cheeks{position:absolute;left:0;right:0;top:36px;display:flex;justify-content:center;gap:27px}
+.gk-cheeks i{width:10px;height:6px;border-radius:50%;background:rgba(255,215,200,.75)}
+.gk-mouth{position:absolute;left:50%;top:37px;width:14px;height:7px;margin-left:-7px;border:3px solid #6E1F0C;border-top:none;border-radius:0 0 10px 10px;transition:all .12s}
+.gk-mouth.o{width:11px;height:11px;margin-left:-5.5px;border:none;border-radius:50%;background:#6E1F0C;top:36px}
+.gk-k{position:absolute;right:7px;bottom:5px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:10px;color:rgba(255,255,255,.75)}
+.gk-slots{position:absolute;left:50%;display:flex;gap:10px;transform:translateX(-50%)}
+.gk-slot{position:relative;width:46px;height:46px}
+.gk-slot .gk-cap{border-radius:15px}
+.gk-slot .gk-cap::before{left:7px;right:14px;top:5px;height:9px}
+.gk-slot .gk-cap span{font-size:18px}
+.gk-slot .gk-ring{border-radius:19px}
+@keyframes gcineLand{0%{transform:translateY(0) scale(1)}30%{transform:translateY(10px) scale(1.04,.95)}65%{transform:translateY(-6px) scale(.99,1.02)}100%{transform:translateY(0) scale(1)}}
+.gcine-card.is-landed .gcine-card-inner{animation:gcineLand .6s cubic-bezier(.3,.7,.4,1)}
 .gcine-panel{position:relative;z-index:20;padding:24px 24px 80px}
 .gcine-panel-head{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:1120px;margin:0 auto;padding-bottom:36px;text-align:center}
 .gcine-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.3em;color:var(--accent)}
@@ -1606,7 +1644,6 @@ a.nav-link{text-decoration:none;display:inline-block}
 .gcine-dot.is-active{width:26px;background:var(--accent)}
 @media(max-width:860px){
   .gcine-h1{font-size:38px}
-  .gcine-hero{left:6%;top:8%;max-width:80%}
   .gcine-sub{font-size:15px}
   .gcine-h2{font-size:32px}
   .gcine-card-inner{width:220px;height:310px;padding:20px}
@@ -6459,30 +6496,34 @@ function shuffleArr(a){
   for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}
   return r;
 }
-const GCINE_ROWS=[
-  {keys:'AZERTYUIOP'.split(''),indent:0},
-  {keys:'QSDFGHJKLM'.split(''),indent:34},
-  {keys:'WXCVBN,;:'.split(''),indent:78},
-  {keys:['','','espace','',''],indent:120,wide:true},
-];
-const GCINE_KW=74,GCINE_KH=74,GCINE_GAP=12,GCINE_LIFT=16;
-function gcineComputeLayout(){
-  const layout=[];
-  GCINE_ROWS.forEach((row,r)=>{
-    let x=row.indent;
-    row.keys.forEach(ch=>{
-      const w=(row.wide&&ch==='espace')?GCINE_KW*4+GCINE_GAP*3:GCINE_KW;
-      layout.push({ch,x:x+w/2,y:r*(GCINE_KH+GCINE_GAP),w});
-      x+=w+GCINE_GAP;
-    });
-  });
-  const maxX=Math.max.apply(null,layout.map(k=>k.x+k.w/2));
-  const maxY=Math.max.apply(null,layout.map(k=>k.y));
-  const cx=maxX/2,cy=maxY/2;
-  layout.forEach(k=>{k.cx=k.x-cx;k.cy=k.y-cy;});
-  return {layout,cx,cy};
+// Intro de la salle de jeux : clavier AZERTY simplifié aux touches
+// moelleuses, sur lequel la touche K (mascotte) saute pour écrire un mot.
+const GK_U=72,GK_K=62;
+function gkLayout(){
+  const rows=[['AZERTYUIOP',0],['QSDFGHJKLM',.3],['WXCVBN,;:',.8]];
+  const keys=[];
+  rows.forEach(([str,ind],r)=>str.split('').forEach((ch,c)=>keys.push({ch,x:(ind+c)*GK_U,y:r*GK_U,w:GK_K,h:GK_K})));
+  keys.push({ch:'espace',x:2.3*GK_U,y:3*GK_U,w:5*GK_U-(GK_U-GK_K),h:GK_K,space:true});
+  keys.forEach(k=>{k.cx=k.x+k.w/2;k.cy=k.y+k.h/2;});
+  return {keys,W:Math.max.apply(null,keys.map(k=>k.x+k.w)),H:3*GK_U+GK_K,find:ch=>keys.find(k=>k.ch===ch)};
 }
-const GCINE_LAYOUT=gcineComputeLayout();
+const GK_LAYOUT=gkLayout();
+// Couleurs d'une touche : repos -> chaude (orange), interpolées en RGB.
+const GK_PAL={idle:{t1:[255,255,255],t2:[245,239,230],side:[224,211,193],lab:[179,168,149]},tint:{t1:[255,243,236],t2:[255,224,209],side:[241,188,164],lab:[255,106,69]},hot:{t1:[255,154,108],t2:[255,77,46],side:[201,56,27],lab:[255,255,255]}};
+function gkPaintKey(cap,lab,press,hot,depth,tint){
+  depth=depth||8;tint=tint||0;
+  const c=f=>{const I=GK_PAL.idle[f],T=GK_PAL.tint[f],B=GK_PAL.hot[f];const m=i=>{const a=I[i]+(T[i]-I[i])*tint;return Math.round(a+(B[i]-a)*hot);};return 'rgb('+m(0)+','+m(1)+','+m(2)+')';};
+  const pp=Math.max(0,press),travel=depth-2;
+  cap.style.background='linear-gradient(180deg,'+c('t1')+','+c('t2')+')';
+  cap.style.transform='translateY('+(press*travel).toFixed(2)+'px) scale('+(1+pp*.035).toFixed(3)+','+(1-pp*.055).toFixed(3)+')';
+  cap.style.boxShadow='0 '+(depth-press*travel).toFixed(2)+'px 0 '+c('side')+',0 '+(depth+7-press*4).toFixed(1)+'px 16px -4px rgba(150,70,30,'+(.16+hot*.24).toFixed(2)+'),inset 0 2px 0 rgba(255,255,255,'+(.95-hot*.6).toFixed(2)+')';
+  lab.style.color=c('lab');
+}
+function gkRing(ring,l){
+  if(l<=0||l>=1){ring.style.opacity=0;return;}
+  ring.style.opacity=(1-l)*.85;
+  ring.style.transform='scale('+(1+l*.45)+')';
+}
 
 /* ===== Page Cours : choix du programme par réseau et par année + liste des modules =====
    Affichée dans un Shadow DOM : son style ne peut ni déborder sur le reste de l'appli ni être cassé par lui. */
@@ -13359,30 +13400,20 @@ const app={
     this._advice=this._gamesAdvice();
     const cardsHTML=visible.map((g,i)=>this._gcineCard(g,i)).join('');
     const dotsHTML=visible.map((g,i)=>`<div class="gcine-dot" data-idx="${i}"></div>`).join('');
-    const keysHTML=GCINE_LAYOUT.layout.map((k,i)=>`<div class="gcine-key" id="gk-${i}" style="width:${k.w}px;margin-left:${-k.w/2}px"><div class="gcine-key-base"></div><div class="gcine-key-top"><span class="gcine-key-label">${k.ch==='espace'?kpT('test.space_key'):k.ch}</span></div></div>`).join('');
     document.getElementById('page-games').innerHTML=`<div class="gcine-root">
-      <div class="gcine-scroller" id="gcine-scroller">
-        <div class="gcine-stage" id="gcine-stage">
-          <div class="gcine-glow"></div>
-          <div class="gcine-fade"></div>
-          <div class="gcine-persp" id="gcine-persp">
-            <div class="gcine-3d" id="gcine-3d">
-              <div class="gcine-floor"></div>
-              ${keysHTML}
-              <div class="gcine-traveler" id="gcine-traveler"><div class="gcine-traveler-face"><span>K</span></div></div>
-            </div>
-          </div>
-          <div class="gcine-hero" id="gcine-hero">
-            <div class="gcine-badge">${ICONS.gamepad} ${kpT('games.badge',{n:totalPlayable})}</div>
-            <h1 class="gcine-h1">${kpT('games.h1')}</h1>
-            <p class="gcine-sub">${kpT('games.sub')}</p>
-          </div>
-          <div class="gcine-hint" id="gcine-hint">
-            <div class="gcine-hint-lbl">${kpT('games.scroll')}</div>
-            <div class="gcine-hint-arrow">↓</div>
-          </div>
+      <section class="gcine-intro" id="gcine-intro">
+        <div class="gcine-glow"></div>
+        <div class="gcine-hero">
+          <div class="gcine-badge">${ICONS.gamepad} ${kpT('games.badge',{n:totalPlayable})}</div>
+          <h1 class="gcine-h1">${kpT('games.h1')}</h1>
+          <p class="gcine-sub">${kpT('games.sub')}</p>
         </div>
-      </div>
+        <div class="gcine-scene" id="gcine-scene" aria-hidden="true"></div>
+        <button class="gcine-hint" id="gcine-hint" type="button">
+          <span class="gcine-hint-lbl" id="gcine-hint-lbl">${kpT('games.scroll')}</span>
+          <span class="gcine-hint-arrow" id="gcine-hint-arrow">↓</span>
+        </button>
+      </section>
       <div class="gcine-panel">
         <div class="gcine-panel-head">
           <div class="gcine-eyebrow">${kpT('games.arrived')}</div>
@@ -13472,54 +13503,24 @@ const app={
   _gcineTeardown(){},
   _gcineInit(){
     this._gcineTeardown();
-    const scroller=document.getElementById('gcine-scroller');
-    if(!scroller)return;
-    const stage=document.getElementById('gcine-stage');
-    const persp=document.getElementById('gcine-persp');
-    const g3d=document.getElementById('gcine-3d');
-    const traveler=document.getElementById('gcine-traveler');
-    const hero=document.getElementById('gcine-hero');
-    const hint=document.getElementById('gcine-hint');
+    const intro=document.getElementById('gcine-intro');
+    if(!intro)return;
     const cardsEl=document.getElementById('gcine-cards');
     const dotsEl=document.getElementById('gcine-dots');
-    const keyEls=GCINE_LAYOUT.layout.map((k,i)=>document.getElementById('gk-'+i));
     const cardEls=Array.prototype.slice.call(cardsEl.children);
     const dotEls=Array.prototype.slice.call(dotsEl.children);
     const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
     const lerp=(a,b,t)=>a+(b-a)*t;
+    const navH=()=>(document.getElementById('main-nav')||{}).offsetHeight||0;
 
-    const setStageTop=()=>{
-      const navH=(document.getElementById('main-nav')||{}).offsetHeight||0;
-      stage.style.top=navH+'px';
-      stage.style.height='calc(100vh - '+navH+'px)';
-    };
-    setStageTop();
-
-    // Position (en px de défilement) correspondant à la fin de l'intro
-    // cinématique, où le sélecteur de jeu est entièrement révélé. Calculée à
-    // partir de la position du panneau lui-même (.gcine-panel, juste après
-    // le conteneur sticky) plutôt que de la distance de défilement du sticky
-    // (scroller.offsetHeight-stage.offsetHeight) : cette dernière ne fait que
-    // décoller .gcine-stage de son point d'ancrage — au pixel près où
-    // scrolled===total, l'élément sticky est encore accroché (dernière image
-    // collante du clavier 3D) et le panneau n'a pas encore commencé à
-    // apparaître. Résultat : revenir sur "Jeux" ou changer de catégorie
-    // rejouait la toute fin de l'intro au lieu de montrer les cartes.
+    // Position (en px de défilement) du sélecteur de jeux (.gcine-panel),
+    // sous la barre de navigation collante : c'est là que la touche K
+    // « emmène » la page à la fin de l'intro.
     const gcineEndY=()=>{
       const panel=document.querySelector('.gcine-panel');
       if(!panel)return null;
-      const navH=(document.getElementById('main-nav')||{}).offsetHeight||0;
-      return window.scrollY+panel.getBoundingClientRect().top-navH;
+      return window.scrollY+panel.getBoundingClientRect().top-navH();
     };
-    // Un retour sur "Jeux" (quitter une partie, ou clic nav) reconstruit tout
-    // le HTML et rejoue donc l'intro depuis le début à chaque fois — agaçant
-    // pour qui veut juste enchaîner plusieurs jeux. Elle n'est rejouée en
-    // entier que la toute première fois ce chargement de page ; les retours
-    // suivants sautent directement au sélecteur.
-    if(this._gcineSeen){
-      const y=gcineEndY();
-      if(y!=null)window.scrollTo({top:y,behavior:'instant'});
-    }
 
     const visibleGames=this._gcineVisible||[];
     const GAP=232;
@@ -13582,58 +13583,260 @@ const app={
     window.addEventListener('pointermove',onMove);
     window.addEventListener('pointerup',onUp);
 
-    let rafId=null;
-    const tick=()=>{
-      rafId=null;
-      if(!document.body.contains(scroller)){this._gcineTeardown();return;}
-      const rect=scroller.getBoundingClientRect();
-      const total=scroller.offsetHeight-stage.offsetHeight;
-      const scrolled=clamp(-rect.top,0,total);
-      const raw=total>0?clamp(scrolled/total,0,1):0;
-      if(raw>=0.5)this._gcineSeen=true; // arrivé au bout : plus la peine de rejouer l'intro au prochain retour
-      const p=raw<0.5?2*raw*raw:1-Math.pow(-2*raw+2,2)/2;
-      const tilt=lerp(64,44,p);
-      persp.style.opacity=lerp(1,0.6,p);
-      g3d.style.transform='translate(-50%,-50%) translate('+lerp(30,-30,p)+'px,'+lerp(40,70,p)+'px) rotateX('+tilt+'deg) rotateZ('+lerp(-22,-6,p)+'deg) scale('+lerp(1.05,1.2,p)+')';
-      const tx=lerp(-GCINE_LAYOUT.cx*0.3,GCINE_LAYOUT.cx*0.62,p);
-      const ty=lerp(-GCINE_LAYOUT.cy-20,GCINE_LAYOUT.cy-4,p)+Math.sin(p*Math.PI*3)*26;
-      const roll=p*1180;
-      GCINE_LAYOUT.layout.forEach((k,i)=>{
-        const el=keyEls[i];if(!el)return;
-        const kx=k.cx,ky=k.cy;
-        const d=Math.hypot(kx-tx,ky-ty);
-        const near=clamp(1-d/150,0,1);
-        const passed=kx<tx-10;
-        const glow=Math.pow(near,1.6);
-        el.style.transform='translate3d('+kx+'px,'+ky+'px,'+(GCINE_LIFT+glow*26)+'px)';
-        const top=el.querySelector('.gcine-key-top');
-        const label=el.querySelector('.gcine-key-label');
-        top.style.background=glow>0.04
-          ?'linear-gradient(150deg,rgba(255,122,77,'+(0.25+glow*0.75)+'),rgba(255,74,28,'+(0.3+glow*0.7)+'))'
-          :passed?'linear-gradient(150deg,#fff3ee,#ffe8df)':'linear-gradient(150deg,#ffffff,#F4F1EA)';
-        top.style.borderColor=glow>0.04?'rgba(255,190,160,.55)':passed?'rgba(255,77,46,.25)':'#E7E1D5';
-        top.style.boxShadow=glow>0.04?'0 0 '+(14+glow*32)+'px rgba(255,74,28,'+(0.28+glow*0.35)+'), inset 0 1px 0 rgba(255,255,255,.6)':'inset 0 1px 0 #fff';
-        label.style.color=glow>0.04?'#fff':passed?'rgba(255,77,46,.55)':'#B5AE9F';
-      });
-      traveler.style.transform='translate3d('+tx+'px,'+ty+'px,'+(GCINE_LIFT+GCINE_KH/2+4)+'px) rotateX(90deg) rotateZ('+roll+'deg)';
-      hero.style.transform='translateY('+(-p*90)+'px)';
-      hero.style.opacity=clamp(1-p*1.9,0,1);
-      hero.style.pointerEvents=p>0.4?'none':'auto';
-      hint.style.opacity=clamp(1-p*3,0,1);
-    };
-    const schedule=()=>{if(rafId==null)rafId=requestAnimationFrame(tick);};
-    const onResize=()=>{setStageTop();schedule();};
+    // ---------- Intro : la touche K saute sur le clavier guimauve puis plonge vers les jeux ----------
+    // Elle se joue toute seule à l'arrivée sur la page ; quand la touche plonge,
+    // la page défile jusqu'au sélecteur. Rejouée seulement la première fois
+    // par chargement : les retours sur « Jeux » (quitter une partie, changer de
+    // catégorie) sautent directement aux cartes, clavier dans son état final.
+    const scene=document.getElementById('gcine-scene');
+    const hintBtn=document.getElementById('gcine-hint');
+    const hintLbl=document.getElementById('gcine-hint-lbl');
+    const hintArrow=document.getElementById('gcine-hint-arrow');
+    const setIntroH=()=>intro.style.setProperty('--gk-nav',navH()+'px');
+    setIntroH();
+    const easeOut=t=>1-Math.pow(1-t,3);
+    const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+    const L=GK_LAYOUT,pad=28,top=120,below=86;
+    const bw=L.W+pad*2,bh=L.H+pad*2,fitH=top+bh+below;
+    let word=String(kpT('games.k_word')||'JEUX').toUpperCase();
+    if(!/^[A-Z]{2,6}$/.test(word)||word.indexOf('K')>=0||word.split('').some(c=>!L.find(c)))word='JEUX';
+    const keyHTML=k=>k.ch==='K'
+      ?`<div class="gk-socket" style="left:${k.x+pad}px;top:${k.y+pad}px;width:${k.w}px;height:${k.h}px"></div>`
+      :`<div class="gk-key${k.space?' sp':''}" style="left:${k.x+pad}px;top:${k.y+pad}px;width:${k.w}px;height:${k.h}px"><div class="gk-ring"></div><div class="gk-cap"><span>${k.space?kpT('test.space_key'):k.ch}</span></div></div>`;
+    scene.innerHTML=`<div class="gcine-fit" style="width:${bw}px;height:${fitH}px">
+      <div class="gk-ground" style="top:${top+bh-22}px"></div>
+      <div class="gk-stage" style="top:${top}px;width:${bw}px;height:${bh}px">
+        <div class="gk-persp"><div class="gk-board"><div class="gk-shell"></div>${L.keys.map(keyHTML).join('')}</div></div>
+        <div class="gk-over">
+          <div class="gk-shadow"></div><div class="gk-dust"></div><div class="gk-dust"></div><div class="gk-dust"></div>
+          <div class="gk-char"><div class="gk-rot"><div class="gk-sq"><div class="gk-tuft"><i></i><i></i><i></i></div><div class="gk-body"></div><div class="gk-eyes"><i></i><i></i></div><div class="gk-cheeks"><i></i><i></i></div><div class="gk-mouth"></div><div class="gk-k">K</div></div></div></div>
+        </div>
+      </div>
+      <div class="gk-slots" style="top:${top+bh+34}px">${word.split('').map(c=>`<div class="gk-slot"><div class="gk-ring"></div><div class="gk-cap"><span>${c}</span></div></div>`).join('')}</div>
+    </div>`;
+    const fit=scene.firstElementChild,q=sel=>fit.querySelector(sel);
+    const stageEl=q('.gk-stage'),board=q('.gk-board'),ground=q('.gk-ground');
+    const ch=q('.gk-char'),rot=q('.gk-rot'),sq=q('.gk-sq'),eyes=q('.gk-eyes'),mouth=q('.gk-mouth'),shadow=q('.gk-shadow');
+    const dust=Array.prototype.slice.call(fit.querySelectorAll('.gk-dust'));
+    const keyMap=L.keys.filter(k=>k.ch!=='K');
+    const keyEls=Array.prototype.map.call(board.querySelectorAll('.gk-key'),el=>({cap:el.querySelector('.gk-cap'),lab:el.querySelector('span'),ring:el.querySelector('.gk-ring')}));
+    const slotEls=Array.prototype.map.call(fit.querySelectorAll('.gk-slot'),el=>({el,cap:el.querySelector('.gk-cap'),lab:el.querySelector('span'),ring:el.querySelector('.gk-ring')}));
+    const kk=L.find('K');
+    // Points d'appui (coordonnées du plateau) : place du K, lettres du mot, espace (tremplin).
+    const wp=[{x:kk.cx+pad,y:kk.cy+pad+26}].concat(word.split('').concat(['espace']).map(c=>{
+      const k=L.find(c);return {x:k.cx+pad+(k.space?-40:0),y:k.cy+pad+8,ki:keyMap.indexOf(k)};
+    }));
+    const nHops=wp.length-1;
+    const T_IDLE=.9,T_HOP=.46,T_HOLD=.26,T_DIVE=1;
+    const T_DIVE0=T_IDLE+nHops*T_HOP+T_HOLD,T_END=T_DIVE0+T_DIVE,T_SCROLL=T_DIVE0+.22,SCROLL_D=1.05,FINAL=T_END+1;
+    const landT=j=>T_IDLE+j*T_HOP;
 
-    tick();
-    window.addEventListener('scroll',schedule,{passive:true});
+    // Le plateau est incliné en 3D (perspective du .gk-persp) ; la touche K,
+    // elle, reste debout dans un calque 2D posé par-dessus : on projette
+    // nous-mêmes ses points d'appui avec la même perspective.
+    const PERSP=1100,POX=bw*.5,POY=bh*.2,TOX=bw*.5,TOY=bh*.55,DEG=Math.PI/180;
+    let rxNow=0,rzNow=0;
+    const project=(x,y)=>{
+      const dx=x-TOX,dy=y-TOY,cz=Math.cos(rzNow),sz=Math.sin(rzNow);
+      const x1=dx*cz-dy*sz,y1=dx*sz+dy*cz;
+      const X=TOX+x1,Y=TOY+y1*Math.cos(rxNow),Z=y1*Math.sin(rxNow);
+      const k=PERSP/(PERSP-Z);
+      return {x:POX+(X-POX)*k,y:POY+(Y-POY)*k,k};
+    };
+    // Deux cadrages : « repos » sous le titre (s0), et « gros plan » (s1) où
+    // le clavier remonte au centre et occupe tout l'écran pendant les sauts,
+    // le titre s'effaçant. Sur téléphone, le gros plan déborde un peu sur
+    // les côtés (A et P coupés) pour que les touches restent assez grandes.
+    const heroEl=intro.querySelector('.gcine-hero');
+    let s0=1,s1=1,dyBig=0,zoom=0,scale=1;
+    const applyFit=()=>{
+      scale=lerp(s0,s1,zoom);
+      fit.style.transform='translate(-50%,-50%) translateY('+(dyBig*zoom).toFixed(1)+'px) scale('+scale.toFixed(4)+')';
+      heroEl.style.opacity=clamp(1-zoom*1.3,0,1).toFixed(3);
+      heroEl.style.transform=zoom?'translateY('+(-28*zoom).toFixed(1)+'px) scale('+(1-.05*zoom).toFixed(3)+')':'';
+    };
+    const fitScene=()=>{
+      const W=scene.clientWidth,H=scene.clientHeight,IW=intro.clientWidth,IH=intro.clientHeight;
+      s0=Math.max(.2,Math.min(1,(W-24)/bw,(H-4)/fitH));
+      const availH=IH-hintBtn.offsetHeight-30;
+      s1=Math.max(s0,Math.min(1.5,(IW<600?IW*1.22:IW-32)/bw,availH/fitH));
+      dyBig=availH/2-(scene.offsetTop+H/2);
+      applyFit();
+    };
+    fitScene();
+
+    const render=(el,tm,still)=>{
+      // Le clavier guimauve se redresse et pivote doucement pendant l'intro,
+      // avec un léger balancement ; il « encaisse » l'appel du plongeon.
+      const pr=ease(clamp(el/T_END,0,1));
+      const sw=still?0:1;
+      const recoil=Math.exp(-Math.pow((el-T_DIVE0-.05)/.12,2));
+      const rx=lerp(46,20,pr)+Math.sin(tm*1.3)*1.2*sw+recoil*5;
+      const rz=lerp(-11,-2,pr)+Math.sin(tm*.9)*1.6*sw;
+      rxNow=rx*DEG;rzNow=rz*DEG;
+      zoom=still?0:ease(clamp((el-(T_IDLE-.25))/.65,0,1));
+      applyFit();
+      board.style.transform='rotateX('+rx.toFixed(2)+'deg) rotateZ('+rz.toFixed(2)+'deg)';
+      const fl=Math.sin(tm*1.6)*3*sw;
+      stageEl.style.transform='translateY('+fl.toFixed(2)+'px)';
+      ground.style.transform='scale('+(lerp(.86,1,pr)-fl*.008).toFixed(3)+',1)';
+
+      // Avancement en « sauts » : 0 = dans sa place, j = posé sur le point j.
+      let t;
+      if(el<T_IDLE)t=0;
+      else if(el<T_IDLE+nHops*T_HOP)t=(el-T_IDLE)/T_HOP;
+      else if(el<T_DIVE0)t=nHops;
+      else t=nHops+clamp((el-T_DIVE0)/T_DIVE,0,1);
+      const diving=t>nHops||(t===nHops&&el>=T_DIVE0);
+      const seg=diving?nHops:Math.min(nHops-1,Math.floor(t)),f=diving?t-nHops:t-seg;
+      let gx,gy,k,Hh,dir,moving=t>0;
+      const sp=project(wp[nHops].x,wp[nHops].y);
+      if(diving){
+        // Plongeon : départ de l'espace, chute hors du clavier vers les jeux.
+        gx=sp.x+50*f;gy=sp.y+f*f*(window.innerHeight*.8/scale);k=sp.k;Hh=150;dir=1;
+      }else{
+        const A=wp[seg],B=wp[seg+1];
+        const g=project(lerp(A.x,B.x,f),lerp(A.y,B.y,f));
+        gx=g.x;gy=g.y;k=g.k;dir=Math.sign(B.x-A.x)||1;
+        Hh=70+Math.min(Math.hypot(B.x-A.x,B.y-A.y),340)*.18;
+      }
+      let y=gy-Hh*Math.sin(Math.PI*f)*(moving?1:0);
+      let sqz=moving?Math.max(0,1-f/.13)+(diving?0:Math.max(0,(f-.87)/.13)):0;
+      if(!moving&&!still){const hop=Math.abs(Math.sin(tm*2.6));y-=hop*12;sqz=Math.max(0,1-hop/.28)*.55;}
+      const air=moving?Math.sin(Math.PI*f)*(1-Math.min(1,sqz)):0;
+      let r=dir*12*Math.sin(Math.PI*f)*(moving?1:0);
+      if(!diving&&seg===nHops-2)r+=dir*360*ease(f);
+      ch.style.transform='translate('+(gx-32).toFixed(1)+'px,'+(y-64).toFixed(1)+'px) scale('+k.toFixed(3)+')';
+      ch.style.transformOrigin='50% 100%';
+      rot.style.transform='rotate('+r.toFixed(1)+'deg)';
+      sq.style.transform='scale('+(1+.2*sqz-.07*air).toFixed(3)+','+(1-.24*sqz+.13*air).toFixed(3)+')';
+      mouth.classList.toggle('o',air>.35);
+      eyes.style.translate=(moving?dir*2.5*Math.min(1,air*3):Math.sin(tm*.9)*2.5).toFixed(2)+'px '+(moving?-air*1.5:0).toFixed(2)+'px';
+      ch.style.opacity=diving?1-clamp((f-.6)/.35,0,1):1;
+      const h=gy-y;
+      shadow.style.transform='translate('+gx.toFixed(1)+'px,'+(gy+3).toFixed(1)+'px) scale('+(k*(1-clamp(h/220,0,.65))).toFixed(3)+')';
+      shadow.style.opacity=!moving?0:(diving?1-clamp(f*2.5,0,1):1)*(1-clamp(h/260,0,.6));
+
+      // Poussière au dernier atterrissage
+      let dj=-1;for(let j=1;j<=nHops;j++){if(el-landT(j)>=0&&el-landT(j)<.4)dj=j;}
+      dust.forEach((d,qi)=>{
+        if(dj<0){d.style.opacity=0;return;}
+        const l=(el-landT(dj))/.4,side=qi===0?-1:qi===1?1:0,g=project(wp[dj].x,wp[dj].y);
+        d.style.opacity=((1-l)*.9).toFixed(2);
+        d.style.transform='translate('+(g.x+side*(14+easeOut(l)*30)*g.k).toFixed(1)+'px,'+(g.y-4-easeOut(l)*(side?10:22)).toFixed(1)+'px) scale('+((.45+l*.8)*g.k).toFixed(2)+')';
+      });
+
+      // Touches : la lettre visée s'enfonce et devient orange ; chaque
+      // atterrissage envoie une onde moelleuse dans les touches voisines.
+      const press=new Array(keyMap.length).fill(0),hot=press.slice(),tint=press.slice(),ring=press.slice();
+      for(let j=1;j<=nHops;j++){
+        const w=wp[j],lt=landT(j),age=el-lt;
+        press[w.ki]=Math.max(press[w.ki],clamp(1-Math.abs(t-j)/.16,0,1));
+        hot[w.ki]=Math.max(hot[w.ki],clamp((t-(j-.06))/.1,0,1));
+        ring[w.ki]=Math.max(ring[w.ki],age/.4);
+        if(age>0&&age<1.1){
+          keyMap.forEach((kk2,i)=>{
+            if(i===w.ki)return;
+            const d=Math.hypot(kk2.cx+pad-w.x,kk2.cy+pad-w.y)/GK_U;
+            if(d>5.5)return;
+            const l=age*8-d,fall=1-d/5.5;
+            if(l>0&&l<1.3)press[i]=Math.max(press[i],Math.sin(Math.PI*l/1.3)*.5*fall);
+            else if(l>=1.3&&l<2)press[i]=Math.min(press[i]||0,-.18*Math.sin(Math.PI*(l-1.3)/.7)*fall);
+            if(l>0&&l<2.4)tint[i]=Math.max(tint[i],Math.sin(Math.PI*l/2.4)*.8*fall);
+          });
+        }
+        const sl=slotEls[j-1];
+        if(sl){
+          gkPaintKey(sl.cap,sl.lab,clamp(1-Math.abs(age-.08)/.1,0,1),hot[w.ki],5);
+          gkRing(sl.ring,(age-.04)/.4);
+          sl.el.style.opacity=.45+.55*hot[w.ki];
+        }
+      }
+      keyEls.forEach((ke,i)=>{gkPaintKey(ke.cap,ke.lab,press[i],hot[i],8,tint[i]);gkRing(ke.ring,ring[i]);});
+    };
+
+    const reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    let el=0,last=0,raf=null,phase='play',tookOver=false,scrolled=false,scrollRaf=null,landTimer=null;
+    const setHint=done=>{hintLbl.textContent=kpT(done?'games.replay':'games.scroll');hintArrow.textContent=done?'↻':'↓';};
+    const stopScroll=()=>{if(scrollRaf){cancelAnimationFrame(scrollRaf);scrollRaf=null;}};
+    const landCard=()=>{
+      const c=cardsEl.querySelector('.gcine-card.is-center');if(!c)return;
+      c.classList.remove('is-landed');void c.offsetWidth;c.classList.add('is-landed');
+      clearTimeout(landTimer);landTimer=setTimeout(()=>c.classList.remove('is-landed'),700);
+    };
+    const finish=()=>{
+      if(raf){cancelAnimationFrame(raf);raf=null;}
+      phase='done';this._gcineSeen=true;
+      render(FINAL,0,true);setHint(true);
+    };
+    // Défilement maison (et non behavior:'smooth') pour rester synchro avec la chute de la touche.
+    const autoScroll=()=>{
+      const y1=gcineEndY();if(y1==null)return;
+      const y0=window.scrollY,t0=performance.now(),dur=SCROLL_D*1000;
+      const step=now=>{
+        scrollRaf=null;
+        if(!document.body.contains(intro))return;
+        const p=clamp((now-t0)/dur,0,1);
+        window.scrollTo({top:y0+(y1-y0)*ease(p),behavior:'instant'});
+        if(p<1)scrollRaf=requestAnimationFrame(step);else landCard();
+      };
+      scrollRaf=requestAnimationFrame(step);
+    };
+    const frame=now=>{
+      raf=null;
+      if(!document.body.contains(intro)){this._gcineTeardown();return;}
+      const dt=last?Math.min(.05,(now-last)/1000):0;last=now;
+      el+=dt;
+      if(!scrolled&&el>=T_SCROLL){scrolled=true;this._gcineSeen=true;if(!tookOver)autoScroll();}
+      if(el>=T_END){finish();return;}
+      render(Math.max(0,el),now/1000,false);
+      raf=requestAnimationFrame(frame);
+    };
+    const play=delay=>{
+      stopScroll();el=-(delay||0);last=0;phase='play';scrolled=false;tookOver=false;setHint(false);
+      if(!raf)raf=requestAnimationFrame(frame);
+    };
+    // Si l'utilisateur fait défiler lui-même pendant l'intro, on ne lui reprend pas la main.
+    const SCROLL_KEYS={ArrowDown:1,ArrowUp:1,PageDown:1,PageUp:1,' ':1,Home:1,End:1};
+    const onUserScroll=e=>{
+      if(e.type==='keydown'&&!SCROLL_KEYS[e.key])return;
+      if(phase==='play')tookOver=true;
+      stopScroll();
+    };
+    window.addEventListener('wheel',onUserScroll,{passive:true});
+    window.addEventListener('touchstart',onUserScroll,{passive:true});
+    window.addEventListener('keydown',onUserScroll);
+    const onHint=()=>{
+      if(phase==='play'){
+        tookOver=true;stopScroll();finish();
+        const y=gcineEndY();if(y!=null)window.scrollTo({top:y,behavior:reduce?'auto':'smooth'});
+      }else{
+        window.scrollTo({top:0,behavior:'instant'});play(.3);
+      }
+    };
+    hintBtn.addEventListener('click',onHint);
+
+    if(this._gcineSeen||reduce){
+      const jump=this._gcineSeen;
+      finish();
+      if(jump){const y=gcineEndY();if(y!=null)window.scrollTo({top:y,behavior:'instant'});}
+    }else{
+      render(0,performance.now()/1000,false);
+      play(.35);
+    }
+    const onResize=()=>{setIntroH();fitScene();if(phase==='done')render(FINAL,0,true);};
     window.addEventListener('resize',onResize);
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(document.body.contains(intro))onResize();});
 
     this._gcineTeardown=()=>{
-      window.removeEventListener('scroll',schedule);
       window.removeEventListener('resize',onResize);
       window.removeEventListener('pointermove',onMove);
       window.removeEventListener('pointerup',onUp);
-      if(rafId)cancelAnimationFrame(rafId);
+      window.removeEventListener('wheel',onUserScroll);
+      window.removeEventListener('touchstart',onUserScroll);
+      window.removeEventListener('keydown',onUserScroll);
+      if(raf)cancelAnimationFrame(raf);
+      stopScroll();clearTimeout(landTimer);
       this._gcineTeardown=()=>{};
     };
   },
