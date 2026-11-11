@@ -435,6 +435,7 @@ async function run(opts = {}) {
           out.enGameScreens={};
           for(const g of ['frappe','sprint','course','ghost','simon']){app.activeGame=g;app.game=null;app.sprint=null;app.course=null;app.ghost=null;app.simon=null;app.renderGames();await new Promise(r=>setTimeout(r,200));out.enGameScreens[g]=document.getElementById('page-games').innerText;}
           out.enSouris=await ${require('./souris-screens')};
+          out.enJeux=await ${require('./jeux-screens')};
           app.activeGame=null;
           out.okQ=await kpChooseFamily('qwerty');out.q={course:kpCourseId(),lessons:ALL_LESSONS.length};
           await kpSetSiteLanguage('fr');out.okFr=kpCourseId()==='fr/qwerty';
@@ -476,6 +477,22 @@ async function run(opts = {}) {
           if (keyLeft.length) problems.push(`BR12 : clé de texte affichée telle quelle dans Précision souris : ${keyLeft.slice(0, 4).join(', ')}`);
           for (const [n, w] of [['menu', 'Accuracy game'], ['menu', 'levels completed'], ['brief6', 'How to play'], ['p3', 'Heart hit'], ['p8ok', 'Well sorted'], ['p10reach', 'Reached'], ['pause12', 'Rules reminder'], ['end3', 'Chaos conquered'], ['sgrBrief1', 'Middle row'], ['sgrCombo2', 'Combo ×2, keep going!'], ['sgrEnd1', 'New record on this level!'], ['duoConfig', 'Where is your mouse?'], ['duoEnd0', 'Tier reached!'], ['tilesSelect', 'Free mode'], ['tilesGlossary', 'Long tile'], ['tilesBrief', 'KEYS FOR THIS GAME'], ['tilesPerfect', 'PERFECT'], ['tilesChordJudge', 'CHORD!'], ['tilesEnd', 'Song rank']]) {
             if (!(sc[n] && sc[n].t.toLowerCase().includes(w.toLowerCase()))) problems.push(`BR12 : « ${w} » absent de l'écran ${n} (Précision souris en anglais)`);
+          }
+        }
+        // Duel, Battle Royale, Boss, Clavier vide, fenêtres (licence, Expert, tutoriel, mot de passe, classe, cookies, bandeaux), espace élève (classe, devoirs), tests chronométrés et pop-ups : états simulés, rendu en anglais, aucun mot français
+        {
+          const sc = lg.enJeux || {}; const names = Object.keys(sc);
+          if (names.length < 120) problems.push(`BR12 : les écrans des jeux multijoueurs et des fenêtres en anglais ne sont pas tous rendus (${names.length})`);
+          const errs = names.filter((n) => n.startsWith('ERR_')); if (errs.length) problems.push(`BR12 : scénario des jeux multijoueurs interrompu : ${errs.slice(0, 3).map((n) => n + ' ' + sc[n].t).join(' ; ')}`);
+          const frWord2 = /[éèêàùçœôîâ]|(^|[^A-Za-z])(le|la|les|des|une|du|et|ou|pour|tu|ton|ta|tes|vous|vos|votre|dans|sur|avec|sans|pas|mot|mots|cette|ces|mes|ses|nos|notre|sont|ont|je|nous|ils|qui|mais|donc|chez|toi|moi|très|élève|élèves|devoir|devoirs|compte|réseau|erreur|réessaie|rejoindre|créer|connexion|enregistrer|annuler|fermer)([^A-Za-z]|$)/i;
+          // textes légitimes en anglais qui portent des accents (noms propres, accents expliqués dans les réglages)
+          const okAccent = (t) => t.replace(/Liège|é, è, ê…|é, è, à, ê, û, î, ô…|à\/é\/è\/ê|<b>œ<\/b>|œ/g, '').split('\n').filter((l) => l.trim().length > 2).join('\n');
+          const leaked = names.filter((n) => !n.startsWith('ERR_') && frWord2.test(okAccent(sc[n].t))).map((n) => `${n} (${(okAccent(sc[n].t).match(new RegExp(frWord2.source, 'i')) || [''])[0].trim()})`);
+          if (leaked.length) problems.push(`BR12 : du français dans les jeux multijoueurs, fenêtres et écrans élève en anglais : ${leaked.slice(0, 6).join(', ')}`);
+          const keyLeft2 = names.filter((n) => /(^|[^A-Za-z0-9])(duel|royale|boss|clavier|net|cl|cj|inv|sso|up|ob|fpw|rst|ver|school|conv|rev|cel|tt|tc|dl|heat|mascot|kbn|kbp|tier|gate|gaze|intro|typ|chal|cfm)\.[a-z0-9_]+/.test(sc[n].t));
+          if (keyLeft2.length) problems.push(`BR12 : clé de texte affichée telle quelle : ${keyLeft2.slice(0, 4).join(', ')}`);
+          for (const [n, w] of [['duelMenu', 'Real-time 1v1 duel'], ['duelHostJoined', 'Ben has joined'], ['duelWin', 'Victory!'], ['duelDraw', 'It’s a draw!'], ['duelRematchOpp', 'wants a rematch!'], ['royaleMenu', 'Create a game'], ['royaleLobbyHost1', 'at least 1 more player needed to start'], ['royaleWait2', 'Typing Race'], ['royaleFinal', 'Game results'], ['clavierDone0', 'Keyboard rebuilt!'], ['clavierPlay', 'PLACED'], ['bossLobbyFull', 'The challenge text'], ['bossPlaying', 'Type the challenge text'], ['bossResult', 'Challenge complete!'], ['schoolModal', 'School licence'], ['upgradeModal', 'Unlock the 55 advanced lessons'], ['upgradeModal', '4.99€'], ['upgradeModal', '/month'], ['upgradeModal', 'Go Expert: Pay'], ['obStudent', 'Where to start'], ['obTeacher', 'Your first class'], ['forcedPw', 'Choose your password'], ['resetPw', 'Save the new password'], ['joinClassPreview', 'Join the class'], ['joinClassDone', 'You have joined the class'], ['verified_success', 'Email confirmed!'], ['verified_expired', 'Link expired'], ['sso_state', 'The login has expired'], ['cookieBanner', 'Decline'], ['cookieBanner', 'Accept'], ['cookieReopen', 'Manage my cookies'], ['clLate5', 'overdue'], ['clWelcome', 'Welcome to your class'], ['clView', 'Joined on'], ['clNone', 'No class yet'], ['reviewAsk', 'Send my review'], ['celebrate', 'Lesson complete'], ['convGuest', 'Create your free account'], ['convUpgrade', 'Unlock everything with Expert'], ['page_testtime', 'Assess your level'], ['page_testchoix', 'Which test'], ['settings', 'Reference layout']]) {
+            if (!(sc[n] && sc[n].t.toLowerCase().includes(w.toLowerCase()))) problems.push(`BR12 : « ${w} » absent de l'écran ${n} (jeux multijoueurs et fenêtres en anglais)`);
           }
         }
         for (const w of ['Home', 'Test', 'Courses', 'Games', 'Progress', 'Log out']) if (!lg.enNav.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent du menu en anglais`);

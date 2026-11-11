@@ -7,6 +7,21 @@
   var GA_ID = 'G-3FTPKKF679';
   var STORAGE_KEY = 'keypace_cookie_consent'; // 'accepted' | 'rejected'
 
+  // Anglais : seulement quand i18n.js est chargé avant ce script (l'application) ET que l'interface est en anglais ;
+  // les pages statiques (sans i18n.js) gardent le français. Le français ci-dessous est le texte de référence.
+  var EN = {
+    label: 'Cookie consent',
+    text: 'We use audience measurement cookies (Google Analytics) to understand how KeyPace is used. No advertising cookies, no reselling of data. ',
+    more: 'Learn more',
+    reject: 'Decline',
+    accept: 'Accept',
+    manage: 'Manage my cookies'
+  };
+  function T(k, fr) {
+    try { if (window.KPI18n && window.KPI18n.lang() === 'en') return EN[k]; } catch (e) {}
+    return fr;
+  }
+
   function loadAnalytics() {
     if (window.__gaLoaded) return;
     window.__gaLoaded = true;
@@ -39,16 +54,15 @@
     var el = document.createElement('div');
     el.id = 'cookie-consent-banner';
     el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-label', 'Consentement aux cookies');
+    el.setAttribute('aria-label', T('label', 'Consentement aux cookies'));
     el.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:9999;background:var(--card,#fff);border-top:1px solid var(--border,#E7E1D5);box-shadow:0 -8px 24px rgba(0,0,0,.08);padding:16px 20px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:center;font-family:Inter,sans-serif;';
     el.innerHTML =
       '<p style="margin:0;flex:1 1 320px;min-width:220px;font-size:13.5px;line-height:1.55;color:var(--txt,#16140F)">' +
-      'On utilise des cookies de mesure d\'audience (Google Analytics) pour comprendre comment KeyPace est utilisé. ' +
-      'Aucun cookie publicitaire, aucune revente de données. ' +
-      '<a href="/cookies" style="color:var(--accent,#FF4D2E);text-decoration:underline">En savoir plus</a>.</p>' +
+      T('text', 'On utilise des cookies de mesure d\'audience (Google Analytics) pour comprendre comment KeyPace est utilisé. Aucun cookie publicitaire, aucune revente de données. ') +
+      '<a href="/cookies" style="color:var(--accent,#FF4D2E);text-decoration:underline">' + T('more', 'En savoir plus') + '</a>.</p>' +
       '<div style="display:flex;gap:10px;flex-shrink:0">' +
-      '<button id="cc-reject" style="font:inherit;font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:9px;border:1.5px solid var(--border,#E7E1D5);background:var(--card,#fff);color:var(--txt,#16140F);cursor:pointer">Refuser</button>' +
-      '<button id="cc-accept" style="font:inherit;font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:9px;border:none;background:var(--accent,#FF4D2E);color:#fff;cursor:pointer">Accepter</button>' +
+      '<button id="cc-reject" style="font:inherit;font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:9px;border:1.5px solid var(--border,#E7E1D5);background:var(--card,#fff);color:var(--txt,#16140F);cursor:pointer">' + T('reject', 'Refuser') + '</button>' +
+      '<button id="cc-accept" style="font:inherit;font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:9px;border:none;background:var(--accent,#FF4D2E);color:#fff;cursor:pointer">' + T('accept', 'Accepter') + '</button>' +
       '</div>';
     document.body.appendChild(el);
     document.getElementById('cc-accept').addEventListener('click', function () {
@@ -68,8 +82,8 @@
     if (document.getElementById('cookie-consent-reopen')) return;
     var btn = document.createElement('button');
     btn.id = 'cookie-consent-reopen';
-    btn.title = 'Gérer mes cookies';
-    btn.setAttribute('aria-label', 'Gérer mes cookies');
+    btn.title = T('manage', 'Gérer mes cookies');
+    btn.setAttribute('aria-label', T('manage', 'Gérer mes cookies'));
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="9" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="14.5" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>';
     btn.style.cssText = 'position:fixed;left:14px;bottom:14px;z-index:9998;width:36px;height:36px;border-radius:50%;border:1px solid var(--border,#E7E1D5);background:var(--card,#fff);color:#FF4D2E;box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;';
     btn.addEventListener('click', renderBanner);

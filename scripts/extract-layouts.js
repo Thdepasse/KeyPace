@@ -17,7 +17,9 @@ function pick(html, name) {
 }
 function load(htmlPath) {
   const html = fs.readFileSync(htmlPath, 'utf8');
-  const ev = (name) => new Function(`return (${pick(html, name)});`)();
+  // kpT : certains textes de la page (notes des dispositions) passent par le dictionnaire ; ici on veut le français de référence
+  const kpT = (k) => require('../i18n.js').dict.fr[k];
+  const ev = (name) => new Function('kpT', `return (${pick(html, name)});`)(kpT);
   return { KB_LAYOUTS: ev('KB_LAYOUTS'), KB_EXTRA: ev('KB_EXTRA'), KB_HOW: ev('KB_HOW'), KB_LAYOUT_LABELS: ev('KB_LAYOUT_LABELS'), KB_LAYOUT_NOTES: ev('KB_LAYOUT_NOTES') };
 }
 function build(data) {
