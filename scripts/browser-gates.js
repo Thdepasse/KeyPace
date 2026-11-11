@@ -427,6 +427,7 @@ async function run(opts = {}) {
           document.getElementById('nav-kb-btn').click();await new Promise(r=>setTimeout(r,150));out.enChip=document.getElementById('nav-kb-menu').innerText;document.getElementById('nav-kb-btn').click();
           go('stats');await new Promise(r=>setTimeout(r,500));out.enStats=document.getElementById('page-stats').innerText;
           await app.openSettings();await new Promise(r=>setTimeout(r,600));{const o=document.getElementById('settings-overlay');out.enSettings=o?o.innerText:'(pas de fenêtre)';app.closeSettings();}
+          go('home');await new Promise(r=>setTimeout(r,500));out.enHome=document.getElementById('page-home').innerText;
           out.enGameScreens={};
           for(const g of ['frappe','sprint','course','ghost','simon']){app.activeGame=g;app.game=null;app.sprint=null;app.course=null;app.ghost=null;app.simon=null;app.renderGames();await new Promise(r=>setTimeout(r,200));out.enGameScreens[g]=document.getElementById('page-games').innerText;}
           app.activeGame=null;
@@ -467,6 +468,8 @@ async function run(opts = {}) {
         const ps = ['Ta vitesse', 'Tes records', 'Faire un test', 'Meilleure vitesse', 'Précision moyenne', 'Leçons validées', 'Frappe-mots', 'certificat', 'Certification', 'Série', 'Aucun test'].filter((w) => lg.enStats.toLowerCase().includes(w.toLowerCase())); if (ps.length) problems.push(`BR12 : du français sur la page Progrès en anglais : ${ps.join(', ')}`);
         for (const w of ['Gaze tracker', 'Sounds', 'Game sounds', 'Keyboard format', 'Profile', 'Account', 'Privacy (GDPR)', 'Export my data', 'Delete my account', 'Log out']) if (!lg.enSettings.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent des Réglages en anglais`);
         const st = ['Traqueur du regard', 'Sons de jeu', 'Format du clavier', 'Profil', 'Confidentialité', 'Exporter mes données', 'Supprimer mon compte', 'Enregistrer', 'Mot de passe', 'Adresse actuelle'].filter((w) => new RegExp('(^|[^a-zà-ÿ])' + w.toLowerCase() + '([^a-zà-ÿ]|$)').test(lg.enSettings.toLowerCase())); if (st.length) problems.push(`BR12 : du français dans les Réglages en anglais : ${st.join(', ')}`);
+        for (const w of ['Learn to type', 'Welcome back', 'Back to my lessons']) if (!lg.enHome.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent de l'accueil en anglais`);
+        const hm = ['Apprends à taper', 'Te revoilà', 'Questions fréquentes', 'MANOLO', 'Ce qu', 'Simple et transparent', 'Établissements', 'Reprendre'].filter((w) => lg.enHome.toLowerCase().includes(w.toLowerCase())); if (hm.length) problems.push(`BR12 : du français sur l'accueil en anglais : ${hm.join(', ')}`);
         if (lg.frUi.t !== 'Vitesse' || lg.frUi.lang !== 'fr') problems.push(`BR12 : retour au français, l'interface reste en anglais (${JSON.stringify(lg.frUi)})`);
         if (lg.rowEn.join('|') !== 'Français|English*') problems.push(`BR12 : langue active après le passage (${lg.rowEn.join('|')})`);
         if (!lg.okQ || lg.q.course !== 'en/qwerty' || lg.q.lessons !== 58) problems.push(`BR12 : en anglais, passer à QWERTY garde la langue (${JSON.stringify(lg.q)})`);
@@ -482,6 +485,10 @@ async function run(opts = {}) {
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/?ui=en` }); await sleep(2500); exceptions.splice(0);
         const en = await ev(readTest);
         const readAuth = `(async()=>{openAuth('register');await new Promise(r=>setTimeout(r,300));const m=document.getElementById('auth-modal');const t=m.innerText+' | '+[...m.querySelectorAll('input')].map(i=>i.placeholder).join(' / ');closeModal('auth-modal');return t})()`;
+        const enHomeO = JSON.parse(await ev(`(async()=>{go('home');await new Promise(r=>setTimeout(r,500));const el=document.getElementById('page-home');const c=el.cloneNode(true);c.querySelectorAll('[data-lang-hide]').forEach(x=>x.remove());return JSON.stringify({seen:el.innerText,all:c.textContent})})()`));
+        const enHome = enHomeO.seen;
+        for (const w of ['Learn to type', 'Start for free', 'Test my speed', 'Speed test', 'One finger, one colour']) if (!enHomeO.all.toLowerCase().includes(w.toLowerCase())) problems.push(`BR13 : « ${w} » absent de l'accueil visiteur en anglais`);
+        const hg = ['Apprends à taper', 'Commencer gratuitement', 'Tester ma vitesse', 'Questions fréquentes', 'MANOLO', 'Établissements', 'licence établissement', 'Simple et transparent', 'adopté'].filter((w) => (enHomeO.all + ' ' + enHome).toLowerCase().includes(w.toLowerCase())); if (hg.length) problems.push(`BR13 : du français sur l'accueil visiteur en anglais : ${hg.join(', ')}`);
         const enAuth = await ev(readAuth);
         for (const w of ['Log in', 'Create an account', 'Username', 'Email address', 'Password', 'Confirm password', 'Date of birth', 'terms of use', 'Continue with Google', 'Continue with Microsoft', 'e.g. jean42']) if (!enAuth.includes(w)) problems.push(`BR13 : « ${w} » absent de la fenêtre de connexion en anglais`);
         const fa = ['Connexion', "Nom d'utilisateur", 'Mot de passe', 'Adresse email', 'Date de naissance', "conditions d'utilisation", 'Continuer avec', 'ex: jean42'].filter((w) => enAuth.includes(w)); if (fa.length) problems.push(`BR13 : du français dans la fenêtre de connexion en anglais : ${fa.join(', ')}`);
@@ -495,6 +502,8 @@ async function run(opts = {}) {
         if (keep.lang !== 'en' || !keep.text.includes('Type the sentence')) problems.push('BR13 : la langue de l\'interface n\'est pas retenue au rechargement');
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/?ui=fr` }); await sleep(2500); exceptions.splice(0);
         const fr = await ev(readTest);
+        const frHome = await ev(`(async()=>{go('home');await new Promise(r=>setTimeout(r,500));return document.getElementById('page-home').innerText})()`);
+        if (!/Apprends à taper/i.test(frHome) || !/Questions fréquentes/i.test(frHome) || !/MANOLO/i.test(frHome)) problems.push('BR13 : ?ui=fr ne ramène pas l\'accueil complet en français (blocs belges masqués ?)');
         const frAuth = await ev(readAuth);
         if (!frAuth.includes('Mot de passe') || !frAuth.includes('Continuer avec Google') || !frAuth.includes('ex: jean42')) problems.push('BR13 : ?ui=fr ne ramène pas la fenêtre de connexion en français');
         if (fr.lang !== 'fr' || !fr.text.includes('Tape la phrase') || !fr.text.includes('Ana te défie') || !fr.text.toLowerCase().includes('après le test') || !fr.btns.includes('Recommencer') || /Type the sentence|ACCURACY/.test(fr.text)) problems.push('BR13 : ?ui=fr ne ramène pas le français');
