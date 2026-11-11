@@ -95,10 +95,11 @@ module.exports = async function handler(req, res) {
         return res.status(403).json({ error: 'Session non associée à ce compte.' });
       }
     }
+    // On ne regarde QUE l'état actuel de l'abonnement : `cs.payment_status`
+    // reste 'paid' pour toujours, donc rejouer un ancien session_id après une
+    // résiliation redonnait Expert gratuitement.
     const sub = cs.subscription;
-    const paid =
-      cs.payment_status === 'paid' ||
-      (sub && (sub.status === 'active' || sub.status === 'trialing'));
+    const paid = !!(sub && (sub.status === 'active' || sub.status === 'trialing'));
     if (paid) {
       const patch = { plan: 'expert' };
       if (!user.stripe_customer_id) patch.stripe_customer_id = cs.customer;

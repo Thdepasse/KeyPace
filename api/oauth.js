@@ -198,6 +198,16 @@ async function findOrCreateUser(provider, profile, inviteCtx) {
     const patch = { session_token: session, session_expires_at: shortLivedExpiresAt(), last_seen_at: new Date().toISOString(), deletion_warned_at: null, email_verified: true };
     if (!existing.oauth_provider) patch.oauth_provider = provider;
     if (existing.verification_token) patch.verification_token = null;
+    // Compte jamais confirmé : rien ne prouve que son créateur possède cette
+    // adresse (quelqu'un a pu s'inscrire avec l'email d'autrui pour attendre
+    // la liaison SSO). Le vrai propriétaire, prouvé par le fournisseur, prend
+    // la main : on invalide le mot de passe choisi à la création et tout lien
+    // de réinitialisation en cours. Il pourra en définir un depuis son compte.
+    if (!existing.email_verified) {
+      patch.password_hash = randomHash();
+      patch.reset_token = null;
+      patch.reset_expires_at = null;
+    }
     await sb(`/users?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
     return { token: session };
   }

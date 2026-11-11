@@ -15845,10 +15845,12 @@ const app={
               style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--bg);color:var(--txt);box-sizing:border-box">
           </div>
           <div id="reset-pw-modal-msg" style="display:none;font-size:13px;padding:10px 12px;border-radius:10px"></div>
-          <button id="reset-pw-submit" class="btn-primary" style="margin-top:4px" onclick="app._confirmPasswordReset('${resetToken}')">Enregistrer le nouveau mot de passe</button>
+          <button id="reset-pw-submit" class="btn-primary" style="margin-top:4px">Enregistrer le nouveau mot de passe</button>
         </div>
       </div>
     </div>`;
+    // Le jeton vient de l'URL : jamais interpolé dans le HTML (XSS), passé par closure.
+    overlay.querySelector('#reset-pw-submit').addEventListener('click',()=>app._confirmPasswordReset(resetToken));
     document.body.appendChild(overlay);
     // Nettoyer l'URL
     window.history.replaceState({},'',window.location.pathname);
@@ -18539,7 +18541,7 @@ handlePaymentReturn();
 handleVerificationReturn();
 handleDuelReturn();
 // Réinitialisation de mot de passe via lien email (?reset=TOKEN)
-(()=>{const p=new URLSearchParams(window.location.search);const rt=p.get('reset');if(rt)setTimeout(()=>app.showResetPasswordModal(rt),300);})();
+(()=>{const p=new URLSearchParams(window.location.search);const rt=p.get('reset');if(rt&&/^[a-f0-9]{64}$/i.test(rt))setTimeout(()=>app.showResetPasswordModal(rt),300);})();
 // Ouverture directe de la connexion/inscription depuis un lien externe (?auth=login|register)
 (()=>{const p=new URLSearchParams(window.location.search);const at=p.get('auth');if(at==='login'||at==='register')setTimeout(()=>openAuth(at),300);})();
 loadProgressFromServer();
