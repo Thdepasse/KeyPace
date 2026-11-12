@@ -30,6 +30,7 @@ function render(html, key) {
   } else {
     // l'accueil statique cite sa page /en : une autre adresse sans équivalent anglais ne doit pas la reprendre
     out = out.replace(/<link rel="alternate" hreflang="en-GB"[^>]*>\n?/, '');
+    out = out.replace(/<link rel="alternate" hreflang="nl-BE"[^>]*>\n?/, '');
     out = out.replace(/(<link rel="alternate" hreflang="[^"]+" href=")[^"]*(">)/g, (_, a, b) => a + url + b);
   }
   out = setMeta(out, /<meta property="og:url"[^>]*>/, `<meta property="og:url" content="${url}">`);

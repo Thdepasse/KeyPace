@@ -29,6 +29,7 @@
 <link rel="alternate" hreflang="fr-BE" href="https://keypace.be/">
 <link rel="alternate" hreflang="fr-FR" href="https://keypace.be/fr">
 <link rel="alternate" hreflang="en-GB" href="https://keypace.be/en">
+<link rel="alternate" hreflang="nl-BE" href="https://keypace.be/nl">
 <link rel="alternate" hreflang="fr" href="https://keypace.be/">
 <link rel="alternate" hreflang="x-default" href="https://keypace.be/">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
@@ -4062,7 +4063,7 @@ const VIEW_PATHS={home:'/accueil',test:'/test-frappe-en-ligne',testtime:'/test-d
 const FR_VIEW_PATHS={home:'/fr',lessons:'/fr/cours-dactylo-en-ligne'};
 /* Interface en anglais : adresses /en (même appli, textes anglais ; pages non indexées tant que le cours d'anglais est en bêta, voir api/_page-routes.js). */
 const EN_VIEW_PATHS={home:'/en',test:'/en/typing-test',testtime:'/en/timed-typing-test',testchoix:'/en/typing-tests',lessons:'/en/typing-lessons',games:'/en/typing-games',stats:'/en/progress',classes:'/en/class'};
-/* Interface en néerlandais : adresses /nl (même appli, textes néerlandais ; pages non indexées tant que le néerlandais est en bêta). */
+/* Interface en néerlandais : adresses /nl (même appli, textes néerlandais ; pages indexées depuis le 2026-11-12). */
 const NL_VIEW_PATHS={home:'/nl',test:'/nl/typtest',testtime:'/nl/typtest-tijd',testchoix:'/nl/typtesten',lessons:'/nl/typlessen',games:'/nl/typspellen',stats:'/nl/voortgang',classes:'/nl/klas'};
 const LANG_VIEW_PATHS={en:EN_VIEW_PATHS,nl:NL_VIEW_PATHS};
 const kpPathLang=()=>/^\/en(\/|$)/.test(location.pathname)?'en':/^\/nl(\/|$)/.test(location.pathname)?'nl':null;
@@ -4445,7 +4446,7 @@ const KP_COURSES={
   /* Anglais britannique (bêta : comptes testeurs, côté serveur). L'interface reste en français ; seuls les textes à taper et le vocabulaire des jeux sont en anglais. */
   'en/azerty':{id:'en/azerty',family:'azerty',content:'en',src:'/courses-src/en-azerty.json'},
   'en/qwerty':{id:'en/qwerty',family:'qwerty',content:'en',src:'/courses-src/en-qwerty.json'},
-  /* Néerlandais : AZERTY belge (Flandre) et QWERTY (Pays-Bas), interface en néerlandais (dictionnaire nl), en bêta. */
+  /* Néerlandais : AZERTY belge (Flandre) et QWERTY (Pays-Bas), interface en néerlandais (dictionnaire nl), ouvert à tous depuis le 2026-11-12. */
   'nl/azerty':{id:'nl/azerty',family:'azerty',content:'nl',src:'/courses-src/nl-azerty.json'},
   'nl/qwerty':{id:'nl/qwerty',family:'qwerty',content:'nl',src:'/courses-src/nl-qwerty.json'}
 };

@@ -38,7 +38,7 @@ test('balises d\'une page /en : langue, adresse canonique, hreflang avec elle-m√
   assert.match(out, /<html lang="en"/);
   assert.ok(out.includes(`<link rel="canonical" href="${BASE}/en/typing-lessons">`));
   const hl = [...out.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]*)">/g)].map((m) => m[1] + '=' + m[2]);
-  assert.deepStrictEqual(hl, [`en-GB=${BASE}/en/typing-lessons`, `fr-BE=${BASE}/cours-dactylo-en-ligne`, `fr-FR=${BASE}/fr/cours-dactylo-en-ligne`, `x-default=${BASE}/cours-dactylo-en-ligne`]);
+  assert.deepStrictEqual(hl, [`en-GB=${BASE}/en/typing-lessons`, `nl-BE=${BASE}/nl/typlessen`, `fr-BE=${BASE}/cours-dactylo-en-ligne`, `fr-FR=${BASE}/fr/cours-dactylo-en-ligne`, `x-default=${BASE}/cours-dactylo-en-ligne`]);
   assert.match(out, /<div class="seo-sec" data-route="en-lessons">/);
   assert.match(out, /<div class="seo-sec" data-route="en-games" hidden>/);
 });
