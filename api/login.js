@@ -273,11 +273,27 @@ module.exports = async function handler(req, res) {
   // — Demande de réinitialisation de mot de passe
   if (body.action === 'reset-request') {
     const { token } = body;
-    if (!token) return res.status(400).json({ error: 'Token de session manquant.' });
-
-    const sessionR = await sb(`/users?${sessionFilter(token)}&select=id,username,email`);
-    const user = sessionR.data && sessionR.data[0];
-    if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    let user = null;
+    if (token) {
+      const sessionR = await sb(`/users?${sessionFilter(token)}&select=id,username,email,reset_expires_at`);
+      user = sessionR.data && sessionR.data[0];
+      if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    } else {
+      // Déconnecté (« Mot de passe oublié ? » de la connexion) : on cherche par
+      // e-mail ou par identifiant. Réponse identique que le compte existe ou
+      // non, pour ne pas permettre d'énumérer les comptes.
+      const ident = String(body.identifier || '').trim();
+      if (ident.length < 3 || ident.length > 254) return res.status(400).json({ error: 'Indique ton adresse e-mail ou ton identifiant.' });
+      const esc = ident.replace(/[\\%_]/g, (c) => '\\' + c);
+      const col = ident.includes('@') ? 'email' : 'username';
+      const lookR = await sb(`/users?${col}=ilike.${encodeURIComponent(esc)}&select=id,username,email,reset_expires_at`);
+      const rows = Array.isArray(lookR.data) ? lookR.data : [];
+      user = rows.length === 1 ? rows[0] : null;
+      if (!user || !user.email) return res.json({ ok: true });
+      // Anti-rafale : au plus un e-mail toutes les 2 minutes par compte
+      // (le lien dure 60 min, donc une échéance à plus de 58 min = envoyé il y a < 2 min).
+      if (user.reset_expires_at && new Date(user.reset_expires_at).getTime() - Date.now() > 58 * 60 * 1000) return res.json({ ok: true });
+    }
 
     const resetToken = require('crypto').randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
@@ -543,8 +559,13 @@ module.exports = async function handler(req, res) {
   const { username, passwordHash } = body;
   if (!username || !passwordHash) return res.status(400).json({ error: 'Champs manquants.' });
 
-  const r = await sb(`/users?username=eq.${encodeURIComponent(username)}&select=*`);
-  const user = r.data && r.data[0];
+  // Insensible à la casse : le client envoie l'identifiant en minuscules, alors
+  // qu'un renommage peut l'avoir stocké avec des majuscules (« Theo ») : un
+  // eq. strict rendait la reconnexion impossible. S'il reste d'anciens
+  // doublons de casse, la correspondance exacte l'emporte.
+  const r = await sb(`/users?${usernameEqFilter(username)}&select=*`);
+  const rows = Array.isArray(r.data) ? r.data : [];
+  const user = rows.find((u) => u.username === username) || (rows.length === 1 ? rows[0] : null);
   // Message générique dans les deux cas (compte inexistant / mauvais mot de
   // passe) : des messages distincts permettaient d'énumérer les comptes
   // existants depuis le formulaire de connexion public.

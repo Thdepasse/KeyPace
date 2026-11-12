@@ -408,6 +408,26 @@
 
   // ── API helper (avec repli local si l'API n'est pas joignable, utile en
   // aperçu avant déploiement — voir message de fin de tâche) ─────────────
+  // File d'attente locale des scores non envoyés (réseau du salon), vidée au
+  // chargement et après chaque envoi réussi.
+  function kpStandQueue(p){
+    try { var k = 'kp_event_pending_' + EVENT_SLUG; var q = JSON.parse(localStorage.getItem(k) || '[]'); q.push(p); localStorage.setItem(k, JSON.stringify(q.slice(-100))); } catch (e) {}
+  }
+  function kpStandFlush(){
+    try {
+      var k = 'kp_event_pending_' + EVENT_SLUG; var q = JSON.parse(localStorage.getItem(k) || '[]');
+      if (!q.length) return;
+      localStorage.setItem(k, '[]');
+      q.forEach(function(p){ callApi('event-submit', p).catch(function(){ kpStandQueue(p); }); });
+    } catch (e) {}
+  }
+  function kpStandNotice(msg){
+    var el = document.getElementById('res-rank');
+    if (el) { el.textContent = msg; el.style.color = '#C2410C'; }
+  }
+  setTimeout(kpStandFlush, 1500);
+  window.addEventListener('online', kpStandFlush);
+
   function callApi(action, payload){
     return fetch(API_URL, {
       method: 'POST',
@@ -643,11 +663,20 @@
       timeMs: result.timeMs,
       textLength: sess.idx
     };
+    // Avant, tout échec basculait en silence sur un classement local : le
+    // participant croyait son score enregistré et le contact était perdu.
     callApi('event-submit', payload).then(function(res){
-      if (!res.ok) throw new Error(res.data && res.data.error || 'api-error');
+      if (!res.ok) {
+        renderResults(result, demoStats(result.wpm, result.acc));
+        kpStandNotice('Score non enregistré' + (res.data && res.data.error ? ' : ' + res.data.error : '.') + ' Préviens l\'équipe du stand.');
+        return;
+      }
       renderResults(result, res.data);
+      kpStandFlush();
     }).catch(function(){
+      kpStandQueue(payload); // réseau du salon instable : renvoyé automatiquement plus tard
       renderResults(result, demoStats(result.wpm, result.acc));
+      kpStandNotice('Connexion instable : ton score est gardé et sera envoyé dès que le réseau revient.');
     });
   }
 
@@ -659,6 +688,7 @@
     document.getElementById('res-time').textContent = Math.round(result.timeMs / 1000) + 's';
 
     var rankEl = document.getElementById('res-rank');
+    rankEl.style.color = '';
     var cmpEl = document.getElementById('res-cmp');
     var improved = stats.bestScore == null || stats.score >= stats.bestScore;
     if (stats.rank && stats.count) {

@@ -2839,7 +2839,12 @@ footer{border-top:1px solid var(--border);margin-top:10px}
     <div class="auth-field" id="auth-parent-wrap" style="display:none"><label data-i18n="auth.parent">Email d'un responsable légal</label><input type="email" id="auth-parent" placeholder="parent@email.com" data-i18n-ph="auth.parent_ph" autocomplete="email"></div>
     <label id="auth-consent-wrap" style="display:none;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--muted);line-height:1.5;margin:2px 0 14px;cursor:pointer"><input type="checkbox" id="auth-consent" style="margin-top:2px;flex-shrink:0"><span data-i18n-html="auth.consent">J'accepte les <a href="/conditions" target="_blank" style="color:var(--accent)">conditions d'utilisation</a> et la <a href="/confidentialite" target="_blank" style="color:var(--accent)">politique de confidentialité</a>.</span></label>
     <div id="auth-forgot-wrap" style="text-align:right;margin-top:-4px;margin-bottom:8px">
-      <a href="mailto:contact@keypace.be?subject=Mot de passe oublié" style="font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:2px" data-i18n="auth.forgot">Mot de passe oublié ?</a>
+      <a href="#" onclick="kpForgotToggle();return false" aria-controls="auth-forgot-panel" style="font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:2px" data-i18n="auth.forgot">Mot de passe oublié ?</a>
+    </div>
+    <div id="auth-forgot-panel" hidden style="background:var(--light);border:1px solid var(--border);border-radius:12px;padding:12px;margin:0 0 12px">
+      <label for="auth-forgot-id" style="display:block;font-size:12.5px;font-weight:600;margin-bottom:6px" data-i18n="auth.forgot_desc">Ton adresse e-mail ou ton identifiant : on t'envoie un lien pour choisir un nouveau mot de passe.</label>
+      <div style="display:flex;gap:8px"><input type="text" id="auth-forgot-id" autocomplete="email" style="flex:1;min-width:0;padding:9px 11px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:var(--bg);color:var(--txt)" onkeydown="if(event.key==='Enter'){event.preventDefault();kpForgotSend();}"><button type="button" class="btn-primary" id="auth-forgot-send" style="padding:9px 14px;font-size:13px" onclick="kpForgotSend()" data-i18n="auth.forgot_send">Envoyer</button></div>
+      <div id="auth-forgot-msg" role="status" style="display:none;font-size:12.5px;margin-top:8px;line-height:1.45"></div>
     </div>
     <button class="auth-btn" id="auth-submit" onclick="authSubmit()" data-i18n="nav.login">Se connecter</button>
     <div style="display:flex;align-items:center;gap:12px;margin:16px 0 12px">
@@ -2968,9 +2973,10 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <div class="nav-dropdown" id="nav-ecoles-wrap" data-lang-hide="en nl">
         <a class="nav-link" href="/ecoles" style="display:inline-flex;align-items:center;text-decoration:none">Établissements</a>
         <div class="nav-dropdown-menu" id="nav-ecoles-menu">
-          <a href="/cours-dactylo-en-ligne#tronc-commun" onclick="kpOpenProgram('tronc-commun');return false">Tronc commun</a>
-          <a href="/cours-dactylo-en-ligne#general" onclick="kpOpenProgram('general');return false">Enseignement général</a>
-          <a href="/cours-dactylo-en-ligne#qualifiant" onclick="kpOpenProgram('qualifiant');return false">Enseignement qualifiant</a>
+          <a href="/dactylographie-tronc-commun">Tronc commun</a>
+          <a href="/dactylographie-general-transition">Général ou transition</a>
+          <a href="/dactylographie-qualifiant">Qualifiant</a>
+          <a href="/dactylographie-superieur">Supérieur et adultes</a>
         </div>
       </div>
       <div class="nav-dropdown" id="nav-test-wrap">
@@ -3571,6 +3577,25 @@ function loadSession(){
 function openModal(id,opts){if(id==='upgrade-modal'&&!(opts&&opts.silent)){try{track('upgrade_wall_shown');}catch{}}document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
+/* « Mot de passe oublié ? » sans être connecté : avant, un simple mailto. */
+function kpForgotToggle(){
+  const p=document.getElementById('auth-forgot-panel');if(!p)return;
+  p.hidden=!p.hidden;
+  if(!p.hidden){const i=document.getElementById('auth-forgot-id'),u=document.getElementById('auth-username');if(i&&!i.value&&u&&u.value)i.value=u.value.trim();i&&i.focus();}
+}
+async function kpForgotSend(){
+  const i=document.getElementById('auth-forgot-id'),m=document.getElementById('auth-forgot-msg'),b=document.getElementById('auth-forgot-send');
+  const v=(i&&i.value||'').trim();
+  const say=(t,ok)=>{m.style.display='block';m.style.color=ok?'#1FA971':'#E5484D';m.textContent=t;};
+  if(v.length<3){say(kpT('auth.forgot_need'),false);i&&i.focus();return;}
+  b.disabled=true;
+  try{
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'reset-request',identifier:v})});
+    if(!r.ok)throw new Error();
+    say(kpT('auth.forgot_sent'),true);
+  }catch(e){say(kpT('auth.forgot_err'),false);}
+  finally{b.disabled=false;}
+}
 function openAuth(tab, contextMsg, callback){
   _authCallback = callback || null;
   switchTab(tab || 'login');
@@ -3592,6 +3617,7 @@ function switchTab(tab){
   document.getElementById('auth-parent-wrap').style.display='none';
   document.getElementById('auth-submit').textContent=tab==='login'?kpT('nav.login'):kpT('auth.submit_register');
   document.getElementById('auth-forgot-wrap').style.display=tab==='login'?'block':'none';
+  {const fp=document.getElementById('auth-forgot-panel');if(fp&&tab!=='login')fp.hidden=true;}
   document.getElementById('auth-error').classList.remove('show');
   const dh=document.getElementById('auth-domain-hint');if(dh)dh.style.display='none';
 }
@@ -3704,7 +3730,9 @@ document.addEventListener('keydown',e=>{
   // alors passer au champ suivant. Avant, Tab dans les Réglages était bloqué et relançait le test dessous.
   if(e.key==='Tab'){
     const t=e.target,inPage=!t||t===document.body||t===document.documentElement||!!(t.closest&&t.closest('#page-test,#page-lessons'));
-    if(!kpDialogOpen()&&!kpIsField(t)&&inPage&&app&&(app.view==='test'||app.view==='lessons')&&app.sess){
+    // Seulement une fois la frappe commencée, et jamais Maj+Tab : avant, Tab relançait le test même
+    // au repos, et la nav comme le bandeau cookies étaient inatteignables au clavier (WCAG 2.1.2).
+    if(!e.shiftKey&&!kpDialogOpen()&&!kpIsField(t)&&inPage&&app&&(app.view==='test'||app.view==='lessons')&&app.sess&&app.sess.started){
       e.preventDefault();
       app.restart();
     }
@@ -4141,13 +4169,16 @@ async function kpSetSiteLanguage(lang){
   try{if(typeof app!=='undefined'&&app.renderView)app.renderView(app.view||'home');}catch{}
   try{if(document.getElementById('settings-overlay')){app.closeSettings();app.openSettings();}}catch{}
 }
-/* Sous « Établissements » : les types de programme du pays choisi avec le drapeau. Belgique : les trois portes de la page Cours
-   (#tronc-commun, #general, #qualifiant). France : pas de portes, un seul lien vers le programme officiel. */
+/* Sous « Établissements » : selon le drapeau. Belgique : les quatre pages établissements (mêmes catégories que les portes
+   de la page Cours, plus le supérieur). France : pas de portes, un seul lien vers le programme officiel. */
 function kpNavProgramRender(){
   const m=document.getElementById('nav-ecoles-menu');if(!m)return;
-  const be=kpRegionId()==='be';
-  const items=be?[['tronc-commun','Tronc commun'],['general','Enseignement général'],['qualifiant','Enseignement qualifiant']]:[['','Programme officiel']];
-  m.innerHTML=items.map(([h,l])=>'<a href="'+(be?'':'/fr')+'/cours-dactylo-en-ligne'+(h?'#'+h:'')+'" onclick="kpOpenProgram(\''+h+'\');return false">'+l+'</a>').join('');
+  if(kpRegionId()==='be'){
+    m.innerHTML=[['/dactylographie-tronc-commun','Tronc commun'],['/dactylographie-general-transition','Général ou transition'],['/dactylographie-qualifiant','Qualifiant'],['/dactylographie-superieur','Supérieur et adultes']]
+      .map(([h,l])=>'<a href="'+h+'">'+l+'</a>').join('');
+    return;
+  }
+  m.innerHTML='<a href="/fr/cours-dactylo-en-ligne" onclick="kpOpenProgram(\'\');return false">Programme officiel</a>';
 }
 function kpOpenProgram(h){
   app._skipModulesHub=false;go('lessons');
@@ -4316,7 +4347,8 @@ function handleVerificationReturn(){
     success:{icon:'✓',title:kpT('ver.ok_title'),body:kpT('ver.ok_body'),cta:kpT('nav.login'),action:"openAuth('login')"},
     already:{icon:'✓',title:kpT('ver.already_title'),body:kpT('ver.already_body'),cta:kpT('nav.login'),action:"openAuth('login')"},
     'email-changed':{icon:'✓',title:kpT('ver.changed_title'),body:kpT('ver.changed_body'),cta:'',action:''},
-    expired:{icon:`<span style="color:var(--accent)">${ICONS.clock}</span>`,title:kpT('ver.expired_title'),body:kpT('ver.expired_body'),cta:kpT('nav.signup'),action:"openAuth('register')"},
+    expired:{icon:`<span style="color:var(--accent)">${ICONS.clock}</span>`,title:kpT('ver.expired_title'),body:kpT('ver.expired_body'),cta:'',action:''},
+    resent:{icon:`<span style="color:var(--accent)">${ICONS.clock}</span>`,title:kpT('ver.resent_title'),body:kpT('ver.resent_body'),cta:'',action:''},
     invalid:{icon:'✕',title:kpT('ver.invalid_title'),body:kpT('ver.invalid_body'),cta:kpT('ver.home'),action:''},
     error:{icon:'⚠',title:kpT('ver.error_title'),body:kpT('ver.error_body'),cta:kpT('ver.home'),action:''},
   };
@@ -9140,7 +9172,7 @@ const app={
       </div>
 
       <div class="features-grid home-features-desktop" data-lang-hide="en nl">
-        <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.gradCap}</div><h3>Adapté à chaque établissement</h3><p>Programmes ajustés au <a href="/dactylographie-primaire">primaire</a>, au <a href="/dactylographie-secondaire">secondaire</a> et au <a href="/dactylographie-superieur">supérieur</a>, alignés sur les référentiels pédagogiques en vigueur.</p></div>
+        <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.gradCap}</div><h3>Adapté à chaque établissement</h3><p>Une page pour le <a href="/dactylographie-tronc-commun">tronc commun</a>, le <a href="/dactylographie-general-transition">général ou la transition</a>, le <a href="/dactylographie-qualifiant">qualifiant</a> et le <a href="/dactylographie-superieur">supérieur</a>, alignée sur les référentiels en vigueur.</p></div>
         <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.award}</div><h3>Éligible à la subvention MANOLO</h3><p>Réduisez le coût pour votre établissement grâce au dispositif de subvention de la Fédération Wallonie-Bruxelles.</p></div>
         <div class="feature-card"><div class="icon" style="color:var(--accent)">${ICONS.keyboard}</div><h3>65 leçons et 8+ jeux</h3><p>65 leçons progressives de dactylographie et plus de 8 jeux pour travailler précision, mémoire et vitesse au clavier.</p></div>
       </div>

@@ -399,7 +399,10 @@ module.exports = async function handler(req, res) {
 
   // POST action=contact → formulaire de contact licence
   const { name, email, count, message } = req.body || {};
+  if (req.body && req.body.website) return res.json({ ok: true }); // champ piège anti-robot
   if (!name || !email || !count) return res.status(400).json({ error: 'Champs manquants.' });
+  if (String(name).length > 200 || String(count).length > 20 || (message && String(message).length > 5000)) return res.status(400).json({ error: 'Champ trop long.' });
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(String(email)) || String(email).length > 254) return res.status(400).json({ error: 'Adresse e-mail invalide.' });
   if (!RESEND_API_KEY) return res.status(500).json({ error: 'Email non configuré.' });
 
   const safeName = escapeHtml(name);
@@ -407,8 +410,12 @@ module.exports = async function handler(req, res) {
   const safeCount = escapeHtml(count);
   const safeMessage = message ? escapeHtml(message).replace(/\n/g, '<br>') : '';
 
+  // Avant, le résultat de Resend n'était pas vérifié : « Demande envoyée ! »
+  // s'affichait même si rien n'était parti (demande commerciale perdue).
   const resend = new Resend(RESEND_API_KEY);
-  await resend.emails.send({
+  let sent;
+  try {
+  sent = await resend.emails.send({
     from: FROM_EMAIL,
     to: 'contact@keypace.be',
     replyTo: email,
@@ -465,6 +472,11 @@ module.exports = async function handler(req, res) {
   </table>
 </body></html>`,
   });
+  } catch (e) { sent = { error: e }; }
+  if (!sent || sent.error) {
+    console.error('licence contact error:', (sent && sent.error && (sent.error.message || sent.error)) || 'no response');
+    return res.status(502).json({ error: "La demande n'a pas pu être envoyée. Réessaie, ou écris-nous à contact@keypace.be." });
+  }
 
   res.json({ ok: true });
 };

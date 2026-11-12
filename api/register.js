@@ -330,7 +330,7 @@ async function verifyEmail(req, res) {
     const token = (req.query && req.query.token) || (new URL(req.url, `https://${req.headers.host}`).searchParams.get('token'));
     if (!token) return redirect(res, `${APP_URL}?verified=invalid`);
 
-    const r = await sb(`/users?verification_token=eq.${encodeURIComponent(token)}&select=id,email,email_verified,verification_expires_at,pending_email,institution_id`);
+    const r = await sb(`/users?verification_token=eq.${encodeURIComponent(token)}&select=id,username,email,email_verified,verification_expires_at,pending_email,institution_id`);
     const user = r.data && r.data[0];
 
     if (!user) return redirect(res, `${APP_URL}?verified=invalid`);
@@ -354,8 +354,31 @@ async function verifyEmail(req, res) {
 
     if (user.email_verified) return redirect(res, `${APP_URL}?verified=already`);
     // N'expire que si une date est réellement fixée (null => on n'expire pas).
-    if (user.verification_expires_at && new Date(user.verification_expires_at) < new Date())
-      return redirect(res, `${APP_URL}?verified=expired`);
+    // Lien d'inscription expiré : avant, impasse (« crée un nouveau compte »,
+    // alors que le nom et l'e-mail restaient pris). Cliquer le lien prouve
+    // l'accès à la boîte : on renvoie un nouveau lien valable 24 h.
+    if (user.verification_expires_at && new Date(user.verification_expires_at) < new Date()) {
+      if (!RESEND_API_KEY || !user.email) return redirect(res, `${APP_URL}?verified=expired`);
+      const fresh = require('crypto').randomBytes(32).toString('hex');
+      const upd = await sb(`/users?id=eq.${user.id}&verification_token=eq.${encodeURIComponent(token)}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ verification_token: fresh, verification_expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() }),
+      });
+      if (!upd.ok) return redirect(res, `${APP_URL}?verified=expired`);
+      try {
+        const resend = new Resend(RESEND_API_KEY);
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: user.email,
+          subject: 'Une dernière étape pour accéder à KeyPace',
+          html: confirmationEmail(user.username, `${APP_URL}/api/verify-email?token=${fresh}`),
+        });
+      } catch (e) {
+        console.error('verify resend error:', e.message || e);
+        return redirect(res, `${APP_URL}?verified=expired`);
+      }
+      return redirect(res, `${APP_URL}?verified=resent`);
+    }
 
     await sb(`/users?id=eq.${user.id}`, {
       method: 'PATCH',
