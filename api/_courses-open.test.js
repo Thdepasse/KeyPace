@@ -28,7 +28,7 @@ test('le registre déclare le cours QWERTY en ligne', () => {
 });
 
 test('tout compte connecté a accès au cours QWERTY, quel que soit son rôle ; sans compte, rien', () => {
-  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.deepEqual(courseIdsFor({ username: 'quelquun', role }), ['fr/qwerty', 'en/azerty', 'en/qwerty'], role);
+  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.deepEqual(courseIdsFor({ username: 'quelquun', role }), ['fr/qwerty', 'en/azerty', 'en/qwerty', 'nl/azerty', 'nl/qwerty'], role);
   assert.deepEqual(courseIdsFor(null), []);
   assert.deepEqual(courseIdsFor(undefined), []);
 });
@@ -36,7 +36,7 @@ test('tout compte connecté a accès au cours QWERTY, quel que soit son rôle ; 
 test('requête access : un compte ordinaire reçoit le cours QWERTY', async () => {
   USER = { id: 9, role: 'eleve', username: 'eleve-ordinaire' };
   const r = await call({ token: 't', access: true });
-  assert.deepEqual(r.body, { ok: true, coursAcces: ['fr/qwerty', 'en/azerty', 'en/qwerty'] });
+  assert.deepEqual(r.body, { ok: true, coursAcces: ['fr/qwerty', 'en/azerty', 'en/qwerty', 'nl/azerty', 'nl/qwerty'] });
 });
 
 test('un compte ordinaire enregistre la progression du cours QWERTY, sans écraser la progression AZERTY', async () => {
@@ -48,20 +48,19 @@ test('un compte ordinaire enregistre la progression du cours QWERTY, sans écras
 
 test('un cours qui n\'est pas au registre reste refusé', async () => {
   USER = { id: 9, role: 'eleve', username: 'eleve-ordinaire' }; PROGRESS = null;
-  await call({ token: 't', data: { lessons: { r1: R1 }, courses: { 'nl/azerty': { lessons: { r1: R1 } } } } });
-  assert.equal(PROGRESS.courses && PROGRESS.courses['nl/azerty'], undefined);
+  await call({ token: 't', data: { lessons: { r1: R1 }, courses: { 'es/azerty': { lessons: { r1: R1 } } } } });
+  assert.equal(PROGRESS.courses && PROGRESS.courses['es/azerty'], undefined);
 });
 
 test('les cours d\'anglais sont en ligne : tout compte connecté les reçoit, sans compte rien', () => {
   assert.deepEqual(COURSE_ACCESS['en/qwerty'], { status: 'en ligne' });
   assert.deepEqual(COURSE_ACCESS['en/azerty'], { status: 'en ligne' });
-  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.deepEqual(courseIdsFor({ username: 'autre', role }), ['fr/qwerty', 'en/azerty', 'en/qwerty'], role);
+  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.deepEqual(courseIdsFor({ username: 'autre', role }), ['fr/qwerty', 'en/azerty', 'en/qwerty', 'nl/azerty', 'nl/qwerty'], role);
   assert.deepEqual(courseIdsFor(null), []);
 });
 
-test('le néerlandais (nl/azerty) est en bêta : un testeur le reçoit, un compte ordinaire non', () => {
-  assert.deepEqual(COURSE_ACCESS['nl/azerty'], { status: 'bêta' }); assert.deepEqual(COURSE_ACCESS['nl/qwerty'], { status: 'bêta' });
-  assert.deepEqual(courseIdsFor({ username: 'testeur1', role: 'eleve' }), ['fr/qwerty', 'en/azerty', 'en/qwerty', 'nl/azerty', 'nl/qwerty']);
-  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.ok(!courseIdsFor({ username: 'autre', role }).some((id) => id.startsWith('nl/')), role);
-  assert.ok(!courseIdsFor(null).includes('nl/azerty'));
+test('le néerlandais est en ligne : tout compte connecté le reçoit, sans compte rien', () => {
+  assert.deepEqual(COURSE_ACCESS['nl/azerty'], { status: 'en ligne' }); assert.deepEqual(COURSE_ACCESS['nl/qwerty'], { status: 'en ligne' });
+  for (const role of ['eleve', 'prof', 'etablissement', 'admin']) assert.deepEqual(courseIdsFor({ username: 'autre', role }), ['fr/qwerty', 'en/azerty', 'en/qwerty', 'nl/azerty', 'nl/qwerty'], role);
+  assert.deepEqual(courseIdsFor(null), []);
 });

@@ -8,7 +8,7 @@ const assert = require('node:assert');
 const saveProgress = require('./save-progress');
 const { COURSE_ACCESS, courseIdsFor, betaTesters } = require('./_courses-registry');
 // Ce fichier teste le mécanisme « bêta » : on remet le statut du cours à 'bêta' pour la durée du test (le vrai statut est vérifié ailleurs).
-for (const id of ['fr/qwerty', 'en/azerty', 'en/qwerty']) COURSE_ACCESS[id].status = 'bêta';
+for (const id of ['fr/qwerty', 'en/azerty', 'en/qwerty', 'nl/azerty', 'nl/qwerty']) COURSE_ACCESS[id].status = 'bêta';
 
 let USER, PROGRESS, CALLS;
 global.fetch = async (url, opts = {}) => {
