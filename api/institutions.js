@@ -105,7 +105,7 @@ function linkInviteEmail(url) {
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#faf9f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#16140F">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0">Ouvre ce lien sur ton ordinateur : 65 leçons et des jeux de frappe, gratuits pour commencer.</div>
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0">Ouvre ce lien sur ton ordinateur : 66 leçons et des jeux de frappe, gratuits pour commencer.</div>
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#faf9f5;padding:32px 12px">
     <tr><td align="center">
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #E7E1D5;border-radius:28px;overflow:hidden">
@@ -131,7 +131,7 @@ function linkInviteEmail(url) {
             <p style="margin:0 0 16px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#A39C8D">En trois étapes</p>
             <table width="100%" cellpadding="0" cellspacing="0">
               ${step(1, 'Ouvre le lien sur ton ordinateur', 'Clique sur le bouton ci-dessus depuis ta boîte mail.')}
-              ${step(2, 'Lance ta première leçon', '65 leçons progressives, à ton rythme, pour apprendre les dix doigts.')}
+              ${step(2, 'Lance ta première leçon', '66 leçons progressives, à ton rythme, pour apprendre les dix doigts.')}
               ${step(3, 'Entraîne-toi avec les jeux', 'Précision, mémoire, vitesse : tu progresses sans t\'en rendre compte.')}
             </table>
           </td></tr></table>

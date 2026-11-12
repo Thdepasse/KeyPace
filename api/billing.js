@@ -111,7 +111,7 @@ module.exports = async function handler(req, res) {
 
   if (action === 'portal') {
     if (!user.stripe_customer_id) {
-      return res.status(400).json({ error: 'Aucun abonnement associe a ce compte.' });
+      return res.status(400).json({ error: 'Aucun abonnement associé à ce compte.' });
     }
     const session = await stripe.billingPortal.sessions.create({
       customer: user.stripe_customer_id,

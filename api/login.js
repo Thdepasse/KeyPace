@@ -29,6 +29,12 @@ function usernameEqFilter(name) {
   return `username=ilike.${encodeURIComponent(escaped)}`;
 }
 
+// RGPD mineurs : accord parental non confirmé 30 jours après l'inscription → compte suspendu.
+const PARENT_CONSENT_MSG = "Compte suspendu : l'accord d'un parent n'a pas été confirmé dans le délai de 30 jours. Contacte contact@keypace.be.";
+function parentConsentExpired(user) {
+  return !!(user && user.parent_consent_token && user.created_at && Date.now() - new Date(user.created_at).getTime() > 30 * 24 * 60 * 60 * 1000);
+}
+
 async function sb(path, opts = {}) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
     ...opts,
@@ -548,6 +554,12 @@ module.exports = async function handler(req, res) {
     const r = await sb(`/users?${sessionFilter(token)}&select=*`);
     const user = r.data && r.data[0];
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    // Même règle RGPD que la connexion normale (voir plus bas) : sans elle, une
+    // session ouverte avant la suspension se prolongeait de 30 jours en 30 jours.
+    if (parentConsentExpired(user)) {
+      await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ session_token: null, session_expires_at: null }) });
+      return res.status(403).json({ error: PARENT_CONSENT_MSG, code: 'PARENT_CONSENT_MISSING' });
+    }
     const newToken = require('crypto').randomUUID();
     await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ session_token: newToken, session_expires_at: sessionExpiresAt(), last_seen_at: new Date().toISOString(), deletion_warned_at: null }) });
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
@@ -606,8 +618,8 @@ module.exports = async function handler(req, res) {
   // connexion. Les comptes créés avant l'ajout de cette colonne ont
   // parent_consent_token=null (jamais émis) et ne sont donc jamais suspendus
   // rétroactivement.
-  if (user.parent_consent_token && user.created_at && Date.now() - new Date(user.created_at).getTime() > 30 * 24 * 60 * 60 * 1000) {
-    return res.status(403).json({ error: "Compte suspendu : l'accord d'un parent n'a pas été confirmé dans le délai de 30 jours. Contacte contact@keypace.be.", code: 'PARENT_CONSENT_MISSING' });
+  if (parentConsentExpired(user)) {
+    return res.status(403).json({ error: PARENT_CONSENT_MSG, code: 'PARENT_CONSENT_MISSING' });
   }
 
   const token = require('crypto').randomUUID();

@@ -437,13 +437,20 @@ module.exports = async function handler(req, res) {
   try {
   const { username, email, passwordHash, profInviteToken, consent, birthdate, parentEmail } = req.body || {};
   if (!username || !passwordHash || !email) return res.status(400).json({ error: 'Champs manquants.' });
-  const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-  if (!emailRe.test(String(email))) return res.status(400).json({ error: 'Adresse email invalide.' });
+  const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/;
+  if (!emailRe.test(String(email)) || String(email).length > 254) return res.status(400).json({ error: 'Adresse email invalide.' });
+  // Mêmes règles que le changement d'identifiant (api/login.js update-username) :
+  // avant, « Jean Dupont <b> » ou un nom de 200 caractères étaient acceptés.
+  const uname = String(username).trim();
+  if (uname.length < 3 || uname.length > 24) return res.status(400).json({ error: "Le nom d'utilisateur doit faire entre 3 et 24 caractères." });
+  if (!/^[a-zA-Z0-9._-]+$/.test(uname)) return res.status(400).json({ error: 'Nom d\'utilisateur : lettres sans accent, chiffres, points, tirets et underscores seulement.' });
 
   const check = await sb(`/users?${usernameEqFilter(username)}&select=id`);
   if (check.data && check.data.length > 0) return res.status(409).json({ error: 'Ce nom est déjà pris.' });
 
-  const emailCheck = await sb(`/users?email=eq.${encodeURIComponent(email)}&select=id`);
+  // Insensible à la casse (Jean@x.be et jean@x.be = même boîte).
+  const emailEsc = String(email).replace(/[\\%_]/g, (c) => '\\' + c);
+  const emailCheck = await sb(`/users?email=ilike.${encodeURIComponent(emailEsc)}&select=id`);
   if (emailCheck.data && emailCheck.data.length > 0) return res.status(409).json({ error: 'Cet email est déjà utilisé.' });
 
   // Rattachement à un établissement : uniquement via une invitation prof/admin
@@ -494,7 +501,7 @@ module.exports = async function handler(req, res) {
     const bd = (birthdate || '').trim();
     if (!bd) return res.status(400).json({ error: 'Date de naissance requise.' });
     const d = new Date(bd);
-    if (isNaN(d.getTime())) return res.status(400).json({ error: 'Date de naissance invalide.' });
+    if (isNaN(d.getTime()) || d.getTime() > Date.now() || d.getFullYear() < 1900) return res.status(400).json({ error: 'Date de naissance invalide.' });
     birthdateVal = bd;
     const age = Math.floor((Date.now() - d.getTime()) / 31557600000); // ~365,25 j
     if (age < 13) {

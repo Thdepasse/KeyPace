@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#faf9f5;--txt:#16140F;--muted:#8A8275;--border:#E7E1D5;--card:#fff;--accent:#FF4D2E;--light:#F4F1EA;--ok:#1FA971;--err:#E5484D}
+:root{--bg:#faf9f5;--txt:#16140F;--muted:#716A5E;--border:#E7E1D5;--card:#fff;--accent:#FF4D2E;--light:#F4F1EA;--ok:#1FA971;--err:#E5484D}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--txt);font-family:'Bricolage Grotesque',-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column}
 .mono{font-family:'JetBrains Mono',monospace}
@@ -57,7 +57,7 @@ details input{margin-top:8px}
 /* Race */
 .race{width:100%;display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:start}
 @media(max-width:760px){.race{grid-template-columns:1fr}}
-.textbox{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;font-size:22px;line-height:2;max-height:200px;overflow:hidden;user-select:none}
+.textbox{position:relative;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;font-size:22px;line-height:2;max-height:200px;overflow:hidden;user-select:none}
 .textbox .w{color:var(--muted);margin-right:.45em;display:inline-block}
 .textbox .w.done{color:var(--ok)}
 .textbox .w.cur{color:var(--txt);background:var(--light);border-radius:6px;padding:0 4px;outline:2px solid var(--accent)}
