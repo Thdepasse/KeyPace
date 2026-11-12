@@ -183,10 +183,22 @@ footer{text-align:center;padding:14px;color:var(--muted);font-size:12px}
 <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 <script>
 'use strict';
-// URL du serveur de jeu : ?server=https://... prioritaire, sinon localhost en dev
+// URL du serveur de jeu : ?server=https://... prioritaire, sinon localhost en dev.
+// Pas de serveur multijoueur déployé en prod : hors localhost, sans ?server=,
+// on ne tente pas http://localhost (bloqué par le navigateur) — message clair.
 const qs = new URLSearchParams(location.search);
-const SERVER_URL = qs.get('server') || localStorage.getItem('kp_game_server') || 'http://localhost:3001';
-if (qs.get('server')) localStorage.setItem('kp_game_server', qs.get('server'));
+const IS_LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+// N'accepter que https:// (ou http://localhost en dev) : un lien piégé ne doit
+// pas pouvoir rediriger durablement un joueur vers un serveur arbitraire en clair.
+function validServer(u){
+  try{ const x = new URL(u); return x.protocol === 'https:' || (x.protocol === 'http:' && /^(localhost|127\.0\.0\.1)$/.test(x.hostname)); }
+  catch(e){ return false; }
+}
+const qsServer = validServer(qs.get('server')) ? qs.get('server') : null;
+if (qsServer) localStorage.setItem('kp_game_server', qsServer);
+let storedServer = null;
+try { storedServer = localStorage.getItem('kp_game_server'); } catch(e) {}
+const SERVER_URL = qsServer || (validServer(storedServer) ? storedServer : null) || (IS_LOCAL ? 'http://localhost:3001' : null);
 
 const $ = (id) => document.getElementById(id);
 const screens = ['s-home','s-lobby','s-count','s-race','s-end'];
@@ -198,6 +210,11 @@ let words = [];
 let wordIndex = 0;
 let raceOver = false;   // fini / éliminé / disqualifié → on ne tape plus
 let myState = 'typing';
+
+if (!SERVER_URL) {
+  $('homeMsg').textContent = 'Le Battle Royale multijoueur n\'est pas encore ouvert. Reviens bientôt !';
+  $('btnCreate').disabled = true; $('btnJoin').disabled = true;
+}
 
 // ── Connexion ──
 function connect(){
@@ -257,7 +274,7 @@ function renderLobby(count, min, max){
 
 $('btnCopy').onclick = async () => {
   const link = location.origin + location.pathname + '?room=' + me.roomId +
-    (qs.get('server') ? '&server=' + encodeURIComponent(SERVER_URL) : '');
+    (qsServer ? '&server=' + encodeURIComponent(SERVER_URL) : '');
   try { await navigator.clipboard.writeText(link); $('btnCopy').textContent = 'Copié !'; }
   catch { $('btnCopy').textContent = me.roomId; }
   setTimeout(() => $('btnCopy').textContent = 'Copier', 1500);

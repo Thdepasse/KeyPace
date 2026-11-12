@@ -308,6 +308,7 @@
         <img src="/images/keypace-mascot-cheer.webp" alt="" width="210" height="210" decoding="async">
         <h2>Dernière étape : <em>confirmez votre e-mail</em></h2>
         <p>L'espace de <b id="cr-ml-name"></b> est créé. Nous avons envoyé un lien de confirmation à <b id="cr-ml-to"></b>. Cliquez dessus, puis connectez-vous pour ouvrir votre espace.</p>
+        <p id="cr-ml-user-wrap" hidden>Votre identifiant de connexion : <b id="cr-ml-user" style="font-family:ui-monospace,Menlo,monospace"></b> (il figure aussi dans l'e-mail).</p>
         <a class="btn" href="/?auth=login" style="padding:15px 30px;font-size:17px;border-radius:14px">Aller à la connexion →</a>
         <p style="font-size:14px">Vous ne le trouvez pas ? Regardez dans les courriers indésirables, ou écrivez-nous à <a href="mailto:contact@keypace.be">contact@keypace.be</a>.</p>
       </div>
@@ -467,9 +468,9 @@ document.addEventListener('click',e=>{const nl=document.getElementById('nav-link
     await doneLine(1,67);
 
     if(method==='email'){
-      var passwordHash=await hashPw(pw), base=baseUsername(name), reg=null;
+      var passwordHash=await hashPw(pw), base=baseUsername(name), reg=null, username=base;
       for(var i=0;i<4;i++){
-        var username=i===0?base:base+Math.floor(1000+Math.random()*9000);
+        username=i===0?base:base+Math.floor(1000+Math.random()*9000);
         reg=await post('/api/register',{username:username,email:email,passwordHash:passwordHash,profInviteToken:token});
         if(reg.ok||reg.status!==409||/email/i.test((reg.data&&reg.data.error)||''))break;
       }
@@ -477,7 +478,7 @@ document.addEventListener('click',e=>{const nl=document.getElementById('nav-link
         renderPath(0); show('s-form'); setBusy(false);
         var em=(reg.data&&reg.data.error)||'';
         return showErr(/email/i.test(em)
-          ?'Cette adresse a déjà un compte KeyPace. Choisis Google ou Microsoft avec cette adresse, ou écris-nous à contact@keypace.be : ton espace est créé, nous le rattachons.'
+          ?'Cette adresse a déjà un compte KeyPace. Écris-nous à contact@keypace.be : ton espace est créé, nous le rattachons à ton compte.'
           :(em||"La création du compte a échoué. Écris-nous à contact@keypace.be, ton espace est créé."));
       }
     }
@@ -487,6 +488,7 @@ document.addEventListener('click',e=>{const nl=document.getElementById('nav-link
 
     if(method==='email'){
       $('cr-ml-name').textContent=name; $('cr-ml-to').textContent=email;
+      $('cr-ml-user').textContent=username; $('cr-ml-user-wrap').hidden=false;
       renderPath(2); show('s-mail'); setBusy(false);
       return;
     }

@@ -226,6 +226,16 @@ async function selfOnboard(req, res) {
   if (byIp.data.length >= 3) return res.status(429).json({ error: 'Trop de demandes depuis ce réseau. Réessaie plus tard.' });
   if (byEmail.data.length >= 1) return res.status(409).json({ error: 'Un espace a déjà été ouvert avec cette adresse. Vérifie ta boîte mail, ou écris-nous à contact@keypace.be.' });
 
+  // Adresse déjà liée à un compte : l'invitation admin ne peut pas être
+  // appliquée à un compte existant (register et SSO ne gèrent que la création).
+  // Créer l'espace quand même le laissait sans gérant, et bloquait toute
+  // nouvelle tentative 24 h. On refuse donc AVANT de créer quoi que ce soit.
+  // (register renvoie déjà 409 sur un e-mail pris : aucune fuite nouvelle.)
+  const emailIlike = String(v.email).replace(/[\\%_]/g, (c) => '\\' + c); // match exact, insensible à la casse
+  const byUser = await sb(`/users?email=ilike.${encodeURIComponent(emailIlike)}&select=id`);
+  if (!byUser.ok) return res.status(503).json({ error: 'Service momentanément indisponible. Réessaie dans un instant.' });
+  if (byUser.data.length >= 1) return res.status(409).json({ error: 'Cette adresse a déjà un compte KeyPace. Utilise une autre adresse pour le gérant, ou écris-nous à contact@keypace.be : nous ouvrons l\'espace et le rattachons à ton compte.' });
+
   const endsAt = trialEnd();
   let institution = null;
   for (let i = 0; i < 5 && !institution; i++) {

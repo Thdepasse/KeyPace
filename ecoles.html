@@ -110,7 +110,8 @@
   .nav-signup-btn:hover{text-decoration:none}
   .nav-guest-btns{display:flex;gap:8px}
   .nav-burger{display:none;background:none;border:1.5px solid var(--border);border-radius:10px;width:40px;height:40px;font-size:19px;color:var(--txt);align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
-  @media (max-width:768px){
+  /* Burger jusqu'à 900 px : entre 769 et ~880 px (iPad Air portrait), « Créer un compte » sortait de l'écran. */
+  @media (max-width:900px){
     .nav-inner{padding:10px 14px;gap:8px}
     .nav-burger{display:inline-flex}
     .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:2px;margin:0;background:var(--card);border-bottom:1px solid var(--border);padding:8px;display:none;box-shadow:0 14px 30px rgba(0,0,0,.12);max-height:78vh;overflow-y:auto}
@@ -192,6 +193,7 @@
     .etab-cta-btns{flex-direction:column;gap:10px}
     .etab-cta-btns a{width:100%;padding:14px 20px;font-size:15px}
   }
+  html,body{overflow-x:clip} /* halo décoratif du hero (inset:-18 %) : pas de défilement horizontal */
 </style>
 </head>
 <body>

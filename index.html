@@ -4640,7 +4640,7 @@ async function kpChooseFamily(fam){
   if(!cid||!KP_COURSES_OFFERED.includes(cid))return false;
   let remembered=null;try{remembered=localStorage.getItem('kp_kb_layout_'+fam);}catch{}
   if(!(await kpSetCourse(cid)))return false;
-  const lay=KB_LAYOUTS[remembered]?remembered:KP_DEFAULT_VARIANT[fam];
+  const lay=KB_LAYOUTS[remembered]?remembered:(fam==='azerty'?kpDefaultAzerty():KP_DEFAULT_VARIANT[fam]);
   if(KB_LAYOUTS[lay]){setKbLayoutId(lay);applyKbLayout(lay);}
   kpKbChipRender();kpRedrawKeyboard();
   return true;
@@ -5294,8 +5294,32 @@ function kpRelabelMoveKeys(){
     while((n=w.nextNode())){const t=n.nodeValue;if(/ZQSD|Z Q S D/.test(t))n.nodeValue=t.replace(/Z Q S D/g,'W A S D').replace(/ZQSD/g,'WASD');}
   }catch{}
 }
-function getKbLayoutId(){try{const v=localStorage.getItem('kp_kb_layout');return KB_LAYOUTS[v]?v:'fr';}catch{return 'fr';}}
+/* Sans choix enregistré : la disposition du pays (drapeau BE → AZERTY belge, FR → français).
+   Avant, tout le monde partait en 'fr' : un visiteur belge voyait @ ! § - $ * aux positions françaises. */
+function kpDefaultAzerty(){try{return kpRegionId()==='be'&&KB_LAYOUTS.be?'be':'fr';}catch{return 'fr';}}
+function getKbLayoutId(){try{const v=localStorage.getItem('kp_kb_layout');return KB_LAYOUTS[v]?v:kpDefaultAzerty();}catch{return kpDefaultAzerty();}}
 function setKbLayoutId(v){try{localStorage.setItem('kp_kb_layout',v);localStorage.setItem('kp_kb_layout_'+(KB_QWERTY[v]?'qwerty':'azerty'),v);}catch{}}
+/* Modificateur à tenir pour obtenir `next` sur la touche {l,s,g,gs} (l en minuscule) :
+   '' (aucun), 'Maj', AltGr/Option, ou AltGr + Maj. Avant, seul AltGr était indiqué :
+   un débutant sur la touche « 1 » allumée tapait « & » faute de savoir qu'il fallait Maj. */
+function kbModLabel(k,next,kdir){
+  if(next==null||next===' ')return '';
+  const low=next.toLowerCase(),l=(k.l||'').toLowerCase();
+  const dir=l===low||(!!k.s&&k.s===next);
+  if(dir){
+    // Rangée des chiffres : sur AZERTY, `l` (le chiffre) est en Maj et `s` (&, é, "…) en direct ;
+    // sur QWERTY et sur les autres rangées, c'est `s` qui demande Maj.
+    const azerty=(()=>{try{return !KB_QWERTY[getKbLayoutId()];}catch{return true;}})();
+    if(/^[0-9]$/.test(l)&&azerty)return next===l?'Maj':'';
+    if(k.s&&k.s===next&&l!==next)return 'Maj';
+    if(next!==low&&l===low)return 'Maj';
+    return '';
+  }
+  if(kdir)return '';
+  if(k.g&&k.g.toLowerCase()===low)return kbModifierName();
+  if(k.gs&&k.gs.toLowerCase()===low)return kbModifierName()+' + Maj';
+  return '';
+}
 function kbModifierName(){const l=getKbLayoutId();return l==='mac'||(KB_QWERTY[l]&&KB_QWERTY[l].mac)?'Option (⌥)':'AltGr';}
 /* Petit message temporaire en bas d'écran (Verr. Maj, Verr. Num, touches non transmises). */
 function kbNotice(msg){
@@ -8270,7 +8294,7 @@ const app={
         else e._composedKey=_tb[e.key]||(e.key===' '?pk:e.key);
       }
     }
-    if(e.key==='Escape'&&this.view==='games'&&this.activeGame){if(this._sfsEl()){this._sfsEsc();return;}if(this._sgrEl()){this._sgrEsc();return;}this.exitActiveGame();return;}
+    if(e.key==='Escape'&&this.view==='games'&&this.activeGame){if(this._sfsEl()){this._sfsEsc();return;}if(this._sgrEl()){this._sgrEsc();return;}if(this.activeGame==='frappe'&&this.game&&this.game.on&&!this.game.over&&!this.game.paused){this._frappePause();return;}this.exitActiveGame();return;}
     if(this.view==='games'&&this.activeGame==='sprint'&&this.sprint&&this.sprint.on){this.sprintKey(e);return;}
     if(this.view==='games'&&this.activeGame==='frappe'&&this.game&&this.game.on){this.gameKey(e);return;}
     if(this.view==='games'&&this.activeGame==='course'&&this.course&&this.course.on){this.courseKey(e);return;}
@@ -8470,6 +8494,12 @@ const app={
   startGame(){
     if(!canAccessGame()){openAuth('register',kpT('gate.play_free'),()=>this.startGame());return;}
     this.stopGame();this._gameRec=false;this._pendingDeadKey=null;
+    if(!this._frappeAwayBound){
+      this._frappeAwayBound=true;
+      const away=()=>{if(this.view==='games'&&this.activeGame==='frappe')this._frappePause();};
+      window.addEventListener('blur',away);
+      document.addEventListener('visibilitychange',()=>{if(document.hidden)away();});
+    }
     this.game={on:false,over:false,score:0,lives:3,words:[],spawnAcc:0,
       tierIdx:0,tierFlash:0,
       wordsTyped:0,errorCount:0,totalKeys:0,
@@ -8522,22 +8552,48 @@ const app={
     </div>`;
     (arena||document.body).appendChild(el);
     this._celebrateGame(null,'levelup');
-    // Resume game loop after banner fades out
-    setTimeout(()=>{
+    // Resume game loop after banner fades out. Minuteurs annulés par stopGame() :
+    // sinon quitter/relancer pendant le bandeau laissait tourner 2 boucles (jeu 2× plus rapide).
+    const g0=this.game;
+    this._tierTimers=[setTimeout(()=>{
       el.style.transition='opacity .5s';el.style.opacity='0';
-      setTimeout(()=>{
-        el.remove();
-        if(this.game&&this.game.on){this._gameLoop=setInterval(()=>this.gameTick(),60);}
-      },500);
-    },2800);
+      this._tierTimers.push(setTimeout(()=>{
+        el.remove();this._tierTimers=[];
+        if(this.game===g0&&g0.on&&!g0.paused&&!this._gameLoop){this._gameLoop=setInterval(()=>this.gameTick(),60);}
+      },500));
+    },2800)];
+  },
+  // Pause automatique quand l'onglet/la fenêtre perd le focus : sans elle, les
+  // mots continuaient de tomber et on revenait sur un game over.
+  _frappePause(){
+    const g=this.game;if(!g||!g.on||g.over||g.paused)return;
+    g.paused=true;
+    if(this._gameLoop){clearInterval(this._gameLoop);this._gameLoop=null;}
+    this._frappePauseOverlay();
+  },
+  _frappePauseOverlay(){
+    const g=this.game;if(!g||!g.paused||document.getElementById('game-pause'))return;
+    const arena=document.querySelector('.game-arena');if(!arena)return;
+    const el=document.createElement('div');el.id='game-pause';
+    el.style.cssText='position:absolute;inset:0;z-index:11;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(10,10,12,.72);color:#fff;border-radius:24px;text-align:center;padding:20px';
+    el.innerHTML='<div style="font-family:\'Bricolage Grotesque\',sans-serif;font-weight:800;font-size:28px">Pause</div><div style="font-size:14px;opacity:.75">Appuie sur une touche pour reprendre · Échap pour quitter</div>';
+    arena.appendChild(el);
+  },
+  _frappeResume(){
+    const g=this.game;if(!g||!g.paused)return;
+    g.paused=false;
+    document.getElementById('game-pause')?.remove();
+    if(g.on&&!g.over&&!this._gameLoop&&!document.getElementById('tier-banner'))this._gameLoop=setInterval(()=>this.gameTick(),60);
   },
   stopGame(){
     const ag=this.game;
     if(ag&&ag.on&&!ag.over&&!ag._abandonSent&&ag.level){ag._abandonSent=true;try{track('game_abandon',{game:'frappe',level:ag.level.id,score:ag.score,secs:ag.startTime?Math.round((Date.now()-ag.startTime)/1000):0});}catch{}}
     if(this._gameLoop){clearInterval(this._gameLoop);this._gameLoop=null;}
     if(this._cdTimer){clearTimeout(this._cdTimer);this._cdTimer=null;}
+    (this._tierTimers||[]).forEach(clearTimeout);this._tierTimers=[];
     document.getElementById('game-cd')?.remove();
     document.getElementById('tier-banner')?.remove();
+    document.getElementById('game-pause')?.remove();
   },
   spawnWord(){
     const g=this.game;
@@ -8597,6 +8653,10 @@ const app={
     e.preventDefault();
     const char=k;
     const g=this.game;if(!g||!g.on)return;
+    if(g.paused){this._frappeResume();return;}
+    // Espace entre deux mots (réflexe naturel) : ignoré, pas une faute. Aucun mot
+    // ne commence par une espace et un mot se valide sur sa dernière lettre.
+    if(char===' '&&!g.words.some(w=>w.typedLen>0))return;
     if(!g.startTime)g.startTime=Date.now();
     g.totalKeys++;
     let active=g.words.find(w=>w.typedLen>0);
@@ -9856,7 +9916,7 @@ const app={
     let tbHTML='';
     if(s){let wbuf=[];const flush=()=>{if(wbuf.length){tbHTML+='<span style="white-space:nowrap">'+wbuf.join('')+'</span>';wbuf=[];}};s.text.split('').forEach((ch,i)=>{let cls='todo';if(i<s.idx)cls=s.typed[i]==='w'?'wrong':'ok';else if(i===s.idx)cls='cur';if(ch===' '){flush();tbHTML+=`<span class="ch ${cls}">&nbsp;</span>`;}else wbuf.push(`<span class="ch ${cls}">${ch}</span>`);});flush();}
     const knext=this._kbNext(s),klow=(knext||'').toLowerCase(),kdir=knext!=null&&kbDirect(knext);
-    const kbHTML=KB_FULL.map(row=>`<div class="kb-row-t">${row.map(k=>{const on=knext!=null&&this.keyMatches(k,knext);const viaG=on&&!kdir&&!!k.g&&k.g.toLowerCase()===klow&&k.l.toLowerCase()!==klow;const viaGS=on&&!kdir&&!viaG&&!!k.gs&&k.gs.toLowerCase()===klow&&k.l.toLowerCase()!==klow;return`<div class="kb-key-t${on?' on':''}" data-l="${kbAttr(k.l.toLowerCase())}" data-s="${kbAttr(k.s)}" data-g="${kbAttr(k.g)}" data-gs="${kbAttr(k.gs)}" data-finger="${FINGERS[k.f]||''}" style="border-bottom-color:${on?'rgba(0,0,0,0.2)':FINGERS[k.f]}">${k.l.toLowerCase()}${k.s?'<br><span style="font-size:9px;opacity:.6">'+k.s+'</span>':''}${(k.g||k.gs)?`<span class="kb-ag" style="display:${viaG||viaGS?'block':'none'};font-size:8px;opacity:.7">${viaGS?kbModifierName()+' + Maj':kbModifierName()}</span>`:''}</div>`;}).join('')}</div>`).join('');
+    const kbHTML=KB_FULL.map(row=>`<div class="kb-row-t">${row.map(k=>{const on=knext!=null&&this.keyMatches(k,knext);const viaG=on&&!kdir&&!!k.g&&k.g.toLowerCase()===klow&&k.l.toLowerCase()!==klow;const viaGS=on&&!kdir&&!viaG&&!!k.gs&&k.gs.toLowerCase()===klow&&k.l.toLowerCase()!==klow;return`<div class="kb-key-t${on?' on':''}" data-l="${kbAttr(k.l.toLowerCase())}" data-s="${kbAttr(k.s)}" data-g="${kbAttr(k.g)}" data-gs="${kbAttr(k.gs)}" data-finger="${FINGERS[k.f]||''}" style="border-bottom-color:${on?'rgba(0,0,0,0.2)':FINGERS[k.f]}">${k.l.toLowerCase()}${k.s?'<br><span style="font-size:9px;opacity:.6">'+k.s+'</span>':''}${(()=>{const ml=on?kbModLabel(k,knext,kdir):'';return `<span class="kb-ag" style="display:${ml?'block':'none'};font-size:8px;opacity:.7">${ml}</span>`;})()}</div>`;}).join('')}</div>`).join('');
     document.getElementById(pageId).innerHTML=`<div class="typing-section">
       <div class="typing-header">
         <div>${isLesson?'<button onclick="app.backLessons()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">'+kpT('typ.back_courses')+'</button><br>':custom?'<button onclick="go(\'classes\')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:0 0 6px">'+kpT('typ.back_asg')+'</button><br>':''}<h2>${typingTitle}</h2><p>${typingSub}</p></div>
@@ -9995,7 +10055,7 @@ const app={
       const wasOn=el.classList.contains('on');
       if(on!==wasOn){el.classList.toggle('on',on);el.style.borderBottomColor=on?'rgba(0,0,0,0.2)':(el.dataset.finger||'');}
       const ag=el.querySelector('.kb-ag');
-      if(ag){const show=viaG||viaGS;ag.style.display=show?'block':'none';if(show)ag.textContent=viaGS?kbModifierName()+' + Maj':kbModifierName();}
+      if(ag){const ml=on?kbModLabel({l:el.dataset.l,s:el.dataset.s,g:el.dataset.g,gs:el.dataset.gs},next,kdir):'';ag.style.display=ml?'block':'none';ag.textContent=ml;}
     });
     const sp=document.querySelector('.kb-space');
     if(sp)sp.classList.toggle('on',realNext===' '||(next===' '));
@@ -14399,9 +14459,10 @@ const app={
   },
   simonKey(e){
     const s=this.simon;if(!s||!s.on||s.phase!=='input')return;
-    const k=e.key;
-    if(k==='Backspace'){e.preventDefault();if(s.currentWord.length)s.currentWord=s.currentWord.slice(0,-1);this.renderCurrent();return;}
-    if(k==='Enter'||k===' '){e.preventDefault();this._simonSubmitWord();return;}
+    if(e.key==='Backspace'){e.preventDefault();if(s.currentWord.length)s.currentWord=s.currentWord.slice(0,-1);this.renderCurrent();return;}
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();this._simonSubmitWord();return;}
+    // Caractère composé par touche morte (^ puis e → ê), comme dans les autres jeux.
+    const k=e._composedKey||e.key;
     if(k.length!==1)return;
     e.preventDefault();
     s.currentWord+=k;this.renderCurrent();

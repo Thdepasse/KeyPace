@@ -150,11 +150,12 @@
   .shortcut-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,77,46,.14)}
   .kb-search-count{display:block;margin-top:8px;font-size:13px;color:var(--muted)}
   .kb-no-results{display:none;text-align:center;color:var(--muted);padding:18px 0;font-size:14.5px}
-  .table-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin:14px 0}
+  .table-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:18px;margin:14px 0}
   .tcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 22px;overflow:hidden}
   .tcard h3{margin:0 0 10px;font-size:17px}
   .tcard table{margin:0}
   .tcard p.tip{font-size:13.5px;color:var(--muted);margin:10px 0 0}
+  @media (max-width:600px){table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}} /* tableau large : défile dans son cadre, pas toute la page */
 </style>
 </head>
 <body>

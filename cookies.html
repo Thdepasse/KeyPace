@@ -57,7 +57,8 @@
     .footer-links { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
     .footer-links a { color: var(--muted); text-decoration: none; }
     .footer-links a:hover { color: var(--txt); }
-  </style>
+    @media (max-width:600px){table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}} /* tableau large : défile dans son cadre, pas toute la page */
+</style>
   <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png?v=2" sizes="32x32">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">

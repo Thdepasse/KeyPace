@@ -86,6 +86,7 @@ function confirmationEmail(username, verifyUrl) {
                   <p style="margin:0;font-size:15px;color:rgba(255,255,255,0.88);line-height:1.65">
                     Tu es à un clic de commencer ton apprentissage.<br>Confirme ton adresse email pour accéder à KeyPace.
                   </p>
+                  <p style="margin:14px 0 0;font-size:14px;color:#ffffff;line-height:1.5">Ton identifiant de connexion : <strong>${escapeHtml(username)}</strong></p>
                 </td>
               </tr>
             </table>

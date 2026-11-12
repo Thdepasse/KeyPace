@@ -257,8 +257,9 @@ async function run(opts = {}) {
         await ev("app.sess=null;app.openSettings();true"); await sleep(300);
         await ev("document.querySelectorAll('#kb-family-box .kb-family-card')[0].click();true"); await sleep(150);
         await ev("document.getElementById('kb-sw-yes').click();true"); await sleep(1000);
-        const back = await ev("({course:kpCourseId(),layout:getKbLayoutId(),r4:ALL_LESSONS.find(x=>x.id==='r4').title,gone:!KB_LAYOUTS['windows-us'],btns:document.querySelectorAll('#kb-layout-btns .kb-layout-btn').length})");
-        if (back.course !== 'fr/azerty' || back.layout !== 'fr') problems.push(`BR7 : retour à l'AZERTY incomplet (${back.course} / ${back.layout})`);
+        // sans choix enregistré, l'AZERTY du pays (région par défaut : Belgique → 'be')
+        const back = await ev("({course:kpCourseId(),layout:getKbLayoutId(),want:kpDefaultAzerty(),r4:ALL_LESSONS.find(x=>x.id==='r4').title,gone:!KB_LAYOUTS['windows-us'],btns:document.querySelectorAll('#kb-layout-btns .kb-layout-btn').length})");
+        if (back.course !== 'fr/azerty' || back.layout !== back.want) problems.push(`BR7 : retour à l'AZERTY incomplet (${back.course} / ${back.layout})`);
         if (back.r4 !== 'Q et M, les auriculaires') problems.push(`BR7 : r4 n'est pas restaurée (« ${back.r4} »)`);
         if (!back.gone) problems.push('BR7 : les claviers QWERTY restent enregistrés après le retour à l\'AZERTY');
         if (back.btns !== 4) problems.push(`BR7 : ${back.btns} variantes AZERTY au lieu de 4`);
@@ -632,7 +633,8 @@ async function run(opts = {}) {
             gu=document.getElementById('nav-guest').getBoundingClientRect(),nav=document.querySelector('.nav-links').getBoundingClientRect();
             return{text:document.getElementById('nav-kb-text').textContent,w:r.width,h:r.height,left:r.left,right:r.right,flagRight:f.right,guestLeft:gu.left,linksRight:nav.right,gear:!!document.querySelector('.nav-guest-settings'),overflow:document.documentElement.scrollWidth-window.innerWidth,signupH:Math.round(document.querySelector('.nav-signup-btn').getBoundingClientRect().height)}})()`);
           if (!g1) { problems.push(`BR8 (${w}) : pastille clavier absente`); continue; }
-          if (g1.text !== 'AZERTY · Français') problems.push(`BR8 (${w}) : texte « ${g1.text} » au lieu de « AZERTY · Français »`);
+          // visiteur sans choix enregistré : AZERTY du pays par défaut (Belgique)
+          if (g1.text !== 'AZERTY · Belge') problems.push(`BR8 (${w}) : texte « ${g1.text} » au lieu de « AZERTY · Belge »`);
           if (!g1.w || !g1.h) problems.push(`BR8 (${w}) : pastille invisible`);
           if (g1.gear) problems.push(`BR8 (${w}) : l'engrenage des visiteurs est encore là`);
           if (g1.left < g1.flagRight - 1) problems.push(`BR8 (${w}) : la pastille chevauche le drapeau`);

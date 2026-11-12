@@ -16,6 +16,7 @@ function fakeDb(opts = {}) {
     const reply = (status, data) => ({ ok: status < 300, status, text: async () => JSON.stringify(data) });
     if (path.startsWith('/institutions?onboarding_ip')) return reply(200, opts.byIp || []);
     if (path.startsWith('/institutions?contact_email')) return reply(200, opts.byEmail || []);
+    if (path.startsWith('/users?email=')) return reply(200, opts.byUser || []);
     if (path === '/institutions' && init.method === 'POST') return reply(201, [{ id: 'inst-1', name: JSON.parse(init.body).name }]);
     if (path === '/prof_invites' && init.method === 'POST') return reply(201, [{ id: 'inv-1' }]);
     return reply(404, null);
@@ -74,4 +75,14 @@ test('limite par IP (3 par heure) et par adresse (1 par jour)', async () => {
   assert.equal((await run(OK)).status, 429);
   fakeDb({ byEmail: [{}] });
   assert.equal((await run(OK)).status, 409);
+});
+
+test("refuse si l'adresse a déjà un compte, sans créer d'espace orphelin", async () => {
+  const calls = fakeDb({ byUser: [{ id: 'u-1' }] });
+  const r = await run({ ...OK, email: 'dir_x@ecole.be' });
+  assert.equal(r.status, 409);
+  assert.match(r.json.error, /déjà un compte/);
+  assert.ok(!calls.some((c) => c.method === 'POST'));
+  // `_` échappé : ILIKE ne doit pas le traiter comme un joker
+  assert.ok(calls.some((c) => c.path.includes('email=ilike.dir%5C_x%40ecole.be')));
 });
