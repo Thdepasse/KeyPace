@@ -2,6 +2,10 @@
     "regions": ["fra1"],
     "functions": { "api/track.js": { "includeFiles": "index.html" } },
     "redirects": [
+          { "source": "/dactylographie-primaire", "destination": "/dactylographie-tronc-commun", "permanent": true },
+          { "source": "/dactylographie-primaire.html", "destination": "/dactylographie-tronc-commun", "permanent": true },
+          { "source": "/dactylographie-secondaire", "destination": "/dactylographie-general-transition", "permanent": true },
+          { "source": "/dactylographie-secondaire.html", "destination": "/dactylographie-general-transition", "permanent": true },
           { "source": "/((?!\\.well-known/mta-sts\\.txt$).*)", "has": [{ "type": "host", "value": "mta-sts.keypace.be" }], "destination": "https://keypace.be/", "permanent": false }
     ],
     "rewrites": [
@@ -52,8 +56,9 @@
           { "source": "/10ansdeLinkube", "destination": "/linkube-stand.html" },
           { "source": "/ecoles/creer", "destination": "/ecoles-creer.html" },
           { "source": "/10ansdelinkube", "destination": "/linkube-stand.html" },
-          { "source": "/dactylographie-primaire", "destination": "/dactylographie-primaire.html" },
-          { "source": "/dactylographie-secondaire", "destination": "/dactylographie-secondaire.html" },
+          { "source": "/dactylographie-tronc-commun", "destination": "/dactylographie-tronc-commun.html" },
+          { "source": "/dactylographie-general-transition", "destination": "/dactylographie-general-transition.html" },
+          { "source": "/dactylographie-qualifiant", "destination": "/dactylographie-qualifiant.html" },
           { "source": "/dactylographie-superieur", "destination": "/dactylographie-superieur.html" },
           { "source": "/comparatif", "destination": "/comparatif.html" },
           { "source": "/ebook-gratuit-dactylographie", "destination": "/ebook-gratuit-dactylographie.html" },
