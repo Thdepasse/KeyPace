@@ -1431,12 +1431,13 @@ a.nav-link{text-decoration:none;display:inline-block}
    utilisé par les écrans de fin/portail invité, où le glow serait excessif). */
 .gidle{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:40px 20px}
 .gidle p{color:rgba(255,255,255,.55);font-size:15px;line-height:1.6;max-width:420px;margin:0}
-.gcine-advice{max-width:1120px;margin:0 auto 22px;padding:18px 22px;border-radius:20px;background:var(--card);border:1.5px solid var(--border)}
+.gcine-advice{max-width:1080px;margin:0 auto 30px;padding:20px 24px 24px;border-radius:28px;background:linear-gradient(180deg,#fff,#FBF8F3);box-shadow:0 8px 0 #E7DDCF,0 24px 36px -22px rgba(150,70,30,.3),inset 0 2px 0 #fff}
 .gcine-advice h3{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;margin:0 0 4px}
 .gcine-advice p{margin:0 0 12px;color:var(--muted);font-size:14px}
-.gcine-advice-list{display:flex;flex-wrap:wrap;gap:10px}
-.gcine-advice-item{flex:1 1 220px;text-align:left;font:inherit;border:1.5px solid var(--border);background:var(--bg);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--txt)}
-.gcine-advice-item:hover{border-color:var(--accent)}
+.gcine-advice-list{display:flex;flex-wrap:wrap;gap:14px}
+.gcine-advice-item{flex:1 1 220px;text-align:left;font:inherit;border:none;background:linear-gradient(180deg,#FFF6F1,#FFEDE4);border-radius:18px;padding:13px 16px;cursor:pointer;color:var(--txt);box-shadow:0 5px 0 #F4CDBE,inset 0 2px 0 #fff;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s cubic-bezier(.34,1.56,.64,1)}
+.gcine-advice-item:hover{transform:translateY(-2px);box-shadow:0 7px 0 #F4CDBE,inset 0 2px 0 #fff}
+.gcine-advice-item:active{transform:translateY(4px);box-shadow:0 1px 0 #F4CDBE,inset 0 2px 0 #fff}
 .gcine-advice-item b{display:block;font-size:15px;margin-bottom:2px}
 .gcine-advice-item span{font-size:13px;color:var(--muted)}
 .boss-card .gl-picker .gl-lab,.boss-card .gl-picker .gl-info,.duel-card .gl-picker .gl-lab,.duel-card .gl-picker .gl-info{color:var(--muted)}
@@ -1554,8 +1555,8 @@ a.nav-link{text-decoration:none;display:inline-block}
 .gcine-hint-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.28em}
 .gcine-hint-arrow{font-size:18px;animation:gcineHintBob 1.8s ease-in-out infinite}
 @media(max-height:760px){.gcine-sub{display:none}.gcine-badge{margin-bottom:10px}}
-@media(prefers-reduced-motion:reduce){.gcine-hint-arrow,.gk-eyes{animation:none}}
-/* Clavier moelleux + touche K mascotte qui saute jusqu'aux jeux */
+@media(prefers-reduced-motion:reduce){.gcine-hint-arrow{animation:none}}
+/* Clavier moelleux + touche K qui saute jusqu'aux jeux */
 .gk-ground{position:absolute;left:8%;right:8%;height:46px;border-radius:50%;background:radial-gradient(closest-side,rgba(130,60,25,.24),rgba(130,60,25,0));pointer-events:none}
 .gk-stage{position:absolute;left:0}
 .gk-persp{position:absolute;inset:0;perspective:1100px;perspective-origin:50% 20%}
@@ -1577,20 +1578,8 @@ a.nav-link{text-decoration:none;display:inline-block}
 .gk-rot{position:absolute;inset:0;transform-origin:50% 60%}
 .gk-sq{position:absolute;inset:0;transform-origin:50% 100%}
 .gk-body{position:absolute;inset:0;border-radius:23px;background:linear-gradient(160deg,#FF9A6C,#FF4D2E 72%);box-shadow:0 6px 0 #CC391B,inset 0 3px 0 rgba(255,255,255,.4),0 16px 24px -10px rgba(200,60,20,.55)}
-.gk-tuft{position:absolute;left:50%;top:-13px;width:44px;height:22px;margin-left:-22px}
-.gk-tuft i{position:absolute;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#E6E3DE)}
-.gk-tuft i:nth-child(1){width:20px;height:20px;left:2px;top:6px}
-.gk-tuft i:nth-child(2){width:24px;height:24px;left:11px;top:0}
-.gk-tuft i:nth-child(3){width:18px;height:18px;left:25px;top:7px}
-.gk-eyes{position:absolute;left:0;right:0;top:21px;display:flex;justify-content:center;gap:15px;animation:gkBlink 3.6s infinite}
-.gk-eyes i{width:10px;height:13px;border-radius:50%;background:#3A1A0E;position:relative}
-.gk-eyes i::after{content:'';position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;left:2px;top:2px}
-@keyframes gkBlink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
-.gk-cheeks{position:absolute;left:0;right:0;top:36px;display:flex;justify-content:center;gap:27px}
-.gk-cheeks i{width:10px;height:6px;border-radius:50%;background:rgba(255,215,200,.75)}
-.gk-mouth{position:absolute;left:50%;top:37px;width:14px;height:7px;margin-left:-7px;border:3px solid #6E1F0C;border-top:none;border-radius:0 0 10px 10px;transition:all .12s}
-.gk-mouth.o{width:11px;height:11px;margin-left:-5.5px;border:none;border-radius:50%;background:#6E1F0C;top:36px}
-.gk-k{position:absolute;right:7px;bottom:5px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:10px;color:rgba(255,255,255,.75)}
+.gk-body::before{content:'';position:absolute;left:10px;right:22px;top:6px;height:12px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,0))}
+.gk-letter{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;color:#fff;text-shadow:0 2px 0 rgba(150,30,10,.25)}
 .gk-slots{position:absolute;left:50%;display:flex;gap:10px;transform:translateX(-50%)}
 .gk-slot{position:relative;width:46px;height:46px}
 .gk-slot .gk-cap{border-radius:15px}
@@ -1599,86 +1588,135 @@ a.nav-link{text-decoration:none;display:inline-block}
 .gk-slot .gk-ring{border-radius:19px}
 @keyframes gcineLand{0%{transform:translateY(0) scale(1)}30%{transform:translateY(10px) scale(1.04,.95)}65%{transform:translateY(-6px) scale(.99,1.02)}100%{transform:translateY(0) scale(1)}}
 .gcine-card.is-landed .gcine-card-inner{animation:gcineLand .6s cubic-bezier(.3,.7,.4,1)}
-.gcine-panel{position:relative;z-index:20;padding:24px 24px 80px}
-.gcine-panel-head{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:1120px;margin:0 auto;padding-bottom:36px;text-align:center}
+/* Section « Choisis ton jeu » : même matière « guimauve » que le clavier de
+   l'intro. Tout ce qui se clique est une touche épaisse (tranche colorée
+   dessous, reflet en haut) qui s'enfonce quand on appuie dessus. */
+.gcine-panel{position:relative;z-index:20;padding:34px 24px 90px;overflow:hidden}
+.gcine-panel>*{position:relative;z-index:1}
+.gcine-floaty{position:absolute;z-index:0;width:36px;height:36px;border-radius:12px;background:linear-gradient(180deg,#fff,#F5EFE6);box-shadow:0 5px 0 #E0D3C1,0 10px 14px -6px rgba(150,70,30,.2),inset 0 2px 0 #fff;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;color:#C9BBA6;opacity:.8;pointer-events:none;animation:gcineFloaty 7s ease-in-out infinite}
+.gcine-floaty.is-hot{background:linear-gradient(180deg,#FF9A6C,#FF4D2E);box-shadow:0 5px 0 #C9381B,0 10px 14px -6px rgba(150,70,30,.2),inset 0 2px 0 rgba(255,255,255,.35);color:#fff}
+@keyframes gcineFloaty{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-14px) rotate(calc(var(--r,0deg)*-1))}}
+.gcine-panel-head{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:1120px;margin:0 auto;padding-bottom:10px;text-align:center}
 .gcine-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.3em;color:var(--accent)}
+.gcine-word{display:flex;gap:9px;margin:4px 0 2px}
+.gcine-word span{position:relative;width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;color:#fff;background:linear-gradient(180deg,#FF9A6C,#FF4D2E);box-shadow:0 6px 0 #C9381B,0 14px 22px -8px rgba(255,77,46,.55),inset 0 2px 0 rgba(255,255,255,.35);opacity:0;transform:translateY(-26px) scale(.4)}
+.gcine-word span::before,.gcine-cat-tab::before,.gcine-arrow::before,.gcine-boss-cta::before,.gcine-boss-timer b::before,.gcine-card-cta::before{content:'';position:absolute;left:12%;right:38%;top:5px;height:9px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,0));pointer-events:none}
+.gcine-panel-head.is-in .gcine-word span{animation:gcinePop .6s cubic-bezier(.34,1.56,.64,1) forwards}
+.gcine-panel-head.is-in .gcine-word span:nth-child(2){animation-delay:.08s}
+.gcine-panel-head.is-in .gcine-word span:nth-child(3){animation-delay:.16s}
+.gcine-panel-head.is-in .gcine-word span:nth-child(4){animation-delay:.24s}
+.gcine-panel-head.is-in .gcine-word span:nth-child(5){animation-delay:.32s}
+@keyframes gcinePop{to{opacity:1;transform:none}}
 .gcine-h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:46px;line-height:1.02;color:var(--txt);letter-spacing:-.02em;margin:0}
 .gcine-panel-sub{font-size:15px;color:var(--muted);margin:0}
-.gcine-carousel{position:relative;height:420px;max-width:1120px;margin:0 auto;perspective:1400px;cursor:grab;touch-action:pan-y;user-select:none}
+
+/* Bandeau Boss de la semaine : grosse touche orange, la mascotte (bras croisés, couronnée) en dépasse */
+.gcine-boss-banner{position:relative;display:flex;align-items:center;gap:24px;max-width:1080px;margin:66px auto 34px;padding:22px 30px 22px 24px;border-radius:32px;color:#fff;cursor:pointer;background:radial-gradient(420px 200px at 85% -20%,rgba(255,255,255,.22),transparent 70%),linear-gradient(135deg,#FF8A5C,#FF4D2E 62%);box-shadow:0 10px 0 #C9381B,0 30px 50px -22px rgba(255,77,46,.55),inset 0 3px 0 rgba(255,255,255,.3);transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s cubic-bezier(.34,1.56,.64,1)}
+.gcine-boss-banner:hover{transform:translateY(-3px) rotate(-.4deg)}
+.gcine-boss-banner:active{transform:translateY(7px);box-shadow:0 3px 0 #C9381B,0 10px 20px -10px rgba(255,77,46,.55),inset 0 3px 0 rgba(255,255,255,.3)}
+.gcine-boss-mascot{position:relative;flex:none;width:120px;align-self:stretch}
+.gcine-boss-fig{position:absolute;left:50%;bottom:-22px;height:196px;aspect-ratio:626/960;transform:translateX(-50%);transform-origin:50% 100%;transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.gcine-boss-fig img{width:100%;height:100%;display:block;filter:drop-shadow(0 12px 14px rgba(120,40,0,.35))}
+.gcine-boss-banner:hover .gcine-boss-fig{transform:translateX(-50%) translateY(-6px) rotate(-3deg) scale(1.04)}
+.gcine-boss-crown{position:absolute;left:50%;top:-14px;width:40px;height:24px;margin-left:-14px;background:#FFD166;clip-path:polygon(0 100%,0 25%,25% 60%,50% 0,75% 60%,100% 25%,100% 100%);filter:drop-shadow(0 2px 0 #D9A62E);transform:rotate(14deg);z-index:2}
+.gcine-boss-body{flex:1;min-width:0}
+.gcine-boss-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.24em;font-weight:700;color:rgba(255,255,255,.85);margin-bottom:4px}
+.gcine-boss-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;letter-spacing:-.02em;color:#fff}
+.gcine-boss-desc{font-size:14px;line-height:1.5;color:rgba(255,255,255,.92);max-width:520px;margin-top:4px}
+.gcine-boss-side{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:14px}
+.gcine-boss-timer{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700}
+.gcine-boss-timer b{position:relative;min-width:38px;height:38px;padding:0 6px;border-radius:12px;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;color:var(--txt);background:linear-gradient(180deg,#fff,#F5EFE6);box-shadow:0 5px 0 #E0D3C1,inset 0 2px 0 #fff}
+.gcine-boss-timer b::before{top:3px;height:7px}
+.gcine-boss-cta{position:relative;padding:13px 22px;border-radius:16px;font-weight:800;font-size:15px;color:var(--accent);white-space:nowrap;background:linear-gradient(180deg,#fff,#FFF1EA);box-shadow:0 6px 0 #E8B9A5,0 12px 18px -8px rgba(120,30,10,.35),inset 0 2px 0 #fff}
+@media(max-width:640px){
+  .gcine-boss-banner{flex-direction:column;text-align:center;gap:14px;padding:22px 20px;margin-top:112px}
+  .gcine-boss-mascot{height:56px;width:100%}
+  .gcine-boss-fig{bottom:0;height:170px}
+  .gcine-boss-side{align-items:center}
+  .gcine-boss-desc{margin-left:auto;margin-right:auto}
+}
+
+/* Onglets de catégorie (Vitesse/Précision/Mémoire/Multijoueur) : des touches ; l'active est orange et enfoncée */
+.gcine-cat-tabs{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px;max-width:1120px;margin:0 auto 14px}
+.gcine-cat-tab{position:relative;display:inline-flex;align-items:center;gap:9px;padding:11px 20px 11px 12px;border-radius:18px;border:none;background:linear-gradient(180deg,#fff,#F5EFE6);color:#5f584c;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 6px 0 #E0D3C1,0 12px 18px -6px rgba(150,70,30,.2),inset 0 2px 0 #fff;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s cubic-bezier(.34,1.56,.64,1)}
+.gcine-cat-tab>svg{width:28px;height:28px;padding:6px;box-sizing:border-box;border-radius:9px;background:#FFF0EA;color:var(--accent)}
+.gcine-cat-tab:hover{transform:translateY(-2px);box-shadow:0 8px 0 #E0D3C1,0 16px 22px -8px rgba(150,70,30,.25),inset 0 2px 0 #fff}
+.gcine-cat-tab.is-active{background:linear-gradient(180deg,#FF9A6C,#FF4D2E);color:#fff;transform:translateY(3px);box-shadow:0 3px 0 #C9381B,0 10px 18px -8px rgba(255,77,46,.55),inset 0 2px 0 rgba(255,255,255,.35)}
+.gcine-cat-tab.is-active>svg{background:rgba(255,255,255,.25);color:#fff}
+.gcine-cat-tab:active{transform:translateY(5px);box-shadow:0 1px 0 #E0D3C1,inset 0 2px 0 #fff;transition-duration:.06s}
+
+/* Carrousel de cartes-touches : la carte du milieu est orange et flotte, les autres penchent légèrement */
+.gcine-carousel{position:relative;height:470px;max-width:1120px;margin:0 auto;cursor:grab;touch-action:pan-y;user-select:none}
 .gcine-cards{position:absolute;inset:0}
-.gcine-card{position:absolute;top:50%;left:50%;will-change:transform,opacity;backface-visibility:hidden;transition:transform .45s cubic-bezier(.22,.9,.3,1),opacity .35s}
+.gcine-card{position:absolute;top:50%;left:50%;will-change:transform,opacity;transition:transform .6s cubic-bezier(.34,1.56,.64,1),opacity .35s}
 .gcine-cards.is-dragging .gcine-card{transition:none}
-.gcine-card-inner{width:270px;height:360px;border-radius:32px;overflow:hidden;position:relative;padding:26px;display:flex;flex-direction:column;justify-content:space-between;background:#fff;border:1px solid var(--border);box-shadow:0 10px 30px rgba(21,19,15,.07);transform:translateZ(0);backface-visibility:hidden;transition:border-color .45s cubic-bezier(.22,.9,.3,1),box-shadow .3s}
-.gcine-card-inner::before{content:'';position:absolute;inset:0;z-index:0;background:var(--gcine-fill,linear-gradient(140deg,#ff7a4d,var(--accent) 64%));opacity:0;transition:opacity .45s cubic-bezier(.22,.9,.3,1)}
-.gcine-card:not(.is-center):hover .gcine-card-inner{box-shadow:0 16px 40px rgba(21,19,15,.14)}
-.gcine-card.is-center .gcine-card-inner{box-shadow:0 26px 60px rgba(255,77,46,.34);border-color:transparent}
-/* Une bordure transparente laissait voir le fond blanc de la carte sous le dégradé (::before ne couvre que la zone de padding) : liseré blanc. On la retire, le padding compense pour que le contenu ne bouge pas. */
-.gcine-card.is-center .gcine-card-inner{border-width:0;padding:27px}
+.gcine-card-inner{width:272px;height:360px;border-radius:36px;overflow:hidden;position:relative;padding:24px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(180deg,#fff,#F7F2EA);box-shadow:0 12px 0 #E0D3C1,0 34px 44px -22px rgba(150,70,30,.35),inset 0 2px 0 #fff;transition:box-shadow .35s}
+.gcine-card-inner::before{content:'';position:absolute;inset:0;z-index:0;background:var(--gcine-fill,linear-gradient(180deg,#FF9A6C,#FF4D2E 70%));opacity:0;transition:opacity .35s}
+.gcine-card-inner::after{content:'';position:absolute;left:22px;right:120px;top:9px;height:16px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,0));z-index:1;pointer-events:none}
+.gcine-card:not(.is-center):hover .gcine-card-inner{box-shadow:0 14px 0 #E0D3C1,0 38px 50px -22px rgba(150,70,30,.4),inset 0 2px 0 #fff}
+.gcine-card.is-center .gcine-card-inner{box-shadow:0 12px 0 var(--gcine-side,#C9381B),0 40px 60px -22px rgba(255,77,46,.6),inset 0 3px 0 rgba(255,255,255,.35);animation:gcineFloat 3.2s ease-in-out infinite}
 .gcine-card.is-center .gcine-card-inner::before{opacity:1}
-.gcine-blob{position:absolute;border-radius:50%;background:#fff5f1;transition:background .45s cubic-bezier(.22,.9,.3,1)}
-.gcine-blob-a{width:200px;height:200px;right:-72px;top:-80px}
-.gcine-blob-b{width:140px;height:140px;left:-52px;bottom:-60px}
-.gcine-card.is-center .gcine-blob{background:rgba(255,255,255,.11)}
-.gcine-card-top{position:relative;display:flex;align-items:flex-start;justify-content:space-between}
-.gcine-card-icon{font-size:46px;line-height:1;color:var(--accent);transition:color .45s cubic-bezier(.22,.9,.3,1)}
-.gcine-card.is-center .gcine-card-icon{color:#fff}
-.gcine-card-tag-wrap{position:relative;display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em}
-.gcine-card-tag{padding:6px 12px;border-radius:999px;white-space:nowrap;transition:opacity .45s cubic-bezier(.22,.9,.3,1)}
-.gcine-card-tag-idle{position:relative;background:#fff0eb;color:var(--accent)}
-.gcine-card-tag-active{position:absolute;inset:0;background:rgba(255,255,255,.22);color:#fff;opacity:0}
+.gcine-card.is-center.is-arriving .gcine-card-inner{animation:gcineSquish .55s cubic-bezier(.34,1.56,.64,1)}
+.gcine-card.is-center.is-landed .gcine-card-inner{animation:gcineLand .6s cubic-bezier(.3,.7,.4,1)}
+@keyframes gcineFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes gcineSquish{0%{transform:scale(1.06,.9)}45%{transform:scale(.97,1.04)}100%{transform:none}}
+.gcine-blob{position:absolute;z-index:0;border-radius:50%;background:#FFF3EC;transition:background .35s}
+.gcine-blob-a{width:190px;height:190px;right:-70px;top:-80px}
+.gcine-blob-b{width:130px;height:130px;left:-56px;bottom:-62px;opacity:.6}
+.gcine-card.is-center .gcine-blob{background:rgba(255,255,255,.12)}
+.gcine-card-top{position:relative;z-index:2;display:flex;align-items:flex-start;justify-content:space-between}
+.gcine-card-icon{width:62px;height:62px;border-radius:20px;display:grid;place-items:center;font-size:30px;line-height:1;color:var(--accent);background:#FFF0EA;box-shadow:0 4px 0 #F4CDBE;transition:background .35s,box-shadow .35s}
+.gcine-card.is-center .gcine-card-icon{background:linear-gradient(180deg,#fff,#FFF1EA);box-shadow:0 6px 0 #E8B9A5,inset 0 2px 0 #fff}
+.gcine-card-tag-wrap{position:relative;display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em}
+.gcine-card-tag{padding:6px 11px;border-radius:999px;white-space:nowrap;transition:opacity .35s}
+.gcine-card-tag-idle{position:relative;background:#FFF0EA;color:var(--accent);box-shadow:0 2px 0 #F4CDBE}
+.gcine-card-tag-active{position:absolute;inset:0;background:rgba(255,255,255,.25);color:#fff;opacity:0}
 .gcine-card.is-center .gcine-card-tag-idle{opacity:0}
 .gcine-card.is-center .gcine-card-tag-active{opacity:1}
-.gcine-card-body{position:relative;display:flex;flex-direction:column;gap:9px}
-.gcine-card-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;line-height:1.1;letter-spacing:-.02em;color:var(--txt);transition:color .45s cubic-bezier(.22,.9,.3,1)}
+.gcine-card-body{position:relative;z-index:2;display:flex;flex-direction:column;gap:8px}
+.gcine-card-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:25px;line-height:1.08;letter-spacing:-.02em;color:var(--txt);transition:color .35s}
 .gcine-card.is-center .gcine-card-name{color:#fff}
-.gcine-card-desc{font-size:13px;line-height:1.55;color:var(--muted);transition:color .45s cubic-bezier(.22,.9,.3,1)}
-.gcine-card.is-center .gcine-card-desc{color:rgba(255,255,255,.9)}
-.gcine-card-foot{position:relative;height:46px}
-.gcine-card-cta{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;color:var(--accent);font-weight:700;font-size:14px;border-radius:16px;cursor:pointer;box-shadow:0 6px 18px rgba(21,19,15,.14);opacity:0;pointer-events:none;transition:opacity .45s cubic-bezier(.22,.9,.3,1)}
+.gcine-card-desc{font-size:13px;line-height:1.55;color:var(--muted);transition:color .35s}
+.gcine-card.is-center .gcine-card-desc{color:rgba(255,255,255,.92)}
+.gcine-card-foot{position:relative;z-index:2;height:52px}
+.gcine-card-cta{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:9px;border-radius:18px;font-weight:800;font-size:15px;color:var(--accent);cursor:pointer;background:linear-gradient(180deg,#fff,#FFF1EA);box-shadow:0 6px 0 #E8B9A5,0 12px 18px -8px rgba(120,30,10,.35),inset 0 2px 0 #fff;opacity:0;pointer-events:none;transition:opacity .3s,transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s cubic-bezier(.34,1.56,.64,1)}
 .gcine-card.is-center .gcine-card-cta{opacity:1;pointer-events:auto}
-.gcine-card-n{position:absolute;left:0;bottom:0;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:#b9b3a8;opacity:1;transition:opacity .45s cubic-bezier(.22,.9,.3,1)}
+.gcine-card.is-center .gcine-card-cta:active,.gcine-card-cta.is-pressed{transform:translateY(5px);box-shadow:0 1px 0 #E8B9A5,inset 0 2px 0 #fff;transition-duration:.06s}
+.gcine-card-n{position:absolute;left:0;bottom:12px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:#C3B9AA;transition:opacity .3s}
 .gcine-card.is-center .gcine-card-n{opacity:0}
-.gcine-controls{display:flex;align-items:center;justify-content:center;gap:24px;margin-top:8px}
-.gcine-arrow{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--txt);cursor:pointer;transition:border-color .2s,color .2s}
-.gcine-arrow:hover{border-color:var(--accent);color:var(--accent)}
-.gcine-dots{display:flex;align-items:center;gap:7px}
-.gcine-dot{width:8px;height:8px;border-radius:999px;background:#e2ddd4;cursor:pointer;transition:.3s}
-.gcine-dot.is-active{width:26px;background:var(--accent)}
+
+/* Flèches = vraies touches ← → ; points en pastilles */
+.gcine-controls{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:4px}
+.gcine-arrow{position:relative;width:54px;height:54px;border-radius:17px;border:none;display:grid;place-items:center;font-size:20px;font-weight:800;color:#5f584c;cursor:pointer;background:linear-gradient(180deg,#fff,#F5EFE6);box-shadow:0 6px 0 #E0D3C1,0 12px 18px -6px rgba(150,70,30,.2),inset 0 2px 0 #fff;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s cubic-bezier(.34,1.56,.64,1),color .2s}
+.gcine-arrow:hover{color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 0 #E0D3C1,0 16px 22px -8px rgba(150,70,30,.25),inset 0 2px 0 #fff}
+.gcine-arrow:active,.gcine-arrow.is-pressed{transform:translateY(5px);box-shadow:0 1px 0 #E0D3C1,inset 0 2px 0 #fff;transition-duration:.06s}
+.gcine-dots{display:flex;align-items:center;gap:8px}
+.gcine-dot{width:12px;height:12px;border-radius:999px;background:#EAE3D8;box-shadow:inset 0 2px 3px rgba(120,80,40,.18);cursor:pointer;transition:width .35s cubic-bezier(.34,1.56,.64,1),background .3s}
+.gcine-dot.is-active{width:30px;background:linear-gradient(180deg,#FF9A6C,#FF4D2E);box-shadow:0 3px 0 #C9381B}
+.gcine-keys-hint{text-align:center;margin:16px 0 0;font-size:13px;color:var(--muted)}
+.gcine-keys-hint kbd{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:2px 7px;border-radius:7px;background:#fff;box-shadow:0 2px 0 #E0D3C1;color:var(--txt)}
+@media(hover:none){.gcine-keys-hint{display:none}}
+
+/* Carte désactivée : "Bientôt disponible" ou verrouillée dynamiquement (fond gris, tranche grise) */
+.gcine-card.is-disabled{--gcine-side:#8f887d}
+.gcine-card.is-disabled .gcine-card-inner{filter:grayscale(.35);opacity:.72}
+.gcine-card.is-disabled.is-center .gcine-card-cta{color:var(--muted);cursor:not-allowed}
+.gcine-card.is-disabled .gcine-card-tag-idle{background:rgba(21,19,15,.08);color:var(--muted);box-shadow:none}
+
 @media(max-width:860px){
   .gcine-h1{font-size:38px}
   .gcine-sub{font-size:15px}
   .gcine-h2{font-size:32px}
-  .gcine-card-inner{width:220px;height:310px;padding:20px}
-  .gcine-card.is-center .gcine-card-inner{padding:21px}
-  .gcine-card-name{font-size:20px}
+  .gcine-floaty{display:none}
+  .gcine-carousel{height:440px}
+  .gcine-card-inner{width:240px;height:340px;padding:20px}
+  .gcine-card-name{font-size:21px}
+  .gcine-cat-tab{padding:10px 14px 10px 10px;font-size:14px}
 }
-
-/* Onglets de catégorie (Vitesse/Précision/Mémoire/Multijoueur) au-dessus du carrousel */
-.gcine-cat-tabs{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;max-width:1120px;margin:0 auto 28px}
-.gcine-cat-tab{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;border:1.5px solid var(--border);background:#fff;color:var(--txt);font-weight:700;font-size:14px;cursor:pointer;transition:.2s}
-.gcine-cat-tab svg{width:16px;height:16px}
-.gcine-cat-tab:hover{border-color:var(--accent);color:var(--accent)}
-.gcine-cat-tab.is-active{background:linear-gradient(140deg,#ff7a4d,var(--accent) 64%);border-color:transparent;color:#fff;box-shadow:0 10px 24px rgba(255,77,46,.28)}
-
-/* Bandeau Boss de la semaine : défi hebdo à part, pas une carte parmi d'autres */
-.gcine-boss-banner{display:flex;align-items:center;gap:20px;max-width:1120px;margin:0 auto 28px;padding:22px 28px;border-radius:24px;background:linear-gradient(120deg,#fff8f5,#fff0e9);border:1.5px solid rgba(255,140,90,.35);cursor:pointer;transition:box-shadow .2s,border-color .2s}
-.gcine-boss-banner:hover{box-shadow:0 16px 34px rgba(255,77,46,.15);border-color:rgba(255,110,60,.55)}
-.gcine-boss-icon{flex:none;width:52px;height:52px;border-radius:16px;background:linear-gradient(140deg,#ff7a4d,var(--accent) 64%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px}
-.gcine-boss-body{flex:1;min-width:0}
-.gcine-boss-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--accent);font-weight:700;margin-bottom:4px}
-.gcine-boss-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;color:var(--txt)}
-.gcine-boss-desc{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5}
-.gcine-boss-cta{flex:none;font-weight:700;font-size:14px;color:var(--accent);white-space:nowrap}
-@media(max-width:640px){
-  .gcine-boss-banner{flex-direction:column;align-items:flex-start;text-align:left}
-  .gcine-boss-cta{align-self:flex-end}
+@media(prefers-reduced-motion:reduce){
+  .gcine-floaty,.gcine-card.is-center .gcine-card-inner{animation:none}
+  .gcine-word span{opacity:1;transform:none;animation:none!important}
 }
-
-/* Carte désactivée : "Bientôt disponible" (ex: Battle Royale) ou verrouillée dynamiquement */
-.gcine-card.is-disabled .gcine-card-inner{filter:grayscale(.35);opacity:.72}
-.gcine-card.is-disabled.is-center .gcine-card-inner{box-shadow:0 20px 44px rgba(21,19,15,.18)}
-.gcine-card.is-disabled.is-center .gcine-card-cta{color:var(--muted);cursor:not-allowed}
-.gcine-card.is-disabled .gcine-card-tag-idle{background:rgba(21,19,15,.08);color:var(--muted)}
 
 /* Clavier vide : grille de touches vierges + banque de lettres à replacer */
 .clavier-stage{display:flex;flex-direction:column;align-items:center;gap:26px;padding:12px 0 4px}
@@ -6616,7 +6654,7 @@ function shuffleArr(a){
   return r;
 }
 // Intro de la salle de jeux : clavier AZERTY simplifié aux touches
-// moelleuses, sur lequel la touche K (mascotte) saute pour écrire un mot.
+// moelleuses, sur lequel la touche K saute pour écrire un mot.
 const GK_U=72,GK_K=62;
 function gkLayout(){
   const rows=[['AZERTYUIOP',0],['QSDFGHJKLM',.3],['WXCVBN,;:',.8]];
@@ -6627,6 +6665,20 @@ function gkLayout(){
   return {keys,W:Math.max.apply(null,keys.map(k=>k.x+k.w)),H:3*GK_U+GK_K,find:ch=>keys.find(k=>k.ch===ch)};
 }
 const GK_LAYOUT=gkLayout();
+// Mot écrit par la touche K (JEUX, PLAY en anglais), repris en tête du sélecteur.
+function gkWord(){
+  const w=String(kpT('games.k_word')||'JEUX').toUpperCase();
+  return /^[A-Z]{2,6}$/.test(w)&&w.indexOf('K')<0&&w.split('').every(c=>GK_LAYOUT.find(c))?w:'JEUX';
+}
+// Temps restant avant le prochain Boss : la semaine ISO se termine le lundi
+// suivant à 00:00 UTC (même calcul que isoWeekBounds dans api/_boss-shared.js).
+function gkBossLeft(now){
+  now=now||new Date();
+  const d=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()));
+  d.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7)+7);
+  const h=Math.max(0,Math.floor((d-now)/3600000));
+  return {d:Math.floor(h/24),h:h%24};
+}
 // Couleurs d'une touche : repos -> chaude (orange), interpolées en RGB.
 const GK_PAL={idle:{t1:[255,255,255],t2:[245,239,230],side:[224,211,193],lab:[179,168,149]},tint:{t1:[255,243,236],t2:[255,224,209],side:[241,188,164],lab:[255,106,69]},hot:{t1:[255,154,108],t2:[255,77,46],side:[201,56,27],lab:[255,255,255]}};
 function gkPaintKey(cap,lab,press,hot,depth,tint){
@@ -13559,14 +13611,18 @@ const app={
     const visible=GCINE_GAMES.filter(g=>g.category===cat);
     this._gcineVisible=visible;
     const tabsHTML=GCINE_CATS.map(c=>`<button class="gcine-cat-tab${c.key===cat?' is-active':''}" onclick="app.setGcineCat('${c.key}')">${ICONS[c.icon]}<span>${KP_CAT_TXT[c.key]?KP_CAT_TXT[c.key]():c.label}</span></button>`).join('');
+    const left=gkBossLeft();
     const bossHTML=`<div class="gcine-boss-banner" onclick="app.selectGame('boss')">
-      <div class="gcine-boss-icon">${ICONS[GCINE_BOSS.icon]}</div>
+      <div class="gcine-boss-mascot" aria-hidden="true"><div class="gcine-boss-fig"><div class="gcine-boss-crown"></div><img src="/images/keypace-pose-7.webp" alt="" width="626" height="960" loading="lazy" decoding="async"></div></div>
       <div class="gcine-boss-body">
         <div class="gcine-boss-eyebrow">${kpT('games.boss_eyebrow')}</div>
         <div class="gcine-boss-name">${kpGameName(GCINE_BOSS)}</div>
         <div class="gcine-boss-desc">${kpGameDesc(GCINE_BOSS)}</div>
       </div>
-      <div class="gcine-boss-cta">${kpT('games.boss_cta')}</div>
+      <div class="gcine-boss-side">
+        <div class="gcine-boss-timer">${kpT('games.boss_left')} <b>${left.d}</b>${kpT('games.boss_d')} <b>${left.h}</b>${kpT('games.boss_h')}</div>
+        <div class="gcine-boss-cta">${kpT('games.boss_cta')}</div>
+      </div>
     </div>`;
     this._advice=this._gamesAdvice();
     const cardsHTML=visible.map((g,i)=>this._gcineCard(g,i)).join('');
@@ -13586,8 +13642,10 @@ const app={
         </button>
       </section>
       <div class="gcine-panel">
-        <div class="gcine-panel-head">
+        ${[['A',3,5,-8],['Z',94,9,10],['K',5,42,6,1],['Q',92,50,-6],['M',2,80,-10],['J',95,86,8,1]].map(([c,x,y,r,hot],i)=>`<div class="gcine-floaty${hot?' is-hot':''}" aria-hidden="true" style="left:${x}%;top:${y}%;--r:${r}deg;animation-delay:${-i*1.3}s">${c}</div>`).join('')}
+        <div class="gcine-panel-head" id="gcine-panel-head">
           <div class="gcine-eyebrow">${kpT('games.arrived')}</div>
+          <div class="gcine-word" aria-hidden="true">${gkWord().split('').map(c=>`<span>${c}</span>`).join('')}</div>
           <h2 class="gcine-h2">${kpT('games.choose')}</h2>
           <p class="gcine-panel-sub">${kpT('games.drag')}</p>
         </div>
@@ -13604,6 +13662,7 @@ const app={
             <div class="gcine-dots" id="gcine-dots">${dotsHTML}</div>
             <button class="gcine-arrow" id="gcine-next" aria-label="${kpT('games.next')}">→</button>
           </div>
+          <p class="gcine-keys-hint">${kpT('games.keys_hint')}</p>
         </div>
       </div>
     </div>`;
@@ -13694,22 +13753,34 @@ const app={
     };
 
     const visibleGames=this._gcineVisible||[];
-    const GAP=232;
-    let idx=0,dragOffset=0;
+    const gap=()=>window.innerWidth<760?200:250;
+    let GAP=gap();
+    let idx=0,dragOffset=0,arriveT=null;
+    // Cartes voisines légèrement plus basses, plus petites et penchées : un
+    // tas de touches posées en éventail plutôt qu'un manège en 3D.
     const renderCarousel=()=>{
       cardEls.forEach((el,i)=>{
-        const o=i-idx,a=Math.abs(o),hidden=a>3,center=o===0&&dragOffset===0;
-        const scale=center?1:Math.max(0.6,1-a*0.15);
-        el.style.transform='translate(-50%,-50%) translateX('+(o*GAP+dragOffset)+'px) scale('+scale+') rotateY('+(-o*12)+'deg)';
+        const o=i-idx,a=Math.abs(o),hidden=a>2,center=o===0&&dragOffset===0;
+        const scale=center?1:Math.max(0.72,1-a*0.12);
+        el.style.transform='translate(-50%,-50%) translateX('+(o*GAP+dragOffset)+'px) translateY('+(a*18)+'px) rotate('+(o*3.5)+'deg) scale('+scale+')';
         el.style.zIndex=20-a;
-        el.style.opacity=hidden?0:center?1:(a===1?0.95:0.6);
+        el.style.opacity=hidden?0:1;
         el.style.pointerEvents=hidden?'none':'auto';
         el.style.cursor=center?'default':'pointer';
         el.classList.toggle('is-center',center);
       });
       dotEls.forEach((d,i)=>d.classList.toggle('is-active',i===idx));
     };
-    const setIdx=v=>{idx=clamp(v,0,visibleGames.length-1);renderCarousel();};
+    // La nouvelle carte du milieu arrive avec un petit écrasement élastique.
+    const setIdx=v=>{
+      const n=clamp(v,0,visibleGames.length-1),changed=n!==idx;
+      idx=n;renderCarousel();
+      if(!changed)return;
+      const c=cardEls[idx];
+      cardEls.forEach(el=>el.classList.remove('is-arriving'));
+      void c.offsetWidth;c.classList.add('is-arriving');
+      clearTimeout(arriveT);arriveT=setTimeout(()=>c.classList.remove('is-arriving'),600);
+    };
     renderCarousel();
 
     let justDragged=false;
@@ -13730,6 +13801,36 @@ const app={
     prevBtn.addEventListener('click',onPrev);
     nextBtn.addEventListener('click',onNext);
 
+    // Clavier : ← → changent de jeu (la touche à l'écran s'enfonce aussi),
+    // Entrée lance le jeu du milieu. Ignoré pendant une saisie ou si un
+    // bouton/lien a le focus (Entrée l'activerait déjà).
+    const pressVis=el=>{if(!el)return;el.classList.add('is-pressed');setTimeout(()=>el.classList.remove('is-pressed'),140);};
+    const onKey=e=>{
+      if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey)return;
+      const t=e.target;
+      if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+      if(document.querySelector('.modal-overlay.open,#ob-overlay.active'))return;
+      if(e.key==='ArrowRight'){e.preventDefault();setIdx(idx+1);pressVis(nextBtn);}
+      else if(e.key==='ArrowLeft'){e.preventDefault();setIdx(idx-1);pressVis(prevBtn);}
+      else if(e.key==='Enter'&&(!t||t===document.body)){
+        const g=visibleGames[idx];
+        if(!g||g.comingSoon||(typeof g.locked==='function'&&g.locked(this)))return;
+        e.preventDefault();pressVis(cardEls[idx].querySelector('.gcine-card-cta'));
+        setTimeout(()=>{if(document.body.contains(cardsEl))this.selectGame(g.key);},120);
+      }
+    };
+    window.addEventListener('keydown',onKey);
+
+    // Les lettres JEUX sautent en place quand l'en-tête du sélecteur arrive à l'écran.
+    const headEl=document.getElementById('gcine-panel-head');
+    let headIO=null;
+    if(headEl){
+      if('IntersectionObserver' in window){
+        headIO=new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting)){headEl.classList.add('is-in');headIO.disconnect();}},{threshold:.4});
+        headIO.observe(headEl);
+      }else headEl.classList.add('is-in');
+    }
+
     let dragging=false,dx0=0,di0=0;
     const carouselEl=document.getElementById('gcine-carousel');
     const onDown=e=>{dragging=true;dx0=e.clientX;di0=idx;dragOffset=0;carouselEl.style.cursor='grabbing';cardsEl.classList.add('is-dragging');};
@@ -13746,7 +13847,7 @@ const app={
       cardsEl.classList.remove('is-dragging');
       const moved=dragOffset;
       dragOffset=0;
-      const deltaIdx=-Math.round(moved/GAP);
+      const deltaIdx=-Math.round(moved/GAP);/* GAP suit la largeur d'écran */
       if(deltaIdx!==0)setIdx(di0+deltaIdx);
       else renderCarousel();
     };
@@ -13769,8 +13870,7 @@ const app={
     const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
     const L=GK_LAYOUT,pad=28,top=120,below=86;
     const bw=L.W+pad*2,bh=L.H+pad*2,fitH=top+bh+below;
-    let word=String(kpT('games.k_word')||'JEUX').toUpperCase();
-    if(!/^[A-Z]{2,6}$/.test(word)||word.indexOf('K')>=0||word.split('').some(c=>!L.find(c)))word='JEUX';
+    const word=gkWord();
     const keyHTML=k=>k.ch==='K'
       ?`<div class="gk-socket" style="left:${k.x+pad}px;top:${k.y+pad}px;width:${k.w}px;height:${k.h}px"></div>`
       :`<div class="gk-key${k.space?' sp':''}" style="left:${k.x+pad}px;top:${k.y+pad}px;width:${k.w}px;height:${k.h}px"><div class="gk-ring"></div><div class="gk-cap"><span>${k.space?kpT('test.space_key'):k.ch}</span></div></div>`;
@@ -13780,14 +13880,14 @@ const app={
         <div class="gk-persp"><div class="gk-board"><div class="gk-shell"></div>${L.keys.map(keyHTML).join('')}</div></div>
         <div class="gk-over">
           <div class="gk-shadow"></div><div class="gk-dust"></div><div class="gk-dust"></div><div class="gk-dust"></div>
-          <div class="gk-char"><div class="gk-rot"><div class="gk-sq"><div class="gk-tuft"><i></i><i></i><i></i></div><div class="gk-body"></div><div class="gk-eyes"><i></i><i></i></div><div class="gk-cheeks"><i></i><i></i></div><div class="gk-mouth"></div><div class="gk-k">K</div></div></div></div>
+          <div class="gk-char"><div class="gk-rot"><div class="gk-sq"><div class="gk-body"></div><div class="gk-letter">K</div></div></div></div>
         </div>
       </div>
       <div class="gk-slots" style="top:${top+bh+34}px">${word.split('').map(c=>`<div class="gk-slot"><div class="gk-ring"></div><div class="gk-cap"><span>${c}</span></div></div>`).join('')}</div>
     </div>`;
     const fit=scene.firstElementChild,q=sel=>fit.querySelector(sel);
     const stageEl=q('.gk-stage'),board=q('.gk-board'),ground=q('.gk-ground');
-    const ch=q('.gk-char'),rot=q('.gk-rot'),sq=q('.gk-sq'),eyes=q('.gk-eyes'),mouth=q('.gk-mouth'),shadow=q('.gk-shadow');
+    const ch=q('.gk-char'),rot=q('.gk-rot'),sq=q('.gk-sq'),shadow=q('.gk-shadow');
     const dust=Array.prototype.slice.call(fit.querySelectorAll('.gk-dust'));
     const keyMap=L.keys.filter(k=>k.ch!=='K');
     const keyEls=Array.prototype.map.call(board.querySelectorAll('.gk-key'),el=>({cap:el.querySelector('.gk-cap'),lab:el.querySelector('span'),ring:el.querySelector('.gk-ring')}));
@@ -13881,8 +13981,6 @@ const app={
       ch.style.transformOrigin='50% 100%';
       rot.style.transform='rotate('+r.toFixed(1)+'deg)';
       sq.style.transform='scale('+(1+.2*sqz-.07*air).toFixed(3)+','+(1-.24*sqz+.13*air).toFixed(3)+')';
-      mouth.classList.toggle('o',air>.35);
-      eyes.style.translate=(moving?dir*2.5*Math.min(1,air*3):Math.sin(tm*.9)*2.5).toFixed(2)+'px '+(moving?-air*1.5:0).toFixed(2)+'px';
       ch.style.opacity=diving?1-clamp((f-.6)/.35,0,1):1;
       const h=gy-y;
       shadow.style.transform='translate('+gx.toFixed(1)+'px,'+(gy+3).toFixed(1)+'px) scale('+(k*(1-clamp(h/220,0,.65))).toFixed(3)+')';
@@ -13995,7 +14093,7 @@ const app={
       render(0,performance.now()/1000,false);
       play(.35);
     }
-    const onResize=()=>{setIntroH();fitScene();if(phase==='done')render(FINAL,0,true);};
+    const onResize=()=>{setIntroH();fitScene();if(phase==='done')render(FINAL,0,true);const g=gap();if(g!==GAP){GAP=g;renderCarousel();}};
     window.addEventListener('resize',onResize);
     if(document.fonts&&document.fonts.ready&&typeof document.fonts.ready.then==='function')document.fonts.ready.then(()=>{if(document.body.contains(intro))onResize();});
 
@@ -14006,8 +14104,10 @@ const app={
       window.removeEventListener('wheel',onUserScroll);
       window.removeEventListener('touchstart',onUserScroll);
       window.removeEventListener('keydown',onUserScroll);
+      window.removeEventListener('keydown',onKey);
+      if(headIO)headIO.disconnect();
       if(raf)cancelAnimationFrame(raf);
-      stopScroll();clearTimeout(landTimer);
+      stopScroll();clearTimeout(landTimer);clearTimeout(arriveT);
       this._gcineTeardown=()=>{};
     };
   },
