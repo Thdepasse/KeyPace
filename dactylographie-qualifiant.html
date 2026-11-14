@@ -6,8 +6,8 @@
 <script src="/cookie-consent.js" defer></script>
 <script src="/field-focus-guard.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dactylographie dans le qualifiant, technique et professionnel | KeyPace</title>
-<meta name="description" content="Technique de qualification ou professionnel : pour chaque option, les compétences des profils officiels que KeyPace entraîne déjà, et celles qu&#x27;il ne couvre pas. Éligible MANOLO.">
+<title>Dactylographie dans l&#x27;enseignement qualifiant | KeyPace</title>
+<meta name="description" content="Technique de qualification ou professionnel : les compétences officielles de votre option que KeyPace entraîne, et celles qu&#x27;il ne couvre pas.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://keypace.be/dactylographie-qualifiant">
 <link rel="alternate" hreflang="fr-BE" href="https://keypace.be/dactylographie-qualifiant">
@@ -228,7 +228,7 @@
       <details><summary>Qu'est-ce que la subvention MANOLO ?</summary><p>Un dispositif de la Fédération Wallonie-Bruxelles qui peut réduire le coût de la licence. On vérifie votre éligibilité ensemble.</p></details>
     </div>
     <aside class="ask">
-      <img src="/images/keypace-mascot-idea.webp" alt="" loading="lazy">
+      <img src="/images/keypace-mascot-idea.webp" width="234" height="282" alt="" loading="lazy">
       <h2>Une question ?</h2>
       <p>On répond vite, MANOLO compris.</p>
       <button class="btn" type="button" onclick="openAsk()" id="ask-btn">Poser ma question</button>
@@ -291,7 +291,7 @@ function show(i){
     <div class="keys">${keys.map(k=>`<span><i style="--c:${COV[k].c}"></i>${COV[k].l} ${n[k]}</span>`).join('')}</div>
     <ul class="comp">${shown.map(c=>`<li><em style="--c:${COV[c.couverture].c}">${COV[c.couverture].l}</em><span>${esc(c.texte.replace(/\s*:\s*$/,''))}</span></li>`).join('')}</ul>`;
   const kp=(n.couvert||0)+(n.partiel||0);
-  info.innerHTML=`<div class="info-y" style="font-size:40px">${kp}<sup style="font-size:.45em"> / ${all.length}</sup></div><div class="info-g">${o.forme}</div><h3>Compétences travaillées dans KeyPace</h3><p>Entièrement ou en partie. Le reste se travaille ailleurs qu'au clavier, ou arrive bientôt.</p><span class="lessons">${esc(o.annees.replace(/\s*\(.*\)/,''))}</span>`;
+  info.innerHTML=`<div class="info-y" style="font-size:40px">${kp}<sup style="font-size:.45em"> / ${all.length}</sup></div><div class="info-g">${o.forme}</div><p class="info-t">Compétences travaillées dans KeyPace</p><p>Entièrement ou en partie. Le reste se travaille ailleurs qu'au clavier, ou arrive bientôt.</p><span class="lessons">${esc(o.annees.replace(/\s*\(.*\)/,''))}</span>`;
 }
 btns.forEach(b=>b.addEventListener('click',()=>show(+b.dataset.i)));
 show(Math.max(0,OPTS.findIndex(o=>o.id==='technicien-de-bureau')));

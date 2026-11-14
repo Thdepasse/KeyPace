@@ -6,8 +6,8 @@
 <script src="/cookie-consent.js" defer></script>
 <script src="/field-focus-guard.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dactylographie au tronc commun, du primaire à la 3e secondaire | KeyPace</title>
-<meta name="description" content="Le volet numérique du tronc commun (référentiel FMTTN) en leçons de dactylographie, année par année, de la 3e primaire à la 3e secondaire. Tableau de bord enseignant, éligible MANOLO.">
+<title>Dactylographie au primaire et au tronc commun | KeyPace</title>
+<meta name="description" content="Les leçons de dactylographie de chaque année, de la 3e primaire à la 3e secondaire, d&#x27;après le référentiel FMTTN. Tableau de bord enseignant, éligible MANOLO.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://keypace.be/dactylographie-tronc-commun">
 <link rel="alternate" hreflang="fr-BE" href="https://keypace.be/dactylographie-tronc-commun">
@@ -181,6 +181,15 @@
         <div class="kb" id="kb" aria-hidden="true"></div>
         <div class="info" id="info" aria-live="polite"></div>
       </div>
+      <ol class="sr-only" aria-label="Le programme année par année">
+        <li>3e primaire, découvrir le clavier : la rangée de repos et la bonne posture. Leçons 1 à 6.</li>
+        <li>4e primaire, saisir un texte court : toutes les lettres, les majuscules et la ponctuation. Leçons 7 à 33.</li>
+        <li>5e primaire, accents, chiffres et arobase : écrire juste en français, encoder des données, taper une adresse email. Leçons 34 à 52.</li>
+        <li>6e primaire, les symboles : parenthèses, crochets, signes de calcul, pour un mot de passe sûr. Leçons 53 à 60.</li>
+        <li>1re secondaire, éditer et enrichir un texte : enchaîner phrases et paragraphes sans regarder. Leçons 61 à 64.</li>
+        <li>2e secondaire, formules et vitesse : textes techniques pour le tableur et sprint de vitesse. Leçons 65 et 66. Arrive d'ici 2028.</li>
+        <li>3e secondaire, communiquer et collaborer : on consolide la vitesse et la fluidité. Arrive d'ici 2028.</li>
+      </ol>
       <div class="prog-foot">
         <div class="legend"><span><i style="background:var(--yc,var(--accent))"></i>Nouvelles touches</span><span><i style="background:#FFE3D6"></i>Déjà apprises</span></div>
         <span>Source : référentiel FMTTN, commun à tous les réseaux · <a href="/cours-dactylo-en-ligne#tronc-commun">détail et citations</a></span>
@@ -236,7 +245,7 @@
       <details><summary>Qu'est-ce que la subvention MANOLO ?</summary><p>Un dispositif de la Fédération Wallonie-Bruxelles qui peut réduire le coût de la licence. On vérifie votre éligibilité ensemble.</p></details>
     </div>
     <aside class="ask">
-      <img src="/images/keypace-mascot-idea.webp" alt="" loading="lazy">
+      <img src="/images/keypace-mascot-idea.webp" width="234" height="282" alt="" loading="lazy">
       <h2>Une question ?</h2>
       <p>On répond vite, MANOLO compris.</p>
       <button class="btn" type="button" onclick="openAsk()" id="ask-btn">Poser ma question</button>
@@ -305,7 +314,7 @@ function show(i){
   kb.style.setProperty('--yc',Y.c);document.getElementById('prog').style.setProperty('--yc',Y.c);
   kb.classList.toggle('flow',!!Y.flow);
   keys.forEach(k=>{const y=k.dataset.y===undefined?null:+k.dataset.y;k.classList.toggle('new',!Y.flow&&y===i);k.classList.toggle('old',!Y.flow&&y!==null&&y<i)});
-  info.innerHTML=`<div class="info-y">${Y.n}<sup>${Y.s}</sup></div><div class="info-g">${Y.g}</div><h3>${Y.t}</h3><p>${Y.d}</p><span class="lessons">${Y.l}</span><div class="when${Y.live?'':' soon'}"><i></i>${Y.live?'En vigueur cette année':'Arrive d’ici 2028'}</div>`;
+  info.innerHTML=`<div class="info-y">${Y.n}<sup>${Y.s}</sup></div><div class="info-g">${Y.g}</div><p class="info-t">${Y.t}</p><p>${Y.d}</p><span class="lessons">${Y.l}</span><div class="when${Y.live?'':' soon'}"><i></i>${Y.live?'En vigueur cette année':'Arrive d’ici 2028'}</div>`;
 }
 let cur=1,auto=null;
 btns.forEach(b=>b.addEventListener('click',()=>{clearInterval(auto);auto=null;cur=+b.dataset.y;show(cur)}));

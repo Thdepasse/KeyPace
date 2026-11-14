@@ -6,8 +6,8 @@
 <script src="/cookie-consent.js" defer></script>
 <script src="/field-focus-guard.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taper vite au clavier en secondaire général ou de transition | KeyPace</title>
-<meta name="description" content="Vitesse, prise de notes, mail, CV, lettre de motivation : une sélection KeyPace pour la 4e à la 6e secondaire générale ou de transition. Tableau de bord enseignant, éligible MANOLO.">
+<title>Dactylographie en secondaire général et transition | KeyPace</title>
+<meta name="description" content="Vitesse, prise de notes, mail, CV et lettre de motivation pour la 4e à la 6e secondaire générale ou de transition. Tableau de bord enseignant, éligible MANOLO.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://keypace.be/dactylographie-general-transition">
 <link rel="alternate" hreflang="fr-BE" href="https://keypace.be/dactylographie-general-transition">
@@ -174,6 +174,11 @@
         <div class="docs" id="docs" aria-hidden="true"></div>
         <div class="info" id="info" aria-live="polite"></div>
       </div>
+      <ol class="sr-only" aria-label="La sélection année par année">
+        <li>4e secondaire, gagner en vitesse : vitesse et précision, prise de notes, pavé numérique, protection des données.</li>
+        <li>5e secondaire, écrire pour être lu : mail, CV, lettre de motivation, rapport ou synthèse, relecture, prise de notes.</li>
+        <li>6e secondaire, prêt pour la suite : mail, CV, lettre de motivation, rapport ou synthèse et relecture, au niveau du supérieur.</li>
+      </ol>
       <div class="prog-foot">
         <div class="legend"><span><i style="background:var(--ok)"></i>Disponible</span><span><i style="background:#C9BFAE"></i>Bientôt</span></div>
         <span>Sélection KeyPace, appuyée sur le cadre européen DigComp · <a href="/cours-dactylo-en-ligne#general">voir sur la page des cours</a></span>
@@ -225,7 +230,7 @@
       <details><summary>Qu'est-ce que la subvention MANOLO ?</summary><p>Un dispositif de la Fédération Wallonie-Bruxelles qui peut réduire le coût de la licence. On vérifie votre éligibilité ensemble.</p></details>
     </div>
     <aside class="ask">
-      <img src="/images/keypace-mascot-idea.webp" alt="" loading="lazy">
+      <img src="/images/keypace-mascot-idea.webp" width="234" height="282" alt="" loading="lazy">
       <h2>Une question ?</h2>
       <p>On répond vite, MANOLO compris.</p>
       <button class="btn" type="button" onclick="openAsk()" id="ask-btn">Poser ma question</button>
@@ -294,7 +299,7 @@ function show(i){
   btns.forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.y===i)));
   cards.forEach(c=>{const on=n.includes(c);c.classList.toggle('on',on);c.classList.toggle('off',!on)});
   const live=n.filter(c=>c.classList.contains('live')).length;
-  info.innerHTML=`<div class="info-y">${Y.n}<sup>e</sup></div><div class="info-g">Secondaire</div><h3>${Y.t}</h3><p>${Y.d}</p><span class="lessons">${n.length} modules · ${live} disponibles</span>`;
+  info.innerHTML=`<div class="info-y">${Y.n}<sup>e</sup></div><div class="info-g">Secondaire</div><p class="info-t">${Y.t}</p><p>${Y.d}</p><span class="lessons">${n.length} modules · ${live} disponibles</span>`;
 }
 let cur=1,auto=null;
 btns.forEach(b=>b.addEventListener('click',()=>{clearInterval(auto);auto=false;cur=+b.dataset.y;show(cur)}));
