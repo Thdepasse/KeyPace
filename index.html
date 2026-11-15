@@ -1156,7 +1156,7 @@ a.nav-link{text-decoration:none;display:inline-block}
 .tuto-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;line-height:1.15;margin-bottom:10px}
 .tuto-intro{font-size:15px;color:#7A7365;line-height:1.55;margin-bottom:18px}
 .tuto-kb{display:flex;flex-direction:column;gap:5px;background:var(--light);border:1px solid var(--border);border-radius:14px;padding:14px;margin:0 auto 16px;width:fit-content;max-width:100%}
-.tuto-kb-row{display:flex;gap:5px;justify-content:center}
+.tuto-kb-row{display:flex;gap:5px;justify-content:center}.tuto-kb-row:has(.tuto-key-altgr){margin-bottom:16px}
 .tuto-key{position:relative;min-width:30px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:7px;background:#fff;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#C2BBAC}
 .tuto-key.on{color:#fff;font-weight:800;box-shadow:0 3px 0 rgba(0,0,0,0.12)}
 .tuto-key-altgr{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;white-space:nowrap;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:5px;padding:1px 4px}
@@ -1236,10 +1236,10 @@ a.nav-link{text-decoration:none;display:inline-block}
 .les-dot.l{background:var(--light);color:#B5AE9F}
 .les-dot.t{background:rgba(255,77,46,0.14);color:var(--accent)}
 .les-dot.ex{background:rgba(255,77,46,0.08);color:var(--accent)}
-.les-title{font-size:14px;font-weight:700;margin-bottom:2px}
+.les-title{font-size:14px;font-weight:700;margin-bottom:2px;overflow-wrap:break-word;hyphens:auto}
 .les-keys{font-size:12px;color:var(--muted)}
 .les-best{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#1FA971}
-.expert-tag{font-size:10px;font-weight:700;color:var(--accent);background:rgba(255,77,46,0.1);padding:2px 6px;border-radius:5px;letter-spacing:.04em}
+.expert-tag{flex-shrink:0;font-size:10px;font-weight:700;color:var(--accent);background:rgba(255,77,46,0.1);padding:2px 6px;border-radius:5px;letter-spacing:.04em}
 
 /* PAGE PROGRÈS (profil collant + chapitres) */
 .pg-wrap{max-width:1120px;margin:0 auto;padding:44px 24px 70px}
@@ -8828,9 +8828,11 @@ const app={
       stats:['My progress | KeyPace','Follow your typing progress: speed, accuracy, daily streak, passed lessons and difficult keys.'],
       classes:['My class | KeyPace','Classes and homework on KeyPace.'],
     };
-    const [t,d]=(kpInEnPath()&&_metaEn[v])||(kpPathLang()==='nl'&&_metaNl[v])||(KPProg.getCountry()==='fr'&&KPProg.META_FR[v])||_meta[v]||_meta.home;
-    document.title=t;
     const desc=document.querySelector('meta[name="description"]');
+    window._kpRootMeta=window._kpRootMeta||[document.title,desc&&desc.content];
+    // « / » garde son propre titre (canonical « / ») au lieu de dupliquer celui de /test-frappe-en-ligne.
+    const [t,d]=(v==='test'&&normPath(location.pathname)==='/'&&window._kpRootMeta)||(kpInEnPath()&&_metaEn[v])||(kpPathLang()==='nl'&&_metaNl[v])||(KPProg.getCountry()==='fr'&&KPProg.META_FR[v])||_meta[v]||_meta.home;
+    document.title=t;
     if(desc)desc.setAttribute('content',d);
     this._syncUrl(v,_req);
     this._seoSync(_req);
@@ -10072,7 +10074,7 @@ const app={
           <button class="res-btn sec" onclick="${isLesson?'app.backLessons()':custom?'go(\'classes\')':'go(\'stats\')'}">${isLesson?kpT('typ.all_courses'):custom?kpT('typ.my_asg'):kpT('typ.see_progress')}</button>
         </div>
       </div>`:''}
-      ${!finished?`<div class="hint-txt">${s&&!s.started?kpT('typ.start_hint'):s&&s.started?'<span style="opacity:.5;font-size:12px">'+kpT('typ.tab_restart')+'</span>':''}</div>`:''}
+      ${!finished?`<div class="hint-txt">${s&&!s.started?(IS_TOUCH_ONLY()?kpT('typ.kb_needed'):kpT('typ.start_hint')):s&&s.started?'<span style="opacity:.5;font-size:12px">'+kpT('typ.tab_restart')+'</span>':''}</div>`:''}
       ${(()=>{
         if(!(s&&s._gazeStats))return'';
         const stats=s._gazeStats;
@@ -10149,7 +10151,7 @@ const app={
     const sp=document.querySelector('.kb-space');
     if(sp)sp.classList.toggle('on',realNext===' '||(next===' '));
     const hint=document.querySelector('.hint-txt');
-    if(hint)hint.innerHTML=s.started?'<span style="opacity:.45;font-size:12px">'+kpT('typ.tab_restart')+'</span>':kpT('typ.start_hint');
+    if(hint)hint.innerHTML=s.started?'<span style="opacity:.45;font-size:12px">'+kpT('typ.tab_restart')+'</span>':IS_TOUCH_ONLY()?kpT('typ.kb_needed'):kpT('typ.start_hint');
     requestAnimationFrame(()=>this.scrollToCursor());
   },
 
@@ -10330,7 +10332,7 @@ const app={
     const pb=currentUser&&this.stats?Math.max(0,...(course().tests||[]).filter(t=>!t.dur).map(t=>t.wpm)):0;
     const beating=!!(pb&&s.started&&!s.finished&&wpm>pb);
 
-    const hintText=s.finished?kpT('test.hint_done',{wpm,acc:s.idx?Math.round(100*s.correct/s.idx):0}):s.started?kpT('test.hint_running'):kpT('test.hint_idle');
+    const hintText=s.finished?kpT('test.hint_done',{wpm,acc:s.idx?Math.round(100*s.correct/s.idx):0}):s.started?kpT('test.hint_running'):IS_TOUCH_ONLY()?kpT('typ.kb_needed'):kpT('test.hint_idle');
     const hintCls='t4a-hint'+(s.finished?' done':!s.started?' idle':'');
 
     const chal=this._t4aChallenge(s,!!s.finished);
@@ -10506,7 +10508,7 @@ const app={
 
     const hintEl=$('t4a-hint');
     if(hintEl){
-      const txt=s.finished?kpT('test.hint_done',{wpm,acc:s.idx?Math.round(100*s.correct/s.idx):0}):s.started?kpT('test.hint_running'):kpT('test.hint_idle');
+      const txt=s.finished?kpT('test.hint_done',{wpm,acc:s.idx?Math.round(100*s.correct/s.idx):0}):s.started?kpT('test.hint_running'):IS_TOUCH_ONLY()?kpT('typ.kb_needed'):kpT('test.hint_idle');
       if(hintEl.textContent!==txt)hintEl.textContent=txt;
       hintEl.classList.toggle('done',!!s.finished);
       hintEl.classList.toggle('idle',!s.started&&!s.finished);
@@ -10582,7 +10584,7 @@ const app={
           :expertLocked?`openModal('upgrade-modal')`
           :progressLocked?''
           :`app.tryStartLesson('${les.id}')`;
-        const isDisabled=!currentUser||progressLocked;
+        const isDisabled=!!currentUser&&progressLocked; // visiteur : cliquable, ouvre l'inscription
         return`<button class="${cardCls}" ${isDisabled?'disabled':''} onclick="${clickHandler}">
           <div class="les-dot ${dotCls}">${icon}</div>
           <div style="flex:1;min-width:0">

@@ -465,7 +465,7 @@ async function run(opts = {}) {
         const frInEn = (txt, list) => list.filter((w) => txt.includes(w));
         const l1 = frInEn(lg.enList, ['Position de base', 'Rangée', 'La base de', 'Tous les modules', 'Objectif', 'leçons']); if (l1.length) problems.push(`BR12 : du français dans la liste des leçons en anglais : ${l1.join(', ')}`);
         if (/Choisis ton|module du jour|Mon enseignement/.test(lg.enList)) problems.push('BR12 : la page « Cours » française (programmes) s\'affiche pour un cours en anglais');
-        for (const w of ['Speed', 'Accuracy', 'All courses']) if (!lg.enLesson.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent de l'écran de leçon en anglais`);
+        for (const w of ['Speed', 'Accuracy', 'All lessons']) if (!lg.enLesson.toLowerCase().includes(w.toLowerCase())) problems.push(`BR12 : « ${w} » absent de l'écran de leçon en anglais`);
         const l2 = frInEn(lg.enLesson.toLowerCase(), ['vitesse', 'précision', 'tous les cours', 'explication', 'commence à taper', 'objectif']); if (l2.length) problems.push(`BR12 : du français sur l'écran de leçon en anglais : ${l2.join(', ')}`);
         if (!lg.tutoLessons[1]) problems.push('BR12 : aucune leçon de symboles trouvée pour contrôler la fenêtre Explication');
         const tutoFr = ['Commencer la leçon', 'main gauche', 'main droite', 'pouce', 'auriculaire', 'annulaire', 'majeur', 'Sur ton clavier', 'touche ', 'Maj ', 'à droite du', 'à gauche du', 'sans Maj'];

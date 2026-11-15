@@ -34,7 +34,7 @@ h1 em{color:var(--accent);font-style:normal}
 .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px;display:flex;gap:14px;align-items:center}
 input{padding:16px 20px;border:2px solid var(--border);border-radius:12px;font-size:26px;letter-spacing:6px;width:260px;background:var(--bg);color:var(--txt);font-family:'JetBrains Mono',monospace;text-transform:lowercase}
 input:focus{outline:none;border-color:var(--accent)}
-button{cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:20px;font-weight:700;font-family:inherit;background:var(--accent);color:#fff}
+button:where(:not(#cookie-consent-reopen,#cc-accept,#cc-reject)){cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:20px;font-weight:700;font-family:inherit;background:var(--accent);color:#fff}
 .msg{color:var(--err);font-size:16px;min-height:22px}
 /* Lobby */
 #cdBig{font-size:190px;font-weight:800;color:var(--accent);line-height:1}

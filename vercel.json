@@ -2,6 +2,9 @@
     "regions": ["fra1"],
     "functions": { "api/track.js": { "includeFiles": "index.html" } },
     "redirects": [
+          { "source": "/fr/", "destination": "/fr", "permanent": true },
+          { "source": "/en/", "destination": "/en", "permanent": true },
+          { "source": "/nl/", "destination": "/nl", "permanent": true },
           { "source": "/dactylographie-primaire", "destination": "/dactylographie-tronc-commun", "permanent": true },
           { "source": "/dactylographie-primaire.html", "destination": "/dactylographie-tronc-commun", "permanent": true },
           { "source": "/dactylographie-secondaire", "destination": "/dactylographie-general-transition", "permanent": true },
