@@ -1605,6 +1605,7 @@ a.nav-link{text-decoration:none;display:inline-block}
 .gcine-panel-head.is-in .gcine-word span:nth-child(4){animation-delay:.24s}
 .gcine-panel-head.is-in .gcine-word span:nth-child(5){animation-delay:.32s}
 @keyframes gcinePop{to{opacity:1;transform:none}}
+.gcine-panel-head.is-shown .gcine-word span{opacity:1;transform:none}
 .gcine-h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:46px;line-height:1.02;color:var(--txt);letter-spacing:-.02em;margin:0}
 .gcine-panel-sub{font-size:15px;color:var(--muted);margin:0}
 
@@ -13669,6 +13670,9 @@ const app={
   setGcineCat(cat){
     if(this._gcineCat===cat)return;
     this._gcineCat=cat;
+    // Changer de catégorie reconstruit la page : on garde la position de
+    // défilement telle quelle au lieu de remonter au titre du sélecteur.
+    this._gcineKeepY=window.scrollY;
     this.renderGames();
   },
   /* « Pour toi » : le niveau repéré (lettres des leçons validées) conseille quelques jeux. Tableau fixe, sans règle dynamique ni IA ; rien n'est verrouillé.
@@ -13822,9 +13826,11 @@ const app={
     // Les lettres JEUX sautent en place quand l'en-tête du sélecteur arrive à l'écran.
     const headEl=document.getElementById('gcine-panel-head');
     let headIO=null;
-    if(headEl){
+    // Une seule fois par chargement : changer de catégorie ne les refait pas sauter.
+    if(headEl&&this._gcineHeadDone)headEl.classList.add('is-shown');
+    else if(headEl){
       if('IntersectionObserver' in window){
-        headIO=new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting)){headEl.classList.add('is-in');headIO.disconnect();}},{threshold:.4});
+        headIO=new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting)){headEl.classList.add('is-in');this._gcineHeadDone=true;headIO.disconnect();}},{threshold:.4});
         headIO.observe(headEl);
       }else headEl.classList.add('is-in');
     }
@@ -14083,10 +14089,12 @@ const app={
     };
     hintBtn.addEventListener('click',onHint);
 
-    if(this._gcineSeen||reduce){
+    const keepY=this._gcineKeepY;this._gcineKeepY=null;
+    if(keepY!=null||this._gcineSeen||reduce){
       const jump=this._gcineSeen;
       finish();
-      if(jump){const y=gcineEndY();if(y!=null)window.scrollTo({top:y,behavior:'instant'});}
+      if(keepY!=null)window.scrollTo({top:keepY,behavior:'instant'});
+      else if(jump){const y=gcineEndY();if(y!=null)window.scrollTo({top:y,behavior:'instant'});}
     }else{
       render(0,performance.now()/1000,false);
       play(.35);
