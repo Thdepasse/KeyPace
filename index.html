@@ -1566,7 +1566,6 @@ a.nav-link{text-decoration:none;display:inline-block}
 .gk-key{position:absolute}
 .gk-cap{position:absolute;inset:0;border-radius:22px;display:grid;place-items:center;transform-origin:50% 100%;background:linear-gradient(180deg,#fff,#F5EFE6);box-shadow:0 8px 0 #E0D3C1,0 15px 16px -4px rgba(150,70,30,.16),inset 0 2px 0 rgba(255,255,255,.95)}
 .gk-cap::before{content:'';position:absolute;left:10px;right:22px;top:6px;height:13px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,0));pointer-events:none}
-.gk-key.sp .gk-cap::before{right:40%}
 .gk-cap span{position:relative;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;line-height:1;color:#B3A895}
 .gk-key.sp .gk-cap span{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;letter-spacing:.06em}
 .gk-ring{position:absolute;inset:-6px;border-radius:27px;border:3px solid var(--accent);opacity:0;pointer-events:none}
@@ -6657,8 +6656,7 @@ function gkLayout(){
   const rows=[['AZERTYUIOP',0],['QSDFGHJKLM',.3],['WXCVBN,;:',.8]];
   const keys=[];
   rows.forEach(([str,ind],r)=>str.split('').forEach((ch,c)=>keys.push({ch,x:(ind+c)*GK_U,y:r*GK_U,w:GK_K,h:GK_K})));
-  // Barre d'espace large et centrée sous les lettres, comme sur un vrai clavier.
-  keys.push({ch:'espace',x:1.6*GK_U,y:3*GK_U,w:6.6*GK_U-(GK_U-GK_K),h:GK_K,space:true});
+  keys.push({ch:'espace',x:2.3*GK_U,y:3*GK_U,w:5*GK_U-(GK_U-GK_K),h:GK_K,space:true});
   keys.forEach(k=>{k.cx=k.x+k.w/2;k.cy=k.y+k.h/2;});
   return {keys,W:Math.max.apply(null,keys.map(k=>k.x+k.w)),H:3*GK_U+GK_K,find:ch=>keys.find(k=>k.ch===ch)};
 }
