@@ -32,7 +32,7 @@ test('compte gratuit : 403, rien du module', async () => {
 });
 test('compte Expert : 200 et code du module, sans cache', async () => {
   USERS = { t2: { id: 2, plan: 'expert' } };
-  for (const m of ['cv', 'mail', 'mdp', 'lettre']) {
+  for (const m of ['cv', 'mail', 'mdp', 'lettre', 'signature']) {
     const r = await call(m, 'POST', { token: 't2' });
     assert.equal(r.status, 200);
     assert.ok(typeof r.body === 'string' && r.body.length > 10000);
@@ -49,6 +49,6 @@ test('Expert via établissement à licence expirée : 403', async () => {
 });
 test('contrôle de déploiement : tailles seulement, pas de contenu', async () => {
   const r = await call('cv', 'GET', undefined, { check: '1' });
-  assert.equal(r.status, 200); assert.ok(r.body.sizes.cv > 10000 && r.body.sizes.mail > 10000 && r.body.sizes.mdp > 10000 && r.body.sizes.lettre > 10000);
+  assert.equal(r.status, 200); assert.ok(r.body.sizes.cv > 10000 && r.body.sizes.mail > 10000 && r.body.sizes.mdp > 10000 && r.body.sizes.lettre > 10000 && r.body.sizes.signature > 10000);
   assert.ok(!JSON.stringify(r.body).includes('function'));
 });
