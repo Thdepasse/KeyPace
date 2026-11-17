@@ -2,7 +2,7 @@
 // Lancer : node --test api/_class-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals } = require('./_class-logic');
+const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings } = require('./_class-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -210,4 +210,33 @@ test('parseGoalInput : bornes, entiers, null = défaut', () => {
   for (const bad of [4, 81, 2.5, 'abc', -1, NaN, {}, [], true]) assert.equal(parseGoalInput(bad, GOAL_LIMITS.minWpm).ok, false, String(bad));
   assert.equal(parseGoalInput(31, GOAL_LIMITS.maxErrors).ok, false);
   assert.deepEqual(GOAL_DEFAULTS, { minWpm: 20, maxErrors: 8 });
+});
+
+// Réglages pédagogiques de la classe : normes typographiques (étape 1 des normes belges).
+test('classSettingsOf : défaut français, colonne absente ou valeur inconnue = défaut', () => {
+  assert.deepEqual(classSettingsOf({}), { typoNorm: 'fr' });
+  assert.deepEqual(classSettingsOf(null), { typoNorm: 'fr' });
+  assert.deepEqual(classSettingsOf({ typo_norm: 'be' }), { typoNorm: 'be' });
+  assert.deepEqual(classSettingsOf({ typo_norm: 'xx' }), { typoNorm: 'fr' });
+});
+
+test('parseClassSetting : valeurs admises, null remet le défaut, le reste est refusé', () => {
+  assert.deepEqual(parseClassSetting('typoNorm', 'be'), { ok: true, value: 'be' });
+  assert.deepEqual(parseClassSetting('typoNorm', 'fr'), { ok: true, value: 'fr' });
+  assert.deepEqual(parseClassSetting('typoNorm', null), { ok: true, value: 'fr' });
+  assert.deepEqual(parseClassSetting('typoNorm', ''), { ok: true, value: 'fr' });
+  for (const v of ['BE', 'nl', 1, true, undefined, {}]) assert.equal(parseClassSetting('typoNorm', v).ok, false);
+  assert.equal(parseClassSetting('role', 'admin').ok, false);
+  assert.equal(parseClassSetting('__proto__', 'x').ok, false);
+  assert.equal(CLASS_SETTINGS.typoNorm.col, 'typo_norm');
+});
+
+test('effectiveClassSettings : sans classe active = null (l\'élève choisit), sinon le réglage non par défaut l\'emporte', () => {
+  assert.equal(effectiveClassSettings([]), null);
+  assert.equal(effectiveClassSettings(undefined), null);
+  assert.equal(effectiveClassSettings([{ archived: true, typo_norm: 'be' }]), null);
+  assert.deepEqual(effectiveClassSettings([{}]), { typoNorm: 'fr' });
+  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }]), { typoNorm: 'fr' });
+  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }, { typo_norm: 'be' }]), { typoNorm: 'be' });
+  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }, { typo_norm: 'be', archived: true }]), { typoNorm: 'fr' });
 });

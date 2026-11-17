@@ -631,4 +631,69 @@ function u15() {
   return errs.length ? { ok: false, detail: `${errs.length} problème(s) :\n` + errs.slice(0, 12).join('\n') } : { ok: true, detail: done.join(' ; ') };
 }
 
-module.exports = { u15, u14, u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
+// U16 : normes typographiques (typo-norm.js). Norme française (défaut) : chaque texte tapé reste identique à la source. Norme belge :
+// plus d'espace avant ? ! ; : ni de « », sauf leçons exclues (chiffres, symboles) qui restent identiques ; les leçons de ponctuation
+// se terminent sans faute sur les 4 dispositions (ce qui est attendu = ce qui est affiché) ; la norme de la classe l'emporte sur le
+// choix de l'élève ; les explications du module 6 suivent la norme.
+function u16() {
+  const h = loadApp(); if (h.errors.length) return { ok: false, detail: 'chargement : ' + h.errors[0] };
+  login(h);
+  const errs = [];
+  const lessons = h.run('JSON.stringify(ALL_LESSONS.map(l=>({id:l.id,text:l.text||"",excluded:l.typoNorm===false})))');
+  const L = JSON.parse(lessons);
+  const others = JSON.parse(h.run('JSON.stringify([...PASSAGES.map(adaptQuotes),CERT_TEXT,...RACE_TEXTS.map(kpTypable)])'));
+  const norm = (t, id) => h.run(`kpNormText(${JSON.stringify(t)},${id ? `app.lessonById(${JSON.stringify(id)})` : 'null'})`);
+  // 1. défaut : rien ne change
+  delete h.store.kp_typo_norm;
+  if (h.run('kpTypoNorm()') !== 'fr') errs.push('norme par défaut : ' + h.run('kpTypoNorm()'));
+  for (const l of L) if (l.text && startLesson(h, l.id) !== h.run(`adaptQuotes(app.genDrill(${JSON.stringify(l.id)}))`)) errs.push(`fr/${l.id} : texte modifié en norme française`);
+  for (const t of others) if (norm(t) !== t) errs.push('fr : texte de test modifié : ' + t.slice(0, 40));
+  // 2. norme belge (élève sans classe)
+  h.store.kp_typo_norm = 'be';
+  if (h.run('kpTypoNorm()') !== 'be') errs.push('kp_typo_norm=be non suivi');
+  const FR_SPACE = /[^\d\s][   ]+[?!;:](?=[ "»)\]?!.…]|$)/;
+  let changed = 0;
+  for (const l of L) {
+    if (!l.text) continue;
+    const t = startLesson(h, l.id);
+    if (l.excluded) { if (t !== l.text) errs.push(`be/${l.id} : leçon exclue modifiée`); continue; }
+    if (t !== l.text) changed++;
+    if (/[«»]/.test(t)) errs.push(`be/${l.id} : guillemets « » restants`);
+    const m = t.match(FR_SPACE); if (m) errs.push(`be/${l.id} : espace française restante « ${m[0]} »`);
+  }
+  for (const t of others) { const b = norm(t); const m = b.match(FR_SPACE); if (m || /[«»]/.test(b)) errs.push('be : texte de test non converti : ' + (m ? m[0] : '« »')); }
+  // 3. leçons qui contiennent de la ponctuation : jouées jusqu'au bout sur les 4 dispositions, sans faute
+  const dead = h.run('KB_DEAD_DECOMP'); const play = ['pon1', 'pon2', 'pon3', 'pon4', 'pon5', 'pon6', 'acc3', 'num6', 'flu1', 'flu4', 'flu5', 'flu6'];
+  let played = 0;
+  for (const lay of LAYOUTS) {
+    const direct = typableSet(loadLayout(lay)); h.store.kp_kb_layout = lay; h.run(`applyKbLayout('${lay}')`);
+    for (const id of play) {
+      const text = startLesson(h, id); let bad = null;
+      for (const ch of text) { const st = plan(ch, lay, direct, dead); if (!st) { bad = ch; break; } st.forEach((x) => press(h, x)); }
+      if (bad) { errs.push(`be/${lay}/${id} : « ${bad} » impossible à taper`); continue; }
+      if (!h.run('app.sess.finished') || h.run('app.sess.keystrokes') !== h.run('app.sess.correct')) errs.push(`be/${lay}/${id} : non terminé ou fautif`);
+      played++;
+    }
+  }
+  h.store.kp_kb_layout = 'fr'; h.run("applyKbLayout('fr')");
+  const pon6 = startLesson(h, 'pon6'), pon6Want = '"Viens vite!" dit-il. Elle répondit: "J\'arrive; attends-moi." Vingt-cinq minutes plus tard (enfin), elle arriva.';
+  if (pon6 !== pon6Want) errs.push('be/pon6 : ' + pon6);
+  // 4. explications et touches du module 6
+  if (h.run("kpLessonKeys(app.lessonById('pon5'))") !== '" ( )') errs.push('be/pon5 : touches affichées ' + h.run("kpLessonKeys(app.lessonById('pon5'))"));
+  for (const id of ['pon2', 'pon3', 'pon5', 'pon6']) {
+    const t = h.run(`JSON.stringify(kpLessonTuto(app.lessonById('${id}')))`);
+    if (/en français|espaces? française|Guillemets français/i.test(t) || !/belge/.test(t)) errs.push(`be/${id} : explications non adaptées`);
+  }
+  h.html.length = 0; h.run("app.openLessonTuto('pon5')");
+  const tutoHtml = h.html.join('\n');
+  if (!/Guillemets droits/.test(tutoHtml) || /toggleQuoteStyle/.test(tutoHtml)) errs.push('be/pon5 : modale d\'explication non adaptée');
+  // 5. la classe décide : sa norme l'emporte sur le choix de l'élève, dans les deux sens
+  h.run("app.classSettings={typoNorm:'fr'}"); if (h.run('kpTypoNorm()') !== 'fr') errs.push('classe fr + élève be : ' + h.run('kpTypoNorm()'));
+  h.store.kp_typo_norm = 'fr'; h.run("app.classSettings={typoNorm:'be'}"); if (h.run('kpTypoNorm()') !== 'be') errs.push('classe be + élève fr : ' + h.run('kpTypoNorm()'));
+  h.run('app.classSettings=null'); if (h.run('kpTypoNorm()') !== 'fr') errs.push('sans classe : choix de l\'élève non suivi');
+  if (h.run('getQuoteStyle()') !== 'fr') errs.push('norme française : guillemets non rétablis');
+  return errs.length ? { ok: false, detail: errs.slice(0, 10).join('\n') }
+    : { ok: true, detail: `norme fr : ${L.filter((l) => l.text).length} leçons et ${others.length} textes inchangés ; norme be : ${changed} leçons converties, ${L.filter((l) => l.excluded).length} exclues intactes, ${played} leçons de ponctuation jouées sans faute (${LAYOUTS.length} dispositions), classe prioritaire, explications du module 6 adaptées` };
+}
+
+module.exports = { u16, u15, u14, u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };

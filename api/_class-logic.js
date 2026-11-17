@@ -448,6 +448,42 @@ function effectiveClassGoals(classRows) {
   return { minWpm, maxErrors };
 }
 
-module.exports = { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
+// Réglages pédagogiques de la classe (fixés par un prof de la classe ou l'établissement). Chaque réglage : colonne de
+// `classes`, valeurs admises, valeur par défaut (= comportement historique du site). Étape 1 : normes typographiques.
+//   typoNorm  'fr' normes françaises (défaut) | 'be' normes belges (secrétariat-bureautique, FWB)
+const CLASS_SETTINGS = {
+  typoNorm: { col: 'typo_norm', values: ['fr', 'be'], def: 'fr' },
+};
+
+// Valeur envoyée par le prof : null/'' remet le défaut ; toute autre valeur hors liste = erreur.
+function parseClassSetting(key, value) {
+  if (!Object.prototype.hasOwnProperty.call(CLASS_SETTINGS, key)) return { ok: false };
+  const d = CLASS_SETTINGS[key];
+  if (value === null || value === '') return { ok: true, value: d.def };
+  return d.values.includes(value) ? { ok: true, value } : { ok: false };
+}
+
+// Réglages d'UNE classe (colonne absente si la migration n'est pas appliquée : valeur par défaut).
+function classSettingsOf(cls) {
+  const out = {};
+  for (const [k, d] of Object.entries(CLASS_SETTINGS)) out[k] = cls && d.values.includes(cls[d.col]) ? cls[d.col] : d.def;
+  return out;
+}
+
+// Réglages effectifs d'un élève à partir de ses classes. null s'il n'est dans aucune classe active (il choisit alors lui-même).
+// Plusieurs classes : une valeur autre que le défaut l'emporte (un prof qui a choisi les normes belges n'est pas annulé par
+// une autre classe restée au réglage d'origine).
+function effectiveClassSettings(classRows) {
+  const rows = (Array.isArray(classRows) ? classRows : []).filter((c) => c && !c.archived);
+  if (!rows.length) return null;
+  const out = {};
+  for (const [k, d] of Object.entries(CLASS_SETTINGS)) {
+    const vals = rows.map((c) => classSettingsOf(c)[k]);
+    out[k] = vals.find((v) => v !== d.def) || d.def;
+  }
+  return out;
+}
+
+module.exports = { CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
   ESSAY_TYPES, essayTypeDef, countWords, essayWordCount, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
   moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals };

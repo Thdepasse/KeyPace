@@ -1030,3 +1030,19 @@ alter table classes add column if not exists goal_errors integer check (goal_err
 alter table users
   add column if not exists reset_token text,
   add column if not exists reset_expires_at timestamptz;
+
+-- ───────────────────────────────────────────────────────────────
+-- Normes typographiques de la classe (nov. 2026)
+-- Les écoles de secrétariat-bureautique de la FWB enseignent les règles
+-- d'espacement belges : pas d'espace avant : ; ? !, guillemets droits "…"
+-- sans espace intérieure. Le prof choisit la norme de sa classe (action
+-- class-settings-set) ; les textes restent écrits une seule fois en norme
+-- française et sont transformés à l'affichage (typo-norm.js).
+-- 'fr' (défaut) = comportement historique du site, rien ne change pour les
+-- classes existantes. Accès : comme le reste de `classes`, uniquement par
+-- l'API (clé service) ; l'autorisation est vérifiée dans api/classes.js
+-- (canManageClass : profs de la classe, admin de l'établissement). Un élève
+-- dans plusieurs classes suit la norme belge si l'une d'elles l'a choisie.
+-- Idempotent.
+-- ───────────────────────────────────────────────────────────────
+alter table classes add column if not exists typo_norm text not null default 'fr' check (typo_norm in ('fr', 'be'));

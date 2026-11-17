@@ -3067,6 +3067,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <script src="/cookie-consent.js"></script>
 <script src="/programme-data.js"></script>
 <script src="/game-levels.js"></script>
+<script src="/typo-norm.js"></script>
 
 <div id="page-home"><noscript>
   <main>
@@ -3594,7 +3595,7 @@ function saveSession(username, plan, token, userId, role, email, displayName, in
 function clearSession(){
   currentUser=null; currentPlan=null; currentToken=null; currentUserId=null;
   currentEmail=null; currentDisplayName=null; currentInstitutionName=null; currentHasClass=false;
-  try{app.classGoals=null;}catch{}
+  try{app.classGoals=null;app.classSettings=null;}catch{}
   localStorage.removeItem('klak_session');
 }
 function loadSession(){
@@ -4734,7 +4735,7 @@ async function kpSetCourse(id){
 /* ── Célébration de fin de leçon : un clavier s'affiche et les touches travaillées explosent ── */
 function celebrateLesson(lesson,res){
   lesson=lesson||{keys:'',title:kpT('cl.k_lesson')};
-  const targets=(lesson.keys||'').split(/\s+/).filter(Boolean);
+  const targets=kpLessonKeys(lesson).split(/\s+/).filter(Boolean);
   const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
   // Clavier réel (KB, dépend de la variante AZERTY choisie) plutôt qu'une
   // rangée de lettres codée en dur : les touches travaillées s'allument
@@ -5402,8 +5403,40 @@ function kbAttr(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/
 /* Guillemets : « » n'existent pas sur la plupart des claviers AZERTY (français,
    belge). Les leçons affichent « » par défaut ('fr') et le guillemet droit "
    est accepté à la place (cf. typeKey). Réglage 'droits' : afficher " à la place. */
-function getQuoteStyle(){try{const v=localStorage.getItem('kp_quotes');if(v==='fr'||v==='droits')return v;}catch{}return'fr';}
+function getQuoteStyle(){if(kpTypoNorm()==='be')return'droits';try{const v=localStorage.getItem('kp_quotes');if(v==='fr'||v==='droits')return v;}catch{}return'fr';}
 function setQuoteStyle(v){try{localStorage.setItem('kp_quotes',v);}catch{}}
+/* Normes typographiques (typo-norm.js) : 'fr' (défaut, comportement historique) ou 'be' (secrétariat-bureautique, FWB : pas d'espace
+   avant : ; ? !, guillemets droits "…"). Élève dans une classe : la norme de sa classe, fixée par le prof (app.classSettings, chargé
+   avec les objectifs). Sans classe : son propre choix, sur cet appareil (kp_typo_norm). Seul le contenu français est concerné.
+   En norme belge, les guillemets sont toujours droits (getQuoteStyle). */
+function kpOwnTypoNorm(){try{return KPTypoNorm.normalizeNorm(localStorage.getItem('kp_typo_norm'));}catch{return'fr';}}
+function setOwnTypoNorm(v){try{localStorage.setItem('kp_typo_norm',KPTypoNorm.normalizeNorm(v));}catch{}}
+function kpClassTypoNorm(){try{const c=app.classSettings;return c?KPTypoNorm.normalizeNorm(c.typoNorm):null;}catch{return null;}}
+function kpTypoNorm(){
+  try{if(typeof KPTypoNorm==='undefined'||kpContentLang()!=='fr')return'fr';}catch{return'fr';}
+  return kpClassTypoNorm()||kpOwnTypoNorm();
+}
+/* Texte à taper dans la norme active. `les` : la leçon d'origine, qui peut s'exclure (typoNorm:false : symboles, chiffres, code). */
+function kpNormText(t,les){
+  try{if(typeof KPTypoNorm==='undefined'||(les&&!KPTypoNorm.lessonAllowsNorm(les)))return t;return KPTypoNorm.applyTypoNorm(t,kpTypoNorm());}catch{return t;}
+}
+/* Explications d'une leçon dans la norme active : tutoBe remplace tuto pour les leçons qui enseignent la règle d'espacement. */
+function kpLessonTuto(les){return les&&les.tutoBe&&kpTypoNorm()==='be'?les.tutoBe:(les&&les.tuto)||{};}
+/* Réglages élève, section Clavier : choix de la norme (élève sans classe) ou rappel de celle de sa classe. Contenu français seulement. */
+function kpTypoSettingsHTML(){
+  try{if(typeof KPTypoNorm==='undefined'||kpContentLang()!=='fr')return'';}catch{return'';}
+  const cls=kpClassTypoNorm(),n=kpTypoNorm(),label=v=>kpT(v==='be'?'set.typo_be':'set.typo_fr');
+  const head=`<div class="settings-row-info" style="margin-top:4px"><strong>${kpT('set.typo')}</strong><span>${kpT('set.typo_help')}</span></div>`;
+  if(cls)return head+`<div id="typo-btns" style="font-size:13px;color:var(--muted)">🔒 ${kpT('set.typo_locked',{norm:label(cls)})}</div>`;
+  const btn=v=>`<button class="settings-btn${n===v?' active':''}" data-v="${v}" aria-pressed="${n===v}" style="white-space:normal;text-align:left" onclick="app.setTypoNorm('${v}')">${label(v)}</button>`;
+  return head+`<div id="typo-btns" style="display:flex;gap:8px;flex-wrap:wrap">${btn('fr')}${btn('be')}</div>`;
+}
+/* Touches affichées d'une leçon : en norme belge, « » deviennent le guillemet droit ". */
+function kpLessonKeys(les){
+  const k=(les&&les.keys)||'';
+  if(kpTypoNorm()!=='be'||!/[«»]/.test(k))return k;
+  return[...new Set(k.replace(/[«»]/g,'"').split(/\s+/).filter(Boolean))].join(' ');
+}
 /* Accents (D5) : par défaut ils sont exigés. Mode « toléré » (par appareil, comme le clavier) : la lettre sans accent
    est acceptée à la place de la lettre accentuée ; le test porte alors tolerant:true et le certificat reste exigeant. */
 function getAccentMode(){try{return localStorage.getItem('kp_accents')==='tolerant'?'tolerant':'exact';}catch{return'exact';}}
@@ -5497,7 +5530,7 @@ function kbHowFor(H,c){
 function kbHowHTML(les){
   const lay=getKbLayoutId(),H=KB_HOW[lay]||KB_HOW.fr;
   const chars=[];
-  const kt=(les.keys||'').split(/\s+/).filter(Boolean);
+  const kt=kpLessonKeys(les).split(/\s+/).filter(Boolean);
   // `keys` est parfois un libellé (« Maj + lettres gauches ») : on ne le lit que s'il liste des touches.
   if(kt.every(x=>x.length===1))for(const c of kt)if(H[c]!==undefined&&!chars.includes(c))chars.push(c);
   if(KB_HOW_TEXT_LESSONS.includes(les.id))for(const c of (les.text||''))if(H[c]!==undefined&&c!=="'"&&!chars.includes(c))chars.push(c);
@@ -6044,6 +6077,15 @@ const CURRICULUM=[
        ],
        tip:"Objectif : taper ? et ! avec l'espace française avant le signe."
      },
+     tutoBe:{
+       intro:"Le point d'interrogation et le point d'exclamation donnent le ton: une question, une émotion.",
+       rules:[
+         {icon:'⇧',t:'Souvent avec Shift',d:"Sur AZERTY, le ? se fait avec Shift. Maintiens Shift de la main opposée, puis frappe le signe."},
+         {icon:'✍️',t:'Collés au mot',d:"En norme belge, ? et ! se collent au mot qui précède (pas d'espace avant), puis une espace suit: où es-tu? viens ici!"},
+         {icon:'🎭',t:'Le bon ton',d:"? pour interroger, ! pour exclamer. Un seul suffit: évite les points d'exclamation à répétition."}
+       ],
+       tip:"Objectif: taper ? et ! collés au mot, sans espace avant, une espace après."
+     },
      text:'où es-tu ? que fais-tu ? viens ici ! attention ! c\'est beau ! vraiment ? super ! bravo ! encore ?'},
     {id:'pon3',title:'Deux-points et point-virgule',keys:': ;',
      tuto:{
@@ -6054,6 +6096,15 @@ const CURRICULUM=[
          {icon:'⌨️',t:'Deux touches voisines',d:"Sur ce clavier, ; et : sont côte à côte à droite. Repère-les bien pour ne pas les confondre."}
        ],
        tip:"Objectif : utiliser deux-points et point-virgule avec les espaces françaises."
+     },
+     tutoBe:{
+       intro:"Les deux-points annoncent, le point-virgule relie. Deux outils pour structurer des phrases plus riches.",
+       rules:[
+         {icon:'📋',t:'Les deux-points annoncent',d:"Ils introduisent une liste, une explication ou une citation. En norme belge, ils se collent au mot qui précède, puis une espace: voici la liste: pain, lait."},
+         {icon:'🔗',t:'Le point-virgule relie',d:"Il sépare deux idées proches sans couper la phrase. Comme les deux-points: pas d'espace avant, une espace après."},
+         {icon:'⌨️',t:'Deux touches voisines',d:"Sur ce clavier, ; et: sont côte à côte à droite. Repère-les bien pour ne pas les confondre."}
+       ],
+       tip:"Objectif: utiliser deux-points et point-virgule sans espace avant, une espace après."
      },
      text:'voici la liste : pain, lait, café ; beurre, sel, sucre ; eau, jus, thé. trois règles : clarté, brièveté, précision.'},
     {id:'pon4',title:"L'apostrophe et le tiret",keys:"' -",
@@ -6077,6 +6128,15 @@ const CURRICULUM=[
        ],
        tip:"Objectif : ouvrir et fermer guillemets et parenthèses par paire, sans en oublier."
      },
+     tutoBe:{
+       intro:"Les guillemets encadrent les citations, les parenthèses ajoutent une précision. On apprend à les ouvrir et les fermer.",
+       rules:[
+         {icon:'💬',t:'Guillemets droits',d:"En norme belge, on utilise le guillemet droit \" (touche 3, sans Maj), sans espace à l'intérieur et une espace à l'extérieur: il dit: \"bonjour\". Ils vont toujours par paire."},
+         {icon:'🧩',t:'Parenthèses par paire',d:"Une parenthèse ouverte se ferme toujours. Pas d'espace juste à l'intérieur: (comme ceci)."},
+         {icon:'⇧',t:'Souvent avec Shift',d:"Selon le clavier, parenthèses et guillemets peuvent demander Shift. Pense alors à maintenir Shift de la main opposée."}
+       ],
+       tip:"Objectif: ouvrir et fermer guillemets et parenthèses par paire, sans espace à l'intérieur."
+     },
      text:'il dit : « bonjour ». elle répond : « merci ». le résultat (42) est juste. bonne journée (enfin) !'},
     {id:'pon6',title:'Ponctuation en texte réel',keys:'toute la ponctuation',
      tuto:{
@@ -6087,6 +6147,15 @@ const CURRICULUM=[
          {icon:'📖',t:'Lis pour anticiper',d:"Repère la ponctuation à venir en lisant le texte d'avance : tu prépares le bon doigt et le bon Shift."}
        ],
        tip:"Objectif : ponctuer un texte réel proprement, en respectant les espaces françaises."
+     },
+     tutoBe:{
+       intro:"On réunit toute la ponctuation dans un vrai texte. C'est l'épreuve qui ressemble le plus à l'écriture réelle.",
+       rules:[
+         {icon:'🧩',t:'Tout en même temps',d:"Guillemets, virgules, points, deux-points... Tout arrive ensemble. Reste calme et applique les règles d'espacement."},
+         {icon:'🇧🇪',t:"Les règles d'espacement belges",d:"Rappel: aucune espace avant . , ; : ? ! et une espace après. Guillemets droits \"…\" sans espace à l'intérieur, une espace à l'extérieur."},
+         {icon:'📖',t:'Lis pour anticiper',d:"Repère la ponctuation à venir en lisant le texte d'avance: tu prépares le bon doigt et le bon Shift."}
+       ],
+       tip:"Objectif: ponctuer un texte réel proprement, en respectant les règles d'espacement belges."
      },
      text:'« Viens vite ! » dit-il. Elle répondit : « J\'arrive ; attends-moi. » Vingt-cinq minutes plus tard (enfin), elle arriva.'},
   ]},
@@ -6247,7 +6316,7 @@ const CURRICULUM=[
   /* ── MODULE 10 : chiffres ────────────────────────────────────────────────── */
   {name:'10. Chiffres',lessons:[
     // progression du centre vers les bords
-    {id:'num1',title:'4 5 6 7 : proches des index',keys:'4 5 6 7',genNum:'4567',
+    {id:'num1',typoNorm:false,title:'4 5 6 7 : proches des index',keys:'4 5 6 7',genNum:'4567',
      tuto:{
        intro:"On monte sur la rangée des chiffres. On commence par le centre : 4 5 6 7, les plus proches des index.",
        rules:[
@@ -6257,7 +6326,7 @@ const CURRICULUM=[
        ],
        tip:"Objectif : atteindre 4 5 6 7 avec les index, sans baisser les yeux."
      }},
-    {id:'num2',title:'3 et 8 : un pas de plus',keys:'3 8',genNum:'38453867',
+    {id:'num2',typoNorm:false,title:'3 et 8 : un pas de plus',keys:'3 8',genNum:'38453867',
      tuto:{
        intro:"On élargit aux majeurs : 3 à gauche, 8 à droite, juste à côté des chiffres déjà connus.",
        rules:[
@@ -6267,7 +6336,7 @@ const CURRICULUM=[
        ],
        tip:"Objectif : ajouter 3 et 8 avec les majeurs, sans perdre le centre."
      }},
-    {id:'num3',title:'2 et 9 : les annulaires',keys:'2 9',genNum:'29382979',
+    {id:'num3',typoNorm:false,title:'2 et 9 : les annulaires',keys:'2 9',genNum:'29382979',
      tuto:{
        intro:"Au tour des annulaires : 2 à gauche, 9 à droite. On approche des bords de la rangée.",
        rules:[
@@ -6277,7 +6346,7 @@ const CURRICULUM=[
        ],
        tip:"Objectif : atteindre 2 et 9 avec les annulaires, sans regarder."
      }},
-    {id:'num4',title:'1 et 0 : les auriculaires',keys:'1 0',genNum:'10291030',
+    {id:'num4',typoNorm:false,title:'1 et 0 : les auriculaires',keys:'1 0',genNum:'10291030',
      tuto:{
        intro:"Les extrémités de la rangée : 1 tout à gauche, 0 tout à droite, pour les auriculaires.",
        rules:[
@@ -6287,7 +6356,7 @@ const CURRICULUM=[
        ],
        tip:"Objectif : atteindre 1 et 0 avec les auriculaires, main stable."
      }},
-    {id:'num5',title:'Tous les chiffres enchaînés',keys:'tous les chiffres',genNum:'1234567890',
+    {id:'num5',typoNorm:false,title:'Tous les chiffres enchaînés',keys:'tous les chiffres',genNum:'1234567890',
      tuto:{
        intro:"On enchaîne maintenant les dix chiffres. Chacun a son doigt : c'est le moment de tout relier.",
        rules:[
@@ -6312,7 +6381,7 @@ const CURRICULUM=[
 
   /* ── MODULE 11 : symboles courants ──────────────────────────────────────── */
   {name:'11. Symboles courants',lessons:[
-    {id:'sym1',title:'@ et # : email et hashtag',keys:'@ #',
+    {id:'sym1',typoNorm:false,title:'@ et # : email et hashtag',keys:'@ #',
      tuto:{
        intro:"Les symboles comme @ et # demandent une combinaison de touches qui change selon les claviers : le geste du tien est indiqué juste en dessous.",
        rules:[
@@ -6323,7 +6392,7 @@ const CURRICULUM=[
        tip:"Objectif : produire @ et # avec le bon geste, sans casser ta position de repos."
      },
      text:'contact@keypace.be #keypace @user info@site.com #top @jean #apprendre #clavier @monde contact@mail.fr'},
-    {id:'sym2',title:'Parenthèses () et crochets []',keys:'( ) [ ]',
+    {id:'sym2',typoNorm:false,title:'Parenthèses () et crochets []',keys:'( ) [ ]',
      tuto:{
        intro:"Parenthèses et crochets vont par paire : on apprend à toujours ouvrir ET fermer.",
        rules:[
@@ -6334,7 +6403,7 @@ const CURRICULUM=[
        tip:"Objectif : ouvrir et fermer parenthèses et crochets, sans en oublier."
      },
      text:'(bonjour) [monde] fonctions(x) tableau[0] résultat(42) liste[fin] (ok) [a-z] valeur(2+3) index[i]'},
-    {id:'sym3',title:'/ et | : chemins et pipes',keys:'/ |',
+    {id:'sym3',typoNorm:false,title:'/ et | : chemins et pipes',keys:'/ |',
      tuto:{
        intro:"La barre oblique / et la barre verticale | servent aux adresses web, chemins de fichiers et commandes.",
        rules:[
@@ -6345,7 +6414,7 @@ const CURRICULUM=[
        tip:"Objectif : taper / et | pour les chemins et les commandes."
      },
      text:'http://site.fr chemin/vers/fichier cat fichier | grep mot droite | gauche /home/user a/b | c/d /var/log'},
-    {id:'sym4',title:'* = + : calculs et code',keys:'* = +',
+    {id:'sym4',typoNorm:false,title:'* = + : calculs et code',keys:'* = +',
      tuto:{
        intro:"Les opérateurs * = + servent aux calculs et au code. On les enchaîne dans des expressions.",
        rules:[
@@ -6356,7 +6425,7 @@ const CURRICULUM=[
        tip:"Objectif : enchaîner * = + dans des expressions, sans hésiter sur le bon geste."
      },
      text:'2*3=6 a+b=c x*y+z=0 total=prix*quantité résultat=a+b+c valeur*2=8 score=temps*précision vitesse+1=ok'},
-    {id:'sym5',title:'% et _ : taux et variables',keys:'% _',
+    {id:'sym5',typoNorm:false,title:'% et _ : taux et variables',keys:'% _',
      tuto:{
        intro:"Le pourcentage % et le tiret bas _ (underscore) reviennent souvent dans les chiffres et les noms techniques.",
        rules:[
@@ -6371,7 +6440,7 @@ const CURRICULUM=[
 
   /* ── MODULE 12 : symboles avancés ───────────────────────────────────────── */
   {name:'12. Symboles avancés',lessons:[
-    {id:'sym6',title:'{} et <> : code et HTML',keys:'{ } < >',
+    {id:'sym6',typoNorm:false,title:'{} et <> : code et HTML',keys:'{ } < >',
      tuto:{
        intro:"Les accolades {} et chevrons <> sont les symboles du code et du HTML. Eux aussi vont par paire.",
        rules:[
@@ -6382,7 +6451,7 @@ const CURRICULUM=[
        tip:"Objectif : ouvrir et fermer accolades et chevrons."
      },
      text:'{code: true} <html> </html> {style: "bold"} <div class="main"> </div> {return x+y} <p>texte</p>'},
-    {id:'sym7',title:'"" et ~ : chaînes et chemins',keys:'" ~',
+    {id:'sym7',typoNorm:false,title:'"" et ~ : chaînes et chemins',keys:'" ~',
      tuto:{
        intro:"Les guillemets droits et le tilde ~ servent aux chaînes de caractères et aux chemins système.",
        rules:[
@@ -6393,7 +6462,7 @@ const CURRICULUM=[
        tip:"Objectif : taper le guillemet droit et ~ sans hésiter."
      },
      text:'"bonjour" "monde" ~/documents ~user "valeur": true ~/bureau "clé": "données" ~root "résultat": 42'},
-    {id:'sym8',tuto:{
+    {id:'sym8',typoNorm:false,tuto:{
        intro:"L'antislash et l'accent grave (le backtick) sont des symboles purement techniques, fréquents en code.",
        rules:[
          {icon:'⌨️',t:"L'antislash",d:"Il sépare les dossiers sous Windows et marque les caractères spéciaux en code."},
@@ -6403,7 +6472,7 @@ const CURRICULUM=[
        tip:"Objectif : situer l'antislash et le backtick et les taper sans regarder."
      },title:'\\ et ` : code et terminal',keys:'\\ `',
      text:'C:\\Users\\theo `code inline` \\n \\t `variable` C:\\Windows `npm install` \\r\\n `git commit -m "fix"`'},
-    {id:'sym9',title:'Révision : tous les symboles en texte',keys:'tous symboles',
+    {id:'sym9',typoNorm:false,title:'Révision : tous les symboles en texte',keys:'tous symboles',
      tuto:{
        intro:"On réunit tous les symboles dans un texte mêlant email, web, code et pourcentages. Le grand mélange !",
        rules:[
@@ -7333,6 +7402,8 @@ const app={
   // Objectifs de leçon imposés par la/les classe(s) de l'élève (null = élève sans classe,
   // il règle lui-même ses objectifs). Chargés par loadClassGoals() à chaque init().
   classGoals:null,
+  // Réglages pédagogiques de la/des classe(s) ({typoNorm}) ; null = élève sans classe (il choisit lui-même). Chargés avec les objectifs.
+  classSettings:null,
   _goals(){return this.classGoals||(this.stats&&this.stats.goals)||{minWpm:20,maxErrors:8};},
   async loadClassGoals(){
     if(!currentToken||isTeacher())return;
@@ -7342,8 +7413,9 @@ const app={
       if(!r.ok||tok!==currentToken)return;
       const d=await r.json();
       const g=d&&d.goals&&typeof d.goals.minWpm==='number'&&typeof d.goals.maxErrors==='number'?{minWpm:d.goals.minWpm,maxErrors:d.goals.maxErrors}:null;
-      const changed=JSON.stringify(g)!==JSON.stringify(this.classGoals);
-      this.classGoals=g;
+      const cs=d&&d.settings&&typeof d.settings==='object'?{typoNorm:KPTypoNorm.normalizeNorm(d.settings.typoNorm)}:null;
+      const changed=JSON.stringify(g)!==JSON.stringify(this.classGoals)||JSON.stringify(cs)!==JSON.stringify(this.classSettings);
+      this.classGoals=g;this.classSettings=cs;
       if(changed&&this.view==='lessons'&&!this.sess)this.renderCurrent();
     }catch{}
   },
@@ -7410,8 +7482,23 @@ const app={
     finally{if(sv)sv.disabled=false;if(rs)rs.disabled=false;}
   },
 
+  /* Réglages pédagogiques de la classe (normes typographiques) : action class-settings-set, profs de la classe et admin de l'établissement. */
+  async saveClassSettings(classId,patch){
+    const msg=document.getElementById('cs-msg'),btns=[...document.querySelectorAll('#cs-typo .settings-btn')];
+    const say=(t,ok)=>{if(msg){msg.textContent=t;msg.style.color=ok?'var(--green,#1FA971)':'var(--accent)';}};
+    btns.forEach(b=>b.disabled=true);
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-settings-set',token:currentToken,classId,settings:patch})});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok||!d.settings){say(d.error||kpT('cls.settings_error'),false);return;}
+      btns.forEach(b=>{const on=b.dataset.v===d.settings.typoNorm;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false');});
+      if(this._classDetail&&this._classDetail.id===classId)this._classDetail.settings=d.settings;
+      say(kpT('cls.settings_saved'),true);
+    }catch{say(kpT('cls.settings_net'),false);}
+    finally{btns.forEach(b=>b.disabled=false);}
+  },
   makeSession(mode,lessonId){
-    let text=adaptQuotes(mode==='lesson'?this.genDrill(lessonId):kpTestPassage());
+    let text=kpNormText(adaptQuotes(mode==='lesson'?this.genDrill(lessonId):kpTestPassage()),mode==='lesson'?this.lessonById(lessonId):null);
     return{mode,lessonId:lessonId||null,text,idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false};
   },
   lessonById(id){return ALL_LESSONS.find(l=>l.id===id);},
@@ -7479,14 +7566,14 @@ const app={
     const showKb=infos.length>0&&missing.every(k=>Hlay[k]!==undefined);
     const viaHint=v=>v==='shift'?kpT('tuto.via_shift'):v==='altgr'?kpT('tuto.via_mod',{mod:kbModifierName()}):v==='altgrshift'?kpT('tuto.via_mod_shift',{mod:kbModifierName()}):'';
     const cards=infos.map(i=>`<div class="tuto-keycard"><div class="k" style="background:${i.color}">${i.label}</div><div class="meta"><b>${i.label}</b>${viaHint(i.via)} · ${i.finger} · ${i.hand}</div></div>`).join('');
-    const t=les.tuto||{};
+    const t=kpLessonTuto(les);
     const rules=(t.rules||[]).map(r=>{
       if(straightQ&&r.t==='Guillemets français')return`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>Guillemets droits</strong>Sur ton clavier, on tape le guillemet droit " (touche 3, sans Maj) : "bonjour". Pas d'espace à l'intérieur. Ils vont toujours par paire.</div></div>`;
       const extra=r.t==='Guillemets français'?` <b>Pas de touche « » sur ton clavier ? Tape le guillemet droit "</b> (touche 3) : il est accepté.`:'';
       return`<div class="intro-rule"><div class="intro-rule-icon">${r.icon}</div><div class="intro-rule-text"><strong>${r.t}</strong>${r.d}${extra}</div></div>`;
     }).join('');
     const how=kbHowHTML(les);
-    const quoteSwitch=hasFrQuotes?`<p style="font-size:13px;color:var(--muted);margin:0 0 18px">${straightQ?'Ton clavier a les guillemets « » ?':'Ton clavier n\'a pas les guillemets « » ?'} <a href="#" style="color:var(--accent)" onclick="app.toggleQuoteStyle();return false">${straightQ?'Utiliser « et »':'Utiliser les guillemets droits (")'}</a></p>`:'';
+    const quoteSwitch=hasFrQuotes&&kpTypoNorm()!=='be'?`<p style="font-size:13px;color:var(--muted);margin:0 0 18px">${straightQ?'Ton clavier a les guillemets « » ?':'Ton clavier n\'a pas les guillemets « » ?'} <a href="#" style="color:var(--accent)" onclick="app.toggleQuoteStyle();return false">${straightQ?'Utiliser « et »':'Utiliser les guillemets droits (")'}</a></p>`:'';
     let html=`
       <div class="tuto-badge">${les.module||''}</div>
       <h2 class="tuto-title">${les.title}</h2>
@@ -8228,7 +8315,7 @@ const app={
     if(this.sess.vocal)setTimeout(()=>this.speakAssignment(),450);
   },
   _makeCustomSess(a){
-    return{mode:'test',lessonId:null,text:kpTypable(a.customText),idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false,custom:true,vocal:a.mode==='vocal',audioUrl:a.audioUrl||null,assignmentId:a.id,title:a.title};
+    return{mode:'test',lessonId:null,text:kpNormText(kpTypable(a.customText)),idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false,custom:true,vocal:a.mode==='vocal',audioUrl:a.audioUrl||null,assignmentId:a.id,title:a.title};
   },
   // Lit la dictée : audio du prof si disponible, sinon synthèse vocale FR.
   speakAssignment(){
@@ -9627,7 +9714,7 @@ const app={
   // Ajoute des phrases tant qu'il n'y a pas ~800 caractères d'avance. Retourne l'ancienne longueur.
   _ttExtend(){
     const t=this.tt,from=t.text.length;
-    while(t.text.length<t.idx+800){t.text+=(t.text.length?' ':'')+kpTestPassage();}
+    while(t.text.length<t.idx+800){t.text+=(t.text.length?' ':'')+kpNormText(kpTestPassage());}
     return from;
   },
   _ttCharsHTML(from,to){
@@ -10599,7 +10686,7 @@ const app={
           <div class="les-dot ${dotCls}">${icon}</div>
           <div style="flex:1;min-width:0">
             <div class="les-title">${les.title}</div>
-            <div class="les-keys">${les.keys||''}</div>
+            <div class="les-keys">${kpLessonKeys(les)}</div>
           </div>
           ${s.cleared?`<div class="les-best">${s.best} ${kpT('unit.wpm')}</div>`:''}
           ${(expertLocked||guestExpertLocked)?`<div class="expert-tag">EXPERT</div>`:''}
@@ -14262,7 +14349,7 @@ const app={
     this.stopGame();this.stopSprint();this.stopCourse();
     this.activeGame='course';this._courseRec=false;
     const glv=this._glResolve('course');
-    const text=glv.full?kpTypable(RACE_TEXTS[Math.floor(Math.random()*RACE_TEXTS.length)]):KPGameLevels.textFor(GAME_VOCAB,glv.letters,14);
+    const text=glv.full?kpNormText(kpTypable(RACE_TEXTS[Math.floor(Math.random()*RACE_TEXTS.length)])):KPGameLevels.textFor(GAME_VOCAB,glv.letters,14);
     try{track('game_start',{game:'course',level:glv.id,letters:glv.full?0:glv.letters.size,mixed:!!(glv.content&&glv.content.mixed)});}catch{}
     this.course={on:true,over:false,text,typed:[],correct:0,keystrokes:0,glv,
       raceStarted:false,startAt:Date.now()+3000,startTime:0,endTime:0,finished:false,
@@ -14881,7 +14968,7 @@ const app={
   },
   startBossAttempt(){
     const b=this.boss;if(!b||!b.challenge)return;
-    this.boss={...b,phase:'playing',text:kpTypable(b.challenge.text),typed:[],correct:0,keystrokes:0,started:false,startTime:0,endTime:0,finished:false};
+    this.boss={...b,phase:'playing',text:kpNormText(kpTypable(b.challenge.text)),typed:[],correct:0,keystrokes:0,started:false,startTime:0,endTime:0,finished:false};
     this.renderCurrent();
   },
   _bossCorrectPrefix(){return this._correctPrefix(this.boss.typed,this.boss.text);},
@@ -15138,7 +15225,7 @@ const app={
     }catch{if(seq===this._duelSeq){this.duel={phase:'menu',_codeError:kpT('net.error')};this.renderCurrent();}}
   },
   _duelBlank(role,roomId,roomCode,text,hostLabel){
-    return {phase:'lobby',role,roomId,roomCode,text:kpTypable(text),hostLabel,oppLabel:null,oppPresent:false,startAt:0,
+    return {phase:'lobby',role,roomId,roomCode,text:kpNormText(kpTypable(text)),hostLabel,oppLabel:null,oppPresent:false,startAt:0,
       typed:[],correct:0,keystrokes:0,started:false,startTime:0,endTime:0,finished:false,myFinishMs:0,
       myProg:0,oppProg:0,oppFinished:false,oppForfeit:false,oppWpm:0,oppAcc:0,oppFinishMs:0,
       myWpm:0,myAcc:0,winner:null,_channel:null,_copied:false,_lastSent:0};
@@ -15763,6 +15850,8 @@ const app={
           <div id="kb-form-btns" style="display:flex;flex-direction:column;gap:10px">
             ${kbFormBtnsHTML(getKbLayoutId())}
           </div>
+          ${kpTypoSettingsHTML()}
+          <div id="quote-block" style="display:${kpTypoNorm()==='be'?'none':'contents'}">
           <div class="settings-row-info" style="margin-top:4px">
             <strong>${kpT('set.quotes')}</strong>
             <span>${kpT('set.quotes_help')}</span>
@@ -15770,6 +15859,7 @@ const app={
           <div id="quote-btns" style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="settings-btn${getQuoteStyle()==='fr'?' active':''}" onclick="app.setQuotes('fr')">${kpT('set.quotes_fr')}</button>
             <button class="settings-btn${getQuoteStyle()==='droits'?' active':''}" onclick="app.setQuotes('droits')">${kpT('set.quotes_straight')}</button>
+          </div>
           </div>
           <div class="settings-row-info" style="margin-top:4px">
             <strong>${kpT('chip.accents')}</strong>
@@ -15896,6 +15986,14 @@ const app={
     }
   },
   setAccents(v){setAccentMode(v);kpKbChipRender();const b=document.querySelectorAll('#accent-btns .settings-btn');if(b.length===2){b[0].classList.toggle('active',v==='exact');b[1].classList.toggle('active',v==='tolerant');}},
+  /* Normes typographiques choisies par l'élève sans classe (avec une classe, c'est le prof qui décide : boutons absents). */
+  setTypoNorm(v){
+    if(kpClassTypoNorm())return;
+    setOwnTypoNorm(v);const n=kpTypoNorm();
+    document.querySelectorAll('#typo-btns .settings-btn').forEach(b=>{const on=b.dataset.v===n;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false');});
+    const q=document.getElementById('quote-block');if(q)q.style.display=n==='be'?'none':'contents';
+    const qs=getQuoteStyle(),qb=document.querySelectorAll('#quote-btns .settings-btn');if(qb.length===2){qb[0].classList.toggle('active',qs==='fr');qb[1].classList.toggle('active',qs==='droits');}
+  },
   setQuotes(v){setQuoteStyle(v);const b=document.querySelectorAll('#quote-btns .settings-btn');if(b.length===2){b[0].classList.toggle('active',v==='fr');b[1].classList.toggle('active',v==='droits');}},
   /* Changer de famille de clavier = changer de cours : on explique avant, la progression de chaque famille est gardée. */
   askKbFamily(fam){
@@ -16923,7 +17021,7 @@ const app={
     this._certMode=mode;
     this.stopTimer();this._showIntro=false;
     this._gaze.enabled=true;this._gaze.permError=null;
-    this.sess={mode:'test',lessonId:null,text:CERT_TEXT,idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false,cert:true,certMode:mode,vocal:mode==='vocal',title:'Examen de certification : '+(mode==='vocal'?'dictée vocale':'écrit')};
+    this.sess={mode:'test',lessonId:null,text:kpNormText(CERT_TEXT),idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false,cert:true,certMode:mode,vocal:mode==='vocal',title:'Examen de certification : '+(mode==='vocal'?'dictée vocale':'écrit')};
     this.renderView('test');
     this._gazeStart(); // demande la webcam tout de suite
     if(mode==='vocal')setTimeout(()=>this.speakAssignment(),700);
@@ -17559,6 +17657,14 @@ const app={
       </div>
       <div id="cg-msg" role="status" style="font-size:12.5px;margin-top:10px;min-height:16px"></div>
     </div>`;
+    const cs=d.settings||{typoNorm:'fr'};
+    const csBtn=v=>`<button class="settings-btn${(cs.typoNorm||'fr')===v?' active':''}" data-v="${v}" aria-pressed="${(cs.typoNorm||'fr')===v}" style="white-space:normal;text-align:left" onclick="app.saveClassSettings('${d.id}',{typoNorm:'${v}'})">${kpT(v==='be'?'set.typo_be':'set.typo_fr')}</button>`;
+    const settingsCard=`<div id="class-settings-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;margin-bottom:24px">
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px">${kpT('cls.settings_title')}</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:14px">${kpT('cls.typo_help')}</div>
+      <div id="cs-typo" style="display:flex;gap:8px;flex-wrap:wrap">${csBtn('fr')}${csBtn('be')}</div>
+      <div id="cs-msg" role="status" style="font-size:12.5px;margin-top:10px;min-height:16px"></div>
+    </div>`;
     const asgHtml=`<div id="class-asg-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)">
         <div style="font-size:15px;font-weight:700">Devoirs ${asg.length?`<span style="font-size:13px;font-weight:600;color:var(--muted)">· ${asg.length}</span>`:''}</div>
@@ -17614,6 +17720,7 @@ const app={
         ${skillsCard}
         ${hmHtml}
         ${goalsCard}
+        ${settingsCard}
         ${asgHtml}
 
         ${students.length===0?`
