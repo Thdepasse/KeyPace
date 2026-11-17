@@ -6784,7 +6784,7 @@ function mount(host){
   /* Le pays n'a pas de bouton ici : c'est le drapeau en haut à droite qui décide (KPProg.getCountry, lu dans useCountry). */
   const isExpert=()=>typeof getUserPlan==='function'&&getUserPlan()==='expert';
   const isLogged=()=>typeof currentUser!=='undefined'&&!!currentUser;
-  const MOD_HREF={mail:'/cours/ecrire-un-mail',cv:'/cours/ecrire-un-cv','mot-de-passe':'/cours/creer-un-mot-de-passe',lettre:'/cours/ecrire-une-lettre-de-motivation','signature-mail':'/cours/creer-sa-signature-mail'};
+  const MOD_HREF={mail:'/cours/ecrire-un-mail',cv:'/cours/ecrire-un-cv','mot-de-passe':'/cours/creer-un-mot-de-passe',lettre:'/cours/ecrire-une-lettre-de-motivation','adresse-email':'/cours/creer-une-adresse-mail','signature-mail':'/cours/creer-sa-signature-mail'};
   const statusLabel=m=>m.live?(isExpert()?'Disponible':'Expert'):'Bientôt';
   const ctaLabel=m=>m.live?(isExpert()?'Commencer →':'Débloquer avec Expert'):'Bientôt';
   function openModule(id){
@@ -6920,7 +6920,7 @@ function mount(host){
    {id:'etiquettes',k:'man',icon:'eye',img:'/images/keypace-mascot-books.webp',cat:'Autres champs',title:'Lire une étiquette alimentaire',short:'Labels, allergènes et informations nutritionnelles.'},
    {id:'ordinateur',k:'num',icon:'keyboard',img:'/images/keypace-mascots-duo.webp',cat:'Outils numériques',title:'Comprendre son ordinateur',short:'Matériel, logiciels, mémoire, périphériques, extensions et formats de fichiers.'},
    {id:'reseau',k:'num',icon:'eye',img:'/images/keypace-mascot-bureau-complet.webp',cat:'Outils numériques',title:'Comprendre Internet et le réseau',short:'Connexion, routeur, adresse IP.'},
-   {id:'adresse-email',k:'ecr',icon:'mail',img:'/images/keypace-perso-adresse-email.webp',cat:'Écriture',title:'Créer une adresse email, Cc et Cci',short:'Choisir son adresse, répondre, répondre à tous, transférer.'},
+   {id:'adresse-email',k:'ecr',icon:'mail',img:'/images/keypace-perso-adresse-email.webp',cat:'Écriture',title:'Créer une adresse email, Cc et Cci',short:'Choisir son adresse, répondre, répondre à tous, transférer.',live:true,desc:"Les morceaux d'une adresse, comment la choisir, puis À, Cc et Cci, répondre, répondre à tous et transférer. Mises en situation, quiz final, et écrans Outlook, Gmail et Zimbra pour aller plus loin."},
    {id:'signature-mail',k:'ecr',icon:'mail',img:'/images/keypace-perso-adresse-email.webp',cat:'Écriture',title:'Créer sa signature de mail',short:'Nom, classe, école, logo : une signature claire, puis où l\'installer.',live:true,desc:"Ce qu'on met dans une signature de mail, ce qu'on évite, puis crée la tienne avec le logo de ton école, ta classe et l'année, en image ou en PDF. Et où la régler dans Smartschool, Outlook, Gmail ou Zimbra."},
    {id:'messagerie',k:'ecr',icon:'mail',img:'/images/keypace-mascot-desk.webp',cat:'Écriture',title:'Messagerie instantanée et réseaux sociaux',short:'Écrire des messages courts, dans des groupes, et comprendre chaque réseau.'},
    {id:'netiquette',k:'ecr',icon:'mail',img:'/images/keypace-perso-netiquette.webp',cat:'Écriture',title:'Écrire poliment en ligne',short:'Les règles de politesse des messages, des chats et des documents partagés.'},
