@@ -35,7 +35,9 @@
     const sets = cumulative(lessons); const out = [];
     const add = (id, label, idx) => { if (idx >= 0) out.push({ id, label, lesson: idx, letters: sets[idx] }); };
     add('repos', 'Rangée de repos', lastIndexWhere(lessons, (l) => inModule(l, /Position de base|Home row|Basisrij/i)));
-    add('haut', 'Rangée du haut', lastIndexWhere(lessons, (l) => inModule(l, /Rang[ée]e du haut|Top row|Bovenste rij/i)));
+    // Méthode AZER-UIOP (home-row-azer.js) : le module 2 enseigne la rangée du milieu ; le palier garde son identifiant, son nom suit le module.
+    const hautIdx = lastIndexWhere(lessons, (l) => inModule(l, /Rang[ée]e du haut|Rang[ée]e du milieu|Top row|Bovenste rij/i));
+    add('haut', hautIdx >= 0 && inModule(lessons[hautIdx], /milieu/i) ? 'Rangée du milieu' : 'Rangée du haut', hautIdx);
     add('alphabet', 'Alphabet complet', lastIndexWhere(lessons, (l) => inModule(l, /Rang[ée]e du bas|Bottom row|Onderste rij/i)));
     // accents : première leçon qui apporte une lettre accentuée, jusqu'à la dernière qui en apporte une
     let last = -1; const seen = new Set();

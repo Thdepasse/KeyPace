@@ -214,10 +214,10 @@ test('parseGoalInput : bornes, entiers, null = défaut', () => {
 
 // Réglages pédagogiques de la classe : normes typographiques (étape 1 des normes belges).
 test('classSettingsOf : défaut français, colonne absente ou valeur inconnue = défaut', () => {
-  assert.deepEqual(classSettingsOf({}), { typoNorm: 'fr', freeAccess: false });
-  assert.deepEqual(classSettingsOf(null), { typoNorm: 'fr', freeAccess: false });
-  assert.deepEqual(classSettingsOf({ typo_norm: 'be', free_access: true }), { typoNorm: 'be', freeAccess: true });
-  assert.deepEqual(classSettingsOf({ typo_norm: 'xx', free_access: 'oui' }), { typoNorm: 'fr', freeAccess: false });
+  assert.deepEqual(classSettingsOf({}), { typoNorm: 'fr', freeAccess: false, homeRow: 'qsdf' });
+  assert.deepEqual(classSettingsOf(null), { typoNorm: 'fr', freeAccess: false, homeRow: 'qsdf' });
+  assert.deepEqual(classSettingsOf({ typo_norm: 'be', free_access: true }), { typoNorm: 'be', freeAccess: true, homeRow: 'qsdf' });
+  assert.deepEqual(classSettingsOf({ typo_norm: 'xx', free_access: 'oui' }), { typoNorm: 'fr', freeAccess: false, homeRow: 'qsdf' });
 });
 
 test('parseClassSetting : valeurs admises, null remet le défaut, le reste est refusé', () => {
@@ -235,11 +235,11 @@ test('effectiveClassSettings : sans classe active = null (l\'élève choisit), s
   assert.equal(effectiveClassSettings([]), null);
   assert.equal(effectiveClassSettings(undefined), null);
   assert.equal(effectiveClassSettings([{ archived: true, typo_norm: 'be' }]), null);
-  assert.deepEqual(effectiveClassSettings([{}]), { typoNorm: 'fr', freeAccess: false });
-  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }]), { typoNorm: 'fr', freeAccess: false });
-  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }, { typo_norm: 'be' }]), { typoNorm: 'be', freeAccess: false });
-  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }, { typo_norm: 'be', archived: true }]), { typoNorm: 'fr', freeAccess: false });
-  assert.deepEqual(effectiveClassSettings([{ free_access: false }, { free_access: true }]), { typoNorm: 'fr', freeAccess: true });
+  assert.deepEqual(effectiveClassSettings([{}]), { typoNorm: 'fr', freeAccess: false, homeRow: 'qsdf' });
+  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }]), { typoNorm: 'fr', freeAccess: false, homeRow: 'qsdf' });
+  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }, { typo_norm: 'be' }]), { typoNorm: 'be', freeAccess: false, homeRow: 'qsdf' });
+  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }, { typo_norm: 'be', archived: true }]), { typoNorm: 'fr', freeAccess: false, homeRow: 'qsdf' });
+  assert.deepEqual(effectiveClassSettings([{ free_access: false }, { free_access: true }]), { typoNorm: 'fr', freeAccess: true, homeRow: 'qsdf' });
 });
 
 test('parseClassSetting freeAccess : booléens seulement', () => {
@@ -260,4 +260,13 @@ test('devoir individuel (remédiation) : seul l\'élève visé le voit et compte
   assert.equal(assignmentVisibleTo({ student_id: 'a' }, 'a'), true);
   assert.equal(assignmentVisibleTo({ student_id: 'b' }, 'a'), false);
   assert.equal(assignmentVisibleTo(null, 'a'), false);
+});
+
+test('homeRow : méthode AZER-UIOP par classe, défaut QSDF, la méthode belge l\'emporte entre plusieurs classes', () => {
+  assert.equal(classSettingsOf({ home_row: 'azer' }).homeRow, 'azer');
+  assert.equal(classSettingsOf({ home_row: 'AZER' }).homeRow, 'qsdf');
+  assert.deepEqual(parseClassSetting('homeRow', 'azer'), { ok: true, value: 'azer' });
+  assert.deepEqual(parseClassSetting('homeRow', null), { ok: true, value: 'qsdf' });
+  assert.equal(parseClassSetting('homeRow', 'asdf').ok, false);
+  assert.equal(effectiveClassSettings([{ home_row: 'qsdf' }, { home_row: 'azer' }]).homeRow, 'azer');
 });

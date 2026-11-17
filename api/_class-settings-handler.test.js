@@ -38,20 +38,20 @@ const call = async (body) => { let status = 200, out; const res = { status(c) { 
   await handler({ method: 'POST', body, headers: {}, query: {} }, res); return { status, out }; };
 const reset = () => { CALLS = []; ASSIGNMENTS = []; CLASS = { id: 'C1', name: '6e', teacher_id: 'p1', institution_id: 'i1', archived: false, typo_norm: 'fr', free_access: false }; };
 
-test('class-settings-set : le prof de la classe règle normes et accès libre ; les élèves les reçoivent', async () => {
+test('class-settings-set : le prof de la classe règle normes, accès libre et rangée de repos ; les élèves les reçoivent', async () => {
   reset();
-  const r = await call({ action: 'class-settings-set', token: 'prof', classId: 'C1', settings: { typoNorm: 'be', freeAccess: true } });
+  const r = await call({ action: 'class-settings-set', token: 'prof', classId: 'C1', settings: { typoNorm: 'be', freeAccess: true, homeRow: 'azer' } });
   assert.equal(r.status, 200);
-  assert.deepEqual(r.out.settings, { typoNorm: 'be', freeAccess: true });
-  assert.deepEqual(CALLS.filter((c) => c.m === 'PATCH').map((c) => c.body), [{ typo_norm: 'be', free_access: true }]);
+  assert.deepEqual(r.out.settings, { typoNorm: 'be', freeAccess: true, homeRow: 'azer' });
+  assert.deepEqual(CALLS.filter((c) => c.m === 'PATCH').map((c) => c.body), [{ typo_norm: 'be', free_access: true, home_row: 'azer' }]);
   const g = await call({ action: 'my-goals', token: 'e1' });
-  assert.deepEqual(g.out.settings, { typoNorm: 'be', freeAccess: true });
+  assert.deepEqual(g.out.settings, { typoNorm: 'be', freeAccess: true, homeRow: 'azer' });
 });
 
 test('class-settings-set : refusé aux élèves, aux profs d\'une autre classe, aux valeurs et clés inconnues', async () => {
   reset();
-  assert.equal((await call({ action: 'class-settings-set', token: 'e1', classId: 'C1', settings: { freeAccess: true } })).status, 403);
-  assert.equal((await call({ action: 'class-settings-set', token: 'autre', classId: 'C1', settings: { freeAccess: true } })).status, 403);
+  assert.equal((await call({ action: 'class-settings-set', token: 'e1', classId: 'C1', settings: { freeAccess: true, homeRow: 'qsdf' } })).status, 403);
+  assert.equal((await call({ action: 'class-settings-set', token: 'autre', classId: 'C1', settings: { freeAccess: true, homeRow: 'qsdf' } })).status, 403);
   assert.equal((await call({ action: 'class-settings-set', token: 'prof', classId: 'C1', settings: { freeAccess: 'oui' } })).status, 400);
   assert.equal((await call({ action: 'class-settings-set', token: 'prof', classId: 'C1', settings: { teacher_id: 'p9' } })).status, 400);
   assert.equal((await call({ action: 'class-settings-set', token: 'prof', classId: 'C1', settings: {} })).status, 400);

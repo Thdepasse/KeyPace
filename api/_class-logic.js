@@ -452,9 +452,11 @@ function effectiveClassGoals(classRows) {
 // `classes`, valeurs admises, valeur par défaut (= comportement historique du site).
 //   typoNorm    'fr' normes françaises (défaut) | 'be' normes belges (secrétariat-bureautique, FWB)
 //   freeAccess  false leçons débloquées l'une après l'autre (défaut) | true accès libre à toutes les leçons (remédiation)
+//   homeRow     'qsdf' doigts sur Q S D F · J K L M (méthode française, défaut) | 'azer' doigts sur A Z E R · U I O P (méthode belge)
 const CLASS_SETTINGS = {
   typoNorm: { col: 'typo_norm', values: ['fr', 'be'], def: 'fr' },
   freeAccess: { col: 'free_access', values: [false, true], def: false },
+  homeRow: { col: 'home_row', values: ['qsdf', 'azer'], def: 'qsdf' },
 };
 
 // Valeur envoyée par le prof : null/'' remet le défaut ; toute autre valeur hors liste = erreur.
