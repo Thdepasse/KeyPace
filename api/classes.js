@@ -2,7 +2,8 @@
 // Tout passe par la clé service (RLS deny-anon). Logique pure dans _class-logic.
 const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary,
   essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
-  moduleMastery, studentModuleProgress, GOAL_LIMITS, parseGoalInput, effectiveClassGoals } = require('./_class-logic');
+  moduleMastery, studentModuleProgress, GOAL_LIMITS, parseGoalInput, effectiveClassGoals,
+  CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings } = require('./_class-logic');
 const { hashPassword, safeEqual } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
 
@@ -291,7 +292,29 @@ async function myGoals(req, res) {
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
   const r = await sb(`/class_members?student_id=eq.${encodeURIComponent(user.id)}&select=classes(*)`);
   if (!r.ok || !Array.isArray(r.data)) throw new Error('myGoals ' + r.status);
-  return res.json({ goals: effectiveClassGoals(r.data.map((m) => m.classes)) });
+  const rows = r.data.map((m) => m.classes);
+  return res.json({ goals: effectiveClassGoals(rows), settings: effectiveClassSettings(rows) });
+}
+
+// Réglages pédagogiques de la classe (normes typographiques…) : seul un prof de la classe (ou l'établissement) les règle.
+// Mise à jour partielle : seuls les réglages présents dans `settings` sont modifiés ; null remet la valeur par défaut.
+async function classSettingsSet(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  const input = req.body.settings && typeof req.body.settings === 'object' ? req.body.settings : {};
+  const patch = {};
+  for (const key of Object.keys(input)) { // parseClassSetting refuse toute clé hors CLASS_SETTINGS (dont __proto__)
+    const p = parseClassSetting(key, input[key]);
+    if (!p.ok) return res.status(400).json({ error: 'Réglage invalide : ' + String(key).slice(0, 40) + '.' });
+    patch[CLASS_SETTINGS[key].col] = p.value;
+  }
+  if (!Object.keys(patch).length) return res.status(400).json({ error: 'Aucun réglage à enregistrer.' });
+  const { cls, error, status } = await loadClassForManage(user, req.body.classId);
+  if (error) return res.status(status).json({ error });
+  const r = await sb(`/classes?id=eq.${cls.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  if (!r.ok) return res.status(503).json({ error: "Ce réglage n'est pas encore activé (mise à jour de la base en attente). Réessaie dans un instant." });
+  return res.json({ ok: true, settings: classSettingsOf({ ...cls, ...patch }) });
 }
 
 async function classArchive(req, res) {
@@ -364,7 +387,7 @@ async function classDetail(req, res) {
 
   const goals = effectiveClassGoals([cls]);
   goals.custom = Number.isInteger(cls.goal_wpm) || Number.isInteger(cls.goal_errors);
-  return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now), modules, weakestModule: weakest, goals });
+  return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now), modules, weakestModule: weakest, goals, settings: classSettingsOf(cls) });
 }
 function alertRank(s) { return s.alertStuck ? 0 : s.alertInactive ? 1 : 2; }
 
@@ -1433,6 +1456,7 @@ module.exports = async function handler(req, res) {
       case 'class-rename': return await classRename(req, res);
       case 'class-goals-set': return await classGoalsSet(req, res);
       case 'my-goals': return await myGoals(req, res);
+      case 'class-settings-set': return await classSettingsSet(req, res);
       case 'class-archive': return await classArchive(req, res);
       case 'class-restore': return await classRestore(req, res);
       case 'archived-classes': return await archivedClasses(req, res);
