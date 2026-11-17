@@ -106,16 +106,29 @@ const LESSON_MODULE = {"r1":0,"r2":0,"r3":0,"r4":0,"r5":0,"r6":0,"h1":1,"h2":1,"
 // élèves en maîtrisé (toutes les leçons du module validées) / en cours (au
 // moins une, pas toutes) / pas commencé, plus un % moyen de complétion.
 // studentsLessonsData : liste de `lessons` bruts (progress.data.lessons par élève).
-function moduleMastery(studentsLessonsData) {
-  const totalLessonsInModule = MODULE_NAMES.map(() => 0);
-  Object.values(LESSON_MODULE).forEach((mi) => { totalLessonsInModule[mi]++; });
-  return MODULE_NAMES.map((name, mi) => {
+// Méthode AZER-UIOP (home-row-azer.js, réglage de classe home_row) : les modules 1 et 2 sont faits des leçons ar1-ar6 et
+// am1-am6, avec leur propre progression ; le module 2 enseigne la rangée du milieu. Les leçons QSDF déjà validées restent
+// enregistrées telles quelles (elles comptent pour une classe QSDF). Cohérence avec home-row-azer.js : _class-logic.test.js.
+const AZER_LESSON_MODULE = { ar1: 0, ar2: 0, ar3: 0, ar4: 0, ar5: 0, ar6: 0, am1: 1, am2: 1, am3: 1, am4: 1, am5: 1, am6: 1 };
+function lessonModuleMap(homeRow) {
+  if (homeRow !== 'azer') return LESSON_MODULE;
+  const out = { ...AZER_LESSON_MODULE };
+  for (const [id, mi] of Object.entries(LESSON_MODULE)) if (mi > 1) out[id] = mi;
+  return out;
+}
+function moduleNamesFor(homeRow) { return homeRow === 'azer' ? MODULE_NAMES.map((n, i) => (i === 1 ? '2. Rangée du milieu' : n)) : MODULE_NAMES; }
+
+function moduleMastery(studentsLessonsData, homeRow) {
+  const MAP = lessonModuleMap(homeRow), NAMES = moduleNamesFor(homeRow);
+  const totalLessonsInModule = NAMES.map(() => 0);
+  Object.values(MAP).forEach((mi) => { totalLessonsInModule[mi]++; });
+  return NAMES.map((name, mi) => {
     const total = totalLessonsInModule[mi] || 1;
     let mastered = 0, inProgress = 0, behind = 0, pctSum = 0;
     for (const lessons of studentsLessonsData) {
       const l = lessons && typeof lessons === 'object' ? lessons : {};
       let cleared = 0;
-      for (const [lid, m] of Object.entries(LESSON_MODULE)) {
+      for (const [lid, m] of Object.entries(MAP)) {
         if (m === mi && l[lid] && l[lid].cleared) cleared++;
       }
       const pct = cleared / total;
@@ -131,15 +144,16 @@ function moduleMastery(studentsLessonsData) {
 
 // Progression d'UN élève module par module (leçons validées / total), même
 // découpage que moduleMastery : alimente la heatmap "Qui en est où ?".
-function studentModuleProgress(lessons) {
-  const total = MODULE_NAMES.map(() => 0);
-  Object.values(LESSON_MODULE).forEach((mi) => { total[mi]++; });
-  const cleared = MODULE_NAMES.map(() => 0);
+function studentModuleProgress(lessons, homeRow) {
+  const MAP = lessonModuleMap(homeRow), NAMES = moduleNamesFor(homeRow);
+  const total = NAMES.map(() => 0);
+  Object.values(MAP).forEach((mi) => { total[mi]++; });
+  const cleared = NAMES.map(() => 0);
   const l = lessons && typeof lessons === 'object' ? lessons : {};
-  for (const [lid, mi] of Object.entries(LESSON_MODULE)) {
+  for (const [lid, mi] of Object.entries(MAP)) {
     if (l[lid] && l[lid].cleared) cleared[mi]++;
   }
-  return MODULE_NAMES.map((_, mi) => ({ c: cleared[mi], t: total[mi] }));
+  return NAMES.map((_, mi) => ({ c: cleared[mi], t: total[mi] }));
 }
 
 // Série d'activité jour par jour (par défaut 7 jours), du plus ancien au plus récent.
@@ -496,6 +510,6 @@ function assignmentTargets(a, members) {
 }
 function assignmentVisibleTo(a, userId) { return !!a && (!a.student_id || a.student_id === userId); }
 
-module.exports = { assignmentTargets, assignmentVisibleTo, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
+module.exports = { AZER_LESSON_MODULE, lessonModuleMap, moduleNamesFor, assignmentTargets, assignmentVisibleTo, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
   ESSAY_TYPES, essayTypeDef, countWords, essayWordCount, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
   moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals };

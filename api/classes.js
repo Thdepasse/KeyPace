@@ -369,7 +369,7 @@ async function classDetail(req, res) {
       ...studentSummary(datas[i], now),
       alertInactive: inactiveNames.has(m.username),
       alertStuck: stuckNames.has(m.username),
-      modulesProgress: studentModuleProgress(datas[i].lessons),
+      modulesProgress: studentModuleProgress(datas[i].lessons, classSettingsOf(cls).homeRow),
     }))
     // Élèves à surveiller en premier (bloqué avant inactif), le reste garde son ordre.
     .sort((a, b) => alertRank(a) - alertRank(b));
@@ -378,7 +378,7 @@ async function classDetail(req, res) {
   // "point faible collectif" — le module le moins maîtrisé parmi ceux que la
   // classe a réellement entamés (on exclut les modules à 0%, pas encore
   // atteints, qui ne sont pas un point faible mais juste "pas encore vu").
-  const modules = moduleMastery(datas.map((d) => d.lessons));
+  const modules = moduleMastery(datas.map((d) => d.lessons), classSettingsOf(cls).homeRow); // méthode AZER-UIOP : modules 1-2 en leçons ar*/am*
   const started = modules.filter((m) => m.avgPct > 0 && m.avgPct < 100);
   // "en retard sur le reste de la classe" n'a de sens que s'il y a au moins un
   // autre module entamé à comparer : avec un seul module démarré, ce module

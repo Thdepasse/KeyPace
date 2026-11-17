@@ -3,20 +3,30 @@
    Fichier pur : chargé par index.html (balise script) et par les tests Node. C'EST LE SEUL ENDROIT À MODIFIER pour ajuster
    la progression AZER-UIOP avec la prof : ordre des touches, titres, consignes, textes.
 
-   Principe : chaque doigt garde SA colonne (le doigt qui tape chaque touche ne change pas) ; seule la rangée de repos change.
-   On ne duplique pas le programme : les modules 1 et 2 gardent leurs identifiants de leçons (r1 à r6, h1 à h6), donc la
-   progression, les leçons gratuites, les statistiques du prof et les niveaux des jeux restent valables. Seuls leurs titres,
-   touches, consignes et textes sont remplacés. Le module 3 (rangée du bas) et la suite ne changent pas : à ce stade, les
-   20 lettres du haut et du milieu sont connues dans les deux méthodes. Quelques consignes de la suite qui parlent des
-   repères « F et J » sont adaptées (PATCHES).
+   Référentiels (programmes de l'enseignement organisé par la FWB, secteur Économie) :
+     - « La rangée repère est "azer" » (programmes WBE 2002, 2007 et 2011, dactylographie-bureautique et secrétariat) ;
+     - l'apprentissage repose sur l'« évaluation spatiale » : mémoriser les distances et les directions entre les
+       touches-repères AZER UIOP et les autres touches (programme 2007) ;
+     - « deux heures d'apprentissage pour l'étude de deux touches est un temps minimum », plus de temps pour les
+       touches-repères, b et n, c et ; (programme D2 Vente, 2001) ;
+     - « le positionnement acquis antérieurement (pour autant qu'il soit correct) ne sera pas modifié » (2007) : la méthode
+       reste un choix du prof (ou de l'élève sans classe), jamais imposé aux comptes existants ;
+     - chiffres dans un texte : rangée supérieure ; dans un tableau : pavé numérique (2011).
 
-   Progression proposée (à valider avec la prof) :
-     Module 1 « Position de base » (rangée du haut = repos) : R U (index), E I (majeurs), Z O (annulaires), A P (auriculaires),
+   Principe : chaque doigt garde SA colonne (le doigt qui tape chaque touche ne change pas) ; seule la rangée de repos change.
+   Les modules 1 et 2 sont remplacés par des leçons AZER-UIOP qui ont LEURS PROPRES identifiants (ar1 à ar6, am1 à am6) :
+   leur progression est distincte de celle de la méthode française. Un élève qui passe en AZER-UIOP refait donc ces deux
+   modules (choix validé : revoir des touches déjà vues vaut mieux que garder une position mal ancrée) ; ce qu'il a validé en
+   QSDF reste enregistré et revient s'il repasse en QSDF. Le module 3 (rangée du bas) et la suite gardent leurs leçons ; seules
+   les consignes qui parlent des repères « F et J » ou de la rangée des chiffres sont adaptées (PATCHES, TUTOS).
+
+   Progression (deux touches par leçon, des touches-repères vers l'extérieur) :
+     Module 1 « Position de base » (touches-repères) : R U (index), E I (majeurs), Z O (annulaires), A P (auriculaires),
        T Y (index vers l'intérieur), révision.
-     Module 2 « Rangée du milieu » : F J, D K, S L, Q M, G H, révision.
-     Module 3 « Rangée du bas » et suivants : inchangés.
-   Règle vérifiée par la gate U18 : un texte n'emploie que des lettres déjà enseignées (touches des leçons précédentes et de
-   la leçon elle-même), et emploie chaque nouvelle touche. */
+     Module 2 « Rangée du milieu » (un cran sous les repères) : F J, D K, S L, Q M, G H, révision.
+     Module 3 « Rangée du bas » et suivants : leçons inchangées.
+   Règle vérifiée par les tests et la gate U18 : un texte n'emploie que des lettres déjà enseignées (touches des leçons
+   précédentes et de la leçon elle-même), et emploie chaque nouvelle touche. */
 (function (root) {
   const HOME_ROWS = ['qsdf', 'azer'];
   const DEFAULT = 'qsdf';
@@ -32,7 +42,7 @@
 
   const L = {
     // ── Module 1 : la rangée de repos est la rangée du haut ──
-    r1: { title: 'R et U, les index', keys: 'r u',
+    ar1: { replaces: 'r1', title: 'R et U, les index', keys: 'r u',
       tip: "Bienvenue ! Dans cette méthode, tes doigts reposent sur la rangée du haut : A Z E R à gauche, U I O P à droite. Les index se posent sur R et U. Ne regarde pas ton clavier : fais confiance à ta mémoire musculaire.",
       tuto: {
         intro: "Bienvenue dans ta toute première leçon ! Prends 30 secondes pour comprendre la base de la frappe à dix doigts, c'est ce qui va tout changer pour la suite.",
@@ -45,7 +55,7 @@
         tip: "Objectif de cette leçon : ancrer la position de tes deux index en ne tapant que R et U. Ne force pas, vise la régularité plutôt que la vitesse.",
       },
       text: 'ru ur ru ur ruru urur rruu uurr ru ur ruru urur rru uur ru ur rruu' },
-    r2: { title: 'E et I, les majeurs', keys: 'e i',
+    ar2: { replaces: 'r2', title: 'E et I, les majeurs', keys: 'e i',
       tip: "Les majeurs se posent sur E et I, juste à côté des index. Garde les index sur R et U comme ancres : les autres doigts reviennent toujours à leur place de repos après chaque frappe.",
       tuto: {
         intro: "Tu ajoutes tes majeurs. E et I se posent juste à côté de tes index, sur la même rangée de repos.",
@@ -57,7 +67,7 @@
         tip: "Objectif : enchaîner R E I U de mémoire, en gardant les quatre doigts proches de leur position de repos.",
       },
       text: 'ei ie re ui eiru urie rue rie ire ruer rire rieur ei ie re ui rue rire' },
-    r3: { title: 'Z et O, les annulaires', keys: 'z o',
+    ar3: { replaces: 'r3', title: 'Z et O, les annulaires', keys: 'z o',
       tip: "Les annulaires couvrent Z et O. Tu as maintenant 6 doigts placés. Garde les doigts légèrement courbés, prêts à frapper sans lever le poignet.",
       tuto: {
         intro: "Place tes annulaires sur Z (à gauche) et O (à droite). Tu as maintenant six doigts posés sur la rangée de repos.",
@@ -69,7 +79,7 @@
         tip: "Objectif : taper Z et O sans tordre la main, en revenant à chaque fois sur la rangée de repos.",
       },
       text: 'zo oz ez oi or ou roi riz zoo roue euro rouer zozo ou or roi riz zoo roue' },
-    r4: { title: 'A et P, les auriculaires', keys: 'a p',
+    ar4: { replaces: 'r4', title: 'A et P, les auriculaires', keys: 'a p',
       tip: "Les auriculaires (petits doigts) sont les moins forts, c'est normal. A à gauche, P à droite. Évite de tourner tout le poignet : laisse juste l'auriculaire travailler.",
       tuto: {
         intro: "Au tour des auriculaires, les petits doigts : A à gauche, P à droite. Ce sont les plus délicats à dompter.",
@@ -81,7 +91,7 @@
         tip: "Objectif : activer les auriculaires sans casser ta position de repos. Lenteur et régularité avant tout.",
       },
       text: 'ap pa ar pu papa pape pipe pur pure paru aura poire pierre parure poireau papier' },
-    r5: { title: 'T et Y, index intérieurs', keys: 't y',
+    ar5: { replaces: 'r5', title: 'T et Y, index intérieurs', keys: 't y',
       tip: "T et Y sont tapés par les index qui s'avancent légèrement vers le centre. Ce mouvement doit rester petit : l'index glisse, ne saute pas. Reviens sur R ou U après chaque frappe.",
       tuto: {
         intro: "T et Y sont au centre de la rangée. Ce sont tes index qui s'avancent un peu pour les atteindre.",
@@ -93,7 +103,7 @@
         tip: "Objectif : couvrir toute la rangée de repos sans déplacer les autres doigts.",
       },
       text: 'ty yt tu ta toi tour tuer type tuyau titre route porte petite toupie utopie patate retour tirer' },
-    r6: { title: 'Révision : toute la rangée de repos', keys: 'a z e r t y u i o p',
+    ar6: { replaces: 'r6', title: 'Révision : toute la rangée de repos', keys: 'a z e r t y u i o p',
       tip: "Révision complète de la rangée de repos A Z E R T Y U I O P : toutes les voyelles y sont, de quoi taper déjà de vrais mots. Prends ton temps, la régularité compte plus que la vitesse.",
       tuto: {
         intro: "Tu connais maintenant toute la rangée de repos : A Z E R T et Y U I O P.",
@@ -107,7 +117,7 @@
       text: 'aze rty uiop azer uiop tuyau poire route petite papier zoo type retour toupie azer uiop' },
 
     // ── Module 2 : la rangée du milieu, un cran sous la rangée de repos ──
-    h1: { title: 'F et J, sous les index', keys: 'f j',
+    am1: { replaces: 'h1', title: 'F et J, sous les index', keys: 'f j',
       tip: "F est sous R, J est sous U : l'index descend d'un cran puis remonte sur sa touche de repos. Ce sont les deux touches avec un petit relief.",
       tuto: {
         intro: "Tu descends sur la rangée du milieu. Chaque doigt garde sa colonne : il descend d'un cran, frappe, puis remonte.",
@@ -119,7 +129,7 @@
         tip: "Objectif : descendre vers F et J et remonter aussitôt, sans regarder.",
       },
       text: 'fj jf rf uj fier fuir foi fou fort fruit jour joue jupe jet jeu futur fourre fiat' },
-    h2: { title: 'D et K, sous les majeurs', keys: 'd k',
+    am2: { replaces: 'h2', title: 'D et K, sous les majeurs', keys: 'd k',
       tip: "D est sous E, K est sous I : le majeur descend d'un cran puis revient. Garde les index sur R et U pendant ce temps.",
       tuto: {
         intro: "Les majeurs descendent à leur tour : D sous E, K sous I.",
@@ -131,7 +141,7 @@
         tip: "Objectif : taper D et K avec les majeurs, en revenant toujours sur la rangée de repos.",
       },
       text: 'dk kd ed ik dire date dur doute drap radio kayak kaki kart dodo tordu perdu kayak dire' },
-    h3: { title: 'S et L, sous les annulaires', keys: 's l',
+    am3: { replaces: 'h3', title: 'S et L, sous les annulaires', keys: 's l',
       tip: "S est sous Z, L est sous O : l'annulaire descend d'un cran. Ce sont des doigts moins habiles, va doucement.",
       tuto: {
         intro: "Les annulaires descendent : S sous Z, L sous O. Avec S et L, beaucoup de mots deviennent possibles.",
@@ -143,7 +153,7 @@
         tip: "Objectif : taper S et L sans tordre la main, en revenant à chaque fois sur la rangée de repos.",
       },
       text: 'sl ls zs ol sel sol lis lire salut soleil stylo silo lait loup tasse pastel lilas sortie' },
-    h4: { title: 'Q et M, sous les auriculaires', keys: 'q m',
+    am4: { replaces: 'h4', title: 'Q et M, sous les auriculaires', keys: 'q m',
       tip: "Q est sous A, M est sous P : l'auriculaire descend d'un cran. Évite de tourner le poignet.",
       tuto: {
         intro: "Les auriculaires descendent à leur tour : Q sous A, M sous P.",
@@ -155,7 +165,7 @@
         tip: "Objectif : activer les auriculaires sur la rangée du milieu sans casser ta position de repos.",
       },
       text: 'qm mq aq pm quoi quel mot mur moto mardi masque tomate marque musique quatre mesure' },
-    h5: { title: 'G et H, index intérieurs', keys: 'g h',
+    am5: { replaces: 'h5', title: 'G et H, index intérieurs', keys: 'g h',
       tip: "G est sous T, H est sous Y : l'index descend et s'avance vers le centre. Reviens sur R ou U après chaque frappe.",
       tuto: {
         intro: "G et H sont au centre de la rangée du milieu. Ce sont les touches les plus éloignées de tes index.",
@@ -167,7 +177,7 @@
         tip: "Objectif : couvrir tout le centre du clavier sans déplacer les autres doigts.",
       },
       text: 'gh hg tg yh gare gros huit haut page ligue image garage horloge homme gigot hall' },
-    h6: { title: 'Révision : la rangée du milieu', keys: 'q s d f g h j k l m',
+    am6: { replaces: 'h6', title: 'Révision : la rangée du milieu', keys: 'q s d f g h j k l m',
       tip: "Révision de la rangée du milieu, avec de vraies phrases. Chaque doigt descend d'un cran puis remonte sur la rangée de repos.",
       tuto: {
         intro: "Tu connais maintenant la rangée du haut et la rangée du milieu : 20 lettres, de quoi écrire de vraies phrases.",
@@ -181,27 +191,95 @@
       text: 'le petit ours sort de sa grotte il fait jour le soleil luit sur le quai du port et la mer est plate le kayak glisse sur la houle' },
   };
 
-  // Consignes des leçons suivantes (inchangées sinon) qui parlent des repères de la méthode française.
+  // Ordre des leçons AZER-UIOP (modules 1 et 2) et leçon de la méthode française qu'elles remplacent.
+  const ORDER = Object.keys(L);
+  const REPLACES = Object.fromEntries(ORDER.map((id) => [id, L[id].replaces]));
+
+  // Consignes de la suite (leçons inchangées sinon) qui parlent des repères de la méthode française.
   // [texte d'origine, texte AZER] ; la gate U18 vérifie que chaque texte d'origine existe encore (sinon le remplacement serait muet).
   const PATCHES = {
-    b1: [['sous la rangée de repos', 'sous la rangée du milieu']],
+    b1: [['sont tes premières touches sous la rangée de repos', 'sont tes premières touches de la rangée du bas, deux rangées sous ta position de repos (A Z E R · U I O P)']],
     b2: [['la position de référence sur F et J', 'la position de référence sur R et U'], ['sans perdre F et J de référence', 'sans perdre R et U de référence']],
     b6: [['à partir de F et J', 'à partir de R et U']],
-    num1: [["ramène l'index sur F ou J", "ramène l'index sur R ou U"]],
-    num2: [['Reviens sur la rangée du milieu après chaque chiffre', 'Reviens sur ta rangée de repos (A Z E R · U I O P) après chaque chiffre']],
-    num6: [['Reviens toujours sur F et J', 'Reviens toujours sur R et U']],
   };
 
-  // Applique la méthode AZER-UIOP EN PLACE sur le programme (objets leçon et module du cours fr/azerty).
-  // L'appelant a pris une copie du programme d'origine avant (kpSnapshotDefault) et le restaure pour revenir à QSDF.
-  function applyAzer(lessons, modules) {
-    const renamed = {};
-    (modules || []).forEach((m, i) => { if (MODULE_NAMES[i] && m) { renamed[m.name] = MODULE_NAMES[i]; m.name = MODULE_NAMES[i]; } });
-    for (const l of lessons || []) {
-      if (!l) continue;
-      if (renamed[l.module]) l.module = renamed[l.module];
-      const o = L[l.id];
-      if (o) { l.title = o.title; l.keys = o.keys; l.tip = o.tip; l.tuto = o.tuto; l.text = o.text; continue; }
+  // Module « Chiffres » en AZER-UIOP : chaque chiffre est juste au-dessus de la touche-repère du même doigt (1 sur A, 4 sur R,
+  // 7 sur U, 0 sur P) : un seul cran à monter, contre deux en méthode française. Tutoriels complets (texte et touches inchangés).
+  const TUTOS = {
+    num1: {
+      intro: "On monte sur la rangée des chiffres. Avec tes doigts sur A Z E R · U I O P, elle est juste au-dessus : un seul cran à monter. On commence par 4 5 6 7, pour les index.",
+      rules: [
+        { icon: '⬆️', t: 'Les index montent d\'un cran', d: "Le 4 est juste au-dessus de R, le 7 juste au-dessus de U : l'index monte d'un cran. Le 5 et le 6, un peu vers le centre, sont pour les mêmes index." },
+        { icon: '🎯', t: 'Vise sans regarder', d: "La rangée des chiffres est celle où l'on est le plus tenté de regarder. Résiste : repère la direction depuis ta touche-repère, puis vise de mémoire." },
+        { icon: '⚓', t: 'Retour au repos', d: "Après chaque chiffre, ramène l'index sur R ou U. C'est le repère qui t'évite de te perdre en haut." },
+      ],
+      tip: "Objectif : atteindre 4 5 6 7 avec les index, un cran au-dessus de R et U, sans baisser les yeux.",
+    },
+    num2: {
+      intro: "On élargit aux majeurs : 3 juste au-dessus de E, 8 juste au-dessus de I.",
+      rules: [
+        { icon: '⬆️', t: 'Les majeurs montent', d: "Le 3 se tape avec le majeur gauche, le 8 avec le majeur droit. Chacun monte d'un cran au-dessus de sa touche-repère." },
+        { icon: '🧭', t: 'Pense en directions', d: "Chaque chiffre est au-dessus de la lettre du même doigt : 3 sur E, 4 sur R, 7 sur U, 8 sur I. Mémorise ces directions plutôt que la rangée entière." },
+        { icon: '⚓', t: 'Toujours revenir', d: "Après chaque chiffre, reviens sur ta rangée de repos (A Z E R · U I O P)." },
+      ],
+      tip: "Objectif : ajouter 3 et 8 avec les majeurs, sans perdre tes repères.",
+    },
+    num3: {
+      intro: "Au tour des annulaires : 2 juste au-dessus de Z, 9 juste au-dessus de O.",
+      rules: [
+        { icon: '⬆️', t: 'Les annulaires montent', d: "Le 2 (annulaire gauche) et le 9 (annulaire droit) sont un cran au-dessus de Z et O. Doigts moins forts : va doucement." },
+        { icon: '🔁', t: 'Rappel des accents', d: "Sur AZERTY, ces touches portent aussi é (2) et ç (9). Tu retrouves des repères connus du module accents." },
+        { icon: '🎯', t: 'Précision avant tout', d: "Plus on s'éloigne du centre, plus les fautes guettent. Mieux vaut lent et juste que rapide et faux." },
+      ],
+      tip: "Objectif : atteindre 2 et 9 avec les annulaires, sans regarder.",
+    },
+    num4: {
+      intro: "Les extrémités de la rangée : 1 juste au-dessus de A, 0 juste au-dessus de P, pour les auriculaires.",
+      rules: [
+        { icon: '🤏', t: 'Les auriculaires montent', d: "Le 1 (auriculaire gauche) et le 0 (auriculaire droit) sont un cran au-dessus de A et P. Les petits doigts montent sans entraîner la main." },
+        { icon: '🤚', t: 'Stabilise la main', d: "Ne déplace pas toute la main : laisse l'auriculaire monter, les autres doigts restent posés sur leurs touches-repères." },
+        { icon: '✅', t: 'La rangée complète', d: "Avec 1 et 0, tu couvres toute la rangée des chiffres. Il ne reste plus qu'à les enchaîner." },
+      ],
+      tip: "Objectif : atteindre 1 et 0 avec les auriculaires, main stable.",
+    },
+    num5: {
+      intro: "On enchaîne maintenant les dix chiffres. Chacun est au-dessus d'une touche-repère : c'est le moment de tout relier.",
+      rules: [
+        { icon: '🔢', t: 'Chaque chiffre, son doigt', d: "1 2 3 4 au-dessus de A Z E R, 7 8 9 0 au-dessus de U I O P. Le 5 et le 6, au centre, sont pour les index (comme T et Y)." },
+        { icon: '⬆️', t: 'Un cran seulement', d: "Avec les doigts sur la rangée du haut, la rangée des chiffres est toute proche : garde un mouvement court et net, sans regarder." },
+        { icon: '🐢', t: 'Lentement d\'abord', d: "Les chiffres sont souvent le point faible. Travaille-les au calme : très utile pour les codes, dates et montants." },
+      ],
+      tip: "Objectif : enchaîner 0 à 9 de mémoire, chaque chiffre avec le bon doigt.",
+    },
+    num6: {
+      intro: "On mélange chiffres et lettres dans un vrai texte : numéros, heures, codes. C'est l'usage quotidien.",
+      rules: [
+        { icon: '🔀', t: 'Alterner lettres et chiffres', d: "Le défi : passer des lettres aux chiffres sans perdre tes repères. Reviens toujours sur R et U." },
+        { icon: '📞', t: 'Dans un texte ou un tableau', d: "Dans un texte, les chiffres se tapent sur la rangée des chiffres, comme ici. Dans un tableau de nombres, on utilise plutôt le pavé numérique." },
+        { icon: '🎯', t: 'Précision indispensable', d: "Une faute dans un numéro change tout. Sur les chiffres, la précision compte encore plus que la vitesse." },
+      ],
+      tip: "Objectif : taper chiffres et lettres mélangés sans hésiter ni regarder.",
+    },
+  };
+
+  // Applique la méthode AZER-UIOP EN PLACE sur le programme du cours fr/azerty :
+  //   - les modules 1 et 2 sont remplacés par de NOUVEAUX objets (leçons ar*/am*, progression distincte), les objets d'origine
+  //     ne sont pas modifiés ;
+  //   - les leçons gratuites suivent (les 10 premières du programme, comme en QSDF) ;
+  //   - les consignes de la suite sont adaptées (PATCHES, TUTOS) sur les objets d'origine.
+  // L'appelant a pris une copie du programme d'origine avant (kpSnapshotDefault) et la restaure pour revenir à QSDF.
+  function applyAzer(lessons, modules, free) {
+    if (!Array.isArray(lessons) || !Array.isArray(modules) || modules.length < 2) return;
+    const mk = (id, mi) => Object.assign({}, L[id], { id, module: MODULE_NAMES[mi], moduleIdx: mi, pool: '' });
+    const l0 = ORDER.filter((id) => /^ar/.test(id)).map((id) => mk(id, 0));
+    const l1 = ORDER.filter((id) => /^am/.test(id)).map((id) => mk(id, 1));
+    const gone = new Set([...(modules[0].lessons || []), ...(modules[1].lessons || [])].map((l) => l && l.id));
+    const rest = lessons.filter((l) => l && !gone.has(l.id));
+    lessons.splice(0, lessons.length, ...l0, ...l1, ...rest);
+    modules.splice(0, 2, { name: MODULE_NAMES[0], lessons: l0 }, { name: MODULE_NAMES[1], lessons: l1 });
+    if (Array.isArray(free)) free.splice(0, free.length, ...lessons.slice(0, 10).map((l) => l.id));
+    for (const l of rest) {
+      if (TUTOS[l.id]) { l.tuto = TUTOS[l.id]; continue; }
       const p = PATCHES[l.id];
       if (p) {
         let tip = l.tip || '', tuto = JSON.stringify(l.tuto || null);
@@ -212,6 +290,14 @@
     }
   }
 
-  const api = { HOME_ROWS, DEFAULT, normalizeHomeRow, REST, MODULE_NAMES, LESSONS: L, PATCHES, applyAzer };
+  // Programme à proposer pour une classe (liste {id, title}) : la liste de la méthode française, modules 1 et 2 remplacés en AZER.
+  function lessonListFor(homeRow, base) {
+    const list = Array.isArray(base) ? base : [];
+    if (normalizeHomeRow(homeRow) !== 'azer') return list;
+    const gone = new Set(Object.values(REPLACES));
+    return ORDER.map((id) => ({ id, title: L[id].title })).concat(list.filter((l) => !gone.has(l.id)));
+  }
+
+  const api = { HOME_ROWS, DEFAULT, normalizeHomeRow, REST, MODULE_NAMES, LESSONS: L, ORDER, REPLACES, PATCHES, TUTOS, applyAzer, lessonListFor };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.KPHomeRow = api;
 })(typeof window !== 'undefined' ? window : globalThis);
