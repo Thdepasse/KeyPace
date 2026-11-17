@@ -4603,15 +4603,16 @@ function kpHomeRow(){
   try{if(typeof KPHomeRow==='undefined'||kpCourseId()!=='fr/azerty')return'qsdf';}catch{return'qsdf';}
   return kpClassHomeRow()||kpOwnHomeRow();
 }
-/* Applique ou retire la méthode AZER-UIOP sur le programme : en place, sur les modules 1 et 2 (mêmes identifiants de leçons), et
-   retour à l'identique depuis la copie du cours par défaut. Retourne true si le programme a changé (l'appelant redessine). */
+/* Applique ou retire la méthode AZER-UIOP sur le programme : modules 1 et 2 remplacés par les leçons AZER (leurs propres
+   identifiants, donc leur propre progression), consignes de la suite adaptées ; retour à l'identique depuis la copie du cours par
+   défaut. Retourne true si le programme a changé (l'appelant redessine). */
 function kpSyncHomeRow(){
   try{
     if(typeof ALL_LESSONS==='undefined')return false;
     const want=kpHomeRow()==='azer';
     if(want===_kpAzerOn)return false;
     kpSnapshotDefault();kpRestoreDefault();
-    if(want)KPHomeRow.applyAzer(ALL_LESSONS,ALL_MODULES);
+    if(want)KPHomeRow.applyAzer(ALL_LESSONS,ALL_MODULES,FREE_LESSON_IDS); // leçons ar*/am* : progression distincte de la méthode française
     _kpAzerOn=want;
     return true;
   }catch{return false;}
@@ -12166,7 +12167,10 @@ const app={
   // Les identifiants (r1 à r4) ne changent pas : les records existants restent valables.
   get _sgrLevels(){
     const R=kpLetterRows(),pools=[R[1],R[0],R[2],[...R[0],...R[1],...R[2]]];
-    const out=this._sgrLevelsBase.map((l,i)=>Object.assign({},l,{pool:pools[i].join(''),intro:l.intro.replace('{L}',pools[i].join(' '))}));
+    // Méthode AZER-UIOP : la rangée de repos (rangée du haut, id r2) passe en niveau 1, la rangée du milieu (id r1) en niveau 2.
+    // Chaque niveau garde son identifiant, ses lettres et ses seuils : les records restent attachés à la bonne rangée.
+    const order=kpHomeRow()==='azer'?[1,0,2,3]:[0,1,2,3];
+    const out=order.map((bi,i)=>{const l=this._sgrLevelsBase[bi];return Object.assign({},l,{n:i+1,pool:pools[bi].join(''),intro:l.intro.replace('{L}',pools[bi].join(' '))});});
     // 5e niveau, d'entraînement : les lettres déjà apprises (toutes rangées confondues), sans médaille ni record. Jamais « verrouillé ».
     const mine=this._sgrMineInfo(),known=pools[3].filter(c=>mine.letters.has(c.toLowerCase()));
     const mp=known.length>=2?known:pools[1].slice(0,4);
@@ -17907,7 +17911,11 @@ const app={
     this._asgRecBlob=null;this._asgAudioUrl=null;this._asgPrevStoragePath=null;
     this._asgMediaRecorder=null;this._asgRecStream=null;this._asgRecChunks=[];
     if(this._asgRecInterval){clearInterval(this._asgRecInterval);this._asgRecInterval=null;}
-    const opts=ALL_LESSONS.map(l=>`<option value="${l.id}">${l.title}</option>`).join('');
+    // Leçons proposées : celles de la méthode de la classe (AZER-UIOP : modules 1 et 2 en leçons ar*/am*), quelle que soit la méthode
+    // affichée chez le prof. Base : le programme français AZERTY d'origine (copie prise au premier changement de programme).
+    const cdh=this._classDetail&&this._classDetail.id===classId&&this._classDetail.settings?this._classDetail.settings.homeRow:'qsdf';
+    const base=_kpAzSnap?_kpAzSnap.lessons.map((l,i)=>({id:l.id,title:_kpAzSnap.fields[i].title})):ALL_LESSONS.map(l=>({id:l.id,title:l.title}));
+    const opts=(typeof KPHomeRow!=='undefined'?KPHomeRow.lessonListFor(cdh,base):base).map(l=>`<option value="${l.id}">${l.title}</option>`).join('');
     const ov=document.createElement('div');
     ov.style.cssText='position:fixed;inset:0;background:rgba(20,16,12,.45);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;animation:settings-fade .18s ease';
     const fld='width:100%;margin:6px 0 14px;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font:inherit;background:var(--bg);box-sizing:border-box;color:var(--txt)';
@@ -18246,7 +18254,7 @@ const app={
       if(!customText)return fail('Saisis le texte à taper.');
     }else{
       lessonId=document.getElementById('asg-lesson').value;
-      if(lessonId){const l=this.lessonById(lessonId);title=l?l.title:'Exercice';}
+      if(lessonId){const sel=document.getElementById('asg-lesson'),o=sel&&sel.selectedOptions&&sel.selectedOptions[0],l=this.lessonById(lessonId);title=(o&&o.textContent)||(l?l.title:'Exercice');} // titre de la liste : leçons AZER d'une classe AZER-UIOP comprises
       else{if(!wpm)return fail('Pour un test libre, fixe un objectif de vitesse.');title='Test de vitesse · '+wpm+' mpm';}
     }
     const btn=document.getElementById('asg-save');btn.disabled=true;btn.textContent='…';

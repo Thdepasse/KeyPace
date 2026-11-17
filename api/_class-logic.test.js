@@ -2,7 +2,7 @@
 // Lancer : node --test api/_class-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, assignmentTargets, assignmentVisibleTo } = require('./_class-logic');
+const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, assignmentTargets, assignmentVisibleTo, AZER_LESSON_MODULE, lessonModuleMap, moduleNamesFor } = require('./_class-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -269,4 +269,21 @@ test('homeRow : méthode AZER-UIOP par classe, défaut QSDF, la méthode belge l
   assert.deepEqual(parseClassSetting('homeRow', null), { ok: true, value: 'qsdf' });
   assert.equal(parseClassSetting('homeRow', 'asdf').ok, false);
   assert.equal(effectiveClassSettings([{ home_row: 'qsdf' }, { home_row: 'azer' }]).homeRow, 'azer');
+});
+
+test('statistiques par module en AZER-UIOP : leçons ar*/am*, module 2 « Rangée du milieu », QSDF inchangé', () => {
+  const H = require('../home-row-azer.js');
+  assert.deepEqual(Object.keys(AZER_LESSON_MODULE), H.ORDER, 'mêmes leçons que home-row-azer.js');
+  for (const id of H.ORDER) assert.equal(AZER_LESSON_MODULE[id], /^ar/.test(id) ? 0 : 1);
+  assert.equal(lessonModuleMap('qsdf').r1, 0);
+  assert.equal(lessonModuleMap('azer').r1, undefined);
+  assert.equal(lessonModuleMap('azer').b1, 2);
+  assert.equal(moduleNamesFor('azer')[1], '2. Rangée du milieu');
+  assert.equal(moduleNamesFor('qsdf')[1], '2. Rangée du haut');
+  const qsdfDone = { r1: { cleared: true }, r2: { cleared: true }, b1: { cleared: true } };
+  assert.deepEqual(studentModuleProgress(qsdfDone).slice(0, 3), [{ c: 2, t: 6 }, { c: 0, t: 6 }, { c: 1, t: 6 }]);
+  assert.deepEqual(studentModuleProgress(qsdfDone, 'azer').slice(0, 3), [{ c: 0, t: 6 }, { c: 0, t: 6 }, { c: 1, t: 6 }], 'en AZER, les leçons QSDF ne comptent pas');
+  assert.deepEqual(studentModuleProgress({ ar1: { cleared: true } }, 'azer')[0], { c: 1, t: 6 });
+  assert.equal(moduleMastery([qsdfDone], 'azer')[1].name, '2. Rangée du milieu');
+  assert.equal(moduleMastery([qsdfDone])[1].name, '2. Rangée du haut');
 });
