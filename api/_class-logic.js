@@ -449,10 +449,12 @@ function effectiveClassGoals(classRows) {
 }
 
 // Réglages pédagogiques de la classe (fixés par un prof de la classe ou l'établissement). Chaque réglage : colonne de
-// `classes`, valeurs admises, valeur par défaut (= comportement historique du site). Étape 1 : normes typographiques.
-//   typoNorm  'fr' normes françaises (défaut) | 'be' normes belges (secrétariat-bureautique, FWB)
+// `classes`, valeurs admises, valeur par défaut (= comportement historique du site).
+//   typoNorm    'fr' normes françaises (défaut) | 'be' normes belges (secrétariat-bureautique, FWB)
+//   freeAccess  false leçons débloquées l'une après l'autre (défaut) | true accès libre à toutes les leçons (remédiation)
 const CLASS_SETTINGS = {
   typoNorm: { col: 'typo_norm', values: ['fr', 'be'], def: 'fr' },
+  freeAccess: { col: 'free_access', values: [false, true], def: false },
 };
 
 // Valeur envoyée par le prof : null/'' remet le défaut ; toute autre valeur hors liste = erreur.
@@ -484,6 +486,14 @@ function effectiveClassSettings(classRows) {
   return out;
 }
 
-module.exports = { CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
+// Devoirs individuels (remédiation) : student_id vide = toute la classe, sinon ce seul élève.
+// Les élèves concernés par un devoir (parmi les membres de la classe) et qui le voit.
+function assignmentTargets(a, members) {
+  const list = Array.isArray(members) ? members : [];
+  return a && a.student_id ? list.filter((m) => m.student_id === a.student_id) : list;
+}
+function assignmentVisibleTo(a, userId) { return !!a && (!a.student_id || a.student_id === userId); }
+
+module.exports = { assignmentTargets, assignmentVisibleTo, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
   ESSAY_TYPES, essayTypeDef, countWords, essayWordCount, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
   moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals };

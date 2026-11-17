@@ -1046,3 +1046,22 @@ alter table users
 -- Idempotent.
 -- ───────────────────────────────────────────────────────────────
 alter table classes add column if not exists typo_norm text not null default 'fr' check (typo_norm in ('fr', 'be'));
+
+-- ───────────────────────────────────────────────────────────────
+-- Accès libre aux leçons et devoirs de remédiation (nov. 2026)
+-- free_access : réglage de classe (action class-settings-set). false (défaut)
+-- = les leçons s'ouvrent l'une après l'autre, comme avant ; true = l'élève
+-- peut ouvrir n'importe quelle leçon pour remédier, sans perdre sa
+-- progression ni son point de reprise. L'offre Expert reste exigée au-delà
+-- des leçons gratuites. Un élève dans plusieurs classes a l'accès libre si
+-- l'une d'elles l'accorde.
+-- assignments.student_id : NULL (défaut) = devoir de toute la classe ;
+-- renseigné = devoir de remédiation pour ce seul élève (membre de la classe,
+-- vérifié par assignment-create ; les essais restent des devoirs de classe).
+-- Les autres élèves ne le voient pas (my-assignments) et il ne compte que
+-- pour lui dans les « x/y terminés » du prof. Accès : uniquement par l'API
+-- (clé service), autorisation dans api/classes.js. Idempotent.
+-- ───────────────────────────────────────────────────────────────
+alter table classes add column if not exists free_access boolean not null default false;
+alter table assignments add column if not exists student_id uuid references users(id) on delete cascade;
+create index if not exists assignments_student_id_idx on assignments(student_id) where student_id is not null;

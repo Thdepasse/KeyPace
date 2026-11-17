@@ -2,7 +2,7 @@
 // Lancer : node --test api/_class-logic.test.js
 const test = require('node:test');
 const assert = require('node:assert');
-const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings } = require('./_class-logic');
+const { studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, assignmentTargets, assignmentVisibleTo } = require('./_class-logic');
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_700_000_000_000;
@@ -214,10 +214,10 @@ test('parseGoalInput : bornes, entiers, null = défaut', () => {
 
 // Réglages pédagogiques de la classe : normes typographiques (étape 1 des normes belges).
 test('classSettingsOf : défaut français, colonne absente ou valeur inconnue = défaut', () => {
-  assert.deepEqual(classSettingsOf({}), { typoNorm: 'fr' });
-  assert.deepEqual(classSettingsOf(null), { typoNorm: 'fr' });
-  assert.deepEqual(classSettingsOf({ typo_norm: 'be' }), { typoNorm: 'be' });
-  assert.deepEqual(classSettingsOf({ typo_norm: 'xx' }), { typoNorm: 'fr' });
+  assert.deepEqual(classSettingsOf({}), { typoNorm: 'fr', freeAccess: false });
+  assert.deepEqual(classSettingsOf(null), { typoNorm: 'fr', freeAccess: false });
+  assert.deepEqual(classSettingsOf({ typo_norm: 'be', free_access: true }), { typoNorm: 'be', freeAccess: true });
+  assert.deepEqual(classSettingsOf({ typo_norm: 'xx', free_access: 'oui' }), { typoNorm: 'fr', freeAccess: false });
 });
 
 test('parseClassSetting : valeurs admises, null remet le défaut, le reste est refusé', () => {
@@ -235,8 +235,29 @@ test('effectiveClassSettings : sans classe active = null (l\'élève choisit), s
   assert.equal(effectiveClassSettings([]), null);
   assert.equal(effectiveClassSettings(undefined), null);
   assert.equal(effectiveClassSettings([{ archived: true, typo_norm: 'be' }]), null);
-  assert.deepEqual(effectiveClassSettings([{}]), { typoNorm: 'fr' });
-  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }]), { typoNorm: 'fr' });
-  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }, { typo_norm: 'be' }]), { typoNorm: 'be' });
-  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }, { typo_norm: 'be', archived: true }]), { typoNorm: 'fr' });
+  assert.deepEqual(effectiveClassSettings([{}]), { typoNorm: 'fr', freeAccess: false });
+  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }]), { typoNorm: 'fr', freeAccess: false });
+  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }, { typo_norm: 'be' }]), { typoNorm: 'be', freeAccess: false });
+  assert.deepEqual(effectiveClassSettings([{ typo_norm: 'fr' }, { typo_norm: 'be', archived: true }]), { typoNorm: 'fr', freeAccess: false });
+  assert.deepEqual(effectiveClassSettings([{ free_access: false }, { free_access: true }]), { typoNorm: 'fr', freeAccess: true });
+});
+
+test('parseClassSetting freeAccess : booléens seulement', () => {
+  assert.deepEqual(parseClassSetting('freeAccess', true), { ok: true, value: true });
+  assert.deepEqual(parseClassSetting('freeAccess', false), { ok: true, value: false });
+  assert.deepEqual(parseClassSetting('freeAccess', null), { ok: true, value: false });
+  for (const v of ['true', 1, 0, 'oui']) assert.equal(parseClassSetting('freeAccess', v).ok, false);
+});
+
+test('devoir individuel (remédiation) : seul l\'élève visé le voit et compte', () => {
+  const members = [{ student_id: 'a' }, { student_id: 'b' }, { student_id: 'c' }];
+  assert.equal(assignmentTargets({ student_id: null }, members).length, 3);
+  assert.equal(assignmentTargets({}, members).length, 3);
+  assert.deepEqual(assignmentTargets({ student_id: 'b' }, members), [{ student_id: 'b' }]);
+  assert.deepEqual(assignmentTargets({ student_id: 'z' }, members), []); // élève sorti de la classe : le devoir ne compte plus
+  assert.deepEqual(assignmentTargets({ student_id: 'b' }, null), []);
+  assert.equal(assignmentVisibleTo({}, 'a'), true);
+  assert.equal(assignmentVisibleTo({ student_id: 'a' }, 'a'), true);
+  assert.equal(assignmentVisibleTo({ student_id: 'b' }, 'a'), false);
+  assert.equal(assignmentVisibleTo(null, 'a'), false);
 });

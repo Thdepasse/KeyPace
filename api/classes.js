@@ -3,7 +3,7 @@
 const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary,
   essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
   moduleMastery, studentModuleProgress, GOAL_LIMITS, parseGoalInput, effectiveClassGoals,
-  CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings } = require('./_class-logic');
+  CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, assignmentTargets, assignmentVisibleTo } = require('./_class-logic');
 const { hashPassword, safeEqual } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
 
@@ -570,8 +570,17 @@ async function assignmentCreate(req, res) {
     if (!ev.ok) return res.status(400).json({ error: ev.error });
     essayCols = ev.value;
   }
+  // Devoir individuel (remédiation) : l'élève doit être membre de la classe ; un essai reste un devoir de classe.
+  let studentId = null;
+  if (req.body.studentId) {
+    if (isEssay) return res.status(400).json({ error: 'Un essai se donne à toute la classe.' });
+    const mem = await sb(`/class_members?class_id=eq.${cls.id}&student_id=eq.${encodeURIComponent(req.body.studentId)}&select=student_id`);
+    if (!mem.ok || !Array.isArray(mem.data) || !mem.data[0]) return res.status(400).json({ error: "Cet élève n'est pas dans la classe." });
+    studentId = mem.data[0].student_id;
+  }
   const row = {
     class_id: cls.id,
+    ...(studentId ? { student_id: studentId } : {}), // colonne écrite seulement si utilisée : un devoir de classe ne dépend pas de la migration
     lesson_id: req.body.lessonId || null,
     title,
     target_wpm: isModule ? null : (req.body.targetWpm ? parseInt(req.body.targetWpm, 10) : null),
@@ -595,7 +604,7 @@ async function assignmentList(req, res) {
   const assignments = Array.isArray(aR.data) ? aR.data : [];
   const members = await membersOf(cls.id);
   const pmap = await fetchProgressMap(members.map((m) => m.student_id));
-  const out = assignments.map((a) => ({
+  const out = assignments.map((a) => { const targets = assignmentTargets(a, members); const who = a.student_id ? targets[0] : null; return {
     id: a.id,
     lessonId: a.lesson_id,
     title: a.title,
@@ -604,14 +613,16 @@ async function assignmentList(req, res) {
     customText: a.custom_text || null,
     mode: a.mode || null,
     audioUrl: a.audio_url || null,
+    studentId: a.student_id || null,
+    studentName: who ? (who.fullName || who.username) : null,
     essayType: a.essay_type || null,
     essayBrief: a.essay_brief || null,
     minWords: a.min_words || null,
     maxWords: a.max_words || null,
     createdAt: a.created_at,
-    total: members.length,
-    doneCount: members.filter((m) => assignmentDone(pmap[m.student_id] || {}, a)).length,
-  }));
+    total: targets.length,
+    doneCount: targets.filter((m) => assignmentDone(pmap[m.student_id] || {}, a)).length,
+  }; });
   return res.json({ assignments: out });
 }
 
@@ -647,8 +658,9 @@ async function teacherToday(req, res) {
         if (missing > 0) notSubmitted.push({ assignmentId: a.id, title: a.title, className: cls.name, missing });
       } else {
         if (!pmap) pmap = await fetchProgressMap(members.map((m) => m.student_id));
-        const doneCount = members.filter((m) => assignmentDone(pmap[m.student_id] || {}, a)).length;
-        const missing = total - doneCount;
+        const targets = assignmentTargets(a, members);
+        const doneCount = targets.filter((m) => assignmentDone(pmap[m.student_id] || {}, a)).length;
+        const missing = targets.length - doneCount;
         if (missing > 0) notSubmitted.push({ assignmentId: a.id, title: a.title, className: cls.name, missing });
       }
     }
@@ -674,7 +686,7 @@ async function assignmentDetail(req, res) {
   // assignmentsDone[].wpm) mais n'était jamais renvoyée : le prof voyait
   // seulement "fait" / "pas encore", jamais si l'objectif de vitesse fixé sur
   // le devoir était atteint ou juste "rendu" à une vitesse plus basse.
-  const rows = members
+  const rows = assignmentTargets(a, members)
     .map((m) => {
       const data = pmap[m.student_id] || {};
       let wpm = null;
@@ -689,7 +701,7 @@ async function assignmentDetail(req, res) {
     })
     .sort((x, y) => Number(x.done) - Number(y.done) || x.username.localeCompare(y.username));
   return res.json({
-    assignment: { id: a.id, title: a.title, targetWpm: a.target_wpm, dueDate: a.due_date },
+    assignment: { id: a.id, title: a.title, targetWpm: a.target_wpm, dueDate: a.due_date, studentId: a.student_id || null },
     rows,
   });
 }
@@ -761,7 +773,7 @@ async function myAssignments(req, res) {
   const ids = Object.keys(classMap);
   if (!ids.length) return res.json({ assignments: [] });
   const aR = await sb(`/assignments?class_id=in.(${ids.join(',')})&select=*&order=created_at.desc`);
-  const assignments = Array.isArray(aR.data) ? aR.data : [];
+  const assignments = (Array.isArray(aR.data) ? aR.data : []).filter((a) => assignmentVisibleTo(a, user.id)); // devoir individuel d'un autre élève : invisible
   const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(user.id)}&select=data`);
   const data = (pr.data && pr.data[0] && pr.data[0].data) || {};
   const out = assignments.map((a) => ({
@@ -775,6 +787,7 @@ async function myAssignments(req, res) {
     mode: a.mode || null,
     audioUrl: a.audio_url || null,
     className: classMap[a.class_id] || '',
+    personal: !!a.student_id,
     done: assignmentDone(data, a),
   }));
   return res.json({ assignments: out });

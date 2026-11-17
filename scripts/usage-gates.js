@@ -696,4 +696,43 @@ function u16() {
     : { ok: true, detail: `norme fr : ${L.filter((l) => l.text).length} leçons et ${others.length} textes inchangés ; norme be : ${changed} leçons converties, ${L.filter((l) => l.excluded).length} exclues intactes, ${played} leçons de ponctuation jouées sans faute (${LAYOUTS.length} dispositions), classe prioritaire, explications du module 6 adaptées` };
 }
 
-module.exports = { u16, u15, u14, u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
+// U17 : accès libre aux leçons (réglage de classe) et devoir de remédiation. Sans réglage : verrou de progression intact (identique à
+// avant). Accès libre : aucune leçon verrouillée par la progression, un seul point de reprise mis en avant, progression inchangée ;
+// le verrou Expert reste. Modale de devoir : le choix d'un élève part dans la requête.
+function u17() {
+  const h = loadApp(); if (h.errors.length) return { ok: false, detail: 'chargement : ' + h.errors[0] };
+  login(h);
+  const errs = [];
+  h.run("currentPlan='expert';try{localStorage.setItem('klak_session',JSON.stringify({username:'tester',plan:'expert',token:'tok',userId:'uid'}))}catch{};app.stats.lessons={r1:{cleared:true,bestWpm:30,bestErr:0},r2:{cleared:true,bestWpm:28,bestErr:1}};");
+  const plan = h.run('getUserPlan()');
+  const render = () => { h.html.length = 0; h.run("app._skipModulesHub=true;app.sess=null;app._showIntro=false;app.view='lessons';app.renderLessons()"); return h.html.join('\n'); };
+  const count = (html) => ({ disabled: (html.match(/<button class="lesson-card[^"]*" disabled/g) || []).length, todo: (html.match(/lesson-card todo-c/g) || []).length, cards: (html.match(/<button class="lesson-card/g) || []).length });
+  const before = JSON.stringify(h.run('app.stats.lessons'));
+  // sans classe, puis classe sans accès libre : verrou de progression (r4 et suivantes)
+  h.run('app.classSettings=null'); const a = count(render());
+  h.run("app.classSettings={typoNorm:'fr',freeAccess:false}"); const b = count(render());
+  if (!a.cards) errs.push('liste des leçons non affichée (plan ' + plan + ')');
+  if (a.disabled !== a.cards - 3) errs.push(`sans classe : ${a.disabled} leçons verrouillées sur ${a.cards}, attendu ${a.cards - 3}`);
+  if (JSON.stringify(a) !== JSON.stringify(b)) errs.push('classe sans accès libre : affichage différent du comportement d\'origine');
+  // accès libre
+  h.run("app.classSettings={typoNorm:'fr',freeAccess:true}"); const htmlC = render(); const c = count(htmlC);
+  if (c.disabled !== 0) errs.push(`accès libre : ${c.disabled} leçon(s) encore verrouillée(s)`);
+  if (plan === 'expert' && c.todo !== 1) errs.push(`accès libre : ${c.todo} leçons mises en avant, attendu 1 (point de reprise r3)`);
+  if (!/app\.tryStartLesson\('flu6'\)/.test(htmlC)) errs.push('accès libre : la dernière leçon ne s\'ouvre pas');
+  if (!htmlC.includes(h.run("kpT('les.free_access')"))) errs.push('accès libre : message à l\'élève absent');
+  if (JSON.stringify(h.run('app.stats.lessons')) !== before) errs.push('accès libre : progression modifiée');
+  if (h.run("(ALL_LESSONS.find(l=>!app.lessonRec(l.id).cleared)||{}).id") !== 'r3') errs.push('point de reprise déplacé');
+  // verrou Expert toujours actif en accès libre
+  h.run("currentPlan='free';try{localStorage.setItem('klak_session',JSON.stringify({username:'tester',plan:'free',token:'tok',userId:'uid'}))}catch{}");
+  const htmlF = render();
+  if (!/expert-locked/.test(htmlF) || /app\.tryStartLesson\('flu6'\)/.test(htmlF)) errs.push('accès libre : le verrou Expert a sauté (compte gratuit)');
+  // modale de devoir : élève choisi -> studentId envoyé
+  h.run("currentPlan='expert';app._classDetail={id:'C1',students:[{studentId:'e2',username:'eleve2',fullName:\"Léa D'Hondt\"}]};app.openAssignModal('C1',{studentId:'e2'})");
+  const modal = h.html.join('\n');
+  if (!/id="asg-for"/.test(modal) || !/value="e2" selected/.test(modal)) errs.push('modale de devoir : élève non présélectionné');
+  if (!/L&eacute;a D&#39;Hondt|Léa D&#39;Hondt/.test(modal)) errs.push('modale de devoir : nom de l\'élève absent ou mal échappé');
+  return errs.length ? { ok: false, detail: errs.join('\n') }
+    : { ok: true, detail: `sans réglage : ${a.disabled}/${a.cards} leçons verrouillées comme avant ; accès libre : 0 verrouillée, 1 point de reprise (r3), progression intacte, verrou Expert gardé ; devoir de remédiation : élève présélectionné` };
+}
+
+module.exports = { u17, u16, u15, u14, u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
