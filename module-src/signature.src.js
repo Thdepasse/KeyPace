@@ -152,7 +152,7 @@ function quizBanner(n){
 }
 function platCard(){
   return `<section class="optcard"><div class="opt-txt"><span class="qb-tag">Pour aller plus loin · Facultatif</span><h2>L'installer dans ta <em>messagerie</em></h2>
-    <p>Ta signature est prête : reste à la mettre dans Smartschool, Outlook, Gmail ou Zimbra. Le chemin dans les paramètres change d'une messagerie à l'autre. Entraîne-toi sur un écran proche du vrai, quand tu veux.</p>
+    <p>Ta signature est prête : reste à la mettre dans Smartschool, Outlook, Gmail, Zimbra, Yahoo, iCloud, Proton ou Proximus. Le chemin dans les paramètres change d'une messagerie à l'autre. Entraîne-toi sur un écran proche du vrai, quand tu veux.</p>
     <div class="qb-meta">${PLAT_ORDER.map(k => `<span class="lg">${svcBadge(k, 20)}${esc(PLAT[k].name.replace(" messagerie", ""))}</span>`).join("")}</div></div>
     <div class="qb-act"><button class="btn primary" onclick="location.hash='signature/messagerie'">Ouvrir →</button></div></section>`;
 }
@@ -570,6 +570,57 @@ const PLAT = {
             "Smartschool est la messagerie interne de beaucoup d'écoles : cette signature est celle des messages Smartschool, pas celle de ton adresse Outlook ou Gmail.",
             "Les libellés varient selon la version et les choix de ton école : certaines affichent les menus en néerlandais. Si tu ne trouves pas, clique sur le point d'interrogation (aide) ou demande à l'école.",
             "Je n'ai pas trouvé comment régler la signature dans l'application du téléphone : vérifie dans ton application." ] },
+  yahoo: { name:'Yahoo Mail', sub:'Yahoo Mail sur ordinateur', skin:'pf-zm',
+    path:['Icône « Plus d\'options »','Paramètres','Writing email (Rédaction)','Activer la signature','Écrire la signature'],
+    steps:[
+      { q:"Sur quel appareil règles-tu la signature ?", o:["Dans un navigateur, sur ordinateur","Dans le dossier Spam","Dans le calendrier"], ok:0, say:"Le chemin décrit ici est celui de Yahoo Mail dans un navigateur sur ordinateur." },
+      { q:"Que cliques-tu ?", o:["L'icône « Plus d'options », puis Paramètres","Ton adresse mail, en haut","Le bouton « Écrire »"], ok:0, say:"Les paramètres s'ouvrent depuis l'icône « Plus d'options »." },
+      { q:"Quelle rubrique ouvres-tu ?", o:["Writing email (Rédaction de mails)","Filtres","Comptes"], ok:0, say:"La rubrique de rédaction des mails, « Writing email » : c'est là que se trouve la signature." },
+      { q:"Que fais-tu avec l'interrupteur ?", o:["Je l'active pour mon adresse","Je le laisse éteint","Je supprime mon compte"], ok:0, say:"Active l'interrupteur de la signature pour ton adresse." },
+      { q:"Pour terminer, que fais-tu ?", o:["J'écris ma signature dans la zone de texte","Je ferme sans rien écrire"], ok:0, say:"Écris ta signature dans la zone de texte prévue." }
+    ],
+    facts:[ "Dans Yahoo Mail sur ordinateur : icône « Plus d'options », Paramètres, « Writing email », interrupteur de la signature, puis zone de texte.",
+            "Dans les aides que j'ai lues, il n'y a pas d'étape pour enregistrer : vérifie en t'envoyant un mail de test.",
+            "Je n'ai pas trouvé d'indication sur les images dans la signature : « Copier le texte » du générateur est le plus sûr.",
+            "Les libellés changent selon la langue et la version : cherche le mot « signature »." ] },
+  icloud: { name:'iCloud Mail', sub:'Mail sur icloud.com (compte Apple)', skin:'pf-zm',
+    path:['icloud.com/mail','Réglages (bouton en haut de la liste des boîtes)','Réglages','Rédaction (barre latérale)','Ajouter une signature','Terminé'],
+    steps:[
+      { q:"Où vas-tu ?", o:["icloud.com/mail, puis je me connecte avec mon compte Apple","Dans l'App Store","Dans les contacts"], ok:0, say:"Va sur icloud.com/mail et connecte-toi avec ton compte Apple." },
+      { q:"Que cliques-tu ?", o:["Le bouton Réglages en haut de la liste des boîtes aux lettres, puis Réglages","Le bouton « Nouveau message »","Ta photo"], ok:0, say:"Le bouton Réglages est en haut de la liste des boîtes aux lettres. Choisis ensuite Réglages." },
+      { q:"Quelle rubrique ouvres-tu dans la barre latérale ?", o:["Rédaction","Règles","Comptes"], ok:0, say:"Ouvre la barre latérale, puis la rubrique Rédaction." },
+      { q:"Que fais-tu en descendant dans la page ?", o:["Je sélectionne « Ajouter une signature » et j'écris mon texte","Je clique sur « Supprimer »"], ok:0, say:"Sélectionne « Ajouter une signature », puis écris ton texte." },
+      { q:"Pour terminer, que fais-tu ?", o:["Je touche Terminé","Je ferme la fenêtre"], ok:0, say:"Termine avec le bouton Terminé." }
+    ],
+    facts:[ "Sur icloud.com/mail, Apple indique que la signature est du texte brut : pas d'image possible. Utilise « Copier le texte » du générateur, pas l'image.",
+            "Réglages, Rédaction, « Ajouter une signature » : une fois réglée, elle apparaît dans les nouveaux e-mails que tu envoies.",
+            "Pour la supprimer : même chemin, puis décocher « Ajouter une signature ».",
+            "L'application Mail de ton iPhone ou de ton Mac a ses propres réglages de signature, séparés de ceux de icloud.com : je n'ai pas détaillé ce chemin ici." ] },
+  proton: { name:'Proton Mail', sub:'Proton Mail sur ordinateur (account.proton.me)', skin:'pf-zm',
+    path:['account.proton.me','Paramètres › Tous les paramètres','Identité et adresses','Nom d\'affichage et signature','Mettre à jour'],
+    steps:[
+      { q:"Où te connectes-tu ?", o:["account.proton.me","Au site de ton école","À Google"], ok:0, say:"Connecte-toi à ton compte sur account.proton.me." },
+      { q:"Qu’ouvres-tu ?", o:["Paramètres, puis Tous les paramètres","Calendrier","Drive"], ok:0, say:"Ouvre Paramètres, puis Tous les paramètres." },
+      { q:"Quelle rubrique choisis-tu dans la barre latérale ?", o:["Identité et adresses","Sécurité","Appareils"], ok:0, say:"Choisis Identité et adresses, puis descends jusqu'à « Nom d'affichage et signature »." },
+      { q:"Tu as plusieurs adresses. Comment choisis-tu l'adresse concernée ?", o:["Je clique sur Adresse e-mail et je choisis dans le menu","Je les modifie toutes d'un coup, c'est automatique"], ok:0, say:"Clique sur Adresse e-mail et choisis l'adresse voulue dans le menu : chaque adresse peut avoir sa signature." },
+      { q:"Pour terminer, que cliques-tu ?", o:["Mettre à jour","Quitter"], ok:0, say:"Écris ta signature, puis clique sur « Mettre à jour »." }
+    ],
+    facts:[ "Proton Mail : Paramètres, Tous les paramètres, Identité et adresses, « Nom d'affichage et signature », puis « Mettre à jour ».",
+            "La barre d'outils sous le champ de signature permet de régler le style, la taille et la couleur, et d'ajouter une image.",
+            "Si tu ajoutes une image, le destinataire ne la voit que s'il a autorisé le chargement des contenus distants : garde ton nom et ta classe en texte.",
+            "Une fois enregistrée, la signature sert par défaut pour l'adresse, et tu peux la modifier pour un message précis." ] },
+  proximus: { name:'Proximus', sub:'Webmail Proximus (adresses @proximus.be, @skynet.be, @belgacom.net)', skin:'pf-zm',
+    path:['proximus.be/webmail','Te connecter','Paramètres du webmail','Chercher « Signature »','Enregistrer, puis test'],
+    steps:[
+      { q:"Où ouvres-tu ta messagerie Proximus ?", o:["Sur proximus.be/webmail, avec mon adresse et mon mot de passe","Sur un site au hasard","Dans l'agenda de l'école"], ok:0, say:"Le webmail Proximus est accessible depuis proximus.be/webmail." },
+      { q:"Où cherches-tu la signature ?", o:["Dans les paramètres du webmail","Dans l'objet d'un message","Dans le dossier Spam"], ok:0, say:"Cherche les paramètres, souvent un engrenage ou un menu « Paramètres »." },
+      { q:"Que cherches-tu ?", o:["Le mot « signature »","Le mot « Cci »","Le mot « mot de passe »"], ok:0, say:"L'aide de Proximus dit que tu peux ajouter une signature à tes messages : cherche ce mot." },
+      { q:"Une fois la signature écrite, que fais-tu ?", o:["Je l'enregistre puis je m'envoie un test","Je ferme sans enregistrer"], ok:0, say:"Enregistre, puis envoie-toi un message de test." }
+    ],
+    facts:[ "L'aide Proximus indique qu'on peut ajouter une signature aux messages dans le webmail, mais je n'ai pas trouvé le chemin exact dans les menus : cherche « Signature » dans les paramètres.",
+            "Ce parcours est donc plus général que les autres : il ne montre pas les boutons exacts du webmail Proximus.",
+            "Si tu ne trouves pas, utilise la recherche dans les paramètres ou l'aide de Proximus.",
+            "Pour une signature simple, « Copier le texte » du générateur convient très bien." ] },
   autre: { name:'Autre messagerie', path:['Paramètres ou Préférences','Chercher « Signature »','Enregistrer, puis test'], sub:'Une autre messagerie (Apple Mail, Thunderbird, téléphone…)', skin:'pf-zm',
     steps:[
       { q:"Où commences-tu ?", o:["Dans les paramètres ou les préférences","Dans l'objet d'un nouveau message","Dans le dossier Spam"], ok:0, say:"Cherche l'engrenage, le menu ou « Préférences »." },
@@ -582,14 +633,14 @@ const PLAT = {
             "Si tu ne trouves pas, demande à l'enseignant ou au service informatique de l'école : certaines écoles imposent une signature." ] }
 };
 /* Repères visuels : logos des messageries (fichiers dans images/mail/, comme le module Adresse mail). */
-const LOGO_FILE = { smartschool:'png', gmail:'svg', outlook:'svg', zimbra:'png' };
+const LOGO_FILE = { smartschool:'png', gmail:'svg', outlook:'svg', zimbra:'png', yahoo:'jpeg', icloud:'png', proton:'svg', proximus:'png' };
 const ENVI = c => `<rect x="6.5" y="9.5" width="19" height="13" rx="2.2" fill="none" stroke="${c}" stroke-width="2.4"/><path d="M7.5 11.5l8.5 6.5 8.5-6.5" fill="none" stroke="${c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
 function svcBadge(k, size){
   const n = size || 32, nm = (PLAT[k] || {}).name || 'Messagerie';
   if (LOGO_FILE[k]) return `<img class="svc" src="/images/mail/${k}.${LOGO_FILE[k]}" width="${n}" height="${n}" alt="${esc(nm)}">`;
   return `<svg class="svc" width="${n}" height="${n}" viewBox="0 0 32 32" role="img" aria-label="${esc(nm)}"><rect x=".75" y=".75" width="30.5" height="30.5" rx="8" fill="#8A8275"/>${ENVI('#fff')}</svg>`;
 }
-const PLAT_ORDER = ['smartschool', 'outlook', 'gmail', 'zimbra', 'autre'];
+const PLAT_ORDER = ['smartschool', 'outlook', 'gmail', 'zimbra', 'yahoo', 'icloud', 'proton', 'proximus', 'autre'];
 function renderPlat(start){
   $('#crumb-part').textContent = 'Dans ta messagerie'; $('#lesson-pos').textContent = 'Pour aller plus loin';
   $('#lesson-hero').innerHTML = `<div class="hero small"><div class="wrap"><div class="txt"><span class="tag">Pour aller plus loin</span><h1>L'installer dans ta <em>messagerie</em></h1><p>Le but est le même partout : trouver la rubrique « Signature » dans les paramètres. Choisis ta messagerie et suis le chemin, un clic à la fois.</p></div><img src="/images/keypace-mascot-mail-allonge.webp" alt=""></div></div>`;
