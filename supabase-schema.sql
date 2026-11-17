@@ -1065,3 +1065,15 @@ alter table classes add column if not exists typo_norm text not null default 'fr
 alter table classes add column if not exists free_access boolean not null default false;
 alter table assignments add column if not exists student_id uuid references users(id) on delete cascade;
 create index if not exists assignments_student_id_idx on assignments(student_id) where student_id is not null;
+
+-- ───────────────────────────────────────────────────────────────
+-- Rangée de repos de la classe (nov. 2026)
+-- Méthode belge AZER-UIOP (secrétariat-bureautique FWB) : les doigts
+-- reposent sur la rangée du haut au lieu de Q S D F · J K L M. Le prof la
+-- choisit pour sa classe (action class-settings-set) ; les modules 1 et 2 du
+-- cours français AZERTY sont alors réécrits par home-row-azer.js (mêmes
+-- identifiants de leçons). 'qsdf' (défaut) = comportement historique. Un
+-- élève dans plusieurs classes suit AZER-UIOP si l'une d'elles l'a choisie.
+-- Accès : uniquement par l'API (clé service). Idempotent.
+-- ───────────────────────────────────────────────────────────────
+alter table classes add column if not exists home_row text not null default 'qsdf' check (home_row in ('qsdf', 'azer'));

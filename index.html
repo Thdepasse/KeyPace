@@ -3068,6 +3068,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
 <script src="/programme-data.js"></script>
 <script src="/game-levels.js"></script>
 <script src="/typo-norm.js"></script>
+<script src="/home-row-azer.js"></script>
 
 <div id="page-home"><noscript>
   <main>
@@ -3595,7 +3596,7 @@ function saveSession(username, plan, token, userId, role, email, displayName, in
 function clearSession(){
   currentUser=null; currentPlan=null; currentToken=null; currentUserId=null;
   currentEmail=null; currentDisplayName=null; currentInstitutionName=null; currentHasClass=false;
-  try{app.classGoals=null;app.classSettings=null;}catch{}
+  try{app.classGoals=null;app.classSettings=null;kpSyncHomeRow();}catch{}
   localStorage.removeItem('klak_session');
 }
 function loadSession(){
@@ -4591,6 +4592,30 @@ function kpRegisterKeyboards(data){
    - `lessons` / `tutos` / `moduleNames` : ancienne forme, qui ne fait que remplacer des champs des leçons du cours par défaut.
    Dans les deux cas le cours par défaut est restauré à l'identique (mêmes objets, mêmes champs) au retour. */
 let _kpAzSnap=null;
+/* Rangée de repos (home-row-azer.js) : 'qsdf' (méthode française, défaut) ou 'azer' (méthode belge AZER-UIOP, doigts sur la rangée
+   du haut). Comme les normes typographiques : la classe décide (app.classSettings.homeRow) ; sans classe, le choix de l'élève sur cet
+   appareil (kp_home_row). Seul le cours français AZERTY a une méthode AZER-UIOP. _kpAzerOn : la surcouche est appliquée au programme. */
+let _kpAzerOn=false;
+function kpOwnHomeRow(){try{return KPHomeRow.normalizeHomeRow(localStorage.getItem('kp_home_row'));}catch{return'qsdf';}}
+function setOwnHomeRow(v){try{localStorage.setItem('kp_home_row',KPHomeRow.normalizeHomeRow(v));}catch{}}
+function kpClassHomeRow(){try{const c=app.classSettings;return c?KPHomeRow.normalizeHomeRow(c.homeRow):null;}catch{return null;}}
+function kpHomeRow(){
+  try{if(typeof KPHomeRow==='undefined'||kpCourseId()!=='fr/azerty')return'qsdf';}catch{return'qsdf';}
+  return kpClassHomeRow()||kpOwnHomeRow();
+}
+/* Applique ou retire la méthode AZER-UIOP sur le programme : en place, sur les modules 1 et 2 (mêmes identifiants de leçons), et
+   retour à l'identique depuis la copie du cours par défaut. Retourne true si le programme a changé (l'appelant redessine). */
+function kpSyncHomeRow(){
+  try{
+    if(typeof ALL_LESSONS==='undefined')return false;
+    const want=kpHomeRow()==='azer';
+    if(want===_kpAzerOn)return false;
+    kpSnapshotDefault();kpRestoreDefault();
+    if(want)KPHomeRow.applyAzer(ALL_LESSONS,ALL_MODULES);
+    _kpAzerOn=want;
+    return true;
+  }catch{return false;}
+}
 function kpSnapshotDefault(){
   if(_kpAzSnap)return;
   _kpAzSnap={lessons:ALL_LESSONS.slice(),modules:ALL_MODULES.slice(),free:FREE_LESSON_IDS.slice(),howText:KB_HOW_TEXT_LESSONS.slice(),
@@ -4630,8 +4655,8 @@ function kpCurriculumError(cur){
   return'';
 }
 function kpApplyCourseData(id,data){
-  kpSnapshotDefault();kpRestoreDefault();kpUnregisterKeyboards();
-  if(!data||id==='fr/azerty')return true;
+  kpSnapshotDefault();kpRestoreDefault();_kpAzerOn=false;kpUnregisterKeyboards();
+  if(!data||id==='fr/azerty'){kpSyncHomeRow();return true;} // cours français AZERTY : la méthode AZER-UIOP se réapplique si elle est choisie
   if(data.schema!==1||data.id!==id)return false;
   if(data.curriculum){
     if(kpCurriculumError(data.curriculum))return false;
@@ -5431,6 +5456,15 @@ function kpTypoSettingsHTML(){
   const btn=v=>`<button class="settings-btn${n===v?' active':''}" data-v="${v}" aria-pressed="${n===v}" style="white-space:normal;text-align:left" onclick="app.setTypoNorm('${v}')">${label(v)}</button>`;
   return head+`<div id="typo-btns" style="display:flex;gap:8px;flex-wrap:wrap">${btn('fr')}${btn('be')}</div>`;
 }
+/* Réglages élève, section Clavier : rangée de repos (élève sans classe) ou rappel de celle de sa classe. Cours français AZERTY seulement. */
+function kpHomeRowSettingsHTML(){
+  try{if(typeof KPHomeRow==='undefined'||kpCourseId()!=='fr/azerty')return'';}catch{return'';}
+  const cls=kpClassHomeRow(),n=kpHomeRow(),label=v=>kpT(v==='azer'?'set.homerow_azer':'set.homerow_qsdf');
+  const head=`<div class="settings-row-info" style="margin-top:4px"><strong>${kpT('set.homerow')}</strong><span>${kpT('set.homerow_help')}</span></div>`;
+  if(cls)return head+`<div id="homerow-btns" style="font-size:13px;color:var(--muted)">🔒 ${kpT('set.homerow_locked',{row:label(cls)})}</div>`;
+  const btn=v=>`<button class="settings-btn${n===v?' active':''}" data-v="${v}" aria-pressed="${n===v}" style="white-space:normal;text-align:left" onclick="app.setHomeRow('${v}')">${label(v)}</button>`;
+  return head+`<div id="homerow-btns" style="display:flex;gap:8px;flex-wrap:wrap">${btn('qsdf')}${btn('azer')}</div>`;
+}
 /* Touches affichées d'une leçon : en norme belge, « » deviennent le guillemet droit ". */
 function kpLessonKeys(les){
   const k=(les&&les.keys)||'';
@@ -5617,11 +5651,18 @@ const TILES_LANES=[
    QWERTY : A S D F J K L ;). Les lettres sont lues dans la disposition courante, jamais écrites en dur ; la liste est modifiée en place (les morceaux visent des indices). */
 function kpSyncTilesLanes(){
   try{
-    const row=(KB_LAYOUTS[getKbLayoutId()]||KB_LAYOUTS.fr)[2].map(k=>String(k.l||'').toLowerCase());
+    // Rangée de repos : celle du milieu (QSDF JKLM), ou celle du haut en méthode AZER-UIOP. Les 4 couloirs étendus (morceau Extrême,
+    // mode libre) prennent l'autre rangée, au-dessus ou au-dessous des index et majeurs (R E U I, ou F D J K en AZER-UIOP).
+    const rest=typeof KPHomeRow!=='undefined'&&kpHomeRow()==='azer'?1:2;
+    const rows=KB_LAYOUTS[getKbLayoutId()]||KB_LAYOUTS.fr,low=r=>(rows[r]||[]).map(k=>String(k.l||'').toLowerCase());
+    const row=low(rest),ext=low(rest===2?1:2);
     if(row.length<10)return;
     [0,1,2,3,6,7,8,9].forEach((src,i)=>{TILES_LANES[i].letter=row[src];});
+    if(ext.length>=8)[3,2,6,7].forEach((src,i)=>{TILES_EXPERT_LANES[i].letter=ext[src];});
   }catch{}
 }
+/* Lettres des 8 couloirs de Magic Tiles, pour les textes (« QSDF JKLM », « AZER UIOP »…). */
+function kpTilesRowLabel(){try{kpSyncTilesLanes();const u=TILES_LANES.map(l=>String(l.letter).toUpperCase());return u.slice(0,4).join('')+' '+u.slice(4).join('');}catch{return'QSDF JKLM';}}
 // Couleur unique des tuiles "normales" (appui simple), tuiles longues
 // (maintien) et accords : c'est le TYPE qui donne la couleur, plus la
 // lettre. Bonus (♥) et piège (✕) gardent leur propre couleur via les classes
@@ -6700,7 +6741,7 @@ const GCINE_GAMES=[
   {key:'souris',icon:'mouse',name:'Précision souris',desc:"12 niveaux qui montent en difficulté : viser, cliquer, glisser-déposer, puis le clavier (ZQSD) en renfort.",expert:false,category:'precision'},
   {key:'sourisGrid',icon:'grid',name:'Grille réflexe',desc:"Une touche s'allume : tape sa lettre avant qu'elle s'éteigne. 4 niveaux, une rangée du clavier à la fois, puis tout le clavier.",expert:false,category:'precision'},
   {key:'sourisHybrid',icon:'hand',name:'Duo souris + clavier',desc:"Vise à la souris, valide au clavier : une main sur chaque, une lettre à la fois.",expert:true,category:'precision'},
-  {key:'sourisTiles',icon:'layers',name:'Magic Tiles',desc:"8 couloirs, ta rangée de repos QSDF JKLM : tape ou tiens la touche avant la ligne.",expert:false,category:'precision'},
+  {key:'sourisTiles',icon:'layers',name:'Magic Tiles',get desc(){return kpT('game.sourisTiles.desc',{row:kpTilesRowLabel()});},expert:false,category:'precision'},
   {key:'simon',icon:'brain',name:'Simon des mots',desc:"Une séquence de mots s'affiche puis disparaît : retape-la de mémoire. Elle s'allonge à chaque manche réussie.",expert:false,category:'memoire'},
   {key:'clavier',icon:'keyboard',name:'Clavier vide',desc:"Le clavier est totalement vide : replace chaque lettre au bon endroit, de mémoire. Chrono lancé, chaque erreur compte.",expert:false,category:'memoire'},
   {key:'duel',icon:'swords',name:'Duel 1v1',desc:"Défie un ami en temps réel sur le même texte. Partage un lien, comptez 3-2-1, et que le plus rapide gagne !",expert:false,category:'multi'},
@@ -6711,7 +6752,7 @@ const GCINE_BOSS={key:'boss',icon:'trophy',name:'Boss de la semaine',desc:"Un d�
 const KP_GAME_TXT={
   frappe:()=>[kpT('game.frappe.name'),kpT('game.frappe.desc')],sprint:()=>[kpT('game.sprint.name'),kpT('game.sprint.desc')],course:()=>[kpT('game.course.name'),kpT('game.course.desc')],
   ghost:()=>[kpT('game.ghost.name'),kpT('game.ghost.desc')],souris:()=>[kpT('game.souris.name'),kpT('game.souris.desc')],sourisGrid:()=>[kpT('game.sourisGrid.name'),kpT('game.sourisGrid.desc')],
-  sourisHybrid:()=>[kpT('game.sourisHybrid.name'),kpT('game.sourisHybrid.desc')],sourisTiles:()=>[kpT('game.sourisTiles.name'),kpT('game.sourisTiles.desc')],simon:()=>[kpT('game.simon.name'),kpT('game.simon.desc')],
+  sourisHybrid:()=>[kpT('game.sourisHybrid.name'),kpT('game.sourisHybrid.desc')],sourisTiles:()=>[kpT('game.sourisTiles.name'),kpT('game.sourisTiles.desc',{row:kpTilesRowLabel()})],simon:()=>[kpT('game.simon.name'),kpT('game.simon.desc')],
   clavier:()=>[kpT('game.clavier.name'),kpT('game.clavier.desc')],duel:()=>[kpT('game.duel.name'),kpT('game.duel.desc')],royale:()=>[kpT('game.royale.name'),kpT('game.royale.desc')],
   boss:()=>[kpT('game.boss.name'),kpT('game.boss.desc')],
 };
@@ -7402,7 +7443,7 @@ const app={
   // Objectifs de leçon imposés par la/les classe(s) de l'élève (null = élève sans classe,
   // il règle lui-même ses objectifs). Chargés par loadClassGoals() à chaque init().
   classGoals:null,
-  // Réglages pédagogiques de la/des classe(s) ({typoNorm, freeAccess}) ; null = élève sans classe (il choisit lui-même). Chargés avec les objectifs.
+  // Réglages pédagogiques de la/des classe(s) ({typoNorm, freeAccess, homeRow}) ; null = élève sans classe (il choisit lui-même). Chargés avec les objectifs.
   classSettings:null,
   _goals(){return this.classGoals||(this.stats&&this.stats.goals)||{minWpm:20,maxErrors:8};},
   async loadClassGoals(){
@@ -7413,14 +7454,16 @@ const app={
       if(!r.ok||tok!==currentToken)return;
       const d=await r.json();
       const g=d&&d.goals&&typeof d.goals.minWpm==='number'&&typeof d.goals.maxErrors==='number'?{minWpm:d.goals.minWpm,maxErrors:d.goals.maxErrors}:null;
-      const cs=d&&d.settings&&typeof d.settings==='object'?{typoNorm:KPTypoNorm.normalizeNorm(d.settings.typoNorm),freeAccess:d.settings.freeAccess===true}:null;
-      const changed=JSON.stringify(g)!==JSON.stringify(this.classGoals)||JSON.stringify(cs)!==JSON.stringify(this.classSettings);
+      const cs=d&&d.settings&&typeof d.settings==='object'?{typoNorm:KPTypoNorm.normalizeNorm(d.settings.typoNorm),freeAccess:d.settings.freeAccess===true,homeRow:KPHomeRow.normalizeHomeRow(d.settings.homeRow)}:null;
+      let changed=JSON.stringify(g)!==JSON.stringify(this.classGoals)||JSON.stringify(cs)!==JSON.stringify(this.classSettings);
       this.classGoals=g;this.classSettings=cs;
+      if(kpSyncHomeRow())changed=true; // la classe impose la méthode AZER-UIOP (ou revient à QSDF)
       if(changed&&this.view==='lessons'&&!this.sess)this.renderCurrent();
     }catch{}
   },
   init(){
     this.stats=loadStats();
+    kpSyncHomeRow(); // rangée de repos choisie par l'élève sans classe (celle de la classe arrive avec loadClassGoals)
     this.loadClassGoals();
     if(this._onKey)window.removeEventListener('keydown',this._onKey);
     this._onKey=e=>this.handleKey(e);
@@ -7482,7 +7525,7 @@ const app={
     finally{if(sv)sv.disabled=false;if(rs)rs.disabled=false;}
   },
 
-  /* Réglages pédagogiques de la classe (normes typographiques, accès libre) : action class-settings-set, profs de la classe et admin de l'établissement. */
+  /* Réglages pédagogiques de la classe (normes typographiques, accès libre, rangée de repos) : action class-settings-set, profs de la classe et admin de l'établissement. */
   async saveClassSettings(classId,patch){
     const msg=document.getElementById('cs-msg'),btns=[...document.querySelectorAll('#class-settings-card .settings-btn')];
     const say=(t,ok)=>{if(msg){msg.textContent=t;msg.style.color=ok?'var(--green,#1FA971)':'var(--accent)';}};
@@ -9232,7 +9275,8 @@ const app={
     const isGuest=!currentUser;
 
     // Keyboard home row color preview (mobile)
-    const homeRow=[{l:'Q',f:'lp'},{l:'S',f:'lr'},{l:'D',f:'lm'},{l:'F',f:'li'},{l:'G',f:'li'},{l:'H',f:'ri'},{l:'J',f:'ri'},{l:'K',f:'rm'},{l:'L',f:'rr'},{l:'M',f:'rp'}];
+    const hrF=['lp','lr','lm','li','li','ri','ri','rm','rr','rp'];
+    const homeRow=((typeof KPHomeRow!=='undefined'&&KPHomeRow.REST[kpHomeRow()])||{letters:'QSDFGHJKLM'}).letters.split('').map((l,i)=>({l,f:hrF[i]})); // rangée de repos de la méthode choisie
     const kbColorHtml=homeRow.map(k=>`<div class="home-kb-key" style="border-bottom:3px solid ${FINGERS[k.f]}">${k.l}</div>`).join('');
 
     const A='var(--accent)';
@@ -12109,9 +12153,9 @@ const app={
   // pool : lettres tirées au dernier moment dans l'un des 9 emplacements vides.
   // tiers : seuils de médaille du niveau.
   _sgrLevelsBase:[
-    {n:1,id:'r1',get name(){return kpT('sgr.l1.name')},get short(){return kpT('sgr.l1.short')},get intro(){return kpT('sgr.l1.intro')},
+    {n:1,id:'r1',get name(){return kpT('sgr.l1.name')},get short(){return kpT('sgr.l1.short')},get intro(){return kpT(kpHomeRow()==='azer'?'sgr.l1.intro_azer':'sgr.l1.intro')},
      pool:'QSDFGHJKLM',tiers:{bronze:150,silver:245,gold:345},tune:{dur0:3000,durMin:1800,durStep:20}},
-    {n:2,id:'r2',get name(){return kpT('sgr.l2.name')},get short(){return kpT('sgr.l2.short')},get intro(){return kpT('sgr.l2.intro')},
+    {n:2,id:'r2',get name(){return kpT('sgr.l2.name')},get short(){return kpT('sgr.l2.short')},get intro(){return kpT(kpHomeRow()==='azer'?'sgr.l2.intro_azer':'sgr.l2.intro')},
      pool:'AZERTYUIOP',tiers:{bronze:120,silver:205,gold:310},tune:{dur0:3000,durMin:1800,durStep:20}},
     {n:3,id:'r3',get name(){return kpT('sgr.l3.name')},get short(){return kpT('sgr.l3.short')},get intro(){return kpT('sgr.l3.intro')},
      pool:'WXCVBN',tiers:{bronze:105,silver:175,gold:265},tune:{dur0:3200,durMin:2000,durStep:20}},
@@ -15856,6 +15900,7 @@ const app={
             ${kbFormBtnsHTML(getKbLayoutId())}
           </div>
           ${kpTypoSettingsHTML()}
+          ${kpHomeRowSettingsHTML()}
           <div id="quote-block" style="display:${kpTypoNorm()==='be'?'none':'contents'}">
           <div class="settings-row-info" style="margin-top:4px">
             <strong>${kpT('set.quotes')}</strong>
@@ -15991,6 +16036,12 @@ const app={
     }
   },
   setAccents(v){setAccentMode(v);kpKbChipRender();const b=document.querySelectorAll('#accent-btns .settings-btn');if(b.length===2){b[0].classList.toggle('active',v==='exact');b[1].classList.toggle('active',v==='tolerant');}},
+  /* Rangée de repos choisie par l'élève sans classe : le programme (modules 1 et 2) change aussitôt. */
+  setHomeRow(v){
+    if(kpClassHomeRow())return;
+    setOwnHomeRow(v);kpSyncHomeRow();const n=kpHomeRow();
+    document.querySelectorAll('#homerow-btns .settings-btn').forEach(b=>{const on=b.dataset.v===n;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false');});
+  },
   /* Normes typographiques choisies par l'élève sans classe (avec une classe, c'est le prof qui décide : boutons absents). */
   setTypoNorm(v){
     if(kpClassTypoNorm())return;
@@ -17662,7 +17713,7 @@ const app={
       </div>
       <div id="cg-msg" role="status" style="font-size:12.5px;margin-top:10px;min-height:16px"></div>
     </div>`;
-    const cs=Object.assign({typoNorm:'fr',freeAccess:false},d.settings||{});
+    const cs=Object.assign({typoNorm:'fr',freeAccess:false,homeRow:'qsdf'},d.settings||{});
     // Un groupe de boutons par réglage : data-k (réglage) et data-v (valeur, JSON) servent à remettre l'état actif après enregistrement.
     const csBtn=(k,v,label)=>{const on=cs[k]===v,j=JSON.stringify(v);return`<button class="settings-btn${on?' active':''}" data-k="${k}" data-v='${j}' aria-pressed="${on}" style="white-space:normal;text-align:left" onclick='app.saveClassSettings("${d.id}",{"${k}":${j}})'>${label}</button>`;};
     const csLbl='font-size:13px;font-weight:700;margin:16px 0 4px';
@@ -17673,6 +17724,9 @@ const app={
       <div style="${csLbl}">${kpT('cls.free_title')}</div>
       <div style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:10px">${kpT('cls.free_help')}</div>
       <div class="cs-group" style="display:flex;gap:8px;flex-wrap:wrap">${csBtn('freeAccess',false,kpT('cls.free_off'))}${csBtn('freeAccess',true,kpT('cls.free_on'))}</div>
+      <div style="${csLbl}">${kpT('cls.homerow_title')}</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:10px">${kpT('cls.homerow_help')}</div>
+      <div class="cs-group" style="display:flex;gap:8px;flex-wrap:wrap">${csBtn('homeRow','qsdf',kpT('set.homerow_qsdf'))}${csBtn('homeRow','azer',kpT('set.homerow_azer'))}</div>
       <div id="cs-msg" role="status" style="font-size:12.5px;margin-top:10px;min-height:16px"></div>
     </div>`;
     const asgHtml=`<div id="class-asg-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">

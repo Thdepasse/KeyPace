@@ -735,4 +735,93 @@ function u17() {
     : { ok: true, detail: `sans réglage : ${a.disabled}/${a.cards} leçons verrouillées comme avant ; accès libre : 0 verrouillée, 1 point de reprise (r3), progression intacte, verrou Expert gardé ; devoir de remédiation : élève présélectionné` };
 }
 
-module.exports = { u17, u16, u15, u14, u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
+// U18 : rangée de repos AZER-UIOP (home-row-azer.js). Par défaut (QSDF) : programme, couloirs de Magic Tiles et accueil identiques à
+// avant. AZER-UIOP : mêmes identifiants de leçons, modules 1 et 2 réécrits, chaque texte n'emploie que des lettres déjà enseignées et
+// emploie chaque nouvelle touche, consignes « F et J » de la suite adaptées, leçons jouées sans faute sur les 4 dispositions, couloirs
+// et niveaux des jeux sur A Z E R · U I O P ; retour à QSDF à l'identique ; la classe l'emporte ; un autre cours n'est pas touché.
+function u18() {
+  const h = loadApp(); if (h.errors.length) return { ok: false, detail: 'chargement : ' + h.errors[0] };
+  login(h);
+  const errs = [];
+  const H = require('../home-row-azer.js');
+  const G = require('../game-levels.js');
+  const fields = () => h.run('JSON.stringify({l:ALL_LESSONS.map(l=>({id:l.id,title:l.title,keys:l.keys,tip:l.tip,tuto:l.tuto,text:l.text,module:l.module})),m:ALL_MODULES.map(m=>m.name)})');
+  const lanes = () => h.run("kpSyncTilesLanes();TILES_LANES.map(l=>l.letter).join('')+'|'+TILES_EXPERT_LANES.map(l=>l.letter).join('')");
+  delete h.store.kp_home_row;
+  const orig = fields(), origLanes = lanes();
+  if (h.run('kpHomeRow()') !== 'qsdf') errs.push('défaut : ' + h.run('kpHomeRow()'));
+  if (h.run('kpSyncHomeRow()') !== false || fields() !== orig) errs.push('défaut : le programme a changé');
+  if (origLanes !== 'qsdfjklm|reui') errs.push('défaut : couloirs Magic Tiles ' + origLanes);
+  // méthode belge (élève sans classe)
+  h.store.kp_home_row = 'azer';
+  if (h.run('kpSyncHomeRow()') !== true || h.run('kpHomeRow()') !== 'azer') errs.push('kp_home_row=azer non appliqué');
+  const O = JSON.parse(orig), A = JSON.parse(fields());
+  if (O.l.map((l) => l.id).join() !== A.l.map((l) => l.id).join()) errs.push('AZER : identifiants ou ordre des leçons modifiés');
+  if (A.m[0] !== H.MODULE_NAMES[0] || A.m[1] !== H.MODULE_NAMES[1]) errs.push('AZER : noms de modules ' + A.m.slice(0, 2).join(' / '));
+  const known = new Set(); let checked = 0;
+  for (const l of A.l) {
+    const keys = String(l.keys).split(/\s+/).filter((k) => /^[a-z]$/.test(k));
+    keys.forEach((k) => known.add(k));
+    if (!H.LESSONS[l.id]) continue;
+    checked++;
+    if (l.module !== A.m[/^r/.test(l.id) ? 0 : 1]) errs.push(`AZER/${l.id} : module ${l.module}`);
+    const bad = [...new Set([...l.text].filter((c) => /[a-zà-ÿ]/i.test(c) && !known.has(c.toLowerCase())))];
+    if (bad.length) errs.push(`AZER/${l.id} : lettres pas encore enseignées « ${bad.join(' ')} »`);
+    const miss = keys.filter((k) => !l.text.includes(k)); if (miss.length) errs.push(`AZER/${l.id} : nouvelle touche absente du texte « ${miss.join(' ')} »`);
+    if (/\bsur F (?:et|ou) J|QSDF|Q S D F/.test(JSON.stringify([l.tip, l.tuto]))) /* les reliefs de F et J restent des repères ; « reviens sur F et J » est la méthode française */ errs.push(`AZER/${l.id} : consigne de la méthode française restée`);
+  }
+  if (checked !== 12) errs.push(`AZER : ${checked} leçons réécrites, attendu 12`);
+  const unchanged = A.l.filter((l, i) => !H.LESSONS[l.id] && !H.PATCHES[l.id] && JSON.stringify(l) !== JSON.stringify({ ...O.l[i], module: l.module }));
+  if (unchanged.length) errs.push('AZER : leçons hors modules 1-2 modifiées : ' + unchanged.map((l) => l.id).join(' '));
+  for (const [id, list] of Object.entries(H.PATCHES)) {
+    const o = O.l.find((l) => l.id === id), a = A.l.find((l) => l.id === id);
+    if (!o || !a) { errs.push(`patch ${id} : leçon introuvable`); continue; }
+    for (const [from, to] of list) {
+      if (!JSON.stringify([o.tip, o.tuto]).includes(from)) errs.push(`patch ${id} : « ${from} » n'existe plus dans la consigne d'origine`);
+      if (!JSON.stringify([a.tip, a.tuto]).includes(to)) errs.push(`patch ${id} : « ${to} » non appliqué`);
+    }
+  }
+  if (lanes() !== 'azeruiop|fdjk') errs.push('AZER : couloirs Magic Tiles ' + lanes());
+  if (h.run('kpTilesRowLabel()') !== 'AZER UIOP') errs.push('AZER : description Magic Tiles ' + h.run('kpTilesRowLabel()'));
+  const lv = G.levels(A.l.map((l) => ({ id: l.id, keys: l.keys, module: l.module })));
+  const repos = lv.find((x) => x.id === 'repos'), haut = lv.find((x) => x.id === 'haut');
+  if (!repos || [...repos.letters].sort().join('') !== 'aeioprtuyz') errs.push('AZER : niveau « Rangée de repos » des jeux ' + (repos ? [...repos.letters].join('') : 'absent'));
+  if (!haut || haut.label !== 'Rangée du milieu') errs.push('AZER : niveau du module 2 des jeux ' + (haut ? haut.label : 'absent'));
+  // leçons réécrites jouées jusqu'au bout sur les 4 dispositions
+  const dead = h.run('KB_DEAD_DECOMP'); let played = 0;
+  for (const lay of LAYOUTS) {
+    const direct = typableSet(loadLayout(lay)); h.store.kp_kb_layout = lay; h.run(`applyKbLayout('${lay}')`);
+    for (const id of Object.keys(H.LESSONS)) {
+      const text = startLesson(h, id); let bad = null;
+      if (text !== H.LESSONS[id].text) { errs.push(`AZER/${lay}/${id} : texte de séance différent`); continue; }
+      for (const ch of text) { const st = plan(ch, lay, direct, dead); if (!st) { bad = ch; break; } st.forEach((x) => press(h, x)); }
+      if (bad) { errs.push(`AZER/${lay}/${id} : « ${bad} » impossible à taper`); continue; }
+      if (!h.run('app.sess.finished') || h.run('app.sess.keystrokes') !== h.run('app.sess.correct')) errs.push(`AZER/${lay}/${id} : non terminé ou fautif`);
+      played++;
+    }
+  }
+  h.store.kp_kb_layout = 'fr'; h.run("applyKbLayout('fr')");
+  // le cours par défaut rechargé (changement de cours) garde la méthode choisie
+  h.run("kpApplyCourseData('fr/azerty',null)");
+  if (h.run("app.lessonById('r1').keys") !== 'r u') errs.push('AZER : méthode perdue après rechargement du cours');
+  // retour à QSDF à l'identique
+  h.store.kp_home_row = 'qsdf';
+  if (h.run('kpSyncHomeRow()') !== true || fields() !== orig) errs.push('retour QSDF : programme différent de l\'origine');
+  if (lanes() !== origLanes) errs.push('retour QSDF : couloirs ' + lanes());
+  // la classe décide, dans les deux sens
+  h.run("app.classSettings={typoNorm:'fr',freeAccess:false,homeRow:'azer'};kpSyncHomeRow()");
+  if (h.run('kpHomeRow()') !== 'azer' || h.run("app.lessonById('r1').keys") !== 'r u') errs.push('classe azer + élève qsdf : non appliqué');
+  h.store.kp_home_row = 'azer'; h.run("app.classSettings={typoNorm:'fr',freeAccess:false,homeRow:'qsdf'};kpSyncHomeRow()");
+  if (h.run('kpHomeRow()') !== 'qsdf' || fields() !== orig) errs.push('classe qsdf + élève azer : non appliqué');
+  // un autre cours (français QWERTY) garde son propre programme
+  h.run("app.classSettings={typoNorm:'fr',freeAccess:false,homeRow:'azer'}");
+  const qc = JSON.stringify(require('../courses-src/fr-qwerty.json'));
+  h.run(`KP_COURSES_OFFERED.push('fr/qwerty');localStorage.setItem('kp_course','fr/qwerty');kpApplyCourseData('fr/qwerty',${qc})`);
+  if (h.run('kpHomeRow()') !== 'qsdf' || h.run("app.lessonById('r1').keys") === 'r u') errs.push('cours QWERTY : méthode AZER appliquée à tort');
+  h.run("localStorage.setItem('kp_course','fr/azerty');kpApplyCourseData('fr/azerty',null)");
+  if (h.run("app.lessonById('r1').keys") !== 'r u') errs.push('retour au cours AZERTY : méthode de la classe non réappliquée');
+  return errs.length ? { ok: false, detail: errs.slice(0, 12).join('\n') }
+    : { ok: true, detail: `QSDF par défaut identique ; AZER-UIOP : 12 leçons réécrites (lettres déjà enseignées seulement), ${Object.keys(H.PATCHES).length} consignes adaptées, ${played} leçons jouées sans faute (${LAYOUTS.length} dispositions), Magic Tiles AZER UIOP, retour à l'identique, classe prioritaire, cours QWERTY intact` };
+}
+
+module.exports = { u18, u17, u16, u15, u14, u13, u12, u11, u10, u1, u2, u3, u4, u5, u6, u7, u8, u9, typableSet, plan };
