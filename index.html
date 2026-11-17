@@ -6784,7 +6784,7 @@ function mount(host){
   /* Le pays n'a pas de bouton ici : c'est le drapeau en haut à droite qui décide (KPProg.getCountry, lu dans useCountry). */
   const isExpert=()=>typeof getUserPlan==='function'&&getUserPlan()==='expert';
   const isLogged=()=>typeof currentUser!=='undefined'&&!!currentUser;
-  const MOD_HREF={mail:'/cours/ecrire-un-mail',cv:'/cours/ecrire-un-cv','mot-de-passe':'/cours/creer-un-mot-de-passe',lettre:'/cours/ecrire-une-lettre-de-motivation','adresse-email':'/cours/creer-une-adresse-mail','signature-mail':'/cours/creer-sa-signature-mail'};
+  const MOD_HREF={mail:'/cours/ecrire-un-mail',cv:'/cours/ecrire-un-cv','mot-de-passe':'/cours/creer-un-mot-de-passe',lettre:'/cours/ecrire-une-lettre-de-motivation','adresse-email':'/cours/creer-une-adresse-mail','signature-mail':'/cours/creer-sa-signature-mail',raccourcis:'/cours/les-raccourcis-clavier'};
   const statusLabel=m=>m.live?(isExpert()?'Disponible':'Expert'):'Bientôt';
   const ctaLabel=m=>m.live?(isExpert()?'Commencer →':'Débloquer avec Expert'):'Bientôt';
   function openModule(id){
@@ -6887,7 +6887,7 @@ function mount(host){
     M('lettre','emp',IC.letter,'/images/keypace-perso-lettre.webp','Emploi','Lettre de motivation',"Les éléments d'une lettre, l'adapter à ta situation, repérer et corriger les erreurs, puis écrire ta propre lettre avec une checklist et l'exporter en PDF.",true),
     M('commande','ecr',IC.parcel,'/images/keypace-mascot-cheer.webp','Écriture','Répondre à une commande',"Écrire un retour à un mail de commande : confirmer, signaler un souci, demander un échange ou un remboursement, poliment et clairement.",false),
     M('pave','cla',IC.numpad,'/images/keypace-perso-pave.webp','Clavier','Le pavé numérique',"Apprendre à taper les chiffres vite et sans regarder : montants, dates, numéros de téléphone, petits calculs.",false),
-    M('raccourcis','cla',IC.cmd,'/images/keypace-perso-raccourcis.webp','Clavier','Les raccourcis clavier',"Copier, coller, annuler, sélectionner : les raccourcis qui font gagner du temps, pour Windows et pour Mac.",false),
+    M('raccourcis','cla',IC.cmd,'/images/keypace-perso-raccourcis.webp','Clavier','Les raccourcis clavier',"Copier, coller, annuler, sélectionner : les raccourcis qui font gagner du temps, pour Windows et pour Mac.",true),
     M('formulaire','cla',IC.form,'/images/keypace-perso-formulaire.webp','Clavier','Remplir un formulaire',"Tabulation, champs obligatoires, majuscules, adresses : remplir un formulaire en ligne sans erreur.",false),
     M('ponctuation','lan',IC.quote,'/images/keypace-perso-ponctuation.webp','Langue','Ponctuation et majuscules',"Virgules, points, guillemets, majuscules : les règles qui rendent un texte facile à lire.",false),
     M('conj','lan',IC.book,'/images/keypace-mascot-conjugaison-reflexion.webp','Langue','Conjugaison',"Des règles de base du présent jusqu'aux temps les plus complexes, avec des mises en situation dans des phrases et des textes à trous.",false),
