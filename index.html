@@ -7402,7 +7402,7 @@ const app={
   // Objectifs de leçon imposés par la/les classe(s) de l'élève (null = élève sans classe,
   // il règle lui-même ses objectifs). Chargés par loadClassGoals() à chaque init().
   classGoals:null,
-  // Réglages pédagogiques de la/des classe(s) ({typoNorm}) ; null = élève sans classe (il choisit lui-même). Chargés avec les objectifs.
+  // Réglages pédagogiques de la/des classe(s) ({typoNorm, freeAccess}) ; null = élève sans classe (il choisit lui-même). Chargés avec les objectifs.
   classSettings:null,
   _goals(){return this.classGoals||(this.stats&&this.stats.goals)||{minWpm:20,maxErrors:8};},
   async loadClassGoals(){
@@ -7413,7 +7413,7 @@ const app={
       if(!r.ok||tok!==currentToken)return;
       const d=await r.json();
       const g=d&&d.goals&&typeof d.goals.minWpm==='number'&&typeof d.goals.maxErrors==='number'?{minWpm:d.goals.minWpm,maxErrors:d.goals.maxErrors}:null;
-      const cs=d&&d.settings&&typeof d.settings==='object'?{typoNorm:KPTypoNorm.normalizeNorm(d.settings.typoNorm)}:null;
+      const cs=d&&d.settings&&typeof d.settings==='object'?{typoNorm:KPTypoNorm.normalizeNorm(d.settings.typoNorm),freeAccess:d.settings.freeAccess===true}:null;
       const changed=JSON.stringify(g)!==JSON.stringify(this.classGoals)||JSON.stringify(cs)!==JSON.stringify(this.classSettings);
       this.classGoals=g;this.classSettings=cs;
       if(changed&&this.view==='lessons'&&!this.sess)this.renderCurrent();
@@ -7482,16 +7482,16 @@ const app={
     finally{if(sv)sv.disabled=false;if(rs)rs.disabled=false;}
   },
 
-  /* Réglages pédagogiques de la classe (normes typographiques) : action class-settings-set, profs de la classe et admin de l'établissement. */
+  /* Réglages pédagogiques de la classe (normes typographiques, accès libre) : action class-settings-set, profs de la classe et admin de l'établissement. */
   async saveClassSettings(classId,patch){
-    const msg=document.getElementById('cs-msg'),btns=[...document.querySelectorAll('#cs-typo .settings-btn')];
+    const msg=document.getElementById('cs-msg'),btns=[...document.querySelectorAll('#class-settings-card .settings-btn')];
     const say=(t,ok)=>{if(msg){msg.textContent=t;msg.style.color=ok?'var(--green,#1FA971)':'var(--accent)';}};
     btns.forEach(b=>b.disabled=true);
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-settings-set',token:currentToken,classId,settings:patch})});
       const d=await r.json().catch(()=>({}));
       if(!r.ok||!d.settings){say(d.error||kpT('cls.settings_error'),false);return;}
-      btns.forEach(b=>{const on=b.dataset.v===d.settings.typoNorm;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false');});
+      btns.forEach(b=>{const on=JSON.stringify(d.settings[b.dataset.k])===b.dataset.v;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false');});
       if(this._classDetail&&this._classDetail.id===classId)this._classDetail.settings=d.settings;
       say(kpT('cls.settings_saved'),true);
     }catch{say(kpT('cls.settings_net'),false);}
@@ -10650,8 +10650,12 @@ const app={
     const goals=this._goals();
     const plan=getUserPlan();
     const statusById={};
+    // Accès libre (réglage de la classe, remédiation) : aucune leçon n'attend la précédente. La progression et le point de reprise
+    // (première leçon non validée, mise en avant) ne changent pas.
+    const freeAccess=!!(currentUser&&this.classSettings&&this.classSettings.freeAccess);
+    const resumeId=(ALL_LESSONS.find(l=>!this.lessonRec(l.id).cleared)||{}).id;
     ALL_LESSONS.forEach((les,i)=>{
-      const prev=i===0?true:!!this.lessonRec(ALL_LESSONS[i-1].id).cleared;
+      const prev=freeAccess||i===0?true:!!this.lessonRec(ALL_LESSONS[i-1].id).cleared;
       const rec=this.lessonRec(les.id);
       statusById[les.id]={locked:!prev&&currentUser,cleared:!!rec.cleared,best:rec.bestWpm||0};
     });
@@ -10675,7 +10679,7 @@ const app={
         const isAccessible=isFree&&!currentUser;
         const icon=s.cleared?'✓':(expertLocked||guestExpertLocked)?'':(!currentUser||progressLocked)?ICONS.lock:'▸';
         const dotCls=s.cleared?'c':(expertLocked||guestExpertLocked)?'ex':(!currentUser||progressLocked)?'l':'t';
-        const isTodo=currentUser&&!progressLocked&&!s.cleared&&isFree;
+        const isTodo=currentUser&&!progressLocked&&!s.cleared&&isFree&&(!freeAccess||les.id===resumeId);
         const cardCls=`lesson-card${isTodo?' todo-c':''}${(expertLocked||guestExpertLocked)?' expert-locked':''}`;
         const clickHandler=!currentUser?`openAuth('register',${JSON.stringify(kpT('les.auth_msg')).replace(/"/g,'&quot;')})`
           :expertLocked?`openModal('upgrade-modal')`
@@ -10713,6 +10717,7 @@ const app={
       <div class="goal-item"><span class="goal-label">${kpT('les.goal_speed')}</span>${locked?'':`<button class="goal-btn" onclick="app.setGoal('minWpm',-1)">–</button>`}<span class="goal-val">${goals.minWpm}</span>${locked?'':`<button class="goal-btn" onclick="app.setGoal('minWpm',1)">+</button>`}<span style="font-size:13px;color:var(--muted)">${kpT('unit.wpm')}</span></div>
       <div class="goal-item"><span class="goal-label">${kpT('les.goal_errors')}</span>${locked?'':`<button class="goal-btn" onclick="app.setGoal('maxErrors',-1)">–</button>`}<span class="goal-val">${goals.maxErrors}</span>${locked?'':`<button class="goal-btn" onclick="app.setGoal('maxErrors',1)">+</button>`}</div>
       ${locked?`<div class="goal-item" style="font-size:12.5px;color:var(--muted)">🔒 ${kpT('les.goal_locked')}</div>`:''}
+      ${freeAccess?`<div class="goal-item" style="font-size:12.5px;color:var(--muted)">🔓 ${kpT('les.free_access')}</div>`:''}
     </div>`:'';
 
     document.getElementById('page-lessons').innerHTML=`<div class="lessons-section">
@@ -17216,7 +17221,7 @@ const app={
   },
   _clRow(a,withClass){
     const k=this._clKind(a),du=this._clDue(a),ac=this._clAction(a);
-    const meta=[withClass&&a.className?this._esc(a.className):'',k.kind,a.targetWpm?kpT('cl.target',{n:a.targetWpm}):''].filter(Boolean).join(' · ');
+    const meta=[withClass&&a.className?this._esc(a.className):'',k.kind,a.personal?kpT('cl.personal'):'',a.targetWpm?kpT('cl.target',{n:a.targetWpm}):''].filter(Boolean).join(' · ');
     return`<div class="cl-row"><div class="cl-ico">${ICONS[k.icon]}</div><div class="cl-rt"><b>${this._esc(a.title)}</b><span>${meta}</span></div>${du?`<span class="cl-pill ${du.cls}">${ICONS.clock} ${du.label}</span>`:''}<button class="cl-btn" onclick="${ac.onclick}">${ac.label}</button></div>`;
   },
   _clDoneRow(a,withClass){
@@ -17657,12 +17662,17 @@ const app={
       </div>
       <div id="cg-msg" role="status" style="font-size:12.5px;margin-top:10px;min-height:16px"></div>
     </div>`;
-    const cs=d.settings||{typoNorm:'fr'};
-    const csBtn=v=>`<button class="settings-btn${(cs.typoNorm||'fr')===v?' active':''}" data-v="${v}" aria-pressed="${(cs.typoNorm||'fr')===v}" style="white-space:normal;text-align:left" onclick="app.saveClassSettings('${d.id}',{typoNorm:'${v}'})">${kpT(v==='be'?'set.typo_be':'set.typo_fr')}</button>`;
+    const cs=Object.assign({typoNorm:'fr',freeAccess:false},d.settings||{});
+    // Un groupe de boutons par réglage : data-k (réglage) et data-v (valeur, JSON) servent à remettre l'état actif après enregistrement.
+    const csBtn=(k,v,label)=>{const on=cs[k]===v,j=JSON.stringify(v);return`<button class="settings-btn${on?' active':''}" data-k="${k}" data-v='${j}' aria-pressed="${on}" style="white-space:normal;text-align:left" onclick='app.saveClassSettings("${d.id}",{"${k}":${j}})'>${label}</button>`;};
+    const csLbl='font-size:13px;font-weight:700;margin:16px 0 4px';
     const settingsCard=`<div id="class-settings-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;margin-bottom:24px">
       <div style="font-size:15px;font-weight:700;margin-bottom:4px">${kpT('cls.settings_title')}</div>
       <div style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:14px">${kpT('cls.typo_help')}</div>
-      <div id="cs-typo" style="display:flex;gap:8px;flex-wrap:wrap">${csBtn('fr')}${csBtn('be')}</div>
+      <div class="cs-group" style="display:flex;gap:8px;flex-wrap:wrap">${csBtn('typoNorm','fr',kpT('set.typo_fr'))}${csBtn('typoNorm','be',kpT('set.typo_be'))}</div>
+      <div style="${csLbl}">${kpT('cls.free_title')}</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:10px">${kpT('cls.free_help')}</div>
+      <div class="cs-group" style="display:flex;gap:8px;flex-wrap:wrap">${csBtn('freeAccess',false,kpT('cls.free_off'))}${csBtn('freeAccess',true,kpT('cls.free_on'))}</div>
       <div id="cs-msg" role="status" style="font-size:12.5px;margin-top:10px;min-height:16px"></div>
     </div>`;
     const asgHtml=`<div id="class-asg-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">
@@ -17678,7 +17688,7 @@ const app={
         const barColor=pct>=100?'var(--success)':late?'var(--danger)':'var(--warning)';
         return`<div class="asg-row">
           <div style="width:44px;height:44px;border-radius:13px;background:${ty[1]};display:flex;align-items:center;justify-content:center;font-size:20px">${ty[0]}</div>
-          <div style="min-width:0"><div style="font-weight:700;font-size:14.5px;overflow-wrap:anywhere">${this._esc(a.title)}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px"><span class="asg-tag">${ty[2]}</span>${a.targetWpm?`<span class="asg-tag">Objectif ${a.targetWpm} mpm</span>`:''}${pct>=100?'<span class="asg-tag done">Terminé ✓</span>':''}${late?`<span class="asg-tag late">${a.total-a.doneCount} en retard</span>`:''}</div></div>
+          <div style="min-width:0"><div style="font-weight:700;font-size:14.5px;overflow-wrap:anywhere">${this._esc(a.title)}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px"><span class="asg-tag">${ty[2]}</span>${a.studentId?`<span class="asg-tag">${kpT('asg.for_student',{name:this._esc(a.studentName||'')})}</span>`:''}${a.targetWpm?`<span class="asg-tag">Objectif ${a.targetWpm} mpm</span>`:''}${pct>=100?'<span class="asg-tag done">Terminé ✓</span>':''}${late?`<span class="asg-tag late">${a.total-a.doneCount} en retard</span>`:''}</div></div>
           <div class="asg-due" style="font-size:12.5px;font-weight:600;color:${late?'var(--danger)':'var(--muted)'}">${due?('Échéance '+due):'Sans échéance'}</div>
           <div class="asg-prog">
             <div style="font-size:13px;font-weight:700;color:${pct>=100?'var(--success)':'var(--txt)'}">${a.doneCount}/${a.total} terminé${a.doneCount!==1?'s':''}</div>
@@ -17838,7 +17848,7 @@ const app={
     if(status)status.textContent='';
     if(preview)preview.src='';
   },
-  openAssignModal(classId){
+  openAssignModal(classId,pre={}){
     // Réinitialiser l'état d'enregistrement à chaque ouverture
     this._asgRecBlob=null;this._asgAudioUrl=null;this._asgPrevStoragePath=null;
     this._asgMediaRecorder=null;this._asgRecStream=null;this._asgRecChunks=[];
@@ -17862,6 +17872,14 @@ const app={
           <button type="button" id="asg-seg-essay" onclick="app._asgSetType('essay')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">${ICONS.fileText} Essai</button>
           <button type="button" id="asg-seg-module" onclick="app._asgSetType('module')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">${ICONS.layers||ICONS.bookOpen} Module</button>
         </div>
+        ${(()=>{ /* Pour qui : toute la classe ou un élève (remédiation). Les essais restent des devoirs de classe. */
+          const cd=this._classDetail&&this._classDetail.id===classId?this._classDetail:null;
+          const st=((cd&&cd.students)||[]).map(x=>({id:x.studentId,name:x.fullName||x.username}));
+          const sd=this._sd&&this._sd.studentId===pre.studentId?this._sd:null; // ouverte depuis la fiche d'un élève
+          if(pre.studentId&&!st.some(x=>x.id===pre.studentId))st.push({id:pre.studentId,name:sd?(sd.fullName||sd.username):'?'});
+          if(!st.length)return'';
+          return`<div id="asg-block-for"><label style="${lbl}">${kpT('asg.for')}</label><select id="asg-for" style="${fld}"><option value="">${kpT('asg.for_class')}</option>${st.sort((a,b)=>String(a.name).localeCompare(String(b.name))).map(x=>`<option value="${this._esc(x.id)}"${x.id===pre.studentId?' selected':''}>${this._esc(x.name)}</option>`).join('')}</select></div>`;
+        })()}
         <div id="asg-block-lesson">
           <label style="${lbl}">Exercice</label>
           <select id="asg-lesson" style="${fld}"><option value="">Test de vitesse libre</option>${opts}</select>
@@ -17929,6 +17947,7 @@ const app={
     });
     document.getElementById('asg-block-lesson').style.display=type==='lesson'?'':'none';
     document.getElementById('asg-block-custom').style.display=type==='custom'?'':'none';
+    const fb=document.getElementById('asg-block-for');if(fb)fb.style.display=type==='essay'?'none':'';
     const mb=document.getElementById('asg-block-module');if(mb)mb.style.display=type==='module'?'':'none';
     const eb=document.getElementById('asg-block-essay');
     if(eb)eb.style.display=type==='essay'?'':'none';
@@ -18151,12 +18170,13 @@ const app={
     const fail=(m)=>{err.textContent=m;err.style.display='block';};
     let title,lessonId=null,customText=null,mode=null;
     if(type==='essay')return this._createEssayAssignment(classId,due,fail);
+    const studentId=((document.getElementById('asg-for')||{}).value)||null; // devoir individuel (remédiation) ou toute la classe
     if(type==='module'){
       const key=document.getElementById('asg-module').value,m=ASG_MODULES.find(x=>x.key===key);
       if(!m)return fail('Choisis un module.');
       const btn=document.getElementById('asg-save');btn.disabled=true;btn.textContent='…';
       try{
-        const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-create',token:currentToken,classId,mode:'module',lessonId:key,title:m.title,dueDate:due||null})});
+        const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-create',token:currentToken,classId,mode:'module',lessonId:key,title:m.title,dueDate:due||null,studentId})});
         const d=await r.json();
         if(!r.ok){btn.disabled=false;btn.textContent='Assigner le devoir';fail(d.error||kpT('net.generic'));return;}
         if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}
@@ -18186,7 +18206,7 @@ const app={
       btn.textContent='…';
     }
     try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-create',token:currentToken,classId,lessonId:lessonId||null,title,targetWpm:wpm||null,dueDate:due||null,customText,mode,audioUrl:audioUrl||null})});
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-create',token:currentToken,classId,studentId,lessonId:lessonId||null,title,targetWpm:wpm||null,dueDate:due||null,customText,mode,audioUrl:audioUrl||null})});
       const d=await r.json();
       if(!r.ok){btn.disabled=false;btn.textContent='Assigner';fail(d.error||kpT('net.generic'));return;}
       if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}
@@ -18409,6 +18429,7 @@ const app={
         <button onclick="app.viewClass('${d.classId}')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">← Retour à la classe</button>
         <h1 style="margin-bottom:4px">${this._studentPrimary(d)}</h1>
         <p style="margin:0">${this._studentSub(d)?this._studentSub(d)+' · ':''}Inscrit le ${d.joinedAt?new Date(d.joinedAt).toLocaleDateString('fr-FR'):'-'} · dernière activité : ${last}</p>
+        <button onclick="app.openAssignModal('${d.classId}',{studentId:'${d.studentId}'})" style="margin-top:12px;margin-right:8px;background:var(--accent);border:none;color:#fff;border-radius:9px;padding:7px 14px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer">${kpT('asg.remediation_btn')}</button>
         <button onclick="app.removeStudentFromClass('${d.classId}','${d.studentId}','${this._esc(d.username).replace(/'/g,"\\'")}')" style="margin-top:12px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Retirer de la classe</button>
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">

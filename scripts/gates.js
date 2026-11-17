@@ -297,6 +297,7 @@ const GATES = process.env.GATES_FAKE_RED
     { id: 'I1', name: 'Interface : textes français et anglais complets, clés de la page valides', run: () => require('./i18n-gates').i1() },
     { id: 'U15', name: 'Cours de langue : appliqués à la page, vocabulaire des jeux, rien de français, leçons rejouées sur chaque disposition', run: () => usage().u15() },
     { id: 'U16', name: 'Normes typographiques : française inchangée, belge appliquée et jouable, classe prioritaire', run: () => usage().u16() },
+    { id: 'U17', name: 'Accès libre aux leçons et devoir de remédiation : verrou d\'origine sans réglage, point de reprise gardé', run: () => usage().u17() },
     { id: 'T1', name: 'Traces de matériel réel rejouées dans le moteur (G6)', run: () => require('./traces-gate').run() },
     { id: 'B1', name: 'Vrai navigateur : chargement, écrans, 26 claviers, vraies frappes', run: b1 },
   ];
