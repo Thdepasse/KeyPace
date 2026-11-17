@@ -12,7 +12,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
 // require() à chemins littéraux : Vercel n'embarque que les fichiers qu'il voit ainsi.
-const MODULES = { cv: () => require('./_module-cv'), mail: () => require('./_module-mail'), mdp: () => require('./_module-mdp'), lettre: () => require('./_module-lettre'), adresse: () => require('./_module-adresse'), signature: () => require('./_module-signature'), raccourcis: () => require('./_module-raccourcis') };
+const MODULES = { cv: () => require('./_module-cv'), mail: () => require('./_module-mail'), mdp: () => require('./_module-mdp'), lettre: () => require('./_module-lettre'), adresse: () => require('./_module-adresse'), signature: () => require('./_module-signature'), raccourcis: () => require('./_module-raccourcis'), raccourcisav: () => require('./_module-raccourcis-avances') };
 
 async function sb(path) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
@@ -37,7 +37,7 @@ async function handle(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   // Contrôle de déploiement : confirme que les modules sont bien embarqués avec la fonction (renvoie leur taille, jamais leur contenu).
   if (req.method === 'GET' && req.query && req.query.check === '1') {
-    try { return res.status(200).json({ ok: true, sizes: { cv: MODULES.cv().length, mail: MODULES.mail().length, mdp: MODULES.mdp().length, lettre: MODULES.lettre().length, adresse: MODULES.adresse().length, signature: MODULES.signature().length, raccourcis: MODULES.raccourcis().length } }); }
+    try { return res.status(200).json({ ok: true, sizes: { cv: MODULES.cv().length, mail: MODULES.mail().length, mdp: MODULES.mdp().length, lettre: MODULES.lettre().length, adresse: MODULES.adresse().length, signature: MODULES.signature().length, raccourcis: MODULES.raccourcis().length, raccourcisav: MODULES.raccourcisav().length } }); }
     catch (e) { return res.status(500).json({ ok: false }); }
   }
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée.' });

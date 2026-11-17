@@ -490,6 +490,10 @@ async function myClasses(req, res) {
 }
 
 /* ── Devoirs / exercices assignés ── */
+// Modules du cours (Expert) assignables comme devoir. Un devoir « module » a mode='module' et
+// lesson_id = clé du module ; il est fait quand l'élève a terminé toutes les parties du module
+// (marque assignmentsDone['mod:<clé>'] posée par moduleDone(), jamais par le client).
+const MODULE_KEYS = ['mail', 'cv', 'mdp', 'lettre', 'adresse', 'signature', 'raccourcis', 'raccourcisav'];
 // Un devoir est "fait" si l'élève a validé la leçon visée (et atteint l'objectif vitesse si fixé),
 // ou, pour un test libre avec objectif, s'il a un test atteignant la vitesse demandée.
 function assignmentDone(data, a) {
@@ -500,6 +504,7 @@ function assignmentDone(data, a) {
   if (a.essay_type) {
     return !!(d.assignmentsDone || {})[a.id];
   }
+  if (a.mode === 'module') return !!(d.assignmentsDone || {})['mod:' + a.lesson_id];
   // Texte personnalisé : fait dès que l'élève a complété CE devoir (clé = id), avec
   // l'objectif vitesse atteint le cas échéant.
   if (a.custom_text) {
@@ -529,8 +534,10 @@ async function assignmentCreate(req, res) {
   const title = (req.body.title || '').trim();
   if (!title) return res.status(400).json({ error: 'Titre requis.' });
   const isEssay = req.body.mode === 'essay';
-  const customText = isEssay ? null : ((req.body.customText || '').trim() || null);
-  const mode = isEssay ? 'essay' : (customText ? (req.body.mode === 'vocal' ? 'vocal' : 'written') : null);
+  const customText = (isEssay || req.body.mode === 'module') ? null : ((req.body.customText || '').trim() || null);
+  const isModule = !isEssay && req.body.mode === 'module';
+  if (isModule && !MODULE_KEYS.includes(req.body.lessonId)) return res.status(400).json({ error: 'Module inconnu.' });
+  const mode = isEssay ? 'essay' : isModule ? 'module' : (customText ? (req.body.mode === 'vocal' ? 'vocal' : 'written') : null);
   // Une transcription garde son audio source ; les autres essais n'en ont pas.
   const audioUrl = ((mode === 'vocal' || (isEssay && req.body.essayType === 'transcription')) && req.body.audioUrl) ? req.body.audioUrl : null;
   // Consignes d'essai : validées à part (logique pure, testable).
@@ -544,7 +551,7 @@ async function assignmentCreate(req, res) {
     class_id: cls.id,
     lesson_id: req.body.lessonId || null,
     title,
-    target_wpm: req.body.targetWpm ? parseInt(req.body.targetWpm, 10) : null,
+    target_wpm: isModule ? null : (req.body.targetWpm ? parseInt(req.body.targetWpm, 10) : null),
     due_date: req.body.dueDate || null,
     custom_text: customText,
     mode,
@@ -748,6 +755,30 @@ async function myAssignments(req, res) {
     done: assignmentDone(data, a),
   }));
   return res.json({ assignments: out });
+}
+
+// Élève : un module vient d'être terminé (toutes les parties). Marque posée côté serveur,
+// par compare-and-swap comme essaySubmit(), pour ne pas écraser un save-progress concurrent.
+async function moduleDone(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const key = req.body.moduleKey;
+  if (!MODULE_KEYS.includes(key)) return res.status(400).json({ error: 'Module inconnu.' });
+  for (let i = 0; i < 4; i++) {
+    const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(user.id)}&select=data,updated_at`);
+    const row = pr.data && pr.data[0];
+    const data = (row && row.data) || {};
+    data.assignmentsDone = data.assignmentsDone || {};
+    if (data.assignmentsDone['mod:' + key]) return res.json({ ok: true });
+    data.assignmentsDone['mod:' + key] = { t: Date.now(), module: true };
+    if (!row) { const c = await sb('/progress', { method: 'POST', body: JSON.stringify({ user_id: user.id, data }) }); if (c.ok) return res.json({ ok: true }); continue; }
+    const filter = row.updated_at
+      ? `/progress?user_id=eq.${encodeURIComponent(user.id)}&updated_at=eq.${encodeURIComponent(row.updated_at)}`
+      : `/progress?user_id=eq.${encodeURIComponent(user.id)}`;
+    const w = await sb(filter, { method: 'PATCH', body: JSON.stringify({ data, updated_at: new Date().toISOString() }) });
+    if (w.ok && w.data && w.data.length) return res.json({ ok: true });
+  }
+  return res.status(500).json({ error: 'Enregistrement impossible.' });
 }
 
 /* ── Migration des classes jsonb (ancien modèle) vers les tables ── */
@@ -1416,6 +1447,7 @@ module.exports = async function handler(req, res) {
       case 'assignment-update': return await assignmentUpdate(req, res);
       case 'assignment-delete': return await assignmentDelete(req, res);
       case 'my-assignments': return await myAssignments(req, res);
+      case 'module-done': return await moduleDone(req, res);
       case 'audio-upload': return await audioUpload(req, res);
       // essais
       case 'essay-submit': return await essaySubmit(req, res);
@@ -1447,3 +1479,5 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'Erreur serveur.' });
   }
 };
+
+module.exports.assignmentDone = assignmentDone; // exposé pour les tests

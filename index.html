@@ -6594,6 +6594,17 @@ function genSprintText(){
   return words.join(' ');
 }
 const ALL_LESSONS=[],ALL_MODULES=[];
+// Modules assignables comme devoir (clés = api/classes.js MODULE_KEYS ; pages = routes /cours/…).
+const ASG_MODULES=[
+  {key:'mail',title:'Rédiger un mail',href:'/cours/ecrire-un-mail'},
+  {key:'cv',title:'Rédiger un CV',href:'/cours/ecrire-un-cv'},
+  {key:'lettre',title:'Lettre de motivation',href:'/cours/ecrire-une-lettre-de-motivation'},
+  {key:'mdp',title:'Créer un mot de passe solide',href:'/cours/creer-un-mot-de-passe'},
+  {key:'adresse',title:'Créer une adresse mail, Cc et Cci',href:'/cours/creer-une-adresse-mail'},
+  {key:'signature',title:'Créer sa signature de mail',href:'/cours/creer-sa-signature-mail'},
+  {key:'raccourcis',title:'Les raccourcis clavier',href:'/cours/les-raccourcis-clavier'},
+  {key:'raccourcisav',title:'Raccourcis avancés',href:'/cours/raccourcis-avances'}
+];
 (function(){let pool='';CURRICULUM.forEach((mod,mi)=>{const ml=[];mod.lessons.forEach(les=>{if(les.neu)pool+=les.neu;const l=Object.assign({},les,{module:mod.name,moduleIdx:mi,pool});ALL_LESSONS.push(l);ml.push(l);});ALL_MODULES.push({name:mod.name,lessons:ml});});})();
 
 /* ── APP ── */
@@ -6784,7 +6795,7 @@ function mount(host){
   /* Le pays n'a pas de bouton ici : c'est le drapeau en haut à droite qui décide (KPProg.getCountry, lu dans useCountry). */
   const isExpert=()=>typeof getUserPlan==='function'&&getUserPlan()==='expert';
   const isLogged=()=>typeof currentUser!=='undefined'&&!!currentUser;
-  const MOD_HREF={mail:'/cours/ecrire-un-mail',cv:'/cours/ecrire-un-cv','mot-de-passe':'/cours/creer-un-mot-de-passe',lettre:'/cours/ecrire-une-lettre-de-motivation','adresse-email':'/cours/creer-une-adresse-mail','signature-mail':'/cours/creer-sa-signature-mail',raccourcis:'/cours/les-raccourcis-clavier'};
+  const MOD_HREF={mail:'/cours/ecrire-un-mail',cv:'/cours/ecrire-un-cv','mot-de-passe':'/cours/creer-un-mot-de-passe',lettre:'/cours/ecrire-une-lettre-de-motivation','adresse-email':'/cours/creer-une-adresse-mail','signature-mail':'/cours/creer-sa-signature-mail',raccourcis:'/cours/les-raccourcis-clavier','raccourcis-avances':'/cours/raccourcis-avances'};
   const statusLabel=m=>m.live?(isExpert()?'Disponible':'Expert'):'Bientôt';
   const ctaLabel=m=>m.live?(isExpert()?'Commencer →':'Débloquer avec Expert'):'Bientôt';
   function openModule(id){
@@ -6944,7 +6955,7 @@ function mount(host){
    {id:'solutions',k:'num',icon:'rocket',img:'/images/keypace-mascot-idea.webp',cat:'Outils numériques',title:'Trouver ses solutions et progresser',short:'Solutions créatives avec le numérique, repérer ce qu’il reste à apprendre.'},
    {id:'mail-pro',k:'ecr',icon:'mail',img:'/images/keypace-perso-commande.webp',cat:'Écriture',title:'Écrire un mail professionnel',short:'Ton adapté au destinataire, réponse à une commande ou une réclamation.'},
    {id:'rapport',k:'ecr',icon:'pen',img:'/images/keypace-perso-ecrire-texte.webp',cat:'Écriture',title:'Rédiger un rapport ou une synthèse',short:'Titres, styles, table des matières, sources et bibliographie.'},
-   {id:'raccourcis-avances',k:'cla',icon:'cmd',img:'/images/keypace-perso-raccourcis.webp',cat:'Clavier',title:'Raccourcis avancés',short:'Traitement de texte et tableur : aller beaucoup plus vite.'},
+   {id:'raccourcis-avances',k:'cla',icon:'cmd',img:'/images/keypace-perso-raccourcis.webp',cat:'Clavier',title:'Raccourcis avancés',short:'Traitement de texte et tableur : aller beaucoup plus vite.',live:true,desc:"Se déplacer dans un texte, aller vite dans un tableur, calculer sans tout retaper et piloter son ordinateur, pour Windows et pour Mac. Avec un mini tableur et des exercices où tu fais le vrai geste."},
    {id:'relire',k:'lan',icon:'spell',img:'/images/keypace-perso-ortho.webp',cat:'Langue',title:'Relire et corriger un texte',short:'Orthographe et ponctuation d’un texte professionnel.'},
    {id:'vitesse',k:'cla',icon:'keyboard',img:'/images/keypace-test-vitesse-frappe.webp',cat:'Clavier',title:'Vitesse et précision',short:'Garder la précision en augmentant sa vitesse de frappe.'}
   ];
@@ -8208,6 +8219,7 @@ const app={
   startAssignment(id){
     const a=(this._myAssignments||[]).find(x=>x.id===id);
     if(!a)return;
+    if(a.mode==='module'){const m=ASG_MODULES.find(x=>x.key===a.lessonId);location.href=m?m.href:'/?view=lessons';return;}
     if(!a.customText){if(a.lessonId)return this.tryStartLesson(a.lessonId);return go('test');}
     if(!currentUser){openAuth('login',kpT('gate.asg'),()=>this.startAssignment(id));return;}
     this.stopTimer();this._gazeStop();this._gaze.enabled=false;this._showIntro=false;
@@ -17079,6 +17091,7 @@ const app={
     return{days,cls:days<=1?'rd':days<=7?'or':'',label:days<0?kpT('cl.due_late',{n:-days}):days===0?kpT('cl.today'):days===1?kpT('cl.tomorrow'):kpT('cl.in_days',{n:days})};
   },
   _clKind(a){
+    if(a.mode==='module')return{icon:'bookOpen',kind:'Module'};
     if(a.mode==='essay')return{icon:'pencil',kind:kpT('cl.k_essay')};
     if(a.customText)return a.mode==='vocal'?{icon:'volume',kind:kpT('cl.k_dictation')}:{icon:'fileText',kind:kpT('cl.k_text')};
     if(a.lessonId)return{icon:'bookOpen',kind:kpT('cl.k_lesson')};
@@ -17086,6 +17099,7 @@ const app={
   },
   // Même action que l'ancienne liste : rédiger, dictée/texte perso, leçon, ou test libre.
   _clAction(a){
+    if(a.mode==='module'){const m=ASG_MODULES.find(x=>x.key===a.lessonId);return{onclick:`location.href='${m?m.href:'/?view=lessons'}'`,label:'Ouvrir le module'};}
     if(a.mode==='essay')return{onclick:`app.openEssay('${a.id}')`,label:ICONS.pencil+' '+kpT('cl.write')};
     if(a.customText)return{onclick:`app.startAssignment('${a.id}')`,label:a.mode==='vocal'?ICONS.volume+' '+kpT('cl.do_dictation'):kpT('cl.do_exercise')};
     if(a.lessonId)return{onclick:`app.tryStartLesson('${a.lessonId}')`,label:kpT('cl.do_exercise')};
@@ -17554,7 +17568,7 @@ const app={
         const pct=a.total?Math.round(a.doneCount/a.total*100):0;
         const due=a.dueDate?new Date(a.dueDate).toLocaleDateString('fr-FR'):null;
         const late=lateAsg.indexOf(a)>=0;
-        const ty=a.mode==='essay'?['✍️','rgba(139,92,246,.13)','Rédaction']:a.mode==='vocal'?['🎧','rgba(240,138,36,.15)','Dictée']:['⌨️','rgba(31,169,113,.13)','Exercice'];
+        const ty=a.mode==='module'?['📘','rgba(14,155,196,.14)','Module']:a.mode==='essay'?['✍️','rgba(139,92,246,.13)','Rédaction']:a.mode==='vocal'?['🎧','rgba(240,138,36,.15)','Dictée']:['⌨️','rgba(31,169,113,.13)','Exercice'];
         const barColor=pct>=100?'var(--success)':late?'var(--danger)':'var(--warning)';
         return`<div class="asg-row">
           <div style="width:44px;height:44px;border-radius:13px;background:${ty[1]};display:flex;align-items:center;justify-content:center;font-size:20px">${ty[0]}</div>
@@ -17739,10 +17753,16 @@ const app={
           <button type="button" id="asg-seg-lesson" onclick="app._asgSetType('lesson')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:all .15s">${ICONS.bookOpen} Exercice</button>
           <button type="button" id="asg-seg-custom" onclick="app._asgSetType('custom')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">${ICONS.pencil} Texte</button>
           <button type="button" id="asg-seg-essay" onclick="app._asgSetType('essay')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">${ICONS.fileText} Essai</button>
+          <button type="button" id="asg-seg-module" onclick="app._asgSetType('module')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">${ICONS.layers||ICONS.bookOpen} Module</button>
         </div>
         <div id="asg-block-lesson">
           <label style="${lbl}">Exercice</label>
           <select id="asg-lesson" style="${fld}"><option value="">Test de vitesse libre</option>${opts}</select>
+        </div>
+        <div id="asg-block-module" style="display:none">
+          <label style="${lbl}">Module à terminer</label>
+          <select id="asg-module" style="${fld}">${ASG_MODULES.map(m=>`<option value="${m.key}">${m.title}</option>`).join('')}</select>
+          <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin:-4px 0 14px;font-size:12.5px;line-height:1.5;color:var(--muted)">Le devoir est rendu quand l'élève a terminé toutes les parties du module. Les modules sont réservés aux comptes Expert : vérifie que tes élèves y ont accès.</div>
         </div>
         <div id="asg-block-custom" style="display:none">
           <label style="${lbl}">Titre du devoir</label>
@@ -17793,7 +17813,7 @@ const app={
 
   _asgSetType(type){
     document.getElementById('asg-type').value=type;
-    const segs={lesson:'asg-seg-lesson',custom:'asg-seg-custom',essay:'asg-seg-essay'};
+    const segs={lesson:'asg-seg-lesson',custom:'asg-seg-custom',essay:'asg-seg-essay',module:'asg-seg-module'};
     Object.entries(segs).forEach(([k,id])=>{
       const el=document.getElementById(id);if(!el)return;
       const on=k===type;
@@ -17802,11 +17822,12 @@ const app={
     });
     document.getElementById('asg-block-lesson').style.display=type==='lesson'?'':'none';
     document.getElementById('asg-block-custom').style.display=type==='custom'?'':'none';
+    const mb=document.getElementById('asg-block-module');if(mb)mb.style.display=type==='module'?'':'none';
     const eb=document.getElementById('asg-block-essay');
     if(eb)eb.style.display=type==='essay'?'':'none';
     // Un essai n'a pas d'objectif de vitesse : on rédige, on ne recopie pas.
     const sb=document.getElementById('asg-speed-block');
-    if(sb)sb.style.display=type==='essay'?'none':'';
+    if(sb)sb.style.display=(type==='essay'||type==='module')?'none':'';
     if(type==='essay')app._asgEssayTypeChange();
   },
 
@@ -18023,6 +18044,19 @@ const app={
     const fail=(m)=>{err.textContent=m;err.style.display='block';};
     let title,lessonId=null,customText=null,mode=null;
     if(type==='essay')return this._createEssayAssignment(classId,due,fail);
+    if(type==='module'){
+      const key=document.getElementById('asg-module').value,m=ASG_MODULES.find(x=>x.key===key);
+      if(!m)return fail('Choisis un module.');
+      const btn=document.getElementById('asg-save');btn.disabled=true;btn.textContent='…';
+      try{
+        const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-create',token:currentToken,classId,mode:'module',lessonId:key,title:m.title,dueDate:due||null})});
+        const d=await r.json();
+        if(!r.ok){btn.disabled=false;btn.textContent='Assigner le devoir';fail(d.error||kpT('net.generic'));return;}
+        if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}
+        this.viewClass(classId);
+      }catch{btn.disabled=false;btn.textContent='Assigner le devoir';fail('Erreur réseau.');}
+      return;
+    }
     if(type==='custom'){
       title=document.getElementById('asg-title').value.trim();
       customText=document.getElementById('asg-text').value.trim();

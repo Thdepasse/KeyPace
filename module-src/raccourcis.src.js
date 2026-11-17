@@ -143,7 +143,9 @@ const BEST_KEY = 'kp-raccourcis-quiz-best';
 const getBest = () => { try{ return +localStorage.getItem(BEST_KEY) || 0; }catch(e){ return 0; } };
 const setBest = n => { try{ localStorage.setItem(BEST_KEY, String(n)); }catch(e){} };
 const allDone = () => PARTS.every(p => done[p.k]);
+function reportDone(){ try{ const s = JSON.parse(localStorage.getItem('klak_session')); if (s && s.token) fetch('/api/classes', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ action:'module-done', token:s.token, moduleKey:'raccourcis' }) }).catch(() => {}); }catch(e){} }
 function completePart(k){
+  setTimeout(() => { if (allDone()) reportDone(); }, 0);
   done[k] = true; store.set(done);
   const f = $('#finish'), p = PARTS.find(x => x.k === k);
   if (f && '#raccourcis/'+p.n === location.hash){ f.textContent = 'Terminée ✓'; f.className = 'btn ok'; const r = $('#restart'); if (r) r.hidden = false; refreshNext(); }
@@ -207,6 +209,7 @@ function quizBanner(n){
     <div class="qb-act"><button class="btn primary" onclick="location.hash='raccourcis/quiz'" style="font-size:16px;padding:14px 26px">Jouer →</button></div></section>`;
 }
 function renderHub(){
+  if (allDone()) reportDone();
   const n = PARTS.filter(p => done[p.k]).length, all = n === PARTS.length;
   $('#hub-prog').textContent = n + '/' + PARTS.length + ' parties';
   $('#hub-bar').style.width = (n/PARTS.length*100) + '%';

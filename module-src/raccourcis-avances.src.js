@@ -1,0 +1,642 @@
+/* Module « Raccourcis avancés » : même moteur que « Les raccourcis clavier ». Texte, tableur et ordinateur, avec des exercices où l'élève fait le vrai geste. Rien de ce qui est tapé n'est envoyé : tout reste dans le navigateur. */
+/* =====================  PLATEFORME ET RACCOURCIS  ===================== */
+const PLAT_KEY = 'kp-raccourcisav-plat';
+let PLAT = (() => { try{ const s = localStorage.getItem(PLAT_KEY); if (s === 'win' || s === 'mac') return s; }catch(e){} return /Mac/i.test((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '') ? 'mac' : 'win'; })();
+const setPlat = p => { PLAT = p; try{ localStorage.setItem(PLAT_KEY, p); }catch(e){} };
+const KEYLAB = { win:{ ctrl:'Ctrl', shift:'Maj', alt:'Alt', opt:'Alt', cmd:'Ctrl', tab:'Tab', win:'Win', Home:'Début', End:'Fin', Backspace:'Retour', Enter:'Entrée', ' ':'Espace', ArrowLeft:'←', ArrowRight:'→', ArrowUp:'↑', ArrowDown:'↓' },
+                 mac:{ ctrl:'Ctrl', shift:'⇧ Maj', alt:'Alt', opt:'⌥ Option', cmd:'⌘ Cmd', tab:'Tab', win:'⌘ Cmd', Home:'Début', End:'Fin', Backspace:'⌫ Retour', Enter:'Entrée', ' ':'Espace', ArrowLeft:'←', ArrowRight:'→', ArrowUp:'↑', ArrowDown:'↓' } };
+const lab = k => KEYLAB[PLAT][k] || k;
+const kbd = c => `<span class="kbd">${c.map(k => `<kbd>${lab(k)}</kbd>`).join('<i>+</i>')}</span>`;
+/* grp : text = zone de texte de l'exercice, sheet = mini tableur de l'exercice, sys = ordinateur (le navigateur ne peut pas les détecter : on choisit). */
+const SC = {
+  wordR:  { n:'Avancer d\'un mot', win:['ctrl','ArrowRight'], mac:['opt','ArrowRight'], grp:'text' },
+  lineEnd:{ n:'Fin de la ligne', win:['End'], mac:['cmd','ArrowRight'], grp:'text' },
+  lineStart:{ n:'Début de la ligne', win:['Home'], mac:['cmd','ArrowLeft'], grp:'text' },
+  docEnd: { n:'Fin du document', win:['ctrl','End'], mac:['cmd','ArrowDown'], grp:'text' },
+  docStart:{ n:'Début du document', win:['ctrl','Home'], mac:['cmd','ArrowUp'], grp:'text' },
+  delWord:{ n:'Effacer le mot précédent', win:['ctrl','Backspace'], mac:['opt','Backspace'], grp:'text' },
+  selWord:{ n:'Sélectionner le mot suivant', win:['ctrl','shift','ArrowRight'], mac:['opt','shift','ArrowRight'], grp:'text' },
+  jump:   { n:'Aller au bout des données', win:['ctrl','ArrowDown'], mac:['cmd','ArrowDown'], grp:'sheet' },
+  selReg: { n:'Sélectionner jusqu\'au bout des données', win:['ctrl','shift','ArrowDown'], mac:['cmd','shift','ArrowDown'], grp:'sheet' },
+  edit:   { n:'Modifier la cellule', win:['F2'], mac:['ctrl','U'], grp:'sheet' },
+  sum:    { n:'Somme automatique', win:['alt','='], mac:['cmd','shift','T'], grp:'sheet' },
+  abs:    { n:'Fixer une référence ($)', win:['F4'], mac:['cmd','T'], grp:'sheet' },
+  fill:   { n:'Recopier vers le bas', win:['ctrl','D'], mac:['cmd','D'], grp:'sheet' },
+  lock:   { n:'Verrouiller l\'ordinateur', win:['win','L'], mac:['ctrl','cmd','Q'], grp:'sys' },
+  desk:   { n:'Afficher le bureau', win:['win','D'], mac:['F11'], grp:'sys' },
+  close:  { n:'Fermer le programme', win:['alt','F4'], mac:['cmd','Q'], grp:'sys' },
+  snap:   { n:'Capturer une partie de l\'écran', win:['win','shift','S'], mac:['cmd','shift','4'], grp:'sys' },
+  find:   { n:'Chercher sur l\'ordinateur', win:['win','S'], mac:['cmd',' '], grp:'sys' }
+};
+const combo = id => SC[id][PLAT];
+const KEYNAME = { ArrowRight:'arrowright', ArrowLeft:'arrowleft', ArrowUp:'arrowup', ArrowDown:'arrowdown', Home:'home', End:'end', Backspace:'backspace', ' ':' ' };
+function matches(e, c){
+  const need = { ctrl:0, cmd:0, shift:0, alt:0 }; let key = null;
+  c.forEach(k => { const m = k === 'opt' ? 'alt' : k; if (m in need) need[m] = 1; else key = k; });
+  const has = { ctrl:e.ctrlKey, cmd:e.metaKey, shift:e.shiftKey, alt:e.altKey };
+  for (const m in need) if (!!has[m] !== !!need[m]) return false;
+  return (e.key || '').toLowerCase() === String(KEYNAME[key] || key).toLowerCase();
+}
+const pressed = (e, id) => matches(e, combo(id));
+
+/* =====================  PARTIE 1 : SE DÉPLACER ET EFFACER DANS UN TEXTE  ===================== */
+const STEPS1 = [
+  { z:'why', t:"Pourquoi ne pas tout faire avec les flèches", x:"Avec seulement les flèches, il faut appuyer vingt fois pour traverser une phrase. En ajoutant une touche (Ctrl, ou Option sur Mac), le curseur saute d'un mot entier. Pour aller aux extrémités, il y a des touches prévues pour ça.", tip:"Une touche en plus change l'échelle du déplacement : lettre, mot, ligne, document.", a:"Maintenir la flèche enfoncée en attendant d'arriver." },
+  { z:'wordR', t:"D'un mot à l'autre", x:"Ctrl + flèche droite (Option + flèche droite sur Mac) fait avancer le curseur d'un mot. Avec la flèche gauche, il recule d'un mot. C'est le moyen le plus rapide de revenir corriger une faute au milieu d'une phrase.", tip:"Pour corriger : va au bon mot d'un saut, puis corrige.", a:"Cliquer à la souris au milieu d'un mot et rater la bonne lettre." },
+  { z:'line', t:"Début et fin de ligne", x:"La touche Fin envoie le curseur à la fin de la ligne, la touche Début au début. Les ordinateurs portables Mac n'ont pas ces touches : on utilise Cmd + flèche gauche ou droite à la place.", tip:"Un seul appui, quelle que soit la longueur de la ligne.", a:"Appuyer sur la flèche gauche trente fois pour revenir au début." },
+  { z:'doc', t:"Début et fin du document", x:"Ctrl + Début te renvoie tout en haut du document, Ctrl + Fin tout en bas. Sur Mac, c'est Cmd + flèche haut ou bas. C'est pratique dans un texte de plusieurs pages.", tip:"Haut du document : vérifier le titre. Bas du document : continuer à écrire.", a:"Faire défiler la page avec la souris sur dix pages." },
+  { z:'del', t:"Effacer un mot entier", x:"Ctrl + Retour arrière efface le mot qui est à gauche du curseur, en un seul geste. Sur Mac, c'est Option + la touche d'effacement. Quand tu as écrit un mot de travers, c'est plus rapide que de le gommer lettre par lettre.", tip:"Retour arrière efface une lettre. Avec Ctrl (ou Option), il efface un mot.", a:"Appuyer dix fois sur Retour arrière pour supprimer un long mot." },
+  { z:'sel', t:"Sélectionner mot par mot", x:"Tu connais déjà Maj + flèche pour agrandir une sélection. Ajoute Ctrl (Option sur Mac) : la sélection s'agrandit d'un mot entier. Tu peux ensuite copier, couper ou remplacer ce mot.", tip:"Dans l'ordre : te placer, sélectionner, agir.", a:"Faire glisser la souris pour sélectionner un seul mot." }
+];
+const EX1 = { title:"Exercice : se déplacer dans un texte", text:"Premier point : les mots\nDeuxième point : les lignes\nTroisième point : le document", steps:[
+  { id:'wordR', say:"Clique tout au début du texte, puis avance d'un mot.", post:ta => ta.selectionStart >= 1 && ta.selectionStart <= 9 && ta.selectionStart === ta.selectionEnd, postMsg:"Clique d'abord devant « Premier », puis refais le raccourci." },
+  { id:'lineEnd', say:"Va à la fin de cette première ligne.", post:ta => ta.selectionStart === ta.value.indexOf('\n') && ta.selectionEnd === ta.selectionStart, postMsg:"Le curseur doit être à la fin de la première ligne." },
+  { id:'lineStart', say:"Reviens au début de la ligne.", post:ta => ta.selectionStart === 0 && ta.selectionEnd === 0 },
+  { id:'docEnd', say:"Saute à la fin du document.", post:ta => ta.selectionStart === ta.value.length && ta.selectionEnd === ta.value.length, postMsg:"Le curseur doit être tout à la fin du texte." },
+  { id:'delWord', say:"Efface le dernier mot d'un seul geste.", post:(ta, before) => ta.value.length < before.length - 2 && ta.value.length > before.length - 14, postMsg:"Un mot entier doit disparaître, pas une seule lettre." },
+  { id:'docStart', say:"Remonte tout en haut du document.", post:ta => ta.selectionStart === 0 && ta.selectionEnd === 0 },
+  { id:'selWord', say:"Sélectionne le premier mot.", post:ta => ta.selectionStart === 0 && ta.selectionEnd >= 7 && ta.selectionEnd <= 9, postMsg:"Le curseur doit être au tout début avant de sélectionner." }
+], end:"Tu te déplaces et tu corriges sans toucher à la souris." };
+
+/* =====================  PARTIE 2 : TABLEUR, SE DÉPLACER ET SÉLECTIONNER  ===================== */
+const STEPS2 = [
+  { z:'why', t:"Un tableur, c'est une grande grille", x:"Dans un tableur (Excel, Google Sheets, LibreOffice Calc), les colonnes ont des lettres et les lignes des numéros. Chaque case s'appelle une cellule : B3 est la cellule de la colonne B, ligne 3. Les raccourcis servent surtout à bouger vite dans des listes longues.", tip:"Une cellule = une lettre (colonne) + un nombre (ligne).", a:"Descendre ligne par ligne dans un tableau de cent lignes." },
+  { z:'jump', t:"Aller au bout des données", x:"Ctrl + flèche (Cmd + flèche sur Mac, dans Excel) te fait sauter jusqu'au bord de la zone de données : si tu es au début d'une liste, Ctrl + flèche bas t'emmène à la dernière ligne remplie. Une deuxième fois et tu continues jusqu'à la prochaine zone remplie.", tip:"Utilise-le pour trouver la fin d'une liste ou revenir au début.", a:"Utiliser la molette de la souris pour chercher la dernière ligne." },
+  { z:'sel', t:"Sélectionner toute une colonne de données", x:"Ajoute Maj : Ctrl + Maj + flèche bas sélectionne de ta cellule jusqu'à la fin des données. En un geste, tu sélectionnes toute la liste pour la copier, la trier ou la mettre en forme.", tip:"Sélection de toute une colonne de données : Ctrl + Maj + flèche bas depuis la première cellule.", a:"Glisser la souris sur toute la colonne et dépasser la fin sans s'en apercevoir." },
+  { z:'edit', t:"Modifier ce qu'il y a dans une cellule", x:"Si tu tapes directement dans une cellule, tu remplaces tout son contenu. Pour juste corriger un morceau (une faute, un chiffre), appuie sur F2 : la cellule passe en modification, avec le curseur à la fin. Entrée valide, Échap annule.", tip:"F2 pour corriger, taper directement pour remplacer.", a:"Retaper toute une formule parce qu'on a une faute dedans." }
+];
+const SHEET1 = { cols:['A','B'], rows:8, start:'A1', cells:{ A1:'Article', B1:'Prix', A2:'Cahier', B2:'2', A3:'Stylo', B3:'1', A4:'Règle', B4:'1', A5:'Classeur', B5:'4', A6:'Gomme', B6:'1', A7:'Feutres', B7:'3' } };
+const EX2 = { title:"Exercice : se déplacer dans un tableur", steps:[
+  { id:'jump', say:"Tu es en A1. Descends tout en bas de la liste d'un seul geste.", ok:S => S.r === 7 && S.c === 0 },
+  { id:'jump', say:"Remonte en haut de la liste d'un seul geste (même raccourci, flèche haut).", key:'ArrowUp', ok:S => S.r === 1 && S.c === 0 },
+  { id:'jump', say:"Va au bout de la ligne d'en-tête (flèche droite).", key:'ArrowRight', ok:S => S.r === 1 && S.c === 1 },
+  { id:'selReg', say:"Sélectionne toute la colonne Prix, en-tête compris.", ok:S => S.sel && S.sel.r1 === 1 && S.sel.r2 === 7 && S.sel.c1 === 1 && S.sel.c2 === 1 },
+  { id:'edit', say:"Place-toi sur une cellule de prix et passe-la en modification.", ok:S => !!S.edit && S.c === 1 },
+  { type:'esc', say:"Annule la modification avec la touche Échap.", ok:S => !S.edit }
+], end:"Tu te déplaces et tu sélectionnes dans un tableau sans la souris." };
+
+/* =====================  PARTIE 3 : TABLEUR, CALCULER  ===================== */
+const STEPS3 = [
+  { z:'sum', t:"La somme en un geste", x:"Quand tu es sous une colonne de nombres, la Somme automatique écrit la formule d'addition à ta place. Sous Windows c'est Alt + =. Sur Mac, c'est Cmd + Maj + T. Dans Excel en français, la formule s'écrit =SOMME(...).", tip:"Place-toi dans la cellule vide sous les nombres, puis fais le raccourci.", a:"Additionner à la calculatrice puis taper le résultat à la main : il ne se met pas à jour." },
+  { z:'abs', t:"Fixer une référence avec F4", x:"Dans une formule, B2 est une référence qui « bouge » quand on recopie la formule vers le bas : elle devient B3, B4... Pour empêcher une référence de bouger (un prix fixe, un coefficient), on la fixe avec des dollars : $E$1. En mode modification, F4 passe de E1 à $E$1 (sur Mac, Cmd + T).", tip:"Les dollars verrouillent la colonne et la ligne. Appuyer plusieurs fois fait défiler les variantes.", a:"Recopier une formule avec une référence qui doit rester fixe, puis avoir des résultats faux." },
+  { z:'fill', t:"Recopier vers le bas", x:"Sélectionne la cellule qui contient la formule et celles en dessous, puis Ctrl + D (Cmd + D sur Mac) recopie la formule vers le bas, en adaptant les références qui ne sont pas fixées. Tu as ainsi un calcul pour toutes les lignes en un geste.", tip:"Vérifie ensuite une ligne en bas : la formule doit viser la bonne ligne.", a:"Réécrire la même formule dans chaque cellule." }
+];
+const SHEET2 = { cols:['A','B','C','D','E'], rows:8, start:'B8', cells:{ A1:'Article', B1:'Prix', C1:'Quantité', D1:'Coef.', E1:'0,9', A2:'Cahier', B2:'2', C2:'=B2*E1', A3:'Stylo', B3:'1', A4:'Règle', B4:'1', A5:'Classeur', B5:'4', A6:'Gomme', B6:'1', A7:'Feutres', B7:'3', D1:'Coef.' } };
+const EX3 = { title:"Exercice : calculer dans un tableur", steps:[
+  { id:'sum', say:"Tu es sous la colonne Prix. Calcule le total des prix.", ok:S => /^=SOMME\(B2:B7\)$/.test(S.cells.B8 || '') },
+  { id:'edit', say:"Va dans C2 (clique dessus) et passe-la en modification : la formule multiplie le prix par le coefficient E1.", ok:S => !!S.edit && S.r === 2 && S.c === 2 },
+  { id:'abs', say:"Le coefficient E1 ne doit pas bouger quand on recopie. Fixe-le.", ok:S => !!S.edit && /\$E\$1/.test(S.edit.text) },
+  { type:'enter', say:"Valide avec Entrée.", ok:S => !S.edit && S.cells.C2 === '=B2*$E$1' },
+  { type:'selC', say:"Sélectionne C2 jusqu'à C7 (clique sur C2 puis Maj + flèche bas cinq fois).", ok:S => S.sel && S.sel.c1 === 2 && S.sel.c2 === 2 && S.sel.r1 === 2 && S.sel.r2 === 7 },
+  { id:'fill', say:"Recopie la formule vers le bas.", ok:S => S.cells.C7 === '=B7*$E$1' }
+], end:"Une formule, un geste de recopie : tout le tableau est calculé." };
+
+/* =====================  PARTIE 4 : L'ORDINATEUR  ===================== */
+const STEPS4 = [
+  { z:'lock', t:"Verrouiller avant de partir", x:"Tu quittes ta place un instant ? Verrouille l'ordinateur : personne ne peut lire ni écrire à ta place, et tes comptes restent protégés. Windows : touche Windows + L. Mac : Ctrl + Cmd + Q.", tip:"Réflexe à prendre dans une salle informatique.", a:"Laisser un compte ouvert et partir." },
+  { z:'desk', t:"Revenir au bureau", x:"Windows + D cache toutes les fenêtres pour montrer le bureau, et un deuxième appui les ramène. Sur Mac, la touche F11 fait à peu près la même chose (sur certains claviers, avec la touche fn).", tip:"Utile pour retrouver un fichier posé sur le bureau.", a:"Réduire les fenêtres une à une." },
+  { z:'close', t:"Fermer un programme", x:"Sous Windows, Alt + F4 ferme la fenêtre active (et le programme s'il n'y a plus de fenêtre). Sur Mac, Cmd + Q quitte le programme. Pense à enregistrer avant : un message te le rappellera si besoin.", tip:"Enregistrer, puis fermer.", a:"Éteindre l'ordinateur sans fermer ses documents." },
+  { z:'snap', t:"Capturer une partie de l'écran", x:"Windows + Maj + S te laisse dessiner un rectangle sur l'écran : la capture est copiée, prête à coller. Sur Mac, Cmd + Maj + 4 fait la même chose et enregistre l'image sur le bureau. Utile pour garder une erreur ou une consigne.", tip:"Capture seulement ce dont tu as besoin : pas ton mot de passe ni un message privé.", a:"Prendre une photo de l'écran avec son téléphone." },
+  { z:'find', t:"Chercher sur l'ordinateur", x:"Sous Windows, Windows + S ouvre la recherche : tape le nom d'un programme ou d'un fichier. Sur Mac, Cmd + Espace ouvre Spotlight, qui fait pareil. On gagne du temps par rapport aux menus.", tip:"Tape juste quelques lettres du nom.", a:"Fouiller dans tous les dossiers un par un." }
+];
+const EX4 = { title:"Exercice : l'ordinateur", choice:true, steps:[
+  { id:'lock', scene:"Tu dois aller chercher ton sac, en pleine séance dans la salle informatique.", say:"Quel raccourci verrouille ton ordinateur ?" },
+  { id:'desk', scene:"Dix fenêtres sont ouvertes et tu veux voir ton bureau.", say:"Quel raccourci le montre ?" },
+  { id:'snap', scene:"Tu veux garder en image l'exercice affiché à l'écran.", say:"Quel raccourci capture une partie de l'écran ?" },
+  { id:'close', scene:"Tu as fini avec ce programme.", say:"Quel raccourci le ferme ?" },
+  { id:'find', scene:"Tu cherches ton programme de dessin sans ouvrir les menus.", say:"Quel raccourci ouvre la recherche ?" }
+], end:"Tu pilotes ton ordinateur au clavier, en sécurité." };
+const SHEETKEYS = { selC:null };
+
+/* =====================  QUIZ  ===================== */
+const QCM = {
+  texte: [
+    { q:"Quel raccourci te fait avancer d'un mot entier ?", o:["Ctrl + flèche droite (Option + flèche droite sur Mac)","Maj + flèche droite","Ctrl + C"], a:0, why:"Ctrl (ou Option) change l'échelle : un mot au lieu d'une lettre." },
+    { q:"Quel raccourci efface le mot précédent ?", o:["Ctrl + Retour arrière (Option + Retour arrière sur Mac)","Ctrl + Z","Maj + Entrée"], a:0, why:"Retour arrière efface une lettre, avec Ctrl il efface un mot." },
+    { q:"Comment aller tout en haut d'un long document ?", o:["Ctrl + Début (Cmd + flèche haut sur Mac)","Fn + F5","Ctrl + S"], a:0, why:"Début du document : Ctrl + Début. Fin du document : Ctrl + Fin." },
+    { q:"Que fait Ctrl + Maj + flèche droite ?", o:["Sélectionne le mot suivant","Colle le texte","Ferme le document"], a:0, why:"Maj agrandit la sélection, Ctrl change l'échelle." }
+  ],
+  tableur: [
+    { q:"Dans un tableur, tu es au début d'une longue liste. Comment atteindre la dernière ligne remplie ?", o:["Ctrl + flèche bas","Entrée dix fois","Ctrl + Z"], a:0, why:"Ctrl + flèche saute au bout de la zone de données." },
+    { q:"Que fait F2 sur une cellule ?", o:["Elle passe en modification, avec le curseur à la fin","Elle efface la ligne","Elle ferme le tableur"], a:0, why:"On corrige un morceau au lieu de tout retaper." },
+    { q:"Comment sélectionner d'un coup toute une colonne de données ?", o:["Ctrl + Maj + flèche bas depuis la première cellule","Ctrl + A deux fois puis supprimer","Cliquer sur chaque cellule"], a:0, why:"Maj agrandit la sélection jusqu'au bout des données." },
+    { q:"Dans Excel, que veut dire « B2 » ?", o:["La cellule de la colonne B, ligne 2","Le deuxième tableau","Un raccourci clavier"], a:0, why:"Colonne (lettre) puis ligne (nombre)." }
+  ],
+  formules: [
+    { q:"Quel raccourci calcule la somme des nombres au-dessus ?", o:["Alt + = (Cmd + Maj + T sur Mac)","Ctrl + S","F5"], a:0, why:"La Somme automatique écrit =SOMME(...) à ta place." },
+    { q:"À quoi sert F4 dans une formule en cours de modification ?", o:["Fixer une référence avec des dollars : $E$1","Fermer la formule","Imprimer"], a:0, why:"Une référence fixée ne bouge plus quand on recopie." },
+    { q:"Quel raccourci recopie une formule vers le bas ?", o:["Ctrl + D (Cmd + D sur Mac)","Ctrl + V","Alt + Tab"], a:0, why:"Sélectionne la cellule et celles du dessous, puis Ctrl + D." },
+    { q:"Après avoir recopié, que vérifies-tu ?", o:["Qu'une ligne du bas vise la bonne ligne","Que le tableau est en couleur","Rien du tout"], a:0, why:"Une référence non fixée s'adapte à chaque ligne : il faut vérifier." }
+  ],
+  ordi: [
+    { q:"Tu quittes ta place : que fais-tu ?", o:["Je verrouille l'ordinateur (Windows + L)","Je laisse la session ouverte","Je ferme la fenêtre"], a:0, why:"Personne ne peut utiliser ta session en ton absence." },
+    { q:"Quel raccourci capture une partie de l'écran sous Windows ?", o:["Windows + Maj + S","Ctrl + S","Alt + F4"], a:0, why:"Tu dessines un rectangle, la capture est copiée. Mac : Cmd + Maj + 4." },
+    { q:"Alt + F4 sous Windows…", o:["Ferme la fenêtre active","Imprime","Verrouille l'ordinateur"], a:0, why:"Sur Mac, Cmd + Q quitte le programme." },
+    { q:"Pourquoi éviter de capturer ton mot de passe ?", o:["La capture peut être partagée ou copiée sans que tu y penses","Parce que c'est interdit par la loi","Parce que l'écran sera abîmé"], a:0, why:"Une image circule facilement : ne montre pas de données privées." }
+  ]
+};
+const BANK_EXTRA = [
+  { part:1, q:"Quelle touche mène à la fin de la ligne sous Windows ?", o:["Fin","Début","Échap"], a:0, why:"Début et Fin : début et fin de ligne. Mac : Cmd + flèches." },
+  { part:1, q:"Pourquoi utiliser Ctrl + flèche pour corriger une faute au milieu ?", o:["On atteint le mot d'un saut","On supprime le texte","On enregistre"], a:0, why:"Plus rapide que cliquer au bon endroit ou appuyer vingt fois." },
+  { part:1, q:"Quel est l'effet de Ctrl + Fin ?", o:["Le curseur va à la fin du document","Le programme se ferme","Le texte est supprimé"], a:0, why:"C'est le raccourci pour la fin du document." },
+  { part:2, q:"Comment lit-on la cellule de la 3e ligne de la colonne C ?", o:["C3","3C","Ligne 3 colonne"], a:0, why:"Lettre de la colonne, puis numéro de ligne." },
+  { part:2, q:"Si tu tapes directement dans une cellule déjà remplie…", o:["Son contenu est remplacé","Le texte s'ajoute à la fin","Rien ne se passe"], a:0, why:"Pour corriger sans remplacer, appuie d'abord sur F2." },
+  { part:2, q:"Quelle touche valide la modification d'une cellule ?", o:["Entrée","Échap","F5"], a:0, why:"Échap annule." },
+  { part:3, q:"Pourquoi fixer une référence dans une formule ?", o:["Pour qu'elle ne bouge pas quand on recopie","Pour la rendre plus jolie","Pour la masquer"], a:0, why:"Le coefficient doit rester le même sur toutes les lignes." },
+  { part:3, q:"La Somme automatique s'écrit en français :", o:["=SOMME(...)","=SUM(...)","=PLUS(...)"], a:0, why:"Excel en français utilise SOMME." },
+  { part:3, q:"Que fait Ctrl + D sur une sélection ?", o:["Recopie la cellule du haut vers le bas","Dessine un tableau","Duplique la page"], a:0, why:"La formule est recopiée dans les cellules du dessous." },
+  { part:4, q:"Windows + D permet de…", o:["Voir le bureau","Imprimer","Verrouiller"], a:0, why:"Un deuxième appui remet les fenêtres." },
+  { part:4, q:"Que fait Cmd + Q sur Mac ?", o:["Quitte le programme","Imprime","Cherche un fichier"], a:0, why:"Cmd + W ferme seulement la fenêtre." },
+  { part:4, q:"Quelle est la bonne habitude avant de t'éloigner ?", o:["Verrouiller la session","Éteindre l'écran seulement","Fermer la porte de la salle"], a:0, why:"Windows + L ou Ctrl + Cmd + Q." }
+];
+const BANK = () => [ ...QCM.texte.map(q => ({ ...q, part:1 })), ...QCM.tableur.map(q => ({ ...q, part:2 })), ...QCM.formules.map(q => ({ ...q, part:3 })), ...QCM.ordi.map(q => ({ ...q, part:4 })), ...BANK_EXTRA ];
+const FQ_COUNT = 10;
+
+const PARTS = [
+  { k:'texte', n:1, title:"Se déplacer vite dans un texte", hl:'vite', img:'keypace-perso-raccourcis', desc:"D'un mot à l'autre, début et fin de ligne ou de document, effacer un mot, sélectionner mot par mot. Pour corriger sans toucher à la souris.", prev:['6 étapes','Exercice','Quiz'] },
+  { k:'tableur', n:2, title:"Tableur : se déplacer et sélectionner", hl:'sélectionner', img:'keypace-mascot-bureau-complet', desc:"Aller au bout d'une liste, sélectionner toute une colonne de données, corriger le contenu d'une cellule. Avec un mini tableur pour t'entraîner.", prev:['4 étapes','Mini tableur','Quiz'] },
+  { k:'formules', n:3, title:"Tableur : calculer", hl:'calculer', img:'keypace-mascot-desk', desc:"La somme en un geste, fixer une référence avec F4, recopier une formule vers le bas. Les trois gestes qui évitent de tout retaper.", prev:['3 étapes','Mini tableur','Quiz'] },
+  { k:'ordi', n:4, title:"Piloter son ordinateur", hl:'ordinateur', img:'keypace-mascot-books', desc:"Verrouiller, afficher le bureau, fermer un programme, capturer l'écran, chercher : les raccourcis de l'ordinateur, pour Windows et pour Mac.", prev:['5 étapes','Mises en situation','Quiz'] }
+];
+
+const hlTitle = p => p.title.replace(p.hl, `<em>${p.hl}</em>`);
+const $ = s => document.querySelector(s);
+const shuffle = a => a.map(x => [Math.random(), x]).sort((x,y) => x[0]-y[0]).map(x => x[1]);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]);
+const store = { get(){ try{ return JSON.parse(localStorage.getItem('kp-raccourcisav-done')||'{}'); }catch(e){ return {}; } }, set(o){ try{ localStorage.setItem('kp-raccourcisav-done', JSON.stringify(o)); }catch(e){} } };
+let done = store.get(), io = null, tmr = null, offKeys = null;
+const BEST_KEY = 'kp-raccourcisav-quiz-best';
+const getBest = () => { try{ return +localStorage.getItem(BEST_KEY) || 0; }catch(e){ return 0; } };
+const setBest = n => { try{ localStorage.setItem(BEST_KEY, String(n)); }catch(e){} };
+const allDone = () => PARTS.every(p => done[p.k]);
+function reportDone(){ try{ const s = JSON.parse(localStorage.getItem('klak_session')); if (s && s.token) fetch('/api/classes', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ action:'module-done', token:s.token, moduleKey:'raccourcisav' }) }).catch(() => {}); }catch(e){} }
+function completePart(k){
+  setTimeout(() => { if (allDone()) reportDone(); }, 0);
+  done[k] = true; store.set(done);
+  const f = $('#finish'), p = PARTS.find(x => x.k === k);
+  if (f && '#raccourcisav/'+p.n === location.hash){ f.textContent = 'Terminée ✓'; f.className = 'btn ok'; const r = $('#restart'); if (r) r.hidden = false; refreshNext(); }
+}
+function refreshNext(){ const nx = $('#next4'); if (!nx) return; if (allDone()){ nx.textContent = 'Quiz final →'; nx.onclick = () => { location.hash = 'raccourcisav/quiz'; }; } }
+function show(id){ document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === id)); window.scrollTo(0,0); }
+
+function route(){
+  if (io){ io.disconnect(); io = null; }
+  if (offKeys){ offKeys(); offKeys = null; }
+  clearInterval(tmr);
+  const h = location.hash.replace('#','');
+  if (h === 'raccourcisav') return renderHub();
+  if (h === 'raccourcisav/quiz') return allDone() ? renderFinalQuiz() : renderHub();
+  const m = h.match(/^raccourcisav\/(\d)$/);
+  if (m && PARTS[m[1]-1]) return renderLesson(PARTS[m[1]-1]);
+  renderHub();
+}
+window.addEventListener('hashchange', route);
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if (g){ if (g.dataset.go === 'cours'){ location.href = '/?view=lessons'; return; } location.hash = g.dataset.go === 'hub' ? 'raccourcisav' : g.dataset.go; return; }
+  const pl = e.target.closest('[data-plat]');
+  if (pl){ setPlat(pl.dataset.plat); route(); return; }
+  if (e.target.id === 'restart'){ const p = PARTS.find(x => '#raccourcisav/'+x.n === location.hash); if (p) renderLesson(p); return; }
+  if (e.target.id === 'reset-all'){ if (confirm("Effacer ta progression dans ce module ? Tu pourras tout refaire depuis le début.")){ done = {}; store.set(done); try{ localStorage.removeItem(BEST_KEY); }catch(err){} renderHub(); } return; }
+  if (e.target.id === 'finish'){ const p = PARTS.find(x => '#raccourcisav/'+x.n === location.hash); if (p){ completePart(p.k); location.hash = 'raccourcisav'; } }
+});
+
+/* Sélecteur Windows / Mac, affiché sur le hub et en haut de chaque leçon. */
+const platToggle = () => `<div class="plat" role="group" aria-label="Ton ordinateur"><span>Ton ordinateur :</span>
+  <button class="${PLAT==='win'?'on':''}" data-plat="win" aria-pressed="${PLAT==='win'}">Windows <small>Ctrl</small></button>
+  <button class="${PLAT==='mac'?'on':''}" data-plat="mac" aria-pressed="${PLAT==='mac'}">Mac <small>⌘ Cmd</small></button></div>`;
+
+/* ---------------- Hub ---------------- */
+/* ---------------- Hub ---------------- */
+const MINI = {
+  texte:`<div class="mK"><span class="kbd"><kbd>Ctrl</kbd><i>+</i><kbd>→</kbd></span><span class="kbd"><kbd>Ctrl</kbd><i>+</i><kbd>Fin</kbd></span></div>`,
+  tableur:`<div class="mK"><span class="kbd"><kbd>Ctrl</kbd><i>+</i><kbd>↓</kbd></span><span class="kbd"><kbd>F2</kbd></span></div>`,
+  formules:`<div class="mK"><span class="kbd"><kbd>Alt</kbd><i>+</i><kbd>=</kbd></span><span class="kbd"><kbd>F4</kbd></span></div>`,
+  ordi:`<div class="mK"><span class="kbd"><kbd>Win</kbd><i>+</i><kbd>L</kbd></span><span class="kbd"><kbd>Win</kbd><i>+</i><kbd>D</kbd></span></div>`
+};
+
+function partCard(p){
+  const d = done[p.k];
+  return `<button class="part ${d?'done':''}" onclick="location.hash='raccourcisav/${p.n}'">
+    <div class="mini">${MINI[p.k]}</div>
+    ${d ? '<span class="badge-done">Terminée ✓</span>' : ''}
+    <h3>${p.title}</h3><p>${p.desc}</p>
+    <div class="prev">${p.prev.map(x => `<span>${x}</span>`).join('')}</div>
+    <div class="foot"><span class="dur">Partie ${p.n}</span><span class="cta">${d?'Revoir':'Ouvrir'} →</span></div>
+  </button>`;
+}
+function quizBanner(n){
+  const all = n === PARTS.length, best = getBest();
+  if (!all) return `<section class="qbanner locked"><img src="/images/keypace-pose-6.webp" alt="">
+    <div class="qb-txt"><span class="qb-tag">Quiz final · 🔒 Verrouillé</span><h2>Le quiz des raccourcis avancés</h2><p>Termine les ${PARTS.length} parties pour le débloquer. Il reprend tout le module, question après question, au hasard.</p></div>
+    <div class="qb-act"><div class="qb-prog"><i style="width:${n/PARTS.length*100}%"></i></div><span style="font-size:12.5px;color:var(--muted)">${n}/${PARTS.length} parties terminées</span></div></section>`;
+  return `<section class="qbanner"><img src="/images/keypace-pose-6.webp" alt="">
+    <div class="qb-txt"><span class="qb-tag">Module terminé, bravo !</span><h2>Teste-toi avec le quiz <em>des raccourcis avancés</em></h2><p>${FQ_COUNT} questions tirées au hasard dans toutes les parties, une à la fois. Tu peux rejouer autant de fois que tu veux.</p>
+      <div class="qb-meta"><span>${FQ_COUNT} questions</span><span>Au hasard</span>${best ? `<span>Meilleur score : ${best}/${FQ_COUNT}</span>` : ''}</div></div>
+    <div class="qb-act"><button class="btn primary" onclick="location.hash='raccourcisav/quiz'" style="font-size:16px;padding:14px 26px">Jouer →</button></div></section>`;
+}
+function renderHub(){
+  if (allDone()) reportDone();
+  const n = PARTS.filter(p => done[p.k]).length, all = n === PARTS.length;
+  $('#hub-prog').textContent = n + '/' + PARTS.length + ' parties';
+  $('#hub-bar').style.width = (n/PARTS.length*100) + '%';
+  $('#hub-meta').innerHTML = `<div class="ring" style="--p:${n/PARTS.length*100}"><i>${n}/${PARTS.length}</i></div><span>parties terminées</span>${n ? '<button class="linkbtn" id="reset-all">Réinitialiser ma progression</button>' : ''}`;
+  const nextK = all ? null : (PARTS.find(p => !done[p.k]) || {}).k, mascots = ['cheer','idea','books','desk','cheer'];
+  $('#parts-host').innerHTML = `${platToggle()}<div class="road">${PARTS.map((p,i) => `
+    <div class="stop ${done[p.k]?'done':''} ${p.k===nextK?'next':''}">
+      ${partCard(p)}
+      <div class="node">${done[p.k] ? '✓' : p.n}</div>
+      <div class="side">${p.k===nextK ? `<img src="/images/keypace-mascot-${mascots[i]}.webp" alt=""><span class="bubble">${n ? 'Tu en es là !' : 'Commence ici !'}</span>` : ''}</div>
+    </div>`).join('')}</div>${quizBanner(n)}`;
+  show('v-hub');
+}
+
+/* ---------------- Quiz final et QCM ---------------- */
+const shuffleQ = list => list.map(q => { const idx = shuffle(q.o.map((_,i) => i)); return { ...q, o:idx.map(i => q.o[i]), a:idx.indexOf(q.a) }; });
+function drawFinalDeck(){
+  const bank = shuffle(BANK()), deck = [];
+  [1,2,3,4].forEach(pt => bank.filter(q => q.part === pt).slice(0,2).forEach(q => deck.push(q)));
+  bank.filter(q => !deck.includes(q)).slice(0, FQ_COUNT - deck.length).forEach(q => deck.push(q));
+  return shuffleQ(shuffle(deck));
+}
+function renderFinalQuiz(){
+  $('#crumb-part').textContent = 'Quiz final'; $('#lesson-pos').textContent = 'Quiz final';
+  $('#lesson-hero').innerHTML = `<div class="hero small"><div class="wrap"><div class="txt"><span class="tag">Quiz final</span><h1>Le quiz <em>des raccourcis avancés</em></h1><p>${FQ_COUNT} questions tirées au hasard dans toutes les parties. Une à la fois, dans un ordre différent à chaque partie.</p></div><img src="/images/keypace-mascot-cheer.webp" alt=""></div></div>`;
+  $('#lesson-root').innerHTML = `<div id="fq"></div><div class="lesson-foot"><button class="btn" onclick="location.hash='raccourcisav'">← Retour au module</button><span></span></div>`;
+  show('v-lesson'); initFinalQuiz($('#fq'));
+}
+function initFinalQuiz(el){
+  let deck = drawFinalDeck(), i = 0, picked = null, res = [];
+  const draw = () => {
+    if (i >= deck.length){
+      const sc = res.filter(Boolean).length, N = deck.length, best = getBest(), isBest = sc > best;
+      if (isBest) setBest(sc);
+      const msg = sc === N ? 'Sans faute ! Tes doigts connaissent les raccourcis.' : sc >= N*0.8 ? 'Excellent, presque parfait.' : sc >= N*0.5 ? 'Bien joué, encore quelques points à revoir.' : 'Pas facile ! Reprends les parties puis retente.';
+      const missed = deck.map((q,k) => ({ q, ok:res[k] })).filter(x => !x.ok);
+      el.innerHTML = `<section class="qz" style="margin-top:34px"><div class="qz-top"><h2>Résultat du quiz</h2></div>
+        <div class="res"><div class="score">${sc}/${N}</div><div><p style="font-size:17px;font-weight:600">${msg}</p><p style="color:var(--muted);font-size:14px">${isBest && sc > 0 ? 'Nouveau meilleur score !' : `Meilleur score : ${Math.max(best, sc)}/${N}`}</p></div></div>
+        ${missed.length ? `<div class="miss-list"><b style="font-family:'Bricolage Grotesque',sans-serif;font-size:17px">À revoir</b>${missed.map(x => `<div><span class="fq-part">Partie ${x.q.part}</span> ${x.q.q}<small>Bonne réponse : ${x.q.o[x.q.a]}. ${x.q.why}</small></div>`).join('')}</div>` : ''}
+        <div class="btnrow" style="margin-top:22px"><button class="btn primary" id="fq-again">Rejouer avec de nouvelles questions</button><button class="btn" onclick="location.hash='raccourcisav'">Retour au module</button></div></section>`;
+      $('#fq-again').onclick = () => { deck = drawFinalDeck(); i = 0; picked = null; res = []; draw(); window.scrollTo(0,0); };
+      return;
+    }
+    const c = deck[i];
+    el.innerHTML = `<section class="qz" style="margin-top:34px">
+      <div class="qz-top"><span class="fq-part">Partie ${c.part} · ${PARTS[c.part-1].title}</span><div class="dots">${deck.map((_,j) => `<i class="${j<i?(res[j]?'ok':'ko'):j===i?'cur':''}"></i>`).join('')}</div></div>
+      <div class="q">${c.q}</div>
+      <div class="opts">${c.o.map((o,j) => { let cl = 'opt'; if (picked !== null){ if (j === c.a) cl += ' right'; else if (j === picked) cl += ' wrong'; }
+        return `<button class="${cl}" data-j="${j}" ${picked!==null?'disabled':''}><span class="k">${'ABCD'[j]}</span>${o}</button>`; }).join('')}</div>
+      ${picked !== null ? `<div class="fb ${picked===c.a?'ok':'ko'}"><b>${picked===c.a?'Exact.':'Pas tout à fait.'}</b> ${c.why}</div>
+        <div class="btnrow" style="margin-top:16px"><button class="btn primary" id="fq-next">${i<deck.length-1?'Question suivante →':'Voir mon résultat'}</button></div>` : ''}
+      <p style="margin-top:18px;font-size:13px;color:var(--muted)">Question ${i+1} sur ${deck.length}</p></section>`;
+    el.querySelectorAll('.opt').forEach(b => b.onclick = () => { picked = +b.dataset.j; res[i] = picked === c.a; draw(); });
+    const nx = $('#fq-next'); if (nx) nx.onclick = () => { i++; picked = null; draw(); };
+  };
+  draw();
+}
+function initQCM(el, p){
+  let Q = shuffleQ(QCM[p.k]), i = 0, picked = null, res = [];
+  const draw = () => {
+    if (i >= Q.length){
+      const s = res.filter(Boolean).length;
+      const msg = s === Q.length ? 'Sans faute, bravo !' : s >= Q.length-1 ? 'Presque parfait.' : s >= 2 ? 'Bon début, relis les points manqués.' : 'Reprends la partie, puis retente.';
+      el.innerHTML = `<section class="qz"><div class="qz-top"><h2>Quiz terminé</h2></div>
+        <div class="res"><div class="score">${s}/${Q.length}</div><div><p style="font-size:17px;font-weight:600">${msg}</p><p style="color:var(--muted);font-size:14px">Partie validée : tu peux passer à la suite quand tu veux.</p></div></div>
+        <div class="btnrow" style="margin-top:20px"><button class="btn" id="qz-again">Refaire le quiz</button>${PARTS[p.n] ? `<button class="btn primary" onclick="location.hash='raccourcisav/${p.n+1}'">${PARTS[p.n].title} →</button>`:''}</div></section>`;
+      $('#qz-again').onclick = () => { Q = shuffleQ(QCM[p.k]); i = 0; picked = null; res = []; draw(); };
+      completePart(p.k); return;
+    }
+    const c = Q[i];
+    el.innerHTML = `<section class="qz"><div class="qz-top"><h2>Petit quiz <em>de fin de partie</em></h2><div class="dots">${Q.map((_,j) => `<i class="${j<i?(res[j]?'ok':'ko'):j===i?'cur':''}"></i>`).join('')}</div></div>
+      <div class="q">${c.q}</div>
+      <div class="opts">${c.o.map((o,j) => { let cl = 'opt'; if (picked !== null){ if (j === c.a) cl += ' right'; else if (j === picked) cl += ' wrong'; }
+        return `<button class="${cl}" data-j="${j}" ${picked!==null?'disabled':''}><span class="k">${'ABCD'[j]}</span>${o}</button>`; }).join('')}</div>
+      ${picked !== null ? `<div class="fb ${picked===c.a?'ok':'ko'}"><b>${picked===c.a?'Exact.':'Pas tout à fait.'}</b> ${c.why}</div>
+        <div class="btnrow" style="margin-top:16px"><button class="btn primary" id="qz-next">${i<Q.length-1?'Question suivante →':'Voir mon résultat'}</button></div>` : ''}</section>`;
+    el.querySelectorAll('.opt').forEach(b => b.onclick = () => { picked = +b.dataset.j; res[i] = picked === c.a; draw(); });
+    const nx = $('#qz-next'); if (nx) nx.onclick = () => { i++; picked = null; draw(); };
+  };
+  draw();
+}
+
+/* ---------------- Leçon ---------------- */
+
+/* ---------------- Leçon ---------------- */
+function renderLesson(p){
+  $('#crumb-part').textContent = p.title;
+  $('#lesson-pos').textContent = 'Partie ' + p.n + ' sur ' + PARTS.length;
+  $('#lesson-hero').innerHTML = `<div class="hero small"><div class="wrap"><div class="txt"><span class="tag">Partie ${p.n} sur ${PARTS.length}</span><h1>${hlTitle(p)}</h1><p>${p.desc}</p></div><img src="/images/${p.img}.webp" alt=""></div></div>`;
+  $('#lesson-root').innerHTML = platToggle() + '<div id="lesson-body"></div><div id="lesson-quiz"></div>' + footer(p);
+  show('v-lesson');
+  ({ texte:initTexte, tableur:initTableur, formules:initFormules, ordi:initOrdi })[p.k]($('#lesson-body'));
+  if (QCM[p.k]) initQCM($('#lesson-quiz'), p);
+}
+function footer(p){
+  const prev = PARTS[p.n-2], next = PARTS[p.n];
+  const nextBtn = next ? `<button class="btn dark" onclick="location.hash='raccourcisav/${next.n}'">${next.title} →</button>`
+    : (allDone() ? `<button class="btn dark" id="next4" onclick="location.hash='raccourcisav/quiz'">Quiz final →</button>` : `<button class="btn dark" id="next4" onclick="location.hash='raccourcisav'">Retour au module</button>`);
+  return `<div class="lesson-foot">
+    ${prev ? `<button class="btn" onclick="location.hash='raccourcisav/${prev.n}'">← ${prev.title}</button>` : `<button class="btn" onclick="location.hash='raccourcisav'">← Retour au module</button>`}
+    <span class="foot-grp"><button class="btn" id="restart" ${done[p.k]?'':'hidden'}>↺ Recommencer cette partie</button>
+    <button class="btn ${done[p.k]?'ok':'primary'}" id="finish">${done[p.k] ? 'Terminée ✓' : 'Terminer cette partie'}</button></span>${nextBtn}</div>`;
+}
+
+/* ---------------- Aide commune : défilement avec zones ---------------- */
+function anatHTML(S, card, cap){
+  return `<div class="anat">
+    <div>${S.map((s,i) => `<article class="step" data-i="${i}">
+      <div class="t"><span class="n">${String(i+1).padStart(2,'0')}</span><h3>${s.t}</h3></div>
+      <p class="x">${s.x}</p>
+      <div style="display:grid;gap:10px"><div class="tip"><b>Astuce :</b> ${s.tip}</div><div class="avoid"><b>À éviter :</b> ${s.a}</div></div>
+    </article>`).join('')}</div>
+    <div class="stk"><div class="cap"><span>${cap}</span><b id="active-label"></b></div>${card}</div>
+  </div>`;
+}
+function bindAnat(el, S){
+  const steps = [...el.querySelectorAll('.step')], zones = [...el.querySelectorAll('[data-z]')];
+  const set = i => { const on = [].concat(S[i].z); steps.forEach((s,j) => s.classList.toggle('on', j === i)); zones.forEach(zn => zn.classList.toggle('on', on.includes(zn.dataset.z)));
+    $('#active-label').textContent = String(i+1).padStart(2,'0') + ' · ' + S[i].t; };
+  set(0);
+  io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) set(+en.target.dataset.i); }), { rootMargin:'-45% 0px -45% 0px' });
+  steps.forEach(s => io.observe(s));
+}
+const zr = (z, inner) => `<div class="zone" data-z="${z}">${inner}</div>`;
+const scRow = (z, id, note) => zr(z, `<div class="scr">${kbd(combo(id))}<span><b>${SC[id].n}</b>${note ? `<em>${note}</em>` : ''}</span></div>`);
+
+const selOf = ta => ta.value.slice(ta.selectionStart, ta.selectionEnd);
+function initFlow(el, cfg){
+  let i = 0, locked = false; const st = { orig:cfg.text || '', typed:'', word:'', fmt:{} };
+  const N = cfg.steps.length;
+  el.innerHTML = `<div class="aw flow"><h2 class="aw-h2">${cfg.title}</h2>
+    <div class="flow-prog" id="fl-prog"></div>
+    <div class="flow-say" id="fl-say" aria-live="polite"></div>
+    ${cfg.choice ? '<div class="flow-scene" id="fl-scene"></div><div class="opts" id="fl-opts"></div>' : `<textarea class="sbx" id="sbx" rows="3" spellcheck="false" autocomplete="off">${esc(cfg.text)}</textarea>${cfg.fmt ? '<p class="fx" id="fx"></p>' : ''}`}
+    <p class="sbx-msg" id="sbx-msg" aria-live="polite"></p>
+    <div class="btnrow" id="fl-end"></div></div>`;
+  const ta = $('#sbx'), msg = $('#sbx-msg');
+  const setMsg = t => { msg.textContent = t || ''; };
+  const paintFx = () => { const fx = $('#fx'); if (!fx) return; if (!st.word){ fx.textContent = ''; return; }
+    fx.innerHTML = `Dans un traitement de texte, « <span style="${st.fmt.bold?'font-weight:800;':''}${st.fmt.ital?'font-style:italic;':''}${st.fmt.under?'text-decoration:underline;':''}">${esc(st.word)}</span> » ressemblerait à ça.`; };
+  const paint = () => {
+    $('#fl-prog').innerHTML = cfg.steps.map((_, j) => `<i class="${j < i ? 'ok' : j === i ? 'cur' : ''}"></i>`).join('') + `<span>${i >= N ? 'Terminé' : 'Étape ' + (i+1) + ' sur ' + N}</span>`;
+    if (i >= N){
+      $('#fl-say').innerHTML = `<div class="fb ok"><b>Exercice réussi !</b> ${cfg.end}</div>`;
+      if (ta) ta.disabled = true;
+      const o = $('#fl-opts'); if (o) o.innerHTML = '';
+      const sc = $('#fl-scene'); if (sc) sc.textContent = '';
+      $('#fl-end').innerHTML = '<button class="btn" id="fl-again">Recommencer l\'exercice</button>';
+      $('#fl-again').onclick = () => { i = 0; locked = false; st.fmt = {}; st.word = ''; if (ta){ ta.disabled = false; ta.value = cfg.text; ta.focus(); } setMsg(''); paintFx(); paint(); };
+      return;
+    }
+    const s = cfg.steps[i];
+    $('#fl-say').innerHTML = `<b>${s.say}</b> ${s.id && !cfg.choice ? kbd(combo(s.id)) : ''}`;
+    if (s.type === 'type') $('#fl-say').innerHTML = `<b>${s.say}</b>`;
+    $('#fl-end').innerHTML = '';
+    if (cfg.choice){
+      $('#fl-scene').textContent = s.scene;
+      $('#fl-opts').innerHTML = trainChoices(s.id).map(c => `<button class="opt" data-c="${c}">${kbd(combo(c))}<span class="trn-n">${SC[c].n}</span></button>`).join('');
+      el.querySelectorAll('#fl-opts [data-c]').forEach(b => b.onclick = () => {
+        if (combo(b.dataset.c).join('+') === combo(s.id).join('+')){ setMsg('Bien joué.'); next(); } else setMsg('Pas celui-là : relis la situation et réessaie.'); });
+    }
+  };
+  const next = () => { i++; locked = false; paint(); if (ta && i < N) ta.focus(); };
+  if (ta){
+    ta.addEventListener('keydown', e => {
+      if (i >= N || locked) return;
+      const s = cfg.steps[i];
+      if (s.type === 'type') return;
+      if (e.key === 'Control' || e.key === 'Meta' || e.key === 'Shift' || e.key === 'Alt') return;
+      if (!(e.ctrlKey || e.metaKey || e.altKey) && !['Home','End','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Backspace','Delete'].includes(e.key)) return;
+      if (!pressed(e, s.id)){
+        if (/^[a-z]$/i.test(e.key || '') && (e.ctrlKey || e.metaKey)) setMsg((PLAT === 'win' ? e.metaKey : e.ctrlKey) ? (PLAT === 'win' ? 'Tu es sur Windows : utilise la touche Ctrl.' : 'Tu es sur Mac : utilise la touche Cmd (⌘).') : 'Ce n\'est pas le raccourci demandé : relis la consigne.');
+        if (cfg.fake) e.preventDefault();
+        return;
+      }
+      if (cfg.fake) e.preventDefault();
+      if (s.pre && !s.pre(ta)){ setMsg(s.preMsg); e.preventDefault(); return; }
+      const before = ta.value; locked = true;
+      if (cfg.fmt && ['bold','ital','under'].includes(s.id)){ if (!st.word) st.word = selOf(ta); st.fmt[s.id === 'ital' ? 'ital' : s.id === 'under' ? 'under' : 'bold'] = true; paintFx(); }
+      setTimeout(() => {
+        if (!s.post || s.post(ta, before, st)){ setMsg('Bien joué : ' + SC[s.id].n + '.'); next(); }
+        else { locked = false; setMsg(s.postMsg || 'Pas tout à fait : réessaie.'); }
+      }, 60);
+    });
+    ta.addEventListener('input', () => {
+      if (i >= N) return;
+      const s = cfg.steps[i];
+      if (s.type === 'type' && ta.value !== st.orig){ st.typed = ta.value; setMsg('Le texte a été remplacé par ce que tu as tapé.'); next(); }
+    });
+  }
+  paint();
+}
+function initCopier(el){
+  const card = `<div class="keycard">
+    ${zr('why','<div class="scr-cmp"><div><b>À la souris</b><span>menu, clic droit, choix, clic</span></div><div><b>Au clavier</b><span>une combinaison, et c\'est fait</span></div></div>')}
+    ${zr('mod',`<div class="scr-mod"><div><b>Windows</b><kbd>Ctrl</kbd></div><div><b>Mac</b><kbd>⌘ Cmd</kbd></div></div>`)}
+    ${scRow('copy','copy','l\'original reste en place')}
+    ${scRow('paste','paste','au curseur, autant de fois que voulu')}
+    ${scRow('cut','cut','le texte part, il reste en mémoire')}
+    ${zr('one','<div class="scr-note">Copier une 2<sup>e</sup> fois remplace la 1<sup>re</sup> copie.</div>')}
+    ${zr('mem','<div class="scr-note">Rangée du bas : <b>X</b> couper, <b>C</b> copier, <b>V</b> coller.</div>')}
+  </div>`;
+  el.innerHTML = anatHTML(STEPS1, card, "Les trois gestes de base") + '<div id="sbx-host"></div>';
+  bindAnat(el, STEPS1);
+  initFlow($('#sbx-host'), EX1);
+}
+function initSelectionner(el){
+  const card = `<div class="keycard">
+    ${zr('dbl','<div class="scr-note"><b>Double-clic</b> : un mot<br><b>Triple-clic</b> : le paragraphe</div>')}
+    ${scRow('all','all','tout le texte')}
+    ${scRow('shift','word','Maj + flèches pour ajuster')}
+    ${zr('warn','<div class="scr-note scr-warn">Texte sélectionné + une lettre = le texte est remplacé.</div>')}
+    ${scRow('undo','undo','plusieurs fois pour remonter')}
+    ${scRow('redo','redo','remet ce qu\'on a annulé')}
+  </div>`;
+  el.innerHTML = anatHTML(STEPS2, card, "Sélectionner, annuler") + '<div id="sbx-host"></div>';
+  bindAnat(el, STEPS2);
+  initFlow($('#sbx-host'), EX2);
+}
+function initFormeP(el){
+  const card = `<div class="keycard">
+    ${zr('eng','<div class="scr-note"><b>S</b>ave · <b>F</b>ind · <b>P</b>rint<br><b>B</b>old · <b>I</b>talic · <b>U</b>nderline</div>')}
+    ${scRow('bold','bold','Word en français : G. Ailleurs : B')}
+    ${scRow('bold','ital','')}
+    ${scRow('bold','under','')}
+    ${scRow('save','save','enregistre ton travail')}
+    ${scRow('find','find','Entrée : résultat suivant')}
+    ${scRow('print','print','aperçu, PDF, copies')}
+  </div>`;
+  el.innerHTML = anatHTML(STEPS3, card, "Mettre en forme, enregistrer, chercher") + '<div id="sbx-host"></div>';
+  bindAnat(el, STEPS3);
+  initFlow($('#sbx-host'), EX3);
+}
+function initNavigateur(el){
+  const card = `<div class="keycard">
+    ${scRow('ntab','ntab','')}
+    ${scRow('ctab','ctab','')}
+    ${scRow('rtab','rtab','la maladresse effacée')}
+    ${scRow('stab','stab','')}
+    ${scRow('swin','swin','maintiens la 1re touche')}
+    ${scRow('refr','refr','Windows : F5 aussi')}
+    ${scRow('addr','addr','puis tape l\'adresse')}
+  </div>`;
+  el.innerHTML = anatHTML(STEPS4, card, "Onglets, fenêtres, barre d'adresse") + `<div class="aw"><p class="aw-intro">Ces raccourcis appartiennent au navigateur : la page ne peut pas les voir quand tu les tapes. Tu t'entraînes donc ici en choisissant le bon raccourci pour chaque situation.</p></div><div id="sbx-host"></div>`;
+  bindAnat(el, STEPS4);
+  initFlow($('#sbx-host'), EX4);
+}
+
+
+/* ---------------- Parties ---------------- */
+function trainChoices(id){
+  const same = a => a.join('+');
+  const pool = shuffle(Object.keys(SC).filter(x => x !== id && SC[x].grp === SC[id].grp && same(combo(x)) !== same(combo(id)))).slice(0, 2);
+  return shuffle([id, ...pool]);
+}
+function initTexte(el){
+  const card = `<div class="keycard">
+    ${zr('why','<div class="scr-cmp"><div><b>Flèche seule</b><span>une lettre</span></div><div><b>Avec Ctrl</b><span>un mot</span></div></div>')}
+    ${scRow('wordR','wordR','Ctrl + ← pour reculer')}
+    ${zr('line',`<div class="scr">${kbd(combo('lineStart'))}<span><b>Début de ligne</b></span></div><div class="scr" style="margin-top:6px">${kbd(combo('lineEnd'))}<span><b>Fin de ligne</b></span></div>`)}
+    ${zr('doc',`<div class="scr">${kbd(combo('docStart'))}<span><b>Début du document</b></span></div><div class="scr" style="margin-top:6px">${kbd(combo('docEnd'))}<span><b>Fin du document</b></span></div>`)}
+    ${scRow('del','delWord','un mot entier d\'un coup')}
+    ${scRow('sel','selWord','puis copie, coupe ou remplace')}
+  </div>`;
+  el.innerHTML = anatHTML(STEPS1, card, "Se déplacer et effacer vite") + '<div id="sbx-host"></div>';
+  bindAnat(el, STEPS1);
+  initFlow($('#sbx-host'), EX1);
+}
+function initOrdi(el){
+  const card = `<div class="keycard">
+    ${scRow('lock','lock','avant de quitter ta place')}
+    ${scRow('desk','desk','un 2e appui remet les fenêtres')}
+    ${scRow('close','close','pense à enregistrer')}
+    ${scRow('snap','snap','sans données privées')}
+    ${scRow('find','find','programmes et fichiers')}
+  </div>`;
+  el.innerHTML = anatHTML(STEPS4, card, "Piloter son ordinateur") + `<div class="aw"><p class="aw-intro">Ces raccourcis appartiennent à l'ordinateur : la page ne peut pas les voir quand tu les tapes. Tu t'entraînes donc en choisissant le bon raccourci. Essaie-les ensuite pour de vrai, dans ta salle informatique.</p></div><div id="sbx-host"></div>`;
+  bindAnat(el, STEPS4);
+  initFlow($('#sbx-host'), EX4);
+}
+function initTableur(el){
+  const card = `<div class="keycard">
+    ${zr('why','<div class="scr-note">Colonne = lettre, ligne = numéro.<br><b>B3</b> : colonne B, ligne 3.</div>')}
+    ${scRow('jump','jump','Ctrl + flèche, dans les 4 sens')}
+    ${scRow('sel','selReg','depuis la 1re cellule')}
+    ${scRow('edit','edit','Entrée valide, Échap annule')}
+  </div>`;
+  el.innerHTML = anatHTML(STEPS2, card, "Se déplacer dans un tableau") + '<div id="sbx-host"></div>';
+  bindAnat(el, STEPS2);
+  initSheet($('#sbx-host'), SHEET1, EX2);
+}
+function initFormules(el){
+  const card = `<div class="keycard">
+    ${scRow('sum','sum','=SOMME(B2:B7)')}
+    ${scRow('abs','abs','E1 devient $E$1')}
+    ${scRow('fill','fill','les références libres s\'adaptent')}
+  </div>`;
+  el.innerHTML = anatHTML(STEPS3, card, "Calculer sans tout retaper") + '<div id="sbx-host"></div>';
+  bindAnat(el, STEPS3);
+  initSheet($('#sbx-host'), SHEET2, EX3);
+}
+
+/* ---------------- Mini tableur ---------------- */
+const colLetter = c => String.fromCharCode(65 + c), addrOf = (r, c) => colLetter(c) + r;
+function parseAddr(a){ const m = /^\$?([A-Z])\$?(\d+)$/.exec(a); return m ? { c:m[1].charCodeAt(0) - 65, r:+m[2] } : null; }
+function initSheet(el, cfg, ex){
+  const NC = cfg.cols.length, NR = cfg.rows;
+  const S = { cells:{ ...cfg.cells }, r:parseAddr(cfg.start).r, c:parseAddr(cfg.start).c, anchor:null, sel:null, edit:null };
+  let i = 0, locked = false;
+  const filled = (r, c) => r >= 1 && r <= NR && c >= 0 && c < NC && String(S.cells[addrOf(r, c)] || '') !== '';
+  const num = v => { const t = String(v == null ? '' : v).replace(',', '.'); return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : 0; };
+  const rawOf = (r, c) => S.cells[addrOf(r, c)] || '';
+  function valueOf(r, c, depth = 0){
+    const raw = String(rawOf(r, c));
+    if (raw[0] !== '=' || depth > 6) return raw;
+    let f = raw.slice(1).replace(/SOMME\(\$?([A-Z])\$?(\d+):\$?([A-Z])\$?(\d+)\)/g, (_, c1, r1, c2, r2) => { let t = 0; for (let rr = +r1; rr <= +r2; rr++) for (let cc = c1.charCodeAt(0) - 65; cc <= c2.charCodeAt(0) - 65; cc++) t += num(valueOf(rr, cc, depth + 1)); return t; });
+    f = f.replace(/\$?([A-Z])\$?(\d+)/g, (_, cl, rw) => num(valueOf(+rw, cl.charCodeAt(0) - 65, depth + 1)));
+    if (!/^[0-9+\-*/().\s]+$/.test(f)) return '#NOM?';
+    try{ const v = Function('"use strict";return (' + f + ')')(); return Number.isFinite(v) ? String(Math.round(v * 100) / 100).replace('.', ',') : '#DIV/0!'; }catch(e){ return '#ERREUR'; }
+  }
+  const cycleRef = text => text.replace(/(\$?)([A-Z])(\$?)(\d+)(?!.*\$?[A-Z]\$?\d)/, (_, d1, cl, d2, rw) => (!d1 && !d2) ? `$${cl}$${rw}` : (d1 && d2) ? `${cl}$${rw}` : (!d1 && d2) ? `$${cl}${rw}` : `${cl}${rw}`);
+  const shiftRows = (f, d) => f.replace(/(\$?)([A-Z])(\$?)(\d+)/g, (m, d1, cl, d2, rw) => d2 ? m : `${d1}${cl}${+rw + d}`);
+  const msgEl = () => $('#sh-msg');
+  const say = t => { const m = msgEl(); if (m) m.textContent = t || ''; };
+  function render(){
+    const rng = S.sel || { r1:S.r, r2:S.r, c1:S.c, c2:S.c };
+    const rows = [];
+    for (let r = 1; r <= NR; r++){
+      const tds = [`<th>${r}</th>`];
+      for (let c = 0; c < NC; c++){
+        const inSel = r >= rng.r1 && r <= rng.r2 && c >= rng.c1 && c <= rng.c2, act = r === S.r && c === S.c;
+        const raw = rawOf(r, c), isNum = /^[0-9,.\-]+$/.test(valueOf(r, c));
+        tds.push(`<td data-a="${r},${c}" class="${inSel ? 'sel' : ''} ${act ? 'act' : ''} ${isNum ? 'nm' : ''}">${esc(valueOf(r, c))}</td>`);
+      }
+      rows.push(`<tr>${tds.join('')}</tr>`);
+    }
+    const fb = S.edit ? `<input id="sh-edit" class="sh-edit" value="${esc(S.edit.text)}" spellcheck="false" autocomplete="off">` : `<span class="sh-raw">${esc(rawOf(S.r, S.c))}</span>`;
+    $('#sh-grid').innerHTML = `<div class="sh-bar"><b>${addrOf(S.r, S.c)}</b><span class="sh-fx">fx</span>${fb}</div>
+      <table class="sh-t" aria-label="Mini tableur" tabindex="0" id="sh-tab"><thead><tr><th></th>${cfg.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+    bindCells();
+    if (S.edit){ const inp = $('#sh-edit'); inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); bindEdit(inp); }
+    else { const t = $('#sh-tab'); if (document.activeElement && document.activeElement.id !== 'sh-tab' && !locked) {} }
+  }
+  function head(){
+    const N = ex.steps.length, s = ex.steps[i];
+    $('#fl-prog').innerHTML = ex.steps.map((_, j) => `<i class="${j < i ? 'ok' : j === i ? 'cur' : ''}"></i>`).join('') + `<span>${i >= N ? 'Terminé' : 'Étape ' + (i+1) + ' sur ' + N}</span>`;
+    if (i >= N){ $('#fl-say').innerHTML = `<div class="fb ok"><b>Exercice réussi !</b> ${ex.end}</div>`; $('#fl-end').innerHTML = '<button class="btn" id="fl-again">Recommencer l\'exercice</button>'; $('#fl-again').onclick = () => { reset(); }; return; }
+    $('#fl-end').innerHTML = '';
+    $('#fl-say').innerHTML = `<b>${s.say}</b> ${s.id ? kbd(shown(s)) : s.type === 'esc' ? kbd(['Échap']) : s.type === 'enter' ? kbd(['Entrée']) : ''}`;
+  }
+  const shown = s => { const c = combo(s.id).slice(); if (s.key){ c[c.length - 1] = s.key; } return c; };
+  function check(){
+    const s = ex.steps[i]; if (!s || !s.ok(S)) return;
+    i++; say('Bien joué.'); head();
+  }
+  function reset(){ Object.assign(S, { cells:{ ...cfg.cells }, r:parseAddr(cfg.start).r, c:parseAddr(cfg.start).c, anchor:null, sel:null, edit:null }); i = 0; say(''); head(); render(); }
+  function bindCells(){ el.querySelectorAll('td[data-a]').forEach(td => td.onclick = e => { const [r, c] = td.dataset.a.split(',').map(Number); if (S.edit) return; if (e.shiftKey && S.anchor) setSel(r, c); else { S.r = r; S.c = c; S.anchor = { r, c }; S.sel = null; } render(); $('#sh-tab').focus(); check(); }); }
+  function setSel(r, c){ const a = S.anchor || { r:S.r, c:S.c }; S.anchor = a; S.r = r; S.c = c; S.sel = { r1:Math.min(a.r, r), r2:Math.max(a.r, r), c1:Math.min(a.c, c), c2:Math.max(a.c, c) }; }
+  const DIR = { ArrowUp:[-1, 0], ArrowDown:[1, 0], ArrowLeft:[0, -1], ArrowRight:[0, 1] };
+  function jumpFrom(r, c, [dr, dc]){
+    const inb = (rr, cc) => rr >= 1 && rr <= NR && cc >= 0 && cc < NC;
+    let rr = r + dr, cc = c + dc;
+    if (!inb(rr, cc)) return { r, c };
+    if (filled(r, c) && filled(rr, cc)){ while (inb(rr + dr, cc + dc) && filled(rr + dr, cc + dc)){ rr += dr; cc += dc; } return { r:rr, c:cc }; }
+    while (inb(rr, cc) && !filled(rr, cc)){ if (!inb(rr + dr, cc + dc)) return { r:rr, c:cc }; rr += dr; cc += dc; }
+    return { r:rr, c:cc };
+  }
+  function onKey(e){
+    if (S.edit) return;
+    const stepCur = ex.steps[i];
+    const mod = PLAT === 'mac' ? e.metaKey : e.ctrlKey;
+    if (DIR[e.key]){
+      e.preventDefault();
+      const d = DIR[e.key];
+      let t; if (mod) t = jumpFrom(S.r, S.c, d); else t = { r:Math.min(NR, Math.max(1, S.r + d[0])), c:Math.min(NC - 1, Math.max(0, S.c + d[1])) };
+      if (e.shiftKey) setSel(t.r, t.c); else { S.r = t.r; S.c = t.c; S.anchor = { r:t.r, c:t.c }; S.sel = null; }
+      render(); $('#sh-tab').focus(); check(); return;
+    }
+    if (pressed(e, 'edit')){ e.preventDefault(); S.edit = { text:rawOf(S.r, S.c) }; render(); check(); return; }
+    if (pressed(e, 'sum')){ e.preventDefault();
+      let top = S.r - 1; while (top >= 1 && /^[0-9,.\-]+$/.test(valueOf(top, S.c))) top--; top++;
+      if (top < S.r){ S.cells[addrOf(S.r, S.c)] = `=SOMME(${addrOf(top, S.c)}:${addrOf(S.r - 1, S.c)})`; render(); check(); } else say('Place-toi sous une colonne de nombres.'); return; }
+    if (pressed(e, 'fill')){ e.preventDefault();
+      if (S.sel && S.sel.r2 > S.sel.r1){ const raw = rawOf(S.sel.r1, S.sel.c1); for (let r = S.sel.r1 + 1; r <= S.sel.r2; r++) for (let c = S.sel.c1; c <= S.sel.c2; c++) S.cells[addrOf(r, c)] = raw[0] === '=' ? shiftRows(rawOf(S.sel.r1, c), r - S.sel.r1) : rawOf(S.sel.r1, c); render(); check(); }
+      else say('Sélectionne d\'abord la cellule qui contient la formule et celles du dessous.'); return; }
+    if (e.ctrlKey || e.metaKey || e.altKey){ if (stepCur && stepCur.id && /^[a-z0-9=]$/i.test(e.key || '') && !pressed(e, stepCur.id) && (e.ctrlKey || e.metaKey)) say('Ce n\'est pas le raccourci demandé : relis la consigne.'); }
+  }
+  function bindEdit(inp){
+    inp.onkeydown = e => {
+      if (e.key === 'Escape'){ e.preventDefault(); S.edit = null; render(); $('#sh-tab').focus(); check(); return; }
+      if (e.key === 'Enter'){ e.preventDefault(); S.cells[addrOf(S.r, S.c)] = inp.value; S.edit = null; render(); $('#sh-tab').focus(); check(); return; }
+      if (pressed(e, 'abs')){ e.preventDefault(); inp.value = cycleRef(inp.value); S.edit.text = inp.value; check(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+    };
+    inp.oninput = () => { S.edit.text = inp.value; };
+  }
+  el.innerHTML = `<div class="aw flow"><h2 class="aw-h2">${ex.title}</h2><div class="flow-prog" id="fl-prog"></div><div class="flow-say" id="fl-say" aria-live="polite"></div>
+    <div id="sh-grid" class="sh"></div><p class="sbx-msg" id="sh-msg" aria-live="polite"></p><div class="btnrow" id="fl-end"></div></div>`;
+  el.addEventListener('keydown', e => { if (e.target.id === 'sh-tab') onKey(e); });
+  render(); head(); const t = $('#sh-tab'); if (t) t.focus({ preventScroll:true });
+  check();
+}
+
+route();
