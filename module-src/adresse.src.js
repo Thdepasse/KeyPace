@@ -333,7 +333,7 @@ function initAdresse(el){
 }
 /* ---------------- Repères visuels : pastilles des services ---------------- */
 /* Pastilles simplifiées aux couleurs des services, pas les logos officiels. Pour utiliser un vrai logo : déposer images/mail/<clé>.svg (ou .png) et ajouter la clé dans LOGO_FILE, ex. { gmail:'svg' }. */
-const LOGO_FILE = { gmail:'svg', outlook:'svg', proton:'svg', icloud:'png', yahoo:'jpeg', zimbra:'png', proximus:'png', smartschool:'png' };
+const LOGO_FILE = { gmail:'svg', outlook:'svg', proton:'svg', icloud:'png', yahoo:'jpeg', zimbra:'png', proximus:'png', smartschool:'png', infomaniak:'png' };
 const ENV = c => `<rect x="6.5" y="9.5" width="19" height="13" rx="2.2" fill="none" stroke="${c}" stroke-width="2.4"/><path d="M7.5 11.5l8.5 6.5 8.5-6.5" fill="none" stroke="${c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
 const SVC = {
   gmail:{ name:'Gmail', kind:'messagerie grand public (Google)', bg:'#fff', mark:ENV('#EA4335'), line:true },
@@ -344,16 +344,17 @@ const SVC = {
   proximus:{ name:'Proximus', kind:"adresse Proximus (@skynet.be, @proximus.be ou @belgacom.net)", bg:'#5B2D8E', txt:'P' },
   zimbra:{ name:'Zimbra', kind:"messagerie d'école ou d'entreprise", bg:'#3B4A6B', txt:'Z' },
   smartschool:{ name:'Smartschool', kind:"plateforme d'école, messagerie interne (pas une adresse mail avec @)", bg:'#F2561D', txt:'S' },
+  infomaniak:{ name:'Infomaniak', kind:'messagerie suisse (Infomaniak Mail)', bg:'#0098FF', txt:'k' },
   autre:{ name:'Autre domaine', kind:'service inconnu', bg:'#8A8275', mark:ENV('#fff') }
 };
-const SVC_DOM = { 'gmail.com':'gmail', 'googlemail.com':'gmail', 'outlook.com':'outlook', 'outlook.be':'outlook', 'outlook.fr':'outlook', 'hotmail.com':'outlook', 'hotmail.be':'outlook', 'hotmail.fr':'outlook', 'live.com':'outlook', 'live.be':'outlook', 'live.fr':'outlook', 'msn.com':'outlook', 'yahoo.com':'yahoo', 'yahoo.fr':'yahoo', 'icloud.com':'icloud', 'me.com':'icloud', 'proton.me':'proton', 'protonmail.com':'proton', 'skynet.be':'proximus', 'proximus.be':'proximus', 'belgacom.net':'proximus' };
+const SVC_DOM = { 'gmail.com':'gmail', 'googlemail.com':'gmail', 'outlook.com':'outlook', 'outlook.be':'outlook', 'outlook.fr':'outlook', 'hotmail.com':'outlook', 'hotmail.be':'outlook', 'hotmail.fr':'outlook', 'live.com':'outlook', 'live.be':'outlook', 'live.fr':'outlook', 'msn.com':'outlook', 'yahoo.com':'yahoo', 'yahoo.fr':'yahoo', 'icloud.com':'icloud', 'me.com':'icloud', 'proton.me':'proton', 'protonmail.com':'proton', 'skynet.be':'proximus', 'proximus.be':'proximus', 'belgacom.net':'proximus', 'ik.me':'infomaniak', 'ikmail.com':'infomaniak', 'etik.com':'infomaniak' };
 function svcBadge(k, size){
   const v = SVC[k] || SVC.autre, n = size || 32;
   if (LOGO_FILE[k]) return `<img class="svc" src="/images/mail/${k}.${LOGO_FILE[k]}" width="${n}" height="${n}" alt="${esc(v.name)}">`;
   return `<svg class="svc" width="${n}" height="${n}" viewBox="0 0 32 32" role="img" aria-label="${esc(v.name)}"><rect x=".75" y=".75" width="30.5" height="30.5" rx="8" fill="${v.bg}" ${v.line ? 'stroke="#DDD6C8" stroke-width="1.5"' : ''}/>${v.txt ? `<text x="16" y="22" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="17" fill="#fff">${v.txt}</text>` : v.mark}</svg>`;
 }
 /* Analyse d'une adresse : règles de forme, domaine douteux, adresse peu sérieuse. Heuristique, sans réseau : rien n'est envoyé. */
-const DOM_OK = ['gmail.com','googlemail.com','outlook.com','outlook.be','outlook.fr','hotmail.com','hotmail.be','hotmail.fr','live.com','live.be','live.fr','yahoo.com','yahoo.fr','icloud.com','me.com','proton.me','protonmail.com','skynet.be','telenet.be','proximus.be','scarlet.be','voo.be','belgacom.net','msn.com','gmx.com','gmx.fr','orange.fr','free.fr','laposte.net'];
+const DOM_OK = ['gmail.com','googlemail.com','outlook.com','outlook.be','outlook.fr','hotmail.com','hotmail.be','hotmail.fr','live.com','live.be','live.fr','yahoo.com','yahoo.fr','icloud.com','me.com','proton.me','protonmail.com','ik.me','ikmail.com','etik.com','skynet.be','telenet.be','proximus.be','scarlet.be','voo.be','belgacom.net','msn.com','gmx.com','gmx.fr','orange.fr','free.fr','laposte.net'];
 const BRAND_END = { gmail:['com'], googlemail:['com'], outlook:['com','be','fr'], hotmail:['com','be','fr'], live:['com','be','fr'], icloud:['com'], proton:['me'], protonmail:['com'] };
 const TLD_OK = ['be','com','fr','net','org','eu','nl','de','uk','ch','lu','info','edu','io','co','es','it','ca','us','brussels','vlaanderen'];
 const DOM_EXEMPLE = ['exemple.be','example.com','example.org','test.com','exemple.com','domaine.be','domaine.com','email.com','mail.com'];
@@ -540,6 +541,12 @@ function initRepondre(el){
 /* =====================  POUR ALLER PLUS LOIN : SUR TA MESSAGERIE (facultatif)  ===================== */
 /* Écrans simplifiés : ils ressemblent à la messagerie sans la copier. Sources : aides officielles Microsoft, Google et Zimbra, voir _research_adresse_mail.md. */
 const PLAT = {
+  infomaniak: { key:'infomaniak', name:'Infomaniak', sub:'Infomaniak Mail, sur le web', skin:'pf-ik', newBtn:'Nouveau message', cc:'single', read:'icons',
+    facts:[ "Dans l'aide d'Infomaniak, on ouvre un nouveau message puis on clique sur un bouton qui affiche les champs Cc et Cci (« CC & BCC » dans l'aide en anglais).",
+            "Comme partout : Cc est visible par tous les destinataires, Cci reste caché aux autres.",
+            "Infomaniak propose aussi des adresses gratuites en @ik.me, @ikmail.com ou @etik.com. Beaucoup de clients utilisent plutôt leur propre nom de domaine.",
+            "Les boutons de réponse sont surtout des icônes : survole-les pour lire leur nom avant de cliquer.",
+            "Les écrans changent selon la version de l'application et ton réglage." ] },
   smartschool: { key:'smartschool', name:'Smartschool', sub:"Smartschool, messagerie de l'école", skin:'pf-ss', newBtn:'Rédiger un nouveau message', cc:'fields', read:'icons',
     facts:[ "Smartschool a sa propre messagerie, interne à l'école : on écrit aux membres de l'école depuis l'onglet « Messages », sans adresse en @.",
             "Dans un mode d'emploi d'école, la fenêtre de rédaction propose les champs À, Cc et Cci, chacun avec une croix verte pour choisir les personnes ou les groupes dans une liste.",
@@ -562,11 +569,11 @@ const PLAT = {
             "Répondre, Répondre à tous et Transférer sont dans la barre d'outils quand un message est ouvert.",
             "Quand tu tapes dans À, Cc ou Cci, Zimbra propose des adresses prises dans tes contacts : vérifie que c'est la bonne avant de valider." ] }
 };
-const PLAT_ORDER = ['smartschool', 'outlook', 'gmail', 'zimbra'];
+const PLAT_ORDER = ['smartschool', 'outlook', 'gmail', 'zimbra', 'infomaniak'];
 function platCard(){
   return `<section class="optcard"><div class="opt-txt"><span class="qb-tag">Pour aller plus loin · Facultatif</span><h2>Sur ta <em>messagerie</em></h2>
-    <p>Cc, Cci et les boutons de réponse ne sont pas toujours au même endroit. Entraîne-toi sur un écran proche de Smartschool, d'Outlook, de Gmail ou de Zimbra. Tu peux le faire quand tu veux, avec ou sans le quiz.</p>
-    <div class="qb-meta"><span>Smartschool</span><span>Outlook</span><span>Gmail</span><span>Zimbra</span></div></div>
+    <p>Cc, Cci et les boutons de réponse ne sont pas toujours au même endroit. Entraîne-toi sur un écran proche de Smartschool, d'Outlook, de Gmail, de Zimbra ou d'Infomaniak. Tu peux le faire quand tu veux, avec ou sans le quiz.</p>
+    <div class="qb-meta"><span>Smartschool</span><span>Outlook</span><span>Gmail</span><span>Zimbra</span><span>Infomaniak</span></div></div>
     <div class="qb-act"><button class="btn primary" onclick="location.hash='adresse/messagerie'">Ouvrir →</button></div></section>`;
 }
 function renderPlat(){
@@ -586,7 +593,7 @@ function renderPlat(){
   const draw = () => {
     const P = PLAT[cur], st = PS[cur], k1 = st.bccShown, k2 = st.replied;
     const mA = MAIL_A;
-    const ccLinks = P.cc === 'links' ? `<span class="trg"><button data-trg="cc">Cc</button><button data-trg="bcc">Cci</button></span>` : '';
+    const ccLinks = P.cc === 'single' ? `<span class="trg"><button data-trg="both">Cc et Cci</button></span>` : P.cc === 'links' ? `<span class="trg"><button data-trg="cc">Cc</button><button data-trg="bcc">Cci</button></span>` : '';
     const opt = P.cc === 'options' ? `<div class="tb"><span>Envoyer</span><span>Joindre</span><button data-trg="opt">Options ▾</button>${st.optOpen ? `<div class="dd"><button data-trg="showbcc">Afficher Cci</button></div>` : ''}</div>` : `<div class="tb"><span class="send">Envoyer</span></div>`;
     const compose = `<div class="pf-win"><div class="pf-top"><b>${svcBadge(P.key, 22)}${P.name}</b><span>${P.newBtn}</span></div>
       ${opt}
@@ -619,7 +626,8 @@ function renderPlat(){
     host.querySelectorAll('[data-pf]').forEach(b => b.onclick = () => { cur = b.dataset.pf; draw(); });
     host.querySelectorAll('[data-trg]').forEach(b => b.onclick = () => {
       const t = b.dataset.trg;
-      if (t === 'cc'){ st.ccShown = true; st.msg1 = "Ça, c'est Cc : la copie visible par tous. Cherche Cci, la copie cachée."; }
+      if (t === 'both'){ st.ccShown = true; st.bccShown = true; }
+      else if (t === 'cc'){ st.ccShown = true; st.msg1 = "Ça, c'est Cc : la copie visible par tous. Cherche Cci, la copie cachée."; }
       else if (t === 'to'){ st.msg1 = "Ça, c'est À : le destinataire principal. Cherche Cci."; }
       else if (t === 'bcc' || t === 'showbcc'){ st.bccShown = true; st.optOpen = false; }
       else if (t === 'opt'){ st.optOpen = !st.optOpen; st.msg1 = st.optOpen ? "Un menu s'ouvre. Regarde ce qu'il propose." : ''; }
