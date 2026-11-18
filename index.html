@@ -1485,6 +1485,68 @@ a.nav-link{text-decoration:none;display:inline-block}
 .cls-chip{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:8px 13px;font:inherit;font-size:13.5px;font-weight:600;color:var(--txt);cursor:pointer;transition:border-color .15s,transform .15s}
 .cls-chip:hover{border-color:var(--accent);transform:translateY(-1px)}
 .cls-chip b{font-size:17px;font-weight:800}
+/* Page Classe : onglets Suivi / Devoirs / Réglages */
+.cls-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin:0 0 24px;overflow-x:auto;scrollbar-width:none}
+.cls-tabs::-webkit-scrollbar{display:none}
+.cls-tab{background:none;border:0;border-bottom:2.5px solid transparent;margin-bottom:-1px;padding:10px 16px;font:inherit;font-size:14.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;transition:color .15s,border-color .15s}
+.cls-tab:hover{color:var(--txt)}
+.cls-tab[aria-selected="true"]{color:var(--txt);border-bottom-color:var(--accent)}
+.cls-tab-n{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;background:var(--light);color:var(--muted);border-radius:99px;padding:1px 8px}
+.cls-tab-n.late{background:rgba(229,72,77,.12);color:var(--danger)}
+/* Onglet Réglages de la classe */
+.cset{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:0 22px;margin-bottom:24px}
+.cset-sec{display:grid;grid-template-columns:minmax(0,240px) minmax(0,1fr);gap:12px 32px;padding:22px 0;border-top:1px solid var(--border)}
+.cset-sec:first-child{border-top:0}
+.cset-h{display:flex;flex-direction:column;gap:5px;min-width:0}
+.cset-h h3{margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap}
+.cset-h p{margin:0;font-size:12.5px;line-height:1.55;color:var(--muted)}
+.cset-c{display:flex;flex-direction:column;gap:12px;min-width:0}
+.cset-saved{font-size:12px;font-weight:700;color:var(--success);opacity:0;transition:opacity .25s}
+.cset-saved.on{opacity:1}
+.cset-saved.err{color:var(--danger);font-weight:600}
+.cset-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cset-opt{background:var(--card);border:1.5px solid var(--border);border-radius:13px;padding:12px 14px;text-align:left;font:inherit;color:var(--txt);cursor:pointer;display:flex;flex-direction:column;gap:9px;min-width:0;transition:border-color .15s,background .15s}
+.cset-opt:hover{border-color:var(--accent)}
+.cset-opt[aria-checked="true"]{border-color:var(--accent);background:rgba(255,77,46,.07)}
+.cset-opt:disabled{cursor:wait;opacity:.7}
+.cset-opt-t{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:700}
+.cset-opt-t::before{content:"";width:15px;height:15px;border-radius:50%;border:2px solid var(--border);box-sizing:border-box;flex-shrink:0}
+.cset-opt[aria-checked="true"] .cset-opt-t::before{border:4.5px solid var(--accent)}
+.cset-opt-d{font-size:12.5px;color:var(--muted);line-height:1.45}
+.cset-kb{display:flex;flex-direction:column;gap:3px}
+.cset-kb>span{display:flex;gap:3px}
+.cset-kb>span:nth-child(2){padding-left:7px}
+.cset-kb>span:nth-child(3){padding-left:17px}
+.cset-kb i{font-style:normal;width:19px;height:19px;border-radius:5px;background:var(--light);border:1px solid var(--border);font:700 9.5px/17px 'JetBrains Mono',monospace;text-align:center;color:var(--muted);flex-shrink:0}
+.cset-kb i.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.cset-sample{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--light);border-radius:8px;padding:7px 10px;overflow-wrap:anywhere}
+.cset-sample u{text-decoration:none;background:rgba(229,114,43,.3);border-radius:2px}
+.cset-seg{display:inline-flex;flex-wrap:wrap;gap:3px;background:var(--light);border:1px solid var(--border);border-radius:12px;padding:3px}
+.cset-seg button{background:none;border:0;border-radius:9px;padding:7px 13px;font:inherit;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
+.cset-seg button[aria-checked="true"]{background:var(--card);color:var(--txt);box-shadow:0 1px 3px rgba(22,20,15,.14)}
+.cset-seg button:disabled{cursor:default}
+.cset-goals{display:flex;gap:14px 22px;flex-wrap:wrap;align-items:flex-end}
+.cset-step{display:flex;flex-direction:column;gap:6px}
+.cset-step label{font-size:12px;font-weight:700;color:var(--muted)}
+.cset-stepper{display:inline-flex;align-items:center;border:1.5px solid var(--border);border-radius:11px;background:var(--bg);overflow:hidden}
+.cset-stepper button{background:none;border:0;width:38px;height:40px;font:inherit;font-size:18px;font-weight:700;color:var(--muted);cursor:pointer}
+.cset-stepper button:hover{color:var(--accent)}
+.cset-stepper input{width:52px;border:0;background:none;text-align:center;font:700 16px 'JetBrains Mono',monospace;color:var(--txt);font-variant-numeric:tabular-nums;-moz-appearance:textfield;appearance:textfield}
+.cset-stepper input::-webkit-outer-spin-button,.cset-stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.cset-link{background:none;border:0;padding:0 0 11px;font:inherit;font-size:12.5px;font-weight:700;color:var(--accent);cursor:pointer}
+.cset-def{font-size:12.5px;color:var(--muted);padding-bottom:11px}
+.cset-dist{position:relative;height:40px;margin:2px 4px 0}
+.cset-dist .ax{position:absolute;left:0;right:0;top:19px;height:2px;border-radius:2px;background:var(--border)}
+.cset-dist .dt{position:absolute;top:13px;width:12px;height:12px;margin-left:-6px;border-radius:50%;border:2px solid var(--card)}
+.cset-dist .th{position:absolute;top:0;bottom:6px;width:2px;margin-left:-1px;background:var(--accent)}
+.cset-dist .th b{position:absolute;top:-2px;left:6px;font:700 10.5px 'JetBrains Mono',monospace;color:var(--accent);white-space:nowrap}
+.cset-dist .th.r b{left:auto;right:6px}
+.cset-note{font-size:12.5px;color:var(--muted);line-height:1.55;margin:0}
+.cset-note b{color:var(--txt)}
+.cset-foot{font-size:12.5px;color:var(--muted);line-height:1.55;padding:16px 0 18px;border-top:1px solid var(--border)}
+@media(max-width:760px){.cset{padding:0 16px}.cset-sec{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){.cls-tab{padding:10px 9px;font-size:14px;gap:6px}.cls-tab-n{padding:1px 6px}}
+@media(max-width:520px){.cset-opts{grid-template-columns:minmax(0,1fr)}}
 .hm-t{border-collapse:separate;border-spacing:4px;min-width:820px;width:100%}
 .hm-t th{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--muted);text-align:center;padding:0 0 6px;vertical-align:bottom;white-space:nowrap}
 .hm-t td.hc{height:28px;min-width:34px;border-radius:7px;transition:transform .12s}
@@ -7502,44 +7564,155 @@ const app={
     else g.maxErrors=Math.max(0,Math.min(30,g.maxErrors+delta));
     saveStats(this.stats);this.renderCurrent();
   },
-  // Prof : règle les objectifs de leçon de SA classe (reset=true : valeurs par défaut).
-  async saveClassGoals(classId,reset){
-    const msg=document.getElementById('cg-msg'),wEl=document.getElementById('cg-wpm'),eEl=document.getElementById('cg-err');
-    const sv=document.getElementById('cg-save'),rs=document.getElementById('cg-reset');
-    if(!msg||!wEl||!eEl)return;
-    const say=(t,ok)=>{msg.textContent=t;msg.style.color=ok?'var(--success)':'var(--danger)';};
-    const w=reset?null:Number(wEl.value),e=reset?null:Number(eEl.value);
-    if(!reset){
-      if(wEl.value.trim()===''||!Number.isInteger(w)||w<5||w>80)return say('La vitesse minimale doit être un nombre entier entre 5 et 80.',false);
-      if(eEl.value.trim()===''||!Number.isInteger(e)||e<0||e>30)return say("Le nombre d'erreurs maximum doit être un nombre entier entre 0 et 30.",false);
-    }
-    if(sv)sv.disabled=true;if(rs)rs.disabled=true;
-    try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-goals-set',token:currentToken,classId,minWpm:w,maxErrors:e})});
-      const d=await r.json().catch(()=>({}));
-      if(!r.ok){say(d.error||'Enregistrement impossible.',false);return;}
-      wEl.value=d.goals.minWpm;eEl.value=d.goals.maxErrors;
-      const df=document.getElementById('cg-default');if(df)df.style.display=d.goals.custom?'none':'';
-      if(this._classDetail&&this._classDetail.id===classId)this._classDetail.goals=d.goals;
-      say(reset?'Valeurs par défaut rétablies. Tes élèves les verront à leur prochaine connexion.':'Enregistré. Tes élèves verront ces objectifs à leur prochaine connexion.',true);
-    }catch{say('Erreur réseau, réessaie.',false);}
-    finally{if(sv)sv.disabled=false;if(rs)rs.disabled=false;}
+  /* Page Classe d'un prof : onglets Suivi / Devoirs / Réglages (viewClass). */
+  setClassTab(tab){
+    if(!['suivi','devoirs','reglages'].includes(tab))return;
+    this._classTab=tab;
+    document.querySelectorAll('#cls-tabs [data-ctab]').forEach(b=>{const on=b.dataset.ctab===tab;b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1;});
+    document.querySelectorAll('.cls-panel').forEach(p=>{p.hidden=p.id!=='cls-panel-'+tab;});
+  },
+  _classTabKey(e){
+    const tabs=[...document.querySelectorAll('#cls-tabs [data-ctab]')],i=tabs.indexOf(document.activeElement);
+    if(i<0||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+    e.preventDefault();
+    const j=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+    tabs[j].focus();this.setClassTab(tabs[j].dataset.ctab);
   },
 
-  /* Réglages pédagogiques de la classe (normes typographiques, accès libre, rangée de repos) : action class-settings-set, profs de la classe et admin de l'établissement. */
-  async saveClassSettings(classId,patch){
-    const msg=document.getElementById('cs-msg'),btns=[...document.querySelectorAll('#class-settings-card .settings-btn')];
-    const say=(t,ok)=>{if(msg){msg.textContent=t;msg.style.color=ok?'var(--green,#1FA971)':'var(--accent)';}};
+  /* Onglet Réglages : profil, rangée de repos, validation d'une leçon, normes typographiques, accès aux leçons.
+     Tout s'enregistre au changement (réglages : class-settings-set ; vitesse et erreurs : class-goals-set, 600 ms après la dernière modification).
+     Profs de la classe et admin de l'établissement. */
+  _classSettingsOf(d){return Object.assign({typoNorm:'fr',freeAccess:false,homeRow:'qsdf'},(d&&d.settings)||{});},
+  _classSettingsPanel(){
+    const d=this._classDetail;if(!d)return'';
+    const cs=this._classSettingsOf(d);
+    const KB=['AZERTYUIOP','QSDFGHJKLM','WXCVBN'];
+    const kb=hr=>{const home=hr==='azer'?'AZERUIOP':'QSDFJKLM';return`<span class="cset-kb" aria-hidden="true">${KB.map(r=>`<span>${[...r].map(c=>`<i${home.includes(c)?' class="on"':''}>${c}</i>`).join('')}</span>`).join('')}</span>`;};
+    // Exemples en français : les normes ne portent que sur les textes français (espaces surlignées).
+    const sample=n=>`<span class="cset-sample">${n==='be'?'Il a dit: "Viens-tu?"':'Il a dit<u>&nbsp;</u>: «<u>&nbsp;</u>Viens-tu<u>&nbsp;</u>?<u>&nbsp;</u>»'}</span>`;
+    const opt=(k,v,title,extra)=>`<button type="button" class="cset-opt" role="radio" aria-checked="${cs[k]===v}" onclick="app.setClassSetting('${k}',${JSON.stringify(v).replace(/"/g,'&quot;')})"><span class="cset-opt-t">${title}</span>${extra||''}</button>`;
+    const head=(k,title,help)=>`<div class="cset-h"><h3>${title}<span class="cset-saved" id="cset-saved-${k}" role="status"></span></h3>${help?`<p>${help}</p>`:''}</div>`;
+    const pf=cs.homeRow==='qsdf'&&cs.typoNorm==='fr'?'std':cs.homeRow==='azer'&&cs.typoNorm==='be'?'fwb':'custom';
+    const pfBtn=(k,label)=>`<button type="button" role="radio" aria-checked="${pf===k}" ${k==='custom'?'disabled':`onclick="app.applyClassProfile('${k}')"`}>${label}</button>`;
+    return`<div class="cset">
+      <div class="cset-sec">${head('profile',kpT('cls.profile'),kpT('cls.profile_help'))}
+        <div class="cset-c"><div class="cset-seg" role="radiogroup" aria-label="${kpT('cls.profile')}">${pfBtn('std',kpT('cls.profile_std'))}${pfBtn('fwb',kpT('cls.profile_fwb'))}${pf==='custom'?pfBtn('custom',kpT('cls.profile_custom')):''}</div></div></div>
+      <div class="cset-sec">${head('homeRow',kpT('cls.homerow_title'),kpT('cls.homerow_help'))}
+        <div class="cset-c"><div class="cset-opts" role="radiogroup" aria-label="${kpT('cls.homerow_title')}">
+          ${opt('homeRow','qsdf',kpT('cls.homerow_qsdf_t'),`<span class="cset-opt-d">${kpT('cls.homerow_qsdf_d')}</span>${kb('qsdf')}`)}
+          ${opt('homeRow','azer',kpT('cls.homerow_azer_t'),`<span class="cset-opt-d">${kpT('cls.homerow_azer_d')}</span>${kb('azer')}`)}
+        </div></div></div>
+      <div class="cset-sec">${head('goals',kpT('cls.goals_title'),kpT('cls.goals_help'))}
+        <div class="cset-c" id="cset-goals">${this._classGoalsHTML()}</div></div>
+      <div class="cset-sec">${head('typoNorm',kpT('set.typo'),kpT('cls.typo_help2'))}
+        <div class="cset-c"><div class="cset-opts" role="radiogroup" aria-label="${kpT('set.typo')}">
+          ${opt('typoNorm','fr',kpT('set.typo_fr'),sample('fr'))}${opt('typoNorm','be',kpT('set.typo_be'),sample('be'))}
+        </div></div></div>
+      <div class="cset-sec">${head('freeAccess',kpT('cls.free_title'),kpT('cls.free_help'))}
+        <div class="cset-c"><div class="cset-opts" role="radiogroup" aria-label="${kpT('cls.free_title')}">
+          ${opt('freeAccess',false,kpT('cls.free_off'))}${opt('freeAccess',true,kpT('cls.free_on'))}
+        </div></div></div>
+      <div class="cset-foot">${kpT('cls.settings_foot')}</div>
+    </div>`;
+  },
+  // Vitesse et erreurs (brouillon _cgDraft) et, si la classe a des élèves avec une vitesse moyenne, où se place le seuil.
+  _classGoalsHTML(){
+    const g=this._cgDraft||{wpm:20,err:8},isDef=g.wpm===20&&g.err===8;
+    const step=(k,label,lim)=>`<div class="cset-step"><label for="cset-${k}">${label}</label><div class="cset-stepper"><button type="button" aria-label="−1" onclick="app.classGoalStep('${k}',-1)">−</button><input id="cset-${k}" type="number" inputmode="numeric" min="${lim[0]}" max="${lim[1]}" value="${g[k]}" oninput="app.classGoalInput('${k}',this.value)" onblur="if(this.value!==String(app._cgDraft['${k}']))this.value=app._cgDraft['${k}']"><button type="button" aria-label="+1" onclick="app.classGoalStep('${k}',1)">+</button></div></div>`;
+    const ws=((this._classDetail&&this._classDetail.students)||[]).map(s=>s.avgWpm).filter(v=>typeof v==='number');
+    let dist='';
+    if(ws.length){
+      const hi=Math.ceil((Math.max(40,g.wpm,...ws)+3)/10)*10,x=v=>Math.max(0,Math.min(100,v/hi*100)).toFixed(1);
+      const ok=ws.filter(v=>v>=g.wpm).length;
+      dist=`<div class="cset-dist" role="img" aria-label="${kpT('cls.goals_dist_aria')}"><span class="ax"></span>${ws.map(v=>`<span class="dt" style="left:${x(v)}%;background:${v>=g.wpm?'var(--success)':'var(--warning)'}"></span>`).join('')}<span class="th${g.wpm/hi>.8?' r':''}" style="left:${x(g.wpm)}%"><b>${g.wpm} mpm</b></span></div>
+      <p class="cset-note">${kpT('cls.goals_dist',{wpm:g.wpm,ok,n:ws.length})}</p>`;
+    }
+    return`<div class="cset-goals">${step('wpm',kpT('cls.goals_wpm'),[5,80])}${step('err',kpT('cls.goals_err'),[0,30])}${isDef?`<span class="cset-def">${kpT('cls.goals_default')}</span>`:`<button type="button" class="cset-link" onclick="app.classGoalsReset()">${kpT('cls.goals_reset')}</button>`}</div>${dist}`;
+  },
+  _classGoalsRefresh(keepFocus){
+    const box=document.getElementById('cset-goals');if(!box)return;
+    if(keepFocus){ // saisie au clavier : on ne remplace pas le champ en cours de frappe
+      const f=document.activeElement&&document.activeElement.id;const keep=f&&document.getElementById(f);
+      const tmp=document.createElement('div');tmp.innerHTML=this._classGoalsHTML();
+      box.querySelectorAll('.cset-dist,.cset-note,.cset-def,.cset-link').forEach(n=>n.remove());
+      const goals=box.querySelector('.cset-goals'),extra=tmp.querySelector('.cset-def,.cset-link');if(goals&&extra)goals.appendChild(extra);
+      tmp.querySelectorAll('.cset-dist,.cset-note').forEach(n=>box.appendChild(n));
+      if(keep)keep.focus();return;
+    }
+    box.innerHTML=this._classGoalsHTML();
+  },
+  classGoalStep(k,delta){
+    const g=this._cgDraft;if(!g)return;
+    const lim=k==='wpm'?[5,80]:[0,30],v=Math.max(lim[0],Math.min(lim[1],g[k]+delta));
+    if(v===g[k])return;
+    g[k]=v;this._classGoalsRefresh();this._queueClassGoals();
+  },
+  classGoalInput(k,raw){
+    const g=this._cgDraft;if(!g)return;
+    const lim=k==='wpm'?[5,80]:[0,30],v=Number(raw);
+    if(String(raw).trim()===''||!Number.isInteger(v)||v<lim[0]||v>lim[1]){clearTimeout(this._cgTimer);this._cgTimer=null;this._csSay('goals',k==='wpm'?kpT('cls.goals_bad_wpm'):kpT('cls.goals_bad_err'),false);return;}
+    if(v===g[k])return;
+    g[k]=v;this._classGoalsRefresh(true);this._queueClassGoals();
+  },
+  classGoalsReset(){const g=this._cgDraft;if(!g)return;g.wpm=20;g.err=8;this._classGoalsRefresh();this._queueClassGoals(0);},
+  _queueClassGoals(ms=600){clearTimeout(this._cgTimer);this._cgTimer=setTimeout(()=>this._saveClassGoals(),ms);},
+  async _saveClassGoals(){
+    this._cgTimer=null;
+    const g=this._cgDraft;if(!g)return;
+    const classId=g.id,isDef=g.wpm===20&&g.err===8,seq=(this._cgSeq=(this._cgSeq||0)+1);
+    try{
+      // 20 / 8 : on remet la valeur par défaut (null) plutôt que de la figer, comme l'ancien bouton « Valeurs par défaut ».
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-goals-set',token:currentToken,classId,minWpm:isDef?null:g.wpm,maxErrors:isDef?null:g.err})});
+      const res=await r.json().catch(()=>({}));
+      if(seq!==this._cgSeq)return;
+      if(!r.ok||!res.goals){this._csSay('goals',res.error||kpT('cls.settings_error'),false);return;}
+      if(this._classDetail&&this._classDetail.id===classId)this._classDetail.goals=res.goals;
+      this._csSay('goals',kpT('cls.saved_short'),true);
+    }catch{if(seq===this._cgSeq)this._csSay('goals',kpT('cls.settings_net'),false);}
+  },
+  // Message court à côté du titre d'une section ; « Enregistré » s'efface, une erreur reste.
+  _csSay(k,text,ok){
+    const el=document.getElementById('cset-saved-'+k);if(!el)return;
+    clearTimeout(this._csSayT&&this._csSayT[k]);this._csSayT=this._csSayT||{};
+    el.textContent=ok?'✓ '+text:text;el.classList.toggle('err',!ok);el.classList.add('on');
+    if(ok)this._csSayT[k]=setTimeout(()=>el.classList.remove('on'),2600);
+  },
+  // Changer de rangée de repos : les modules 1 et 2 ont leur propre progression par méthode ; on dit combien d'élèves les referont.
+  _confirmHomeRow(to){
+    const d=this._classDetail,from=to==='azer'?'qsdf':'azer';
+    const NAME={qsdf:'QSDF',azer:'AZER-UIOP'},KEYS={qsdf:'Q S D F · J K L M',azer:'A Z E R · U I O P'};
+    const n=((d&&d.students)||[]).filter(s=>{const mp=s.modulesProgress||[];return((mp[0]&&mp[0].c)||0)+((mp[1]&&mp[1].c)||0)>0;}).length;
+    const body=n?kpTn('cls.hr_confirm_n',n,{from:NAME[from],keys:KEYS[to]}):kpT('cls.hr_confirm_none',{from:NAME[from]});
+    return confirmModal({icon:ICONS.keyboard,title:kpT('cls.hr_confirm_title',{method:NAME[to]}),body,confirmText:kpT('cls.hr_confirm_btn',{method:NAME[to]})});
+  },
+  async setClassSetting(k,v){
+    const d=this._classDetail;if(!d||this._classSettingsOf(d)[k]===v)return;
+    if(k==='homeRow'&&!await this._confirmHomeRow(v))return;
+    return this._saveClassSettings({[k]:v},k);
+  },
+  async applyClassProfile(p){
+    const d=this._classDetail;if(!d)return;
+    const want=p==='fwb'?{homeRow:'azer',typoNorm:'be'}:{homeRow:'qsdf',typoNorm:'fr'},cur=this._classSettingsOf(d),patch={};
+    for(const k in want)if(cur[k]!==want[k])patch[k]=want[k];
+    if(!Object.keys(patch).length)return;
+    if(patch.homeRow&&!await this._confirmHomeRow(patch.homeRow))return;
+    return this._saveClassSettings(patch,'profile');
+  },
+  async _saveClassSettings(patch,sayKey){
+    const d=this._classDetail;if(!d)return;
+    const classId=d.id,btns=[...document.querySelectorAll('.cset-opt,.cset-seg button')];
     btns.forEach(b=>b.disabled=true);
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-settings-set',token:currentToken,classId,settings:patch})});
-      const d=await r.json().catch(()=>({}));
-      if(!r.ok||!d.settings){say(d.error||kpT('cls.settings_error'),false);return;}
-      btns.forEach(b=>{const on=JSON.stringify(d.settings[b.dataset.k])===b.dataset.v;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false');});
-      if(this._classDetail&&this._classDetail.id===classId)this._classDetail.settings=d.settings;
-      say(kpT('cls.settings_saved'),true);
-    }catch{say(kpT('cls.settings_net'),false);}
-    finally{btns.forEach(b=>b.disabled=false);}
+      const res=await r.json().catch(()=>({}));
+      if(!r.ok||!res.settings){btns.forEach(b=>b.disabled=false);this._csSay(sayKey,res.error||kpT('cls.settings_error'),false);return;}
+      if(!this._classDetail||this._classDetail.id!==classId)return;
+      this._classDetail.settings=res.settings;
+      // La rangée de repos change les leçons des modules 1 et 2 : on recharge la classe pour que Suivi compte les bonnes leçons.
+      if('homeRow' in patch){this._csFlash=sayKey;return this.viewClass(classId,{silent:true});}
+      const p=document.getElementById('cls-panel-reglages');if(p)p.innerHTML=this._classSettingsPanel();
+      this._csSay(sayKey,kpT('cls.saved_short'),true);
+    }catch{btns.forEach(b=>b.disabled=false);this._csSay(sayKey,kpT('cls.settings_net'),false);}
   },
   makeSession(mode,lessonId){
     let text=kpNormText(adaptQuotes(mode==='lesson'?this.genDrill(lessonId):kpTestPassage()),mode==='lesson'?this.lessonById(lessonId):null);
@@ -17570,6 +17743,7 @@ const app={
   // Retour depuis une classe : prof -> ses classes ; établissement -> le prof (ou la liste).
   backFromClass(){
     clearInterval(this._classRefreshTimer);
+    if(this._cgTimer){clearTimeout(this._cgTimer);this._saveClassGoals();}
     if(isAdmin()){go('home');return;}
     return this.renderClasses();
   },
@@ -17579,6 +17753,7 @@ const app={
     if(this.view!=='classes')go('classes');
     this._classesSub='class';
     this._classViewingId=id;
+    if(this._cgTimer){clearTimeout(this._cgTimer);this._saveClassGoals();} // vitesse / erreurs modifiées juste avant : on enregistre tout de suite
     if(!opts.silent)this._classFilter='all';
     if(!opts.silent)document.getElementById(pageId).innerHTML=`<div class="stats-section"><div style="padding:80px 20px;text-align:center;color:var(--muted)">Chargement…</div></div>`;
     let d;
@@ -17666,7 +17841,7 @@ const app={
       ['lowacc',flagCount.lowacc,'sous 80 % de précision','var(--danger)']
     ].filter(c=>c[1]>0);
     const todoChips=chipDefs.map(c=>`<button class="cls-chip" data-fchip="${c[0]}" onclick="app.filterClassStudents('${c[0]}')"><span style="width:9px;height:9px;border-radius:50%;background:${c[3]};display:inline-block"></span><b>${c[1]}</b>${c[2]}</button>`).join('')
-      +(lateAsg.length?`<button class="cls-chip" onclick="document.getElementById('class-asg-card').scrollIntoView({behavior:'smooth',block:'start'})"><span style="width:9px;height:9px;border-radius:50%;background:var(--danger);display:inline-block"></span><b>${lateAsg.length}</b>${plural(lateAsg.length,'devoir en retard','devoirs en retard')}</button>`:'');
+      +(lateAsg.length?`<button class="cls-chip" onclick="app.setClassTab('devoirs')"><span style="width:9px;height:9px;border-radius:50%;background:var(--danger);display:inline-block"></span><b>${lateAsg.length}</b>${plural(lateAsg.length,'devoir en retard','devoirs en retard')}</button>`:'');
     const todoHtml=students.length&&todoChips?`<div style="background:linear-gradient(120deg,rgba(255,77,46,.07),var(--card) 60%);border:1px solid var(--border);border-radius:16px;padding:18px 22px;margin-bottom:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
       <img src="/images/keypace-mascot-idea.webp" alt="" loading="lazy" decoding="async" style="height:84px;width:auto;flex-shrink:0">
       <div style="flex:1;min-width:240px">
@@ -17703,36 +17878,6 @@ const app={
         </tr>`;
       }).join('')}</tbody></table></div>
     </div>`:'';
-    const cg=d.goals||{minWpm:20,maxErrors:8,custom:false};
-    const cgFld='width:96px;margin-top:6px;padding:9px 11px;border:1.5px solid var(--border);border-radius:10px;font:inherit;background:var(--bg);color:var(--txt);box-sizing:border-box';
-    const cgLbl='display:block;font-size:12px;font-weight:700;color:var(--muted)';
-    const goalsCard=`<div id="class-goals-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;margin-bottom:24px">
-      <div style="font-size:15px;font-weight:700;margin-bottom:4px">Objectifs de leçon de la classe</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:14px">Une leçon est validée quand l'élève atteint la vitesse minimale avec au plus ce nombre d'erreurs. Tes élèves ne peuvent pas modifier ces valeurs.<span id="cg-default" style="${cg.custom?'display:none':''}"> Valeurs par défaut en ce moment.</span></div>
-      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">
-        <label style="${cgLbl}">Vitesse minimale (mpm)<input id="cg-wpm" type="number" inputmode="numeric" min="5" max="80" value="${cg.minWpm}" style="${cgFld};display:block"></label>
-        <label style="${cgLbl}">Erreurs maximum<input id="cg-err" type="number" inputmode="numeric" min="0" max="30" value="${cg.maxErrors}" style="${cgFld};display:block"></label>
-        <button id="cg-save" onclick="app.saveClassGoals('${d.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Enregistrer</button>
-        <button id="cg-reset" onclick="app.saveClassGoals('${d.id}',true)" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Valeurs par défaut (20 / 8)</button>
-      </div>
-      <div id="cg-msg" role="status" style="font-size:12.5px;margin-top:10px;min-height:16px"></div>
-    </div>`;
-    const cs=Object.assign({typoNorm:'fr',freeAccess:false,homeRow:'qsdf'},d.settings||{});
-    // Un groupe de boutons par réglage : data-k (réglage) et data-v (valeur, JSON) servent à remettre l'état actif après enregistrement.
-    const csBtn=(k,v,label)=>{const on=cs[k]===v,j=JSON.stringify(v);return`<button class="settings-btn${on?' active':''}" data-k="${k}" data-v='${j}' aria-pressed="${on}" style="white-space:normal;text-align:left" onclick='app.saveClassSettings("${d.id}",{"${k}":${j}})'>${label}</button>`;};
-    const csLbl='font-size:13px;font-weight:700;margin:16px 0 4px';
-    const settingsCard=`<div id="class-settings-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;margin-bottom:24px">
-      <div style="font-size:15px;font-weight:700;margin-bottom:4px">${kpT('cls.settings_title')}</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:14px">${kpT('cls.typo_help')}</div>
-      <div class="cs-group" style="display:flex;gap:8px;flex-wrap:wrap">${csBtn('typoNorm','fr',kpT('set.typo_fr'))}${csBtn('typoNorm','be',kpT('set.typo_be'))}</div>
-      <div style="${csLbl}">${kpT('cls.free_title')}</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:10px">${kpT('cls.free_help')}</div>
-      <div class="cs-group" style="display:flex;gap:8px;flex-wrap:wrap">${csBtn('freeAccess',false,kpT('cls.free_off'))}${csBtn('freeAccess',true,kpT('cls.free_on'))}</div>
-      <div style="${csLbl}">${kpT('cls.homerow_title')}</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:10px">${kpT('cls.homerow_help')}</div>
-      <div class="cs-group" style="display:flex;gap:8px;flex-wrap:wrap">${csBtn('homeRow','qsdf',kpT('set.homerow_qsdf'))}${csBtn('homeRow','azer',kpT('set.homerow_azer'))}</div>
-      <div id="cs-msg" role="status" style="font-size:12.5px;margin-top:10px;min-height:16px"></div>
-    </div>`;
     const asgHtml=`<div id="class-asg-card" style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)">
         <div style="font-size:15px;font-weight:700">Devoirs ${asg.length?`<span style="font-size:13px;font-weight:600;color:var(--muted)">· ${asg.length}</span>`:''}</div>
@@ -17760,6 +17905,14 @@ const app={
         </div>`;
       }).join('')}
     </div>`;
+    // Onglets : l'onglet ouvert est gardé pour la même classe (Actualiser, retour d'une fiche élève), Suivi pour une autre classe.
+    if(this._classTabFor!==d.id){this._classTabFor=d.id;this._classTab='suivi';}
+    if(!opts.silent||!this._cgDraft||this._cgDraft.id!==d.id)this._cgDraft={id:d.id,wpm:(d.goals||{}).minWpm||20,err:(d.goals||{}).maxErrors!=null?d.goals.maxErrors:8};
+    const tab=['suivi','devoirs','reglages'].includes(this._classTab)?this._classTab:'suivi';
+    const clsTab=(k,label,extra)=>`<button class="cls-tab" id="cls-tab-${k}" role="tab" data-ctab="${k}" aria-controls="cls-panel-${k}" aria-selected="${tab===k}" tabindex="${tab===k?0:-1}" onclick="app.setClassTab('${k}')">${label}${extra||''}</button>`;
+    const clsTabs=clsTab('suivi',kpT('cls.tab_follow'))
+      +clsTab('devoirs',kpT('cls.tab_asg'),lateAsg.length?`<span class="cls-tab-n late">${kpT('cls.tab_late',{n:lateAsg.length})}</span>`:asg.length?`<span class="cls-tab-n">${asg.length}</span>`:'')
+      +clsTab('reglages',kpT('cls.tab_settings'));
     document.getElementById(pageId).innerHTML=`<div class="stats-section">
       <div class="stats-header" style="padding-bottom:24px">
         <button onclick="app.backFromClass()" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:0 0 10px;display:flex;align-items:center;gap:5px">${isAdmin()?'‹ Retour':'← Toutes les classes'}</button>
@@ -17773,6 +17926,8 @@ const app={
         </div>
       </div>
       <div style="padding:0 0 60px">
+        <div class="cls-tabs" id="cls-tabs" role="tablist" aria-label="${this._esc(d.name)}" onkeydown="app._classTabKey(event)">${clsTabs}</div>
+        <div class="cls-panel" id="cls-panel-suivi" role="tabpanel" aria-labelledby="cls-tab-suivi"${tab==='suivi'?'':' hidden'}>
         ${students.length>0?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px">
           ${(()=>{
             const tot=agg.total!=null?agg.total:students.length,act=agg.activeThisWeek||0;
@@ -17787,9 +17942,6 @@ const app={
         ${todoHtml}
         ${skillsCard}
         ${hmHtml}
-        ${goalsCard}
-        ${settingsCard}
-        ${asgHtml}
 
         ${students.length===0?`
           <div style="text-align:center;padding:64px 20px;color:var(--muted)">
@@ -17797,10 +17949,13 @@ const app={
             <div style="font-size:16px;font-weight:700;color:var(--txt);margin-bottom:6px">Aucun élève encore</div>
             <div style="font-size:13px;max-width:320px;margin:0 auto;line-height:1.6">Contacte ton établissement KeyPace pour ajouter tes élèves à cette classe.</div>
           </div>
-        `:`
-        `}
+        `:''}
+        </div>
+        <div class="cls-panel" id="cls-panel-devoirs" role="tabpanel" aria-labelledby="cls-tab-devoirs"${tab==='devoirs'?'':' hidden'}>${asgHtml}</div>
+        <div class="cls-panel" id="cls-panel-reglages" role="tabpanel" aria-labelledby="cls-tab-reglages"${tab==='reglages'?'':' hidden'}>${this._classSettingsPanel()}</div>
       </div></div>`;
     this._applyClassFilter();
+    if(this._csFlash){const f=this._csFlash;this._csFlash=null;this._csSay(f,kpT('cls.saved_short'),true);}
     // Pas de rafraîchissement automatique : la page ne doit jamais bouger toute
     // seule pendant que le prof la lit. Il actualise lui-même via "↻ Actualiser".
     clearInterval(this._classRefreshTimer);
@@ -17808,6 +17963,7 @@ const app={
 
   filterClassStudents(key){
     this._classFilter=this._classFilter===key?'all':key;
+    if(this._classTab!=='suivi')this.setClassTab('suivi');
     this._applyClassFilter();
     if(this._classFilter!=='all'){const el=document.getElementById('class-hm-card')||document.getElementById('class-stu-card');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
   },
