@@ -122,35 +122,11 @@
   @media(max-width:700px){.docs{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.doc{min-height:96px;padding:12px;border-radius:14px}.doc b{font-size:13.5px}}
   @media(prefers-reduced-motion:reduce){.doc{transition:none}}
 </style>
+<link rel="stylesheet" href="/site-nav.css">
 </head>
 <body>
-<header>
-  <div class="nav-inner">
-    <a class="logo" href="/"><span class="k">K</span> KeyPace</a>
-    <div class="nav-links" id="nav-links">
-      <a class="nav-link" href="/">Accueil</a>
-      <div class="nav-dropdown">
-        <a class="nav-link" href="/ecoles">Établissements</a>
-        <div class="nav-dropdown-menu">
-          <a href="/dactylographie-tronc-commun">Tronc commun</a>
-          <a href="/dactylographie-general-transition">Général ou transition</a>
-          <a href="/dactylographie-qualifiant">Qualifiant</a>
-          <a href="/dactylographie-superieur">Supérieur et adultes</a>
-        </div>
-      </div>
-      <a class="nav-link" href="/test">Test</a>
-      <a class="nav-link" href="/cours-dactylo-en-ligne">Cours</a>
-      <a class="nav-link" href="/jeux-dactylo-en-ligne">Jeux</a>
-      <a class="nav-link" href="/progres">Progrès</a>
-    </div>
-    <div class="nav-spacer"></div>
-    <div class="nav-guest-btns">
-      <a class="nav-login-btn" href="/?auth=login">Se connecter</a>
-      <a class="nav-signup-btn" href="/?auth=register">Créer un compte</a>
-    </div>
-    <button class="nav-burger" onclick="toggleNavMenu(event)" aria-label="Menu">☰</button>
-  </div>
-</header>
+<nav id="main-nav" data-site="be" data-active="ecoles"></nav>
+<script src="/site-nav.js"></script>
 
 <main class="wrap">
   <nav class="crumb" aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/ecoles">Établissements</a> › <span>Général ou transition</span></nav>
@@ -307,8 +283,6 @@ show(cur);
 if(!matchMedia('(prefers-reduced-motion:reduce)').matches){
   new IntersectionObserver(es=>es.forEach(e=>{if(auto===false)return;if(e.isIntersecting&&!auto)auto=setInterval(()=>{cur=(cur+1)%YEARS.length;show(cur)},3000);else if(!e.isIntersecting&&auto){clearInterval(auto);auto=null}}),{threshold:.4}).observe(document.getElementById('prog'));
 }
-function toggleNavMenu(e){if(e)e.stopPropagation();document.getElementById('nav-links')?.classList.toggle('open');}
-document.addEventListener('click',e=>{const nl=document.getElementById('nav-links');const b=document.querySelector('.nav-burger');if(nl&&nl.classList.contains('open')&&!nl.contains(e.target)&&b&&!b.contains(e.target))nl.classList.remove('open');});
 function openAsk(){document.getElementById('licence-form').classList.add('open');document.getElementById('ask-btn').hidden=true;document.getElementById('lf-name').focus();}
 async function submitLicenceForm(e){
   e.preventDefault();

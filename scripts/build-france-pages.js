@@ -1,5 +1,5 @@
 // Génère les trois pages d'établissement de la France : ecoles-france.html, dactylographie-college.html, dactylographie-lycee.html.
-// Elles reprennent l'habillage (style, en-tête, pied de page) de dactylographie-primaire.html ; le texte est celui de la France (CRCN, Pix, voies,
+// Elles reprennent l'habillage (style, pied de page) de dactylographie-primaire.html et l'en-tête commun (site-nav.js) ; le texte est celui de la France (CRCN, Pix, voies,
 // financement par collectivité, GAR). Les jalons et les leçons de chaque classe sont lus dans programme-data.js : un seul endroit à tenir à jour.
 // Aucun formulaire : l'API des établissements est belge (réseaux, subvention MANOLO). Le contact passe par l'adresse mail.
 // Usage : node scripts/build-france-pages.js   (écrit les trois fichiers à la racine)
@@ -33,32 +33,9 @@ const extraCss = `<style>
 .fr-note{font-size:14px;color:var(--muted,#8A8275)}
 </style>`;
 
-const header = `<header>
-  <div class="nav-inner">
-    <a class="logo" href="/fr"><span class="k">K</span> KeyPace</a>
-    <div class="nav-links" id="nav-links">
-      <a class="nav-link" href="/fr">Accueil</a>
-      <div class="nav-dropdown">
-        <a class="nav-link" href="/fr/ecoles">Établissements</a>
-        <div class="nav-dropdown-menu">
-          <a href="/fr/ecoles">École et collège, lycée</a>
-          <a href="/fr/dactylographie-college">Collège</a>
-          <a href="/fr/dactylographie-lycee">Lycée</a>
-        </div>
-      </div>
-      <a class="nav-link" href="/test">Test</a>
-      <a class="nav-link" href="/fr/cours-dactylo-en-ligne">Cours</a>
-      <a class="nav-link" href="/jeux-dactylo-en-ligne">Jeux</a>
-      <a class="nav-link" href="/progres">Progrès</a>
-    </div>
-    <div class="nav-spacer"></div>
-    <div class="nav-guest-btns">
-      <a class="nav-login-btn" href="/?auth=login">Se connecter</a>
-      <a class="nav-signup-btn" href="/?auth=register">Créer un compte</a>
-    </div>
-    <button class="nav-burger" onclick="toggleNavMenu(event)" aria-label="Menu">☰</button>
-  </div>
-</header>`;
+// En-tête commun aux pages séparées de l'appli (site-nav.js + site-nav.css), avec les liens de la France.
+const header = `<nav id="main-nav" data-site="fr" data-active="ecoles"></nav>
+<script src="/site-nav.js"></script>`;
 
 const contact = (what) => `<section>
     <h2>Une question avant de commencer ?</h2>
@@ -245,6 +222,7 @@ ${ld}
 </script>
 ${style}
 ${extraCss}
+<link rel="stylesheet" href="/site-nav.css">
 </head>
 <body>
 ${header}
@@ -273,10 +251,6 @@ ${header}
 </div>
 
 ${footer}
-<script>
-function toggleNavMenu(e){if(e)e.stopPropagation();document.getElementById('nav-links')?.classList.toggle('open');}
-document.addEventListener('click',e=>{const nl=document.getElementById('nav-links');const b=document.querySelector('.nav-burger');if(nl&&nl.classList.contains('open')&&!nl.contains(e.target)&&b&&!b.contains(e.target))nl.classList.remove('open');});
-</script>
 </body>
 </html>
 `;

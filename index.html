@@ -19055,6 +19055,8 @@ handleDuelReturn();
 (()=>{const p=new URLSearchParams(window.location.search);const rt=p.get('reset');if(rt&&/^[a-f0-9]{64}$/i.test(rt))setTimeout(()=>app.showResetPasswordModal(rt),300);})();
 // Ouverture directe de la connexion/inscription depuis un lien externe (?auth=login|register)
 (()=>{const p=new URLSearchParams(window.location.search);const at=p.get('auth');if(at==='login'||at==='register')setTimeout(()=>openAuth(at),300);})();
+// Depuis l'en-tête des pages séparées (site-nav.js) : avatar -> Réglages, « Passer Expert » -> offre Expert. Connecté seulement.
+(()=>{const p=new URLSearchParams(window.location.search);if(!currentUser)return;if(p.get('settings')==='1')setTimeout(()=>app.openSettings(),300);else if(p.get('upgrade')==='1')setTimeout(()=>openModal('upgrade-modal'),300);})();
 loadProgressFromServer();
 handleClassCodeJoin();
 handleProfInvite();
