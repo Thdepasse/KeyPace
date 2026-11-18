@@ -51,7 +51,8 @@ for(const lv of [1,2,3,4,5]){app.souris={phase:'brief',track:'grid',lvl:lv};app.
 app.souris={phase:'brief',track:'grid',lvl:1};app.renderGames();app._sgrBegin();app._sgrStopLoop();s=app.souris;s.phase='play';s.fresh=false;
 const cell=(i,l,st,life)=>{s.cells[i]={id:'s'+i,letter:l,state:st,life:life||2000,dur:2000};};
 cell(0,'F','target');cell(1,'J','trap');app._sgrRender();snap('sgrPlay',sgr());
-s.best=100;s.score=99;s.combo=3;app._sgrKey('F');snap('sgrCombo2',sgr());
+// La bulle du personnage apparaît en fondu (transition .2s, visibilité comprise) : on la capture une fois visible, comme le joueur la voit.
+s.best=100;s.score=99;s.combo=3;app._sgrKey('F');await W(260);snap('sgrCombo2',sgr());
 cell(2,'D','target');s.combo=7;app._sgrKey('D');snap('sgrCombo3',sgr());
 s.hits=app._sgrTuneOf(1).trapFrom-1;cell(3,'K','target');app._sgrKey('K');snap('sgrRed',sgr());
 s.combo=2;app._sgrKey('Z');snap('sgrStray',sgr());
