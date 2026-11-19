@@ -2685,25 +2685,164 @@ body.sfs-open #cookie-consent-reopen{display:none!important}
 .gaze-toggle.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .gaze-toggle.error{border-color:#E5484D;color:#E5484D}
 .gaze-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:900;display:flex;align-items:center;justify-content:center;padding:20px}
-/* ── Onboarding modal ── */
-/* ── Onboarding tooltip walkthrough ── */
-#ob-overlay{position:fixed;inset:0;z-index:1100;display:none;background:rgba(22,20,15,.62)}
-#ob-overlay.active{display:block}
-#ob-tooltip{position:fixed;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 22px 18px;width:290px;box-shadow:0 16px 48px rgba(22,20,15,.28);z-index:1102;transition:opacity .15s ease,left .22s cubic-bezier(.4,0,.2,1),top .22s cubic-bezier(.4,0,.2,1)}
-#ob-tooltip.ob-fading{opacity:0;pointer-events:none}
-#ob-tooltip::before{content:'';position:absolute;top:-7px;left:var(--arrow-left,50%);transform:translateX(-50%);width:13px;height:7px;background:var(--card);clip-path:polygon(50% 0%,100% 100%,0% 100%)}
-.ob-highlight{position:relative;z-index:1101;border-radius:10px;padding:5px 12px;box-shadow:0 0 0 2.5px var(--accent)}
-.nav-link.ob-highlight{background:#fff}
-.ob-tt-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-bottom:5px}
-.ob-tt-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;letter-spacing:-.01em;margin-bottom:6px;color:var(--txt)}
-.ob-tt-desc{font-size:13px;color:#5A5248;line-height:1.55;margin-bottom:16px}
-.ob-tt-footer{display:flex;align-items:center;justify-content:space-between}
-.ob-tt-counter{font-size:12px;color:var(--muted);font-weight:600}
-.ob-tt-actions{display:flex;gap:8px;align-items:center}
-.ob-btn-skip{background:none;border:none;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;padding:0;outline:none;text-decoration:underline}
-.ob-btn-skip:hover{color:var(--txt)}
-.ob-btn-next{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;outline:none;transition:opacity .15s;white-space:nowrap}
-.ob-btn-next:hover{opacity:.88}
+/* ── Didacticiel de première connexion : écran assombri, trou de lumière, mascotte qui parle ──
+   Le calque bloque tout clic (sauf la cible d'une étape « clic » et les réponses du quiz) : on ne peut pas sortir de la visite. */
+#kt{position:fixed;inset:0;z-index:1100;display:none}
+#kt.on{display:block}
+.kt-hole{position:fixed;left:50%;top:50%;width:0;height:0;border-radius:50%;pointer-events:none;box-shadow:0 0 0 300vmax rgba(14,11,8,.86),inset 0 0 22px 8px rgba(14,11,8,.45);transition:left .6s cubic-bezier(.65,0,.35,1),top .6s cubic-bezier(.65,0,.35,1),width .6s cubic-bezier(.65,0,.35,1),height .6s cubic-bezier(.65,0,.35,1),border-radius .6s}
+.kt-ring{position:fixed;pointer-events:none;border-radius:50%;opacity:0;transition:opacity .3s}
+.kt-ring.on{opacity:1}
+.kt-ring::before,.kt-ring::after{content:'';position:absolute;inset:-4px;border-radius:inherit;border:3px solid #FFB08F;animation:kt-ring 1.6s ease-out infinite}
+.kt-ring::after{animation-delay:.8s}
+@keyframes kt-ring{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.25);opacity:0}}
+.kt-block{position:fixed;inset:0;background:transparent}
+.kt-hand{position:fixed;font-size:40px;pointer-events:none;opacity:0;transition:opacity .3s;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4));animation:kt-tap 1.1s ease-in-out infinite}
+.kt-hand.on{opacity:1}
+@keyframes kt-tap{0%,100%{transform:translate(0,0)}50%{transform:translate(-6px,-10px)}}
+.kt-guide{position:fixed;left:0;top:0;display:flex;align-items:flex-end;gap:4px;opacity:0;transform:translateY(16px) scale(.96);transition:opacity .35s,transform .45s cubic-bezier(.3,1.5,.5,1);pointer-events:none}
+.kt-guide.in{opacity:1;transform:none;pointer-events:auto}
+.kt-guide.shake{animation:kt-shake .45s}
+@keyframes kt-shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+.kt-masc{height:190px;width:auto;flex-shrink:0;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45));transform-origin:bottom center}
+.kt-masc.hop{animation:kt-hop .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes kt-hop{30%{transform:scale(1.08,.9)}60%{transform:translateY(-18px) scale(.95,1.06)}100%{transform:none}}
+.kt-guide.center .kt-masc{height:280px}
+.kt-bubble{position:relative;width:min(380px,calc(100vw - 180px));background:#fff;border-radius:22px;padding:16px 20px;margin-bottom:46px;box-shadow:0 20px 50px rgba(0,0,0,.35);color:var(--txt)}
+.kt-bubble::before{content:'';position:absolute;left:-9px;bottom:26px;width:20px;height:20px;background:#fff;transform:rotate(45deg);border-radius:4px}
+.kt-guide.center .kt-bubble{width:min(460px,calc(100vw - 260px));padding:22px 24px}
+.kt-who{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.kt-who b{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;color:var(--accent);font-size:14px}
+.kt-prog{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.kt-prog i{width:7px;height:7px;border-radius:50%;background:#E9E2D6}
+.kt-prog i.d{background:#FFB59F}.kt-prog i.c{background:var(--accent);width:18px;border-radius:4px}
+.kt-text{font-size:16px;line-height:1.5;min-height:48px;cursor:default}
+.kt-guide.center .kt-text{font-size:18px}
+.kt-text b{color:var(--accent)}
+.kt-text .cur{display:inline-block;width:2px;height:1.05em;background:var(--accent);vertical-align:-2px;margin-left:1px;animation:kt-blink .7s steps(1) infinite}
+@keyframes kt-blink{50%{opacity:0}}
+.kt-heroes{display:flex;gap:12px;margin-top:14px}
+.kt-heroes[hidden]{display:none}
+.kt-hero{flex:1;border:2px solid var(--border);background:var(--light);border-radius:18px;padding:10px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font:inherit;font-weight:800;font-size:14px;color:var(--txt);transition:transform .15s,border-color .15s}
+.kt-hero img{height:130px;width:auto}
+.kt-hero:hover{transform:translateY(-3px);border-color:#FFB59F}
+.kt-hero.on{border-color:var(--accent);background:#FFF1EA}
+.kt-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;min-height:38px}
+.kt-hint{font-size:13px;font-weight:700;color:var(--muted)}
+.kt-hint.warn{color:#D9381E}
+.kt-hint.ok{color:var(--success)}
+.kt-next{border:none;background:var(--accent);color:#fff;border-radius:12px;padding:10px 18px;font:inherit;font-weight:800;font-size:14.5px;cursor:pointer;transition:opacity .2s,transform .15s;margin-left:auto;white-space:nowrap}
+.kt-next:disabled{opacity:.35;cursor:default}
+.kt-next:not(:disabled):hover{transform:translateY(-1px)}
+.kt-next[hidden]{display:none}
+.kt-confetti{position:fixed;top:-20px;width:10px;height:14px;border-radius:2px;z-index:1101;pointer-events:none;animation:kt-fall linear forwards}
+@keyframes kt-fall{to{transform:translate(var(--dx),110vh) rotate(var(--r))}}
+.kt-toast{position:fixed;left:50%;top:84px;transform:translate(-50%,-20px);background:var(--txt);color:#fff;font-weight:800;padding:12px 18px;border-radius:14px;opacity:0;transition:.4s;z-index:1100;pointer-events:none}
+.kt-toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){.kt-hole,.kt-guide{transition:none}.kt-ring::before,.kt-ring::after,.kt-hand,.kt-masc.hop{animation:none}}
+/* Héros (avatar choisi par l'élève) : buste cadré dans un rond */
+.kp-hero-img{width:100%;height:auto;display:block;transform:translateY(4%) scale(1.9);transform-origin:50% 0}
+.nav-avatar.has-hero,.settings-modal-avatar.has-hero,.pg-av.has-hero{background:linear-gradient(170deg,#FFF1E8,#FFD9C7);overflow:hidden;align-items:flex-start;padding:0}
+.nav-avatar.has-hero{border-radius:50%;box-shadow:0 0 0 1.5px var(--accent)}
+.pg-av.has-hero{display:block}
+.sh-av .disc .kp-hero-img{align-self:flex-start}
+.nav-lvl-chip{font-size:11px;font-weight:800;background:rgba(255,77,46,.1);color:var(--accent);padding:4px 9px;border-radius:20px;letter-spacing:.02em;white-space:nowrap;cursor:pointer}
+@media(min-width:769px) and (max-width:1000px){.nav-lvl-chip{display:none!important}}
+@media(min-width:769px) and (max-width:1320px){.kb-logged .nav-logout{display:none}}/* déconnexion via l'avatar -> Réglages : l'en-tête d'un compte connecté débordait déjà vers 1280 px */
+.hero-pick{display:flex;gap:14px;margin:18px 0 6px}
+.hero-pick button{flex:1;border:2px solid var(--border);background:var(--light);border-radius:18px;padding:12px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;font:inherit;font-weight:800;font-size:14px;color:var(--txt)}
+.hero-pick button img{height:150px;width:auto}
+.hero-pick button.on,.hero-pick button:hover{border-color:var(--accent);background:#FFF1EA}
+
+/* ── Accueil élève : coach, niveau, devoir, leçon du jour, jeux conseillés ── */
+.sh{max-width:1080px;margin:0 auto;padding:40px 24px 90px}
+.sh-hello{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(28px,3.4vw,38px);letter-spacing:-.02em;line-height:1.15;margin:0}
+.sh-hello span{color:var(--accent)}
+.sh-sec{margin-top:40px}
+.sh-coach{display:grid;grid-template-columns:200px 1fr;align-items:end;gap:14px;margin-top:22px}
+.sh-coach>img{height:260px;width:auto;justify-self:center;filter:drop-shadow(0 16px 20px rgba(120,40,0,.18))}
+.sh-bubble{position:relative;align-self:center;background:var(--card);border:1.5px solid var(--border);border-radius:28px;padding:30px 34px;box-shadow:0 20px 50px -24px rgba(22,20,15,.2)}
+.sh-bubble::before{content:'';position:absolute;left:-13px;bottom:64px;width:24px;height:24px;background:var(--card);border-left:1.5px solid var(--border);border-bottom:1.5px solid var(--border);transform:rotate(45deg);border-radius:0 0 0 6px}
+.sh-bubble .hi{font-size:15px;font-weight:700;color:var(--muted);margin-bottom:8px}
+.sh-bubble h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(22px,2.4vw,28px);line-height:1.22;letter-spacing:-.015em;margin:0 0 22px}
+.sh-bubble h2 em{font-style:normal;color:var(--accent)}
+.sh-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.sh-btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:14px;padding:15px 24px;font:inherit;font-weight:800;font-size:16px;cursor:pointer;transition:transform .15s,box-shadow .15s;background:var(--accent);color:#fff;box-shadow:0 8px 20px rgba(255,77,46,.32)}
+.sh-btn:hover{transform:translateY(-2px)}
+.sh-btn.white{background:#fff;color:var(--accent);box-shadow:0 8px 20px rgba(120,30,0,.25)}
+.sh-btn svg{width:18px;height:18px}
+.sh-sub{font-size:13.5px;color:var(--muted);font-weight:600}
+.sh-level{display:flex;align-items:center;gap:28px;background:var(--card);border:1.5px solid var(--border);border-radius:26px;padding:26px 30px}
+.sh-av{position:relative;width:112px;height:112px;flex-shrink:0;border:none;background:none;padding:0;cursor:pointer}
+.sh-av .ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p)*1%),#F1E7DC 0)}
+.sh-av .disc{position:absolute;inset:7px;border-radius:50%;overflow:hidden;background:linear-gradient(170deg,#FFF1E8,#FFD9C7);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:38px;color:var(--accent)}
+.sh-av .lvl{position:absolute;right:-4px;bottom:0;width:40px;height:40px;border-radius:13px;background:var(--txt);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;line-height:1;border:3px solid #fff;transform:rotate(-6deg)}
+.sh-av .lvl small{font-size:8px;font-weight:700;letter-spacing:.05em;opacity:.7;margin-bottom:1px}
+.sh-who{flex:1;min-width:0}
+.sh-rank{font-size:13px;font-weight:700;color:var(--muted)}
+.sh-who h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;margin:2px 0 12px}
+.sh-xp{display:flex;align-items:center;gap:12px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.sh-xp .bar{flex:1;max-width:340px;height:10px;border-radius:10px;background:#F1E7DC;overflow:hidden}
+.sh-xp .bar span{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,#FF8A3D,var(--accent));transition:width 1.2s cubic-bezier(.3,1.4,.5,1)}
+.sh-next{font-size:13px;color:var(--muted);margin-top:8px}
+.sh-next b{color:var(--txt)}
+.sh-stats{display:flex;flex-direction:column;gap:8px}
+.sh-pill{display:flex;align-items:center;gap:8px;background:var(--light);border-radius:12px;padding:8px 12px;font-size:13px;color:var(--muted);font-weight:600;white-space:nowrap}
+.sh-pill b{color:var(--txt);font-size:15px;font-weight:800}
+.sh-pill svg{width:16px;height:16px;flex-shrink:0}
+.sh-hw{position:relative;display:flex;align-items:stretch;border-radius:24px;background:linear-gradient(120deg,#F3F6FF 0%,#E8EEFF 100%);border:1.5px solid #D6E0FB;overflow:hidden}
+.sh-hw-date{flex-shrink:0;width:108px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:#fff;border-right:1.5px dashed #C9D6F7;padding:16px 8px;color:#22406E;text-transform:uppercase}
+.sh-hw-date .d,.sh-hw-date .m{font-size:11px;font-weight:800;letter-spacing:.1em;color:#2F7DF6}
+.sh-hw-date b{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:40px;line-height:1;color:#0F2A52}
+.sh-hw-date em{font-style:normal;text-transform:none;margin-top:8px;font-size:11px;font-weight:800;color:#B5470F;background:#FFE9DC;padding:4px 8px;border-radius:20px;white-space:nowrap}
+.sh-hw-date em.late{color:#fff;background:#E5484D}
+.sh-hw-date .nod svg{width:34px;height:34px;color:#2F7DF6}
+.sh-hw-body{flex:1;min-width:0;padding:20px 24px}
+.sh-hw-from{display:flex;align-items:center;gap:8px;font-size:13px;color:#3D5683;margin-bottom:6px}
+.sh-hw-from b{color:#0F2A52}
+.sh-hw-from i{width:24px;height:24px;border-radius:50%;background:#2F7DF6;color:#fff;display:flex;align-items:center;justify-content:center;font-style:normal}
+.sh-hw-from i svg{width:13px;height:13px}
+.sh-hw h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#0F2A52;margin:0 0 12px}
+.sh-hw-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.sh-hw-chips span{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid #D6E0FB;border-radius:20px;padding:6px 12px;font-size:13px;font-weight:700;color:#22406E}
+.sh-hw-chips svg{width:14px;height:14px}
+.sh-hw-foot{display:flex;align-items:center;gap:12px;font-size:12.5px;font-weight:700;color:#3D5683;flex-wrap:wrap}
+.sh-hw-foot .bar{width:140px;height:8px;border-radius:8px;background:#D6E0FB;overflow:hidden}
+.sh-hw-foot .bar span{display:block;height:100%;background:#2F7DF6}
+.sh-hw-foot a{color:#2F7DF6;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.sh-hw-cta{margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:#2F7DF6;color:#fff;border:none;border-radius:12px;padding:11px 16px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 8px 18px -6px rgba(47,125,246,.6);transition:transform .15s}
+.sh-hw-cta svg{width:16px;height:16px}
+.sh-hw-cta:hover{transform:translateY(-2px)}
+.sh-hw>img{width:170px;height:auto;align-self:flex-end;margin:-10px 6px -24px -10px;object-fit:contain}
+.sh-lesson{position:relative;overflow:hidden;border-radius:28px;padding:36px 40px;color:#fff;background:linear-gradient(135deg,#FF7A45 0%,#FF4D2E 55%,#E8381C 100%);box-shadow:0 22px 50px -18px rgba(255,77,46,.6);display:grid;grid-template-columns:1fr 230px;gap:20px;align-items:center}
+.sh-lesson::before{content:'';position:absolute;right:-80px;top:-80px;width:340px;height:340px;border-radius:50%;background:rgba(255,255,255,.08)}
+.sh-lesson>div{position:relative}
+.sh-lesson .ey{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.2);padding:5px 11px;border-radius:20px;margin-bottom:14px}
+.sh-lesson .num{font-size:14px;font-weight:700;opacity:.88;margin-bottom:4px}
+.sh-lesson h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(26px,3vw,34px);line-height:1.1;letter-spacing:-.02em;margin:0 0 16px}
+.sh-lesson .meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px;font-size:14px;font-weight:700}
+.sh-lesson .sh-key{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 8px;border-radius:9px;background:#fff;color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:800;font-size:16px;text-transform:uppercase;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.sh-lesson .steps{display:flex;gap:6px;margin-bottom:26px}
+.sh-lesson .steps i{height:8px;flex:1;max-width:54px;border-radius:6px;background:rgba(255,255,255,.28)}
+.sh-lesson .steps i.done{background:#fff}
+.sh-lesson .steps i.cur{background:linear-gradient(90deg,#fff 40%,rgba(255,255,255,.28) 40%)}
+.sh-lesson .masc{align-self:end;margin-bottom:-36px;display:flex;justify-content:center}
+.sh-lesson .masc img{height:260px;width:auto;filter:drop-shadow(0 14px 22px rgba(80,10,0,.35))}
+.sh-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:16px}
+.sh-title h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;letter-spacing:-.01em;margin:0}
+.sh-title a{font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;text-decoration:none}
+.sh-title a:hover{color:var(--txt)}
+.sh-games{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.sh-game{position:relative;background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:10px;text-align:left;font:inherit;color:var(--txt);cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s}
+.sh-game:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(22,20,15,.08);border-color:#DCD3C3}
+.sh-game .ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#FFF1EA;color:var(--accent)}
+.sh-game .ic svg{width:24px;height:24px}
+.sh-game h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;margin:0}
+.sh-game .why{font-size:13.5px;color:var(--muted);line-height:1.5}
+.sh-game .go{margin-top:auto;padding-top:4px;font-weight:800;font-size:14px;color:var(--accent)}
+.sh-note{margin-top:28px;background:var(--light);border-radius:14px;padding:14px 18px;font-size:14px;color:var(--muted);line-height:1.5}
+@media(max-width:900px){.sh-level{flex-wrap:wrap}.sh-stats{flex-direction:row;flex-wrap:wrap;width:100%}.sh-hw>img{display:none}.sh-games{grid-template-columns:1fr}}
+@media(max-width:820px){.sh{padding:24px 16px 70px}.sh-sec{margin-top:28px}.sh-coach{grid-template-columns:1fr}.sh-coach>img{height:180px}.sh-bubble{padding:24px 22px}.sh-bubble::before{left:50%;top:-13px;bottom:auto;transform:translateX(-50%) rotate(135deg)}.sh-lesson{grid-template-columns:1fr;padding:26px 22px}.sh-lesson .masc{display:none}.sh-hw-cta{margin-left:0}}
+@media(max-width:520px){.sh-hw{flex-direction:column}.sh-hw-date{width:auto;flex-direction:row;gap:8px;border-right:none;border-bottom:1.5px dashed #C9D6F7;padding:10px}.sh-hw-date b{font-size:24px}.sh-hw-date em{margin:0 0 0 auto}}
 .gaze-modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:420px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.18)}
 .gaze-modal-icon{font-size:42px;text-align:center;margin-bottom:12px}
 .gaze-modal h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;margin:0 0 12px;text-align:center}
@@ -3037,22 +3176,23 @@ footer{border-top:1px solid var(--border);margin-top:10px}
   </div>
 </div>
 
-<!-- ONBOARDING MODAL -->
-<!-- ONBOARDING TOOLTIP WALKTHROUGH -->
-<div id="ob-overlay">
-  <div id="ob-tooltip">
-    <div class="ob-tt-label" id="ob-tt-label"></div>
-    <div class="ob-tt-title" id="ob-tt-title"></div>
-    <div class="ob-tt-desc" id="ob-tt-desc"></div>
-    <div class="ob-tt-footer">
-      <span class="ob-tt-counter" id="ob-tt-counter"></span>
-      <div class="ob-tt-actions">
-        <button class="ob-btn-skip" onclick="obClose(true)" data-i18n="ob.skip">Passer</button>
-        <button class="ob-btn-next" id="ob-btn-next" onclick="obNext()" data-i18n="ob.next">Suivant →</button>
-      </div>
+<!-- DIDACTICIEL DE PREMIÈRE CONNEXION (mascotte) -->
+<div id="kt" aria-live="polite">
+  <div class="kt-hole" id="kt-hole"></div>
+  <div class="kt-ring" id="kt-ring"></div>
+  <div class="kt-block" id="kt-block"></div>
+  <div class="kt-hand" id="kt-hand" aria-hidden="true">👆</div>
+  <div class="kt-guide" id="kt-guide" role="dialog" aria-modal="true">
+    <img class="kt-masc" id="kt-masc" src="/images/keypace-pose-10.webp" alt="">
+    <div class="kt-bubble">
+      <div class="kt-who"><b>Kiko</b><div class="kt-prog" id="kt-prog"></div></div>
+      <div class="kt-text" id="kt-text"></div>
+      <div class="kt-heroes" id="kt-heroes" hidden></div>
+      <div class="kt-foot"><span class="kt-hint" id="kt-hint"></span><button class="kt-next" id="kt-next" type="button"></button></div>
     </div>
   </div>
 </div>
+<div class="kt-toast" id="kt-toast"></div>
 
 <!-- APP -->
 <nav id="main-nav">
@@ -3112,6 +3252,7 @@ footer{border-top:1px solid var(--border);margin-top:10px}
       <div class="nav-user">
         <span id="nav-plan-badge" class="nav-plan-badge free">GRATUIT</span>
         <span class="nav-username" id="nav-username"></span>
+        <span class="nav-lvl-chip" id="nav-level" style="display:none" onclick="go('home')"></span>
         <div class="nav-avatar" id="nav-avatar" onclick="app.openSettings()"></div>
         <button id="nav-upgrade-btn" class="nav-upgrade-btn" onclick="openModal('upgrade-modal')" style="display:none" data-i18n="nav.upgrade">Passer Expert</button>
         <button class="nav-logout" onclick="logout()" data-i18n="nav.logout">Déconnexion</button>
@@ -3818,7 +3959,7 @@ document.addEventListener('keydown',e=>{
     if(document.getElementById('auth-modal').classList.contains('open')&&!document.querySelector('.settings-overlay'))authSubmit();
   }
   if(e.key==='Escape'){
-    closeModal('auth-modal');closeModal('upgrade-modal');closeModal('school-modal');closeModal('lesson-tuto-modal');if(document.getElementById('ob-overlay')?.classList.contains('active'))obClose(false);
+    closeModal('auth-modal');closeModal('upgrade-modal');closeModal('school-modal');closeModal('lesson-tuto-modal');
   }
   // Tab to restart the current typing session (standard in typing apps)
   // Jamais quand on écrit dans un champ ou qu'une fenêtre est ouverte (réglages compris) : Tab doit
@@ -3939,7 +4080,9 @@ function loginUser(username){
   updateNavUser();
   // Prof/établissement : atterrir sur son tableau de bord, pas sur la vue Test
   // par défaut (déjà fait pour mobile via MOBILE_BLOCKED_VIEWS, manquant sur desktop).
-  if(isTeacher())go('home');
+  // Élève : atterrir sur son accueil (leçon du jour, devoir, jeux conseillés), sauf si la connexion
+  // a été demandée pour une action précise (_authCallback), qui garde la main.
+  if(isTeacher()||!_authCallback)go('home');
   app.init();
   app.renderCurrent();
   if(_authCallback){const cb=_authCallback;_authCallback=null;cb();}
@@ -3947,92 +4090,281 @@ function loginUser(username){
   setTimeout(()=>app.checkReminders(),800);
 }
 
-// ── Onboarding tooltip walkthrough ─────────────────────────────
-// Deux parcours : élève (nav complète) vs prof/établissement (nav réduite à
-// Accueil/Gestion de classes/Compte, cf. updateNavUser()). Avant ce correctif,
-// le tour élève s'affichait pour tout le monde et ciblait des éléments masqués
-// pour prof/admin (#nav-lessons, #nav-test, #nav-games, #nav-stats), donc des
-// tooltips mal positionnés / pointant vers du vide au premier login.
-const OB_STEPS_ELEVE=[
-  {sel:'#nav-lessons', get label(){return kpT('ob.e1_label')}, get title(){return kpT('nav.lessons')}, get desc(){return kpT('ob.e1_desc')}},
-  {sel:'#nav-test',    get label(){return kpT('ob.e2_label')}, get title(){return kpT('nav.test')},    get desc(){return kpT('ob.e2_desc')}},
-  {sel:'#nav-games',   get label(){return kpT('ob.e3_label')}, get title(){return kpT('nav.games')},   get desc(){return kpT('ob.e3_desc')}},
-  {sel:'#nav-stats',   get label(){return kpT('ob.e4_label')}, get title(){return kpT('nav.stats')},   get desc(){return kpT('ob.e4_desc')}},
-  {sel:'#nav-avatar',  get label(){return kpT('ob.settings_label')}, get title(){return kpT('set.account')}, get desc(){return kpT('ob.settings_desc')}},
-];
-const OB_STEPS_PROF=[
-  {sel:'#nav-home',            get label(){return kpT('ob.p1_label')}, get title(){return kpT('nav.home')}, get desc(){return kpT('ob.p1_desc')}},
-  {sel:'#classes-create-btn',  get label(){return kpT('ob.p2_label')}, get title(){return kpT('ob.p2_title')}, get desc(){return kpT('ob.p2_desc')}, nav:'classes'},
-  {sel:'#nav-avatar',          get label(){return kpT('ob.settings_label')}, get title(){return kpT('set.account')}, get desc(){return kpT('ob.settings_desc')}},
-];
-let _obStep=0;
-let _obPrevEl=null;
-let _obList=OB_STEPS_ELEVE;
-
-function obOpen(){
-  _obStep=0;
-  _obList=isTeacher()?OB_STEPS_PROF:OB_STEPS_ELEVE;
-  document.getElementById('ob-overlay').classList.add('active');
-  obRender();
+// ── Héros, XP et niveaux de l'élève ────────────────────────────
+// Le héros (avatar) est choisi par l'élève au début du didacticiel, ou depuis ses réglages : app.stats.hero ('boy' | 'girl').
+// L'XP n'est pas stockée : elle se calcule à partir de la progression déjà enregistrée (leçons validées, exercices, jeux à record),
+// plus un bonus unique pour la visite guidée (app.stats.tourBonus). Les anciens élèves ont donc tout de suite le niveau qui leur revient.
+const KP_HEROES={boy:'/images/keypace-pose-2.webp',girl:'/images/keypace-pose-3.webp'};
+function kpHero(){const h=typeof app!=='undefined'&&app.stats&&app.stats.hero;return KP_HEROES[h]?h:null;}
+function kpHeroImg(h){return`<img class="kp-hero-img" src="${KP_HEROES[h]}" width="640" height="960" alt="" decoding="async">`;}
+// Remplit un rond d'avatar : le buste du héros s'il est choisi, sinon l'initiale.
+function kpPaintAvatar(el,initial){
+  if(!el)return;const h=currentUser&&!isTeacher()?kpHero():null;
+  el.classList.toggle('has-hero',!!h);
+  if(h)el.innerHTML=kpHeroImg(h);else el.textContent=initial;
+}
+function kpSetHero(h){
+  if(!KP_HEROES[h]||!app.stats)return;
+  app.stats.hero=h;saveStats(app.stats);updateNavUser();
+  if(app.view==='home')app.renderHome();
+  if(app.view==='stats')app.renderStats();
+}
+function kpOpenHeroPicker(){
+  const cur=kpHero();
+  const ov=createOverlay(true);
+  ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:22px;padding:28px 26px;max-width:440px;width:100%;text-align:center">
+    <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;margin:0 0 6px">${kpT('hero.title')}</h3>
+    <p style="color:var(--muted);font-size:14px;line-height:1.5;margin:0">${kpT('hero.sub')}</p>
+    <div class="hero-pick">${['boy','girl'].map(h=>`<button type="button" class="${cur===h?'on':''}" data-h="${h}"><img src="${KP_HEROES[h]}" width="640" height="960" alt="">${kpT(h==='boy'?'hero.boy':'hero.girl')}</button>`).join('')}</div>
+  </div>`;
+  ov.querySelectorAll('[data-h]').forEach(b=>b.addEventListener('click',()=>{kpSetHero(b.dataset.h);ov._close();}));
+}
+const KP_LVL_XP=[0,100,250,450,700,1000,1400,1900,2500,3200];
+const kpLevelXp=n=>n<=KP_LVL_XP.length?KP_LVL_XP[n-1]:KP_LVL_XP[KP_LVL_XP.length-1]+800*(n-KP_LVL_XP.length);
+const KP_XP={lesson:50,exercise:5,game:20,tour:50};
+const KP_GAME_RECORDS=['gameBest','sprintBest','courseBest','ghostBest','simonBest','clavierBest','sourisBest','sourisGridBest','sourisHybridBest','sourisTilesBest','bossBest'];
+function kpXp(){
+  if(typeof app==='undefined'||!app.stats)return 0;
+  const c=course()||{};
+  const lessons=ALL_LESSONS.filter(l=>app.lessonRec(l.id).cleared).length;
+  const games=KP_GAME_RECORDS.filter(k=>{const v=c[k]!==undefined?c[k]:app.stats[k];return !!v&&(typeof v!=='object'||Object.keys(v).length>0);}).length;
+  return lessons*KP_XP.lesson+(c.tests||[]).length*KP_XP.exercise+games*KP_XP.game+(app.stats.tourBonus?KP_XP.tour:0);
+}
+// Un titre tous les deux niveaux (masculin et féminin identiques).
+function kpRank(n){const r=[kpT('sh.rank_1'),kpT('sh.rank_2'),kpT('sh.rank_3'),kpT('sh.rank_4'),kpT('sh.rank_5'),kpT('sh.rank_6')];return r[Math.min(r.length,Math.ceil(n/2))-1];}
+function kpLevel(xp){
+  let n=1;while(xp>=kpLevelXp(n+1))n++;
+  const from=kpLevelXp(n),to=kpLevelXp(n+1);
+  return{n,xp,from,to,pct:Math.max(3,Math.round(100*(xp-from)/(to-from))),rank:kpRank(n),nextRank:kpRank(n+1)};
+}
+// Jours d'affilée avec au moins un exercice (aujourd'hui ou hier compris), comme la page Progrès.
+function kpStreak(tests){
+  const dset=new Set((tests||[]).map(t=>{const d=new Date(t.t);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();}));
+  let streak=0;const cur=new Date();
+  for(let i=0;i<60;i++){const k=cur.getFullYear()+'-'+cur.getMonth()+'-'+cur.getDate();if(dset.has(k)){streak++;cur.setDate(cur.getDate()-1);}else if(i===0){cur.setDate(cur.getDate()-1);}else break;}
+  return streak;
 }
 
-function obRender(){
-  // Retirer le highlight de l'étape précédente
-  if(_obPrevEl){_obPrevEl.classList.remove('ob-highlight');_obPrevEl=null;}
-
-  const step=_obList[_obStep];
-  const total=_obList.length;
-
-  // Textes
-  document.getElementById('ob-tt-label').textContent=step.label;
-  document.getElementById('ob-tt-title').textContent=step.title;
-  document.getElementById('ob-tt-desc').textContent=step.desc;
-  document.getElementById('ob-tt-counter').textContent=(_obStep+1)+' / '+total;
-  document.getElementById('ob-btn-next').textContent=_obStep===total-1?kpT('ob.finish'):kpT('ob.next');
-
-  // Certaines étapes ne peuvent être montrées que sur une autre page (ex.
-  // le bouton "+ Nouvelle classe" n'existe que sur la vue "classes") :
-  // on y navigue d'abord, puis on positionne une fois le rendu à jour.
-  if(step.nav&&typeof app!=='undefined'&&app.view!==step.nav){go(step.nav);setTimeout(()=>obPosition(step),60);}
-  else obPosition(step);
+// ── Didacticiel de première connexion ──────────────────────────
+// Kiko, la mascotte, fait visiter la plateforme : l'écran s'assombrit, seul l'endroit montré reste éclairé.
+// Pas de bouton « Passer » : l'élève lit (le bouton Suivant attend la fin du texte), clique lui-même sur les onglets
+// quand on le lui demande, puis répond à deux questions. Une étape dont la cible n'est pas à l'écran est sautée.
+// Modes d'une étape : 'next' (bouton Suivant), 'click' (il faut cliquer la cible), 'quiz', 'hero' (choix du héros).
+const ktHub=sel=>{const h=document.getElementById('kpCoursHost');return h&&h.shadowRoot?h.shadowRoot.querySelector(sel):null;};
+const ktFirst=()=>(currentDisplayName||currentUser||'').trim().split(' ')[0];
+function ktStepsEleve(){
+  const name=app._esc(ktFirst()||'');
+  const tab=id=>{const el=document.getElementById(id);return el?el.textContent.trim():'';};
+  const steps=[
+    {pose:10,mode:'next',btn:()=>kpT('tour.go'),text:()=>kpT('tour.intro',{name})},
+    {pose:2,mode:'hero',text:()=>kpT('tour.hero')},
+    {view:'home',target:'#sh-avatar',shape:'circle',pad:14,scroll:true,pose:13,mode:'next',text:()=>kpT('tour.level')},
+    {view:'home',target:'#sh-coach',shape:'round',pad:10,scroll:true,pose:5,mode:'next',text:()=>kpT('tour.coach')},
+    {view:'home',target:'#sh-hw',shape:'round',pad:10,scroll:true,pose:5,mode:'next',text:()=>kpT('tour.hw')},
+    {view:'home',target:'#sh-lesson',shape:'round',pad:10,scroll:true,pose:13,mode:'next',text:()=>kpT('tour.lesson')},
+    {view:'home',target:'#sh-games',shape:'round',pad:12,scroll:true,pose:10,mode:'next',text:()=>kpT('tour.games')},
+    {view:'home',target:'#nav-lessons',shape:'circle',pad:16,scrollTop:true,pose:5,mode:'click',hint:()=>kpT('tour.hint_click',{tab:tab('nav-lessons')}),text:()=>kpT('tour.click_lessons',{tab:tab('nav-lessons')})},
+    {view:'lessons',target:()=>ktHub('#mainHero'),shape:'round',pad:10,scroll:true,pose:10,mode:'next',text:()=>kpT('tour.hub',{n:ALL_LESSONS.length})},
+    {view:'lessons',target:()=>ktHub('#heroCta'),shape:'round',pad:12,pose:5,mode:'next',text:()=>kpT('tour.hub_cta')},
+    {view:'lessons',target:()=>ktHub('#modules'),shape:'round',pad:14,scroll:true,pose:13,mode:'next',text:()=>kpT('tour.hub_modules')},
+    {view:'lessons',target:'.lessons-section .module',shape:'round',pad:10,scroll:true,pose:13,mode:'next',text:()=>kpT('tour.modules')},
+    {view:'lessons',target:'#nav-games',shape:'circle',pad:16,scrollTop:true,pose:5,mode:'click',hint:()=>kpT('tour.hint_click',{tab:tab('nav-games')}),text:()=>kpT('tour.click_games',{tab:tab('nav-games')})},
+    {view:'games',target:'.gcine-advice',shape:'round',pad:10,scroll:true,pose:10,mode:'next',text:()=>kpT('tour.g_advice')},
+    {view:'games',target:'.gcine-cat-tabs',shape:'round',pad:10,scroll:true,pose:7,mode:'next',text:()=>kpT('tour.g_cats')},
+    {view:'games',target:'.gcine-boss-banner',shape:'round',pad:10,scroll:true,pose:6,mode:'next',text:()=>kpT('tour.g_boss')},
+    {view:'games',target:'#nav-stats',shape:'circle',pad:16,scrollTop:true,pose:5,mode:'click',hint:()=>kpT('tour.hint_click',{tab:tab('nav-stats')}),text:()=>kpT('tour.click_stats',{tab:tab('nav-stats')})},
+    {view:'stats',target:'.pg-side',shape:'round',pad:10,scroll:true,pose:13,mode:'next',text:()=>kpT('tour.stats')},
+    {view:'stats',target:'#nav-join',shape:'circle',pad:16,scrollTop:true,pose:5,mode:'next',text:()=>kpT('tour.class',{tab:tab('nav-join')})},
+    {view:'stats',target:'#main-nav .nav-inner',shape:'round',pad:4,scrollTop:true,pose:10,mode:'quiz',q:1,hint:()=>kpT('tour.hint_quiz'),text:()=>kpT('tour.q1'),
+     answers:[
+       {sel:'#nav-home',ok:true,msg:()=>kpT('tour.q1_home')},
+       {sel:'#nav-lessons',ok:true,msg:()=>kpT('tour.q1_lessons')},
+       {sel:'#nav-games',msg:()=>kpT('tour.q1_games')},
+       {sel:'#nav-stats',msg:()=>kpT('tour.q1_stats')},
+       {sel:'#nav-test-wrap',msg:()=>kpT('tour.q1_test')},
+       {sel:'#nav-join',msg:()=>kpT('tour.q1_class')},
+       {sel:'.nav-user',msg:()=>kpT('tour.q1_profile')},
+     ]},
+    {view:'stats',target:'#main-nav .nav-inner',shape:'round',pad:4,pose:10,mode:'quiz',q:2,hint:()=>kpT('tour.hint_quiz'),text:()=>kpT('tour.q2'),
+     answers:[
+       {sel:'.nav-user',ok:true,msg:()=>kpT('tour.q2_ok')},
+       {sel:'.nav-links',msg:()=>kpT('tour.q2_no')},
+     ]},
+    {view:'home',pose:6,mode:'next',final:true,btn:()=>kpT('tour.final_cta'),text:()=>app.stats&&app.stats.tourBonus?kpT('tour.final_again',{name}):kpT('tour.final',{name})},
+  ];
+  return steps;
 }
-function obPosition(step){
-  const el=document.querySelector(step.sel);
-  if(!el)return;
-
-  // Highlight de l'élément ciblé
-  el.classList.add('ob-highlight');
-  _obPrevEl=el;
-
-  // Positionner le tooltip sous l'élément
-  const rect=el.getBoundingClientRect();
-  const tt=document.getElementById('ob-tooltip');
-  const ttW=290;
-  let left=rect.left+rect.width/2-ttW/2;
-  left=Math.max(12,Math.min(left,window.innerWidth-ttW-12));
-  const top=rect.bottom+12;
-  tt.style.left=left+'px';
-  tt.style.top=top+'px';
-
-  // Flèche alignée sur l'élément
-  const arrowLeft=Math.max(18,Math.min(rect.left+rect.width/2-left,ttW-18));
-  tt.style.setProperty('--arrow-left',arrowLeft+'px');
+function ktStepsProf(){
+  const name=app._esc(ktFirst()||'');
+  const two=(l,d)=>`<b>${l}</b><br>${d}`;
+  return[
+    {pose:10,mode:'next',btn:()=>kpT('tour.go'),text:()=>kpT('tour.p_intro',{name})},
+    {view:'home',target:'#nav-home',shape:'circle',pad:16,scrollTop:true,pose:5,mode:'next',text:()=>two(kpT('ob.p1_label'),kpT('ob.p1_desc'))},
+    {view:'classes',target:'#classes-create-btn',shape:'round',pad:12,scrollTop:true,pose:13,mode:'next',text:()=>two(kpT('ob.p2_label'),kpT('ob.p2_desc'))},
+    {target:'#nav-avatar',shape:'circle',pad:16,scrollTop:true,pose:10,mode:'next',text:()=>two(kpT('ob.settings_label'),kpT('ob.settings_desc'))},
+    {view:'home',pose:6,mode:'next',final:true,btn:()=>kpT('ob.finish'),text:()=>kpT('tour.p_final')},
+  ];
 }
 
-function obNext(){
-  if(_obStep>=_obList.length-1){obClose(true);return;}
-  const tt=document.getElementById('ob-tooltip');
-  tt.classList.add('ob-fading');
-  setTimeout(()=>{
-    _obStep++;
-    obRender();
-    tt.classList.remove('ob-fading');
-  },150);
+const KT={steps:[],i:-1,token:0,typing:null,solved:false,rect:null,on:false};
+const ktEl=id=>document.getElementById(id);
+const ktWait=ms=>new Promise(r=>setTimeout(r,ms));
+const ktPose=n=>`/images/keypace-pose-${n}.webp`;
+function ktTarget(st){
+  if(!st.target)return null;
+  const el=typeof st.target==='function'?st.target():document.querySelector(st.target);
+  if(!el)return null;const r=el.getBoundingClientRect();
+  return r.width>0&&r.height>0?el:null;
 }
-
+async function obOpen(){
+  // Sur téléphone, les onglets Cours et Jeux n'existent pas : la visite attend le premier passage sur ordinateur.
+  if(!currentUser||isMobileLayout()||KT.on)return;
+  const teacher=isTeacher();
+  if(!teacher&&app._myClasses===null&&currentToken){try{await Promise.race([app.loadMyClasses(),ktWait(2500)]);}catch{}}
+  KT.steps=teacher?ktStepsProf():ktStepsEleve();
+  KT.on=true;document.body.style.overflow='hidden';
+  closeNavMenu();
+  ktEl('kt').classList.add('on');
+  ktSetHole(null);
+  ktShow(0);
+}
+// Étape suivante existante à partir de i (les étapes sans cible visible sont sautées ; une étape change d'écran si besoin).
+async function ktShow(i){
+  const my=++KT.token;
+  const g=ktEl('kt-guide'),masc=ktEl('kt-masc'),txt=ktEl('kt-text'),hint=ktEl('kt-hint'),next=ktEl('kt-next'),heroes=ktEl('kt-heroes');
+  g.classList.remove('in','center');ktEl('kt-ring').classList.remove('on');ktEl('kt-hand').classList.remove('on');
+  hint.textContent='';hint.className='kt-hint';heroes.hidden=true;
+  if(KT.typing){clearInterval(KT.typing);KT.typing=null;}
+  await ktWait(250);if(my!==KT.token)return;
+  let st;
+  for(;i<KT.steps.length;i++){
+    st=KT.steps[i];
+    if(st.view&&app.view!==st.view){go(st.view);await ktWait(350);if(my!==KT.token)return;}
+    if(!st.target||ktTarget(st))break;
+  }
+  if(i>=KT.steps.length)return obClose(true);
+  KT.i=i;KT.solved=false;
+  if(st.scrollTop)await ktScroll(0);
+  else if(st.scroll&&st.target){const el=ktTarget(st);if(el){const r=el.getBoundingClientRect();await ktScroll(Math.max(0,scrollY+r.top-110));}}
+  if(my!==KT.token)return;
+  ktSetHole(st);
+  await ktWait(st.target?620:300);if(my!==KT.token)return;
+  masc.src=ktPose(st.pose);
+  ktEl('kt-prog').innerHTML=KT.steps.map((_,k)=>`<i class="${k<i?'d':k===i?'c':''}"></i>`).join('');
+  next.hidden=!(st.mode==='next'||st.mode==='hero');next.disabled=true;
+  next.textContent=st.btn?st.btn():kpT('ob.next');
+  txt.innerHTML='';
+  if(st.mode==='hero'){
+    const cur=kpHero();
+    heroes.innerHTML=['boy','girl'].map(h=>`<button type="button" class="kt-hero${cur===h?' on':''}" data-h="${h}"><img src="${KP_HEROES[h]}" width="640" height="960" alt="">${kpT(h==='boy'?'hero.boy':'hero.girl')}</button>`).join('');
+    heroes.hidden=false;
+  }
+  ktPlaceGuide(st);
+  g.classList.add('in');
+  masc.classList.remove('hop');void masc.offsetWidth;masc.classList.add('hop');
+  if(st.mode==='click')ktEl('kt-ring').classList.add('on');
+  await ktType(st.text(),my);
+  if(my!==KT.token)return;
+  if(st.mode==='next'){await ktWait(500);if(my===KT.token)next.disabled=false;}
+  else if(st.mode==='hero'){next.disabled=!kpHero();}
+  else{hint.textContent=st.hint();if(st.mode==='click')ktPlaceHand();}
+  if(st.final)ktConfetti();
+}
+// Le texte s'écrit lettre à lettre (les balises arrivent d'un coup) ; un clic sur la bulle le termine.
+function ktType(html,my){
+  const txt=ktEl('kt-text');
+  return new Promise(res=>{
+    if(matchMedia('(prefers-reduced-motion:reduce)').matches){txt.innerHTML=html;return res();}
+    let n=0;const done=()=>{clearInterval(KT.typing);KT.typing=null;txt.innerHTML=html;res();};
+    txt.onclick=()=>{if(KT.typing)done();};
+    KT.typing=setInterval(()=>{
+      if(my!==KT.token){clearInterval(KT.typing);return res();}
+      if(html[n]==='<')n=html.indexOf('>',n)+1;else if(html[n]==='&'&&/^&#?\w+;/.test(html.slice(n,n+10)))n=html.indexOf(';',n)+1;else n++;
+      if(n>=html.length||n<=0)return done();
+      txt.innerHTML=html.slice(0,n)+'<span class="cur"></span>';
+    },22);
+  });
+}
+function ktRectOf(st){
+  const el=ktTarget(st);if(!el)return null;
+  const r=el.getBoundingClientRect(),p=st.pad||10;
+  if(st.shape==='circle'){const d=Math.max(r.width,r.height)+p*2;return{l:r.left+r.width/2-d/2,t:r.top+r.height/2-d/2,w:d,h:d,rad:'50%'};}
+  return{l:r.left-p,t:r.top-p,w:r.width+p*2,h:r.height+p*2,rad:'26px'};
+}
+function ktSetHole(st){
+  const R=st&&st.target?ktRectOf(st):null;KT.rect=R;
+  const s=R?{left:R.l+'px',top:R.t+'px',width:R.w+'px',height:R.h+'px',borderRadius:R.rad}:{left:'50%',top:'50%',width:'0px',height:'0px',borderRadius:'50%'};
+  Object.assign(ktEl('kt-hole').style,s);Object.assign(ktEl('kt-ring').style,s);
+}
+function ktPlaceGuide(){
+  const g=ktEl('kt-guide'),vw=innerWidth,vh=innerHeight,R=KT.rect;
+  if(!R){g.classList.add('center');g.style.left=Math.max(8,(vw-g.offsetWidth)/2)+'px';g.style.top=Math.max(16,(vh-g.offsetHeight)/2)+'px';return;}
+  const gw=g.offsetWidth,gh=g.offsetHeight;
+  let top;
+  if(vh-(R.t+R.h)>=gh+10)top=R.t+R.h+6;
+  else if(R.t>=gh+10)top=R.t-gh-6;
+  else top=vh-gh-10;
+  g.style.left=Math.max(16,Math.min(R.l+R.w/2-gw*0.3,vw-gw-16))+'px';g.style.top=top+'px';
+}
+function ktPlaceHand(){
+  const R=KT.rect,h=ktEl('kt-hand');if(!R)return;
+  h.style.left=(R.l+R.w*0.62)+'px';h.style.top=(R.t+R.h*0.62)+'px';h.classList.add('on');
+}
+async function ktScroll(y){
+  y=Math.max(0,Math.min(y,document.documentElement.scrollHeight-innerHeight));
+  if(Math.abs(scrollY-y)<2)return;
+  window.scrollTo({top:y,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
+  let last=-1,same=0;for(let k=0;k<80&&same<6;k++){await ktWait(25);if(scrollY===last)same++;else{same=0;last=scrollY;}}
+  if(Math.abs(scrollY-y)>2)window.scrollTo(0,y); // défilement doux interrompu ou indisponible : on y va directement
+}
+const ktInside=(x,y,el)=>{if(!el)return false;const r=el.getBoundingClientRect();return r.width>0&&x>=r.left-4&&x<=r.right+4&&y>=r.top-4&&y<=r.bottom+4;};
+function ktNudge(msg,wrong){
+  const hint=ktEl('kt-hint'),g=ktEl('kt-guide'),masc=ktEl('kt-masc');
+  hint.textContent=msg;hint.className='kt-hint warn';
+  g.classList.remove('shake');void g.offsetWidth;g.classList.add('shake');
+  if(wrong){const p=KT.steps[KT.i].pose;masc.src=ktPose(14);setTimeout(()=>{if(!KT.solved)masc.src=ktPose(p);},1400);}
+}
+function ktOnClick(e){
+  const st=KT.steps[KT.i];if(!st)return;
+  if(st.mode==='click'){
+    const el=ktTarget(st);
+    if(ktInside(e.clientX,e.clientY,el)){ktEl('kt-hand').classList.remove('on');ktEl('kt-ring').classList.remove('on');(el.querySelector('a,button')||el).click();ktShow(KT.i+1);}
+    else ktNudge(kpT('tour.nudge_click'));
+  }else if(st.mode==='quiz'){
+    if(KT.solved)return;
+    const a=st.answers.find(x=>ktInside(e.clientX,e.clientY,document.querySelector(x.sel)));
+    if(!a){ktNudge(ktInside(e.clientX,e.clientY,ktTarget(st))?kpT('tour.q_wrong'):kpT('tour.nudge_quiz'),true);return;}
+    if(!a.ok){ktNudge(a.msg(),true);return;}
+    KT.solved=true;
+    const hint=ktEl('kt-hint'),masc=ktEl('kt-masc'),next=ktEl('kt-next');
+    hint.textContent='✅ '+a.msg();hint.className='kt-hint ok';
+    masc.src=ktPose(13);masc.classList.remove('hop');void masc.offsetWidth;masc.classList.add('hop');
+    const r=document.querySelector(a.sel).getBoundingClientRect();
+    Object.assign(ktEl('kt-hole').style,{left:r.left-10+'px',top:r.top-10+'px',width:r.width+20+'px',height:r.height+20+'px',borderRadius:'18px'});
+    next.hidden=false;next.disabled=false;next.textContent=st.q===1?kpT('tour.next_q'):kpT('tour.end_quiz');
+  }else{const g=ktEl('kt-guide');g.classList.remove('shake');void g.offsetWidth;g.classList.add('shake');}
+}
+function ktOnMove(e){
+  const st=KT.steps[KT.i];if(!st)return;let ok=false;
+  if(st.mode==='click')ok=ktInside(e.clientX,e.clientY,ktTarget(st));
+  else if(st.mode==='quiz'&&!KT.solved)ok=st.answers.some(a=>ktInside(e.clientX,e.clientY,document.querySelector(a.sel)));
+  ktEl('kt-block').style.cursor=ok?'pointer':'default';
+}
+function ktConfetti(){
+  const cols=['#FF4D2E','#FF8A3D','#FFC94D','#1FA971','#6D5DF5','#2F7DF6'];
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  for(let k=0;k<90;k++){const c=document.createElement('div');c.className='kt-confetti';
+    c.style.left=Math.random()*100+'vw';c.style.background=cols[k%cols.length];
+    c.style.setProperty('--dx',(Math.random()*200-100)+'px');c.style.setProperty('--r',(Math.random()*900)+'deg');
+    c.style.animationDuration=(2.2+Math.random()*1.8)+'s';c.style.animationDelay=(Math.random()*.6)+'s';
+    document.body.appendChild(c);setTimeout(()=>c.remove(),5000);}
+}
 async function obClose(markDone){
-  if(_obPrevEl){_obPrevEl.classList.remove('ob-highlight');_obPrevEl=null;}
-  document.getElementById('ob-overlay').classList.remove('active');
+  KT.token++;KT.on=false;
+  if(KT.typing){clearInterval(KT.typing);KT.typing=null;}
+  ktEl('kt-guide').classList.remove('in');ktSetHole(null);
+  ktEl('kt').classList.remove('on');document.body.style.overflow='';
+  if(app._pendingReminders){const r=app._pendingReminders;app._pendingReminders=null;setTimeout(()=>app._showReminderPopup(r),900);}
   if(markDone){
     localStorage.setItem('klak_ob','1');
     if(currentToken){
@@ -4041,13 +4373,41 @@ async function obClose(markDone){
     }
   }
 }
-
+async function ktFinish(){
+  const teacher=isTeacher();
+  const bonus=!teacher&&app.stats&&!app.stats.tourBonus;
+  if(bonus){app.stats.tourBonus=1;saveStats(app.stats);}
+  await obClose(true);
+  go('home');updateNavUser();
+  if(bonus){const t=ktEl('kt-toast');t.textContent=kpT('tour.toast');t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800);}
+}
 function obReplay(){
   app.closeSettings&&app.closeSettings();
   setTimeout(obOpen,200);
 }
-
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('ob-overlay').classList.contains('active'))obClose(false);});
+(function ktWire(){
+  ktEl('kt-block').addEventListener('click',ktOnClick);
+  ktEl('kt-block').addEventListener('mousemove',ktOnMove);
+  ktEl('kt-heroes').addEventListener('click',e=>{
+    const b=e.target.closest('[data-h]');if(!b)return;
+    kpSetHero(b.dataset.h);
+    ktEl('kt-heroes').querySelectorAll('.kt-hero').forEach(x=>x.classList.toggle('on',x===b));
+    ktEl('kt-next').disabled=false;
+  });
+  ktEl('kt-next').addEventListener('click',()=>{const st=KT.steps[KT.i];if(!st)return;if(st.final)ktFinish();else ktShow(KT.i+1);});
+  // Pas d'échappatoire : molette, défilement tactile et clavier sont neutralisés pendant la visite. Entrée = Suivant.
+  ['wheel','touchmove'].forEach(ev=>addEventListener(ev,e=>{if(KT.on)e.preventDefault();},{passive:false}));
+  addEventListener('keydown',e=>{
+    if(!KT.on)return;
+    const next=ktEl('kt-next');
+    e.preventDefault();e.stopImmediatePropagation();
+    if(e.key==='Enter'&&!next.hidden&&!next.disabled)next.click();
+  },true);
+  // Pendant la visite, seul le didacticiel fait défiler la page : le trou de lumière et Kiko suivent la cible jusqu'au bout du défilement.
+  const follow=()=>{const st=KT.steps[KT.i];if(!KT.on||!st||KT.solved)return;ktSetHole(st);if(ktEl('kt-guide').classList.contains('in'))ktPlaceGuide();if(ktEl('kt-hand').classList.contains('on'))ktPlaceHand();};
+  addEventListener('resize',follow);
+  addEventListener('scroll',follow,{passive:true});
+})();
 // ───────────────────────────────────────────────────────────────
 
 // Élève : un devoir fraîchement assigné par le prof n'apparaissait qu'après un
@@ -4113,7 +4473,9 @@ function updateNavUser(){
   }
   guest.style.display='none';logged.style.display='block';
   document.getElementById('nav-username').textContent=currentUser;
-  document.getElementById('nav-avatar').textContent=currentUser[0].toUpperCase();
+  kpPaintAvatar(document.getElementById('nav-avatar'),currentUser[0].toUpperCase());
+  const lvChip=document.getElementById('nav-level');
+  if(lvChip){const show=!isTeacher()&&!!app.stats;lvChip.style.display=show?'':'none';if(show)lvChip.textContent=kpT('sh.lvl_chip',{n:kpLevel(kpXp()).n});}
   const plan=getUserPlan();
   const role=app.stats&&app.stats.role;
   const teacher=isTeacher();
@@ -4122,6 +4484,7 @@ function updateNavUser(){
   const classesBtn=document.getElementById('nav-classes');
   if(teacher){badge.textContent=role==='admin'?'ÉTABLISSEMENT':'ENSEIGNANT';badge.className='nav-plan-badge etab';}
   else{badge.textContent=plan==='expert'?'EXPERT':kpT('nav.free');badge.className='nav-plan-badge '+(plan==='expert'?'expert':'free');}
+  badge.style.display=teacher?'':'none'; // élève : la pastille de niveau prend sa place (le bouton « Passer Expert » reste pour un compte gratuit)
   upgradeBtn.style.display=(plan==='expert'||teacher)?'none':'inline-block';
   if(classesBtn)classesBtn.style.display=(teacher&&!isAdmin())?'inline-flex':'none';
   ['nav-test-wrap','nav-lessons','nav-games','nav-stats'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=teacher?'none':'';});
@@ -4928,6 +5291,7 @@ function maybeConvUpsell(res){
 // Nudge occasionnel pour les comptes gratuits (1× tous les 3 jours, sur Cours/Jeux)
 function maybeConvNudge(v){
   if(!currentUser||getUserPlan()!=='free'||isTeacher()||isAdmin())return;
+  if(KT.on)return; // pas de sollicitation pendant la visite guidée
   if(v!=='lessons'&&v!=='games')return;
   const last=+(_convGet('kp-conv-nudge')||0), now=Date.now();
   if(now-last<3*86400000)return;
@@ -8223,6 +8587,7 @@ const app={
   },
 
   _showReminderPopup(reminders){
+    if(KT.on){this._pendingReminders=reminders;return;} // affiché à la fin de la visite guidée, pas par-dessus
     const overlay=createOverlay(true);
     overlay.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 28px;max-width:400px;width:100%;text-align:center">
       <div style="font-size:36px;margin-bottom:10px">🔔</div>
@@ -9472,9 +9837,130 @@ const app={
   },
 
   /* ── HOME ── */
+  /* ── Accueil de l'élève connecté ──
+     Dans l'ordre : bonjour, le coach (Kiko dit quoi faire en priorité), le héros et son niveau, le devoir le plus urgent
+     (s'il y en a un), la leçon du jour (là où l'élève en est), puis trois jeux conseillés selon les lettres déjà apprises. */
+  _renderHomeStudent(){
+    const c=course()||{},tests=c.tests||[];
+    const esc=v=>this._esc(v);
+    const full=(currentDisplayName||currentUser||'').trim();
+    const name=esc(full.split(' ')[0]);
+    const cleared=ALL_LESSONS.filter(l=>this.lessonRec(l.id).cleared).length;
+    const fresh=!tests.length&&!cleared;
+    const lv=kpLevel(kpXp());
+    const hero=kpHero();
+    const mobile=isMobileLayout();
+    const best=tests.length?Math.max(...tests.map(t=>t.wpm||0)):0;
+    const acc=tests.length?Math.round(tests.reduce((a,t)=>a+(t.acc||0),0)/tests.length):0;
+    const streak=kpStreak(tests);
+    const arrow='<span aria-hidden="true">→</span>';
+
+    // Leçon à reprendre : la première non validée (même règle que la liste des leçons).
+    const idx=ALL_LESSONS.findIndex(l=>!this.lessonRec(l.id).cleared);
+    const les=idx>=0?ALL_LESSONS[idx]:null;
+    const lesLocked=!!les&&getUserPlan()==='free'&&!isLessonFree(les.id);
+    const lesGo=les?(lesLocked?"openModal('upgrade-modal')":`app.tryStartLesson('${les.id}')`):"go('games')";
+
+    // Devoirs : chargés en arrière-plan, l'accueil se redessine quand ils arrivent (voir loadMyClasses).
+    if(this._myClasses==null&&currentToken&&!this._shAsgLoading){this._shAsgLoading=true;Promise.resolve(this.loadMyClasses()).finally(()=>{this._shAsgLoading=false;});}
+    const all=this._myAssignments||[];
+    const todo=this._clSortTodo(all);
+    const hw=todo[0]||null,hwDue=hw?this._clDue(hw):null;
+
+    // Le coach : devoir urgent d'abord, sinon la leçon du jour, sinon les jeux.
+    let msg,cta,act,sub='';
+    if(hw&&hwDue&&hwDue.days<=1){
+      msg=hwDue.days<0?kpT('sh.coach_hw_late',{title:esc(hw.title)}):kpT('sh.coach_hw_soon',{title:esc(hw.title),when:hwDue.label});
+      cta=kpT('sh.cta_hw');act=this._clAction(hw).onclick;
+    }else if(!les){msg=kpT('sh.coach_done');cta=kpT('sh.cta_games');act="go('games')";}
+    else if(fresh){msg=kpT('sh.coach_first',{title:esc(les.title)});cta=kpT('sh.cta_first');act=lesGo;}
+    else{msg=kpT('sh.coach_resume',{n:idx+1});cta=kpT('sh.cta_resume',{n:idx+1});act=lesGo;sub=esc(les.title);}
+    const coach=`<section class="sh-coach" id="sh-coach">
+      <img src="/images/keypace-pose-5.webp" width="640" height="960" alt="" decoding="async">
+      <div class="sh-bubble">
+        <div class="hi">${kpT('sh.coach_hi',{name})}</div>
+        <h2>${msg}</h2>
+        ${mobile?`<p class="sh-sub" style="margin:0">${kpT('home.desktop_note')}</p>`:`<div class="sh-row"><button class="sh-btn" onclick="${act}">${cta} ${arrow}</button>${sub?`<span class="sh-sub">${sub}</span>`:''}</div>`}
+      </div>
+    </section>`;
+
+    const initial=esc(full.charAt(0).toUpperCase()||'?');
+    const pills=tests.length?`<div class="sh-stats">
+        <div class="sh-pill"><span style="color:var(--accent)">${ICONS.zap}</span>${kpT('sh.stat_wpm',{n:best})}</div>
+        <div class="sh-pill"><span style="color:var(--success)">${ICONS.target}</span>${kpT('sh.stat_acc',{n:acc})}</div>
+        <div class="sh-pill"><span style="color:var(--warning)">${ICONS.flame}</span>${kpTn('sh.stat_streak',streak)}</div>
+      </div>`:'';
+    const level=`<section class="sh-sec sh-level" id="sh-level">
+      <button type="button" class="sh-av" id="sh-avatar" style="--p:${lv.pct}" onclick="kpOpenHeroPicker()" aria-label="${kpT('hero.title')}"><span class="ring"></span><span class="disc">${hero?kpHeroImg(hero):initial}</span><span class="lvl"><small>${kpT('sh.lvl_short')}</small>${lv.n}</span></button>
+      <div class="sh-who">
+        <div class="sh-rank">${lv.rank}</div>
+        <h2>${kpT('sh.level',{n:lv.n})}</h2>
+        <div class="sh-xp"><div class="bar"><span style="width:${lv.pct}%"></span></div>${kpT('sh.xp',{xp:lv.xp,next:lv.to})}</div>
+        <div class="sh-next">${hero?kpT('sh.xp_to_next',{n:lv.to-lv.xp,lvl:lv.n+1}):`<a style="color:var(--accent);font-weight:700;cursor:pointer" onclick="kpOpenHeroPicker()">${kpT('sh.choose_hero')}</a>`}</div>
+      </div>
+      ${pills}
+    </section>`;
+
+    let homework='';
+    if(hw){
+      const k=this._clKind(hw),ac=this._clAction(hw);
+      const d=hw.dueDate?new Date(String(hw.dueDate).slice(0,10)+'T00:00:00'):null;
+      const okDate=d&&!isNaN(d);
+      const date=okDate?`<span class="d">${d.toLocaleDateString(kpLocale(),{weekday:'short'}).replace('.','')}</span><b>${d.getDate()}</b><span class="m">${d.toLocaleDateString(kpLocale(),{month:'short'}).replace('.','')}</span><em class="${hwDue&&hwDue.days<0?'late':''}">${hwDue?hwDue.label:''}</em>`
+        :`<span class="nod">${ICONS.clipboard}</span><em>${kpT('sh.hw_no_date')}</em>`;
+      const doneN=all.filter(a=>a.done).length;
+      homework=`<section class="sh-sec sh-hw" id="sh-hw">
+        <div class="sh-hw-date">${date}</div>
+        <div class="sh-hw-body">
+          <div class="sh-hw-from"><i>${ICONS.gradCap}</i><span>${hw.className?kpT('sh.hw_from',{cls:`<b>${esc(hw.className)}</b>`}):kpT('sh.hw_label')}</span></div>
+          <h3>${esc(hw.title)}</h3>
+          <div class="sh-hw-chips"><span>${ICONS[k.icon]||''} ${k.kind}</span>${hw.targetWpm?`<span>${ICONS.target} ${kpT('cl.target',{n:hw.targetWpm})}</span>`:''}</div>
+          <div class="sh-hw-foot"><div class="bar"><span style="width:${all.length?Math.round(100*doneN/all.length):0}%"></span></div><span>${kpT('sh.hw_handed',{d:doneN,t:all.length})}</span>${todo.length>1?`<a onclick="go('classes')">${kpTn('sh.hw_more',todo.length-1)}</a>`:''}${mobile?'':`<button class="sh-hw-cta" onclick="${ac.onclick}">${ac.label} ${arrow}</button>`}</div>
+        </div>
+        <img src="/images/keypace-perso-courrier-ecole.webp" width="521" height="560" alt="" decoding="async">
+      </section>`;
+    }
+
+    let lesson='';
+    if(les&&!mobile){
+      const mod=ALL_MODULES[les.moduleIdx]||{lessons:[les]};
+      const pos=mod.lessons.findIndex(l=>l.id===les.id);
+      lesson=`<section class="sh-sec sh-lesson" id="sh-lesson">
+        <div>
+          <span class="ey">${kpT('sh.lesson_ey')}</span>
+          <div class="num">${kpT('sh.lesson_num',{module:esc(les.module),n:idx+1,total:ALL_LESSONS.length})}</div>
+          <h2>${esc(les.title)}</h2>
+          <div class="meta">${String(kpLessonKeys(les)).split(/\s+/).filter(Boolean).slice(0,8).map(k=>`<span class="sh-key">${esc(k)}</span>`).join('')}<span>+${KP_XP.lesson} XP</span></div>
+          <div class="steps">${mod.lessons.map((l,i)=>`<i class="${i<pos||this.lessonRec(l.id).cleared?'done':i===pos?'cur':''}"></i>`).join('')}</div>
+          <button class="sh-btn white" onclick="${lesGo}">${lesLocked?kpT('nav.upgrade'):kpT('sh.lesson_cta')} ${arrow}</button>
+        </div>
+        <div class="masc"><img src="/images/keypace-pose-13.webp" width="633" height="960" alt="" decoding="async"></div>
+      </section>`;
+    }
+
+    let games='';
+    if(!mobile){
+      const adv=this._gamesAdvice();
+      const byKey=Object.fromEntries(GCINE_GAMES.map(g=>[g.key,g]));
+      const items=(adv?adv.items:[{key:'frappe'},{key:'sprint'},{key:'course'}]).filter(x=>byKey[x.key]).slice(0,3);
+      const tint={vitesse:['#FFF1EA','var(--accent)'],precision:['#E8F7EF','var(--success)'],memoire:['#EFEDFF','#6D5DF5'],multi:['#EEF4FF','#2F7DF6']};
+      games=`<section class="sh-sec" id="sh-games-sec">
+        <div class="sh-title"><h3>${kpT('sh.games_title')}</h3><a onclick="go('games')">${kpT('sh.games_all')}</a></div>
+        <div class="sh-games" id="sh-games">${items.map(x=>{const g=byKey[x.key],t=tint[g.category]||tint.vitesse;
+          return`<button type="button" class="sh-game" onclick="go('games');app.selectGame('${g.key}')"><span class="ic" style="background:${t[0]};color:${t[1]}">${ICONS[g.icon]||''}</span><h4>${kpGameName(g)}</h4><span class="why">${x.why?x.why():this._gcineDesc(g)}</span><span class="go">${kpT('games.play')}</span></button>`;}).join('')}</div>
+      </section>`;
+    }
+
+    document.getElementById('page-home').innerHTML=`<div class="sh">
+      <h1 class="sh-hello">${fresh?kpT('sh.hello_new',{name}):kpT('sh.hello',{name})}</h1>
+      ${coach}${level}${homework}${lesson}${games}
+    </div>`;
+    const chip=document.getElementById('nav-level');if(chip)chip.textContent=kpT('sh.lvl_chip',{n:lv.n});
+  },
   renderHome(){
     if(isAdmin()){this._renderHomeAdmin();return;}
     if(isTeacher()){this._renderHomeEtab();return;}
+    if(currentUser){this._renderHomeStudent();return;}
     const isGuest=!currentUser;
 
     // Keyboard home row color preview (mobile)
@@ -14166,7 +14652,7 @@ const app={
       if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey)return;
       const t=e.target;
       if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
-      if(document.querySelector('.modal-overlay.open,#ob-overlay.active'))return;
+      if(document.querySelector('.modal-overlay.open,#kt.on'))return;
       if(e.key==='ArrowRight'){e.preventDefault();setIdx(idx+1);pressVis(nextBtn);}
       else if(e.key==='ArrowLeft'){e.preventDefault();setIdx(idx-1);pressVis(prevBtn);}
       else if(e.key==='Enter'&&(!t||t===document.body)){
@@ -16045,7 +16531,7 @@ const app={
     overlay.className='settings-overlay';overlay.id='settings-overlay';
     overlay.innerHTML=`<div class="settings-modal">
       <div class="settings-modal-head">
-        <div class="settings-modal-avatar">${user?user[0].toUpperCase():'?'}</div>
+        <div class="settings-modal-avatar${kpHero()&&!isTeacher()?' has-hero':''}">${kpHero()&&!isTeacher()?kpHeroImg(kpHero()):(user?user[0].toUpperCase():'?')}</div>
         <div class="settings-modal-head-info">
           <strong>${user||kpT('set.guest')}</strong>
           <span style="display:flex;align-items:center;gap:6px;margin-top:3px">
@@ -16170,6 +16656,13 @@ const app={
       </div>
       <div class="settings-section">
         <div class="settings-section-title"><span style="color:var(--accent)">${ICONS.lock}</span> ${kpT('set.account')}</div>
+        ${isTeacher()?'':`<div class="settings-row" style="margin-bottom:10px">
+          <div class="settings-row-info">
+            <strong>${kpT('hero.title')}</strong>
+            <span>${kpT('hero.set_help')}</span>
+          </div>
+          <button class="settings-btn" onclick="app.closeSettings();kpOpenHeroPicker()">${kpT('set.change')}</button>
+        </div>`}
         <div class="settings-row">
           <div class="settings-row-info">
             <strong>${kpT('set.tutorial')}</strong>
@@ -17023,9 +17516,7 @@ const app={
     const bestWpm=tests.length?Math.max(...tests.map(t=>t.wpm)):0;
     const avgAcc=tests.length?Math.round(tests.reduce((a,t)=>a+t.acc,0)/tests.length):0;
     const clearedLessons=ALL_LESSONS.filter(l=>this.lessonRec(l.id).cleared).length;
-    const dset=new Set(tests.map(t=>{const d=new Date(t.t);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();}));
-    let streak=0;const cur=new Date();
-    for(let i=0;i<60;i++){const k=cur.getFullYear()+'-'+cur.getMonth()+'-'+cur.getDate();if(dset.has(k)){streak++;cur.setDate(cur.getDate()-1);}else if(i===0){cur.setDate(cur.getDate()-1);}else break;}
+    const streak=kpStreak(tests);
     const rel=t=>{const d=Math.floor((Date.now()-t)/86400000);if(d<=0)return kpT('prog.today');if(d===1)return kpT('prog.yesterday');return kpT('prog.days_ago',{n:d});};
     const name=this._esc(currentDisplayName||currentUser||'');
     const gain=tests.length>=2?bestWpm-tests[0].wpm:0;
@@ -17056,7 +17547,7 @@ const app={
 
     const initial=(currentDisplayName||currentUser||'?').trim().charAt(0).toUpperCase();
     const side=`<aside class="pg-side">
-        <div class="pg-av">${this._esc(initial)}</div>
+        <div class="pg-av${kpHero()?' has-hero':''}">${kpHero()?kpHeroImg(kpHero()):this._esc(initial)}</div>
         <h2>${name}</h2>
         <div class="pg-sub">${kpTn('prog.exercises',tests.length)}</div>
         ${palier?`<div class="pg-goal"><div class="pg-goal-t"><span>${kpT('prog.next_goal',{n:palier})}</span><span>${bestWpm} / ${palier}</span></div><div class="pg-bar"><i style="width:${Math.min(100,Math.round(100*bestWpm/palier))}%"></i></div></div>`:''}
@@ -17434,6 +17925,7 @@ const app={
       if(!this._myClasses)this._clError=true;
     }
     if(this.view==='classes'&&!isTeacher())this.renderStudentClasses();
+    else if(this.view==='home'&&currentUser&&!isTeacher()&&this._myClasses)this.renderHome();
   },
 
   /* ── Page Classe (élève) : tableau de bord des devoirs ──
@@ -19211,14 +19703,15 @@ app.init();
   // la page, pas sur la vue Test (même choix déjà fait dans loginUser() au
   // premier login, manquant ici) — cette vue ne lui sert à rien puisque la
   // nav Test/Cours/Jeux/Progrès est masquée pour ce rôle.
-  go(_validViews.includes(_vp)?_vp:(isTeacher()?'home':'test'));
+  // Élève connecté : son accueil (leçon du jour, devoirs, jeux) plutôt que le test.
+  go(_validViews.includes(_vp)?_vp:(isTeacher()||currentUser?'home':'test'));
   document.documentElement.classList.remove('kp-boot');
 }
 window.addEventListener('popstate',()=>{
   if(app._ignorePop){app._ignorePop=false;return;}
   if(app._sfsEl&&app._sfsEl()){app._sfsFromPop();return;} // Retour ferme le jeu plein ecran, pas la page
   if(app._sgrEl&&app._sgrEl()){app._sgrFromPop();return;}
-  const v=VIEW_FROM_PATH[normPath(location.pathname)]||(isTeacher()?'home':'test');
+  const v=VIEW_FROM_PATH[normPath(location.pathname)]||(isTeacher()||currentUser?'home':'test');
   app._popping=true;try{app.renderView(v);}finally{app._popping=false;}
 });
 // Liens internes vers une page de l'appli : navigation sans rechargement.

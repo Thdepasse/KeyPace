@@ -14,6 +14,8 @@ const KNOWN_KEYS = new Set([
   'sourisBest', 'sourisTiers', 'sourisHybridHand', 'sourisGridBest', 'sourisGridTop',
   'sourisHybridBest', 'sourisTilesBest', 'sourisTilesTutorialSeen',
   'bossBest', 'duelRecord',
+  // Accueil élève : héros choisi ('boy' | 'girl') et bonus d'XP de la visite guidée (posé une seule fois).
+  'hero', 'tourBonus',
   // Présents en base (relevé du 2026-11-03) mais dont je n'ai pas lu le code : règles de fusion à relever.
   'tireurBest', 'sourisDuoBest', 'sourisSoloBest', 'sourisWavesBest', 'sourisHub', 'sourisTilesGlossaryAutoSeen',
 ]);
