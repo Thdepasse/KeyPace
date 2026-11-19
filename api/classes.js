@@ -205,18 +205,15 @@ async function teacherOverview(req, res) {
 async function classCreate(req, res) {
   const user = await userFromToken(req.body.token);
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
-  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  // Seul le compte établissement crée les classes, pour ses profs (teacherIds, tous de son établissement).
+  // Un prof reçoit ses classes de l'établissement : il ne peut plus en créer lui-même.
+  if (!canActAsAdmin(user)) return res.status(403).json({ error: 'Les classes sont créées par l\'établissement.' });
   const name = (req.body.name || '').trim();
   if (!name) return res.status(400).json({ error: 'Nom de classe requis.' });
 
-  // Un compte établissement crée la classe pour ses profs (teacherIds, tous de
-  // son établissement) ; un prof s'en déclare lui-même enseignant.
-  let teacherIds = [user.id];
-  if (user.role === 'admin') {
-    const checked = await validateTeacherIds(user, req.body.teacherIds);
-    if (checked.error) return res.status(400).json({ error: checked.error });
-    teacherIds = checked.ids;
-  }
+  const checked = await validateTeacherIds(user, req.body.teacherIds);
+  if (checked.error) return res.status(400).json({ error: checked.error });
+  const teacherIds = checked.ids;
   let created = null;
   for (let i = 0; i < 5; i++) {
     const r = await sb('/classes', {

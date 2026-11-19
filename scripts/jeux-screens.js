@@ -97,10 +97,11 @@ const modalOf=(id)=>document.getElementById(id);
 await guard('modals',async()=>{
 for(const [n,id] of [['school','school-modal'],['upgrade','upgrade-modal']]){openModal(id,{silent:true});await W(80);snap(n+'Modal',modalOf(id));closeModal(id);}
 // tutoriel de démarrage (parcours élève puis enseignant)
-for(const [n,steps] of [['obStudent',OB_STEPS_ELEVE],['obTeacher',OB_STEPS_PROF]]){
-  _obList=steps;_obStep=0;document.getElementById('ob-overlay').classList.add('active');let txt='';
-  for(let i=0;i<steps.length;i++){_obStep=i;obRender();await W(20);txt+=document.getElementById('ob-overlay').innerText+'\\n';}
-  const d=document.createElement('div');d.textContent=txt;snap(n,d);_obPrevEl&&_obPrevEl.classList.remove('ob-highlight');document.getElementById('ob-overlay').classList.remove('active');}
+// didacticiel (mascotte) : tous les textes des étapes, consignes, réponses du quiz et boutons
+for(const [n,steps] of [['obStudent',ktStepsEleve()],['obTeacher',ktStepsProf()]]){
+  let html='';
+  for(const st of steps){html+='<p>'+st.text()+'</p>'+(st.hint?'<p>'+st.hint()+'</p>':'')+(st.btn?'<p>'+st.btn()+'</p>':'')+(st.answers?st.answers.map(a=>'<p>'+a.msg()+'</p>').join(''):'');}
+  const d=document.createElement('div');d.innerHTML=html;snap(n,d);}
 showForcedPasswordChangeModal({token:'x'},'h');snap('forcedPw',document.getElementById('forced-pw-overlay'));document.getElementById('forced-pw-overlay').remove();
 app.showResetPasswordModal('a'.repeat(64));snap('resetPw',document.getElementById('reset-pw-overlay'));
 document.getElementById('reset-pw-new').value='abc';await app._confirmPasswordReset('a'.repeat(64));snap('resetPwShort',document.getElementById('reset-pw-overlay'));

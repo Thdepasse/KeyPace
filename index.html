@@ -2747,7 +2747,6 @@ body.sfs-open #cookie-consent-reopen{display:none!important}
 .sh-av .disc .kp-hero-img{align-self:flex-start}
 .nav-lvl-chip{font-size:11px;font-weight:800;background:rgba(255,77,46,.1);color:var(--accent);padding:4px 9px;border-radius:20px;letter-spacing:.02em;white-space:nowrap;cursor:pointer}
 @media(min-width:769px) and (max-width:1000px){.nav-lvl-chip{display:none!important}}
-@media(min-width:769px) and (max-width:1320px){.kb-logged .nav-logout{display:none}}/* déconnexion via l'avatar -> Réglages : l'en-tête d'un compte connecté débordait déjà vers 1280 px */
 .hero-pick{display:flex;gap:14px;margin:18px 0 6px}
 .hero-pick button{flex:1;border:2px solid var(--border);background:var(--light);border-radius:18px;padding:12px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;font:inherit;font-weight:800;font-size:14px;color:var(--txt)}
 .hero-pick button img{height:150px;width:auto}
@@ -4200,7 +4199,6 @@ function ktStepsProf(){
   return[
     {pose:10,mode:'next',btn:()=>kpT('tour.go'),text:()=>kpT('tour.p_intro',{name})},
     {view:'home',target:'#nav-home',shape:'circle',pad:16,scrollTop:true,pose:5,mode:'next',text:()=>two(kpT('ob.p1_label'),kpT('ob.p1_desc'))},
-    {view:'classes',target:'#classes-create-btn',shape:'round',pad:12,scrollTop:true,pose:13,mode:'next',text:()=>two(kpT('ob.p2_label'),kpT('ob.p2_desc'))},
     {target:'#nav-avatar',shape:'circle',pad:16,scrollTop:true,pose:10,mode:'next',text:()=>two(kpT('ob.settings_label'),kpT('ob.settings_desc'))},
     {view:'home',pose:6,mode:'next',final:true,btn:()=>kpT('ob.finish'),text:()=>kpT('tour.p_final')},
   ];
@@ -4498,7 +4496,7 @@ function updateNavUser(){
   const joinBtn=document.getElementById('nav-join');if(joinBtn)joinBtn.style.display=(!teacher&&(currentInstitutionName||currentHasClass))?'inline-flex':'none';
   // "Établissements" fait la promotion des licences pour écoles : sans objet
   // pour un compte déjà rattaché à un établissement (élève ou enseignant).
-  const ecolesWrap=document.getElementById('nav-ecoles-wrap');if(ecolesWrap)ecolesWrap.style.display=(currentInstitutionName||isAdmin()||KPI18n.lang()!=='fr')?'none':'';
+  const ecolesWrap=document.getElementById('nav-ecoles-wrap');if(ecolesWrap)ecolesWrap.style.display=(currentInstitutionName||(currentHasClass&&!teacher)||isAdmin()||KPI18n.lang()!=='fr')?'none':''; // élève d'une classe : pas besoin de la présentation aux écoles (et l'en-tête tient à 1280 px avec la pastille de niveau)
   // Compte établissement : plus aucun lien de menu, la page de gestion est la seule destination.
   if(isAdmin()){const bgA=document.getElementById('nav-burger');if(bgA)bgA.style.display='none';}
   applyMobileNav();
@@ -10225,50 +10223,6 @@ const app={
     },4500);
   },
 
-  // Bandeau d'essai : seulement pour un espace ouvert par l'établissement lui-même
-  // (self onboarding, voir api/institutions.js), à l'approche de la fin des 30 jours.
-  _trialBanner(etab){
-    const inst=etab&&etab.institution;
-    if(!inst||!inst.selfOnboarded||!inst.licenseExpiresAt)return '';
-    const days=Math.max(0,Math.ceil((new Date(inst.licenseExpiresAt)-Date.now())/86400000));
-    if(days>30)return '';
-    const end=new Date(inst.licenseExpiresAt).toLocaleDateString('fr-BE',{day:'numeric',month:'long',year:'numeric'});
-    return `<div style="background:#FFF1EC;border:1px solid #FFD3C6;border-radius:14px;padding:12px 18px;margin-bottom:22px;font-size:13.5px;line-height:1.5;color:var(--txt)"><b>Essai gratuit : ${days} jour${days!==1?'s':''} restant${days!==1?'s':''}</b> (jusqu'au ${end}). Ensuite, une facture vous est envoyée ; l'espace est mis en pause tant qu'elle n'est pas réglée.</div>`;
-  },
-
-  // Premier accès d'un compte établissement : un parcours guidé, une étape à la fois
-  // (fil vertical : étapes faites en orange, étape en cours mise en avant).
-  _etabWelcomeHTML(etab){
-    const inst=etab.institution||null;
-    const name=inst?this._esc(inst.name):'';
-    const trial=this._trialBanner(etab);
-    const node=(state,body)=>{
-      const dot=state==='done'
-        ?'<div style="position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px">✓</div>'
-        :state==='cur'
-          ?'<div style="position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--card);border:3px solid var(--accent);box-shadow:0 0 0 6px rgba(255,77,46,.14)"></div>'
-          :'<div style="position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--card);border:2px solid var(--border)"></div>';
-      return `<div style="position:relative;padding-left:52px">${dot}${body}</div>`;
-    };
-    const title=(txt,state)=>`<div style="font-weight:${state==='cur'?800:700};font-size:${state==='cur'?20:17}px;letter-spacing:-.02em;line-height:1.3;color:${state==='done'?'var(--muted)':(state==='todo'?'var(--muted)':'var(--txt)')}">${txt}</div>`;
-    const sub=txt=>`<div style="font-size:13.5px;color:var(--muted);line-height:1.55;margin-top:3px">${txt}</div>`;
-    return `
-      <div style="max-width:760px;margin:0 auto;padding:56px 24px 90px">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">Votre espace est prêt</div>
-        <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(30px,5vw,44px);letter-spacing:-0.035em;line-height:1.05;margin:0 0 12px">Bienvenue${name?', <span style="color:var(--accent)">'+name+'</span>':''}</h1>
-        <p style="font-size:16px;color:var(--muted);margin:0 0 26px;line-height:1.55">Voici la suite, une étape à la fois.</p>
-        ${trial}
-        <div style="position:relative;display:flex;flex-direction:column;gap:30px">
-          <div style="position:absolute;left:14px;top:14px;bottom:14px;width:2px;background:var(--border)"></div>
-          ${node('done',title("Espace de l'école créé",'done'))}
-          ${node('cur',`${title('Créez votre première classe','cur')}${sub("Donnez-lui un nom (ex. « 6e A »). Un code d'invitation unique est généré pour vos élèves.")}<button class="btn-primary" style="margin-top:14px;padding:11px 22px;font-size:14px" onclick="app.createClass()">+ Créer ma première classe</button>`)}
-          ${node('todo',`${title('Présentez KeyPace à vos élèves','todo')}<ol style="margin:8px 0 0;padding-left:20px;font-size:13.5px;color:var(--muted);line-height:1.6"><li>Donnez à chacun le code de la classe.</li><li>Dites-leur : on apprend à taper sans regarder, 15 à 20 minutes par jour.</li><li>Premier objectif : la position de base, F et J.</li></ol>`)}
-          ${node('todo',`${title('Lancez la première leçon','todo')}${sub("On démarre ensemble, puis chacun avance à son rythme. Vous suivez la progression ici, classe par classe.")}`)}
-          ${node('todo',`${title('Profitez de la subvention MANOLO','todo')}<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:8px"><img src="/images/keypace-manolo-eligible.png" alt="Éligible à la subvention MANOLO, Fédération Wallonie-Bruxelles" width="167" height="34" style="height:34px;width:auto"><span style="font-size:13.5px;color:var(--muted);line-height:1.55;flex:1;min-width:200px">Pour un établissement de la Fédération Wallonie-Bruxelles, la subvention peut prendre le coût en charge. Nous vérifions avec vous l'éligibilité de votre école et le montant applicable : <a href="mailto:contact@keypace.be?subject=Subvention%20MANOLO" style="color:var(--accent);font-weight:700">écrivez-nous</a>.</span></div>`)}
-        </div>
-      </div>`;
-  },
-
   _renderHomeEtab(){
     const etab=this.etab;
     if(!etab||!etab.loaded){
@@ -10293,22 +10247,16 @@ const app={
     const g=etab.global||{total:0,activeThisWeek:0,totalSessions:0,avgWpm:null,avgAcc:null};
     const series=etab.series||[];
 
-    // Parcours guidé réservé aux espaces ouverts par self onboarding : les écoles
-    // déjà présentes (self_onboarded = false) gardent l'écran d'accueil habituel.
-    if(classes.length===0&&isAdmin()&&etab.institution&&etab.institution.selfOnboarded){
-      document.getElementById('page-home').innerHTML=this._etabWelcomeHTML(etab);
-      return;
-    }
     if(classes.length===0){
       document.getElementById('page-home').innerHTML=`
         <div style="max-width:760px;margin:0 auto;padding:56px 24px 80px">
           <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px">Espace enseignant</div>
           <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;letter-spacing:-0.03em;margin:0 0 10px">Bienvenue !</h1>
-          <p style="font-size:15px;color:var(--muted);margin:0 0 32px;line-height:1.6">Crée ta première classe, partage le code à tes élèves, et suis leur progression ici. Tu peux à tout moment tester l'app comme un élève via le menu Aperçu.</p>
+          <p style="font-size:15px;color:var(--muted);margin:0 0 32px;line-height:1.6">Ton établissement crée les classes et te les attribue. Partage ensuite le code à tes élèves et suis leur progression ici. Tu peux à tout moment tester l'app comme un élève via le menu Aperçu.</p>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:18px">
             <div style="display:flex;gap:16px;align-items:flex-start">
               <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,77,46,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0">1</div>
-              <div><div style="font-weight:700;font-size:15px;margin-bottom:2px">Crée une classe</div><div style="font-size:13px;color:var(--muted);line-height:1.5">Donne-lui un nom (ex. « 6e A »). Un code d'invitation unique est généré.</div></div>
+              <div><div style="font-weight:700;font-size:15px;margin-bottom:2px">Reçois ta classe</div><div style="font-size:13px;color:var(--muted);line-height:1.5">Ton établissement la crée et te l'attribue. Elle arrive ici avec un code d'invitation unique.</div></div>
             </div>
             <div style="display:flex;gap:16px;align-items:flex-start">
               <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,77,46,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0">2</div>
@@ -10318,7 +10266,6 @@ const app={
               <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,77,46,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0">3</div>
               <div><div style="font-weight:700;font-size:15px;margin-bottom:2px">Suis la progression</div><div style="font-size:13px;color:var(--muted);line-height:1.5">Vitesse, précision, élèves actifs et alertes : tout est ici, classe par classe.</div></div>
             </div>
-            <button class="btn-primary" style="align-self:flex-start;padding:11px 22px;font-size:14px" onclick="app.createClass()">+ Créer ma première classe</button>
           </div>
         </div>`;
       return;
@@ -18111,7 +18058,6 @@ const app={
       <div class="stats-header" style="padding-bottom:32px">
         <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
           <div><h1 style="margin-bottom:4px">Gestion de classes</h1><p style="margin:0">Suis les performances de tes élèves par classe. <a href="#" onclick="event.preventDefault();app.viewArchivedClasses()" style="color:var(--muted);text-decoration:underline">Classes archivées</a></p></div>
-          <button id="classes-create-btn" class="btn-primary" style="padding:10px 20px;font-size:14px;white-space:nowrap" onclick="app.createClass()">+ Nouvelle classe</button>
         </div>
       </div>
       <div style="max-width:900px;padding-bottom:60px">
@@ -18130,8 +18076,7 @@ const app={
           <div style="text-align:center;padding:80px 20px;color:var(--muted)">
             <div style="font-size:52px;margin-bottom:16px;color:var(--accent)">${ICONS.school}</div>
             <div style="font-size:18px;font-weight:700;color:var(--txt);margin-bottom:8px">Aucune classe encore</div>
-            <div style="font-size:14px;max-width:340px;margin:0 auto 22px;line-height:1.6">Crée ta première classe, partage le code d'invitation et suis les progrès de tes élèves.</div>
-            <button class="btn-primary" style="padding:10px 22px;font-size:14px" onclick="app.createClass()">+ Créer une classe</button>
+            <div style="font-size:14px;max-width:360px;margin:0 auto;line-height:1.6">Les classes sont créées par ton établissement. Dès qu'une classe t'est attribuée, elle apparaît ici avec son code d'invitation.</div>
           </div>
         `:`<div style="display:flex;flex-direction:column;gap:10px">
           ${classes.map(c=>{
@@ -18192,18 +18137,6 @@ const app={
     this.activeGame='royale';
     go('games');
     this._royaleShowFinal();
-  },
-
-  async createClass(){
-    const name=await promptModal({icon:ICONS.school,title:'Nom de la classe',placeholder:'ex: 5e Latin-Grec',confirmText:'Créer la classe'});
-    if(!name)return;
-    try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-create',token:currentToken,name})});
-      const d=await r.json();
-      if(!r.ok){alert(d.error||'Création impossible.');return;}
-      await this.loadEtab(true);
-      this.viewClass(d.id);
-    }catch{alert('Erreur réseau.');}
   },
 
   async renameClass(id,currentName){
