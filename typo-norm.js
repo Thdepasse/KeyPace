@@ -15,7 +15,13 @@
 
    Jamais touché : URL, adresses mail, chemins (C:\…, /var/log), code entre accents graves, objets {…}, balises <…>,
    heures (8h30, 12:30 : pas d'espace avant le deux-points, rien à faire) et calculs (12 : 2).
-   Une leçon peut s'exclure entièrement de la transformation avec typoNorm:false (symboles, programmation, chiffres). */
+   Une leçon peut s'exclure entièrement de la transformation avec typoNorm:false (symboles, programmation, chiffres).
+
+   applyTypoNormUi(text) : les mêmes deux règles pour les textes de l'interface (consignes, boutons, messages, explications),
+   eux aussi écrits en norme française. Un peu plus prudente, car l'interface affiche aussi des signes isolés qui ne sont pas
+   de la ponctuation de phrase (étiquettes de touches « ? ! », « : ; », « « » ») :
+     - l'espace avant ? ! ; : ne tombe que derrière un caractère qui n'est pas lui-même un de ces signes ;
+     - « et » ne deviennent " que s'ils entourent quelque chose (un « isolé, ou « » vide, reste tel quel). */
 (function (root) {
   const NORMS = ['fr', 'be'];
   const DEFAULT = 'fr';
@@ -63,23 +69,37 @@
   // Deux-points arithmétique (« 12 : 2 = 6 ») : division, garde ses espaces.
   const ARITH_COLON = new RegExp('(\\d)' + SP + '+:' + SP + '+(?=\\d)', 'g');
 
-  function applyTypoNorm(text, norm) {
-    if (typeof text !== 'string' || normalizeNorm(norm) !== 'be' || !text) return text;
+  const BEFORE_PUNCT_UI = new RegExp('([^\\s?!;:«])' + SP + '+([?!;:])(?=' + SP + '|$|["»)\\]?!.…])', 'g');
+  const OPEN_Q = new RegExp('«' + SP + '*', 'g'), CLOSE_Q = new RegExp(SP + '*»', 'g');
+  const OPEN_Q_UI = new RegExp('«' + SP + '*(?=[^\\s»])', 'g'), CLOSE_Q_UI = new RegExp('([^\\s«])' + SP + '*»', 'g');
+
+  function transform(text, ui) {
     const { out, saved } = protect(text);
     let t = out;
     // Division protégée (repère) pour ne pas coller son deux-points.
     const arith = [];
     t = t.replace(ARITH_COLON, (m, d) => { arith.push(m.slice(1)); return d + '\uE002' + (arith.length - 1) + '\uE003'; });
     // Guillemets français -> droits, sans espace intérieure (l'espace extérieure est gardée).
-    t = t.replace(new RegExp('«' + SP + '*', 'g'), '"').replace(new RegExp(SP + '*»', 'g'), '"');
-    t = t.replace(BEFORE_PUNCT, '$1$2');
+    if (ui) t = t.replace(OPEN_Q_UI, '"').replace(CLOSE_Q_UI, '$1"').replace(BEFORE_PUNCT_UI, '$1$2');
+    else t = t.replace(OPEN_Q, '"').replace(CLOSE_Q, '"').replace(BEFORE_PUNCT, '$1$2');
     t = t.replace(/\uE002(\d+)\uE003/g, (_, i) => arith[+i]);
     return restore(t, saved);
+  }
+
+  function applyTypoNorm(text, norm) {
+    if (typeof text !== 'string' || normalizeNorm(norm) !== 'be' || !text) return text;
+    return transform(text, false);
+  }
+
+  // Textes de l'interface, toujours vers la norme belge (l'appelant décide si elle est active).
+  function applyTypoNormUi(text) {
+    if (typeof text !== 'string' || !text || !/[«»?!;:]/.test(text)) return text;
+    return transform(text, true);
   }
 
   // Une leçon (objet du programme) accepte-t-elle la transformation ? Non si elle porte typoNorm:false.
   function lessonAllowsNorm(lesson) { return !(lesson && lesson.typoNorm === false); }
 
-  const api = { NORMS, DEFAULT, normalizeNorm, applyTypoNorm, lessonAllowsNorm };
+  const api = { NORMS, DEFAULT, normalizeNorm, applyTypoNorm, applyTypoNormUi, lessonAllowsNorm };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.KPTypoNorm = api;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -94,3 +94,19 @@ test('idempotent : appliquer deux fois donne le même texte', () => {
   const s = '« Viens vite ! » dit-il. Elle répondit : « J\'arrive ; attends-moi. » Vingt-cinq minutes plus tard (enfin), elle arriva.';
   assert.strictEqual(be(be(s)), be(s));
 });
+
+test('interface (applyTypoNormUi) : mêmes règles sur les consignes, boutons et messages', () => {
+  const ui = T.applyTypoNormUi;
+  assert.strictEqual(ui('Accès libre : toutes les leçons'), 'Accès libre: toutes les leçons');
+  assert.strictEqual(ui(`Réessaie${NNBSP}!`), 'Réessaie!');
+  assert.strictEqual(ui(`« Viens-tu${NBSP}? » dit-il`), '"Viens-tu?" dit-il');
+  assert.strictEqual(ui('Ex : Dupont, vraiment ?!'), 'Ex: Dupont, vraiment?!');
+  assert.strictEqual(ui('Sans ponctuation'), 'Sans ponctuation');
+  assert.strictEqual(ui(null), null);
+});
+
+test('interface : signes isolés (étiquettes de touches) et texte protégé jamais touchés', () => {
+  const ui = T.applyTypoNormUi;
+  for (const s of ['? !', ': ;', '« »', '«', '»', '12 : 2', 'https://keypace.be/?a=1 :b']) assert.strictEqual(ui(s), s, s);
+  assert.strictEqual(ui('écris à prof@ecole.be : merci'), 'écris à prof@ecole.be: merci');
+});

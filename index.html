@@ -1521,10 +1521,6 @@ a.nav-link{text-decoration:none;display:inline-block}
 .cset-kb i.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .cset-sample{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--light);border-radius:8px;padding:7px 10px;overflow-wrap:anywhere}
 .cset-sample u{text-decoration:none;background:rgba(229,114,43,.3);border-radius:2px}
-.cset-seg{display:inline-flex;flex-wrap:wrap;gap:3px;background:var(--light);border:1px solid var(--border);border-radius:12px;padding:3px}
-.cset-seg button{background:none;border:0;border-radius:9px;padding:7px 13px;font:inherit;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
-.cset-seg button[aria-checked="true"]{background:var(--card);color:var(--txt);box-shadow:0 1px 3px rgba(22,20,15,.14)}
-.cset-seg button:disabled{cursor:default}
 .cset-goals{display:flex;gap:14px 22px;flex-wrap:wrap;align-items:flex-end}
 .cset-step{display:flex;flex-direction:column;gap:6px}
 .cset-step label{font-size:12px;font-weight:700;color:var(--muted)}
@@ -3658,7 +3654,7 @@ function saveSession(username, plan, token, userId, role, email, displayName, in
 function clearSession(){
   currentUser=null; currentPlan=null; currentToken=null; currentUserId=null;
   currentEmail=null; currentDisplayName=null; currentInstitutionName=null; currentHasClass=false;
-  try{app.classGoals=null;app.classSettings=null;kpSyncHomeRow();}catch{}
+  try{app.classGoals=null;app.classSettings=null;kpSyncHomeRow();kpUiTypoSync();}catch{}
   localStorage.removeItem('klak_session');
 }
 function loadSession(){
@@ -5510,11 +5506,54 @@ function kpNormText(t,les){
 }
 /* Explications d'une leçon dans la norme active : tutoBe remplace tuto pour les leçons qui enseignent la règle d'espacement. */
 function kpLessonTuto(les){return les&&les.tutoBe&&kpTypoNorm()==='be'?les.tutoBe:(les&&les.tuto)||{};}
+/* Norme belge sur toute la plateforme, pas seulement dans les textes à taper : l'interface (consignes, boutons, messages, explications,
+   modules) est écrite en norme française ; en norme belge et en français, chaque texte affiché passe par applyTypoNormUi au moment
+   où il entre dans la page (MutationObserver). Ne sont jamais touchés : les saisies, le code, les claviers dessinés, la zone de frappe
+   (déjà dans la bonne norme, et les leçons typoNorm:false doivent rester intactes) et tout ce qui porte data-typo-keep (exemples des
+   deux normes, règles d'espacement écrites signe par signe). Retour à la norme française : la vue courante est redessinée. */
+const KP_TYPO_SKIP='script,style,code,pre,kbd,svg,canvas,textarea,[contenteditable],[data-typo-keep],.typing-box,.ch,[class^="kb"],[class*=" kb"]';
+const KP_TYPO_ATTRS=['title','placeholder','aria-label'];
+let _kpUiTypoOn=false,_kpUiTypoObs=null;
+function kpUiTypoWanted(){try{return kpTypoNorm()==='be'&&KPI18n.lang()==='fr';}catch{return false;}}
+function kpTypoText(n){
+  const v=n.nodeValue;if(!v||!/[«»?!;:]/.test(v))return;
+  const p=n.parentElement;if(!p||p.closest(KP_TYPO_SKIP))return;
+  // Repères autour du nœud quand un élément le touche (« <b>mot</b> : suite », « «<b>mot</b>» ») : la règle voit alors un voisin.
+  const pre=n.previousSibling?'\uE010':'',post=n.nextSibling?'\uE011':'';
+  let o=KPTypoNorm.applyTypoNormUi(pre+v+post);o=o.slice(pre.length,o.length-post.length);
+  if(o!==v)n.nodeValue=o;
+}
+function kpTypoAttrs(el){
+  for(const a of KP_TYPO_ATTRS){const v=el.getAttribute(a);if(v&&/[«»?!;:]/.test(v)){const o=KPTypoNorm.applyTypoNormUi(v);if(o!==v)el.setAttribute(a,o);}}
+}
+function kpTypoWalk(root){
+  if(!root)return;
+  if(root.nodeType===3)return kpTypoText(root);
+  if(root.nodeType!==1)return;
+  const keep=root.closest('[data-typo-keep],code,pre,kbd,svg,script,style');if(keep)return;
+  kpTypoAttrs(root);
+  if(root.matches(KP_TYPO_SKIP))return;
+  const tw=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,{acceptNode:n=>n.nodeType===1&&n.matches(KP_TYPO_SKIP)&&!n.matches('textarea')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+  for(let n=tw.nextNode();n;n=tw.nextNode()){if(n.nodeType===3)kpTypoText(n);else if(n.hasAttributes())kpTypoAttrs(n);}
+}
+function kpUiTypoSync(){
+  const want=typeof KPTypoNorm!=='undefined'&&typeof document!=='undefined'&&!!document.body&&kpUiTypoWanted();
+  if(want===_kpUiTypoOn)return;
+  _kpUiTypoOn=want;
+  if(want){
+    if(!_kpUiTypoObs&&typeof MutationObserver!=='undefined')_kpUiTypoObs=new MutationObserver(ms=>{if(!_kpUiTypoOn)return;for(const m of ms){if(m.type==='characterData')kpTypoText(m.target);else m.addedNodes.forEach(kpTypoWalk);}});
+    // <head> aussi : le titre de l'onglet change avec chaque vue.
+    for(const r of [document.head,document.body]){if(!r)continue;kpTypoWalk(r);if(_kpUiTypoObs)_kpUiTypoObs.observe(r,{childList:true,subtree:true,characterData:true});}
+  }else{
+    if(_kpUiTypoObs)_kpUiTypoObs.disconnect();
+    try{if(typeof app!=='undefined'&&app.renderCurrent&&!app.sess)app.renderCurrent();}catch{}
+  }
+}
 /* Réglages élève, section Clavier : choix de la norme (élève sans classe) ou rappel de celle de sa classe. Contenu français seulement. */
 function kpTypoSettingsHTML(){
   try{if(typeof KPTypoNorm==='undefined'||kpContentLang()!=='fr')return'';}catch{return'';}
   const cls=kpClassTypoNorm(),n=kpTypoNorm(),label=v=>kpT(v==='be'?'set.typo_be':'set.typo_fr');
-  const head=`<div class="settings-row-info" style="margin-top:4px"><strong>${kpT('set.typo')}</strong><span>${kpT('set.typo_help')}</span></div>`;
+  const head=`<div class="settings-row-info" style="margin-top:4px"><strong>${kpT('set.typo')}</strong><span data-typo-keep>${kpT('set.typo_help')}</span></div>`;
   if(cls)return head+`<div id="typo-btns" style="font-size:13px;color:var(--muted)">🔒 ${kpT('set.typo_locked',{norm:label(cls)})}</div>`;
   const btn=v=>`<button class="settings-btn${n===v?' active':''}" data-v="${v}" aria-pressed="${n===v}" style="white-space:normal;text-align:left" onclick="app.setTypoNorm('${v}')">${label(v)}</button>`;
   return head+`<div id="typo-btns" style="display:flex;gap:8px;flex-wrap:wrap">${btn('fr')}${btn('be')}</div>`;
@@ -7521,12 +7560,14 @@ const app={
       let changed=JSON.stringify(g)!==JSON.stringify(this.classGoals)||JSON.stringify(cs)!==JSON.stringify(this.classSettings);
       this.classGoals=g;this.classSettings=cs;
       if(kpSyncHomeRow())changed=true; // la classe impose la méthode AZER-UIOP (ou revient à QSDF)
+      kpUiTypoSync(); // norme belge de la classe : toute l'interface suit
       if(changed&&this.view==='lessons'&&!this.sess)this.renderCurrent();
     }catch{}
   },
   init(){
     this.stats=loadStats();
     kpSyncHomeRow(); // rangée de repos choisie par l'élève sans classe (celle de la classe arrive avec loadClassGoals)
+    kpUiTypoSync(); // norme belge choisie par l'élève sans classe (celle de la classe arrive avec loadClassGoals)
     this.loadClassGoals();
     if(this._onKey)window.removeEventListener('keydown',this._onKey);
     this._onKey=e=>this.handleKey(e);
@@ -7579,7 +7620,7 @@ const app={
     tabs[j].focus();this.setClassTab(tabs[j].dataset.ctab);
   },
 
-  /* Onglet Réglages : profil, rangée de repos, validation d'une leçon, normes typographiques, accès aux leçons.
+  /* Onglet Réglages : rangée de repos, validation d'une leçon, normes typographiques, accès aux leçons.
      Tout s'enregistre au changement (réglages : class-settings-set ; vitesse et erreurs : class-goals-set, 600 ms après la dernière modification).
      Profs de la classe et admin de l'établissement. */
   _classSettingsOf(d){return Object.assign({typoNorm:'fr',freeAccess:false,homeRow:'qsdf'},(d&&d.settings)||{});},
@@ -7589,14 +7630,10 @@ const app={
     const KB=['AZERTYUIOP','QSDFGHJKLM','WXCVBN'];
     const kb=hr=>{const home=hr==='azer'?'AZERUIOP':'QSDFJKLM';return`<span class="cset-kb" aria-hidden="true">${KB.map(r=>`<span>${[...r].map(c=>`<i${home.includes(c)?' class="on"':''}>${c}</i>`).join('')}</span>`).join('')}</span>`;};
     // Exemples en français : les normes ne portent que sur les textes français (espaces surlignées).
-    const sample=n=>`<span class="cset-sample">${n==='be'?'Il a dit: "Viens-tu?"':'Il a dit<u>&nbsp;</u>: «<u>&nbsp;</u>Viens-tu<u>&nbsp;</u>?<u>&nbsp;</u>»'}</span>`;
+    const sample=n=>`<span class="cset-sample" data-typo-keep>${n==='be'?'Il a dit: "Viens-tu?"':'Il a dit<u>&nbsp;</u>: «<u>&nbsp;</u>Viens-tu<u>&nbsp;</u>?<u>&nbsp;</u>»'}</span>`;
     const opt=(k,v,title,extra)=>`<button type="button" class="cset-opt" role="radio" aria-checked="${cs[k]===v}" onclick="app.setClassSetting('${k}',${JSON.stringify(v).replace(/"/g,'&quot;')})"><span class="cset-opt-t">${title}</span>${extra||''}</button>`;
     const head=(k,title,help)=>`<div class="cset-h"><h3>${title}<span class="cset-saved" id="cset-saved-${k}" role="status"></span></h3>${help?`<p>${help}</p>`:''}</div>`;
-    const pf=cs.homeRow==='qsdf'&&cs.typoNorm==='fr'?'std':cs.homeRow==='azer'&&cs.typoNorm==='be'?'fwb':'custom';
-    const pfBtn=(k,label)=>`<button type="button" role="radio" aria-checked="${pf===k}" ${k==='custom'?'disabled':`onclick="app.applyClassProfile('${k}')"`}>${label}</button>`;
     return`<div class="cset">
-      <div class="cset-sec">${head('profile',kpT('cls.profile'),kpT('cls.profile_help'))}
-        <div class="cset-c"><div class="cset-seg" role="radiogroup" aria-label="${kpT('cls.profile')}">${pfBtn('std',kpT('cls.profile_std'))}${pfBtn('fwb',kpT('cls.profile_fwb'))}${pf==='custom'?pfBtn('custom',kpT('cls.profile_custom')):''}</div></div></div>
       <div class="cset-sec">${head('homeRow',kpT('cls.homerow_title'),kpT('cls.homerow_help'))}
         <div class="cset-c"><div class="cset-opts" role="radiogroup" aria-label="${kpT('cls.homerow_title')}">
           ${opt('homeRow','qsdf',kpT('cls.homerow_qsdf_t'),`<span class="cset-opt-d">${kpT('cls.homerow_qsdf_d')}</span>${kb('qsdf')}`)}
@@ -7690,17 +7727,9 @@ const app={
     if(k==='homeRow'&&!await this._confirmHomeRow(v))return;
     return this._saveClassSettings({[k]:v},k);
   },
-  async applyClassProfile(p){
-    const d=this._classDetail;if(!d)return;
-    const want=p==='fwb'?{homeRow:'azer',typoNorm:'be'}:{homeRow:'qsdf',typoNorm:'fr'},cur=this._classSettingsOf(d),patch={};
-    for(const k in want)if(cur[k]!==want[k])patch[k]=want[k];
-    if(!Object.keys(patch).length)return;
-    if(patch.homeRow&&!await this._confirmHomeRow(patch.homeRow))return;
-    return this._saveClassSettings(patch,'profile');
-  },
   async _saveClassSettings(patch,sayKey){
     const d=this._classDetail;if(!d)return;
-    const classId=d.id,btns=[...document.querySelectorAll('.cset-opt,.cset-seg button')];
+    const classId=d.id,btns=[...document.querySelectorAll('.cset-opt')];
     btns.forEach(b=>b.disabled=true);
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-settings-set',token:currentToken,classId,settings:patch})});
@@ -16222,7 +16251,7 @@ const app={
   /* Normes typographiques choisies par l'élève sans classe (avec une classe, c'est le prof qui décide : boutons absents). */
   setTypoNorm(v){
     if(kpClassTypoNorm())return;
-    setOwnTypoNorm(v);const n=kpTypoNorm();
+    setOwnTypoNorm(v);const n=kpTypoNorm();kpUiTypoSync();
     document.querySelectorAll('#typo-btns .settings-btn').forEach(b=>{const on=b.dataset.v===n;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false');});
     const q=document.getElementById('quote-block');if(q)q.style.display=n==='be'?'none':'contents';
     const qs=getQuoteStyle(),qb=document.querySelectorAll('#quote-btns .settings-btn');if(qb.length===2){qb[0].classList.toggle('active',qs==='fr');qb[1].classList.toggle('active',qs==='droits');}
