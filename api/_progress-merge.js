@@ -97,8 +97,10 @@ function mergeProgress(prev, inc) {
   }
   if (p.bossBest !== undefined && isObj(p.bossBest) && isObj(inc.bossBest) && typeof p.bossBest.isoWeek === 'string' && typeof inc.bossBest.isoWeek === 'string' && p.bossBest.isoWeek > inc.bossBest.isoWeek) set('bossBest', p.bossBest);
   else if (p.bossBest !== undefined && inc.bossBest === undefined) set('bossBest', p.bossBest);
-  // goals, sourisHybridHand : dernier écrit gagne (la valeur envoyée). Absents côté client : valeur du serveur.
-  for (const k of ['goals', 'sourisHybridHand']) if (p[k] !== undefined && inc[k] === undefined) set(k, p[k]);
+  // goals, sourisHybridHand, hero : dernier écrit gagne (la valeur envoyée). Absents côté client : valeur du serveur.
+  for (const k of ['goals', 'sourisHybridHand', 'hero']) if (p[k] !== undefined && inc[k] === undefined) set(k, p[k]);
+  // tourBonus : acquis une fois pour toutes (un onglet resté ouvert ne le retire pas).
+  if (p.tourBonus !== undefined || inc.tourBonus !== undefined) set('tourBonus', p.tourBonus || inc.tourBonus ? 1 : 0);
   for (const k of LEGACY_KEEP) if (p[k] !== undefined) set(k, p[k]);
   // Cours supplémentaires : mêmes règles, cours par cours (récursif, un seul niveau).
   if (isObj(p.courses) || isObj(inc.courses)) {
