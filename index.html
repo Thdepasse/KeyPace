@@ -1555,6 +1555,83 @@ a.nav-link{text-decoration:none;display:inline-block}
 .hm-t .hm-btn:hover{border-color:var(--accent);color:var(--accent)}
 .hm-t th.hl-h{text-align:right;padding-left:10px}
 .hm-t td.hs{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--muted);text-align:right;padding-left:10px;white-space:nowrap}
+/* Popup d'assignation de devoir (assistant en 3 étapes) */
+.a2-scrim{position:fixed;inset:0;background:rgba(26,24,20,.38);backdrop-filter:blur(5px);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px;animation:settings-fade .18s ease}
+.a2-modal{width:520px;max-width:100%;max-height:calc(100vh - 32px);background:var(--card);border-radius:28px;box-shadow:0 40px 100px rgba(26,24,20,.28);display:flex;flex-direction:column;overflow:hidden;animation:settings-pop .28s cubic-bezier(.16,1,.3,1);color:var(--txt)}
+.a2-modal button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.a2-modal input,.a2-modal textarea{font:inherit;color:inherit}
+.a2-ic{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;display:block}
+.a2-top{display:flex;align-items:center;padding:20px 24px 0 32px;font-size:13px;color:var(--muted);font-weight:600}
+.a2-sp{flex:1}
+.a2-x{width:32px;height:32px;border-radius:50%;color:var(--muted)!important;display:flex;align-items:center;justify-content:center;font-size:18px}
+.a2-x:hover{background:var(--light)!important}
+.a2-prog{display:flex;gap:6px;padding:14px 32px 0}
+.a2-prog i{flex:1;height:4px;border-radius:4px;background:var(--light);transition:background .3s}
+.a2-prog i.on{background:var(--accent)}
+.a2-body{padding:26px 32px 8px;overflow-y:auto;flex:1;animation:a2-fin .25s ease}
+@keyframes a2-fin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.a2-q{font-family:'Bricolage Grotesque',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.15;margin-bottom:22px}
+.a2-lbl{display:block;font-size:13px;font-weight:700;color:var(--muted);margin:0 0 8px}
+.a2-fld{margin-bottom:22px}
+.a2-inp{width:100%;padding:14px 16px;border:1.5px solid transparent;border-radius:14px;background:var(--light);outline:none;transition:all .15s;box-sizing:border-box}
+.a2-inp:focus{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 4px rgba(255,77,46,.08)}
+.a2-inp::placeholder{color:#B3ACA0}
+.a2-ta{resize:none;min-height:110px;line-height:1.55;display:block}
+.a2-link{color:var(--accent)!important;font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:6px;padding:4px 0}
+.a2-link:hover{text-decoration:underline}
+.a2-tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.a2-tile{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:20px;border-radius:20px;background:var(--light)!important;text-align:left;border:2px solid transparent!important;transition:all .15s}
+.a2-tile:hover{transform:translateY(-2px)}
+.a2-oi{width:46px;height:46px;border-radius:14px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--c)}
+.a2-tile b{font-size:16px;font-weight:700;display:block}
+.a2-tile small{display:block;font-size:13px;color:var(--muted);margin-top:2px;font-weight:500}
+.a2-tile.on{background:var(--card)!important;border-color:var(--accent)!important;box-shadow:0 8px 24px -8px rgba(255,77,46,.3)}
+.a2-tile.on .a2-oi{background:var(--c);color:#fff}
+.a2-list{border-radius:16px;background:var(--light);padding:6px}
+.a2-search{display:flex;align-items:center;gap:9px;padding:10px 12px;color:var(--muted)}
+.a2-search input{border:none;outline:none;flex:1;background:none;font-size:15px}
+.a2-scroll{max-height:250px;overflow-y:auto}
+.a2-gh{font-size:12px;font-weight:700;color:var(--muted);padding:12px 12px 4px}
+.a2-li{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 12px;border-radius:11px;font-size:15px;font-weight:600}
+.a2-li:hover{background:rgba(255,255,255,.7)!important}
+.a2-n{color:var(--muted);font-weight:500;width:18px;font-size:13px}
+.a2-ck{margin-left:auto;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:none;align-items:center;justify-content:center;font-size:12px}
+.a2-li.on{background:var(--card)!important;box-shadow:0 2px 8px rgba(26,24,20,.07)}
+.a2-li.on .a2-ck{display:flex}
+.a2-empty{padding:20px;text-align:center;color:var(--muted);font-size:14px}
+.a2-chips{display:flex;flex-wrap:wrap;gap:8px}
+.a2-chip{padding:10px 16px;border-radius:99px;font-size:14px;font-weight:600;background:var(--light)!important;transition:all .12s;display:inline-flex;align-items:center;gap:8px}
+.a2-chip:hover{background:#EFEBE1!important}
+.a2-chip.on{background:var(--txt)!important;color:var(--card)!important}
+.a2-seg{display:flex;background:var(--light);border-radius:14px;padding:4px}
+.a2-seg button{flex:1;padding:11px;border-radius:11px;font-weight:700;font-size:14.5px;color:var(--muted)!important;transition:all .15s}
+.a2-seg button.on{background:var(--card)!important;color:var(--txt)!important;box-shadow:0 2px 8px rgba(26,24,20,.09)}
+.a2-sub{font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+.a2-av{width:22px;height:22px;border-radius:50%;background:#FFD9C7;color:#B23A1E;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.a2-av .a2-ic{width:12px;height:12px;stroke-width:3}
+.a2-chip.on .a2-av{background:var(--card);color:var(--txt)}
+.a2-pick{display:flex;align-items:center;justify-content:space-between;margin:14px 0 8px;font-size:13px;font-weight:600;color:var(--muted)}
+.a2-wpm{display:flex;align-items:center;gap:14px}
+.a2-wpm input{flex:1;accent-color:var(--accent)}
+.a2-wpm output{min-width:72px;text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+.a2-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.a2-rec{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:14px;font-size:14px;font-weight:600}
+.a2-recbtn{display:inline-flex;align-items:center;gap:8px;background:var(--accent)!important;color:#fff!important;border-radius:99px;padding:9px 16px;font-weight:700;font-size:14px}
+.a2-o{color:var(--muted);font-weight:500;font-size:13px}
+.a2-timer{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted)}
+.a2-foot{padding:16px 32px 28px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.a2-why{font-size:13px;color:#D93A3F;font-weight:600;text-align:right}
+.a2-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:14px 26px;font-weight:700;font-size:15px;transition:all .12s;white-space:nowrap}
+.a2-pri{background:var(--accent)!important;color:#fff!important;box-shadow:0 10px 24px -8px rgba(255,77,46,.55)}
+.a2-pri:hover{transform:translateY(-1px)}
+.a2-pri.off{opacity:.4;box-shadow:none}
+.a2-ghost{color:var(--muted)!important;padding:14px 10px}
+.a2-ghost:hover{color:var(--txt)!important}
+.a2-done{padding:36px 32px 32px;text-align:center;animation:a2-fin .3s ease}
+.a2-big{width:68px;height:68px;border-radius:50%;background:#1FA971;color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 0 0 10px rgba(31,169,113,.12)}
+.a2-done h3{font-family:'Bricolage Grotesque',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0}
+.a2-done p{color:var(--muted);margin:10px auto 24px;line-height:1.55;max-width:340px}
+@media(max-width:520px){.a2-top,.a2-prog,.a2-body,.a2-foot{padding-left:20px;padding-right:20px}.a2-tiles,.a2-two{grid-template-columns:1fr}.a2-tile{flex-direction:row;align-items:center}.a2-q{font-size:23px}.a2-foot{flex-wrap:wrap}.a2-why{order:-1;width:100%;text-align:left}}
 .asg-row{display:grid;grid-template-columns:44px minmax(0,1fr) 150px 190px auto;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);transition:background .15s}
 .asg-row:last-child{border-bottom:none}
 .asg-row:hover{background:var(--light)}
@@ -8292,37 +8369,6 @@ const app={
     if(!s)return 0;
     const m=String(s).trim().match(/[\p{L}\p{N}'’-]+/gu);
     return m?m.length:0;
-  },
-
-  /* ── PROF : bloc consignes dans le modal d'assignation ───────── */
-
-  _essayBriefHtml(fld,lbl){
-    const opts=Object.entries(this._essayTypes).map(([k,t])=>`<option value="${k}">${t.icon} ${t.label}</option>`).join('');
-    return `<div id="asg-block-essay" style="display:none">
-      <label style="${lbl}">Titre du devoir</label>
-      <input id="asg-essay-title" placeholder="ex. Mail au directeur" style="${fld}">
-      <label style="${lbl}">Type d'essai</label>
-      <select id="asg-essay-type" onchange="app._asgEssayTypeChange()" style="${fld}">${opts}</select>
-      <div id="asg-essay-fields-hint" style="font-size:11.5px;color:var(--muted);margin:-8px 0 14px;line-height:1.5"></div>
-      <label style="${lbl}">Consignes <span style="font-weight:400">(contexte, sujet, thème…)</span></label>
-      <textarea id="asg-essay-brief" rows="3" placeholder="ex. Tu écris au directeur pour demander une salle pour le club de lecture." style="${fld};resize:vertical;min-height:70px;line-height:1.5"></textarea>
-      <div style="display:flex;gap:10px">
-        <div style="flex:1"><label style="${lbl}">Minimum de mots</label><input id="asg-essay-min" type="number" min="1" placeholder="ex. 80" style="${fld}"></div>
-        <div style="flex:1"><label style="${lbl}">Maximum de mots</label><input id="asg-essay-max" type="number" min="1" placeholder="ex. 200" style="${fld}"></div>
-      </div>
-      <div id="asg-essay-audio-note" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:var(--muted);line-height:1.5">
-        <span style="color:var(--accent)">${ICONS.volume}</span> <b style="color:var(--txt)">Transcription</b> : enregistre l'audio que l'élève devra transcrire via l'onglet « Texte » en mode Vocal, ou laisse vide pour une transcription à partir d'un document externe.
-      </div>
-    </div>`;
-  },
-
-  _asgEssayTypeChange(){
-    const t=document.getElementById('asg-essay-type').value;
-    const def=this._essayTypes[t];
-    const hint=document.getElementById('asg-essay-fields-hint');
-    if(hint&&def)hint.textContent='Champs demandés à l\u2019élève : '+def.fields.map(f=>f.label).join(', ')+'.';
-    const note=document.getElementById('asg-essay-audio-note');
-    if(note)note.style.display=t==='transcription'?'':'none';
   },
 
   /* ── ÉLÈVE : éditeur d'essai ─────────────────────────────────── */
@@ -18441,12 +18487,6 @@ const app={
     });
   },
 
-  _asgOnModeChange(){
-    const vocal=(document.querySelector('input[name="asg-mode"]:checked')||{}).value==='vocal';
-    const block=document.getElementById('asg-record-block');
-    if(block)block.style.display=vocal?'':'none';
-    if(!vocal)this._asgStopRecording();
-  },
   _asgRecToggle(){
     if(this._asgMediaRecorder&&this._asgMediaRecorder.state==='recording'){
       this._asgStopRecording();
@@ -18497,6 +18537,7 @@ const app={
     const blob=new Blob(this._asgRecChunks,{type:'audio/webm'});
     this._asgRecBlob=blob;
     const url=URL.createObjectURL(blob);
+    this._asgRecPreviewUrl=url;
     const preview=document.getElementById('asg-rec-preview');
     const wrap=document.getElementById('asg-rec-preview-wrap');
     const status=document.getElementById('asg-rec-status');
@@ -18516,117 +18557,198 @@ const app={
     if(status)status.textContent='';
     if(preview)preview.src='';
   },
+  /* ── Popup d'assignation : assistant en 3 étapes (Type → Contenu → Pour qui / quand) ──
+     État dans this._asg ; tout le rendu passe par _asgRender(), les clics par une
+     délégation unique (data-*). Les champs texte écrivent directement dans l'état,
+     sans re-render, pour ne pas perdre le focus ni l'enregistreur vocal. */
+  _asgIc(n){
+    const P={
+      check:'<path d="M5 12.5 10 17 19 7"/>',arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',plus:'<path d="M12 5v14M5 12h14"/>',
+      search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',up:'<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>',
+      book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+      pencil:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+      file:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+      layers:'<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>'};
+    return `<svg class="a2-ic" viewBox="0 0 24 24">${P[n]||''}</svg>`;
+  },
+  _asgDate(offsetDays,weekday){ // date locale AAAA-MM-JJ : demain, prochain vendredi, +7 jours
+    const d=new Date();d.setHours(12,0,0,0);
+    if(weekday!=null){do{d.setDate(d.getDate()+1);}while(d.getDay()!==weekday);}else d.setDate(d.getDate()+offsetDays);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  },
+  _asgDueOptions(){
+    const f=iso=>new Date(iso+'T12:00').toLocaleDateString('fr-BE',{weekday:'long',day:'numeric',month:'long'});
+    const o=[['Demain',this._asgDate(1)],['Vendredi',this._asgDate(0,5)],['Semaine pro.',this._asgDate(7)],['Sans date',''],['Autre…','custom']];
+    return o.map(([label,iso])=>({label,iso,long:iso&&iso!=='custom'?f(iso):''}));
+  },
+
   openAssignModal(classId,pre={}){
     // Réinitialiser l'état d'enregistrement à chaque ouverture
-    this._asgRecBlob=null;this._asgAudioUrl=null;this._asgPrevStoragePath=null;
+    this._asgRecBlob=null;this._asgAudioUrl=null;this._asgPrevStoragePath=null;this._asgRecPreviewUrl=null;
     this._asgMediaRecorder=null;this._asgRecStream=null;this._asgRecChunks=[];
     if(this._asgRecInterval){clearInterval(this._asgRecInterval);this._asgRecInterval=null;}
+    if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}
     // Leçons proposées : celles de la méthode de la classe (AZER-UIOP : modules 1 et 2 en leçons ar*/am*), quelle que soit la méthode
     // affichée chez le prof. Base : le programme français AZERTY d'origine (copie prise au premier changement de programme).
     const cdh=this._classDetail&&this._classDetail.id===classId&&this._classDetail.settings?this._classDetail.settings.homeRow:'qsdf';
     const base=_kpAzSnap?_kpAzSnap.lessons.map((l,i)=>({id:l.id,title:_kpAzSnap.fields[i].title})):ALL_LESSONS.map(l=>({id:l.id,title:l.title}));
-    const opts=(typeof KPHomeRow!=='undefined'?KPHomeRow.lessonListFor(cdh,base):base).map(l=>`<option value="${l.id}">${l.title}</option>`).join('');
+    const lessons=(typeof KPHomeRow!=='undefined'?KPHomeRow.lessonListFor(cdh,base):base).map(l=>{const full=ALL_LESSONS.find(x=>x.id===l.id);return{id:l.id,title:l.title,group:full&&full.module||''};});
+    // Élèves de la classe (devoir individuel / remédiation), éventuellement présélectionné depuis la fiche d'un élève
+    const cd=this._classDetail&&this._classDetail.id===classId?this._classDetail:null;
+    const students=((cd&&cd.students)||[]).map(x=>({id:x.studentId,name:x.fullName||x.username}));
+    const sd=this._sd&&this._sd.studentId===pre.studentId?this._sd:null;
+    if(pre.studentId&&!students.some(x=>x.id===pre.studentId))students.push({id:pre.studentId,name:sd?(sd.fullName||sd.username):'?'});
+    students.sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+    const className=(cd&&(cd.name||cd.className))||'';
+    const dues=this._asgDueOptions();
+    this._asg={classId,lessons,students,className,dues,step:0,type:null,lesson:null,module:null,mode:'written',title:'',text:'',
+      essayType:'mail',brief:'',min:'',max:'',wpm:30,showWpm:false,showWords:false,due:1,date:'',
+      oneStudent:!!pre.studentId,sel:pre.studentId?[pre.studentId]:[],q:'',err:false,busy:false};
     const ov=document.createElement('div');
-    ov.style.cssText='position:fixed;inset:0;background:rgba(20,16,12,.45);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;animation:settings-fade .18s ease';
-    const fld='width:100%;margin:6px 0 14px;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;font:inherit;background:var(--bg);box-sizing:border-box;color:var(--txt)';
-    const lbl='display:block;font-size:12px;font-weight:700;color:var(--muted)';
-    ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:22px;max-width:480px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(20,16,12,.28);animation:settings-pop .22s cubic-bezier(.16,1,.3,1)">
-      <div style="padding:24px 28px 18px;background:linear-gradient(135deg,rgba(255,77,46,.10),rgba(124,58,237,.06));border-bottom:1px solid var(--border);display:flex;align-items:center;gap:13px">
-        <div style="width:46px;height:46px;border-radius:13px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 6px 16px rgba(255,77,46,.3)">${ICONS.pencil}</div>
-        <div style="flex:1;min-width:0"><h2 style="margin:0;font-size:19px;letter-spacing:-.01em">Assigner un devoir</h2><div style="font-size:12.5px;color:var(--muted);margin-top:2px">Un exercice du parcours ou ton propre texte</div></div>
-        <button onclick="app._asgStopRecording();this.closest('[style*=fixed]').remove()" style="background:rgba(20,16,12,.06);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--muted);font-size:15px;flex-shrink:0">✕</button>
-      </div>
-      <div style="padding:22px 28px;overflow-y:auto">
-        <input type="hidden" id="asg-type" value="lesson">
-        <div style="display:flex;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:13px;padding:5px;margin-bottom:18px">
-          <button type="button" id="asg-seg-lesson" onclick="app._asgSetType('lesson')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:all .15s">${ICONS.bookOpen} Exercice</button>
-          <button type="button" id="asg-seg-custom" onclick="app._asgSetType('custom')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">${ICONS.pencil} Texte</button>
-          <button type="button" id="asg-seg-essay" onclick="app._asgSetType('essay')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">${ICONS.fileText} Essai</button>
-          <button type="button" id="asg-seg-module" onclick="app._asgSetType('module')" style="flex:1;border:none;border-radius:9px;padding:10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s">${ICONS.layers||ICONS.bookOpen} Module</button>
-        </div>
-        ${(()=>{ /* Pour qui : toute la classe ou un élève (remédiation). Les essais restent des devoirs de classe. */
-          const cd=this._classDetail&&this._classDetail.id===classId?this._classDetail:null;
-          const st=((cd&&cd.students)||[]).map(x=>({id:x.studentId,name:x.fullName||x.username}));
-          const sd=this._sd&&this._sd.studentId===pre.studentId?this._sd:null; // ouverte depuis la fiche d'un élève
-          if(pre.studentId&&!st.some(x=>x.id===pre.studentId))st.push({id:pre.studentId,name:sd?(sd.fullName||sd.username):'?'});
-          if(!st.length)return'';
-          return`<div id="asg-block-for"><label style="${lbl}">${kpT('asg.for')}</label><select id="asg-for" style="${fld}"><option value="">${kpT('asg.for_class')}</option>${st.sort((a,b)=>String(a.name).localeCompare(String(b.name))).map(x=>`<option value="${this._esc(x.id)}"${x.id===pre.studentId?' selected':''}>${this._esc(x.name)}</option>`).join('')}</select></div>`;
-        })()}
-        <div id="asg-block-lesson">
-          <label style="${lbl}">Exercice</label>
-          <select id="asg-lesson" style="${fld}"><option value="">Test de vitesse libre</option>${opts}</select>
-        </div>
-        <div id="asg-block-module" style="display:none">
-          <label style="${lbl}">Module à terminer</label>
-          <select id="asg-module" style="${fld}">${ASG_MODULES.map(m=>`<option value="${m.key}">${m.title}</option>`).join('')}</select>
-          <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin:-4px 0 14px;font-size:12.5px;line-height:1.5;color:var(--muted)">Le devoir est rendu quand l'élève a terminé toutes les parties du module. Les modules sont réservés aux comptes Expert : vérifie que tes élèves y ont accès.</div>
-        </div>
-        <div id="asg-block-custom" style="display:none">
-          <label style="${lbl}">Titre du devoir</label>
-          <input id="asg-title" placeholder="ex. Dictée sur les accents" style="${fld}">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-            <label style="${lbl}">Texte à taper par l'élève</label>
-            <button type="button" onclick="document.getElementById('asg-file').click()" title="Word (.docx), PDF, LibreOffice (.odt) ou texte brut (.txt). Le fichier est lu dans ton navigateur, rien n'est envoyé." style="display:flex;align-items:center;gap:6px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;padding:6px 11px;font:inherit;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;white-space:nowrap">${ICONS.upload} Importer un fichier</button>
-          </div>
-          <input type="file" id="asg-file" accept=".txt,.text,.md,.docx,.odt,.pdf" onchange="app._asgImportFile(this)" style="display:none">
-          <textarea id="asg-text" rows="5" placeholder="Colle ou écris le texte du devoir, ou importe un fichier (Word, PDF, texte)…" style="${fld};resize:vertical;min-height:96px;line-height:1.5"></textarea>
-          <div id="asg-import-status" style="display:none;font-size:12px;line-height:1.5;margin:-8px 0 14px"></div>
-          <label style="${lbl}">Présentation</label>
-          <div style="display:flex;gap:10px;margin:6px 0 14px">
-            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="written" checked onchange="app._asgOnModeChange()" style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px"><span style="color:var(--accent)">${ICONS.fileText}</span> Écrit</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">L'élève voit le texte et le recopie</span></span></label>
-            <label style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start"><input type="radio" name="asg-mode" value="vocal" onchange="app._asgOnModeChange()" style="margin-top:3px;accent-color:var(--accent)"><span><b style="font-size:13px"><span style="color:var(--accent)">${ICONS.volume}</span> Vocal</b><br><span style="font-size:11.5px;color:var(--muted);line-height:1.4">Dictée : le texte est lu, caché</span></span></label>
-          </div>
-          <div id="asg-record-block" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px">
-            <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px">ENREGISTREMENT VOCAL DU PROF</div>
-            <div id="asg-rec-hint" style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Enregistre ta voix lisant le texte. L'élève entendra ton audio à la place de la synthèse vocale.</div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-              <button id="asg-rec-btn" type="button" onclick="app._asgRecToggle()" style="display:flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">${ICONS.mic} Enregistrer</button>
-              <span id="asg-rec-timer" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);display:none">0:00</span>
-              <span id="asg-rec-status" style="font-size:12px;color:var(--muted)"></span>
-            </div>
-            <div id="asg-rec-preview-wrap" style="display:none;margin-top:12px">
-              <audio id="asg-rec-preview" controls style="width:100%;height:36px;border-radius:8px"></audio>
-              <button type="button" onclick="app._asgRecRetry()" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:9px;padding:7px 13px;font:inherit;font-size:12px;color:var(--muted);cursor:pointer">↩️ Réenregistrer</button>
-            </div>
-          </div>
-        </div>
-        ${app._essayBriefHtml(fld,lbl)}
-        <div id="asg-speed-block">
-        <label style="${lbl}">Objectif de vitesse <span style="font-weight:400">(mpm, optionnel)</span></label>
-        <input id="asg-wpm" type="number" min="1" placeholder="ex. 30" style="${fld}">
-        <label style="${lbl}">Échéance <span style="font-weight:400">(optionnel)</span></label>
-        </div>
-        <input id="asg-due" type="date" style="${fld};margin-bottom:2px">
-        <div id="asg-err" style="color:#E5484D;font-size:13px;margin:10px 0 0;display:none"></div>
-      </div>
-      <div style="padding:16px 28px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0">
-        <button onclick="app._asgStopRecording();this.closest('[style*=fixed]').remove()" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px;font:inherit;font-size:14px;font-weight:600;cursor:pointer">Annuler</button>
-        <button id="asg-save" onclick="app.createAssignment('${classId}')" style="flex:1.4;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 5px 16px rgba(255,77,46,.32)">Assigner le devoir</button>
-      </div>
-    </div>`;
+    ov.className='a2-scrim';
+    ov.addEventListener('click',e=>this._asgClick(e));
+    ov.addEventListener('input',e=>this._asgInput(e));
+    ov.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){this._asgClose();return;}
+      if(e.key==='Enter'&&e.target.tagName==='INPUT'&&e.target.type!=='range'&&e.target.id!=='asg-q'){e.preventDefault();this._asgNext();}
+    });
     document.body.appendChild(ov);
     this._asgOverlay=ov;
+    this._asgRender();
+  },
+  _asgClose(){
+    this._asgStopRecording();
+    if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}
+    this._asg=null;
+  },
+  _asgForClass(){const a=this._asg;return a.type==='essay'||!a.oneStudent||(a.students.length>0&&a.sel.length===a.students.length);},
+  _asgWho(){const a=this._asg;if(this._asgForClass())return 'la classe';const n=a.sel.length;return n===0?'…':n===1?this._esc((a.students.find(s=>s.id===a.sel[0])||{}).name||'…'):n+' élèves';},
+  _asgProblem(){
+    const a=this._asg;
+    if(a.step===0&&!a.type)return 'Choisis un type de devoir';
+    if(a.step===1){
+      if(a.type==='lesson'&&a.lesson===null)return 'Choisis une leçon';
+      if(a.type==='module'&&!a.module)return 'Choisis un module';
+      if((a.type==='custom'||a.type==='essay')&&!a.title.trim())return 'Donne un titre au devoir';
+      if(a.type==='custom'&&!a.text.trim())return 'Ajoute le texte';
+      if(a.type==='essay'&&a.min&&a.max&&parseInt(a.min,10)>parseInt(a.max,10))return 'Le minimum dépasse le maximum';
+    }
+    if(a.step===2){
+      if(a.type!=='essay'&&a.oneStudent&&!a.sel.length)return 'Choisis au moins un élève';
+      if(a.dues[a.due].iso==='custom'&&!a.date)return 'Choisis une date';
+    }
+    return '';
+  },
+  _asgDueValue(){const a=this._asg,d=a.dues[a.due];return d.iso==='custom'?a.date:d.iso;},
+  _asgSubject(){
+    const a=this._asg;
+    if(a.type==='lesson'){if(a.lesson==='')return 'Test de vitesse · '+a.wpm+' mpm';const l=a.lessons.find(x=>x.id===a.lesson);return l?l.title:'';}
+    if(a.type==='module'){const m=ASG_MODULES.find(x=>x.key===a.module);return m?m.title:'';}
+    return a.title.trim();
   },
 
-  _asgSetType(type){
-    document.getElementById('asg-type').value=type;
-    const segs={lesson:'asg-seg-lesson',custom:'asg-seg-custom',essay:'asg-seg-essay',module:'asg-seg-module'};
-    Object.entries(segs).forEach(([k,id])=>{
-      const el=document.getElementById(id);if(!el)return;
-      const on=k===type;
-      el.style.background=on?'var(--accent)':'transparent';
-      el.style.color=on?'#fff':'var(--muted)';
-    });
-    document.getElementById('asg-block-lesson').style.display=type==='lesson'?'':'none';
-    document.getElementById('asg-block-custom').style.display=type==='custom'?'':'none';
-    const fb=document.getElementById('asg-block-for');if(fb)fb.style.display=type==='essay'?'none':'';
-    const mb=document.getElementById('asg-block-module');if(mb)mb.style.display=type==='module'?'':'none';
-    const eb=document.getElementById('asg-block-essay');
-    if(eb)eb.style.display=type==='essay'?'':'none';
-    // Un essai n'a pas d'objectif de vitesse : on rédige, on ne recopie pas.
-    const sb=document.getElementById('asg-speed-block');
-    if(sb)sb.style.display=(type==='essay'||type==='module')?'none':'';
-    if(type==='essay')app._asgEssayTypeChange();
+  _asgStepHtml(){
+    const a=this._asg,E=s=>this._esc(s),ic=n=>this._asgIc(n);
+    const TYPES=[['lesson','Exercice','Leçon ou test de vitesse','book','#2F7DF6'],['custom','Texte','À recopier ou en dictée','pencil','#FF4D2E'],['essay','Rédaction','Mail, lettre, récit…','file','#6D5DF5'],['module','Module','Un cours complet','layers','#1FA971']];
+    if(a.step===0)return `<div class="a2-q">Quel type de devoir ?</div><div class="a2-tiles">${TYPES.map(([k,n,d,i,c])=>`<button type="button" class="a2-tile ${a.type===k?'on':''}" style="--c:${c}" data-type="${k}"><span class="a2-oi">${ic(i)}</span><div><b>${n}</b><small>${d}</small></div></button>`).join('')}</div>`;
+    if(a.step===1){
+      if(a.type==='lesson'){
+        const q=a.q.toLowerCase(),match=l=>!q||l.title.toLowerCase().includes(q);
+        const ls=a.lessons.filter(match),showFree=!q||'test de vitesse libre'.includes(q);
+        const groups=[];ls.forEach(l=>{let g=groups.find(x=>x[0]===l.group);if(!g){g=[l.group,[]];groups.push(g);}g[1].push(l);});
+        return `<div class="a2-q">Quelle leçon ?</div><div class="a2-list"><div class="a2-search">${ic('search')}<input id="asg-q" placeholder="Rechercher" value="${E(a.q)}" autocomplete="off"></div>
+        <div class="a2-scroll">${showFree?`<button type="button" class="a2-li ${a.lesson===''?'on':''}" data-lesson=""><span class="a2-n">⚡</span>Test de vitesse libre<span class="a2-ck">${ic('check')}</span></button>`:''}
+        ${groups.map(([g,items])=>(g?`<div class="a2-gh">${E(g)}</div>`:'')+items.map(l=>`<button type="button" class="a2-li ${a.lesson===l.id?'on':''}" data-lesson="${E(l.id)}">${E(l.title)}<span class="a2-ck">${ic('check')}</span></button>`).join('')).join('')}
+        ${!ls.length&&!showFree?'<div class="a2-empty">Aucun résultat</div>':''}</div></div>`;
+      }
+      if(a.type==='module')return `<div class="a2-q">Quel module ?</div><div class="a2-list"><div class="a2-scroll" style="max-height:290px">${ASG_MODULES.map(m=>`<button type="button" class="a2-li ${a.module===m.key?'on':''}" data-module="${m.key}">${E(m.title)}<span class="a2-ck">${ic('check')}</span></button>`).join('')}</div></div><div class="a2-sub">Réservé aux comptes Expert : vérifie que tes élèves y ont accès.</div>`;
+      if(a.type==='custom'){
+        const rec=this._asgRecBlob&&this._asgRecPreviewUrl;
+        return `<div class="a2-q">Ton texte</div>
+        <div class="a2-fld"><input class="a2-inp" id="asg-title" data-bind="title" value="${E(a.title)}" placeholder="Titre du devoir" maxlength="80" aria-label="Titre du devoir"></div>
+        <div class="a2-fld"><textarea class="a2-inp a2-ta" id="asg-text" data-bind="text" placeholder="Colle ou écris le texte à taper…" aria-label="Texte à taper">${E(a.text)}</textarea>
+          <button type="button" class="a2-link" style="margin-top:6px" onclick="document.getElementById('asg-file').click()" title="Word (.docx), PDF, LibreOffice (.odt) ou texte brut (.txt). Le fichier est lu dans ton navigateur, rien n'est envoyé.">${ic('up')} Importer un fichier</button>
+          <input type="file" id="asg-file" accept=".txt,.text,.md,.docx,.odt,.pdf" onchange="app._asgImportFile(this)" style="display:none">
+          <div id="asg-import-status" style="display:none;font-size:12.5px;line-height:1.5;margin-top:6px"></div></div>
+        <div class="a2-seg"><button type="button" class="${a.mode==='written'?'on':''}" data-mode="written">Écrit</button><button type="button" class="${a.mode==='vocal'?'on':''}" data-mode="vocal">Dictée</button></div>
+        <div class="a2-sub">${a.mode==='written'?"L'élève voit le texte et le recopie.":"Le texte est lu à voix haute et caché à l'élève."}</div>
+        ${a.mode==='vocal'?`<div class="a2-rec"><button type="button" id="asg-rec-btn" class="a2-recbtn" onclick="app._asgRecToggle()">${ICONS.mic} Enregistrer ma voix</button><span class="a2-o">(optionnel)</span><span id="asg-rec-timer" class="a2-timer" style="display:none">0:00</span><span id="asg-rec-status" class="a2-o"></span>
+          <div id="asg-rec-preview-wrap" style="display:${rec?'':'none'};flex-basis:100%"><audio id="asg-rec-preview" controls style="width:100%;height:36px" ${rec?`src="${this._asgRecPreviewUrl}"`:''}></audio><button type="button" class="a2-link" onclick="app._asgRecRetry()">Réenregistrer</button></div></div>`:''}`;
+      }
+      if(a.type==='essay'){
+        const kinds=Object.entries(this._essayTypes);
+        return `<div class="a2-q">Ta rédaction</div>
+        <div class="a2-fld"><input class="a2-inp" id="asg-title" data-bind="title" value="${E(a.title)}" placeholder="Titre du devoir" maxlength="80" aria-label="Titre du devoir"></div>
+        <div class="a2-fld"><div class="a2-chips">${kinds.map(([k,t])=>`<button type="button" class="a2-chip ${a.essayType===k?'on':''}" data-essay="${k}">${E(t.label)}</button>`).join('')}</div></div>
+        <div class="a2-fld"><textarea class="a2-inp a2-ta" style="min-height:90px" id="asg-essay-brief" data-bind="brief" placeholder="Consigne pour l'élève (optionnel)" aria-label="Consigne">${E(a.brief)}</textarea></div>
+        ${a.essayType==='transcription'?`<div class="a2-sub" style="margin:-8px 0 16px">Pour une transcription, enregistre l'audio via le type « Texte » en mode Dictée, ou laisse vide pour partir d'un document.</div>`:''}
+        ${a.showWords?`<div class="a2-two"><input class="a2-inp" type="number" min="1" data-bind="min" value="${E(a.min)}" placeholder="Mots min." aria-label="Mots minimum"><input class="a2-inp" type="number" min="1" data-bind="max" value="${E(a.max)}" placeholder="Mots max." aria-label="Mots maximum"></div>`:`<button type="button" class="a2-link" data-words>${ic('plus')} Limiter le nombre de mots</button>`}`;
+      }
+    }
+    // Étape 3 : pour qui / pour quand
+    const free=a.type==='lesson'&&a.lesson==='';
+    const canWpm=a.type==='lesson'||a.type==='custom';
+    const who=a.type==='essay'||!a.students.length?'':`<div class="a2-fld"><label class="a2-lbl">Pour qui</label><div class="a2-seg"><button type="button" class="${!a.oneStudent?'on':''}" data-who="class">Toute la classe</button><button type="button" class="${a.oneStudent?'on':''}" data-who="some">Des élèves</button></div>
+      ${a.oneStudent?`<div class="a2-pick"><span>${a.sel.length?a.sel.length+' sélectionné'+(a.sel.length>1?'s':''):'Touche pour sélectionner'}</span><button type="button" class="a2-link" data-all>${a.sel.length===a.students.length?'Tout désélectionner':'Tout sélectionner'}</button></div><div class="a2-chips">${a.students.map(s=>{const on=a.sel.includes(s.id);return`<button type="button" class="a2-chip ${on?'on':''}" data-student="${E(s.id)}" aria-pressed="${on}"><span class="a2-av">${on?ic('check'):E(String(s.name||'?')[0].toUpperCase())}</span>${E(s.name)}</button>`;}).join('')}</div>`:''}</div>`;
+    const due=`<div class="a2-fld"><label class="a2-lbl">Pour quand</label><div class="a2-chips">${a.dues.map((d,i)=>`<button type="button" class="a2-chip ${a.due===i?'on':''}" data-due="${i}">${d.label}</button>`).join('')}</div>
+      ${a.dues[a.due].iso==='custom'?`<input class="a2-inp" type="date" id="asg-date" data-bind="date" value="${E(a.date)}" style="margin-top:10px;max-width:220px" aria-label="Date d'échéance">`:''}</div>`;
+    const wpm=canWpm?((a.showWpm||free)?`<div class="a2-fld"><label class="a2-lbl">Objectif de vitesse${free?'':' <i style="font-style:normal;font-weight:500">(optionnel)</i>'}</label><div class="a2-wpm"><input type="range" min="5" max="80" step="5" value="${a.wpm}" id="asg-wpm" aria-label="Objectif en mots par minute"><output id="asg-wpmo">${a.wpm} mpm</output></div></div>`:`<button type="button" class="a2-link" data-wpm>${ic('plus')} Ajouter un objectif de vitesse</button>`):'';
+    return `<div class="a2-q">Pour qui et pour quand ?</div>${who}${due}${wpm}`;
+  },
+
+  _asgRender(){
+    const a=this._asg,ov=this._asgOverlay;if(!a||!ov)return;
+    const pb=this._asgProblem(),last=a.step===2;
+    ov.innerHTML=`<div class="a2-modal" role="dialog" aria-modal="true" aria-label="Nouveau devoir">
+      <div class="a2-top">Nouveau devoir${a.className?' · '+this._esc(a.className):''}<span class="a2-sp"></span><button type="button" class="a2-x" aria-label="Fermer" data-close>✕</button></div>
+      <div class="a2-prog" aria-label="Étape ${a.step+1} sur 3">${[0,1,2].map(i=>`<i class="${i<=a.step?'on':''}"></i>`).join('')}</div>
+      <div class="a2-body" id="asg-body">${this._asgStepHtml()}</div>
+      <div class="a2-foot">${a.step?'<button type="button" class="a2-btn a2-ghost" data-back>Retour</button>':'<button type="button" class="a2-btn a2-ghost" data-close>Annuler</button>'}<span class="a2-sp"></span>
+        <span class="a2-why" id="asg-err" role="alert">${pb&&a.err?pb:''}</span>
+        <button type="button" class="a2-btn a2-pri ${pb||a.busy?'off':''}" id="asg-save" data-next ${a.busy?'disabled':''}>${a.busy?'…':last?'Assigner à '+this._asgWho():'Continuer '+this._asgIc('arrow')}</button></div></div>`;
+  },
+  _asgSetErr(msg){const a=this._asg;a.err=true;const e=document.getElementById('asg-err');if(e)e.textContent=msg;},
+  _asgClick(e){
+    const a=this._asg;if(!a)return;
+    if(e.target===this._asgOverlay)return; // pas de fermeture au clic sur le fond : on ne perd pas un texte en cours
+    const t=e.target.closest('[data-type],[data-lesson],[data-module],[data-mode],[data-essay],[data-due],[data-who],[data-student],[data-all],[data-back],[data-next],[data-close],[data-wpm],[data-words]');
+    if(!t||!this._asgOverlay.contains(t))return;
+    const d=t.dataset,body=document.getElementById('asg-body'),top=body?body.scrollTop:0;
+    if(d.close!==undefined){this._asgClose();return;}
+    if(d.next!==undefined){this._asgNext();return;}
+    a.err=false;let nav=false;
+    if(d.type!==undefined)a.type=d.type;
+    if(d.lesson!==undefined){a.lesson=d.lesson;if(d.lesson==='')a.showWpm=true;}
+    if(d.module!==undefined)a.module=d.module;
+    if(d.mode!==undefined){a.mode=d.mode;if(d.mode!=='vocal')this._asgStopRecording();}
+    if(d.essay!==undefined)a.essayType=d.essay;
+    if(d.due!==undefined)a.due=+d.due;
+    if(d.who!==undefined){a.oneStudent=d.who==='some';if(!a.oneStudent)a.sel=[];}
+    if(d.student!==undefined)a.sel=a.sel.includes(d.student)?a.sel.filter(x=>x!==d.student):[...a.sel,d.student];
+    if(d.all!==undefined)a.sel=a.sel.length===a.students.length?[]:a.students.map(s=>s.id);
+    if(d.wpm!==undefined)a.showWpm=true;
+    if(d.words!==undefined)a.showWords=true;
+    if(d.back!==undefined){this._asgStopRecording();a.step=Math.max(0,a.step-1);nav=true;}
+    this._asgRender();
+    const b=document.getElementById('asg-body');if(b&&!nav)b.scrollTop=top;
+  },
+  _asgNext(){
+    const a=this._asg;if(!a||a.busy)return;
+    const p=this._asgProblem();
+    if(p){a.err=true;this._asgRender();return;}
+    if(a.step<2){this._asgStopRecording();a.step++;a.err=false;this._asgRender();return;}
+    this.createAssignment(a.classId);
+  },
+  _asgInput(e){
+    const a=this._asg,el=e.target;if(!a)return;
+    if(el.id==='asg-q'){a.q=el.value;const p=el.selectionStart;this._asgRender();const n=document.getElementById('asg-q');if(n){n.focus();n.setSelectionRange(p,p);}return;}
+    if(el.id==='asg-wpm'){a.wpm=+el.value;const o=document.getElementById('asg-wpmo');if(o)o.textContent=a.wpm+' mpm';return;}
+    if(el.dataset&&el.dataset.bind){
+      a[el.dataset.bind]=el.value;
+      const n=document.getElementById('asg-save'),p=this._asgProblem();
+      if(n)n.classList.toggle('off',!!p);
+      if(!p){a.err=false;const w=document.getElementById('asg-err');if(w)w.textContent='';}
+    }
   },
 
   /* ── Import d'un texte externe (devoir « Texte ») ──
@@ -18801,6 +18923,7 @@ const app={
       ta.value=r.text;
       const ti=document.getElementById('asg-title');
       if(ti&&!ti.value.trim())ti.value=file.name.replace(/\.[^.]+$/,'').replace(/_+/g,' ').trim().slice(0,80);
+      ta.dispatchEvent(new Event('input',{bubbles:true}));if(ti)ti.dispatchEvent(new Event('input',{bubbles:true})); // synchronise l'état de la popup
       const mins=r.text.length/5/30;
       const fmt=n=>n.toLocaleString('fr-FR');
       let html='<span style="color:#1FA971;font-weight:700">✓ «&nbsp;'+name+'&nbsp;» importé</span> · '+fmt(r.text.length)+' caractères · '+(mins<1?'moins d\'1 min':'≈ '+Math.round(mins)+' min')+' à 30 mpm'+(hadText?' · remplace le texte précédent':'');
@@ -18835,86 +18958,54 @@ const app={
   },
 
   async createAssignment(classId){
-    const type=document.getElementById('asg-type').value;
-    const wpm=document.getElementById('asg-wpm').value;
-    const due=document.getElementById('asg-due').value;
-    const err=document.getElementById('asg-err');
-    const fail=(m)=>{err.textContent=m;err.style.display='block';};
-    let title,lessonId=null,customText=null,mode=null;
-    if(type==='essay')return this._createEssayAssignment(classId,due,fail);
-    const studentId=((document.getElementById('asg-for')||{}).value)||null; // devoir individuel (remédiation) ou toute la classe
-    if(type==='module'){
-      const key=document.getElementById('asg-module').value,m=ASG_MODULES.find(x=>x.key===key);
-      if(!m)return fail('Choisis un module.');
-      const btn=document.getElementById('asg-save');btn.disabled=true;btn.textContent='…';
-      try{
-        const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-create',token:currentToken,classId,mode:'module',lessonId:key,title:m.title,dueDate:due||null,studentId})});
-        const d=await r.json();
-        if(!r.ok){btn.disabled=false;btn.textContent='Assigner le devoir';fail(d.error||kpT('net.generic'));return;}
-        if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}
-        this.viewClass(classId);
-      }catch{btn.disabled=false;btn.textContent='Assigner le devoir';fail('Erreur réseau.');}
-      return;
-    }
-    if(type==='custom'){
-      title=document.getElementById('asg-title').value.trim();
-      customText=document.getElementById('asg-text').value.trim();
-      mode=(document.querySelector('input[name="asg-mode"]:checked')||{}).value||'written';
-      if(!title)return fail('Donne un titre au devoir.');
-      if(!customText)return fail('Saisis le texte à taper.');
+    const a=this._asg;if(!a||a.busy)return;
+    const fail=(m)=>{a.busy=false;a.err=true;this._asgRender();const e=document.getElementById('asg-err');if(e)e.textContent=m;};
+    const due=this._asgDueValue()||null;
+    // Corps commun à tous les devoirs créés (un par élève ciblé, ou un seul pour la classe)
+    const body={action:'assignment-create',token:currentToken,classId,dueDate:due};
+    if(a.type==='module'){
+      body.mode='module';body.lessonId=a.module;body.title=this._asgSubject();
+    }else if(a.type==='essay'){
+      body.mode='essay';body.title=a.title.trim();body.essayType=a.essayType;
+      body.essayBrief=a.brief.trim()||null;body.minWords=a.min||null;body.maxWords=a.max||null;
+    }else if(a.type==='custom'){
+      body.title=a.title.trim();body.customText=a.text.trim();body.mode=a.mode||'written';
+      body.targetWpm=a.showWpm?a.wpm:null;
     }else{
-      lessonId=document.getElementById('asg-lesson').value;
-      if(lessonId){const sel=document.getElementById('asg-lesson'),o=sel&&sel.selectedOptions&&sel.selectedOptions[0],l=this.lessonById(lessonId);title=(o&&o.textContent)||(l?l.title:'Exercice');} // titre de la liste : leçons AZER d'une classe AZER-UIOP comprises
-      else{if(!wpm)return fail('Pour un test libre, fixe un objectif de vitesse.');title='Test de vitesse · '+wpm+' mpm';}
+      body.lessonId=a.lesson||null;body.title=this._asgSubject();
+      body.targetWpm=(a.showWpm||a.lesson==='')?a.wpm:null;
     }
-    const btn=document.getElementById('asg-save');btn.disabled=true;btn.textContent='…';
-    // Upload audio si mode vocal et enregistrement en attente
-    let audioUrl=this._asgAudioUrl||null;
-    if(mode==='vocal'&&this._asgRecBlob&&!audioUrl){
-      btn.textContent='Upload audio…';
+    a.busy=true;a.err=false;this._asgRender();
+    // Audio : enregistrement vocal (dictée) ou transcription, envoyé une seule fois
+    if((body.mode==='vocal'||(body.mode==='essay'&&a.essayType==='transcription'))&&this._asgRecBlob&&!this._asgAudioUrl){
       const up=await this._asgUploadPendingAudio();
-      if(!up.ok){btn.disabled=false;btn.textContent='Assigner';fail(up.error);return;}
-      audioUrl=up.url;
-      btn.textContent='…';
+      if(!up.ok)return fail(up.error);
     }
+    body.audioUrl=this._asgAudioUrl||null;
+    // Toute la classe (ou rédaction, ou tous les élèves cochés) = un seul devoir de classe ; sinon un devoir par élève
+    const targets=this._asgForClass()?[null]:a.sel;
+    let ok=0;
     try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'assignment-create',token:currentToken,classId,studentId,lessonId:lessonId||null,title,targetWpm:wpm||null,dueDate:due||null,customText,mode,audioUrl:audioUrl||null})});
-      const d=await r.json();
-      if(!r.ok){btn.disabled=false;btn.textContent='Assigner';fail(d.error||kpT('net.generic'));return;}
-      if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}
-      this.viewClass(classId);
-    }catch{btn.disabled=false;btn.textContent='Assigner';fail('Erreur réseau.');}
-  },
-
-  async _createEssayAssignment(classId,due,fail){
-    const title=document.getElementById('asg-essay-title').value.trim();
-    const essayType=document.getElementById('asg-essay-type').value;
-    const brief=document.getElementById('asg-essay-brief').value.trim();
-    const min=document.getElementById('asg-essay-min').value;
-    const max=document.getElementById('asg-essay-max').value;
-    if(!title)return fail('Donne un titre au devoir.');
-    if(min&&max&&parseInt(min,10)>parseInt(max,10))return fail('Le minimum de mots dépasse le maximum.');
-    const btn=document.getElementById('asg-save');btn.disabled=true;btn.textContent='…';
-    // Upload audio si un enregistrement est en attente (type Transcription).
-    let audioUrl=this._asgAudioUrl||null;
-    if(essayType==='transcription'&&this._asgRecBlob&&!audioUrl){
-      btn.textContent='Upload audio…';
-      const up=await this._asgUploadPendingAudio();
-      if(!up.ok){btn.disabled=false;btn.textContent='Assigner le devoir';return fail(up.error);}
-      audioUrl=up.url;
-      btn.textContent='…';
+      for(const studentId of targets){
+        const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(studentId?{...body,studentId}:body)});
+        const d=await r.json().catch(()=>({}));
+        if(!r.ok){
+          if(ok){this.viewClass(classId);} // des devoirs sont déjà partis : on rafraîchit la liste
+          return fail((ok?`Envoyé à ${ok} élève${ok>1?'s':''} sur ${targets.length}. `:'')+(d.error||kpT('net.generic')));
+        }
+        ok++;
+      }
+    }catch{
+      if(ok)this.viewClass(classId);
+      return fail((ok?`Envoyé à ${ok} élève${ok>1?'s':''} sur ${targets.length}. `:'')+'Erreur réseau.');
     }
-    try{
-      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-        action:'assignment-create',token:currentToken,classId,title,mode:'essay',
-        essayType,essayBrief:brief||null,minWords:min||null,maxWords:max||null,
-        dueDate:due||null,audioUrl,
-      })});
-      const d=await r.json();
-      if(!r.ok){btn.disabled=false;btn.textContent='Assigner le devoir';return fail(d.error||kpT('net.generic'));}
-      if(this._asgOverlay){this._asgOverlay.remove();this._asgOverlay=null;}
-      this.viewClass(classId);
-    }catch{btn.disabled=false;btn.textContent='Assigner le devoir';fail('Erreur réseau.');}
+    // Confirmation
+    const subject=this._asgSubject(),dueLong=due?new Date(due+'T12:00').toLocaleDateString('fr-BE',{day:'numeric',month:'long'}):'';
+    const to=this._asgForClass()?'à la classe':targets.length===1?'à '+this._asgWho():`à ${targets.length} élèves`;
+    this._asgOverlay.innerHTML=`<div class="a2-modal" role="dialog" aria-modal="true" aria-label="Devoir assigné"><div class="a2-top"><span class="a2-sp"></span><button type="button" class="a2-x" aria-label="Fermer" data-close>✕</button></div>
+      <div class="a2-done"><div class="a2-big">${this._asgIc('check')}</div><h3>Devoir assigné</h3><p>« ${this._esc(subject)} » a été envoyé ${to}${dueLong?`, pour le ${dueLong}`:''}.</p><button type="button" class="a2-btn a2-pri" data-close>Terminer</button></div></div>`;
+    this._asg.busy=false;
+    this.viewClass(classId);
   },
 
   editAssignment(id,classId){
