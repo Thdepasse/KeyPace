@@ -8187,6 +8187,13 @@ const app={
     return{mode,lessonId:lessonId||null,text,idx:0,typed:[],started:false,startTime:0,endTime:0,correct:0,keystrokes:0,finished:false};
   },
   lessonById(id){return ALL_LESSONS.find(l=>l.id===id);},
+  // Devoir « leçon » encore à faire qui vise cette leçon (le plus urgent d'abord) : la leçon lancée depuis l'accueil, la page Classe
+  // ou la liste des leçons affiche alors l'objectif du devoir, qui peut être plus exigeant que celui de la classe (vitesse visée).
+  _asgForLesson(lessonId){
+    if(!lessonId||!currentUser||isTeacher())return null;
+    const list=(this._myAssignments||[]).filter(a=>a.lessonId===lessonId&&!a.done&&!a.customText&&a.mode!=='module'&&a.mode!=='essay');
+    return this._clSortTodo(list)[0]||null;
+  },
   genGroups(focus,pool,target){
     const pick=a=>a[Math.floor(Math.random()*a.length)];
     const F=focus.length?focus:pool,P=pool.length?pool:focus;
@@ -10798,6 +10805,19 @@ const app={
       badge=lessonPassed?kpT('typ.lesson_done'):kpT('typ.not_yet');
     }
     const les=isLesson?this.lessonById(s.lessonId):null;
+    // Devoir lié à cette leçon : son objectif de vitesse s'ajoute à celui de la classe. Au résultat, même règle que le serveur
+    // (assignmentDone) : leçon validée une fois et meilleure vitesse au moins égale à l'objectif du devoir.
+    const asg=isLesson&&!(s&&s.cert)?(s._asg!==undefined?s._asg:(s._asg=this._asgForLesson(s.lessonId))):null;
+    let asgBanner='';
+    if(asg){
+      const t=asg.targetWpm||0;
+      if(finished){
+        const rec=this.lessonRec(s.lessonId),done=!!rec.cleared&&(!t||(rec.bestWpm||0)>=t);
+        asgBanner=`<div class="banner ${done?'pass':'fail'}"><div class="banner-title">${done?kpT('typ.asg_done',{title:this._esc(asg.title)}):kpT('typ.asg_not_yet',{title:this._esc(asg.title)})}</div><div class="banner-sub">${done?kpT('typ.asg_done_sub'):!rec.cleared?kpT('typ.asg_need_lesson'):kpT('typ.asg_need_wpm',{target:t,best:rec.bestWpm||0})}</div></div>`;
+      }else if(t>goals.minWpm){
+        asgBanner=`<div class="banner" style="background:var(--light);color:var(--txt)"><div class="banner-title">${kpT('typ.asg_goal',{title:this._esc(asg.title)})}</div><div class="banner-sub">${kpT('typ.asg_goal_sub',{target:t})}</div></div>`;
+      }
+    }
     const ch=this._challenge;
     const custom=!!(s&&s.custom);const vocal=!!(s&&s.vocal);const cert=!!(s&&s.cert);const titled=custom||cert;
     // Défi entre amis : bannière avant le test, comparaison + partage après.
@@ -10850,6 +10870,7 @@ const app={
       </div>
       <div class="prog-wrap"><div class="prog-fill" style="width:${progress}%"></div></div>
       ${chalBanner}
+      ${!finished?asgBanner:''}
       ${!finished&&isLesson&&les&&les.tip&&s&&!s.started?`<div class="lesson-tip"><div class="lesson-tip-icon">💡</div><div>${les.tip}</div></div>`:''}
       ${!finished?(vocal?`<div class="typing-box" style="text-align:center;padding:34px 20px">
         <div style="font-size:13px;color:var(--muted);margin-bottom:18px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5">${kpT('typ.dict_box')}</div>
@@ -10858,6 +10879,7 @@ const app={
       </div>`:`<div class="typing-box"><div class="typing-box-inner" id="tb-scroll">${tbHTML}</div></div>`):''}
       ${finished?`<div class="result-box"><div class="result-badge">${badge}</div>
         ${isLesson?`<div class="banner ${lessonPassed?'pass':'fail'}"><div class="banner-title">${lessonPassed?kpT('typ.passed'):kpT('typ.almost')}</div><div class="banner-sub">${lessonPassed?(hasNext?(nextLocked?kpT('typ.next_expert'):kpT('typ.next_unlocked')):kpT('typ.course_done')):kpT('typ.goal_missing',{wpm:goals.minWpm,errors:goals.maxErrors,missing:missingTxt})}</div></div>`:''}
+        ${asgBanner}
         <div class="result-grid">
           <div class="stat-box"><div class="stat-label">${kpT('typ.speed')}</div><div class="stat-val">${resWpm}<span class="stat-unit"> ${kpT('unit.wpm')}</span></div></div>
           <div class="stat-box"><div class="stat-label">${kpT('typ.accuracy')}</div><div class="stat-val">${resAcc}<span class="stat-unit"> %</span></div></div>
