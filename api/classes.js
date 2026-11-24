@@ -790,6 +790,52 @@ async function myAssignments(req, res) {
   return res.json({ assignments: out });
 }
 
+// Prof : rappel à un élève qui n'a pas encore fait un devoir (table student_reminders).
+// Un seul rappel en attente par élève et par devoir : un second clic ne crée pas de doublon.
+async function remindStudent(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  const aR = await sb(`/assignments?id=eq.${encodeURIComponent(req.body.assignmentId)}&select=*`);
+  const a = aR.data && aR.data[0];
+  if (!a) return res.status(404).json({ error: 'Devoir introuvable.' });
+  const { cls, error, status } = await loadClassForManage(user, a.class_id);
+  if (error) return res.status(status).json({ error });
+  const studentId = req.body.studentId;
+  if (!studentId) return res.status(400).json({ error: 'Élève manquant.' });
+  const members = await membersOf(cls.id);
+  if (!assignmentTargets(a, members).some((m) => m.student_id === studentId)) {
+    return res.status(400).json({ error: "Ce devoir ne concerne pas cet élève." });
+  }
+  const pending = await sb(`/student_reminders?student_id=eq.${encodeURIComponent(studentId)}&assignment_id=eq.${a.id}&seen_at=is.null&select=id`);
+  if (pending.ok && Array.isArray(pending.data) && pending.data.length) return res.json({ ok: true, alreadyPending: true });
+  const r = await sb('/student_reminders', { method: 'POST', body: JSON.stringify({ student_id: studentId, teacher_id: user.id, assignment_id: a.id }) });
+  if (!r.ok) return res.status(500).json({ error: "Rappel impossible à enregistrer." });
+  return res.json({ ok: true, alreadyPending: false });
+}
+
+// Élève : rappels en attente, renvoyés une seule fois (marqués vus dans la foulée).
+// Un rappel sur un devoir fait entre-temps est marqué vu sans être affiché.
+async function remindersCheck(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const r = await sb(`/student_reminders?student_id=eq.${encodeURIComponent(user.id)}&seen_at=is.null&select=id,assignment_id,assignments(*)&order=created_at.asc`);
+  const rows = (r.ok && Array.isArray(r.data)) ? r.data : [];
+  if (!rows.length) return res.json({ reminders: [] });
+  await sb(`/student_reminders?id=in.(${rows.map((x) => x.id).join(',')})`, { method: 'PATCH', body: JSON.stringify({ seen_at: new Date().toISOString() }) });
+  const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(user.id)}&select=data`);
+  const data = (pr.data && pr.data[0] && pr.data[0].data) || {};
+  const seen = new Set();
+  const reminders = [];
+  for (const x of rows) {
+    const a = x.assignments;
+    if (!a || seen.has(a.id) || !assignmentVisibleTo(a, user.id) || assignmentDone(data, a)) continue;
+    seen.add(a.id);
+    reminders.push({ assignmentId: a.id, assignmentTitle: a.title });
+  }
+  return res.json({ reminders });
+}
+
 // Élève : un module vient d'être terminé (toutes les parties). Marque posée côté serveur,
 // par compare-and-swap comme essaySubmit(), pour ne pas écraser un save-progress concurrent.
 async function moduleDone(req, res) {
@@ -1482,6 +1528,8 @@ module.exports = async function handler(req, res) {
       case 'assignment-delete': return await assignmentDelete(req, res);
       case 'my-assignments': return await myAssignments(req, res);
       case 'module-done': return await moduleDone(req, res);
+      case 'remind-student': return await remindStudent(req, res);
+      case 'reminders-check': return await remindersCheck(req, res);
       case 'audio-upload': return await audioUpload(req, res);
       // essais
       case 'essay-submit': return await essaySubmit(req, res);
