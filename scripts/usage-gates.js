@@ -726,10 +726,11 @@ function u17() {
   h.run("currentPlan='free';try{localStorage.setItem('klak_session',JSON.stringify({username:'tester',plan:'free',token:'tok',userId:'uid'}))}catch{}");
   const htmlF = render();
   if (!/expert-locked/.test(htmlF) || /app\.tryStartLesson\('flu6'\)/.test(htmlF)) errs.push('accès libre : le verrou Expert a sauté (compte gratuit)');
-  // modale de devoir : élève choisi -> studentId envoyé
-  h.run("currentPlan='expert';app._classDetail={id:'C1',students:[{studentId:'e2',username:'eleve2',fullName:\"Léa D'Hondt\"}]};app.openAssignModal('C1',{studentId:'e2'})");
+  // modale de devoir (3 étapes) : ouverte depuis la fiche d'un élève, l'étape « Pour qui » le présélectionne (lui seul, pas la classe)
+  h.run("currentPlan='expert';app._classDetail={id:'C1',students:[{studentId:'e1',username:'eleve1',fullName:'Tom B'},{studentId:'e2',username:'eleve2',fullName:\"Léa D'Hondt\"}]};app.openAssignModal('C1',{studentId:'e2'})");
+  h.html.length = 0; h.run("app._asg.type='lesson';app._asg.lesson='';app._asg.step=2;app._asgRender()");
   const modal = h.html.join('\n');
-  if (!/id="asg-for"/.test(modal) || !/value="e2" selected/.test(modal)) errs.push('modale de devoir : élève non présélectionné');
+  if (!/<button[^>]*class="a2-chip on"[^>]*data-student="e2"/.test(modal) || /data-student="e1"[^>]*aria-pressed="true"/.test(modal) || h.run('app._asgForClass()')) errs.push('modale de devoir : élève non présélectionné');
   if (!/L&eacute;a D&#39;Hondt|Léa D&#39;Hondt/.test(modal)) errs.push('modale de devoir : nom de l\'élève absent ou mal échappé');
   return errs.length ? { ok: false, detail: errs.join('\n') }
     : { ok: true, detail: `sans réglage : ${a.disabled}/${a.cards} leçons verrouillées comme avant ; accès libre : 0 verrouillée, 1 point de reprise (r3), progression intacte, verrou Expert gardé ; devoir de remédiation : élève présélectionné` };
@@ -834,8 +835,9 @@ function u18() {
   // modale de devoir d'une classe AZER : leçons ar*/am* proposées, même chez un prof en QSDF
   h.html.length = 0;
   h.run("app._classDetail={id:'C9',students:[],settings:{homeRow:'azer'}};app.openAssignModal('C9')");
+  h.html.length = 0; h.run("app._asg.type='lesson';app._asg.step=1;app._asgRender()"); // étape « Quelle leçon ? »
   const modal = h.html.join('\n');
-  if (!/<option value="ar1">/.test(modal) || /<option value="r1">/.test(modal)) errs.push('modale de devoir (classe AZER) : leçons proposées incorrectes');
+  if (!/data-lesson="ar1"/.test(modal) || !/data-lesson="am1"/.test(modal) || /data-lesson="r1"/.test(modal)) errs.push('modale de devoir (classe AZER) : leçons proposées incorrectes');
   // un autre cours (français QWERTY) garde son propre programme
   h.run("app.classSettings={typoNorm:'fr',freeAccess:false,homeRow:'azer'}");
   const qc = JSON.stringify(require('../courses-src/fr-qwerty.json'));
