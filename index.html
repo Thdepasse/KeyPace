@@ -1485,6 +1485,28 @@ a.nav-link{text-decoration:none;display:inline-block}
 .cls-chip{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:8px 13px;font:inherit;font-size:13.5px;font-weight:600;color:var(--txt);cursor:pointer;transition:border-color .15s,transform .15s}
 .cls-chip:hover{border-color:var(--accent);transform:translateY(-1px)}
 .cls-chip b{font-size:17px;font-weight:800}
+/* Page Classe : Historique de la classe (fil d'activité, api/_class-feed.js) */
+.kfeed{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px 8px;margin-bottom:24px}
+.kfeed-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.kfeed-h small{font:700 11px 'JetBrains Mono',monospace;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.kfeed-live{width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;animation:kfeedPulse 2s ease-in-out infinite}
+@keyframes kfeedPulse{50%{opacity:.35}}
+.kfeed-scroll{max-height:440px;overflow-y:auto;overscroll-behavior:contain;padding:2px 4px 12px 0;scrollbar-width:thin}
+.kfeed-list{position:relative;display:flex;flex-direction:column;gap:10px;padding-left:18px}
+.kfeed-list::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:2px;border-radius:2px;background:var(--border)}
+.kfeed-ev{position:relative;display:flex;gap:10px;align-items:flex-start;background:var(--light);border:1.5px solid transparent;border-radius:14px;padding:11px 12px}
+.kfeed-ev::before{content:'';position:absolute;left:-17px;top:17px;width:10px;height:10px;border-radius:50%;background:var(--card);border:2.5px solid var(--dot,var(--border))}
+.kfeed-ev.act{border-color:var(--danger)}
+.kfeed-ev.new{animation:kfeedIn .5s cubic-bezier(.3,1.4,.5,1)}
+@keyframes kfeedIn{from{opacity:0;transform:translateY(-12px) scale(.97)}}
+.kfeed-ic{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:15px}
+.kfeed-ev p{margin:0;font-size:14px;line-height:1.38;min-width:0;overflow-wrap:anywhere}
+.kfeed-ev time{display:block;font:700 11px 'JetBrains Mono',monospace;color:var(--muted);margin-bottom:2px}
+.kfeed-ev p small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.kfeed-do{margin-top:7px;display:block;width:fit-content;font:inherit;font-size:12.5px;font-weight:700;color:#fff;background:var(--accent);border:none;border-radius:8px;padding:5px 10px;cursor:pointer}
+.kfeed-do:disabled{cursor:default;opacity:.85}
+.kfeed-empty{padding:18px 4px 22px;color:var(--muted);font-size:13px;line-height:1.55}
+@media(prefers-reduced-motion:reduce){.kfeed-ev.new,.kfeed-live{animation:none}}
 /* Page Classe : onglets Suivi / Devoirs / Réglages */
 .cls-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin:0 0 24px;overflow-x:auto;scrollbar-width:none}
 .cls-tabs::-webkit-scrollbar{display:none}
@@ -9252,6 +9274,8 @@ const app={
       rec.bestErr=rec.bestErr==null?res.errors:Math.min(rec.bestErr,res.errors);
       if(res.wpm>=g.minWpm&&res.errors<=g.maxErrors)rec.cleared=true;
       course().lessons[lessonId]=rec;
+      // L'essai qui valide la leçon le dit : l'historique de la classe (api/_class-feed.js) le date ainsi exactement.
+      if(rec.cleared&&!_wasCleared){const _ts=course().tests,_lt=_ts[_ts.length-1];if(_lt&&_lt.lessonId===lessonId)_lt.cleared=true;}
       try{if(rec.cleared&&!_wasCleared)track('lesson_completed',{lessonId,wpm:res.wpm});}catch{}
     }
     saveStats(this.stats);
@@ -18462,6 +18486,7 @@ const app={
         </div>`:''}
 
         ${todoHtml}
+        ${students.length?this._feedCard(d.id,d.feed||[]):''}
         ${skillsCard}
         ${hmHtml}
 
@@ -18480,7 +18505,96 @@ const app={
     if(this._csFlash){const f=this._csFlash;this._csFlash=null;this._csSay(f,kpT('cls.saved_short'),true);}
     // Pas de rafraîchissement automatique : la page ne doit jamais bouger toute
     // seule pendant que le prof la lit. Il actualise lui-même via "↻ Actualiser".
+    // Seule exception : l'historique de la classe, dans un cadre à hauteur fixe (rien ne bouge autour).
     clearInterval(this._classRefreshTimer);
+    this._startFeedPoll(d.id);
+  },
+
+  /* ── Historique de la classe : fil d'activité (données : api/_class-feed.js, action class-feed) ── */
+  _feedLessonTitle(id){
+    const snap=_kpAzSnap&&_kpAzSnap.lessons.findIndex(l=>l.id===id);
+    if(snap!=null&&snap>=0)return _kpAzSnap.fields[snap].title;
+    const l=ALL_LESSONS.find(x=>x.id===id);if(l)return l.title;
+    const az=typeof KPHomeRow!=='undefined'&&KPHomeRow.LESSONS&&KPHomeRow.LESSONS[id];
+    return az?az.title:id;
+  },
+  _feedTime(t){
+    const d=new Date(t),now=new Date(),hm=d.toLocaleTimeString('fr-BE',{hour:'2-digit',minute:'2-digit'});
+    const day=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime();
+    const diff=Math.round((day(now)-day(d))/864e5);
+    if(diff<=0)return hm;
+    if(diff===1)return 'hier · '+hm;
+    return d.toLocaleDateString('fr-BE',{weekday:'short',day:'numeric',month:'numeric'})+' · '+hm;
+  },
+  _feedRow(e,classId,isNew){
+    const esc=s=>this._esc(String(s==null?'':s)),who=`<b>${esc(e.name)}</b>`,q=s=>'« '+esc(s)+' »';
+    const ASG={essay:'Rédaction',module:'Module',vocal:'Dictée',written:'Exercice',lesson:'Leçon',test:'Test de vitesse'};
+    let ic,bg,dot,txt,sub='';
+    switch(e.type){
+      case 'lesson':ic='✓';bg='rgba(31,169,113,.14)';dot='var(--success)';txt=`${who} a validé la leçon ${q(this._feedLessonTitle(e.lessonId))}`;sub=e.wpm!=null?`à ${e.wpm} mots/min`:'';break;
+      case 'record':ic='🏁';bg='rgba(255,77,46,.12)';dot='var(--accent)';txt=`${who} bat son record : ${e.wpm} mots/min`;sub=`Test de vitesse · ancien record ${e.prev}`;break;
+      case 'assignment':ic='✉';bg='rgba(139,92,246,.13)';dot='#8b5cf6';txt=`${who} a rendu le devoir ${q(e.title)}`;sub=(ASG[e.mode]||'Devoir')+(e.words?` · ${e.words} mots`:'');break;
+      case 'stuck_lesson':ic='⚠';bg='rgba(229,72,77,.12)';dot='var(--danger)';txt=`${who} bloque sur ${q(this._feedLessonTitle(e.lessonId))}`;sub=`${e.attempts} essais · précision récente ${e.acc} %`;break;
+      case 'stuck':ic='⚠';bg='rgba(229,72,77,.12)';dot='var(--danger)';txt=`${who} n'a encore validé aucune leçon`;sub=`après ${e.sessions} séances`;break;
+      case 'inactive':ic='💤';bg='var(--card)';dot='var(--danger)';txt=`${who} n'a plus travaillé depuis ${e.days} jours`;break;
+      case 'never':ic='💤';bg='var(--card)';dot='var(--danger)';txt=`${who} n'a pas encore commencé`;sub=`dans la classe depuis ${e.days} jours`;break;
+      default:return '';
+    }
+    let act='';
+    if(e.act){
+      if(e.assignmentId){
+        act=`<button class="kfeed-do" title="Envoie un rappel pour le devoir ${q(e.assignmentTitle)}" onclick="app._feedRemind(this,'${esc(e.assignmentId)}','${esc(e.studentId)}')">Relancer</button>`;
+        sub=(sub?sub+' · ':'')+`devoir ${q(e.assignmentTitle)} pas encore fait`;
+      }else if(e.type==='stuck_lesson'||e.type==='stuck')act=`<button class="kfeed-do" onclick="app.openAssignModal('${esc(classId)}',{studentId:'${esc(e.studentId)}'})">Assigner un exercice</button>`;
+      else act=`<button class="kfeed-do" onclick="app.viewStudent('${esc(classId)}','${esc(e.studentId)}')">Voir la fiche</button>`;
+    }
+    return `<div class="kfeed-ev${e.act?' act':''}${isNew?' new':''}" style="--dot:${dot}"><span class="kfeed-ic" style="background:${bg}">${ic}</span><p><time datetime="${new Date(e.t).toISOString()}">${this._feedTime(e.t)}</time>${txt}${sub?`<small>${sub}</small>`:''}${act}</p></div>`;
+  },
+  async _feedRemind(btn,assignmentId,studentId){
+    btn.disabled=true;btn.textContent='…';
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'remind-student',token:currentToken,assignmentId,studentId})});
+      const d=await r.json();
+      if(!r.ok)throw new Error(d.error||kpT('net.generic_nodot'));
+      btn.textContent=d.alreadyPending?'✓ Rappel déjà envoyé':'✓ Rappel envoyé';btn.style.background='var(--success)';
+    }catch(e){btn.disabled=false;btn.textContent='Relancer';alert(e.message||'Erreur réseau.');}
+  },
+  _feedListHtml(classId,feed,newIds){
+    if(!feed.length)return `<div class="kfeed-empty">Rien de neuf ces 14 derniers jours. Les leçons validées, les records et les devoirs rendus s'afficheront ici au fur et à mesure.</div>`;
+    return `<div class="kfeed-list">${feed.map(e=>this._feedRow(e,classId,newIds&&newIds.has(e.id))).join('')}</div>`;
+  },
+  _feedCard(classId,feed){
+    this._feedKey=feed.map(e=>e.id).join('|');
+    return `<div class="kfeed" id="kfeed-card">
+      <div class="kfeed-h"><div style="font-size:15px;font-weight:700">Historique de la classe</div><small><span class="kfeed-live"></span><span id="kfeed-upd">mis à jour en direct</span></small></div>
+      <div class="kfeed-scroll" id="kfeed-scroll" aria-live="polite">${this._feedListHtml(classId,feed)}</div>
+    </div>`;
+  },
+  // Sondage léger toutes les 30 s, seulement quand le fil est à l'écran et l'onglet visible. Seul le
+  // contenu du cadre change, et seulement si la liste des événements a changé (boutons « envoyé » gardés sinon).
+  _startFeedPoll(classId){
+    clearInterval(this._feedTimer);
+    const tick=async()=>{
+      const box=document.getElementById('kfeed-scroll');
+      if(!box||this.view!=='classes'||this._classesSub!=='class'||this._classViewingId!==classId){clearInterval(this._feedTimer);this._feedTimer=null;return;}
+      if(document.hidden||!box.offsetParent||this._feedBusy)return;
+      this._feedBusy=true;
+      try{
+        const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-feed',token:currentToken,classId})});
+        if(!r.ok)return;
+        const {feed=[]}=await r.json();
+        if(this._classViewingId!==classId)return;
+        const upd=document.getElementById('kfeed-upd');
+        if(upd)upd.textContent='en direct · '+new Date().toLocaleTimeString('fr-BE',{hour:'2-digit',minute:'2-digit'});
+        const key=feed.map(e=>e.id).join('|');
+        if(key===this._feedKey)return;
+        const old=new Set((this._feedKey||'').split('|'));
+        this._feedKey=key;
+        const b=document.getElementById('kfeed-scroll');
+        if(b)b.innerHTML=this._feedListHtml(classId,feed,new Set(feed.filter(e=>!old.has(e.id)).map(e=>e.id)));
+      }catch{}finally{this._feedBusy=false;}
+    };
+    this._feedTimer=setInterval(tick,30000);
   },
 
   filterClassStudents(key){

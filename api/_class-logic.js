@@ -510,6 +510,37 @@ function assignmentTargets(a, members) {
 }
 function assignmentVisibleTo(a, userId) { return !!a && (!a.student_id || a.student_id === userId); }
 
-module.exports = { AZER_LESSON_MODULE, lessonModuleMap, moduleNamesFor, assignmentTargets, assignmentVisibleTo, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
+// Un devoir est "fait" si l'élève a validé la leçon visée (et atteint l'objectif vitesse si fixé),
+// ou, pour un test libre avec objectif, s'il a un test atteignant la vitesse demandée.
+function assignmentDone(data, a) {
+  const d = data || {};
+  // Essai (rédaction) : fait dès que essaySubmit() a écrit son propre marqueur.
+  // custom_text est toujours null pour ce type, donc ce cas doit être vérifié
+  // avant la branche "texte personnalisé" ci-dessous.
+  if (a.essay_type) {
+    return !!(d.assignmentsDone || {})[a.id];
+  }
+  if (a.mode === 'module') return !!(d.assignmentsDone || {})['mod:' + a.lesson_id];
+  // Texte personnalisé : fait dès que l'élève a complété CE devoir (clé = id), avec
+  // l'objectif vitesse atteint le cas échéant.
+  if (a.custom_text) {
+    const rec = (d.assignmentsDone || {})[a.id];
+    if (!rec) return false;
+    if (a.target_wpm) return (rec.wpm || 0) >= a.target_wpm;
+    return true;
+  }
+  if (a.lesson_id) {
+    const rec = (d.lessons || {})[a.lesson_id];
+    if (!rec || !rec.cleared) return false;
+    if (a.target_wpm) return (rec.bestWpm || 0) >= a.target_wpm;
+    return true;
+  }
+  if (a.target_wpm) {
+    return (Array.isArray(d.tests) ? d.tests : []).some((t) => (t.wpm || 0) >= a.target_wpm);
+  }
+  return false;
+}
+
+module.exports = { assignmentDone, AZER_LESSON_MODULE, lessonModuleMap, moduleNamesFor, assignmentTargets, assignmentVisibleTo, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
   ESSAY_TYPES, essayTypeDef, countWords, essayWordCount, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
   moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals };

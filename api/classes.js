@@ -3,7 +3,8 @@
 const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary,
   essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
   moduleMastery, studentModuleProgress, GOAL_LIMITS, parseGoalInput, effectiveClassGoals,
-  CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, assignmentTargets, assignmentVisibleTo } = require('./_class-logic');
+  CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, assignmentTargets, assignmentVisibleTo, assignmentDone } = require('./_class-logic');
+const { buildClassFeed } = require('./_class-feed');
 const { hashPassword, safeEqual } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
 
@@ -384,9 +385,38 @@ async function classDetail(req, res) {
 
   const goals = effectiveClassGoals([cls]);
   goals.custom = Number.isInteger(cls.goal_wpm) || Number.isInteger(cls.goal_errors);
-  return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now), modules, weakestModule: weakest, goals, settings: classSettingsOf(cls) });
+  const feed = await classFeedFor(cls, members, pmap, goals, now);
+  return res.json({ id: cls.id, name: cls.name, inviteCode: cls.invite_code, students, agg: aggregateClass(datas, now), modules, weakestModule: weakest, goals, settings: classSettingsOf(cls), feed });
 }
 function alertRank(s) { return s.alertStuck ? 0 : s.alertInactive ? 1 : 2; }
+
+// Historique de la classe (fil d'activité) : reconstitué à partir des progressions et des devoirs,
+// sans table d'événements (voir _class-feed.js). Une panne ici ne doit pas casser la vue classe.
+async function classFeedFor(cls, members, pmap, goals, now) {
+  try {
+    const aR = await sb(`/assignments?class_id=eq.${cls.id}&select=*`);
+    return buildClassFeed({ members, dataById: pmap, assignments: Array.isArray(aR.data) ? aR.data : [], goals, now });
+  } catch (e) {
+    console.error('classFeedFor:', e);
+    return [];
+  }
+}
+
+// Rafraîchissement du fil pendant que le prof regarde la classe (sondage toutes les 30 s par
+// index.html, seulement onglet visible). Pas de temps réel Supabase : l'authentification du site
+// n'est pas celle de Supabase (jetons maison, RLS qui refuse tout au rôle anon), et les
+// progressions sont un gros jsonb par élève, qu'il faudrait exposer au navigateur.
+async function classFeed(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  const { cls, error, status } = await loadClassForManage(user, req.body.classId);
+  if (error) return res.status(status).json({ error });
+  const members = await membersOf(cls.id);
+  const pmap = await fetchProgressMap(members.map((m) => m.student_id));
+  const now = Date.now();
+  const feed = await classFeedFor(cls, members, pmap, effectiveClassGoals([cls]), now);
+  return res.json({ feed, now });
+}
 
 // Retire un élève de SA classe (désinscription), sans toucher à son compte ni
 // à sa progression — contrairement à une suppression de compte (réservée à KeyPace),
@@ -514,36 +544,7 @@ async function myClasses(req, res) {
 // lesson_id = clé du module ; il est fait quand l'élève a terminé toutes les parties du module
 // (marque assignmentsDone['mod:<clé>'] posée par moduleDone(), jamais par le client).
 const MODULE_KEYS = ['mail', 'cv', 'mdp', 'lettre', 'adresse', 'signature', 'raccourcis', 'raccourcisav'];
-// Un devoir est "fait" si l'élève a validé la leçon visée (et atteint l'objectif vitesse si fixé),
-// ou, pour un test libre avec objectif, s'il a un test atteignant la vitesse demandée.
-function assignmentDone(data, a) {
-  const d = data || {};
-  // Essai (rédaction) : fait dès que essaySubmit() a écrit son propre marqueur.
-  // custom_text est toujours null pour ce type, donc ce cas doit être vérifié
-  // avant la branche "texte personnalisé" ci-dessous.
-  if (a.essay_type) {
-    return !!(d.assignmentsDone || {})[a.id];
-  }
-  if (a.mode === 'module') return !!(d.assignmentsDone || {})['mod:' + a.lesson_id];
-  // Texte personnalisé : fait dès que l'élève a complété CE devoir (clé = id), avec
-  // l'objectif vitesse atteint le cas échéant.
-  if (a.custom_text) {
-    const rec = (d.assignmentsDone || {})[a.id];
-    if (!rec) return false;
-    if (a.target_wpm) return (rec.wpm || 0) >= a.target_wpm;
-    return true;
-  }
-  if (a.lesson_id) {
-    const rec = (d.lessons || {})[a.lesson_id];
-    if (!rec || !rec.cleared) return false;
-    if (a.target_wpm) return (rec.bestWpm || 0) >= a.target_wpm;
-    return true;
-  }
-  if (a.target_wpm) {
-    return (Array.isArray(d.tests) ? d.tests : []).some((t) => (t.wpm || 0) >= a.target_wpm);
-  }
-  return false;
-}
+// assignmentDone (devoir fait ou non) : logique pure, dans _class-logic.js.
 
 async function assignmentCreate(req, res) {
   const user = await userFromToken(req.body.token);
@@ -1517,6 +1518,7 @@ module.exports = async function handler(req, res) {
       case 'class-restore': return await classRestore(req, res);
       case 'archived-classes': return await archivedClasses(req, res);
       case 'class-detail': return await classDetail(req, res);
+      case 'class-feed': return await classFeed(req, res);
       case 'class-remove-student': return await classRemoveStudent(req, res);
       case 'student-detail': return await studentDetail(req, res);
       case 'join-code': return await joinByCode(req, res);
