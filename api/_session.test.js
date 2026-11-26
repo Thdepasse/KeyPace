@@ -23,9 +23,10 @@ global.fetch = async (url, opts = {}) => {
     const match = (x) => (eq('token_hash') === undefined || x.token_hash === eq('token_hash'))
       && (eq('user_id') === undefined || String(x.user_id) === eq('user_id'))
       && (!nowGt || x.expires_at > nowGt) && (!nowLt || x.expires_at < nowLt);
-    if (method === 'POST') { const row = JSON.parse(opts.body); SESSIONS.push(row); data = [row]; }
+    if (method === 'POST') { const row = { created_at: new Date().toISOString(), ...JSON.parse(opts.body) }; SESSIONS.push(row); data = [row]; }
+    else if (method === 'PATCH') { data = SESSIONS.filter(match); data.forEach((x) => Object.assign(x, JSON.parse(opts.body))); PATCHES.push({ session: true, body: JSON.parse(opts.body) }); }
     else if (method === 'DELETE') { data = SESSIONS.filter(match); SESSIONS = SESSIONS.filter((x) => !match(x)); }
-    else data = SESSIONS.filter(match).map((x) => ({ user_id: x.user_id, users: USERS.find((y) => y.id === x.user_id) || null }));
+    else data = SESSIONS.filter(match).map((x) => ({ user_id: x.user_id, created_at: x.created_at, expires_at: x.expires_at, users: USERS.find((y) => y.id === x.user_id) || null }));
     return { ok: true, status: 200, text: async () => JSON.stringify(data) };
   }
   if (u.includes('/users?session_token=eq.') && method === 'PATCH') {
@@ -194,4 +195,21 @@ test('session expirée dans la table : refusée', async () => {
 test('panne de la base : erreur levée plutôt qu\'une fausse « session invalide »', async () => {
   const down = async () => ({ ok: false, status: 503, data: null });
   await assert.rejects(() => sessions.userByToken(down, 'x'));
+});
+
+test('session glissante : prolongée au plus une fois par jour, jamais un jeton court de retour SSO', async () => {
+  const now = Date.now(); const iso = (ms) => new Date(now + ms).toISOString(); const D = 86400000;
+  assert.equal(sessions.shouldExtend({ created_at: iso(0), expires_at: iso(30 * D) }, now), false, 'toute neuve');
+  assert.equal(sessions.shouldExtend({ created_at: iso(-2 * D), expires_at: iso(28 * D) }, now), true, 'utilisée deux jours plus tard');
+  assert.equal(sessions.shouldExtend({ created_at: iso(-60000), expires_at: iso(60000) }, now), false, 'jeton SSO de 2 minutes');
+  assert.equal(sessions.shouldExtend({}, now), false);
+  fresh(true);
+  const s = await sessions.createSession(sbMock, 7);
+  SESSIONS[0].created_at = iso(-10 * D); SESSIONS[0].expires_at = iso(20 * D);
+  assert.equal((await call(saveProgress, { token: s.token, data: { lessons: { a: lesson } } })).body.ok, true);
+  const days = (Date.parse(SESSIONS[0].expires_at) - now) / D;
+  assert.ok(days > 29.9 && days < 30.1, `repoussée à 30 jours (${days})`);
+  const n = PATCHES.filter((p) => p.session).length;
+  await call(saveProgress, { token: s.token, data: { lessons: { a: lesson } } });
+  assert.equal(PATCHES.filter((p) => p.session).length, n, 'pas de nouvelle écriture le même jour');
 });
