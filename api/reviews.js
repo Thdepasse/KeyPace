@@ -4,6 +4,7 @@
 // POST {token,rating,comment}   : dépose/modifie son avis natif (1 par
 // utilisateur, resoumission = repasse en modération).
 const { setCorsOrigin } = require('./_cors');
+const sessions = require('./_sessions');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
@@ -47,8 +48,7 @@ async function myReview(req, res) {
   const { token, rating, comment } = req.body || {};
   if (!token) return res.status(400).json({ error: 'Token manquant.' });
 
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username`);
-  const user = r.data && r.data[0];
+  const user = await sessions.userByToken(sb, token, 'id,username');
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
   // Pas de note => lecture : renvoie l'avis existant de cet utilisateur (ou null).

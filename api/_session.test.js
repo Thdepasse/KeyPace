@@ -9,10 +9,31 @@ const assert = require('node:assert');
 const login = require('./login');
 const saveProgress = require('./save-progress');
 
-let USERS, PROGRESS, PATCHES;
+let USERS, PROGRESS, PATCHES, SESSIONS, TABLE;
 global.fetch = async (url, opts = {}) => {
   const u = String(url); const method = opts.method || 'GET';
   let data = [];
+  // Table user_sessions (sessions multi-appareils) : absente tant que TABLE est faux (migration pas passée).
+  if (u.includes('/user_sessions')) {
+    if (!TABLE) return { ok: false, status: 404, text: async () => JSON.stringify({ message: 'relation "user_sessions" does not exist' }) };
+    const q = new URL(u).searchParams;
+    const eq = (k) => { const v = q.get(k); return v && v.startsWith('eq.') ? decodeURIComponent(v.slice(3)) : undefined; };
+    const nowGt = (q.get('expires_at') || '').startsWith('gt.') ? q.get('expires_at').slice(3) : null;
+    const nowLt = (q.get('expires_at') || '').startsWith('lt.') ? q.get('expires_at').slice(3) : null;
+    const match = (x) => (eq('token_hash') === undefined || x.token_hash === eq('token_hash'))
+      && (eq('user_id') === undefined || String(x.user_id) === eq('user_id'))
+      && (!nowGt || x.expires_at > nowGt) && (!nowLt || x.expires_at < nowLt);
+    if (method === 'POST') { const row = JSON.parse(opts.body); SESSIONS.push(row); data = [row]; }
+    else if (method === 'DELETE') { data = SESSIONS.filter(match); SESSIONS = SESSIONS.filter((x) => !match(x)); }
+    else data = SESSIONS.filter(match).map((x) => ({ user_id: x.user_id, users: USERS.find((y) => y.id === x.user_id) || null }));
+    return { ok: true, status: 200, text: async () => JSON.stringify(data) };
+  }
+  if (u.includes('/users?session_token=eq.') && method === 'PATCH') {
+    const t = decodeURIComponent((/session_token=eq\.([^&]+)/.exec(u) || [])[1]); const b = JSON.parse(opts.body);
+    const user = USERS.find((x) => x.session_token === t);
+    if (user) { PATCHES.push({ id: user.id, body: b }); Object.assign(user, b); }
+    return { ok: true, status: 200, text: async () => JSON.stringify(user ? [user] : []) };
+  }
   const tok = (/session_token=eq\.([^&]+)/.exec(u) || [])[1];
   const nowIso = (/session_expires_at\.gt\.([^)]+)\)/.exec(u) || [])[1];
   if (u.includes('/users?') && tok !== undefined && method === 'GET') {
@@ -23,6 +44,8 @@ global.fetch = async (url, opts = {}) => {
     PATCHES.push({ id, body: b }); const user = USERS.find((x) => x.id === id); if (user) Object.assign(user, b); data = user ? [user] : [];
   } else if (u.includes('/progress?user_id=eq.') && method === 'GET') {
     const id = Number((/user_id=eq\.(\d+)/.exec(u) || [])[1]); data = PROGRESS[id] ? [{ data: PROGRESS[id], rev: 0 }] : [];
+  } else if (u.includes('/progress?user_id=eq.') && method === 'PATCH') {
+    const id = Number((/user_id=eq\.(\d+)/.exec(u) || [])[1]); PROGRESS[id] = JSON.parse(opts.body).data; data = [{ user_id: id }];
   } else if (u.includes('/progress?on_conflict') && method === 'POST') {
     const b = JSON.parse(opts.body); PROGRESS[b.user_id] = b.data;
   }
@@ -34,7 +57,7 @@ const call = async (handler, body) => {
   await handler({ method: 'POST', headers: {}, body }, res);
   return out;
 };
-const fresh = () => { USERS = [{ id: 7, username: 'eleve', plan: 'free', role: 'eleve', session_token: 'ancien', session_expires_at: new Date(Date.now() + 86400000).toISOString() }]; PROGRESS = {}; PATCHES = []; };
+const fresh = (table = false) => { TABLE = table; SESSIONS = []; USERS = [{ id: 7, username: 'eleve', plan: 'free', role: 'eleve', session_token: 'ancien', session_expires_at: new Date(Date.now() + 86400000).toISOString() }]; PROGRESS = {}; PATCHES = []; };
 const lesson = { bestWpm: 30, bestErr: 0, cleared: true };
 
 test('session-login : renvoie un NOUVEAU jeton, enregistré en base', async () => {
@@ -107,4 +130,68 @@ test('déconnexion avec un jeton inconnu : réponse normale, rien de modifié', 
   const r = await call(login, { action: 'logout', token: 'inconnu' });
   assert.equal(r.body.ok, true);
   assert.equal(PATCHES.length, 0);
+});
+
+/* ── Sessions multi-appareils (table user_sessions) ── */
+const sessions = require('./_sessions');
+const sbMock = async (path, opts = {}) => { const r = await global.fetch('http://supabase.test/rest/v1' + path, opts); const t = await r.text(); return { ok: r.ok, status: r.status, data: t ? JSON.parse(t) : null }; };
+
+test('table présente : deux appareils ont chacun leur jeton, les deux restent valides', async () => {
+  fresh(true);
+  const a = await sessions.createSession(sbMock, 7);
+  const b = await sessions.createSession(sbMock, 7);
+  assert.deepEqual(a.legacyPatch, {});
+  assert.notEqual(a.token, b.token);
+  assert.equal((await call(saveProgress, { token: a.token, data: { lessons: { a: lesson } } })).body.ok, true);
+  assert.equal((await call(saveProgress, { token: b.token, data: { lessons: { a: lesson, b: lesson } } })).body.ok, true);
+  assert.equal(USERS[0].session_token, 'ancien', 'l\'ancienne colonne n\'est pas touchée');
+  assert.ok(SESSIONS.every((x) => x.token_hash !== a.token && x.token_hash !== b.token), 'jamais de jeton en clair');
+});
+
+test('table présente : se déconnecter d\'un appareil ne déconnecte pas les autres', async () => {
+  fresh(true);
+  const a = await sessions.createSession(sbMock, 7);
+  const b = await sessions.createSession(sbMock, 7);
+  assert.equal((await call(login, { action: 'logout', token: a.token })).body.ok, true);
+  assert.equal((await call(saveProgress, { token: a.token, data: { lessons: {} } })).status, 401);
+  assert.equal((await call(saveProgress, { token: b.token, data: { lessons: { a: lesson } } })).body.ok, true);
+  assert.equal((await call(saveProgress, { token: 'ancien', data: { lessons: { a: lesson } } })).body.ok, true, 'le jeton de l\'ancienne colonne reste valide');
+});
+
+test('table présente : session-login (retour SSO) remplace CE jeton seulement', async () => {
+  fresh(true);
+  const sso = await sessions.createSession(sbMock, 7, 120000);
+  const other = await sessions.createSession(sbMock, 7);
+  const r = await call(login, { action: 'session-login', token: sso.token });
+  assert.equal(r.status, 200);
+  assert.equal((await call(saveProgress, { token: sso.token, data: { lessons: {} } })).status, 401);
+  assert.equal((await call(saveProgress, { token: r.body.token, data: { lessons: { a: lesson } } })).body.ok, true);
+  assert.equal((await call(saveProgress, { token: other.token, data: { lessons: { a: lesson } } })).body.ok, true);
+});
+
+test('account-info (réglages) : renvoie le compte SANS changer le jeton', async () => {
+  fresh();
+  const r = await call(login, { action: 'account-info', token: 'ancien' });
+  assert.equal(r.status, 200);
+  assert.equal(r.body.token, 'ancien');
+  assert.equal(r.body.username, 'eleve');
+  assert.equal(USERS[0].session_token, 'ancien');
+  assert.equal((await call(login, { action: 'account-info', token: 'inconnu' })).status, 401);
+});
+
+test('table absente : createSession retombe sur l\'ancienne colonne', async () => {
+  fresh(false);
+  const s = await sessions.createSession(sbMock, 7);
+  assert.equal(s.legacyPatch.session_token, s.token);
+});
+
+test('session expirée dans la table : refusée', async () => {
+  fresh(true);
+  const s = await sessions.createSession(sbMock, 7, -1000);
+  assert.equal(await sessions.userByToken(sbMock, s.token), null);
+});
+
+test('panne de la base : erreur levée plutôt qu\'une fausse « session invalide »', async () => {
+  const down = async () => ({ ok: false, status: 503, data: null });
+  await assert.rejects(() => sessions.userByToken(down, 'x'));
 });

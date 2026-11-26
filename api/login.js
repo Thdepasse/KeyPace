@@ -1,6 +1,7 @@
 const { Resend } = require('resend');
 const { hashPassword, verifyPassword, safeEqual, needsEmailVerification } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
+const sessions = require('./_sessions');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -8,16 +9,9 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const APP_URL = (process.env.APP_URL || 'https://keypace.be').trim();
 const FROM_EMAIL = process.env.FROM_EMAIL || 'KeyPace <noreply@keypace.be>';
 
-// Durée de vie d'une session — auparavant un session_token restait valide
-// indéfiniment une fois émis. session_expires_at IS NULL est traité comme
-// valide (sessions émises avant l'ajout de cette colonne) : ça évite de
-// déconnecter tout le monde d'un coup au déploiement — l'expiration réelle
-// s'applique progressivement, à chaque nouvelle émission de token.
-const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 jours
-function sessionExpiresAt() { return new Date(Date.now() + SESSION_TTL_MS).toISOString(); }
-function sessionFilter(token) {
-  return `session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})`;
-}
+// Sessions : une par appareil, 30 jours (voir api/_sessions.js). session_expires_at
+// IS NULL reste traité comme valide pour les jetons de l'ancienne colonne users.session_token.
+
 // Postgres compare `username=eq.` de façon sensible à la casse : un simple
 // eq. laissait passer un changement de nom vers une casse différente d'un nom
 // déjà pris (ex: "Theo" existant, renommage vers "theo" accepté), créant deux
@@ -69,6 +63,13 @@ async function institutionNameFor(institutionId) {
 async function hasAnyClass(userId) {
   const r = await sb(`/class_members?student_id=eq.${userId}&select=id&limit=1`);
   return !!(r.data && r.data[0]);
+}
+
+// Réponse « compte connecté » commune à session-login et account-info.
+async function accountPayload(user, token) {
+  const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
+  const progress = pr.data && pr.data[0];
+  return { id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, email: user.email || null, displayName: user.display_name || null, mustChangePassword: !!user.must_change_password, institutionName: await institutionNameFor(user.institution_id), hasClass: await hasAnyClass(user.id), token, data: progress?.data || {} };
 }
 
 async function effectivePlan(user) {
@@ -256,7 +257,9 @@ async function retentionSweep(req, res) {
     if (historyLastDay) console.warn('progress_history : versions gardées sur 24 h', historyLastDay);
   } catch (e) { console.warn('progress_history purge ignorée', e && e.message); }
 
-  return res.json({ ok: true, warned, deleted: toDelete.length, historyPurged, historyLastDay });
+  const sessionsPurged = await sessions.purgeExpiredSessions(sb);
+
+  return res.json({ ok: true, warned, deleted: toDelete.length, historyPurged, historyLastDay, sessionsPurged });
 }
 
 module.exports = async function handler(req, res) {
@@ -281,8 +284,7 @@ module.exports = async function handler(req, res) {
     const { token } = body;
     let user = null;
     if (token) {
-      const sessionR = await sb(`/users?${sessionFilter(token)}&select=id,username,email,reset_expires_at`);
-      user = sessionR.data && sessionR.data[0];
+      user = await sessions.userByToken(sb, token, 'id,username,email,reset_expires_at');
       if (!user) return res.status(401).json({ error: 'Session invalide.' });
     } else {
       // Déconnecté (« Mot de passe oublié ? » de la connexion) : on cherche par
@@ -337,15 +339,17 @@ module.exports = async function handler(req, res) {
     if (!user.reset_expires_at || new Date(user.reset_expires_at) < new Date())
       return res.status(410).json({ error: 'Ce lien a expiré. Fais une nouvelle demande.' });
 
-    const newSession = require('crypto').randomUUID();
+    // Mot de passe réinitialisé : toutes les sessions ouvertes sont fermées, puis une seule rouverte ici.
+    await sessions.revokeAllSessions(sb, user.id);
+    const ses = await sessions.createSession(sb, user.id);
+    const newSession = ses.token;
     await sb(`/users?id=eq.${user.id}`, {
       method: 'PATCH',
       body: JSON.stringify({
         password_hash: hashPassword(newPasswordHash),
         reset_token: null,
         reset_expires_at: null,
-        session_token: newSession,
-        session_expires_at: sessionExpiresAt(),
+        ...ses.legacyPatch,
         last_seen_at: new Date().toISOString(),
         deletion_warned_at: null,
         failed_attempts: 0,
@@ -367,8 +371,7 @@ module.exports = async function handler(req, res) {
   if (body.action === 'export-me') {
     const { token } = body;
     if (!token) return res.status(400).json({ error: 'Token de session manquant.' });
-    const uR = await sb(`/users?${sessionFilter(token)}&select=id,username,email,role,plan,email_verified,created_at,institution_id`);
-    const user = uR.data && uR.data[0];
+    const user = await sessions.userByToken(sb, token, 'id,username,email,role,plan,email_verified,created_at,institution_id');
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data,updated_at`);
@@ -399,8 +402,7 @@ module.exports = async function handler(req, res) {
   if (body.action === 'delete-me') {
     const { token, passwordHash } = body;
     if (!token || !passwordHash) return res.status(400).json({ error: 'Mot de passe requis.' });
-    const uR = await sb(`/users?${sessionFilter(token)}&select=id,password_hash`);
-    const user = uR.data && uR.data[0];
+    const user = await sessions.userByToken(sb, token, 'id,password_hash');
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     if (!verifyPassword(passwordHash, user.password_hash).ok) return res.status(401).json({ error: 'Mot de passe incorrect.' });
     // reviews.user_id est en `on delete set null` (le commentaire reste affiché
@@ -424,8 +426,7 @@ module.exports = async function handler(req, res) {
     if (newUsername.length < 3 || newUsername.length > 24) return res.status(400).json({ error: "Le nom d'utilisateur doit faire entre 3 et 24 caractères." });
     if (!/^[a-zA-Z0-9._-]+$/.test(newUsername)) return res.status(400).json({ error: 'Caractères autorisés : lettres, chiffres, points, tirets, underscores.' });
 
-    const uR = await sb(`/users?${sessionFilter(token)}&select=id,username,role,institution_id`);
-    const user = uR.data && uR.data[0];
+    const user = await sessions.userByToken(sb, token, 'id,username,role,institution_id');
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     if (user.role === 'eleve' && user.institution_id) {
       return res.status(403).json({ error: "Ton identifiant est géré par ton établissement. Utilise le nom affiché ci-dessous pour changer ce que voient les autres joueurs." });
@@ -448,8 +449,7 @@ module.exports = async function handler(req, res) {
     if (!token) return res.status(400).json({ error: 'Session manquante.' });
     const name = String(displayName || '').trim().slice(0, 24) || null;
     if (name && !/^[\p{L}\p{N}\s._-]+$/u.test(name)) return res.status(400).json({ error: 'Caractères non autorisés dans le nom affiché.' });
-    const uR = await sb(`/users?${sessionFilter(token)}&select=id`);
-    const user = uR.data && uR.data[0];
+    const user = await sessions.userByToken(sb, token, 'id');
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ display_name: name }) });
     return res.json({ ok: true, displayName: name });
@@ -460,16 +460,17 @@ module.exports = async function handler(req, res) {
   if (body.action === 'change-password') {
     const { token, oldPasswordHash, newPasswordHash } = body;
     if (!token || !oldPasswordHash || !newPasswordHash) return res.status(400).json({ error: 'Champs manquants.' });
-    const uR = await sb(`/users?${sessionFilter(token)}&select=id,password_hash`);
-    const user = uR.data && uR.data[0];
+    const user = await sessions.userByToken(sb, token, 'id,password_hash');
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     if (!verifyPassword(oldPasswordHash, user.password_hash).ok) return res.status(401).json({ error: 'Mot de passe actuel incorrect.' });
     // Régénère aussi le session_token : sans ça, une session déjà volée avant
     // ce changement de mot de passe restait valable après (le mot de passe
     // change, mais pas le jeton qui donne accès sans lui).
-    const newToken = require('crypto').randomUUID();
-    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ password_hash: hashPassword(newPasswordHash), must_change_password: false, session_token: newToken, session_expires_at: sessionExpiresAt() }) });
-    return res.json({ ok: true, token: newToken });
+    // Toutes les sessions du compte sont fermées, celle-ci comprise, puis on en rouvre une.
+    await sessions.revokeAllSessions(sb, user.id);
+    const ses = await sessions.createSession(sb, user.id);
+    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ password_hash: hashPassword(newPasswordHash), must_change_password: false, ...ses.legacyPatch }) });
+    return res.json({ ok: true, token: ses.token });
   }
 
   // — Déconnexion explicite : invalide le session_token côté serveur (avant
@@ -478,9 +479,9 @@ module.exports = async function handler(req, res) {
   if (body.action === 'logout') {
     const { token } = body;
     if (!token) return res.json({ ok: true });
-    const uR = await sb(`/users?${sessionFilter(token)}&select=id`);
-    const user = uR.data && uR.data[0];
-    if (user) await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ session_token: null, session_expires_at: null }) });
+    // Ferme seulement la session de CET appareil : se déconnecter du PC de l'école ne
+    // déconnecte plus la maison (avant, un seul jeton par compte pour tous les appareils).
+    await sessions.revokeSession(sb, token);
     return res.json({ ok: true });
   }
 
@@ -494,8 +495,7 @@ module.exports = async function handler(req, res) {
     const emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
     if (!emailRe.test(String(newEmail))) return res.status(400).json({ error: 'Adresse email invalide.' });
 
-    const uR = await sb(`/users?${sessionFilter(token)}&select=id,username,email,password_hash`);
-    const user = uR.data && uR.data[0];
+    const user = await sessions.userByToken(sb, token, 'id,username,email,password_hash');
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     if (!verifyPassword(currentPasswordHash, user.password_hash).ok) return res.status(401).json({ error: 'Mot de passe incorrect.' });
     if (String(newEmail).toLowerCase() === (user.email || '').toLowerCase()) return res.status(400).json({ error: "C'est déjà ton adresse actuelle." });
@@ -532,8 +532,7 @@ module.exports = async function handler(req, res) {
   if (body.action === 'onboarding-done') {
     const { token } = body;
     if (!token) return res.status(400).json({ error: 'Token manquant.' });
-    const uR = await sb(`/users?${sessionFilter(token)}&select=id`);
-    const user = uR.data && uR.data[0];
+    const user = await sessions.userByToken(sb, token, 'id');
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ onboarding_completed: true }) });
     return res.json({ ok: true });
@@ -551,20 +550,31 @@ module.exports = async function handler(req, res) {
   if (body.action === 'session-login') {
     const { token } = body;
     if (!token) return res.status(400).json({ error: 'Token de session manquant.' });
-    const r = await sb(`/users?${sessionFilter(token)}&select=*`);
-    const user = r.data && r.data[0];
+    const user = await sessions.userByToken(sb, token, '*');
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     // Même règle RGPD que la connexion normale (voir plus bas) : sans elle, une
     // session ouverte avant la suspension se prolongeait de 30 jours en 30 jours.
     if (parentConsentExpired(user)) {
-      await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ session_token: null, session_expires_at: null }) });
+      await sessions.revokeAllSessions(sb, user.id);
       return res.status(403).json({ error: PARENT_CONSENT_MSG, code: 'PARENT_CONSENT_MISSING' });
     }
-    const newToken = require('crypto').randomUUID();
-    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ session_token: newToken, session_expires_at: sessionExpiresAt(), last_seen_at: new Date().toISOString(), deletion_warned_at: null }) });
-    const pr = await sb(`/progress?user_id=eq.${user.id}&select=data`);
-    const progress = pr.data && pr.data[0];
-    return res.json({ id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, email: user.email || null, displayName: user.display_name || null, mustChangePassword: !!user.must_change_password, institutionName: await institutionNameFor(user.institution_id), hasClass: await hasAnyClass(user.id), token: newToken, data: progress?.data || {} });
+    // On remplace CE jeton seulement : les autres appareils du compte restent connectés.
+    await sessions.revokeSession(sb, token);
+    const ses = await sessions.createSession(sb, user.id);
+    await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify({ ...ses.legacyPatch, last_seen_at: new Date().toISOString(), deletion_warned_at: null }) });
+    return res.json(await accountPayload(user, ses.token));
+  }
+
+  // — Infos du compte connecté (réglages), SANS faire tourner le jeton. Avant, les
+  // réglages passaient par session-login : ouvrir la fenêtre Réglages changeait le
+  // jeton et coupait tous les autres onglets et appareils du compte (« Session
+  // invalide » sur la sauvegarde, les classes et les devoirs).
+  if (body.action === 'account-info') {
+    const { token } = body;
+    if (!token) return res.status(400).json({ error: 'Token de session manquant.' });
+    const user = await sessions.userByToken(sb, token, '*');
+    if (!user) return res.status(401).json({ error: 'Session invalide.' });
+    return res.json(await accountPayload(user, token));
   }
 
   // — Connexion normale
@@ -622,8 +632,10 @@ module.exports = async function handler(req, res) {
     return res.status(403).json({ error: PARENT_CONSENT_MSG, code: 'PARENT_CONSENT_MISSING' });
   }
 
-  const token = require('crypto').randomUUID();
-  const patch = { session_token: token, session_expires_at: sessionExpiresAt(), last_seen_at: new Date().toISOString(), deletion_warned_at: null, failed_attempts: 0, locked_until: null };
+  // Nouvelle session pour CET appareil : celles déjà ouvertes ailleurs restent valides.
+  const ses = await sessions.createSession(sb, user.id);
+  const token = ses.token;
+  const patch = { ...ses.legacyPatch, last_seen_at: new Date().toISOString(), deletion_warned_at: null, failed_attempts: 0, locked_until: null };
   if (check.upgrade) patch.password_hash = check.upgrade; // migration SHA-256 brut -> scrypt
   await sb(`/users?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
 

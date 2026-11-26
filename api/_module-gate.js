@@ -12,6 +12,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
 // require() à chemins littéraux : Vercel n'embarque que les fichiers qu'il voit ainsi.
+const sessions = require('./_sessions');
 const MODULES = { cv: () => require('./_module-cv'), mail: () => require('./_module-mail'), mdp: () => require('./_module-mdp'), lettre: () => require('./_module-lettre'), adresse: () => require('./_module-adresse'), signature: () => require('./_module-signature'), raccourcis: () => require('./_module-raccourcis'), raccourcisav: () => require('./_module-raccourcis-avances') };
 
 async function sb(path) {
@@ -50,8 +51,7 @@ async function handle(req, res) {
   if (!token) return res.status(401).json({ error: 'Session manquante.', code: 'no-session' });
 
   try {
-    const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,plan,institution_id`);
-    const user = r.data && r.data[0];
+    const user = await sessions.userByToken(sb, token, 'id,plan,institution_id');
     if (!user) return res.status(401).json({ error: 'Session invalide.', code: 'bad-session' });
     if ((await effectivePlan(user)) !== 'expert') return res.status(403).json({ error: 'Module réservé aux comptes Expert.', code: 'not-expert' });
     res.setHeader('Content-Type', 'application/javascript; charset=utf-8');

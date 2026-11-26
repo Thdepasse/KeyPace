@@ -4,6 +4,7 @@ const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeach
   essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
   moduleMastery, studentModuleProgress, GOAL_LIMITS, parseGoalInput, effectiveClassGoals,
   CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, assignmentTargets, assignmentVisibleTo, assignmentDone } = require('./_class-logic');
+const sessions = require('./_sessions');
 const { buildClassFeed } = require('./_class-feed');
 const { hashPassword, safeEqual } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
@@ -66,8 +67,7 @@ async function sb(path, opts = {}) {
 
 async function userFromToken(token) {
   if (!token) return null;
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username,plan,role,institution_id,class_join_failed_attempts,class_join_locked_until`);
-  return (r.data && r.data[0]) || null;
+  return sessions.userByToken(sb, token, 'id,username,plan,role,institution_id,class_join_failed_attempts,class_join_locked_until');
 }
 
 /* ── Plusieurs profs par classe (table class_teachers) ──
@@ -844,21 +844,39 @@ async function moduleDone(req, res) {
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
   const key = req.body.moduleKey;
   if (!MODULE_KEYS.includes(key)) return res.status(400).json({ error: 'Module inconnu.' });
-  for (let i = 0; i < 4; i++) {
-    const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(user.id)}&select=data,updated_at`);
+  const r = await markAssignmentDone(user.id, 'mod:' + key, { module: true });
+  if (r.ok) return res.json({ ok: true });
+  return res.status(500).json({ error: 'Enregistrement impossible.' });
+}
+
+// Pose une marque « devoir fait » dans progress.data, côté serveur (essai rendu, module
+// terminé). Compare-and-swap sur `rev`, le même compteur que save-progress : avant, ces
+// écritures se basaient sur updated_at et n'incrémentaient pas `rev`, si bien qu'une
+// sauvegarde du client lue juste avant pouvait les écraser sans s'en apercevoir.
+// Ne remplace jamais une marque déjà posée.
+async function markAssignmentDone(userId, key, mark) {
+  const uid = encodeURIComponent(userId);
+  for (let i = 0; i < 5; i++) {
+    const pr = await sb(`/progress?user_id=eq.${uid}&select=data,rev,updated_at`);
     const row = pr.data && pr.data[0];
     const data = (row && row.data) || {};
     data.assignmentsDone = data.assignmentsDone || {};
-    if (data.assignmentsDone['mod:' + key]) return res.json({ ok: true });
-    data.assignmentsDone['mod:' + key] = { t: Date.now(), module: true };
-    if (!row) { const c = await sb('/progress', { method: 'POST', body: JSON.stringify({ user_id: user.id, data }) }); if (c.ok) return res.json({ ok: true }); continue; }
-    const filter = row.updated_at
-      ? `/progress?user_id=eq.${encodeURIComponent(user.id)}&updated_at=eq.${encodeURIComponent(row.updated_at)}`
-      : `/progress?user_id=eq.${encodeURIComponent(user.id)}`;
-    const w = await sb(filter, { method: 'PATCH', body: JSON.stringify({ data, updated_at: new Date().toISOString() }) });
-    if (w.ok && w.data && w.data.length) return res.json({ ok: true });
+    if (data.assignmentsDone[key]) return { ok: true };
+    data.assignmentsDone[key] = { t: Date.now(), ...mark };
+    if (!row) {
+      const c = await sb('/progress', { method: 'POST', body: JSON.stringify({ user_id: userId, data }) });
+      if (c.ok) return { ok: true };
+      continue;
+    }
+    const hasRev = typeof row.rev === 'number';
+    const filter = hasRev ? `&rev=eq.${row.rev}` : (row.updated_at ? `&updated_at=eq.${encodeURIComponent(row.updated_at)}` : '');
+    const w = await sb(`/progress?user_id=eq.${uid}${filter}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ data, updated_at: new Date().toISOString(), ...(hasRev ? { rev: row.rev + 1 } : {}) }),
+    });
+    if (w.ok && w.data && w.data.length) return { ok: true };
   }
-  return res.status(500).json({ error: 'Enregistrement impossible.' });
+  return { ok: false };
 }
 
 /* ── Migration des classes jsonb (ancien modèle) vers les tables ── */
@@ -1147,8 +1165,9 @@ async function adminResetPassword(req, res) {
   const tempPassword = genInviteCode().slice(0, 4) + genInviteCode().slice(0, 4);
   await sb(`/users?id=eq.${target.id}`, {
     method: 'PATCH',
-    body: JSON.stringify({ password_hash: hashPassword(sha256hex(tempPassword)), must_change_password: true, session_token: null }),
+    body: JSON.stringify({ password_hash: hashPassword(sha256hex(tempPassword)), must_change_password: true }),
   });
+  await sessions.revokeAllSessions(sb, target.id); // toutes les sessions ouvertes de ce compte sont coupées
   return res.json({ ok: true, username: target.username, tempPassword });
 }
 
@@ -1352,20 +1371,8 @@ async function essaySubmit(req, res) {
   // `data` à partir d'une version déjà périmée, effaçant la progression que
   // le client venait d'enregistrer entre-temps. On relit et réessaie si
   // `updated_at` a changé depuis notre lecture (quelqu'un d'autre a écrit).
-  try {
-    for (let i = 0; i < 4; i++) {
-      const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(user.id)}&select=data,updated_at`);
-      const row = pr.data && pr.data[0];
-      const data = (row && row.data) || {};
-      data.assignmentsDone = data.assignmentsDone || {};
-      data.assignmentsDone[a.id] = { t: Date.now(), essay: true, words: v.words };
-      const filter = row && row.updated_at
-        ? `/progress?user_id=eq.${encodeURIComponent(user.id)}&updated_at=eq.${encodeURIComponent(row.updated_at)}`
-        : `/progress?user_id=eq.${encodeURIComponent(user.id)}`;
-      const w = await sb(filter, { method: 'PATCH', body: JSON.stringify({ data, updated_at: new Date().toISOString() }) });
-      if (w.ok && w.data && w.data.length) break;
-    }
-  } catch { /* le rendu est enregistré : ne pas échouer sur le marqueur */ }
+  try { await markAssignmentDone(user.id, a.id, { essay: true, words: v.words }); }
+  catch { /* le rendu est enregistré : ne pas échouer sur le marqueur */ }
 
   return res.json({ ok: true, words: v.words });
 }

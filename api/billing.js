@@ -1,5 +1,6 @@
 const Stripe = require('stripe');
 const { setCorsOrigin } = require('./_cors');
+const sessions = require('./_sessions');
 const { notifyTeam, checkoutClickedEmail } = require('./_notify');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -50,13 +51,11 @@ module.exports = async function handler(req, res) {
 
   // Dans le try : une réponse inattendue de Supabase faisait planter la
   // fonction en page HTML, que le front affichait comme "Erreur réseau".
-  const r = await sb(
-    `/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username,email,stripe_customer_id`
-  );
   // Panne Supabase ≠ session invalide : le front déconnecte sur un 401, il ne
   // faut pas qu'un incident passager éjecte l'utilisateur.
-  if (!r.ok) return res.status(503).json({ error: 'Service momentanément indisponible, réessaie dans un instant.' });
-  const user = r.data && r.data[0];
+  let user;
+  try { user = await sessions.userByToken(sb, token, 'id,username,email,stripe_customer_id'); }
+  catch { return res.status(503).json({ error: 'Service momentanément indisponible, réessaie dans un instant.' }); }
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
   // httpClient fetch : le client HTTP par défaut (node https) échoue sur ce
