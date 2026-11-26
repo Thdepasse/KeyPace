@@ -1,4 +1,5 @@
 // Helpers partagés pour le Duel 1v1
+const sessions = require('./_sessions');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
 
@@ -58,12 +59,10 @@ const DUEL_TEXTS = [
 
 // session_expires_at IS NULL reste valide (sessions émises avant l'ajout de
 // cette colonne) — évite de déconnecter tout le monde d'un coup au déploiement.
-function sessionOkFilter() { return `or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})`; }
 
 async function userFromToken(token) {
   if (!token) return null;
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&${sessionOkFilter()}&select=id,username,display_name,plan,role`);
-  return (r.data && r.data[0]) || null;
+  return sessions.userByToken(sb, token, 'id,username,display_name,plan,role');
 }
 
 function generateRoomCode() {

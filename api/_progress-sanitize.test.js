@@ -109,9 +109,11 @@ test('save-progress : un test impossible est écarté, le reste est enregistré'
   assert.ok(PROGRESS.lessons.a);
 });
 
-test('save-progress : le garde-fou de régression de leçons reste actif', async () => {
+test('save-progress : le garde-fou de régression de leçons reste actif (mode sans fusion)', async () => {
+  process.env.PROGRESS_MERGE_MODE = 'observe';
   PROGRESS = { lessons: { a: { bestWpm: 30 }, b: { bestWpm: 30 } } }; CALLS = [];
   const r = await call({ token: 't', data: { lessons: { a: { bestWpm: 30 } } } });
+  delete process.env.PROGRESS_MERGE_MODE;
   assert.equal(r.status, 409);
   assert.equal(writes(), 0);
 });

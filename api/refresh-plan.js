@@ -1,4 +1,5 @@
 const { setCorsOrigin } = require('./_cors');
+const sessions = require('./_sessions');
 const { effectivePlan } = require('./_module-gate');
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -27,8 +28,7 @@ module.exports = async function handler(req, res) {
   const { token } = req.body || {};
   if (!token) return res.status(400).json({ error: 'Token manquant.' });
 
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=plan,institution_id`);
-  const user = r.data && r.data[0];
+  const user = await sessions.userByToken(sb, token, 'plan,institution_id');
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
   // Même règle que /api/login : licence d'établissement expirée → plus d'Expert.

@@ -52,7 +52,7 @@ const call = async (data) => {
 };
 
 test('save-progress : une sauvegarde qui ferait reculer les tests garde l\'ancienne version', async () => {
-  delete process.env.PROGRESS_MERGE_MODE;
+  process.env.PROGRESS_MERGE_MODE = 'observe'; // l'historique protège le mode sans fusion
   ROW = { data: { lessons: { a: L }, tests: [{ t: 1, wpm: 40, acc: 90 }, { t: 2, wpm: 41, acc: 91 }] }, rev: 0 };
   HIST = []; NEXT_ID = 1; FAIL_HISTORY = false;
   const r = await call({ lessons: { a: L }, tests: [{ t: 1, wpm: 40, acc: 90 }] });

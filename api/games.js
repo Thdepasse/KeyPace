@@ -2,6 +2,7 @@
 // sous la limite de 12 fonctions du plan Vercel Hobby.
 // Route par `action` dans le body JSON. Helpers dans _boss-shared / _duel-shared.
 const { sb, getCurrentChallenge, computeScore } = require('./_boss-shared');
+const sessions = require('./_sessions');
 const { DUEL_TEXTS, userFromToken, generateRoomCode, sanitizeDuelText } = require('./_duel-shared');
 const { canActAsTeacher } = require('./_class-logic');
 const { setCorsOrigin } = require('./_cors');
@@ -64,8 +65,7 @@ module.exports = async function handler(req, res) {
       case 'boss-submit': {
         const { token, wpm, accuracy, timeMs } = body;
         if (!token) return res.status(400).json({ error: 'Token manquant.' });
-        const ur = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username,display_name`);
-        const user = ur.data && ur.data[0];
+        const user = await sessions.userByToken(sb, token, 'id,username,display_name');
         if (!user) return res.status(401).json({ error: 'Session invalide.' });
         const displayName = user.display_name || user.username;
         const ch = await getCurrentChallenge();
@@ -98,8 +98,7 @@ module.exports = async function handler(req, res) {
         const rows = (top.data || []).map((r, i) => ({ rank: i + 1, ...r }));
         let me = null;
         if (token) {
-          const ur = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,username`);
-          const user = ur.data && ur.data[0];
+          const user = await sessions.userByToken(sb, token, 'id,username');
           if (user) {
             const mine = await sb(`/weekly_scores?challenge_id=eq.${ch.id}&user_id=eq.${user.id}&select=username,score,wpm,accuracy`);
             const row = mine.data && mine.data[0];

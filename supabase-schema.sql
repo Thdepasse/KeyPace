@@ -1077,3 +1077,26 @@ create index if not exists assignments_student_id_idx on assignments(student_id)
 -- Accès : uniquement par l'API (clé service). Idempotent.
 -- ───────────────────────────────────────────────────────────────
 alter table classes add column if not exists home_row text not null default 'qsdf' check (home_row in ('qsdf', 'azer'));
+
+-- ───────────────────────────────────────────────────────────────
+-- Sessions multi-appareils (nov. 2026)
+-- Avant : une seule colonne users.session_token par compte. Se connecter sur un
+-- autre appareil (ou ouvrir les réglages) remplaçait le jeton et coupait sans
+-- prévenir les autres appareils : sauvegardes refusées, devoirs « pas faits ».
+-- Une ligne par appareil connecté ; seule l'empreinte SHA-256 du jeton est
+-- stockée. users.session_token reste lu pour les jetons émis avant (repli dans
+-- api/_sessions.js) et s'éteint de lui-même à leur expiration. Les sessions
+-- expirées sont purgées par la tâche quotidienne (retention-sweep-cron).
+-- Accès : uniquement par l'API (clé service). Idempotent.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists user_sessions (
+  token_hash text primary key,
+  user_id uuid not null references users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null
+);
+create index if not exists user_sessions_user_idx on user_sessions(user_id);
+create index if not exists user_sessions_expires_idx on user_sessions(expires_at);
+alter table user_sessions enable row level security;
+drop policy if exists "no_anon_access" on user_sessions;
+create policy "no_anon_access" on user_sessions for all to anon using (false) with check (false);

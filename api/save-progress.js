@@ -1,4 +1,5 @@
 const { setCorsOrigin } = require('./_cors');
+const sessions = require('./_sessions');
 const { sanitizeProgress, MAX_BYTES } = require('./_progress-sanitize');
 const { courseIdsFor } = require('./_courses-registry');
 const { mergeProgress } = require('./_progress-merge');
@@ -49,8 +50,7 @@ module.exports = async function handler(req, res) {
   let { data } = req.body || {};
   if (!token) return res.status(400).json({ error: 'Token manquant.' });
 
-  const r = await sb(`/users?session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${new Date().toISOString()})&select=id,role,username`);
-  const user = r.data && r.data[0];
+  const user = await sessions.userByToken(sb, token, 'id,role,username');
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
 
   // Cours auxquels ce compte a droit (cours en bêta : comptes testeurs). Ne touche ni à la progression ni à la sauvegarde.
@@ -70,7 +70,10 @@ module.exports = async function handler(req, res) {
   //   off     : comportement d'avant (le client remplace le bloc) ;
   //   observe : on calcule la fusion et on journalise ce qu'elle aurait évité, sans rien changer à l'écriture ;
   //   active  : on écrit la fusion, avec comparaison atomique sur `rev` (réessai, puis 409).
-  const mode = ['off', 'observe', 'active'].includes(process.env.PROGRESS_MERGE_MODE) ? process.env.PROGRESS_MERGE_MODE : 'observe';
+  // Par défaut : active (nov. 2026). En « observe », la dernière écriture gagnait : un
+  // deuxième onglet ou un autre PC resté ouvert effaçait sans bruit des leçons et des
+  // tests, ou se faisait refuser (409) indéfiniment, et le prof ne voyait pas le travail.
+  const mode = ['off', 'observe', 'active'].includes(process.env.PROGRESS_MERGE_MODE) ? process.env.PROGRESS_MERGE_MODE : 'active';
   const readRow = async () => {
     const pr = await sb(`/progress?user_id=eq.${user.id}&select=data,rev`);
     return (pr.data && pr.data[0]) || null;
@@ -137,7 +140,10 @@ module.exports = async function handler(req, res) {
         method: 'PATCH',
         body: JSON.stringify({ ...body, rev: row.rev + 1 }),
       });
-      if (w.ok && Array.isArray(w.data) && w.data.length) return res.json({ ok: true });
+      // `data` : la version réellement enregistrée (fusionnée), que le client reprend
+      // pour ne pas rester sur une copie en retard (autre onglet, autre appareil, devoir
+      // rendu côté serveur).
+      if (w.ok && Array.isArray(w.data) && w.data.length) return res.json({ ok: true, data: candidate });
       continue; // quelqu'un a écrit entre-temps : on relit et on refusionne
     }
 
@@ -147,7 +153,7 @@ module.exports = async function handler(req, res) {
       headers: { Prefer: 'resolution=merge-duplicates' },
       body: JSON.stringify({ user_id: user.id, ...body }),
     });
-    return res.json({ ok: true });
+    return res.json({ ok: true, data: candidate });
   }
   console.warn('save-progress conflit persistant', JSON.stringify({ user: user.id }));
   return res.status(409).json({ error: 'Conflit de sauvegarde, réessaie.' });

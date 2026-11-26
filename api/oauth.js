@@ -4,6 +4,7 @@
 // Le provider est encodé dans le `state` signé (HMAC) => stateless, pas de cookie.
 const crypto = require('crypto');
 const { safeEqual } = require('./_auth');
+const sessions = require('./_sessions');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -146,7 +147,8 @@ function randomHash() {
 // un vrai jeton 30 jours qui, lui, ne transite jamais par une URL. Une copie
 // interceptée de ce lien devient donc inutilisable après quelques minutes au
 // pire, au lieu de rester valable 30 jours comme avant.
-function shortLivedExpiresAt() { return new Date(Date.now() + 2 * 60 * 1000).toISOString(); }
+const SHORT_LIVED_MS = 2 * 60 * 1000;
+function shortLivedExpiresAt() { return new Date(Date.now() + SHORT_LIVED_MS).toISOString(); }
 
 // Génère un username unique à partir de l'email/nom.
 async function uniqueUsername(seed) {
@@ -195,7 +197,10 @@ async function findOrCreateUser(provider, profile, inviteCtx) {
     // Liaison auto + nouvelle session ; on confirme l'email au passage.
     // Note : une invitation présente ici n'est pas appliquée à un compte déjà
     // existant (même périmètre que register.js, qui ne gère que la création).
-    const patch = { session_token: session, session_expires_at: shortLivedExpiresAt(), last_seen_at: new Date().toISOString(), deletion_warned_at: null, email_verified: true };
+    // Session courte propre à CET appareil (voir api/_sessions.js) : une connexion SSO
+    // ne coupe plus les autres appareils déjà connectés sur ce compte.
+    const ses = await sessions.createSession(sb, existing.id, SHORT_LIVED_MS);
+    const patch = { ...ses.legacyPatch, last_seen_at: new Date().toISOString(), deletion_warned_at: null, email_verified: true };
     if (!existing.oauth_provider) patch.oauth_provider = provider;
     if (existing.verification_token) patch.verification_token = null;
     // Compte jamais confirmé : rien ne prouve que son créateur possède cette
@@ -209,7 +214,7 @@ async function findOrCreateUser(provider, profile, inviteCtx) {
       patch.reset_expires_at = null;
     }
     await sb(`/users?id=eq.${existing.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
-    return { token: session };
+    return { token: ses.token };
   }
 
   let institution = null;

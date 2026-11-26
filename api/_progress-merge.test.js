@@ -137,8 +137,19 @@ const call = async (data) => {
 };
 const LESSON = { bestWpm: 30, bestErr: 1, cleared: true };
 
-test('mode observe (par défaut) : l\'écriture reste celle du client, la fusion est seulement journalisée', async () => {
+test('sans réglage, le mode par défaut est active : la fusion est écrite et renvoyée au client', async () => {
   delete process.env.PROGRESS_MERGE_MODE;
+  ROW = { data: { lessons: { a: LESSON, b: LESSON }, gameBest: 100 }, rev: 3 }; CALLS = [];
+  const r = await call({ lessons: { a: LESSON, c: LESSON }, gameBest: 40 });
+  assert.equal(r.body.ok, true);
+  assert.deepEqual(Object.keys(ROW.data.lessons).sort(), ['a', 'b', 'c']);
+  assert.equal(ROW.data.gameBest, 100);
+  assert.equal(ROW.rev, 4);
+  assert.deepEqual(r.body.data, ROW.data, 'le client reçoit la version enregistrée');
+});
+
+test('mode observe : l\'écriture reste celle du client, la fusion est seulement journalisée', async () => {
+  process.env.PROGRESS_MERGE_MODE = 'observe';
   ROW = { data: { lessons: { a: LESSON }, gameBest: 100 }, rev: 3 }; CALLS = [];
   await call({ lessons: { a: LESSON }, gameBest: 40 });
   assert.equal(ROW.data.gameBest, 40);
