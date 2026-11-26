@@ -72,6 +72,27 @@ async function accountPayload(user, token) {
   return { id: user.id, username: user.username, plan: await effectivePlan(user), role: user.role || 'eleve', onboarding_completed: user.onboarding_completed || false, email: user.email || null, displayName: user.display_name || null, mustChangePassword: !!user.must_change_password, institutionName: await institutionNameFor(user.institution_id), hasClass: await hasAnyClass(user.id), token, data: progress?.data || {} };
 }
 
+// Avant la suppression d'un compte prof ou établissement : confie ses classes d'établissement
+// à un autre prof de la classe, sinon à un compte établissement, sinon laisse la classe sans
+// titulaire (teacher_id null : l'établissement la voit toujours). Renvoie true en cas d'échec.
+async function handOverClasses(user) {
+  const owned = await sb(`/classes?teacher_id=eq.${user.id}&institution_id=not.is.null&select=id,institution_id`);
+  if (!owned.ok) return true;
+  for (const cls of owned.data || []) {
+    let next = null;
+    const lk = await sb(`/class_teachers?class_id=eq.${cls.id}&teacher_id=neq.${user.id}&select=teacher_id,users(id,role,archived)`);
+    const other = (Array.isArray(lk.data) ? lk.data : []).find((x) => x.users && x.users.role === 'prof' && !x.users.archived);
+    if (other) next = other.teacher_id;
+    if (!next) {
+      const ad = await sb(`/users?institution_id=eq.${cls.institution_id}&role=eq.admin&id=neq.${user.id}&select=id&limit=1`);
+      if (Array.isArray(ad.data) && ad.data[0]) next = ad.data[0].id;
+    }
+    const w = await sb(`/classes?id=eq.${cls.id}`, { method: 'PATCH', body: JSON.stringify({ teacher_id: next }) });
+    if (!w.ok) return true;
+  }
+  return false;
+}
+
 async function effectivePlan(user) {
   if (user && user.institution_id && user.plan === 'expert') {
     const li = await sb(`/institutions?id=eq.${user.institution_id}&select=license_expires_at`);
@@ -402,9 +423,17 @@ module.exports = async function handler(req, res) {
   if (body.action === 'delete-me') {
     const { token, passwordHash } = body;
     if (!token || !passwordHash) return res.status(400).json({ error: 'Mot de passe requis.' });
-    const user = await sessions.userByToken(sb, token, 'id,password_hash');
+    const user = await sessions.userByToken(sb, token, 'id,password_hash,role,institution_id');
     if (!user) return res.status(401).json({ error: 'Session invalide.' });
     if (!verifyPassword(passwordHash, user.password_hash).ok) return res.status(401).json({ error: 'Mot de passe incorrect.' });
+    // Classes d'établissement dont ce compte est le titulaire : classes.teacher_id est en
+    // « on delete cascade », la suppression du compte effaçait la classe, ses élèves et ses
+    // devoirs pour tout le monde (co-titulaires et élèves compris). On les confie d'abord à un
+    // autre prof de la classe, sinon à l'établissement, sinon on détache le titulaire.
+    if (user.role === 'prof' || user.role === 'admin') {
+      const failed = await handOverClasses(user);
+      if (failed) return res.status(500).json({ error: "Impossible de confier tes classes à ton établissement pour l'instant. Réessaie dans un instant." });
+    }
     // reviews.user_id est en `on delete set null` (le commentaire reste affiché
     // publiquement après suppression du compte, uniquement délié) — on le
     // supprime explicitement avant, le droit à l'effacement porte sur le
