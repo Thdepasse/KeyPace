@@ -25,16 +25,40 @@ function computeStreak(tests, now) {
   return streak;
 }
 
+const isPlainObj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
+
+// Tous les essais horodatés de l'élève, cours par défaut ET autres cours (progress.data.courses :
+// néerlandais, anglais, QWERTY…), du plus ancien au plus récent. Avant, seul le cours par défaut
+// était lu : un élève qui travaillait dans un autre cours paraissait inactif côté prof.
+function allTests(data) {
+  const d = isPlainObj(data) ? data : {};
+  const out = [];
+  const add = (list, course) => {
+    if (!Array.isArray(list)) return;
+    for (const t of list) if (isPlainObj(t) && typeof t.t === 'number' && Number.isFinite(t.t)) out.push(course ? { ...t, course } : t);
+  };
+  add(d.tests, null);
+  if (isPlainObj(d.courses)) for (const [id, c] of Object.entries(d.courses)) if (isPlainObj(c)) add(c.tests, id);
+  return out.map((t, i) => [t, i]).sort((a, b) => a[0].t - b[0].t || a[1] - b[1]).map((x) => x[0]);
+}
+// Leçons validées, tous cours confondus.
+function clearedLessonCount(data) {
+  const d = isPlainObj(data) ? data : {};
+  const count = (lessons) => (isPlainObj(lessons) ? Object.values(lessons).filter((l) => (isPlainObj(l) ? l.cleared : typeof l === 'number')).length : 0);
+  let n = count(d.lessons);
+  if (isPlainObj(d.courses)) for (const c of Object.values(d.courses)) if (isPlainObj(c)) n += count(c.lessons);
+  return n;
+}
+
 // Résumé des stats d'un élève à partir de son progress.data (jsonb) brut.
 function studentSummary(data, now) {
   const d = data || {};
-  const tests = Array.isArray(d.tests) ? d.tests : [];
-  const lessons = d.lessons && typeof d.lessons === 'object' ? d.lessons : {};
+  const tests = allTests(d);
   const lastTest = tests.length ? tests[tests.length - 1].t : null;
   const recent = tests.slice(-10);
   const avg = (key) =>
     recent.length ? Math.round(recent.reduce((a, t) => a + (t[key] || 0), 0) / recent.length) : null;
-  const clearedLessons = Object.values(lessons).filter((l) => l && l.cleared).length;
+  const clearedLessons = clearedLessonCount(d);
   // Math.max(0, ...) : un test très récent (secondes avant l'appel) peut, avec
   // un léger décalage d'horloge entre le poste qui a enregistré `t` et celui
   // qui calcule `now`, produire un écart négatif — Math.floor donnait alors
@@ -163,7 +187,7 @@ function dailySeries(studentsData, now, days = 7) {
   const startOfToday = now - (now % dayMs);
   const buckets = Array.from({ length: days }, () => ({ sessions: 0, wpmSum: 0, wpmN: 0 }));
   for (const d of studentsData) {
-    const tests = Array.isArray(d && d.tests) ? d.tests : [];
+    const tests = allTests(d);
     for (const t of tests) {
       const dayStart = t.t - (t.t % dayMs);
       const idx = days - 1 - Math.round((startOfToday - dayStart) / dayMs);
@@ -536,11 +560,11 @@ function assignmentDone(data, a) {
     return true;
   }
   if (a.target_wpm) {
-    return (Array.isArray(d.tests) ? d.tests : []).some((t) => (t.wpm || 0) >= a.target_wpm);
+    return allTests(d).some((t) => (t.wpm || 0) >= a.target_wpm); // test fait dans n'importe quel cours
   }
   return false;
 }
 
-module.exports = { assignmentDone, AZER_LESSON_MODULE, lessonModuleMap, moduleNamesFor, assignmentTargets, assignmentVisibleTo, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
+module.exports = { allTests, clearedLessonCount, assignmentDone, AZER_LESSON_MODULE, lessonModuleMap, moduleNamesFor, assignmentTargets, assignmentVisibleTo, CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, studentSummary, aggregateClass, detectAlerts, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary, WEEK_MS,
   ESSAY_TYPES, essayTypeDef, countWords, essayWordCount, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
   moduleMastery, studentModuleProgress, MODULE_NAMES, GOAL_DEFAULTS, GOAL_LIMITS, parseGoalInput, effectiveClassGoals };

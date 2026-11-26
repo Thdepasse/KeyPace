@@ -8102,7 +8102,7 @@ function kpAsgDoneLocal(a){
   if(a.mode==='module')return !!done['mod:'+a.lessonId];
   if(a.customText){const r=done[a.id];if(!r)return false;return a.targetWpm?(r.wpm||0)>=a.targetWpm:true;}
   if(a.lessonId){const r=(d.lessons||{})[a.lessonId];if(!r)return false;const rec=typeof r==='number'?{bestWpm:r,cleared:true}:r;if(!rec.cleared)return false;return a.targetWpm?(rec.bestWpm||0)>=a.targetWpm:true;}
-  if(a.targetWpm)return (Array.isArray(d.tests)?d.tests:[]).some(t=>(t.wpm||0)>=a.targetWpm);
+  if(a.targetWpm){const all=[...(Array.isArray(d.tests)?d.tests:[])];Object.values(d.courses||{}).forEach(c=>{if(c&&Array.isArray(c.tests))all.push(...c.tests);});return all.some(t=>t&&(t.wpm||0)>=a.targetWpm);}
   return false;
 }
 function kpReadSession(){try{const v=JSON.parse(localStorage.getItem('klak_session')||'{}');return v&&typeof v==='object'?v:{};}catch{return {};}}
@@ -18652,11 +18652,15 @@ const app={
       case 'stuck':ic='⚠';bg='rgba(229,72,77,.12)';dot='var(--danger)';txt=`${who} n'a encore validé aucune leçon`;sub=`après ${e.sessions} séances`;break;
       case 'inactive':ic='💤';bg='var(--card)';dot='var(--danger)';txt=`${who} n'a plus travaillé depuis ${e.days} jours`;break;
       case 'never':ic='💤';bg='var(--card)';dot='var(--danger)';txt=`${who} n'a pas encore commencé`;sub=`dans la classe depuis ${e.days} jours`;break;
+      case 'member_add':ic='＋';bg='rgba(31,169,113,.14)';dot='var(--success)';txt=e.source==='restore'?`${who} a été remis dans la classe`:`${who} a rejoint la classe`;sub=e.source==='join-code'?'avec le code de classe':e.by?`par ${esc(e.by)}`:'';break;
+      case 'member_remove':ic='−';bg='rgba(229,72,77,.12)';dot='var(--danger)';txt=`${who} a été retiré de la classe`;sub=e.by?`par ${esc(e.by)}`:'';break;
       default:return '';
     }
     let act='';
     if(e.act){
-      if(e.assignmentId){
+      if(e.type==='member_remove'&&e.restorable){
+        act=`<button class="kfeed-do" onclick="app._restoreStudent('${esc(classId)}','${esc(e.studentId)}',this)">Remettre dans la classe</button>`;
+      }else if(e.assignmentId){
         act=`<button class="kfeed-do" title="Envoie un rappel pour le devoir ${q(e.assignmentTitle)}" onclick="app._feedRemind(this,'${esc(e.assignmentId)}','${esc(e.studentId)}')">Relancer</button>`;
         sub=(sub?sub+' · ':'')+`devoir ${q(e.assignmentTitle)} pas encore fait`;
       }else if(e.type==='stuck_lesson'||e.type==='stuck')act=`<button class="kfeed-do" onclick="app.openAssignModal('${esc(classId)}',{studentId:'${esc(e.studentId)}'})">Assigner un exercice</button>`;
@@ -19410,13 +19414,40 @@ const app={
   _sdSetFilter(f){this._sdFilter=f;this._renderSD();},
 
   async removeStudentFromClass(classId,studentId,name){
-    if(!await confirmModal({icon:ICONS.user,title:'Retirer de la classe ?',body:'Retire '+name+' de cette classe. Son compte et sa progression restent intacts : il pourra rejoindre à nouveau avec le code de classe.',confirmText:'Retirer'}))return;
+    // Nom lu sur la fiche ouverte (pas dans l'attribut onclick : une apostrophe, « O'Neil », cassait le bouton).
+    if(!name){const sd=this._sd&&this._sd.studentId===studentId?this._sd:null;name=(sd&&(sd.fullName||sd.username))||'cet élève';}
+    if(!await confirmModal({icon:ICONS.user,danger:true,title:'Retirer '+this._esc(name)+' de la classe ?',body:"Il n'apparaîtra plus dans ta classe ni dans ses devoirs. Son compte et sa progression restent intacts, et tu pourras annuler depuis l'historique de la classe.",confirmText:'Retirer de la classe'}))return;
     try{
       const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-remove-student',token:currentToken,classId,studentId})});
       const d=await r.json();
       if(!r.ok)throw new Error(d.error||kpT('net.generic_nodot'));
-      this.viewClass(classId);
+      await this.viewClass(classId);
+      this._undoToast(name+' a été retiré de la classe.',()=>this._restoreStudent(classId,studentId));
     }catch(e){alert(e.message||'Erreur réseau.');}
+  },
+  // Remet un élève retiré dans la classe (annulation, depuis le message ou l'historique).
+  async _restoreStudent(classId,studentId,btn){
+    if(btn){btn.disabled=true;btn.textContent='…';}
+    try{
+      const r=await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'class-restore-student',token:currentToken,classId,studentId})});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok)throw new Error(d.error||kpT('net.generic_nodot'));
+      if(this._classViewingId===classId&&this._classesSub==='class')await this.viewClass(classId,{silent:true});
+      return true;
+    }catch(e){if(btn){btn.disabled=false;btn.textContent='Remettre dans la classe';}alert(e.message||'Erreur réseau.');return false;}
+  },
+  // Message en bas d'écran avec « Annuler », 12 secondes.
+  _undoToast(text,onUndo){
+    const old=document.getElementById('kp-undo-toast');if(old)old.remove();
+    const el=document.createElement('div');
+    el.id='kp-undo-toast';el.setAttribute('role','status');
+    el.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;background:var(--txt,#16140F);color:#fff;padding:11px 14px 11px 18px;border-radius:12px;font-size:13.5px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:flex;align-items:center;gap:14px;max-width:calc(100vw - 32px)';
+    const span=document.createElement('span');span.textContent=text;
+    const b=document.createElement('button');b.textContent='Annuler';
+    b.style.cssText='background:none;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:5px 12px;font:inherit;font-weight:700;cursor:pointer';
+    b.onclick=async()=>{b.disabled=true;if(await onUndo())el.remove();else b.disabled=false;};
+    el.append(span,b);document.body.appendChild(el);
+    setTimeout(()=>{if(el.isConnected)el.remove();},12000);
   },
 
   _renderSD(){
@@ -19447,7 +19478,6 @@ const app={
         <h1 style="margin-bottom:4px">${this._studentPrimary(d)}</h1>
         <p style="margin:0">${this._studentSub(d)?this._studentSub(d)+' · ':''}Inscrit le ${d.joinedAt?new Date(d.joinedAt).toLocaleDateString('fr-FR'):'-'} · dernière activité : ${last}</p>
         <button onclick="app.openAssignModal('${d.classId}',{studentId:'${d.studentId}'})" style="margin-top:12px;margin-right:8px;background:var(--accent);border:none;color:#fff;border-radius:9px;padding:7px 14px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer">${kpT('asg.remediation_btn')}</button>
-        <button onclick="app.removeStudentFromClass('${d.classId}','${d.studentId}','${this._esc(d.username).replace(/'/g,"\\'")}')" style="margin-top:12px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:9px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Retirer de la classe</button>
       </div>
       <div style="max-width:900px;margin:0 auto;padding:0 20px 60px">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px">
@@ -19476,6 +19506,10 @@ const app={
             <div style="color:var(--muted);font-size:14px">›</div>
           </div>`).join('')}
         </div>`:''}
+        <!-- Retirer de la classe : en bas de la fiche, loin du bouton Remédiation (des élèves étaient retirés par erreur). -->
+        <div style="margin-top:28px;padding-top:18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+          <button onclick="app.removeStudentFromClass('${d.classId}','${d.studentId}')" style="background:none;border:none;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline">Retirer cet élève de la classe</button>
+        </div>
       </div></div>`;
   },
 

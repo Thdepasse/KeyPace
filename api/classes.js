@@ -3,9 +3,9 @@
 const { aggregateClass, detectAlerts, studentSummary, dailySeries, canActAsTeacher, canManageClass, canAdministerClass, canActAsAdmin, institutionProfSummary,
   essayTypeDef, sanitizeEssayContent, validateEssaySubmission, validateEssayBrief, essayWritingSignals, sanitizeEssayStats,
   moduleMastery, studentModuleProgress, GOAL_LIMITS, parseGoalInput, effectiveClassGoals,
-  CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, assignmentTargets, assignmentVisibleTo, assignmentDone } = require('./_class-logic');
+  CLASS_SETTINGS, parseClassSetting, classSettingsOf, effectiveClassSettings, assignmentTargets, assignmentVisibleTo, assignmentDone, allTests } = require('./_class-logic');
 const sessions = require('./_sessions');
-const { buildClassFeed } = require('./_class-feed');
+const { buildClassFeed, FEED_DAYS } = require('./_class-feed');
 const { hashPassword, safeEqual } = require('./_auth');
 const { setCorsOrigin } = require('./_cors');
 
@@ -134,13 +134,36 @@ function genInviteCode() {
   return c;
 }
 
-// Récupère les progress.data de plusieurs élèves en une requête.
+// Découpe une liste en paquets (une URL PostgREST trop longue est refusée : ~40 caractères par uuid).
+function chunks(list, size) {
+  const out = [];
+  for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size));
+  return out;
+}
+
+// Récupère les progress.data de plusieurs élèves, par paquets envoyés en parallèle.
 async function fetchProgressMap(studentIds) {
-  if (!studentIds.length) return {};
-  const list = studentIds.map(encodeURIComponent).join(',');
-  const r = await sb(`/progress?user_id=in.(${list})&select=user_id,data`);
+  const ids = [...new Set(studentIds)];
+  if (!ids.length) return {};
   const map = {};
-  (r.data || []).forEach((row) => { map[row.user_id] = row.data || {}; });
+  const parts = await Promise.all(chunks(ids, 120).map((part) => sb(`/progress?user_id=in.(${part.map(encodeURIComponent).join(',')})&select=user_id,data`)));
+  for (const r of parts) {
+    if (!r.ok) throw new Error('progress ' + r.status + ': ' + JSON.stringify(r.data));
+    (r.data || []).forEach((row) => { map[row.user_id] = row.data || {}; });
+  }
+  return map;
+}
+
+// Membres de plusieurs classes en quelques requêtes : { classId: [membres] } (même forme que membersOf).
+async function membersOfMany(classIds) {
+  const map = {};
+  classIds.forEach((id) => { map[id] = []; });
+  if (!classIds.length) return map;
+  const parts = await Promise.all(chunks(classIds, 80).map((part) => sb(`/class_members?class_id=in.(${part.map(encodeURIComponent).join(',')})&select=class_id,student_id,joined_at,users(id,username,full_name)`)));
+  for (const r of parts) {
+    if (!r.ok || !Array.isArray(r.data)) throw new Error('membersOfMany ' + r.status + ': ' + JSON.stringify(r.data));
+    r.data.forEach((m) => { (map[m.class_id] = map[m.class_id] || []).push({ student_id: m.student_id, joined_at: m.joined_at, username: m.users ? m.users.username : '?', fullName: m.users ? m.users.full_name : null }); });
+  }
   return map;
 }
 
@@ -150,15 +173,44 @@ async function membersOf(classId) {
   return r.data.map((m) => ({ student_id: m.student_id, joined_at: m.joined_at, username: m.users ? m.users.username : '?', fullName: m.users ? m.users.full_name : null }));
 }
 
+/* ── Journal des entrées et sorties de classe (table class_member_events) ──
+   Avant, un élève retiré d'une classe disparaissait sans trace : ni qui, ni quand, ni moyen de
+   revenir en arrière (« il était dans ma classe, il n'y apparaît plus »). Chaque ajout ou retrait
+   est maintenant noté ; l'historique de la classe l'affiche, avec « Remettre dans la classe ».
+   Jamais bloquant : tant que la table manque (migration pas passée), on n'écrit simplement rien. */
+async function logMemberEvents(rows) {
+  if (!rows || !rows.length) return;
+  try {
+    const r = await sb('/class_member_events', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(rows) });
+    if (!r.ok) console.warn('class_member_events non écrit', r.status);
+  } catch (e) { console.warn('class_member_events ignoré', e && e.message); }
+}
+
+// Entrées et sorties des `days` derniers jours d'une classe, avec les noms (élève et auteur).
+async function memberEventsFor(classId, sinceMs) {
+  try {
+    const r = await sb(`/class_member_events?class_id=eq.${encodeURIComponent(classId)}&created_at=gt.${new Date(sinceMs).toISOString()}&select=id,student_id,actor_id,action,source,created_at&order=created_at.desc&limit=100`);
+    if (!r.ok || !Array.isArray(r.data) || !r.data.length) return [];
+    const ids = [...new Set(r.data.flatMap((e) => [e.student_id, e.actor_id]).filter(Boolean))];
+    const ur = ids.length ? await sb(`/users?id=in.(${ids.map(encodeURIComponent).join(',')})&select=id,username,full_name,role`) : { data: [] };
+    const byId = {};
+    (Array.isArray(ur.data) ? ur.data : []).forEach((u) => { byId[u.id] = u; });
+    return r.data.map((e) => ({ ...e, student: byId[e.student_id] || null, actor: byId[e.actor_id] || null }));
+  } catch { return []; }
+}
+
 /* ── Cockpit : construit l'aperçu (classes + agrégats + alertes + courbe) pour
    un ensemble de classes donné. Réutilisé par le cockpit prof et la vue prof
    côté établissement. ── */
 async function buildOverview(classes, now) {
   const allData = [];
   const out = [];
+  // Deux à trois requêtes au total, au lieu de deux par classe à la suite (lenteur, voire délai
+  // dépassé et tableau de bord vide pour un prof ou un établissement avec beaucoup de classes).
+  const membersBy = await membersOfMany(classes.map((c) => c.id));
+  const pmap = await fetchProgressMap(Object.values(membersBy).flat().map((m) => m.student_id));
   for (const cls of classes) {
-    const members = await membersOf(cls.id);
-    const pmap = await fetchProgressMap(members.map((m) => m.student_id));
+    const members = membersBy[cls.id] || [];
     const datas = members.map((m) => pmap[m.student_id] || {});
     allData.push(...datas);
     const agg = aggregateClass(datas, now);
@@ -395,7 +447,8 @@ function alertRank(s) { return s.alertStuck ? 0 : s.alertInactive ? 1 : 2; }
 async function classFeedFor(cls, members, pmap, goals, now) {
   try {
     const aR = await sb(`/assignments?class_id=eq.${cls.id}&select=*`);
-    return buildClassFeed({ members, dataById: pmap, assignments: Array.isArray(aR.data) ? aR.data : [], goals, now });
+    const memberEvents = await memberEventsFor(cls.id, now - FEED_DAYS * 24 * 60 * 60 * 1000);
+    return buildClassFeed({ members, dataById: pmap, assignments: Array.isArray(aR.data) ? aR.data : [], goals, now, memberEvents });
   } catch (e) {
     console.error('classFeedFor:', e);
     return [];
@@ -428,7 +481,40 @@ async function classRemoveStudent(req, res) {
   if (error) return res.status(status).json({ error });
   const studentId = req.body.studentId;
   if (!studentId) return res.status(400).json({ error: 'Élève manquant.' });
-  await sb(`/class_members?class_id=eq.${cls.id}&student_id=eq.${encodeURIComponent(studentId)}`, { method: 'DELETE' });
+  const del = await sb(`/class_members?class_id=eq.${cls.id}&student_id=eq.${encodeURIComponent(studentId)}`, { method: 'DELETE' });
+  const row = Array.isArray(del.data) ? del.data[0] : null;
+  if (row) await logMemberEvents([{ class_id: cls.id, student_id: row.student_id, actor_id: user.id, action: 'remove', source: 'teacher', joined_at: row.joined_at || null }]);
+  return res.json({ ok: true, removed: !!row });
+}
+
+// Annule un retrait : remet l'élève dans la classe, avec sa date d'arrivée d'origine. Seulement
+// pour un élève dont le retrait de CETTE classe est noté dans le journal (pas un moyen d'ajouter
+// n'importe quel compte), et qui appartient toujours au même établissement que la classe.
+async function classRestoreStudent(req, res) {
+  const user = await userFromToken(req.body.token);
+  if (!user) return res.status(401).json({ error: 'Session invalide.' });
+  if (!canActAsTeacher(user)) return res.status(403).json({ error: 'Réservé aux comptes enseignant.' });
+  const { cls, error, status } = await loadClassForManage(user, req.body.classId);
+  if (error) return res.status(status).json({ error });
+  if (cls.archived) return res.status(400).json({ error: 'Cette classe est archivée.' });
+  const studentId = req.body.studentId;
+  if (!studentId) return res.status(400).json({ error: 'Élève manquant.' });
+  const ev = await sb(`/class_member_events?class_id=eq.${cls.id}&student_id=eq.${encodeURIComponent(studentId)}&action=eq.remove&select=joined_at&order=created_at.desc&limit=1`);
+  if (!ev.ok) return res.status(503).json({ error: "L'annulation n'est pas encore activée (mise à jour de la base en attente)." });
+  const last = Array.isArray(ev.data) ? ev.data[0] : null;
+  if (!last) return res.status(404).json({ error: "Aucun retrait de cet élève n'est noté pour cette classe." });
+  const sR = await sb(`/users?id=eq.${encodeURIComponent(studentId)}&select=id,role,institution_id,archived`);
+  const st = sR.data && sR.data[0];
+  if (!st || st.role !== 'eleve' || st.archived || (cls.institution_id && st.institution_id !== cls.institution_id)) {
+    return res.status(404).json({ error: "Cet élève ne peut plus être remis dans la classe (compte supprimé, archivé ou d'un autre établissement)." });
+  }
+  const ins = await sb('/class_members', {
+    method: 'POST',
+    headers: { Prefer: 'return=representation,resolution=ignore-duplicates' },
+    body: JSON.stringify({ class_id: cls.id, student_id: st.id, ...(last.joined_at ? { joined_at: last.joined_at } : {}) }),
+  });
+  if (!ins.ok) return res.status(500).json({ error: 'Impossible de remettre cet élève dans la classe.' });
+  if (Array.isArray(ins.data) && ins.data.length) await logMemberEvents([{ class_id: cls.id, student_id: st.id, actor_id: user.id, action: 'add', source: 'restore' }]);
   return res.json({ ok: true });
 }
 
@@ -446,7 +532,7 @@ async function studentDetail(req, res) {
   if (!m) return res.status(404).json({ error: 'Élève introuvable dans cette classe.' });
   const pr = await sb(`/progress?user_id=eq.${encodeURIComponent(studentId)}&select=data`);
   const data = (pr.data && pr.data[0] && pr.data[0].data) || {};
-  const tests = Array.isArray(data.tests) ? data.tests : [];
+  const tests = allTests(data); // tous les cours, du plus ancien au plus récent
   // Essais rendus par cet élève dans cette classe — pour y accéder directement
   // depuis sa fiche, sans devoir se souvenir de quel devoir il s'agissait.
   const classAsgR = await sb(`/assignments?class_id=eq.${cls.id}&mode=eq.essay&select=id,title`);
@@ -522,7 +608,15 @@ async function joinByCode(req, res) {
 
   const exists = await sb(`/class_members?class_id=eq.${cls.id}&student_id=eq.${user.id}&select=id`);
   if (!(exists.data && exists.data[0])) {
-    await sb('/class_members', { method: 'POST', body: JSON.stringify({ class_id: cls.id, student_id: user.id }) });
+    const ins = await sb('/class_members', { method: 'POST', headers: { Prefer: 'return=representation,resolution=ignore-duplicates' }, body: JSON.stringify({ class_id: cls.id, student_id: user.id }) });
+    // Avant, le résultat n'était pas vérifié : l'élève lisait « classe rejointe » même si l'inscription
+    // avait échoué, et le prof ne le voyait jamais apparaître.
+    if (!ins.ok) {
+      const again = await sb(`/class_members?class_id=eq.${cls.id}&student_id=eq.${user.id}&select=id`);
+      if (!(again.ok && again.data && again.data[0])) return res.status(500).json({ error: "L'inscription dans la classe a échoué. Réessaie dans un instant." });
+    } else if (Array.isArray(ins.data) && ins.data.length) {
+      await logMemberEvents([{ class_id: cls.id, student_id: user.id, actor_id: user.id, action: 'add', source: 'join-code' }]);
+    }
   }
   return res.json({ ok: true, className: cls.name });
 }
@@ -638,24 +732,32 @@ async function teacherToday(req, res) {
   const ungradedItems = [];
   let ungradedCount = 0;
 
+  // Requêtes groupées (membres, devoirs, copies, progressions) au lieu d'une série par classe et par devoir.
+  const classIds = classes.map((c) => c.id);
+  const membersBy = await membersOfMany(classIds);
+  const asgParts = await Promise.all(chunks(classIds, 80).map((part) => sb(`/assignments?class_id=in.(${part.map(encodeURIComponent).join(',')})&select=*`)));
+  const allAsg = asgParts.flatMap((r) => (Array.isArray(r.data) ? r.data : []));
+  const essayIds = allAsg.filter((a) => a.mode === 'essay').map((a) => a.id);
+  const subParts = await Promise.all(chunks(essayIds, 120).map((part) => sb(`/essay_submissions?assignment_id=in.(${part.join(',')})&select=assignment_id,teacher_comment,teacher_grade`)));
+  const subsBy = {};
+  subParts.forEach((r) => (Array.isArray(r.data) ? r.data : []).forEach((x) => { (subsBy[x.assignment_id] = subsBy[x.assignment_id] || []).push(x); }));
+  const needProgress = allAsg.some((a) => a.mode !== 'essay');
+  const pmapAll = needProgress ? await fetchProgressMap(Object.values(membersBy).flat().map((m) => m.student_id)) : {};
   for (const cls of classes) {
-    const members = await membersOf(cls.id);
+    const members = membersBy[cls.id] || [];
     if (!members.length) continue;
     const total = members.length;
-    const aR = await sb(`/assignments?class_id=eq.${cls.id}&select=*`);
-    const assignments = Array.isArray(aR.data) ? aR.data : [];
+    const assignments = allAsg.filter((a) => a.class_id === cls.id);
     if (!assignments.length) continue;
-    let pmap = null;
+    const pmap = pmapAll;
     for (const a of assignments) {
       if (a.mode === 'essay') {
-        const sR = await sb(`/essay_submissions?assignment_id=eq.${a.id}&select=teacher_comment,teacher_grade`);
-        const subs = Array.isArray(sR.data) ? sR.data : [];
+        const subs = subsBy[a.id] || [];
         const ungraded = subs.filter((s) => !s.teacher_comment && !s.teacher_grade).length;
         if (ungraded > 0) { ungradedItems.push({ assignmentId: a.id, title: a.title, className: cls.name, count: ungraded }); ungradedCount += ungraded; }
         const missing = total - subs.length;
         if (missing > 0) notSubmitted.push({ assignmentId: a.id, title: a.title, className: cls.name, missing });
       } else {
-        if (!pmap) pmap = await fetchProgressMap(members.map((m) => m.student_id));
         const targets = assignmentTargets(a, members);
         const doneCount = targets.filter((m) => assignmentDone(pmap[m.student_id] || {}, a)).length;
         const missing = targets.length - doneCount;
@@ -764,8 +866,10 @@ async function assignmentDelete(req, res) {
 async function myAssignments(req, res) {
   const user = await userFromToken(req.body.token);
   if (!user) return res.status(401).json({ error: 'Session invalide.' });
-  const memR = await sb(`/class_members?student_id=eq.${encodeURIComponent(user.id)}&select=class_id,classes(name)`);
-  const mems = Array.isArray(memR.data) ? memR.data : [];
+  const memR = await sb(`/class_members?student_id=eq.${encodeURIComponent(user.id)}&select=class_id,classes(name,archived)`);
+  // Classe archivée : ses devoirs ne sont plus proposés (avant, l'élève les voyait encore alors
+  // que la classe avait disparu de sa liste et de celle du prof).
+  const mems = (Array.isArray(memR.data) ? memR.data : []).filter((m) => !(m.classes && m.classes.archived));
   const classMap = {};
   mems.forEach((m) => { classMap[m.class_id] = m.classes ? m.classes.name : ''; });
   const ids = Object.keys(classMap);
@@ -961,12 +1065,13 @@ async function adminOverview(req, res) {
   const allAlerts = [];
   const dataByClass = {};
   let unassignedClasses = 0;
+  const membersBy = await membersOfMany(classes.map((c) => c.id));
+  const pmap = await fetchProgressMap(Object.values(membersBy).flat().map((m) => m.student_id));
   for (const c of classes) {
     const activeProfs = (tmap[c.id] || []).filter((t) => !t.archived);
     const profNames = activeProfs.map((t) => t.username);
     if (!activeProfs.length) unassignedClasses++;
-    const members = await membersOf(c.id);
-    const pmap = await fetchProgressMap(members.map((m) => m.student_id));
+    const members = membersBy[c.id] || [];
     const classStudents = members.map((m) => ({ username: m.username, data: pmap[m.student_id] || {} }));
     dataByClass[c.id] = classStudents.map((st) => st.data);
     classStudents.forEach((st) => allData.push(st.data));
@@ -1122,13 +1227,18 @@ async function adminStudentClassesSet(req, res) {
   const allCls = await sb(`/classes?institution_id=eq.${user.institution_id}&archived=eq.false&select=id`);
   const activeIds = (allCls.data || []).map((c) => c.id);
   const curR = activeIds.length
-    ? await sb(`/class_members?student_id=eq.${encodeURIComponent(studentId)}&class_id=in.(${activeIds.map(encodeURIComponent).join(',')})&select=class_id`)
+    ? await sb(`/class_members?student_id=eq.${encodeURIComponent(studentId)}&class_id=in.(${activeIds.map(encodeURIComponent).join(',')})&select=class_id,joined_at`)
     : { data: [] };
-  const current = (curR.data || []).map((m) => m.class_id);
+  const currentRows = curR.data || [];
+  const current = currentRows.map((m) => m.class_id);
   const toAdd = scope.cids.filter((id) => !current.includes(id));
   const toRemove = current.filter((id) => !scope.cids.includes(id));
   if (toAdd.length) await sb('/class_members', { method: 'POST', headers: { Prefer: 'return=minimal,resolution=ignore-duplicates' }, body: JSON.stringify(toAdd.map((cid) => ({ class_id: cid, student_id: studentId }))) });
   if (toRemove.length) await sb(`/class_members?student_id=eq.${encodeURIComponent(studentId)}&class_id=in.(${toRemove.map(encodeURIComponent).join(',')})`, { method: 'DELETE' });
+  await logMemberEvents([
+    ...toAdd.map((cid) => ({ class_id: cid, student_id: studentId, actor_id: user.id, action: 'add', source: 'admin' })),
+    ...currentRows.filter((m) => toRemove.includes(m.class_id)).map((m) => ({ class_id: m.class_id, student_id: studentId, actor_id: user.id, action: 'remove', source: 'admin', joined_at: m.joined_at || null })),
+  ]);
   return res.json({ ok: true });
 }
 
@@ -1142,10 +1252,19 @@ async function adminStudentsMove(req, res) {
   const scope = await loadInstitutionScope(user, req.body.studentIds, [toClassId, ...(fromClassId ? [fromClassId] : [])]);
   if (scope.error) return res.status(404).json({ error: scope.error });
   if (!scope.sids.length) return res.status(400).json({ error: 'Aucun élève sélectionné.' });
+  const sidList = scope.sids.map(encodeURIComponent).join(',');
+  const already = await sb(`/class_members?class_id=eq.${encodeURIComponent(toClassId)}&student_id=in.(${sidList})&select=student_id`);
+  const alreadyIds = new Set((Array.isArray(already.data) ? already.data : []).map((m) => m.student_id));
   await sb('/class_members', { method: 'POST', headers: { Prefer: 'return=minimal,resolution=ignore-duplicates' }, body: JSON.stringify(scope.sids.map((sid) => ({ class_id: toClassId, student_id: sid }))) });
+  let removed = [];
   if (fromClassId && fromClassId !== toClassId) {
-    await sb(`/class_members?class_id=eq.${encodeURIComponent(fromClassId)}&student_id=in.(${scope.sids.map(encodeURIComponent).join(',')})`, { method: 'DELETE' });
+    const del = await sb(`/class_members?class_id=eq.${encodeURIComponent(fromClassId)}&student_id=in.(${sidList})`, { method: 'DELETE' });
+    removed = Array.isArray(del.data) ? del.data : [];
   }
+  await logMemberEvents([
+    ...scope.sids.filter((sid) => !alreadyIds.has(sid)).map((sid) => ({ class_id: toClassId, student_id: sid, actor_id: user.id, action: 'add', source: 'admin' })),
+    ...removed.map((m) => ({ class_id: fromClassId, student_id: m.student_id, actor_id: user.id, action: 'remove', source: 'admin', joined_at: m.joined_at || null })),
+  ]);
   return res.json({ ok: true, moved: scope.sids.length });
 }
 
@@ -1527,6 +1646,7 @@ module.exports = async function handler(req, res) {
       case 'class-detail': return await classDetail(req, res);
       case 'class-feed': return await classFeed(req, res);
       case 'class-remove-student': return await classRemoveStudent(req, res);
+      case 'class-restore-student': return await classRestoreStudent(req, res);
       case 'student-detail': return await studentDetail(req, res);
       case 'join-code': return await joinByCode(req, res);
       case 'my-classes': return await myClasses(req, res);

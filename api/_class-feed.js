@@ -10,7 +10,7 @@
 // Les textes sont composés côté navigateur (index.html, _feedRow) : seul lui connaît le titre
 // des leçons. Le serveur renvoie des données brutes (type, élève, leçon, vitesse…).
 
-const { assignmentTargets, assignmentDone, detectAlerts, GOAL_DEFAULTS } = require('./_class-logic');
+const { assignmentTargets, assignmentDone, detectAlerts, allTests, GOAL_DEFAULTS } = require('./_class-logic');
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const LOW_ACC = 80;           // même seuil que la pastille « sous 80 % de précision » de la vue classe
@@ -100,10 +100,13 @@ function stuckLessons(tests, lessons) {
  * goals       { minWpm } objectifs effectifs de la classe
  * Retourne au plus `limit` événements des `days` derniers jours, du plus récent au plus ancien :
  *   { id, type, t, studentId, name, act, ... }
- *   type : lesson | record | assignment | stuck_lesson | stuck | inactive | never
+ *   type : lesson | record | assignment | stuck_lesson | stuck | inactive | never | member_add | member_remove
  *   act  : true pour un événement à traiter (bord rouge et bouton d'action)
+ * memberEvents (facultatif) : journal class_member_events, avec `student` et `actor`
+ *   ({ username, full_name, role }) déjà joints. Un retrait d'élève qui n'est pas revenu
+ *   dans la classe est « à traiter » et peut être annulé (restorable).
  */
-function buildClassFeed({ members, dataById, assignments, goals, now, days = FEED_DAYS, limit = FEED_LIMIT }) {
+function buildClassFeed({ members, dataById, assignments, goals, now, days = FEED_DAYS, limit = FEED_LIMIT, memberEvents = [] }) {
   const minWpm = goals && num(goals.minWpm) ? goals.minWpm : GOAL_DEFAULTS.minWpm;
   const since = now - days * DAY_MS;
   const list = Array.isArray(members) ? members : [];
@@ -117,6 +120,9 @@ function buildClassFeed({ members, dataById, assignments, goals, now, days = FEE
     const sid = m.student_id;
     const data = isObj((dataById || {})[sid]) ? dataById[sid] : {};
     const tests = sortedTests(data);
+    // Records et inactivité : essais de tous les cours (un élève qui travaille dans un autre cours
+    // n'est pas inactif). Leçons et blocages : cours par défaut, seul dont le navigateur connaît les titres.
+    const everyTest = allTests(data);
     const lessons = isObj(data.lessons) ? data.lessons : {};
     const base = { studentId: sid, name: shortName(m) };
     const push = (e) => events.push({ ...base, act: false, ...e });
@@ -140,7 +146,7 @@ function buildClassFeed({ members, dataById, assignments, goals, now, days = FEE
 
     // Records de vitesse (tests de vitesse libres, à partir du 2e test)
     let best = null;
-    for (const t of tests) {
+    for (const t of everyTest) {
       if (!isSpeedTest(t) || !num(t.wpm)) continue;
       if (best != null && t.wpm > best) push({ id: `record:${sid}:${t.t}`, type: 'record', t: t.t, wpm: t.wpm, prev: best });
       if (best == null || t.wpm > best) best = t.wpm;
@@ -161,12 +167,12 @@ function buildClassFeed({ members, dataById, assignments, goals, now, days = FEE
       push({ id: `stuck:${sid}:${s.lessonId}:${s.t}`, type: 'stuck_lesson', t: s.t, lessonId: s.lessonId, attempts: s.attempts, acc: s.acc, act: true, ...relaunchFor(pendingAll.find((a) => a.lesson_id === s.lessonId && !a.essay_type && a.mode !== 'module')) });
     }
     // Élève bloqué sans leçon précise (alerte existante), seulement s'il n'est pas déjà signalé sur une leçon.
-    if (!stuck.length && stuckAlert.has(sid) && tests.length >= 5) {
-      push({ id: `stuck:${sid}`, type: 'stuck', t: tests[4].t, sessions: tests.length, act: true, ...relaunch });
+    if (!stuck.length && stuckAlert.has(sid) && everyTest.length >= 5) {
+      push({ id: `stuck:${sid}`, type: 'stuck', t: everyTest[4].t, sessions: everyTest.length, act: true, ...relaunch });
     }
 
     // Inactivité : l'événement apparaît au moment où l'élève franchit les INACTIVE_DAYS jours.
-    const last = tests.length ? tests[tests.length - 1].t : null;
+    const last = everyTest.length ? everyTest[everyTest.length - 1].t : null;
     if (last != null) {
       const daysOff = Math.floor((now - last) / DAY_MS);
       if (daysOff >= INACTIVE_DAYS) push({ id: `inactive:${sid}:${last}`, type: 'inactive', t: last + INACTIVE_DAYS * DAY_MS, days: daysOff, act: true, ...relaunch });
@@ -175,6 +181,27 @@ function buildClassFeed({ members, dataById, assignments, goals, now, days = FEE
       const daysOff = Math.floor((now - joined) / DAY_MS);
       if (num(joined) && daysOff >= INACTIVE_DAYS) push({ id: `never:${sid}`, type: 'never', t: joined + INACTIVE_DAYS * DAY_MS, days: daysOff, act: true, ...relaunch });
     }
+  }
+
+  // Entrées et sorties de la classe (journal).
+  const currentIds = new Set(list.map((m) => m.student_id));
+  const lastRemove = new Map(); // élève -> id du retrait le plus récent
+  const evs = Array.isArray(memberEvents) ? memberEvents : [];
+  for (const e of evs) {
+    const t = e && e.created_at ? new Date(e.created_at).getTime() : NaN;
+    if (!num(t) || !e.student_id) continue;
+    if (e.action === 'remove' && (!lastRemove.has(e.student_id) || t > lastRemove.get(e.student_id).t)) lastRemove.set(e.student_id, { id: e.id, t });
+  }
+  for (const e of evs) {
+    const t = e && e.created_at ? new Date(e.created_at).getTime() : NaN;
+    if (!num(t) || !e.student_id || (e.action !== 'add' && e.action !== 'remove')) continue;
+    const st = e.student || {};
+    const actor = e.actor || null;
+    const by = !actor || e.actor_id === e.student_id ? null : actor.role === 'admin' ? "l'établissement" : shortName({ fullName: actor.full_name, username: actor.username });
+    const ev = { id: `member:${e.id}`, type: e.action === 'remove' ? 'member_remove' : 'member_add', t, studentId: e.student_id, name: shortName({ fullName: st.full_name, username: st.username }), by, source: e.source || null, act: false };
+    // Le retrait le plus récent d'un élève toujours absent de la classe : à traiter, annulable.
+    if (e.action === 'remove' && !currentIds.has(e.student_id) && lastRemove.get(e.student_id).id === e.id) { ev.act = true; ev.restorable = true; }
+    events.push(ev);
   }
 
   return events

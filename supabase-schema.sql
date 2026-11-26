@@ -1100,3 +1100,34 @@ create index if not exists user_sessions_expires_idx on user_sessions(expires_at
 alter table user_sessions enable row level security;
 drop policy if exists "no_anon_access" on user_sessions;
 create policy "no_anon_access" on user_sessions for all to anon using (false) with check (false);
+
+-- ───────────────────────────────────────────────────────────────
+-- Journal des entrées et sorties de classe + classes protégées (nov. 2026)
+-- Avant : un élève retiré d'une classe disparaissait sans trace (ni qui, ni
+-- quand, ni annulation), et supprimer un compte prof effaçait ses classes
+-- (classes.teacher_id en « on delete cascade » : élèves et devoirs compris).
+-- class_member_events : un ajout ou un retrait par ligne (auteur, source,
+-- date d'arrivée d'origine pour pouvoir annuler un retrait). Affiché dans
+-- l'historique de la classe ; action class-restore-student pour annuler.
+-- Accès : uniquement par l'API (clé service). Idempotent.
+-- ───────────────────────────────────────────────────────────────
+create table if not exists class_member_events (
+  id bigserial primary key,
+  class_id uuid not null references classes(id) on delete cascade,
+  student_id uuid not null references users(id) on delete cascade,
+  actor_id uuid references users(id) on delete set null,
+  action text not null check (action in ('add', 'remove')),
+  source text,                -- join-code | teacher | admin | restore
+  joined_at timestamptz,      -- pour un retrait : date d'arrivée d'origine
+  created_at timestamptz not null default now()
+);
+create index if not exists class_member_events_class_idx on class_member_events(class_id, created_at desc);
+create index if not exists class_member_events_student_idx on class_member_events(student_id);
+alter table class_member_events enable row level security;
+drop policy if exists "no_anon_access" on class_member_events;
+create policy "no_anon_access" on class_member_events for all to anon using (false) with check (false);
+
+-- Supprimer un compte ne supprime plus ses classes : le titulaire est simplement détaché
+-- (api/login.js confie d'abord les classes d'établissement à un co-titulaire ou à l'établissement).
+alter table classes drop constraint if exists classes_teacher_id_fkey;
+alter table classes add constraint classes_teacher_id_fkey foreign key (teacher_id) references users(id) on delete set null;
