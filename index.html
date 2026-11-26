@@ -10,10 +10,10 @@
   var l=location;
   if(l.pathname!=='/'||l.search||l.hash)return;
   var ua=navigator.userAgent||'';
-  if(!/iPhone|iPod|Android.+Mobile|Windows Phone|Mobile.+Firefox/i.test(ua))return;
   if(/bot|crawl|spider|slurp|lighthouse|facebookexternalhit|preview/i.test(ua))return;
   if(localStorage.getItem('klak_session'))return;
-  l.replace('/accueil-mobile.html');
+  // Visiteur non connecté sur « / » sans paramètre : page mobile sur téléphone, nouvelle page d'accueil sur ordinateur.
+  l.replace(/iPhone|iPod|Android.+Mobile|Windows Phone|Mobile.+Firefox/i.test(ua)?'/accueil-mobile.html':'/bienvenue');
 }catch(e){}})();
 </script>
 
