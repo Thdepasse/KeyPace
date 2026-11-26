@@ -10,10 +10,10 @@
   var l=location;
   if(l.pathname!=='/'||l.search||l.hash)return;
   var ua=navigator.userAgent||'';
+  if(!/iPhone|iPod|Android.+Mobile|Windows Phone|Mobile.+Firefox/i.test(ua))return;
   if(/bot|crawl|spider|slurp|lighthouse|facebookexternalhit|preview/i.test(ua))return;
   if(localStorage.getItem('klak_session'))return;
-  // Visiteur non connecté sur « / » sans paramètre : page mobile sur téléphone, nouvelle page d'accueil sur ordinateur.
-  l.replace(/iPhone|iPod|Android.+Mobile|Windows Phone|Mobile.+Firefox/i.test(ua)?'/accueil-mobile.html':'/bienvenue');
+  l.replace('/accueil-mobile.html');
 }catch(e){}})();
 </script>
 
@@ -5322,6 +5322,8 @@ function kpRedrawKeyboard(){
 /* Langue du cours : s'ajoute à la famille de clavier. Un cours = langue + famille (fr/azerty, fr/qwerty, en/azerty, en/qwerty). */
 const KP_LANG_NAMES={fr:'Français',en:'English',nl:'Nederlands'};
 function kpContentLang(){return KP_COURSES[kpCourseId()].content;}
+// Nouvel accueil des visiteurs (accueil-visiteur.js) : visiteur non connecté, site belge en français.
+function kpLandingOk(){try{return !currentUser&&!isTeacher()&&!kpPathLang()&&kpContentLang()==='fr'&&KPI18n.lang()==='fr'&&KPProg.getCountry()!=='fr';}catch(e){return false;}}
 KPI18n.setCourseLangGetter(()=>kpContentLang()); /* l'interface suit la langue du cours actif (sauf ?ui= explicite) */
 /* Textes fixes de la page (menu du haut) : les éléments portent l'attribut data-i18n (valeur : la clé) ; le texte français écrit dans le HTML est le repli. Le texte est le premier noeud texte de l'élément (le soulignement des liens reste intact). */
 function kpApplyStatic(){
@@ -9721,8 +9723,8 @@ const app={
     };
     const desc=document.querySelector('meta[name="description"]');
     window._kpRootMeta=window._kpRootMeta||[document.title,desc&&desc.content];
-    // « / » garde son propre titre (canonical « / ») au lieu de dupliquer celui de /test-frappe-en-ligne.
-    const [t,d]=(v==='test'&&normPath(location.pathname)==='/'&&window._kpRootMeta)||(kpInEnPath()&&_metaEn[v])||(kpPathLang()==='nl'&&_metaNl[v])||(KPProg.getCountry()==='fr'&&KPProg.META_FR[v])||_meta[v]||_meta.home;
+    // « / » garde son propre titre (canonical « / ») au lieu de dupliquer celui de /test-frappe-en-ligne ou /accueil.
+    const [t,d]=((v==='test'||v==='home')&&normPath(location.pathname)==='/'&&window._kpRootMeta)||(kpInEnPath()&&_metaEn[v])||(kpPathLang()==='nl'&&_metaNl[v])||(KPProg.getCountry()==='fr'&&KPProg.META_FR[v])||_meta[v]||_meta.home;
     document.title=t;
     if(desc)desc.setAttribute('content',d);
     this._syncUrl(v,_req);
@@ -10140,10 +10142,31 @@ const app={
     </div>`;
     const chip=document.getElementById('nav-level');if(chip)chip.textContent=kpT('sh.lvl_chip',{n:lv.n});
   },
+  // Nouvel accueil des visiteurs : chargé à la demande (accueil-visiteur.js), monté une seule fois dans un
+  // shadow DOM entre l'en-tête et le pied de page de l'appli. Si le fichier ne se charge pas, l'ancien accueil reste.
+  _mountLanding(){
+    const el=document.getElementById('page-home');if(!el)return false;
+    if(window.KPLanding){
+      if(!this._lpHost){this._lpHost=document.createElement('div');this._lpHost.id='kp-landing';try{KPLanding.mount(this._lpHost);}catch(e){this._lpFail=true;this._lpHost=null;return false;}}
+      if(this._lpHost.parentNode!==el){el.innerHTML='';el.appendChild(this._lpHost);}
+      return true;
+    }
+    if(this._lpFail)return false;
+    if(!this._lpLoading){
+      this._lpLoading=true;
+      const s=document.createElement('script');s.src='/accueil-visiteur.js?v=1';
+      const again=()=>{if(this.view==='home'&&!currentUser)this.renderHome();};
+      s.onload=again;s.onerror=()=>{this._lpFail=true;again();};
+      document.head.appendChild(s);
+    }
+    el.innerHTML='<div style="min-height:80vh"></div>';
+    return true;
+  },
   renderHome(){
     if(isAdmin()){this._renderHomeAdmin();return;}
     if(isTeacher()){this._renderHomeEtab();return;}
     if(currentUser){this._renderHomeStudent();return;}
+    if(kpLandingOk()&&this._mountLanding())return;
     const isGuest=!currentUser;
 
     // Keyboard home row color preview (mobile)
@@ -20016,14 +20039,14 @@ app.init();
   // premier login, manquant ici) — cette vue ne lui sert à rien puisque la
   // nav Test/Cours/Jeux/Progrès est masquée pour ce rôle.
   // Élève connecté : son accueil (leçon du jour, devoirs, jeux) plutôt que le test.
-  go(_validViews.includes(_vp)?_vp:(isTeacher()||currentUser?'home':'test'));
+  go(_validViews.includes(_vp)?_vp:(isTeacher()||currentUser||kpLandingOk()?'home':'test'));
   document.documentElement.classList.remove('kp-boot');
 }
 window.addEventListener('popstate',()=>{
   if(app._ignorePop){app._ignorePop=false;return;}
   if(app._sfsEl&&app._sfsEl()){app._sfsFromPop();return;} // Retour ferme le jeu plein ecran, pas la page
   if(app._sgrEl&&app._sgrEl()){app._sgrFromPop();return;}
-  const v=VIEW_FROM_PATH[normPath(location.pathname)]||(isTeacher()||currentUser?'home':'test');
+  const v=VIEW_FROM_PATH[normPath(location.pathname)]||(isTeacher()||currentUser||kpLandingOk()?'home':'test');
   app._popping=true;try{app.renderView(v);}finally{app._popping=false;}
 });
 // Liens internes vers une page de l'appli : navigation sans rechargement.
