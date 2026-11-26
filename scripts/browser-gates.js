@@ -20,10 +20,10 @@ function serve() {
       let raw = ''; req.on('data', (c) => { raw += c; });
       return req.on('end', () => { let body = {}; try { body = JSON.parse(raw); } catch (e) { /* corps vide */ } res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(body.access === true ? { ok: true, coursAcces: /testeur-en/.test(String(body.token)) ? ['fr/qwerty', 'en/azerty', 'en/qwerty'] : /testeur/.test(String(body.token)) ? ['fr/qwerty'] : [] } : { ok: true })); });
     }
-    // Réouverture de session (ouverture des réglages) : le faux serveur reconnaît le jeton du compte simulé (sinon `{}` effacerait son nom).
+    // Infos du compte (ouverture des réglages : account-info) et retour SSO (session-login) : le faux serveur reconnaît le jeton du compte simulé (sinon `{}` effacerait son nom).
     if (u === '/api/login' && req.method === 'POST') {
       let raw = ''; req.on('data', (c) => { raw += c; });
-      return req.on('end', () => { let body = {}; try { body = JSON.parse(raw); } catch (e) { /* corps vide */ } res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(body.action === 'session-login' && body.token ? { username: String(body.token).replace(/^tok-?/, '') || 'tester', token: body.token, plan: 'free', role: 'eleve' } : {})); });
+      return req.on('end', () => { let body = {}; try { body = JSON.parse(raw); } catch (e) { /* corps vide */ } res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify((body.action === 'session-login' || body.action === 'account-info') && body.token ? { username: String(body.token).replace(/^tok-?/, '') || 'tester', token: body.token, plan: 'free', role: 'eleve' } : {})); });
     }
     if (u.startsWith('/api/')) {
       // Sans compte, le serveur répond 401 aux actions réservées aux comptes ; le reste reçoit un objet vide.

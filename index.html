@@ -4104,6 +4104,9 @@ document.addEventListener('pointerdown',e=>{
 // Termine la connexion après un login réussi (extrait pour être réutilisable
 // après un changement de mot de passe obligatoire — voir showForcedPasswordChangeModal).
 function completeLogin(d){
+  // Reconnexion du MÊME compte après une session expirée : les résultats pas encore
+  // envoyés sont gardés et envoyés tout de suite (le serveur les fusionne).
+  const _pending=(_statsDirty&&_statsLoaded&&app.stats&&currentUser&&currentUser===d.username)?app.stats:null;
   const _mergedData=mergeStats(d.data);
   if(d.role)_mergedData.role=d.role;
   saveSession(d.username, d.plan, d.token, d.id, _mergedData.role||null, d.email, d.displayName, d.institutionName, d.hasClass);
@@ -4117,6 +4120,7 @@ function completeLogin(d){
   window._needsOnboarding = !d.onboarding_completed;
   if(!d.onboarding_completed)localStorage.removeItem('klak_ob');else localStorage.setItem('klak_ob','1');
   loginUser(d.username);
+  if(_pending){if(_mergedData.role)_pending.role=_mergedData.role;saveStats(_pending,{now:true});}
   if(isAdmin())app.loadAdmin(true);else if(isTeacher())app.loadEtab(true);
 }
 
@@ -4511,11 +4515,49 @@ function obReplay(){
 // rechargement complet de la page (cache "Mes classes" invalidé seulement par
 // certaines actions locales). En revenant sur l'onglet, on rafraîchit en
 // silence si l'élève est justement sur "Mes classes".
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible'&&currentUser&&!isTeacher()&&typeof app!=='undefined'&&app.view==='classes'){
-    app._myClasses=null;app.loadMyClasses();
+// Synchronisation au retour sur l'onglet (et toutes les 5 minutes si l'onglet reste au premier
+// plan). Avant, un onglet ouvert depuis le matin gardait tout en mémoire : devoirs ajoutés,
+// objectifs, rangée de repos et normes réglés par le prof, rappels et progression faite sur un
+// autre appareil n'apparaissaient qu'après une déconnexion-reconnexion ou un rechargement.
+let _kpLastSync=Date.now();
+function _kpBusy(){
+  // Exercice ou jeu en cours, ou saisie dans un champ : on ne touche pas à l'écran.
+  if(typeof app==='undefined')return true;
+  if(_kpExerciseRunning())return true;
+  const a=document.activeElement;
+  return !!(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT'||a.isContentEditable));
+}
+async function _kpRefreshProgress(){
+  if(!currentUser||!currentToken||!_statsLoaded||_statsDirty)return;
+  const rev=_statsRev;
+  try{
+    const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken})});
+    if(!r.ok)return;
+    const d=await r.json();
+    if(rev!==_statsRev||_statsDirty||!d||!d.data)return; // modifié localement entre-temps : la sauvegarde s'en charge
+    if(_adoptServerStats(d.data)&&!_kpBusy()&&['home','lessons','stats'].includes(app.view))app.renderCurrent();
+  }catch{}
+}
+function kpSync(from){
+  if(typeof app==='undefined'||!currentUser||!currentToken||document.hidden)return;
+  if(from!=='timer'&&Date.now()-_kpLastSync<15000)return;
+  _kpLastSync=Date.now();
+  _adoptStoredToken();
+  if(isTeacher()){
+    // Prof : seulement au retour sur l'onglet, jamais sur minuterie (la page ne bouge pas toute seule).
+    if(from==='timer'||_kpBusy())return;
+    if(app.view==='classes'&&app._classesSub==='class'&&app._classViewingId)app.viewClass(app._classViewingId,{silent:true});
+    else if(app.view==='home'||app.view==='classes'&&!app._classesSub){if(isAdmin())app.loadAdmin(true);else app.loadEtab(true);}
+    return;
   }
-});
+  if(_statsDirty)flushStats();else _kpRefreshProgress();
+  app.loadClassGoals();
+  if(app.view==='classes'||app.view==='home'){if(!_kpBusy())app.loadMyClasses();}
+  else app._myClasses=null; // rechargé au prochain affichage de la page Devoirs
+  if(!_kpBusy())app.checkReminders();
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')kpSync();});
+setInterval(()=>kpSync('timer'),5*60*1000);
 
 function logout(){
   // saveStats() ne sauvegarde jamais tout de suite : elle attend 2 secondes
@@ -4973,30 +5015,81 @@ let _statsLoaded=false;
 // session expirée) — avant ce correctif, l'échec était totalement silencieux :
 // l'utilisateur voyait "Leçon validée" à chaque leçon sans jamais savoir que
 // plus rien ne s'enregistrait côté serveur, jusqu'au prochain rechargement.
-function _showSaveErrorBanner(){
-  if(document.getElementById('save-error-banner'))return;
-  const el=document.createElement('div');
-  el.id='save-error-banner';
-  el.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;background:#fff3ee;border:1px solid rgba(255,77,46,.35);color:#B23A1E;padding:10px 16px;border-radius:10px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.15);max-width:90vw;text-align:center';
-  el.textContent="Ta progression ne s'enregistre plus sur le serveur. Recharge la page ou reconnecte-toi.";
-  document.body.appendChild(el);
+function _showSaveErrorBanner(kind){
+  let el=document.getElementById('save-error-banner');
+  if(!el){
+    el=document.createElement('div');
+    el.id='save-error-banner';
+    el.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;background:#fff3ee;border:1px solid rgba(255,77,46,.35);color:#B23A1E;padding:10px 16px;border-radius:10px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.15);max-width:90vw;text-align:center';
+    document.body.appendChild(el);
+  }
+  // Session vraiment terminée (expirée, mot de passe changé) : on propose de se reconnecter
+  // sur place. La progression non envoyée reste en mémoire et part dès la reconnexion.
+  if(kind==='session'){
+    el.innerHTML='';
+    el.append(document.createTextNode("Ta session a expiré : ta progression n'est pas encore enregistrée. "));
+    const b=document.createElement('button');
+    b.textContent='Me reconnecter';
+    b.style.cssText='margin-left:6px;background:#FF4D2E;color:#fff;border:none;border-radius:8px;padding:5px 10px;font:inherit;font-weight:700;cursor:pointer';
+    b.onclick=()=>{const u=currentUser;openAuth('login',null,()=>{_hideSaveErrorBanner();});const f=document.getElementById('auth-username');if(f&&u)f.value=u;};
+    el.appendChild(b);
+  }else el.textContent="Ta progression ne s'enregistre pas pour l'instant (connexion). Nouvel essai automatique dans quelques secondes.";
 }
 function _hideSaveErrorBanner(){
   const el=document.getElementById('save-error-banner');
   if(el)el.remove();
 }
+// Un seul jeton par appareil, mais un autre onglet du même navigateur a pu se reconnecter
+// (nouveau jeton dans localStorage) pendant que celui-ci gardait l'ancien en mémoire.
+function _adoptStoredToken(){
+  try{const s=kpReadSession();if(s.token&&s.username===currentUser&&s.token!==currentToken){currentToken=s.token;return true;}}catch{}
+  return false;
+}
+window.addEventListener('storage',e=>{if(e.key==='klak_session'&&currentUser)_adoptStoredToken();});
+// _statsRev : compteur de modifications locales. Une réponse de sauvegarde n'est reprise
+// (version fusionnée du serveur) que si rien n'a changé localement depuis l'envoi.
+let _statsRev=0,_saveRetry=0;
+// Reprend la version enregistrée par le serveur (fusion avec les autres onglets et appareils,
+// devoirs rendus côté serveur), jamais pendant un exercice en cours.
+// Exercice réellement commencé (première touche tapée) ou jeu en cours. Une session prête mais
+// pas commencée (la vue Test en prépare toujours une) ne compte pas.
+function _kpExerciseRunning(){
+  if(typeof app==='undefined')return false;
+  return !!((app.sess&&!app.sess.finished&&app.sess.startTime)||app.activeGame);
+}
+function _adoptServerStats(data){
+  if(!data||typeof data!=='object'||Array.isArray(data)||!app.stats)return false;
+  if(_kpExerciseRunning())return false;
+  const role=app.stats.role;
+  const next=mergeStats(data);
+  if(role&&!next.role)next.role=role;
+  app.stats=next;
+  return true;
+}
 async function flushStats(){
   if(!currentUser||!currentToken||!app.stats||!_statsDirty)return;
   if(!_statsLoaded){_saveDebounce=setTimeout(flushStats,800);return;} // attend le vrai chargement
+  clearTimeout(_saveDebounce);_saveDebounce=null;
+  _adoptStoredToken();
+  const rev=_statsRev;
+  const post=()=>fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:app.stats})});
   try{
-    const r=await fetch('/api/save-progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:currentToken,data:app.stats})});
-    // Le serveur peut refuser (409) une écriture qui régresserait la
-    // progression enregistrée — dans ce cas on garde _statsDirty=true pour
-    // réessayer plus tard plutôt que de faire comme si la sauvegarde avait
-    // réussi : mieux vaut retenter indéfiniment que perdre le signal d'échec.
-    if(r.ok){_statsDirty=false;_hideSaveErrorBanner();}
-    else{_showSaveErrorBanner();}
+    let r=await post();
+    if(r.status===401&&_adoptStoredToken())r=await post();
+    if(r.ok){
+      const d=await r.json().catch(()=>null);
+      _saveRetry=0;_hideSaveErrorBanner();
+      if(rev===_statsRev){_statsDirty=false;if(d&&d.data)_adoptServerStats(d.data);}
+      else{_saveDebounce=setTimeout(flushStats,1000);} // modifié pendant l'envoi : on renvoie la suite
+      return true;
+    }
+    if(r.status===401){_showSaveErrorBanner('session');return false;}
+    // 409 (conflit) ou panne passagère : on garde _statsDirty et on réessaie avec un délai croissant.
+    _showSaveErrorBanner();
   }catch{_showSaveErrorBanner();}
+  _saveRetry=Math.min(_saveRetry+1,6);
+  _saveDebounce=setTimeout(flushStats,2000*Math.pow(2,_saveRetry));
+  return false;
 }
 function mergeStats(remote){
   const def={tests:[],lessons:{},gameBest:0,courseBest:null,simonBest:null,clavierBest:null,sourisBest:0,sourisHybridHand:null,ghostBest:null,goals:{minWpm:20,maxErrors:8},
@@ -5014,12 +5107,14 @@ function loadStats(){
   // stats already loaded from API on login; return from app.stats or empty
   return app.stats||mergeStats();
 }
-function saveStats(s){
+function saveStats(s,opts){
   if(!currentUser)return;
   app.stats=s;
-  _statsDirty=true;
+  _statsDirty=true;_statsRev++;
   clearTimeout(_saveDebounce);
-  _saveDebounce=setTimeout(flushStats,2000);
+  // now : résultat qui compte pour le prof (leçon, devoir, test) : envoyé tout de suite, sans
+  // attendre 2 s. Sinon l'élève revenait sur ses devoirs avant l'envoi et les voyait « à faire ».
+  _saveDebounce=setTimeout(flushStats,opts&&opts.now?0:2000);
 }
 
 /* ── Cours (plan clavier/langues, étape 2) ──
@@ -7997,6 +8092,19 @@ function mount(host){
 return {mount};
 })();
 
+// Même règle que assignmentDone() côté serveur (api/_class-logic.js), appliquée à la
+// progression de ce navigateur : un devoir réussi ici s'affiche « fait » sans attendre le serveur.
+function kpAsgDoneLocal(a){
+  const d=(typeof app!=='undefined'&&app.stats)||{};
+  const done=d.assignmentsDone||{};
+  if(!a)return false;
+  if(a.mode==='essay')return !!done[a.id];
+  if(a.mode==='module')return !!done['mod:'+a.lessonId];
+  if(a.customText){const r=done[a.id];if(!r)return false;return a.targetWpm?(r.wpm||0)>=a.targetWpm:true;}
+  if(a.lessonId){const r=(d.lessons||{})[a.lessonId];if(!r)return false;const rec=typeof r==='number'?{bestWpm:r,cleared:true}:r;if(!rec.cleared)return false;return a.targetWpm?(rec.bestWpm||0)>=a.targetWpm:true;}
+  if(a.targetWpm)return (Array.isArray(d.tests)?d.tests:[]).some(t=>(t.wpm||0)>=a.targetWpm);
+  return false;
+}
 function kpReadSession(){try{const v=JSON.parse(localStorage.getItem('klak_session')||'{}');return v&&typeof v==='object'?v:{};}catch{return {};}}
 const app={
   view:'home',sess:null,stats:null,game:null,sprint:null,course:null,simon:null,boss:null,duel:null,royale:null,clavier:null,activeGame:null,now:Date.now(),_gcineCat:'vitesse',_gcineVisible:null,_clavierFlashT:null,_royaleHistory:null,_royaleHistLoading:false,
@@ -9278,7 +9386,7 @@ const app={
       if(rec.cleared&&!_wasCleared){const _ts=course().tests,_lt=_ts[_ts.length-1];if(_lt&&_lt.lessonId===lessonId)_lt.cleared=true;}
       try{if(rec.cleared&&!_wasCleared)track('lesson_completed',{lessonId,wpm:res.wpm});}catch{}
     }
-    saveStats(this.stats);
+    saveStats(this.stats,{now:true}); // envoi immédiat : c'est ce que le prof et la page Devoirs vont relire
     this._myClasses=null; // forcer le rechargement des devoirs (statut "terminé") au prochain affichage
   },
 
@@ -16539,19 +16647,19 @@ const app={
     // que la reconnexion SSO), pour que la modale affiche toujours l'état réel.
     if(currentToken){
       try{
-        const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'session-login',token:currentToken})});
+        // account-info, et non plus session-login : ce dernier faisait tourner le jeton, et ouvrir
+        // les réglages coupait alors tous les autres onglets et appareils du compte.
+        const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'account-info',token:currentToken})});
         if(r.ok){
           const d=await r.json();
+          if(d&&d.username){ // réponse incomplète : on garde ce qu'on a plutôt que d'effacer le compte affiché
           currentUser=d.username;currentEmail=d.email||null;currentDisplayName=d.displayName||null;
-          // session-login fait maintenant tourner le token à chaque appel (voir
-          // api/login.js) : sans reprendre d.token ici, currentToken restait
-          // l'ancien jeton, désormais invalidé — toute requête authentifiée
-          // suivante aurait échoué en "Session invalide" jusqu'au prochain login.
           if(d.token){currentToken=d.token;}
           const s=kpReadSession();
           s.username=d.username;s.email=currentEmail;s.displayName=currentDisplayName;
           if(d.token)s.token=d.token;
           localStorage.setItem('klak_session',JSON.stringify(s));
+          }
         }
       }catch{}
     }
@@ -17956,7 +18064,12 @@ const app={
       const ok=rc.ok&&ra.ok;
       const classes=ok?((await rc.json()).classes||[]):null;
       const assignments=ok?((await ra.json()).assignments||[]):null;
+      // Un résultat tout juste obtenu peut ne pas être encore arrivé au serveur (envoi en
+      // cours, connexion lente) : on complète avec ce que ce navigateur sait déjà.
+      if(assignments)assignments.forEach(a=>{if(!a.done&&kpAsgDoneLocal(a))a.done=true;});
       if(currentToken!==_token)return;
+      // Rien de neuf (synchronisation en fond) : on ne redessine pas la page sous les yeux de l'élève.
+      if(ok&&this._myClasses&&JSON.stringify(classes)===JSON.stringify(this._myClasses)&&JSON.stringify(assignments)===JSON.stringify(this._myAssignments))return;
       if(ok){this._myClasses=classes;this._myAssignments=assignments;this._clError=false;}
       else if(!this._myClasses)this._clError=true; // sans données déjà chargées : écran d'erreur plutôt que « aucune classe »
     }catch{
@@ -18289,6 +18402,7 @@ const app={
   // Retour depuis une classe : prof -> ses classes ; établissement -> le prof (ou la liste).
   backFromClass(){
     clearInterval(this._classRefreshTimer);
+    this._classesSub=null;this._classViewingId=null; // retour à la liste : plus aucune classe « à l'écran »
     if(this._cgTimer){clearTimeout(this._cgTimer);this._saveClassGoals();}
     if(isAdmin()){go('home');return;}
     return this.renderClasses();
@@ -18467,7 +18581,7 @@ const app={
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button onclick="app.exportClassCSV()" ${students.length?'':'disabled'} style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:${students.length?'pointer':'not-allowed'};color:var(--txt);opacity:${students.length?'1':'.5'}">⬇ CSV</button>
             <button onclick="app.exportClassPDF()" ${students.length?'':'disabled'} style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:${students.length?'pointer':'not-allowed'};color:var(--txt);opacity:${students.length?'1':'.5'}">⬇ PDF</button>
-            <button onclick="app.viewClass('${d.id}')" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt)">↻ Actualiser</button>
+            <button id="class-refresh-btn" onclick="app.viewClass('${d.id}',{silent:true})" style="background:none;border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt)">↻ Actualiser</button>
           </div>
         </div>
       </div>
@@ -18592,6 +18706,10 @@ const app={
         this._feedKey=key;
         const b=document.getElementById('kfeed-scroll');
         if(b)b.innerHTML=this._feedListHtml(classId,feed,new Set(feed.filter(e=>!old.has(e.id)).map(e=>e.id)));
+        // Le tableau des élèves et les compteurs de devoirs ne bougent pas tout seuls (choix voulu) :
+        // on signale qu'ils sont en retard sur l'historique, le prof actualise quand il veut.
+        const rb=document.getElementById('class-refresh-btn');
+        if(rb&&!rb.dataset.fresh){rb.dataset.fresh='1';rb.textContent='↻ Nouveaux résultats : actualiser';rb.style.borderColor='var(--accent)';rb.style.color='var(--accent)';rb.style.background='rgba(255,77,46,.08)';}
       }catch{}finally{this._feedBusy=false;}
     };
     this._feedTimer=setInterval(tick,30000);
