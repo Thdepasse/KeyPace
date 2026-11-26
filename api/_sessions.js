@@ -18,13 +18,34 @@ const hashToken = (token) => crypto.createHash('sha256').update(String(token), '
 const nowIso = () => new Date().toISOString();
 const legacyFilter = (token) => `session_token=eq.${encodeURIComponent(token)}&or=(session_expires_at.is.null,session_expires_at.gt.${nowIso()})`;
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const SHORT_SESSION_MS = 60 * 60 * 1000; // une session plus courte (retour SSO, 2 min) n'est jamais prolongée
+
+// Session glissante : une session utilisée est repoussée à 30 jours, au plus une fois par jour
+// (une seule écriture par jour et par appareil). Avant, elle expirait 30 jours après la
+// connexion même pour un élève présent tous les jours. Les jetons courts du retour SSO, qui
+// transitent par une URL, ne sont jamais prolongés.
+function shouldExtend(row, now = Date.now()) {
+  const created = Date.parse(row && row.created_at);
+  const expires = Date.parse(row && row.expires_at);
+  if (!Number.isFinite(created) || !Number.isFinite(expires)) return false;
+  if (expires - created < SHORT_SESSION_MS) return false;
+  return expires < now + SESSION_TTL_MS - DAY_MS;
+}
+
 // Compte lié à un jeton valide (colonnes `select` de la table users), ou null.
 async function userByToken(sb, token, select = 'id') {
   if (!token || typeof token !== 'string') return null;
   try {
-    const s = await sb(`/user_sessions?token_hash=eq.${hashToken(token)}&expires_at=gt.${nowIso()}&select=user_id,users(${select})`);
+    const h = hashToken(token);
+    const s = await sb(`/user_sessions?token_hash=eq.${h}&expires_at=gt.${nowIso()}&select=user_id,created_at,expires_at,users(${select})`);
     const row = s && s.ok && Array.isArray(s.data) ? s.data[0] : null;
-    if (row && row.users && typeof row.users === 'object' && !Array.isArray(row.users)) return row.users;
+    if (row && row.users && typeof row.users === 'object' && !Array.isArray(row.users)) {
+      if (shouldExtend(row)) {
+        try { await sb(`/user_sessions?token_hash=eq.${h}`, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString() }) }); } catch { /* jamais bloquant */ }
+      }
+      return row.users;
+    }
   } catch { /* table absente ou réponse illisible : on passe à l'ancienne colonne */ }
   const r = await sb(`/users?${legacyFilter(token)}&select=${select}`);
   // Panne de la base ≠ session invalide : on lève une erreur (500/503 chez l'appelant)
@@ -76,4 +97,4 @@ async function purgeExpiredSessions(sb) {
   } catch { return null; }
 }
 
-module.exports = { SESSION_TTL_MS, hashToken, userByToken, createSession, revokeSession, revokeAllSessions, purgeExpiredSessions };
+module.exports = { SESSION_TTL_MS, shouldExtend, hashToken, userByToken, createSession, revokeSession, revokeAllSessions, purgeExpiredSessions };

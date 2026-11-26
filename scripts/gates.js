@@ -283,6 +283,7 @@ const GATES = process.env.GATES_FAKE_RED
     { id: 'U1', name: 'Chaque leçon se termine sur chaque disposition (66 x 4)', run: () => usage().u1() },
     { id: 'U2', name: 'Ce que le client envoie est accepté tel quel par le serveur', run: () => usage().u2() },
     { id: 'U3', name: 'Un visiteur sans compte peut taper, rien n\'est envoyé', run: () => usage().u3() },
+    { id: 'S1', name: 'Deux onglets ou deux appareils : rien ne se perd, rien ne bloque, pas besoin de se reconnecter', run: () => require('./sync-gates').s1() },
     { id: 'U4', name: 'Les comptes existants se rechargent (vides, anciens formats)', run: () => usage().u4() },
     { id: 'U5', name: 'Tous les textes de test et du certificat se terminent (4 dispositions)', run: () => usage().u5() },
     { id: 'U6', name: 'Les gestes sans touche sont découverts par le moteur, pas supposés', run: () => usage().u6() },
