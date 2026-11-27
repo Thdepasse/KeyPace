@@ -557,8 +557,9 @@ async function run(opts = {}) {
         if (keep.lang !== 'en' || !keep.text.includes('Type the sentence')) problems.push('BR13 : la langue de l\'interface n\'est pas retenue au rechargement');
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/?ui=fr` }); await sleep(2500); exceptions.splice(0);
         const fr = await ev(readTest);
-        const frHome = await ev(`(async()=>{go('home');await new Promise(r=>setTimeout(r,500));return document.getElementById('page-home').innerText})()`);
-        if (!/Apprends à taper/i.test(frHome) || !/Questions fréquentes/i.test(frHome) || !/MANOLO/i.test(frHome)) problems.push('BR13 : ?ui=fr ne ramène pas l\'accueil complet en français (blocs belges masqués ?)');
+        // accueil visiteur belge en français : nouveau contenu (accueil-visiteur.js) monté dans #kp-landing (shadow DOM)
+        const frHome = await ev(`(async()=>{go('home');for(let i=0;i<24&&!document.getElementById('kp-landing');i++)await new Promise(r=>setTimeout(r,250));const h=document.getElementById('kp-landing');return (h&&h.shadowRoot?h.shadowRoot.textContent:'')+' '+document.getElementById('page-home').innerText})()`);
+        if (!/Commencer gratuitement/i.test(frHome) || !/Ce qu'ils en pensent/i.test(frHome) || !/MANOLO/i.test(frHome)) problems.push('BR13 : ?ui=fr ne ramène pas l\'accueil complet en français (blocs belges masqués ?)');
         const frAuth = await ev(readAuth);
         if (!frAuth.includes('Mot de passe') || !frAuth.includes('Continuer avec Google') || !frAuth.includes('ex: jean42')) problems.push('BR13 : ?ui=fr ne ramène pas la fenêtre de connexion en français');
         if (fr.lang !== 'fr' || !fr.text.includes('Tape la phrase') || !fr.text.includes('Ana te défie') || !fr.text.toLowerCase().includes('après le test') || !fr.btns.includes('Recommencer') || /Type the sentence|ACCURACY/.test(fr.text)) problems.push('BR13 : ?ui=fr ne ramène pas le français');
@@ -680,7 +681,7 @@ async function run(opts = {}) {
         await S('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
         // compte testeur : les cartes sont dans la pastille, on passe au QWERTY par elle, « Tous les réglages » apparaît
         await S('Page.navigate', { url: `http://127.0.0.1:${port}/` }); await sleep(2200); exceptions.splice(0);
-        await ev("localStorage.clear();if(KT.on)obClose(false);currentUser='testeur';currentToken='tok-testeur';currentUserId='uid';_statsLoaded=true;app.stats=mergeStats();_kpAccessFor=null;updateNavUser();true"); await sleep(700);
+        await ev("localStorage.clear();if(KT.on)obClose(false);currentUser='testeur';currentToken='tok-testeur';currentUserId='uid';_statsLoaded=true;app.stats=mergeStats();_kpAccessFor=null;updateNavUser();go('test');true"); await sleep(700); // « / » ouvre désormais l'accueil visiteur : on va sur la page de frappe
         await ev("document.getElementById('nav-kb-btn').click();true"); await sleep(150);
         const t = await ev("({cards:document.querySelectorAll('#nav-kb-menu .kb-family-card').length,all:/Tous les réglages/.test(document.getElementById('nav-kb-menu').innerText)})");
         if (t.cards !== 2) problems.push(`BR8 : ${t.cards} cartes dans la pastille d'un compte testeur au lieu de 2`);
